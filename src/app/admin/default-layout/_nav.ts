@@ -1,0 +1,100 @@
+import { INavData } from '@coreui/angular';
+
+export const navItems: INavData[] = [
+  {
+    name: 'Escritorio',
+    url: '/admin/dashboard',
+    iconComponent: { name: 'cil-speedometer' },
+    badge: {
+      color: 'info',
+      text: 'Nuevo'
+    }
+  },
+  {
+    title: true,
+    name: 'WEB'
+  },
+  {
+    name: 'Entradas',
+    url: '/admin/control/entradas',
+    iconComponent: { name: 'cil-pencil' }
+  },
+  {
+    name: 'Páginas',
+    url: '/admin/control/paginas',
+    linkProps: { fragment: 'someAnchor' },
+    iconComponent: { name: 'cil-library' }
+  },
+  {
+    name: 'Categorías',
+    url: '/admin/control/categorias',
+    linkProps: { fragment: 'someAnchor' },
+    iconComponent: { name: 'cil-spreadsheet' }
+  },
+  {
+    name: 'Etiquetas',
+    url: '/admin/control/etiquetas',
+    linkProps: { fragment: 'someAnchor' },
+    iconComponent: { name: 'cil-pin' }
+  },
+  {
+    name: 'Comentarios',
+    url: '/admin/control/comentarios',
+    linkProps: { fragment: 'someAnchor' },
+    iconComponent: { name: 'cil-comment-square' }
+  },
+  {
+    name: 'Contenido',
+    title: true
+  },
+  {
+    name: 'Multimedia',
+    iconComponent: { name: 'cil-puzzle' },
+    children: [
+      {
+        name: 'Imágenes',
+        url: '/admin/contenido/imagenes'
+      },
+      {
+        name: 'Archivos',
+        url: '/admin/contenido/archivos'
+      },
+    ]
+  },
+  {
+    title: true,
+    name: 'Gestión'
+  },
+  {
+    name: 'Usuarios',
+    iconComponent: { name: 'cil-people' },
+    children: [
+      {
+        name: 'Todos',
+        url: '/admin/gestion/usuarios'
+      },
+      {
+        name: 'Mi Perfil',
+        url: '/admin/gestion/miperfil'
+      },
+      {
+        name: 'Cambiar contraseña',
+        url: '/admin/gestion/changepassword'
+      },
+    ]
+  },
+  {
+    name: 'Configruración',
+    iconComponent: { name: 'cil-cog' },
+    children: [
+      {
+        name: 'Temas',
+        url: '/admin/configuracion/temas'
+      },
+      {
+        name: 'Ajustes',
+        url: '/admin/configuracion/ajustes'
+      },
+    ]
+  },
+];

@@ -1,0 +1,94 @@
+<c-card>
+  <c-card-header class="d-flex align-items-center">
+    <c-col [sm]="6">
+      <h6 cCardTitle>Listado de entradas</h6>
+    </c-col>
+    <c-col [sm]="6">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button cButton color="light" size="sm">
+          <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
+            Imprimir
+        </button>
+        <button cButton color="warning" size="sm">
+          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Pendientes de revisión"></svg>
+            Sin revisar
+        </button>
+      </div>
+    </c-col>
+  </c-card-header>
+  <c-card-body>
+
+    <div class="d-flex justify-content-between align-items-end">
+      <h5 cCardTitle>Listado de entradas</h5>
+      <div class="hstack gap-3">
+        <button cButton color="success" size="sm" routerLink="crear">
+          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nueva Entrada"></svg>
+          Crear nueva Entrada
+        </button>
+      </div>
+    </div>
+    <hr>
+
+    <c-card *ngIf="listaEntradas.length <= 0">
+      <c-card-body>
+        <div >
+          <h5 cCardTitle>No hay entradas</h5>
+          <p cCardText>
+            No se han encontrado registros en el sistema...
+          </p>
+          <button cButton href="#" color="primary" (click)="refrescarPagina()">Refrescar</button>
+        </div>
+      </c-card-body>
+      <hr>
+    </c-card>
+    
+
+    <span *ngFor="let entr of listaEntradas">
+      <table cTable hover>
+        <thead cTableColor="dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Título</th>
+            <th scope="col">Autor</th>
+            <th scope="col">Fecha Publicación</th>
+            <th scope="col">Resumen</th>
+            <th scope="col">Categorias</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr [routerLink]="['/admin/control/entradas', entr.id]"  style="cursor: pointer">
+            <td scope="row">{{entr.id}}</td>
+            <td>{{entr.titulo}}</td>
+            <td>{{entr.usuario.username}}</td>
+            <td>{{entr.fechaPublicacion}}</td>
+            <td>{{entr.resumen}}</td>
+            <td>{{entr.categoriasConComas}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <c-pagination aria-label="Page navigation example" size="sm">
+        <li cPageItem [active]="true">
+          <a cPageLink [routerLink]>Anteriores</a>
+        </li>
+        <li cPageItem>
+          <a cPageLink [routerLink]>1</a>
+        </li>
+        <li cPageItem>
+          <a cPageLink [routerLink]>2</a>
+        </li>
+        <li cPageItem>
+          <a cPageLink [routerLink]>3</a>
+        </li>
+        <li cPageItem>
+          <a cPageLink [routerLink]>Posteriores</a>
+        </li>
+      </c-pagination>
+
+    </span>
+
+  </c-card-body>
+  </c-card>
+
+
+
