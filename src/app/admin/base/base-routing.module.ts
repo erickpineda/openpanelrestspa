@@ -9,7 +9,7 @@ const routes: Routes = [
   {
     path: 'entradas', children: [
       { path: '', component: ListadoEntradasComponent },
-      { path: ':id', component: VerEditarEntrada },
+      { path: ':idEntrada', component: VerEditarEntrada },
       { path: 'crear', component: VerEditarEntrada },
     ]
   }

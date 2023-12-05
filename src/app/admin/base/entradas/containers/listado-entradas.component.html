@@ -56,10 +56,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr [routerLink]="['/admin/control/entradas', entr.id]"  style="cursor: pointer">
-            <td scope="row">{{entr.id}}</td>
+          <tr [routerLink]="['/admin/control/entradas', entr.idEntrada]"  style="cursor: pointer">
+            <td scope="row">{{entr.idEntrada}}</td>
             <td>{{entr.titulo}}</td>
-            <td>{{entr.usuario.username}}</td>
+            <td>{{entr.idUsuario}}</td>
             <td>{{entr.fechaPublicacion}}</td>
             <td>{{entr.resumen}}</td>
             <td>{{entr.categoriasConComas}}</td>

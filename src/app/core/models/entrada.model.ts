@@ -5,7 +5,7 @@ import { TipoEntrada } from "./tipo-entrada.model";
 import { Usuario } from "./usuario.model";
 
 export class Entrada {
-  id: number = 0;
+  idEntrada: number = 0;
   titulo: string = "";
   contenido: string = "";
   tipoEntrada: TipoEntrada = new TipoEntrada;
@@ -16,13 +16,13 @@ export class Entrada {
   publicada: boolean = false;
   password: string = "";
   privado: boolean = false;
-  estado: EstadoEntrada = new EstadoEntrada();
+  estadoEntrada: EstadoEntrada = new EstadoEntrada();
   permitirComentario: boolean = true;
   imagenDestacada: string = "";
   votos: number = 0;
   cantidadComentarios: number = 0;
-  usuario: Usuario = new Usuario;
-  usuarioEditado: number = 0;
+  idUsuario: number = 0;
+  idUsuarioEditado: number = 0;
   categorias: Categoria[] = [];
   categoriasConComas: string = '';
   etiquetas: Etiqueta[] = [];
@@ -34,7 +34,7 @@ export class Entrada {
 }
 
 export interface Entrada {
-  id: number;
+  idEntrada: number;
   titulo: string;
   contenido: string;
   tipoEntrada: TipoEntrada;
@@ -45,13 +45,13 @@ export interface Entrada {
   publicada: boolean;
   password: string;
   privado: boolean;
-  estado: EstadoEntrada;
+  estadoEntrada: EstadoEntrada;
   permitirComentario: boolean;
   imagenDestacada: string;
   votos: number;
   cantidadComentarios: number;
-  usuario: Usuario;
-  usuarioEditado: number;
+  idUsuario: number;
+  idUsuarioEditado: number;
   categorias: Categoria[];
   categoriasConComas: string;
   etiquetas: Etiqueta[];

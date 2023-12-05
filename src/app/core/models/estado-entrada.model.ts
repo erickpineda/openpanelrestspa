@@ -1,5 +1,5 @@
 export class EstadoEntrada {
-  id: number = 0;
+  idEstadoEntrada: number = 0;
   nombre: string = "";
   descripcion: string = "";
   
@@ -9,7 +9,7 @@ export class EstadoEntrada {
 }
 
 export interface EstadoEntrada {
-  id: number;
+  idEstadoEntrada: number;
   nombre: string;
   descripcion: string;
 }

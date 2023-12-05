@@ -46,7 +46,7 @@ export class VerEditarEntrada implements OnInit {
   }
 
   ngOnInit(): void {
-    this.entradaId = this.getEntradaId('id');
+    this.entradaId = this.getEntradaId('idEntrada');
     if (this.entradaId != 'crear') {
       this.obtenerDatosEntrada();
       this.entradaForm.disable();
@@ -89,7 +89,7 @@ export class VerEditarEntrada implements OnInit {
   obtenerDatosEntrada() {
     this.entradaService.obtenerPorId(this.entradaId)
       .subscribe((res: Entrada) => {
-        if (res.id) {
+        if (res.idEntrada) {
           this.entrada = res;
           console.log(this.entrada);
           this.entradaForm.patchValue(res);
@@ -101,7 +101,7 @@ export class VerEditarEntrada implements OnInit {
   createForm() {
     this.entradaForm = this.fb.group(
       {
-        id: null,
+        idEntrada: null,
         titulo: ['', [Validators.required,
           Validators.minLength(this.vf.formRules.tituloMin),
           Validators.maxLength(this.vf.formRules.tituloMax),
@@ -110,7 +110,7 @@ export class VerEditarEntrada implements OnInit {
           Validators.minLength(this.vf.formRules.contenidoMin),
         ]],
         subtitulo: null,
-        tipoEntradaForm: [TipoEntrada, [Validators.required]],
+        tipoEntrada: [TipoEntrada, [Validators.required]],
         resumen: null,
         fechaPublicacion: Date.now,
         fechaEdicion: null,
@@ -118,7 +118,7 @@ export class VerEditarEntrada implements OnInit {
         publicada: false,
         password: null,
         privado: false,
-        estadoEntradaForm: [EstadoEntrada, [Validators.required]],
+        estadoEntrada: [EstadoEntrada, [Validators.required]],
         permitirComentario: true,
         imagenDestacada: null,
         votos: 0,
@@ -158,7 +158,7 @@ export class VerEditarEntrada implements OnInit {
     this.resetForm(this.entradaForm);
     this.obtenerDatos();
     alert('¡Se borraran los datos!');
-    this.router.navigate(['/admin/control/entradas']);
+    this.redirect();
   }
 
   onValidate() {
@@ -176,14 +176,16 @@ export class VerEditarEntrada implements OnInit {
       console.warn(this.entradaForm.value);
       let entrada = JSON.stringify(this.entradaForm.value);
       var ent: Entrada = this.entradaForm.value;
-      console.log(ent.id);
+      ent.idUsuario = 2;
+      ent.idUsuarioEditado = 1;
+      console.log(ent.idEntrada);
       if (this.entradaId != 'crear') {
-        this.entradaService.actualizar(ent.id, ent);
+        this.entradaService.actualizar(ent.idEntrada, ent).subscribe(data => this.entrada= data);
       } else {
-        this.entradaService.crear(ent);
+        this.entradaService.crear(ent).subscribe(data => this.entrada= data);
       }
-
-      alert('SUCCESS!');
+      console.log('ent-'+this.entrada)
+      this.redirect();
     }
   }
 
@@ -194,5 +196,9 @@ export class VerEditarEntrada implements OnInit {
   editarEntrada() {
     this.entradaForm.enable();
   }
+
+  redirect() {
+    this.router.navigate(['/admin/control/entradas']);
+ }
 
 }

@@ -37,7 +37,7 @@ export class EntradaService {
   }
 
   listarTiposEntradas(): Observable<TipoEntrada[]> {
-    const url = `${this.baseUrl}/tipos`;
+    const url = `${this.baseUrl}/tiposEntradas`;
     return this.http.get<TipoEntrada[]>(url, this.httpOptions);
     /*return this.http
       .get(url, this.httpOptions)
@@ -54,7 +54,7 @@ export class EntradaService {
 
   obtenerPorId(id: number): Observable<Entrada> {
     const url = `${this.baseUrl}/${id}`;
-    return this.http.get<Entrada>(url);
+    return this.http.get<Entrada>(url, this.httpOptions);
     /*return this.http
       .get(url, this.httpOptions)
       .pipe(map((data: any) => data.map((item: Entrada) => this.adapter.adapt(item))));*/

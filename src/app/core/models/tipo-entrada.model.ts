@@ -1,5 +1,5 @@
 export class TipoEntrada {
-  id: number = 0;
+  idTipoEntrada: number = 0;
   nombre: string = "";
   descripcion: string = "";
   
@@ -9,7 +9,7 @@ export class TipoEntrada {
 }
 
 export interface TipoEntrada {
-  id: number;
+  idTipoEntrada: number;
   nombre: string;
   descripcion: string;
 }
