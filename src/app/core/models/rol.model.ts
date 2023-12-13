@@ -1,6 +1,6 @@
 
 export class Rol {
-  id: number = 0;
+  idRol: number = 0;
   nombre: string = "";
   descripcion: string = "";
   
@@ -11,7 +11,7 @@ export class Rol {
 
 
 export interface Rol {
-  id: number;
+  idRol: number;
   nombre: string;
   descripcion: string;
 }

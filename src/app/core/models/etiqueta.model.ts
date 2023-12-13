@@ -1,6 +1,6 @@
 
 export class Etiqueta {
-  id: number = 0;
+  idEtiqueta: number = 0;
   nombre: string = "";
   frecuencia: number = 0;
   descripcion: string = "";
@@ -11,7 +11,7 @@ export class Etiqueta {
 }
 
 export interface Etiqueta {
-  id: number;
+  idEtiqueta: number;
   nombre: string;
   frecuencia: number;
   descripcion: string;

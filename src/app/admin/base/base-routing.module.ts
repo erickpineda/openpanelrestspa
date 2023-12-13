@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { VerEditarEntrada } from './entradas/components/ver-editar/ver-editar-entrada.component';
-import { ListadoEntradasComponent } from './entradas/containers/listado-entradas.component';
+import { CrearEditarEntrada } from './entradas/crear-editar/crear-editar-entrada.component';
+import { ListadoEntradasComponent } from './entradas/listado-entradas.component';
+import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
 
 
 const routes: Routes = [
@@ -9,8 +10,16 @@ const routes: Routes = [
   {
     path: 'entradas', children: [
       { path: '', component: ListadoEntradasComponent },
-      { path: ':idEntrada', component: VerEditarEntrada },
-      { path: 'crear', component: VerEditarEntrada },
+      { path: ':idEntrada', component: CrearEditarEntrada },
+      { path: 'crear', component: CrearEditarEntrada },
+    ]
+  },
+  { path: '', redirectTo: 'comentarios', pathMatch: 'full' },
+  {
+    path: 'comentarios', children: [
+      { path: '', component: ListadoComentariosComponent },
+      { path: ':idComentario', component: CrearEditarEntrada },
+      { path: 'crear', component: CrearEditarEntrada },
     ]
   }
 ];

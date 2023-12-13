@@ -3,7 +3,7 @@
 
     <div class="d-flex justify-content-between align-items-end">
       <h2 cCardTitle class="h5 mb-3 mb-lg-0">Entrada</h2>
-      <div class="hstack gap-3" *ngIf="this.entradaId != 'crear'">
+      <div class="hstack gap-3" *ngIf="this.getEntradaId('idEntrada') != 'crear'">
         <button cButton color="light" size="sm">
           <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear con estos datos"></svg>
           Crear nueva entrada con estos datos
@@ -18,7 +18,7 @@
   </c-card-header>
   <c-card-body>
     <c-container fluid>
-      <form  cForm [formGroup]="entradaForm" novalidate (ngSubmit)="onSubmit()" class="needs-validation">
+      <form  cForm [formGroup]="entradaForm" novalidate (ngSubmit)="guardar()" class="needs-validation">
         <div class="d-flex justify-content-between align-items-end">
 
           <h2 cCardTitle class="h5 mb-3 mb-lg-0">Crear/Editar Entrada</h2>
@@ -175,7 +175,7 @@
                     <c-form-check class="mb-3 form-check" cFormControl
                       *ngFor="let categ of categorias" ngValue="categ">
                     
-                      <input cFormCheckInput formControlName="categoriasFormList" 
+                      <input cFormCheckInput formControlName="categorias" 
                         type="checkbox" [checked]="inputCheckedCategorias(categ,entrada.categorias)">
                       <label cFormCheckLabel>{{categ.nombre}}</label>
 

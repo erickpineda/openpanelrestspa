@@ -1,6 +1,5 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { catchError, concatMap, Observable, of, Subscription } from 'rxjs';
 import { Categoria } from 'src/app/core/models/categoria.model';
 import { Entrada } from 'src/app/core/models/entrada.model';
 import { EntradaService } from 'src/app/core/services/entrada.service';
@@ -31,35 +30,41 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+      this.obtenerListaEntradas().then((listaRes: Entrada[]) => {
+        listaRes.forEach((entradaRes) => {
+          entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
+        });
+      });
+      
+  }
 
-    this.entradaService.listar()
-      .pipe(
-        catchError(error => {
+  obtenerListaEntradas(): Promise<Entrada[]> {
+    return new Promise((resolve, reject) => {
+      this.entradaService.listar().subscribe({
+        next: data => {
+          if (data) {
+            if (data.length < 1 || undefined) {
+              this.noHayEntradas = false
+            }
+            this.entradas = data;
+            this.entradas.forEach(_categorias => {
+              this.categorias = _categorias.categorias;
+            })
+          }
+          resolve(this.entradas);
+        },
+        error: err => {
           this.noHayEntradas = false;
-
-          if (error.error instanceof ErrorEvent) {
-            this.errorMsg = `Error: ${error.error.message}`;
+          if (err.error instanceof ErrorEvent) {
+            this.errorMsg = `Error: ${err.error.message}`;
           } else {
             this.errorMsg = "A client-side or network error occurred";
           }
           console.log("Desde HOME -> " + this.errorMsg);
-
-          return of([]);
-
-        }))
-      .subscribe((data: Entrada[]) => {
-
-        if (data.length < 1 || undefined) {
-          this.noHayEntradas = false
+          reject(err);
         }
-        this.entradas = data;
-        this.entradas.forEach(_categorias => {
-          this.categorias = _categorias.categorias;
-        })
-        console.log(this.entradas);
-      }
-      );
-    
+      });
+    });
   }
 
   public refrescarPagina(): void {

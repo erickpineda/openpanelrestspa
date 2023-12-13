@@ -3,19 +3,18 @@ import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { Comentario } from "../models/comentario.model";
+import { CrudService } from "../_utils/crud.service";
+import { TokenStorageService } from "./token-storage.service";
 
 @Injectable({
   providedIn: "root"
 })
-export class RolService {
-  private baseUrl = "http://localhost:8080/api/v1/comentarios";
+export class ComentarioService extends CrudService<Comentario> {
+  protected resource = '/comentarios';
 
-  constructor(private http: HttpClient) { }
-
-  list(): Observable<Comentario[]> {
-    const url = this.baseUrl;
-    return this.http
-      .get<Comentario[]>(url);
-      //.pipe(map((data: any) => data.map((item: Comentario) => this.adapter.adapt(item))));
+  constructor(
+    protected override http: HttpClient,
+    protected override token: TokenStorageService) {
+    super(http, token);
   }
 }

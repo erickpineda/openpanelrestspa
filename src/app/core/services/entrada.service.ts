@@ -1,89 +1,44 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
-import { catchError, Observable, of, Subscription, throwError } from 'rxjs';
-import { map, retry } from "rxjs/operators";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from 'rxjs';
 import { Entrada } from "../models/entrada.model";
 import { TipoEntrada } from "../models/tipo-entrada.model";
 import { EstadoEntrada } from "../models/estado-entrada.model";
+import { TokenStorageService } from "./token-storage.service";
+import { CrudService } from "../_utils/crud.service";
+import { CambiarEstadoEntradaReq } from "../models/cambiar-estado-entrada.model";
+import { RespuestaModelResp } from "../models/respuesta.model";
 
 @Injectable({
   providedIn: "root"
 })
-export class EntradaService {
-  private baseUrl = "http://localhost:8080/api/v1/entradas";
-  private errorMsg: string;
+export class EntradaService extends CrudService<Entrada> {
 
-  constructor(private http: HttpClient) {
-    this.errorMsg = "";
+  protected resource = '/entradas';
+
+  constructor(
+    protected override http: HttpClient,
+    protected override token: TokenStorageService) {
+    super(http, token);
   }
 
-  /*========================================
-   CRUD Methods for consuming RESTful API
- =========================================*/
-  // Http Options
-  httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-    }),
-  };
-
-  listar(): Observable<Entrada[]> {
-    const url = this.baseUrl;
-    return this.http.get<Entrada[]>(url, this.httpOptions);
-
-    /*return this.http
-      .get(url, this.httpOptions)
-      .pipe(map((data: any) => data.map((item: Entrada) => this.adapter.adapt(item))));*/
-  }
-
-  listarTiposEntradas(): Observable<TipoEntrada[]> {
-    const url = `${this.baseUrl}/tiposEntradas`;
-    return this.http.get<TipoEntrada[]>(url, this.httpOptions);
-    /*return this.http
-      .get(url, this.httpOptions)
-      .pipe(map((data: any) => data.map((item: Entrada) => this.adapter.adapt(item))));*/
+    listarTiposEntradas(): Observable<TipoEntrada[]> {
+    const url = `${this.path}/tiposEntradas`;
+    return this.http.get<TipoEntrada[]>(url, {
+      observe: 'body', headers: this.setHeaders(),
+    });
   }
 
   listarEstadosEntradas(): Observable<EstadoEntrada[]> {
-    const url = `${this.baseUrl}/estados`;
-    return this.http.get<EstadoEntrada[]>(url, this.httpOptions);
-    /*return this.http
-      .get(url, this.httpOptions)
-      .pipe(map((data: any) => data.map((item: Entrada) => this.adapter.adapt(item))));*/
+    const url = `${this.path}/estados`;
+    return this.http.get<EstadoEntrada[]>(url, {
+      observe: 'body', headers: this.setHeaders(),
+    });
   }
 
-  obtenerPorId(id: number): Observable<Entrada> {
-    const url = `${this.baseUrl}/${id}`;
-    return this.http.get<Entrada>(url, this.httpOptions);
-    /*return this.http
-      .get(url, this.httpOptions)
-      .pipe(map((data: any) => data.map((item: Entrada) => this.adapter.adapt(item))));*/
-  }
-
-  crear(entrada: Entrada): Observable<Entrada> {
-    const url = `${this.baseUrl}/crear`;
-    return this.http.post<Entrada>(url, entrada, this.httpOptions);
-    /*return this.http
-      .post(url, entrada, this.httpOptions)
-      .pipe(map((data: any) => data.map((item: Entrada) => this.adapter.adapt(item))));*/
-  }
-
-  actualizar(id: number, entrada: Entrada): Observable<Entrada> {
-    const url = `${this.baseUrl}/${id}`;
-    return this.http
-      .put<Entrada>(url, entrada, this.httpOptions)
-    /*return this.http
-      .put(url, entrada, this.httpOptions)
-      .pipe(map((data: any) => data.map((item: Entrada) => this.adapter.adapt(item))));*/
-  }
-
-  borrar(id: number): Observable<string> {
-    const url = `${this.baseUrl}/${id}`;
-    return this.http
-      .delete<string>(url, this.httpOptions);
-    /*return this.http
-      .delete(url, this.httpOptions)
-      .pipe(map((data: any) => data.map((item: Entrada) => this.adapter.adapt(item))));*/
+  cambiarEstadoEntrada(req: CambiarEstadoEntradaReq): Observable<RespuestaModelResp> {
+    const url = `${this.path}/cambiarEstadoEntrada`;
+    return this.http.post<RespuestaModelResp>(url, req, { headers: this.setHeaders() });
   }
 
 }

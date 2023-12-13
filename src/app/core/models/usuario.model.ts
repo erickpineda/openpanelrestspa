@@ -3,8 +3,8 @@ import { Entrada } from "./entrada.model";
 import { Rol } from "./rol.model";
 
 export class Usuario {
-  id: number = 0;
-  rol: Rol = new Rol;
+  idUsuario: number = 0;
+  idRol: number = 0;
   username: string = "";
   password: string = "";
   nombre: string = "";
@@ -14,9 +14,14 @@ export class Usuario {
   genero: string = "";
   telefono: number = 0;
   emailConfirmado: boolean = false;
+  fechaEmailConfirmado: any;
   website: string = "";
   imagen: string[] = [];
   infouser: string = "";
+  tokenExpirationDate: any;
+  verifyToken: string = "";
+  //refreshToken
+  //deviceMetadata
 
   constructor() {
 
@@ -24,8 +29,8 @@ export class Usuario {
 }
 
 export interface Usuario {
-  id: number;
-  rol: Rol;
+  idUsuario: number;
+  idRol: number;
   username: string;
   password: string;
   nombre: string;
@@ -35,7 +40,10 @@ export interface Usuario {
   genero: string;
   telefono: number;
   emailConfirmado: boolean;
+  fechaEmailConfirmado: any;
   website: string;
   imagen: string[];
   infouser: string;
+  tokenExpirationDate: any;
+  verifyToken: string;
 }

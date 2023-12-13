@@ -6,8 +6,12 @@ import { Usuario } from "./usuario.model";
 
 export class Entrada {
   idEntrada: number = 0;
+  idUsuario: number = 0;
+  idUsuarioEditado: number = 0;
   titulo: string = "";
+  subtitulo: string = "";
   contenido: string = "";
+  notas: string = "";
   tipoEntrada: TipoEntrada = new TipoEntrada;
   resumen: string = "";
   fechaPublicacion: Date = new Date();
@@ -17,15 +21,17 @@ export class Entrada {
   password: string = "";
   privado: boolean = false;
   estadoEntrada: EstadoEntrada = new EstadoEntrada();
+  fechaPublicacionProgramada: Date = new Date();
   permitirComentario: boolean = true;
   imagenDestacada: string = "";
   votos: number = 0;
   cantidadComentarios: number = 0;
-  idUsuario: number = 0;
-  idUsuarioEditado: number = 0;
   categorias: Categoria[] = [];
-  categoriasConComas: string = '';
   etiquetas: Etiqueta[] = [];
+
+  // Fuera del backend
+  categoriasConComas: string = '';
+  username: string = "";
 
   constructor() {
 
@@ -35,8 +41,12 @@ export class Entrada {
 
 export interface Entrada {
   idEntrada: number;
+  idUsuario: number;
+  idUsuarioEditado: number;
   titulo: string;
+  subtitulo: string;
   contenido: string;
+  notas: string;
   tipoEntrada: TipoEntrada;
   resumen: string;
   fechaPublicacion: Date;
@@ -46,15 +56,18 @@ export interface Entrada {
   password: string;
   privado: boolean;
   estadoEntrada: EstadoEntrada;
+  fechaPublicacionProgramada: Date;
   permitirComentario: boolean;
   imagenDestacada: string;
   votos: number;
   cantidadComentarios: number;
-  idUsuario: number;
-  idUsuarioEditado: number;
+  
   categorias: Categoria[];
-  categoriasConComas: string;
   etiquetas: Etiqueta[];
+
+  // Fuera del backend
+  categoriasConComas: string;
+  username: string;
 
 }
 

@@ -2,9 +2,9 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-export const environment = {
-  production: false
-};
+import { base } from "./environment.dev.es";
+
+export const environment = base;
 
 /*
  * For easier debugging in development mode, you can import the following file
