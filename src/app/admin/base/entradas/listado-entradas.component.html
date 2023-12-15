@@ -43,27 +43,28 @@
     </c-card>
     
     <!---->
-    
-    <table cTable hover *ngIf="listaEntradas.length > 0">
+
+    <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length > 0">
       <thead cTableColor="dark">
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Título</th>
-          <th scope="col">Autor</th>
-          <th scope="col">Fecha Publicación</th>
-          <th scope="col">Resumen</th>
-          <th scope="col">Categorias</th>
-        </tr>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Título</th>
+        <th scope="col">Autor</th>
+        <th scope="col">Fecha Publicación</th>
+        <th class="w-25" scope="col">Resumen</th>
+        <th class="w-10" scope="col">Categorias</th>
+      </tr>
       </thead>
       <tbody *ngFor="let entr of listaEntradas">
-        <tr [routerLink]="['/admin/control/entradas', entr.idEntrada]"  style="cursor: pointer">
-          <td scope="row">{{entr.idEntrada}}</td>
-          <td>{{entr.titulo}}</td>
-          <td>{{entr.username}}</td>
-          <td>{{checkFechaPublicacion(entr.fechaPublicacion)}}</td>
-          <td>{{entr.resumen}}</td>
-          <td>{{entr.categoriasConComas}}</td>
-        </tr>
+      <tr [routerLink]="['/admin/control/entradas', entr.idEntrada]" style="cursor: pointer"
+        cAlign="middle">
+        <td scope="row">{{entr.idEntrada}}</td>
+        <td>{{entr.titulo}}</td>
+        <td>{{entr.username}}</td>
+        <td>{{checkFechaPublicacion(entr.fechaPublicacion)}}</td>
+        <td>{{entr.resumen}}</td>
+        <td>{{entr.categoriasConComas}}</td>
+      </tr>
       </tbody>
       <tbody *ngIf="listaEntradas.length <= 0" cAlign="middle">
         <tr style="cursor: pointer">

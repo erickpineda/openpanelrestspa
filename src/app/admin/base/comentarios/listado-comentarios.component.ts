@@ -27,15 +27,17 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
     protected override datePipe: DatePipe
     ) {
       super(router, datePipe);
+
+      this.initList();
   }
 
-  override ngOnInit(): void {
+  private initList() {
     this.obtenerListaComentarios().then((listaRes: Comentario[]) => {
       if (listaRes) {
         listaRes.forEach((res) => {
           if (res) {
             res.fechaCreacionParseada = this.transformaFecha(res.fechaCreacion, 'dd/MM/yyyy', false);
-            
+
             this.obtenerDatosUsuario(res.idUsuario).then((usu: Usuario) => {
               if (usu) {
                 res.username = usu.username;
@@ -50,6 +52,14 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
         });
       }
     });
+  }
+
+  override ngOnInit(): void {
+    
+  }
+
+  navigate(urlToNavigate: string){
+    this.router.navigate([urlToNavigate])
   }
 
   private obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
@@ -86,6 +96,13 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
           resolve(this.listaComentarios);
         },
         error: err => {
+          if (err) {
+            if (err.status == 404) {
+              if (err.error && err.error.message) {
+                this.listaComentarios = [];
+              }
+            }
+          }
           reject(err);
         }
       });
@@ -114,6 +131,3 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
 
 }
 
-function moment(StackMoment: string) {
-  throw new Error("Function not implemented.");
-}

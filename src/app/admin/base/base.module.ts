@@ -11,6 +11,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { CrearEditarEntrada } from './entradas/crear-editar/crear-editar-entrada.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
+import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
 
 @NgModule({
   imports: [
@@ -48,7 +49,8 @@ import { ListadoComentariosComponent } from './comentarios/listado-comentarios.c
   declarations: [
     ListadoEntradasComponent,
     CrearEditarEntrada,
-    ListadoComentariosComponent
+    ListadoComentariosComponent,
+    CrearEditarComentario
   ],
   exports: [],
   providers: [

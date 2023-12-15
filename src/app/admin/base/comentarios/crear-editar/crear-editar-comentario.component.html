@@ -1,0 +1,142 @@
+<c-card>
+  <c-card-header>
+
+    <div class="d-flex justify-content-between align-items-end">
+      <h2 cCardTitle class="h5 mb-3 mb-lg-0">Comentario</h2>
+      <div class="hstack gap-3" *ngIf="this.getComentarioId('idComentario') != 'crear'">
+        <button cButton color="light" size="sm">
+          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear con estos datos"></svg>
+          Crear nueva entrada con estos datos
+        </button>
+        <button cButton color="warning" size="sm" (click)="editarComentario()" [disabled]="this.comentarioForm.enabled">
+          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Editar comentario"></svg>
+          Editar comentario
+        </button>
+      </div>
+
+    </div>
+  </c-card-header>
+  <c-card-body>
+    <c-container fluid>
+      <form  cForm [formGroup]="comentarioForm" novalidate (ngSubmit)="guardar()" class="needs-validation">
+        <div class="d-flex justify-content-between align-items-end">
+
+          <h2 cCardTitle class="h5 mb-3 mb-lg-0">Crear/Editar Comentario</h2>
+          <div class="hstack gap-3">
+
+            <button cButton color="danger" size="sm" type="reset" (click)="onReset()" [tabindex]="'0'">
+              <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
+              Cancelar
+            </button>
+
+            <button cButton color="success" size="sm" type="submit" 
+                [disabled]="comentarioForm.pristine || comentarioForm.invalid" [tabindex]="'0'">
+                <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
+                Guardar
+            </button>
+
+            <button cButton color="info" size="sm" [disabled]="!comentarioForm.valid" (click)="onValidate()" [tabindex]="'0'">
+              <svg cIcon name="cilExternalLink" style="padding-right: 2px" size="sm"
+                title="Previa"></svg>
+                Previa
+            </button>
+
+          </div>
+        </div>
+        <hr>
+        <c-row>
+          <!-- Información básica -->
+          <c-col lg="8">
+            <c-card class="mb-4">
+              <c-card-body>
+                <h3 cCardTitle class="h6 mb-4">Información básica</h3>
+                <c-row>
+                  <c-col lg="12">
+                    <c-row>
+                      <label [sm]="3" cCol cLabel="col" for="username"><strong>Username</strong></label>
+                      <c-col [sm]="3"> <input cFormControl formControlName="idUsuario" id="username" plaintext readonly type="text" value="username" /></c-col>
+
+                      <label [sm]="3" cCol cLabel="col" for="email"><strong>Email</strong></label>
+                      <c-col [sm]="3"> <input cFormControl formControlName="email" id="email" plaintext readonly type="text" value="email@email" /></c-col>
+                    </c-row>
+                    <c-row>
+                      <label [sm]="2" cCol cLabel="col" for="votos"><strong>Votos</strong></label>
+                      <c-col [sm]="10"> <input cFormControl formControlName="votos" id="votos" plaintext readonly type="text" value="1" /></c-col>
+                    </c-row>
+                    <c-row>
+                      <label [sm]="3" cCol cLabel="col" for="fechaCreacion"><strong>Fecha Creación</strong></label>
+                      <c-col [sm]="3"> <input cFormControl formControlName="fechaCreacion" id="fechaCreacion" plaintext readonly type="text" value="12/12/2023" /></c-col>
+
+                      <label [sm]="3" cCol cLabel="col" for="fechaEdicion"><strong>Fecha Edición</strong></label>
+                      <c-col [sm]="3"> <input cFormControl id="fechaEdicion" plaintext readonly type="text" value="12/12/2023" /></c-col>
+                    </c-row>
+                    <c-row>
+                      <label [sm]="2" cCol cLabel="col" for="tituloEntrada"><strong>Título Entrada</strong></label>
+                      <c-col [sm]="10"> <input cFormControl formControlName="idEntrada" id="tituloEntrada" plaintext readonly type="text" value="Mi título entrada"></c-col>
+                    </c-row>
+                  </c-col>
+                </c-row>
+              </c-card-body>
+            </c-card>
+          </c-col>
+          <!-- -->
+          <!-- Derecha -> Estado -->
+          <c-col lg="4">
+            <c-card class="mb-4">
+              <c-card-body>
+                    <ul cListGroup class="mx-n2 list-group list-group-flush">
+                      <li cListGroupItem 
+                        class="px-0 d-flex justify-content-between align-items-start list-group-item" aria-current="false">
+                        <div class="ms-2 me-auto">
+                          <h6 class="mb-0">Aprobado</h6>
+                          <small>Comentario que ha sido aprobado</small>
+                        </div>
+                        <c-form-check [switch]="true">
+                          <input cFormCheckInput type="checkbox" [checked]="f['aprobado']" formControlName="aprobado">
+                        </c-form-check>
+                      </li>
+                      <li cListGroupItem 
+                        class="px-0 d-flex justify-content-between align-items-start list-group-item" aria-current="false">
+                        <div class="ms-2 me-auto">
+                          <h6 class="mb-0">Cuarentena</h6>
+                          <small>Comentario que está en cuarentena</small>
+                        </div>
+                        <c-form-check [switch]="true">
+                          <input cFormCheckInput type="checkbox" [checked]="f['cuarentena']" formControlName="cuarentena">
+                        </c-form-check>
+                      </li>
+                    </ul>
+
+              </c-card-body>
+            </c-card>
+
+          </c-col>
+          <!-- Contenido sin censura -->
+          <c-col lg="12">
+            <c-card class="mb-4">
+              <c-card-body>
+                <h3 cCardTitle class="h6 mb-4">Contenido del comentario sin censura</h3>
+                <textarea aria-label="With textarea" cFormControl formControlName="contenido"></textarea>
+              </c-card-body>
+            </c-card>
+          </c-col>
+          <!-- -->
+
+          <!-- Contenido sin censura -->
+          <c-col lg="12">
+            <c-card class="mb-4">
+              <c-card-body>
+                <h3 cCardTitle class="h6 mb-4">Contenido del comentario censurado</h3>
+                <textarea aria-label="With textarea" cFormControl formControlName="contenidoCensurado"></textarea>
+              </c-card-body>
+            </c-card>
+          </c-col>
+          <!-- -->
+          
+        </c-row>
+      </form>
+    </c-container>
+
+  </c-card-body>
+</c-card>
+

@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { CrearEditarEntrada } from './entradas/crear-editar/crear-editar-entrada.component';
 import { ListadoEntradasComponent } from './entradas/listado-entradas.component';
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
+import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
 
 
 const routes: Routes = [
@@ -18,8 +19,8 @@ const routes: Routes = [
   {
     path: 'comentarios', children: [
       { path: '', component: ListadoComentariosComponent },
-      { path: ':idComentario', component: CrearEditarEntrada },
-      { path: 'crear', component: CrearEditarEntrada },
+      { path: ':idComentario', component: CrearEditarComentario },
+      { path: 'crear', component: CrearEditarComentario },
     ]
   }
 ];

@@ -11,7 +11,7 @@
         </button>
         <button cButton color="warning" size="sm">
           <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Pendientes de revisión"></svg>
-            Sin revisar
+            No aprobados
         </button>
       </div>
     </c-col>
@@ -44,7 +44,7 @@
         </tr>
       </thead>
       <tbody *ngFor="let coment of listaComentarios">
-        <tr [routerLink]="['/admin/control/comentarios', coment.idComentario]"  style="cursor: pointer">
+        <tr (click)="navigate('/admin/control/comentarios/'+coment.idComentario)"  style="cursor: pointer">
           <td scope="row">{{coment.idComentario}}</td>
           <td>{{coment.contenido}}</td>
           <td>{{coment.username}}</td>

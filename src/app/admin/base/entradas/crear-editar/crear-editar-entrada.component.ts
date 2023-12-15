@@ -50,17 +50,20 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     super(router, datePipe);
     this.formErrors = this.vf.errorMessages;
     this.createForm();
-    this.obtenerDatos();
 
-    if (this.getEntradaId('idEntrada') != 'crear') {
-      this.obtenerDatosEntrada().then((ent: Entrada) => {
-        if (ent) {
-          this.entrada = ent;
-          this.entradaForm.patchValue(ent);
-        }
-      });
-      this.entradaForm.disable();
-    }
+    new Promise<void>((resolve, _reject) => {
+      this.obtenerDatos();
+      if (this.getEntradaId('idEntrada') != 'crear') {
+        this.obtenerDatosEntrada().then((ent: Entrada) => {
+          if (ent) {
+            this.entrada = ent;
+            this.entradaForm.patchValue(ent);
+          }
+        });
+        this.entradaForm.disable();
+      }
+      resolve();
+    });
   }
 
   override ngOnInit(): void {
@@ -237,8 +240,6 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
       // TODO: Submit form value
       console.warn(this.entradaForm.value);
       var ent: Entrada = this.entradaForm.value;
-        //ent.fechaPublicacion = null;
-      
       if (this.getEntradaId('idEntrada') != 'crear') {
         this.actualizaEntrada(ent);
       } else {
