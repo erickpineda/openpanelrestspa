@@ -1,22 +1,21 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
 import { TokenStorageService } from './token-storage.service';
-const AUTH_API = 'https://vigilant-capybara-pvw759xqrxc7j97-8080.app.github.dev/api/v1/auth/';
-const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json',
-  
-})
-};
+import { BaseService } from '../_utils/base.service';
+
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class AuthService extends BaseService {
   private userSubject: BehaviorSubject<Usuario | null>;
+
+  protected resource = '/auth';
 
   constructor(private http: HttpClient, private tokenStorageService: TokenStorageService) {
 
+    super(tokenStorageService);
     this.userSubject = new BehaviorSubject<Usuario | null>(null);
   }
 
@@ -25,23 +24,22 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post(AUTH_API + 'login', { // + 'signin'
+    const url = `${this.path}/login`;
+    return this.http.post(url, { // + 'signin'
       username,
       password
     }, {
-    headers: new HttpHeaders(
-      {
-        'Content-Type': 'application/json',
-        //'Authorization': 'Bearer ' + this.tokenStorageService.getToken(),
-        'Accept': '*/*',
-      })}
-    );
+      headers: this.setHeaders()
+    });
   }
   register(username: string, email: string, password: string): Observable<any> {
-    return this.http.post(AUTH_API + 'registerUser', {
+    const url = `${this.path}/registerUser`;
+    return this.http.post(url, {
       username,
       email,
       password
-    }, httpOptions);
+    }, {
+      headers: this.setHeaders()
+    });
   }
 }
