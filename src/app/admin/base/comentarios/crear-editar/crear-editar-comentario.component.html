@@ -53,26 +53,26 @@
                 <c-row>
                   <c-col lg="12">
                     <c-row>
-                      <label [sm]="3" cCol cLabel="col" for="username"><strong>Username</strong></label>
-                      <c-col [sm]="3"> <input cFormControl formControlName="idUsuario" id="username" plaintext readonly type="text" value="username" /></c-col>
+                      <label [sm]="2" cCol cLabel="col" for="username"><strong>Username</strong></label>
+                      <c-col [sm]="4"> <input cFormControl formControlName="username" id="username" plaintext readonly type="text"/></c-col>
 
-                      <label [sm]="3" cCol cLabel="col" for="email"><strong>Email</strong></label>
-                      <c-col [sm]="3"> <input cFormControl formControlName="email" id="email" plaintext readonly type="text" value="email@email" /></c-col>
+                      <label [sm]="2" cCol cLabel="col" for="email"><strong>Email</strong></label>
+                      <c-col [sm]="4"> <input cFormControl formControlName="email" id="email" plaintext readonly type="text"/></c-col>
                     </c-row>
                     <c-row>
                       <label [sm]="2" cCol cLabel="col" for="votos"><strong>Votos</strong></label>
-                      <c-col [sm]="10"> <input cFormControl formControlName="votos" id="votos" plaintext readonly type="text" value="1" /></c-col>
+                      <c-col [sm]="10"> <input cFormControl formControlName="votos" id="votos" plaintext readonly type="text"/></c-col>
                     </c-row>
                     <c-row>
-                      <label [sm]="3" cCol cLabel="col" for="fechaCreacion"><strong>Fecha Creación</strong></label>
-                      <c-col [sm]="3"> <input cFormControl formControlName="fechaCreacion" id="fechaCreacion" plaintext readonly type="text" value="12/12/2023" /></c-col>
+                      <label [sm]="2" cCol cLabel="col" for="fechaCreacion"><strong>F. Creación</strong></label>
+                      <c-col [sm]="4"> <input cFormControl formControlName="fechaCreacion" id="fechaCreacion" plaintext readonly type="text"/></c-col>
 
-                      <label [sm]="3" cCol cLabel="col" for="fechaEdicion"><strong>Fecha Edición</strong></label>
-                      <c-col [sm]="3"> <input cFormControl id="fechaEdicion" plaintext readonly type="text" value="12/12/2023" /></c-col>
+                      <label [sm]="2" cCol cLabel="col" for="fechaEdicion"><strong>F. Edición</strong></label>
+                      <c-col [sm]="4"> <input cFormControl formControlName="fechaEdicion" id="fechaEdicion" plaintext readonly type="text"/></c-col>
                     </c-row>
                     <c-row>
                       <label [sm]="2" cCol cLabel="col" for="tituloEntrada"><strong>Título Entrada</strong></label>
-                      <c-col [sm]="10"> <input cFormControl formControlName="idEntrada" id="tituloEntrada" plaintext readonly type="text" value="Mi título entrada"></c-col>
+                      <c-col [sm]="10"> <input cFormControl formControlName="tituloEntrada" id="tituloEntrada" plaintext readonly type="text"></c-col>
                     </c-row>
                   </c-col>
                 </c-row>
@@ -116,7 +116,9 @@
             <c-card class="mb-4">
               <c-card-body>
                 <h3 cCardTitle class="h6 mb-4">Contenido del comentario sin censura</h3>
-                <textarea aria-label="With textarea" cFormControl formControlName="contenido"></textarea>
+                <textarea aria-label="With textarea" cFormControl formControlName="contenido"
+                  required
+                  ngClass="{ 'is-invalid': (submitted || f['contenido'].touched) && f['contenido'].invalid }"></textarea>
               </c-card-body>
             </c-card>
           </c-col>

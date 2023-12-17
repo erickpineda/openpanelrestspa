@@ -40,7 +40,7 @@ export const navItems: INavData[] = [
   {
     name: 'Comentarios',
     url: '/admin/control/comentarios',
-    linkProps: { fragment: 'someAnchor' },
+    linkProps: { fragment: 'listadoComentarios' },
     iconComponent: { name: 'cil-comment-square' }
   },
   {

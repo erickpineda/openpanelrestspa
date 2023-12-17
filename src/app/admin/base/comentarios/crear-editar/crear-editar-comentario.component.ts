@@ -20,8 +20,9 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
   comentarioForm!: UntypedFormGroup;
   comentario: Comentario = new Comentario();
   usuarioEnSesion: Usuario = new Usuario;
-  usuarioQueCreaEntrada: Usuario = new Usuario;
+  usuarioQueCreaComentario: Usuario = new Usuario;
   entradaDelComentario: Entrada = new Entrada();
+  submitted = false;
 
   constructor(
     protected override router: Router,
@@ -37,9 +38,11 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
     this.createForm();
 
     new Promise<void>((resolve, _reject) => {
-      this.obtenerDatos();
-      resolve();
+      resolve(this.obtenerDatos());
     });
+  }
+
+  override ngOnInit(): void {
   }
 
   private obtenerDatos() {
@@ -50,13 +53,16 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
           //
           this.obtenerDatosUsuario(this.comentario.idUsuario).then((usu: Usuario) => {
             if (usu) {
-              this.usuarioQueCreaEntrada = usu;
+              this.usuarioQueCreaComentario = usu;
+              this.comentarioForm.get('username')?.setValue(this.usuarioQueCreaComentario.username);
+              this.comentarioForm.get('email')?.setValue(this.usuarioQueCreaComentario.email);
             }
           });
           //
           this.obtenerDatosEntrada(this.comentario.idEntrada).then((ent: Entrada) => {
             if (ent) {
               this.entradaDelComentario = ent;
+              this.comentarioForm.get('tituloEntrada')?.setValue(this.entradaDelComentario.titulo);
             }
           });
           this.comentarioForm.patchValue(com);
@@ -127,10 +133,10 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
   }
 
   onValidate() {
-    //this.submitted = true;
+    this.submitted = true;
 
     // stop here if form is invalid
-    //return this.entradaForm.status === 'VALID';
+    return this.comentarioForm.status === 'VALID';
   }
 
   get f() {
@@ -138,11 +144,37 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
   }
 
   guardar() {
+    if (this.onValidate()) {
+      var coment: Comentario = this.comentarioForm.value;
+      if (this.getComentarioId('idComentario') != 'crear') {
+        this.actualiza(coment);
+      } else {
+        this.crea(coment);
+      }
+    }
+  }
 
+  private crea(coment: Comentario) {
+    coment.idUsuario = this.tokenStorageService.getUser().id;
+    this.comentarioService.crear(coment).subscribe((data: Comentario)=> {
+      if (data) {
+        this.comentario = data;
+        this.reloadComponent(false, '/admin/control/comentarios');
+      }
+    });
+  }
+
+  private actualiza(coment: Comentario) {
+    this.comentarioService.actualizar(coment.idComentario, coment).subscribe((data: Comentario)=> {
+      if (data) {
+        this.comentario = data;
+        this.reloadComponent(false, '/admin/control/comentarios');
+      }
+    });
   }
 
   onReset() {
-
+    this.submitted = false;
   }
 
   getComentarioId(param: string) {
@@ -150,7 +182,8 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
   }
 
   editarComentario() {
-
+    this.comentarioForm.enable();
+    this.comentarioForm.controls['contenidoCensurado'].disable();
   }
 
 }
