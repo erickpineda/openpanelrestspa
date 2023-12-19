@@ -1,4 +1,4 @@
-import { LOCALE_ID, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 
 import { HttpClientModule } from '@angular/common/http';
@@ -12,6 +12,8 @@ import { CrearEditarEntrada } from './entradas/crear-editar/crear-editar-entrada
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
 import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
+import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
+import { CrearEditarCategoria } from './categorias/crear-editar/crear-editar-categoria.component';
 
 @NgModule({
   imports: [
@@ -50,7 +52,9 @@ import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-c
     ListadoEntradasComponent,
     CrearEditarEntrada,
     ListadoComentariosComponent,
-    CrearEditarComentario
+    CrearEditarComentario,
+    ListadoCategoriasComponent,
+    CrearEditarCategoria
   ],
   exports: [],
   providers: [

@@ -4,6 +4,8 @@ import { CrearEditarEntrada } from './entradas/crear-editar/crear-editar-entrada
 import { ListadoEntradasComponent } from './entradas/listado-entradas.component';
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
 import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
+import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
+import { CrearEditarCategoria } from './categorias/crear-editar/crear-editar-categoria.component';
 
 
 const routes: Routes = [
@@ -21,6 +23,14 @@ const routes: Routes = [
       { path: '', component: ListadoComentariosComponent },
       { path: ':idComentario', component: CrearEditarComentario },
       { path: 'crear', component: CrearEditarComentario },
+    ]
+  },
+  { path: '', redirectTo: 'categorias', pathMatch: 'full' },
+  {
+    path: 'categorias', children: [
+      { path: '', component: ListadoCategoriasComponent },
+      { path: ':idCategoria', component: CrearEditarCategoria },
+      { path: 'crear', component: CrearEditarCategoria },
     ]
   }
 ];

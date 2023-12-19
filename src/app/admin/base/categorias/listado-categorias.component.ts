@@ -2,12 +2,9 @@ import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { Categoria } from "src/app/core/models/categoria.model";
-import { Comentario } from "src/app/core/models/comentario.model";
-import { Entrada } from "src/app/core/models/entrada.model";
 import { Usuario } from "src/app/core/models/usuario.model";
 import { CategoriaService } from "src/app/core/services/categoria.service";
-import { ComentarioService } from "src/app/core/services/comentario.service";
-import { EntradaService } from "src/app/core/services/entrada.service";
+import { TokenStorageService } from "src/app/core/services/token-storage.service";
 import { UsuarioService } from "src/app/core/services/usuario.service";
 import { CommonFunctionalityComponent } from "src/app/shared/components/funcionalidades-comunes/common-functionality.component";
 
@@ -20,11 +17,13 @@ import { CommonFunctionalityComponent } from "src/app/shared/components/funciona
 export class ListadoCategoriasComponent extends CommonFunctionalityComponent implements OnInit {
 
   listaCategorias: Categoria[] = [];
+  usuarioEnSesion: Usuario = new Usuario();
 
   constructor(
     protected override router: Router,
     private categoriaService: CategoriaService,
     private usuarioService: UsuarioService,
+    private tokenStorageService: TokenStorageService,
     protected override datePipe: DatePipe
     ) {
       super(router, datePipe);
@@ -35,20 +34,10 @@ export class ListadoCategoriasComponent extends CommonFunctionalityComponent imp
   private initList() {
     this.obtenerListaCategorias().then((listaRes: Categoria[]) => {
       if (listaRes) {
-        listaRes.forEach((res) => {
-          if (res) {
-            res.fechaCreacionParseada = this.transformaFecha(res.fechaCreacion, 'dd/MM/yyyy', false);
-
-            this.obtenerDatosUsuario(res.idUsuario).then((usu: Usuario) => {
-              if (usu) {
-                res.username = usu.username;
-              }
-            });
-            this.obtenerDatosEntrada(res.idEntrada).then((ent: Entrada) => {
-              if (ent) {
-                res.tituloEntrada = ent.titulo;
-              }
-            });
+        this.listaCategorias = listaRes;
+        this.obtenerDatosUsuarioActual().then((usu: Usuario)=>{
+          if (usu) {
+            this.usuarioEnSesion = usu;
           }
         });
       }
@@ -63,27 +52,27 @@ export class ListadoCategoriasComponent extends CommonFunctionalityComponent imp
     this.router.navigate([urlToNavigate])
   }
 
-  private obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
+  private obtenerDatosUsuarioActual(): Promise<Usuario> {
     return new Promise((resolve, reject) => {
-      this.usuarioService.obtenerPorId(idUsuario).subscribe({
-        next: data => {
+      const currentUser = this.tokenStorageService.getUser();
+      this.usuarioService.obtenerPorId(currentUser.id).subscribe({
+        next: (data: Usuario | PromiseLike<Usuario>) => {
           resolve(data);
         },
-        error: err => {
+        error: (err: any) => {
           reject(err);
         }
       });
-    });
+    })
   }
 
   private obtenerListaCategorias(): Promise<Categoria[]> {
     return new Promise((resolve, reject) => {
       this.categoriaService.listar().subscribe({
-        next: data => {
-          this.listaCategorias = data;
-          resolve(this.listaCategorias);
+        next: (data: Categoria[]) => {
+          resolve(data);
         },
-        error: err => {
+        error: (err: { status: number; error: { message: any; }; }) => {
           if (err) {
             if (err.status == 404) {
               if (err.error && err.error.message) {
@@ -95,10 +84,6 @@ export class ListadoCategoriasComponent extends CommonFunctionalityComponent imp
         }
       });
     });
-  }
-
-  public checkTrueOrFalseToString(toCheck: boolean) {
-    return toCheck? 'Si': 'No';
   }
 
   crearEntrada() {

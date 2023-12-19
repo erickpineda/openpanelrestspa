@@ -1,7 +1,7 @@
 <c-card>
   <c-card-header class="d-flex align-items-center">
     <c-col [sm]="6">
-      <h6 cCardTitle>Listado de comentarios</h6>
+      <h6 cCardTitle>Listado de Categorias</h6>
     </c-col>
     <c-col [sm]="6">
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -9,21 +9,17 @@
           <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
             Imprimir
         </button>
-        <button cButton color="warning" size="sm">
-          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Pendientes de revisión"></svg>
-            No aprobados
-        </button>
       </div>
     </c-col>
   </c-card-header>
   <c-card-body>
 
     <div class="d-flex justify-content-between align-items-end">
-      <h5 cCardTitle>Listado de comentarios</h5>
+      <h5 cCardTitle>Listado de Categorias</h5>
       <div class="hstack gap-3">
         <button cButton color="success" size="sm" routerLink="crear">
-          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nueva Entrada"></svg>
-          Crear nuevo Comentario
+          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nueva Categoria"></svg>
+          Crear nueva Categoria
         </button>
       </div>
     </div>
@@ -31,32 +27,24 @@
     
     <!---->
     
-    <table cTable hover *ngIf="listaComentarios.length >= 0">
+    <table cTable hover *ngIf="listaCategorias.length >= 0">
       <thead cTableColor="dark">
         <tr>
           <th scope="col">ID</th>
-          <th scope="col">Contenido</th>
-          <th scope="col">Usuario</th>
-          <th scope="col">Entrada</th>
-          <th scope="col">Fecha creación</th>
-          <th scope="col">Aprobado</th>
-          <th scope="col">Cuarentena</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Descripción</th>
         </tr>
       </thead>
-      <tbody *ngFor="let coment of listaComentarios">
-        <tr (click)="navigate('/admin/control/comentarios/'+coment.idComentario)"  style="cursor: pointer">
-          <td scope="row">{{coment.idComentario}}</td>
-          <td>{{coment.contenido}}</td>
-          <td>{{coment.username}}</td>
-          <td>{{coment.tituloEntrada}}</td>
-          <td>{{coment.fechaCreacionParseada}}</td>
-          <td>{{checkTrueOrFalseToString(coment.aprobado)}}</td>
-          <td>{{checkTrueOrFalseToString(coment.cuarentena)}}</td>
+      <tbody *ngFor="let categ of listaCategorias">
+        <tr (click)="navigate('/admin/control/categorias/'+categ.idCategoria)"  style="cursor: pointer">
+          <td scope="row">{{categ.idCategoria}}</td>
+          <td>{{categ.nombre}}</td>
+          <td>{{categ.descripcion}}</td>
         </tr>
       </tbody>
-      <tbody *ngIf="listaComentarios.length <= 0" cAlign="middle">
+      <tbody *ngIf="listaCategorias.length <= 0" cAlign="middle">
         <tr style="cursor: pointer">
-          <td colSpan="7">No se han encontrado registros en el sistema...</td>
+          <td colSpan="3">No se han encontrado registros en el sistema...</td>
         </tr>
       </tbody>
     </table>

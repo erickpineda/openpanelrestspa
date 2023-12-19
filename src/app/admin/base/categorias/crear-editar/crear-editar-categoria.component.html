@@ -1,0 +1,91 @@
+<c-card>
+  <c-card-header>
+
+    <div class="d-flex justify-content-between align-items-end">
+      <h2 cCardTitle class="h5 mb-3 mb-lg-0">Categoria</h2>
+      <div class="hstack gap-3" *ngIf="this.getCategoriaId('idCategoria') != 'crear'">
+        <button cButton color="warning" size="sm" (click)="editarCategoria()" [disabled]="this.categoriaForm.enabled">
+          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Editar categoria"></svg>
+          Editar categoria
+        </button>
+      </div>
+
+    </div>
+  </c-card-header>
+  <c-card-body>
+    <c-container fluid>
+      <form  cForm [formGroup]="categoriaForm" novalidate (ngSubmit)="guardar()" class="needs-validation">
+        <div class="d-flex justify-content-between align-items-end">
+
+          <h2 cCardTitle class="h5 mb-3 mb-lg-0">Crear/Editar Categoria</h2>
+          <div class="hstack gap-3">
+
+            <button cButton color="danger" size="sm" type="reset" (click)="onReset()" [tabindex]="'0'">
+              <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
+              Cancelar
+            </button>
+
+            <button cButton color="success" size="sm" type="submit" 
+                [disabled]="categoriaForm.pristine || categoriaForm.invalid" [tabindex]="'0'">
+                <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
+                Guardar
+            </button>
+
+            <button cButton color="info" size="sm" [disabled]="!categoriaForm.valid" (click)="onValidate()" [tabindex]="'0'">
+              <svg cIcon name="cilExternalLink" style="padding-right: 2px" size="sm"
+                title="Previa"></svg>
+                Previa
+            </button>
+
+          </div>
+        </div>
+        <hr>
+        <c-row>
+          <!-- Información básica -->
+          <c-col lg="8">
+            <c-card class="mb-4">
+              <c-card-body>
+                <h3 cCardTitle class="h6 mb-4">Información básica</h3>
+                <c-row>
+                  <c-col lg="12">
+                    <c-row>
+                      <label [sm]="2" cCol cLabel="col" for="nombre" required ngClass="{ 'is-invalid': (submitted || f['nombre'].touched) && f['nombre'].invalid }">
+                        <strong>Nombre</strong>
+                      </label>
+                      <c-col [sm]="10"> <input cFormControl formControlName="nombre" id="nombre" plaintext readonly type="text"/></c-col>
+                    </c-row>
+                    <c-row>
+                      <label [sm]="3" cCol cLabel="col" for="descripcion"><strong>Descripción</strong></label>
+                      <c-col [sm]="9">
+                        <textarea aria-label="With textarea" cFormControl formControlName="descripcion"></textarea>
+                      </c-col>
+                    </c-row>
+                  </c-col>
+                </c-row>
+              </c-card-body>
+            </c-card>
+          </c-col>
+          <!-- -->
+          <!-- Derecha -> Lista -->
+          <c-col lg="4">
+            <c-card class="mb-4">
+              <c-card-body>
+                <h3 cCardTitle class="h6 mb-4">Categorias existentes</h3>
+                <div cListGroup>
+                  <button cListGroupItem class="d-flex justify-content-between align-items-center">
+                    Sin Categoria
+                    <c-badge color="primary" shape="rounded-pill">14</c-badge>
+                  </button>
+                </div>
+              </c-card-body>
+            </c-card>
+
+          </c-col>
+          
+        </c-row>
+      </form>
+    </c-container>
+
+  </c-card-body>
+</c-card>
+
