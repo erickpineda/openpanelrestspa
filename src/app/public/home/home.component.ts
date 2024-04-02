@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { delay } from 'rxjs';
 import { Categoria } from 'src/app/core/models/categoria.model';
 import { Entrada } from 'src/app/core/models/entrada.model';
 import { EntradaService } from 'src/app/core/services/entrada.service';
@@ -13,6 +14,9 @@ import { LoadingService } from 'src/app/core/services/loading.service';
 
 export class HomeComponent implements OnInit {
   loading$ = this.loader.loading$;
+
+  loading: boolean = false;
+  cargaFinalizada: boolean = false;
 
   characters: any;
   continents: any;
@@ -30,12 +34,12 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-      this.obtenerListaEntradas().then((listaRes: Entrada[]) => {
-        listaRes.forEach((entradaRes) => {
-          entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
-        });
+    this.listenToLoading();
+    this.obtenerListaEntradas().then((listaRes: Entrada[]) => {
+      listaRes.forEach((entradaRes) => {
+        entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
       });
-      
+    });
   }
 
   obtenerListaEntradas(): Promise<Entrada[]> {
@@ -43,10 +47,10 @@ export class HomeComponent implements OnInit {
       this.entradaService.listar().subscribe({
         next: data => {
           if (data) {
-            if (data.length < 1 || undefined) {
+            if (data.data.length < 1 || undefined) {
               this.noHayEntradas = false
             }
-            this.entradas = data;
+            this.entradas = data.data;
             this.entradas.forEach(_categorias => {
               this.categorias = _categorias.categorias;
             })
@@ -65,6 +69,17 @@ export class HomeComponent implements OnInit {
         }
       });
     });
+  }
+
+  listenToLoading(): void {
+    this.loader.loadingSub
+      .pipe(delay(0)) // This prevents a ExpressionChangedAfterItHasBeenCheckedError for subsequent requests
+      .subscribe((loading) => {
+        this.loading = loading;
+        if (loading === false) {
+          this.cargaFinalizada = true;
+        }
+      });
   }
 
   public refrescarPagina(): void {

@@ -8,8 +8,11 @@
     </c-card-header>
     <c-card-body>
 
+      <button cButton color="primary" disabled *ngIf="loading">
+        <c-spinner aria-hidden="true" size="sm"></c-spinner>
+        Cargando datos...
+      </button>
 
-      <c-spinner *ngIf="(loading$ | async )" variant="grow"></c-spinner>
       <div *ngIf="!noHayEntradas">
         <h5 cCardTitle>No hay entradas</h5>
         <p cCardText>
@@ -19,7 +22,7 @@
       </div>
 
 
-      <span *ngFor="let entrada of entradas" class="mb-3 text-start">
+      <span *ngFor="let entrada of entradas" class="mb-3 text-start" [hidden]="!cargaFinalizada">
 
         <c-row [gutter]="4" [md]="1" [xs]="1" class="mb-4">
           <c-col>

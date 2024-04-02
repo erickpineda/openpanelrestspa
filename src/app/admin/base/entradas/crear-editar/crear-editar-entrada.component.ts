@@ -96,7 +96,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     return new Promise((resolve, reject) => {
       this.entradaService.listarTiposEntradas().subscribe({
         next: data => {
-          resolve(data);
+          resolve(data.tiposEntradas);
         },
         error: err => {
           reject(err);
@@ -109,7 +109,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     return new Promise((resolve, reject) => {
       this.entradaService.listarEstadosEntradas().subscribe({
         next: data => {
-          resolve(data);
+          resolve(data.estadosEntradas);
         },
         error: err => {
           reject(err);
@@ -122,7 +122,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     return new Promise((resolve, reject) => {
       this.categoriaService.listar().subscribe({
         next: data => {
-          resolve(data);
+          resolve(data.data);
         },
         error: err => {
           reject(err);

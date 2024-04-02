@@ -19,62 +19,63 @@ import { TokenStorageService } from '../core/services/token-storage.service';
 import { UsuarioService } from '../core/services/usuario.service';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-  suppressScrollX: true,
+    suppressScrollX: true,
 };
 
 const APP_CONTAINERS = [
-  DefaultFooterComponent,
-  DefaultHeaderComponent,
-  AdminComponent,
+    DefaultFooterComponent,
+    DefaultHeaderComponent,
+    AdminComponent,
 ];
 
 @NgModule({
-  declarations: [APP_CONTAINERS, UserComponent, DashboardComponent],
-  imports: [
-    AdminRoutingModule,
-    AvatarModule,
-    BreadcrumbModule,
-    FooterModule,
-    DropdownModule,
-    GridModule,
-    HeaderModule,
-    SidebarModule,
-    IconModule,
-    PerfectScrollbarModule,
-    NavModule,
-    ButtonModule,
-    FormModule,
-    UtilitiesModule,
-    ButtonGroupModule,
-    ReactiveFormsModule,
-    SidebarModule,
-    SharedModule,
-    TabsModule,
-    ListGroupModule,
-    ProgressModule,
-    BadgeModule,
-    ListGroupModule,
-    CardModule,
-    PaginationModule
-  ],
-  providers: [
-    {
-      provide: LocationStrategy,
-      useClass: HashLocationStrategy,
-    },
-    {
-      provide: PERFECT_SCROLLBAR_CONFIG,
-      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
-    },
-    IconSetService,
-    Title,
-    AuthService,
-    TokenStorageService,
-    UsuarioService,
-    EntradaService,
-    authInterceptorProviders,
-    { provide: HTTP_INTERCEPTORS, useClass: NetworkInterceptor, multi: true },
+    declarations: [APP_CONTAINERS, UserComponent, DashboardComponent],
+    providers: [
+        {
+            provide: LocationStrategy,
+            useClass: HashLocationStrategy,
+        },
+        {
+            provide: PERFECT_SCROLLBAR_CONFIG,
+            useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
+        },
+        IconSetService,
+        Title,
+        AuthService,
+        TokenStorageService,
+        UsuarioService,
+        EntradaService,
+        authInterceptorProviders,
+        { provide: HTTP_INTERCEPTORS, useClass: NetworkInterceptor, multi: true },
+    ],
+    imports: [
+        AdminRoutingModule,
+        AvatarModule,
+        BreadcrumbModule,
+        FooterModule,
+        DropdownModule,
+        GridModule,
+        HeaderModule,
+        SidebarModule,
+        IconModule,
+        PerfectScrollbarModule,
+        NavModule,
+        ButtonModule,
+        FormModule,
+        UtilitiesModule,
+        ButtonGroupModule,
+        ReactiveFormsModule,
+        SidebarModule,
+        SharedModule,
+        TabsModule,
+        ListGroupModule,
+        ProgressModule,
+        BadgeModule,
+        ListGroupModule,
+        CardModule,
+        PaginationModule,
+        SpinnerModule,
 
-  ],
+    ]
 })
 export class AdminModule { }

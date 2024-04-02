@@ -8,7 +8,7 @@ const routes: Routes = [
   {
     path: '', component: AdminComponent, children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: DashboardComponent },
+      { path: 'dashboard', data: { preload: true, delay:3000 }, component: DashboardComponent },
       { path: 'control', data: { preload: true, delay:3000 }, loadChildren: () => import('./base/base.module').then(m => m.BaseModule) },
     ]
   }

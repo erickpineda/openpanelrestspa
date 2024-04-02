@@ -139,6 +139,7 @@ import {
 import { EntradaService } from "../core/services/entrada.service";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { NetworkInterceptor } from "../core/interceptor/network.interceptor";
+import { DatePipe } from "@angular/common";
 
 @NgModule({
     imports: [
@@ -185,7 +186,7 @@ import { NetworkInterceptor } from "../core/interceptor/network.interceptor";
         EntradaService,
         authInterceptorProviders,
         { provide: HTTP_INTERCEPTORS, useClass: NetworkInterceptor, multi: true },
-
+        DatePipe
     ]
 })
 
