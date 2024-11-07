@@ -1,22 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ValidationEntradaFormsService } from 'src/app/core/services/validation-entrada-forms.service';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { EntradaService } from 'src/app/core/services/entrada.service';
 import { Entrada } from 'src/app/core/models/entrada.model';
-import { Usuario } from 'src/app/core/models/usuario.model';
 import { Categoria } from 'src/app/core/models/categoria.model';
-import { Etiqueta } from 'src/app/core/models/etiqueta.model';
 import { TipoEntrada } from 'src/app/core/models/tipo-entrada.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoriaService } from 'src/app/core/services/categoria.service';
 import { EstadoEntrada } from 'src/app/core/models/estado-entrada.model';
-import { catchError, of } from 'rxjs';
 import { CommonFunctionalityComponent } from 'src/app/shared/components/funcionalidades-comunes/common-functionality.component';
 import { UsuarioService } from 'src/app/core/services/usuario.service';
-import { TokenStorageService } from 'src/app/core/services/token-storage.service';
 import { DatePipe } from '@angular/common';
+import { PerfilResponse } from 'src/app/core/models/perfil-response.model';
 
 @Component({
   selector: 'app-crear-editar-entrada',
@@ -34,7 +31,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   estadosEntr: EstadoEntrada[] = [];
   categorias: Categoria[] = [];
   modoLectura: boolean = true;
-  usuarioEnSesion: Usuario = new Usuario;
+  usuarioEnSesion: PerfilResponse = new PerfilResponse;
 
   constructor(
     protected override router: Router,
@@ -44,8 +41,8 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     public entradaService: EntradaService,
     public categoriaService: CategoriaService,
     public usuarioService: UsuarioService,
-    public tokenStorageService: TokenStorageService,
-    protected override datePipe: DatePipe
+    protected override datePipe: DatePipe,
+    private cdr: ChangeDetectorRef,
   ) {
     super(router, datePipe);
     this.formErrors = this.vf.errorMessages;
@@ -73,22 +70,37 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     this.obtenerDatosTipoEntrada().then((listTipEnt: TipoEntrada[]) => {
       if (listTipEnt) {
         this.tiposEntr = listTipEnt;
+        this.cdr.detectChanges();
       }
+    }).catch(error => {
+      console.error('Error al obtener tipos de entrada:', error);
     });
+  
     this.obtenerDatosEstadosEntrada().then((listEstEnt: EstadoEntrada[]) => {
       if (listEstEnt) {
         this.estadosEntr = listEstEnt;
+        this.cdr.detectChanges();
       }
+    }).catch(error => {
+      console.error('Error al obtener estados de entrada:', error);
     });
+  
     this.obtenerDatosCategorias().then((listCate: Categoria[]) => {
       if (listCate) {
         this.categorias = listCate;
+        this.cdr.detectChanges();
       }
+    }).catch(error => {
+      console.error('Error al obtener categorías:', error);
     });
-    this.obtenerDatosUsuarioActual().then((usu: Usuario) => {
+  
+    this.obtenerDatosUsuarioActual().then((usu: PerfilResponse) => {
       if (usu) {
         this.usuarioEnSesion = usu;
+        this.cdr.detectChanges();
       }
+    }).catch(error => {
+      console.error('Error al obtener usuario actual:', error);
     });
   }
 
@@ -145,10 +157,9 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     })
   }
 
-  private obtenerDatosUsuarioActual(): Promise<Usuario> {
+  private obtenerDatosUsuarioActual(): Promise<PerfilResponse> {
     return new Promise((resolve, reject) => {
-      const currentUser = this.tokenStorageService.getUser();
-      this.usuarioService.obtenerPorId(currentUser.id).subscribe({
+      this.usuarioService.obtenerDatosSesionActual().subscribe({
         next: data => {
           resolve(data);
         },

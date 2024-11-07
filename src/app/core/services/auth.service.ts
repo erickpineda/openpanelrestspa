@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
 import { TokenStorageService } from './token-storage.service';
-const AUTH_API = 'https://vigilant-capybara-pvw759xqrxc7j97-8080.app.github.dev/api/v1/auth/';
+const AUTH_API = 'https://zany-spoon-g9rxv6gp5rhpwj4-8080.app.github.dev/';
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json',
   
