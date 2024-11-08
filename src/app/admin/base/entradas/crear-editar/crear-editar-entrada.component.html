@@ -89,7 +89,7 @@
                     <div>
                       <label cCol cLabel="col">Estado</label>
                       
-                        <select cSelect cFormControl formControlName="estadoEntrada" >
+                        <select cSelect cFormControl formControlName="estadoEntrada" *ngIf="estadosEntr.length">
                           <option *ngFor="let ee of estadosEntr" [ngValue]="ee" cCardTitle required
                             [selected]="entrada.estadoEntrada != null && ee.idEstadoEntrada == entrada.estadoEntrada.idEstadoEntrada">
                               {{ ee.nombre }}
@@ -100,7 +100,7 @@
                   <c-col lg="12">
                     <div>
                       <label cCol cLabel="col" >Tipo entrada</label>
-                      <select cSelect cFormControl formControlName="tipoEntrada" >
+                      <select cSelect cFormControl formControlName="tipoEntrada" *ngIf="tiposEntr.length">
                         <option *ngFor="let te of tiposEntr" [ngValue]="te" cCardTitle required
                           [selected]="entrada.tipoEntrada!= null && te.idTipoEntrada == entrada.tipoEntrada.idTipoEntrada">
                             {{ te.nombre }}

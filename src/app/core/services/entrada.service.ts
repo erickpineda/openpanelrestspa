@@ -2,12 +2,12 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from 'rxjs';
 import { Entrada } from "../models/entrada.model";
-import { TipoEntrada } from "../models/tipo-entrada.model";
-import { EstadoEntrada } from "../models/estado-entrada.model";
 import { TokenStorageService } from "./token-storage.service";
 import { CrudService } from "../_utils/crud.service";
 import { CambiarEstadoEntradaReq } from "../models/cambiar-estado-entrada.model";
 import { RespuestaModelResp } from "../models/respuesta.model";
+import { TipoEntradaResponse } from "../models/tipo-entrada-response.model";
+import { EstadoEntradaResponse } from "../models/estado-entrada-response.model";
 
 @Injectable({
   providedIn: "root"
@@ -22,16 +22,16 @@ export class EntradaService extends CrudService<Entrada> {
     super(http, token);
   }
 
-    listarTiposEntradas(): Observable<TipoEntrada[]> {
+  listarTiposEntradas(): Observable<TipoEntradaResponse> {
     const url = `${this.path}/tiposEntradas`;
-    return this.http.get<TipoEntrada[]>(url, {
+    return this.http.get<TipoEntradaResponse>(url, {
       observe: 'body', headers: this.setHeaders(),
     });
   }
 
-  listarEstadosEntradas(): Observable<EstadoEntrada[]> {
-    const url = `${this.path}/estados`;
-    return this.http.get<EstadoEntrada[]>(url, {
+  listarEstadosEntradas(): Observable<EstadoEntradaResponse> {
+    const url = `${this.path}/estadosEntradas`;
+    return this.http.get<EstadoEntradaResponse>(url, {
       observe: 'body', headers: this.setHeaders(),
     });
   }

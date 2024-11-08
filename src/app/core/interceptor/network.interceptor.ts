@@ -21,7 +21,7 @@ export class NetworkInterceptor implements HttpInterceptor {
     request: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
-
+    this.loader.setLoading(true, request.url);
     this.loader.show();
     this.totalRequests++;
 
@@ -30,10 +30,10 @@ export class NetworkInterceptor implements HttpInterceptor {
 
         this.requestsCompleted++;
 
-        console.log(this.requestsCompleted, this.totalRequests);
+        //console.log(this.requestsCompleted, this.totalRequests);
 
         if (this.requestsCompleted === this.totalRequests) {
-          this.loader.hide();
+          this.loader.hide(); this.loader.setLoading(false, request.url);
           this.totalRequests = 0;
           this.requestsCompleted = 0;
         }

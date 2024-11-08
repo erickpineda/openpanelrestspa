@@ -92,7 +92,7 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
     return new Promise((resolve, reject) => {
       this.comentarioService.listar().subscribe({
         next: data => {
-          this.listaComentarios = data;
+          this.listaComentarios = data.data;
           resolve(this.listaComentarios);
         },
         error: err => {

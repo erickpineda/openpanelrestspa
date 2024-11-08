@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from '../shared/components/icons/icon-subset';
 import { navItems } from './default-layout/_nav';
+import { LoadingService } from '../core/services/loading.service';
+import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
@@ -14,13 +16,19 @@ export class AdminComponent implements OnInit {
 
   public navItems = navItems;
 
+  loading$ = this.loader.loading$;
+  loading: boolean = false;
+  cargaFinalizada: boolean = false;
+
   ngOnInit(): void {
+    this.listenToLoading();
   }
 
   constructor(
     private router: Router,
     private titleService: Title,
-    private iconSetService: IconSetService
+    private iconSetService: IconSetService,
+    public loader: LoadingService
   ) {
     // iconSet singleton
     iconSetService.icons = { ...iconSubset };
@@ -30,7 +38,16 @@ export class AdminComponent implements OnInit {
     suppressScrollX: true,
   };
 
-
+  listenToLoading(): void {
+    this.loader.loadingSub
+      .pipe(delay(0)) // This prevents a ExpressionChangedAfterItHasBeenCheckedError for subsequent requests
+      .subscribe((loading) => {
+        this.loading = loading;
+        if (loading === false) {
+          this.cargaFinalizada = true;
+        }
+      });
+  }
   
 
 }

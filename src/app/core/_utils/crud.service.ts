@@ -1,7 +1,8 @@
 import { BaseService } from './base.service';
 import { Observable, Subscriber } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { TokenStorageService } from '../services/token-storage.service';
+import { PaginaResponse } from '../models/pagina-response.model';
 
 export abstract class CrudService<C> extends BaseService {
 
@@ -12,9 +13,17 @@ export abstract class CrudService<C> extends BaseService {
         super(token);
     }
 
-    public listar(): Observable<C[]> {
+    public listar(): Observable<PaginaResponse> {
         const url = `${this.path}`;
-        return this.http.get<C[]>(url, { observe: 'body', headers: this.setHeaders(), responseType: 'json' });
+        return this.http.get<PaginaResponse>(url, { observe: 'body', headers: this.setHeaders(), responseType: 'json' });
+    }
+
+    public listarPagina(pageNo: number, pageSize: number): Observable<PaginaResponse> {
+        let params = new HttpParams();
+        params = params.append('pageNo', pageNo.toString());
+        params = params.append('pageSize', pageSize.toString());
+        const url = `${this.path}?${params.toString()}`;
+        return this.http.get<PaginaResponse>(url, { observe: 'body', headers: this.setHeaders(), responseType: 'json' });
     }
 
     public crear(entity: C): Observable<C> {
@@ -23,7 +32,7 @@ export abstract class CrudService<C> extends BaseService {
     }
 
     public obtenerPorId(id: number): Observable<C> {
-        const url = `${this.path}/${id}`;
+        const url = `${this.path}/obtenerPorId/${id}`;
         return this.http.get<C>(url, { observe: 'body', headers: this.setHeaders() });
     }
 

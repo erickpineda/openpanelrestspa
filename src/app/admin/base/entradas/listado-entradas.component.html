@@ -29,6 +29,10 @@
     </div>
     <hr>
 
+    <!--<div class="fade show" style="text-align: center; padding-top: calc(100vh / 2); height: 100vh" *ngIf="!cargaFinalizada">
+      <c-spinner size="sm" variant="grow"></c-spinner>
+      <span class="m-1">Cargando datos...</span>
+    </div>-->
     <c-card *ngIf="listaEntradas.length <= 0">
       <c-card-body>
         <div >
@@ -44,7 +48,7 @@
     
     <!---->
 
-    <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length > 0">
+    <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length > 0" [hidden]="!cargaFinalizada">
       <thead cTableColor="dark">
       <tr>
         <th scope="col">ID</th>

@@ -83,3 +83,11 @@ header.masthead .site-heading .h1 {
     font-size: 1.875rem;
   }
 }
+
+.centrado-fijo {
+  position: fixed; /* or absolute */
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}

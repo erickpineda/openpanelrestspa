@@ -9,8 +9,6 @@ import { GlobalErrorComponent } from './core/errors/global-error/global-error.co
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
 import { CustomPreloadingStrategyService } from './core/preloading/custom-preloading-strategy.service';
-import { NetworkInterceptor } from './core/interceptor/network.interceptor';
-import { SpinnerModule } from '@coreui/angular';
 
 @NgModule({
   declarations: [

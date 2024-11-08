@@ -1,21 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
 import { TokenStorageService } from './token-storage.service';
-import { BaseService } from '../_utils/base.service';
-
+const AUTH_API = 'https://zany-spoon-g9rxv6gp5rhpwj4-8080.app.github.dev/';
+const httpOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/json',
+  
+})
+};
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService extends BaseService {
+export class AuthService {
   private userSubject: BehaviorSubject<Usuario | null>;
-
-  protected resource = '/auth';
 
   constructor(private http: HttpClient, private tokenStorageService: TokenStorageService) {
 
-    super(tokenStorageService);
     this.userSubject = new BehaviorSubject<Usuario | null>(null);
   }
 
@@ -24,22 +25,23 @@ export class AuthService extends BaseService {
   }
 
   login(username: string, password: string): Observable<any> {
-    const url = `${this.path}/login`;
-    return this.http.post(url, { // + 'signin'
+    return this.http.post(AUTH_API + 'login', { // + 'signin'
       username,
       password
     }, {
-      headers: this.setHeaders()
-    });
+    headers: new HttpHeaders(
+      {
+        'Content-Type': 'application/json',
+        //'Authorization': 'Bearer ' + this.tokenStorageService.getToken(),
+        'Accept': '*/*',
+      })}
+    );
   }
   register(username: string, email: string, password: string): Observable<any> {
-    const url = `${this.path}/registerUser`;
-    return this.http.post(url, {
+    return this.http.post(AUTH_API + 'registerUser', {
       username,
       email,
       password
-    }, {
-      headers: this.setHeaders()
-    });
+    }, httpOptions);
   }
 }

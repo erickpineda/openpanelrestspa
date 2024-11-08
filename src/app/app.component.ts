@@ -7,5 +7,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'openpanelspa';
-  
+  loading: boolean = false;
+
+  constructor(
+    
+  ){ }
 }
