@@ -13,7 +13,6 @@ import { EstadoEntradaResponse } from "../models/estado-entrada-response.model";
   providedIn: "root"
 })
 export class EntradaService extends CrudService<Entrada> {
-
   protected resource = '/entradas';
 
   constructor(

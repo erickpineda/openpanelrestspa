@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ValidationEntradaFormsService } from 'src/app/core/services/validation-entrada-forms.service';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -47,61 +46,36 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     super(router, datePipe);
     this.formErrors = this.vf.errorMessages;
     this.createForm();
+    this.initializeData();
+  }
 
-    new Promise<void>((resolve, _reject) => {
-      this.obtenerDatos();
-      if (this.getEntradaId('idEntrada') != 'crear') {
-        this.obtenerDatosEntrada().then((ent: Entrada) => {
-          if (ent) {
-            this.entrada = ent;
-            this.entradaForm.patchValue(ent);
-          }
-        });
+  override ngOnInit(): void { }
+
+  private async initializeData() {
+    await this.obtenerDatos();
+    if (!this.isCreatingNewEntry()) {
+      const ent = await this.obtenerDatosEntrada();
+      if (ent) {
+        this.entrada = ent;
+        this.entradaForm.patchValue(ent);
         this.entradaForm.disable();
       }
-      resolve();
-    });
+    } else {
+      this.entradaForm.enable();
+    }
   }
 
-  override ngOnInit(): void {
-  }
-
-  private obtenerDatos() {
-    this.obtenerDatosTipoEntrada().then((listTipEnt: TipoEntrada[]) => {
-      if (listTipEnt) {
-        this.tiposEntr = listTipEnt;
-        this.cdr.detectChanges();
-      }
-    }).catch(error => {
-      console.error('Error al obtener tipos de entrada:', error);
-    });
-  
-    this.obtenerDatosEstadosEntrada().then((listEstEnt: EstadoEntrada[]) => {
-      if (listEstEnt) {
-        this.estadosEntr = listEstEnt;
-        this.cdr.detectChanges();
-      }
-    }).catch(error => {
-      console.error('Error al obtener estados de entrada:', error);
-    });
-  
-    this.obtenerDatosCategorias().then((listCate: Categoria[]) => {
-      if (listCate) {
-        this.categorias = listCate;
-        this.cdr.detectChanges();
-      }
-    }).catch(error => {
-      console.error('Error al obtener categorías:', error);
-    });
-  
-    this.obtenerDatosUsuarioActual().then((usu: PerfilResponse) => {
-      if (usu) {
-        this.usuarioEnSesion = usu;
-        this.cdr.detectChanges();
-      }
-    }).catch(error => {
-      console.error('Error al obtener usuario actual:', error);
-    });
+  private async obtenerDatos() {
+    try {
+      this.tiposEntr = await this.obtenerDatosTipoEntrada();
+      this.estadosEntr = await this.obtenerDatosEstadosEntrada();
+      this.categorias = await this.obtenerDatosCategorias();
+      this.usuarioEnSesion = await this.obtenerDatosUsuarioActual();
+    } catch (error) {
+      console.error('Error al obtener datos:', error);
+    } finally {
+      this.cdr.detectChanges();
+    }
   }
 
   private obtenerDatosTipoEntrada(): Promise<TipoEntrada[]> {
@@ -171,45 +145,41 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   }
 
   createForm() {
-    this.entradaForm = this.fb.group(
-      {
-        idEntrada: null,
-        idUsuario: null,
-        idUsuarioEditado: null,
-        titulo: ['', [
-          Validators.required,
-          Validators.minLength(this.vf.formRules.tituloMin),
-          Validators.maxLength(this.vf.formRules.tituloMax)]],
-        subtitulo: ['', [
-          Validators.maxLength(this.vf.formRules.subtituloMax)]],
-        contenido: ['', [
-          Validators.required,
-          Validators.minLength(this.vf.formRules.contenidoMin),
-        ]],
-        notas: null,
-        tipoEntrada: [TipoEntrada, [Validators.required]],
-        resumen: null,
-        fechaPublicacion: null,
-        fechaEdicion: null,
-        borrador: true,
-        publicada: false,
-        password: null,
-        privado: false,
-        estadoEntrada: [EstadoEntrada, [Validators.required]],
-        fechaPublicacionProgramada: Date,
-        permitirComentario: true,
-        imagenDestacada: null,
-        votos: 0,
-        cantidadComentarios: 0,
-
-        categorias: [],
-        categoriasConComas: [''],
-        etiquetas: [],
-      },
-    );
+    this.entradaForm = this.fb.group({
+      idEntrada: null,
+      idUsuario: null,
+      idUsuarioEditado: null,
+      titulo: ['', [
+        Validators.required,
+        Validators.minLength(this.vf.formRules.tituloMin),
+        Validators.maxLength(this.vf.formRules.tituloMax)]],
+      subtitulo: ['', [
+        Validators.maxLength(this.vf.formRules.subtituloMax)]],
+      contenido: ['', [
+        Validators.required,
+        Validators.minLength(this.vf.formRules.contenidoMin),
+      ]],
+      notas: null,
+      tipoEntrada: [TipoEntrada, [Validators.required]],
+      resumen: null,
+      fechaPublicacion: null,
+      fechaEdicion: null,
+      borrador: true,
+      publicada: false,
+      password: null,
+      privado: false,
+      estadoEntrada: [EstadoEntrada, [Validators.required]],
+      fechaPublicacionProgramada: Date,
+      permitirComentario: true,
+      imagenDestacada: null,
+      votos: 0,
+      cantidadComentarios: 0,
+      categorias: [],
+      categoriasConComas: [''],
+      etiquetas: [],
+    });
   }
 
-  // convenience getter for easy access to form fields
   get f() {
     return this.entradaForm.controls;
   }
@@ -219,7 +189,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   }
 
   inputCheckedCategorias(categ: Categoria, categoriasEntrada: Categoria[]) {
-    return categoriasEntrada.find(function (el) { return el.nombre === categ.nombre }) !== undefined;
+    return categoriasEntrada.some(el => el.nombre === categ.nombre);
   }
 
   resetForm(form: UntypedFormGroup) {
@@ -241,22 +211,22 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
 
   onValidate() {
     this.submitted = true;
-
-    // stop here if form is invalid
     return this.entradaForm.status === 'VALID';
   }
 
   guardar() {
     if (this.onValidate()) {
-      // TODO: Submit form value
-      console.warn(this.entradaForm.value);
-      var ent: Entrada = this.entradaForm.value;
-      if (this.getEntradaId('idEntrada') != 'crear') {
-        this.actualizaEntrada(ent);
-      } else {
-        this.creaEntrada(ent);
-      }
+        var ent: Entrada = this.entradaForm.value;
+        if (this.isCreatingNewEntry()) {
+            this.creaEntrada(ent);
+        } else {
+            this.actualizaEntrada(ent);
+        }
     }
+  }
+
+  private isCreatingNewEntry(): boolean {
+      return this.getEntradaId('idEntrada') === 'crear';
   }
 
   private creaEntrada(ent: Entrada) {
@@ -266,22 +236,21 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
         this.entrada = data;
         this.reloadComponent(false, '/admin/control/entradas');
       }
-    })
+    });
   }
 
   private actualizaEntrada(ent: Entrada) {
     ent.idUsuarioEditado = this.usuarioEnSesion.idUsuario;
-    //ent.fechaEdicion = new Date(this.transformaFecha(new Date(), 'dd-MM-yyyy hh:mm:ss', true));
     this.entradaService.actualizar(ent.idEntrada, ent).subscribe((data: Entrada) => {
       if (data) {
         this.entrada = data;
         this.reloadComponent(false, '/admin/control/entradas');
       }
-    })
+    });
   }
 
   editarEntrada() {
     this.entradaForm.enable();
   }
-
 }
+

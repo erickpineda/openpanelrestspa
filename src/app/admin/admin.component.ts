@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { IconSetService } from '@coreui/icons-angular';
+import { delay } from 'rxjs';
+
 import { iconSubset } from '../shared/components/icons/icon-subset';
 import { navItems } from './default-layout/_nav';
 import { LoadingService } from '../core/services/loading.service';
-import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
@@ -15,14 +16,10 @@ import { delay } from 'rxjs';
 export class AdminComponent implements OnInit {
 
   public navItems = navItems;
-
-  loading$ = this.loader.loading$;
-  loading: boolean = false;
-  cargaFinalizada: boolean = false;
-
-  ngOnInit(): void {
-    this.listenToLoading();
-  }
+  public loading$ = this.loader.loading$;
+  public loading: boolean = false;
+  public cargaFinalizada: boolean = false;
+  public perfectScrollbarConfig = { suppressScrollX: true };
 
   constructor(
     private router: Router,
@@ -31,23 +28,19 @@ export class AdminComponent implements OnInit {
     public loader: LoadingService
   ) {
     // iconSet singleton
-    iconSetService.icons = { ...iconSubset };
+    this.iconSetService.icons = { ...iconSubset };
   }
 
-  public perfectScrollbarConfig = {
-    suppressScrollX: true,
-  };
+  ngOnInit(): void {
+    this.listenToLoading();
+  }
 
-  listenToLoading(): void {
+  private listenToLoading(): void {
     this.loader.loadingSub
       .pipe(delay(0)) // This prevents a ExpressionChangedAfterItHasBeenCheckedError for subsequent requests
       .subscribe((loading) => {
         this.loading = loading;
-        if (loading === false) {
-          this.cargaFinalizada = true;
-        }
+        this.cargaFinalizada = !loading;
       });
   }
-  
-
 }

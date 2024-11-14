@@ -1,16 +1,18 @@
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import { ReactiveFormsModule } from '@angular/forms';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { PerfectScrollbarConfigInterface, PerfectScrollbarModule, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { SharedModule, AvatarModule, BadgeModule, BreadcrumbModule, ButtonGroupModule, ButtonModule, CardModule, DropdownModule, FooterModule, FormModule, GridModule, HeaderModule, ListGroupModule, NavModule, ProgressModule, SidebarModule, SpinnerModule, TabsModule, UtilitiesModule, PaginationModule } from '@coreui/angular';
 import { IconModule, IconSetService } from '@coreui/icons-angular';
-import { Title } from '@angular/platform-browser';
-import { PerfectScrollbarConfigInterface, PerfectScrollbarModule, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
-import { AdminComponent } from './admin.component';
+
 import { AdminRoutingModule } from './admin-routing.module';
+import { AdminComponent } from './admin.component';
 import { DefaultFooterComponent, DefaultHeaderComponent } from './default-layout';
 import { UserComponent } from './perfil/user.component';
-import { ReactiveFormsModule } from '@angular/forms';
 import { DashboardComponent } from './base/dashboard/dashboard.component';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+
 import { authInterceptorProviders } from '../core/interceptor/auth.interceptor';
 import { NetworkInterceptor } from '../core/interceptor/network.interceptor';
 import { AuthService } from '../core/services/auth.service';
@@ -19,63 +21,64 @@ import { TokenStorageService } from '../core/services/token-storage.service';
 import { UsuarioService } from '../core/services/usuario.service';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-    suppressScrollX: true,
+  suppressScrollX: true,
 };
 
 const APP_CONTAINERS = [
-    DefaultFooterComponent,
-    DefaultHeaderComponent,
-    AdminComponent,
+  DefaultFooterComponent,
+  DefaultHeaderComponent,
+  AdminComponent,
 ];
 
 @NgModule({
-    declarations: [APP_CONTAINERS, UserComponent, DashboardComponent],
-    providers: [
-        {
-            provide: LocationStrategy,
-            useClass: HashLocationStrategy,
-        },
-        {
-            provide: PERFECT_SCROLLBAR_CONFIG,
-            useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
-        },
-        IconSetService,
-        Title,
-        AuthService,
-        TokenStorageService,
-        UsuarioService,
-        EntradaService,
-        authInterceptorProviders,
-        { provide: HTTP_INTERCEPTORS, useClass: NetworkInterceptor, multi: true },
-    ],
-    imports: [
-        AdminRoutingModule,
-        AvatarModule,
-        BreadcrumbModule,
-        FooterModule,
-        DropdownModule,
-        GridModule,
-        HeaderModule,
-        SidebarModule,
-        IconModule,
-        PerfectScrollbarModule,
-        NavModule,
-        ButtonModule,
-        FormModule,
-        UtilitiesModule,
-        ButtonGroupModule,
-        ReactiveFormsModule,
-        SidebarModule,
-        SharedModule,
-        TabsModule,
-        ListGroupModule,
-        ProgressModule,
-        BadgeModule,
-        ListGroupModule,
-        CardModule,
-        PaginationModule,
-        SpinnerModule,
-
-    ]
+  declarations: [
+    ...APP_CONTAINERS,
+    UserComponent,
+    DashboardComponent
+  ],
+  providers: [
+    {
+      provide: LocationStrategy,
+      useClass: HashLocationStrategy,
+    },
+    {
+      provide: PERFECT_SCROLLBAR_CONFIG,
+      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
+    },
+    IconSetService,
+    Title,
+    AuthService,
+    TokenStorageService,
+    UsuarioService,
+    EntradaService,
+    authInterceptorProviders,
+    { provide: HTTP_INTERCEPTORS, useClass: NetworkInterceptor, multi: true },
+  ],
+  imports: [
+    AdminRoutingModule,
+    AvatarModule,
+    BadgeModule,
+    BreadcrumbModule,
+    ButtonGroupModule,
+    ButtonModule,
+    CardModule,
+    DropdownModule,
+    FooterModule,
+    FormModule,
+    GridModule,
+    HeaderModule,
+    IconModule,
+    ListGroupModule,
+    NavModule,
+    PaginationModule,
+    PerfectScrollbarModule,
+    ProgressModule,
+    ReactiveFormsModule,
+    SharedModule,
+    SidebarModule,
+    SpinnerModule,
+    TabsModule,
+    UtilitiesModule,
+  ]
 })
 export class AdminModule { }

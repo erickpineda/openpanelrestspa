@@ -1,6 +1,5 @@
 <c-card>
   <c-card-header>
-
     <div class="d-flex justify-content-between align-items-end">
       <h2 cCardTitle class="h5 mb-3 mb-lg-0">Entrada</h2>
       <div class="hstack gap-3" *ngIf="this.getEntradaId('idEntrada') != 'crear'">
@@ -13,34 +12,28 @@
           Editar entrada
         </button>
       </div>
-
     </div>
   </c-card-header>
   <c-card-body>
     <c-container fluid>
-      <form  cForm [formGroup]="entradaForm" novalidate (ngSubmit)="guardar()" class="needs-validation">
+      <form cForm [formGroup]="entradaForm" novalidate (ngSubmit)="guardar()" class="needs-validation">
         <div class="d-flex justify-content-between align-items-end">
-
           <h2 cCardTitle class="h5 mb-3 mb-lg-0">Crear/Editar Entrada</h2>
           <div class="hstack gap-3">
-
             <button cButton color="danger" size="sm" type="reset" (click)="onReset()" [tabindex]="'0'">
               <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
               Cancelar
             </button>
-
             <button cButton color="success" size="sm" type="submit" 
                 [disabled]="entradaForm.pristine || entradaForm.invalid" [tabindex]="'0'">
                 <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
                 Guardar
             </button>
-
             <button cButton color="info" size="sm" [disabled]="!entradaForm.valid" (click)="onValidate()" [tabindex]="'0'">
               <svg cIcon name="cilExternalLink" style="padding-right: 2px" size="sm"
                 title="Previa"></svg>
                 Previa
             </button>
-
           </div>
         </div>
         <hr>
@@ -63,11 +56,9 @@
                       <small id="passwordHelpInline" class="text-muted">
                         <abbr title="El título de la entrada ha de tener entre 1 y 30 caracteres">Mínimo 1, Máximo 30 caracteres.</abbr>
                       </small>
-
                       <div *ngIf="submitted || f['titulo'].invalid" class="invalid-feedback">
                         <div *ngIf="f['titulo'].errors?.['required']">El título es obligatorio</div>
                       </div>
-
                     </div>
                   </c-col>
                   <c-col lg="12">
@@ -88,13 +79,12 @@
                   <c-col lg="12">
                     <div>
                       <label cCol cLabel="col">Estado</label>
-                      
-                        <select cSelect cFormControl formControlName="estadoEntrada" *ngIf="estadosEntr.length">
-                          <option *ngFor="let ee of estadosEntr" [ngValue]="ee" cCardTitle required
-                            [selected]="entrada.estadoEntrada != null && ee.idEstadoEntrada == entrada.estadoEntrada.idEstadoEntrada">
-                              {{ ee.nombre }}
-                          </option>
-                        </select>
+                      <select cSelect cFormControl formControlName="estadoEntrada" *ngIf="estadosEntr.length">
+                        <option *ngFor="let ee of estadosEntr" [ngValue]="ee" cCardTitle required
+                          [selected]="entrada.estadoEntrada != null && ee.idEstadoEntrada == entrada.estadoEntrada.idEstadoEntrada">
+                            {{ ee.nombre }}
+                        </option>
+                      </select>
                     </div>
                   </c-col>
                   <c-col lg="12">
@@ -109,10 +99,8 @@
                     </div>
                   </c-col>
                 </c-row>
-
               </c-card-body>
             </c-card>
-
           </c-col>
           <c-col lg="12">
             <c-card class="mb-4">
@@ -125,11 +113,9 @@
                   required
                   [ngClass]="{ 'is-invalid': (submitted || f['contenido'].touched) && f['contenido'].invalid }"
                 ></ckeditor>
-
                 <div *ngIf="f['contenido'].invalid" class="invalid-feedback">
                   <div *ngIf="f['contenido'].errors?.['required']">Escribe algo en la entrada vago</div>
                 </div>
-                
               </c-card-body>
             </c-card>
           </c-col>
@@ -174,11 +160,9 @@
                     <h3 cCardTitle class="h6 card-title">Categorias</h3>
                     <c-form-check class="mb-3 form-check" cFormControl
                       *ngFor="let categ of categorias" ngValue="categ">
-                    
                       <input cFormCheckInput formControlName="categorias" 
                         type="checkbox" [checked]="inputCheckedCategorias(categ,entrada.categorias)">
                       <label cFormCheckLabel>{{categ.nombre}}</label>
-
                     </c-form-check>
                   </c-card-body>
                 </c-card>
@@ -227,7 +211,5 @@
         </c-row>
       </form>
     </c-container>
-
   </c-card-body>
 </c-card>
-
