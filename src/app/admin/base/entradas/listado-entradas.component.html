@@ -7,17 +7,16 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button cButton color="light" size="sm">
           <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
-            Imprimir
+          Imprimir
         </button>
         <button cButton color="warning" size="sm">
           <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Pendientes de revisión"></svg>
-            Sin revisar
+          Sin revisar
         </button>
       </div>
     </c-col>
   </c-card-header>
   <c-card-body>
-
     <div class="d-flex justify-content-between align-items-end">
       <h5 cCardTitle>Listado de entradas</h5>
       <div class="hstack gap-3">
@@ -28,47 +27,36 @@
       </div>
     </div>
     <hr>
-
-    <!--<div class="fade show" style="text-align: center; padding-top: calc(100vh / 2); height: 100vh" *ngIf="!cargaFinalizada">
-      <c-spinner size="sm" variant="grow"></c-spinner>
-      <span class="m-1">Cargando datos...</span>
-    </div>-->
-    <c-card *ngIf="listaEntradas.length <= 0">
+    <!--<c-card *ngIf="listaEntradas.length <= 0">
       <c-card-body>
-        <div >
+        <div>
           <h5 cCardTitle>No hay entradas</h5>
-          <p cCardText>
-            No se han encontrado registros en el sistema...
-          </p>
+          <p cCardText>No se han encontrado registros en el sistema...</p>
           <button cButton href="#" color="primary" (click)="refrescarPagina()">Refrescar</button>
         </div>
       </c-card-body>
       <hr>
-    </c-card>
-    
-    <!---->
-
-    <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length > 0" [hidden]="!cargaFinalizada">
+    </c-card>-->
+    <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length >= 0">
       <thead cTableColor="dark">
-      <tr>
-        <th scope="col">ID</th>
-        <th scope="col">Título</th>
-        <th scope="col">Autor</th>
-        <th scope="col">Fecha Publicación</th>
-        <th class="w-25" scope="col">Resumen</th>
-        <th class="w-10" scope="col">Categorias</th>
-      </tr>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Título</th>
+          <th scope="col">Autor</th>
+          <th scope="col">Fecha Publicación</th>
+          <th class="w-25" scope="col">Resumen</th>
+          <th class="w-10" scope="col">Categorias</th>
+        </tr>
       </thead>
       <tbody *ngFor="let entr of listaEntradas">
-      <tr [routerLink]="['/admin/control/entradas', entr.idEntrada]" style="cursor: pointer"
-        cAlign="middle">
-        <td scope="row">{{entr.idEntrada}}</td>
-        <td>{{entr.titulo}}</td>
-        <td>{{entr.username}}</td>
-        <td>{{checkFechaPublicacion(entr.fechaPublicacion)}}</td>
-        <td>{{entr.resumen}}</td>
-        <td>{{entr.categoriasConComas}}</td>
-      </tr>
+        <tr [routerLink]="['/admin/control/entradas', entr.idEntrada]" style="cursor: pointer" cAlign="middle">
+          <td scope="row">{{entr.idEntrada}}</td>
+          <td>{{entr.titulo}}</td>
+          <td>{{entr.username}}</td>
+          <td>{{checkFechaPublicacion(entr.fechaPublicacion)}}</td>
+          <td>{{entr.resumen}}</td>
+          <td>{{entr.categoriasConComas}}</td>
+        </tr>
       </tbody>
       <tbody *ngIf="listaEntradas.length <= 0" cAlign="middle">
         <tr style="cursor: pointer">
@@ -76,29 +64,16 @@
         </tr>
       </tbody>
     </table>
-
-    <c-pagination aria-label="Page navigation example" size="sm" *ngIf="listaEntradas.length > 0">
-      <li cPageItem [active]="true">
-        <a cPageLink [routerLink]>Anteriores</a>
+    <c-pagination aria-label="Paginación de entradas" size="sm" *ngIf="listaEntradas.length > 0">
+      <li cPageItem [active]="page === 1">
+        <a cPageLink (click)="onPageChange(page - 1)" [routerLink]><span aria-hidden="true">&laquo;</span></a>
       </li>
-      <li cPageItem>
-        <a cPageLink [routerLink]>1</a>
+      <li cPageItem *ngFor="let p of getPages()" [active]="p === page">
+        <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
       </li>
-      <li cPageItem>
-        <a cPageLink [routerLink]>2</a>
-      </li>
-      <li cPageItem>
-        <a cPageLink [routerLink]>3</a>
-      </li>
-      <li cPageItem>
-        <a cPageLink [routerLink]>Posteriores</a>
+      <li cPageItem [active]="page === numberOfPages">
+        <a cPageLink (click)="onPageChange(page + 1)" [routerLink]><span aria-hidden="true">&raquo;</span></a>
       </li>
     </c-pagination>
-
-    <!---->
-
   </c-card-body>
-  </c-card>
-
-
-
+</c-card>

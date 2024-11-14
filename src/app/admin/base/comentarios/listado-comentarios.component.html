@@ -7,11 +7,11 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button cButton color="light" size="sm">
           <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
-            Imprimir
+          Imprimir
         </button>
         <button cButton color="warning" size="sm">
           <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Pendientes de revisión"></svg>
-            No aprobados
+          No aprobados
         </button>
       </div>
     </c-col>
@@ -22,16 +22,14 @@
       <h5 cCardTitle>Listado de comentarios</h5>
       <div class="hstack gap-3">
         <button cButton color="success" size="sm" routerLink="crear">
-          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nueva Entrada"></svg>
+          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nuevo Comentario"></svg>
           Crear nuevo Comentario
         </button>
       </div>
     </div>
     <hr>
     
-    <!---->
-    
-    <table cTable hover *ngIf="listaComentarios.length >= 0">
+    <table cTable hover *ngIf="listaComentarios.length > 0">
       <thead cTableColor="dark">
         <tr>
           <th scope="col">ID</th>
@@ -43,8 +41,8 @@
           <th scope="col">Cuarentena</th>
         </tr>
       </thead>
-      <tbody *ngFor="let coment of listaComentarios">
-        <tr (click)="navigate('/admin/control/comentarios/'+coment.idComentario)"  style="cursor: pointer">
+      <tbody>
+        <tr *ngFor="let coment of listaComentarios" (click)="navigate('/admin/control/comentarios/'+coment.idComentario)" style="cursor: pointer">
           <td scope="row">{{coment.idComentario}}</td>
           <td>{{coment.contenido}}</td>
           <td>{{coment.username}}</td>
@@ -54,17 +52,23 @@
           <td>{{checkTrueOrFalseToString(coment.cuarentena)}}</td>
         </tr>
       </tbody>
-      <tbody *ngIf="listaComentarios.length <= 0" cAlign="middle">
+      <tbody *ngIf="listaComentarios.length === 0" cAlign="middle">
         <tr style="cursor: pointer">
           <td colSpan="7">No se han encontrado registros en el sistema...</td>
         </tr>
       </tbody>
     </table>
-
-    <!---->
+    <c-pagination aria-label="Paginación de comentarios" size="sm" *ngIf="listaComentarios.length > 0">
+      <li cPageItem>
+        <a cPageLink aria-label="Previous" (click)="onPreviousPage()"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li cPageItem *ngFor="let page of pages">
+        <a cPageLink (click)="onPageChange(page)">{{ page }}</a>
+      </li>
+      <li cPageItem>
+        <a cPageLink aria-label="Next" (click)="onNextPage()"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+    </c-pagination>
 
   </c-card-body>
-  </c-card>
-
-
-
+</c-card>

@@ -129,7 +129,9 @@ import {
     GridModule,
     HeaderModule,
     ListGroupModule,
+    NavbarModule,
     NavModule,
+    PaginationModule,
     ProgressModule,
     SidebarModule,
     SpinnerModule,
@@ -161,11 +163,13 @@ import { DatePipe } from "@angular/common";
         IconModule,
         ListGroupModule,
         NavModule,
+        NavbarModule,
         ProgressModule,
         SidebarModule,
         SpinnerModule,
         TabsModule,
         UtilitiesModule,
+        PaginationModule
     ],
     declarations: [
         PublicComponent,

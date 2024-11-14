@@ -1,0 +1,77 @@
+html {
+  scroll-behavior: smooth;
+}
+
+.navbar-fixed {
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.brand-large {
+  font-size: 2rem; /* Tamaño grande */
+  transition: font-size 0.3s ease;
+}
+
+.navbar-shrink {
+  height: 70px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff; /* Asegura que el texto sea blanco */
+}
+
+.navbar-shrink .brand-large {
+  font-size: 1.5rem; /* Tamaño pequeño */
+}
+
+/* Asegura que los enlaces sean blancos */
+.navbar-shrink a {
+  color: #fff !important; /* Fuerza el color blanco para los enlaces */
+}
+
+/* Ajustes para modo oscuro */
+.dark-mode .navbar-fixed {
+  background-color: #343a40;
+}
+
+.dark-mode .navbar-fixed .brand-large,
+.dark-mode .navbar-fixed a {
+  color: #fff !important; /* Fuerza el color blanco para los enlaces en modo oscuro */
+}
+
+/* Asegura que los enlaces sean blancos */
+.navbar-shrink c-nav-link,
+.navbar-shrink c-nav-link a,
+.navbar-shrink c-header-brand,
+.navbar-shrink c-header-brand a {
+  color: #fff !important; /* Fuerza el color blanco para los enlaces */
+}
+
+.dark-mode .navbar-fixed .brand-large,
+.dark-mode .navbar-fixed c-nav-link,
+.dark-mode .navbar-fixed c-nav-link a,
+.dark-mode .navbar-fixed c-header-brand,
+.dark-mode .navbar-fixed c-header-brand a {
+  color: #fff !important; /* Fuerza el color blanco para los enlaces en modo oscuro */
+}
+
+/* Media query for responsive behavior */
+@media (max-width: 768px) {
+  .navbar-fixed {
+    padding: 0 10px; /* Ajusta el padding según sea necesario */
+  }
+
+  .navbar-shrink {
+    height: auto;
+  }
+
+  .navbar-shrink .brand-large {
+    font-size: 1.2rem; /* Ajusta el tamaño de la fuente */
+  }
+
+  .navbar-shrink a {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}

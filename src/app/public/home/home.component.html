@@ -1,13 +1,9 @@
-<!-- Main Content-->
-
 <main class="container">
-
   <c-card class="text-center mb-4">
     <c-card-header>
       <h5>Entradas</h5>
     </c-card-header>
     <c-card-body>
-
       <button cButton color="primary" disabled *ngIf="loading">
         <c-spinner aria-hidden="true" size="sm"></c-spinner>
         Cargando datos...
@@ -21,96 +17,64 @@
         <button cButton href="#about" color="primary" (click)="refrescarPagina()">Refrescar</button>
       </div>
 
-
-      <span *ngFor="let entrada of entradas" class="mb-3 text-start" [hidden]="!cargaFinalizada">
-
-        <c-row [gutter]="4" [md]="1" [xs]="1" class="mb-4">
-          <c-col>
-            <c-card>
-              <img src="../../../../assets/img/brand/coreui-base.svg">
-              <c-card-body>
-                <h5 cCardTitle>{{ entrada.titulo }}</h5>
-                <p cCardText>
-                  {{ entrada.resumen }}
-                </p>
-                <button cButton color="primary">Continuar leyendo...</button>
-              </c-card-body>
-              <c-card-footer>
-                <small class="text-medium-emphasis">Fecha publicación: {{ entrada.fechaPublicacion }}</small>
-                <br />
-                <small class="text-medium-emphasis" *ngFor="let categoria of categorias">Categorias: <a cCardLink
-                    [routerLink]>{{ categoria.nombre }}</a></small>
-              </c-card-footer>
-            </c-card>
-          </c-col>
-        </c-row>
-
-        <c-row [gutter]="4" class="mb-3 text-start" [md]="2" [xs]="1">
-          <c-col>
-            <c-card>
-              <img cCardImg="top" src="../../../../assets/img/brand/coreui-base.svg">
-              <c-card-body>
-
-                <h5 cCardTitle>{{ entrada.titulo }}</h5>
-                <p cCardText>
-                  {{ entrada.resumen }}
-                </p>
-                <button cButton color="primary">Continuar leyendo...</button>
-              </c-card-body>
-              <c-card-footer>
-                <small class="text-medium-emphasis">Fecha publicación: {{ entrada.fechaPublicacion }}</small>
-                <br />
-                <small class="text-medium-emphasis" *ngFor="let categoria of categorias">Categorias: <a cCardLink
-                    [routerLink]>{{ categoria.nombre }}</a></small>
-              </c-card-footer>
-            </c-card>
-          </c-col>
-        </c-row>
-      </span>
-
-
-      <!--Entradas-->
-      <div *ngFor="let entrada of entradas">
-
-        <div class="p-4 p-md-5 mb-4 rounded text-bg-dark">
-          <div class="col-md-6 px-0">
-            <h1 class="display-4 fst-italic">{{ entrada.titulo }}</h1>
-            <p class="lead my-3">{{ entrada.resumen }}</p>
-            <p class="lead mb-0"><a href="#" class="text-white fw-bold">Continuar leyendo...</a></p>
-          </div>
+      <div *ngIf="cargaFinalizada">
+        <div class="large-entry mb-4" *ngIf="pagedEntradas.length > 0">
+          <c-card>
+            <img src="../../../../assets/img/brand/coreui-base.svg" class="card-img-top">
+            <c-card-body>
+              <h5 cCardTitle>{{ pagedEntradas[0]?.titulo }}</h5>
+              <p cCardText>{{ pagedEntradas[0]?.resumen }}</p>
+              <button cButton color="primary">Continuar leyendo...</button>
+            </c-card-body>
+            <c-card-footer>
+              <small class="text-medium-emphasis">
+                Fecha publicación: {{ pagedEntradas[0]?.fechaPublicacion ? pagedEntradas[0]?.fechaPublicacion : 'No Publicada' }}
+              </small>
+              <div *ngFor="let categoria of pagedEntradas[0]?.categorias">
+                <small class="text-medium-emphasis">Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small>
+              </div>
+            </c-card-footer>
+          </c-card>
         </div>
 
-        <div class="row mb-2">
-          <div class="col-md-6">
-            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-              <div class="col p-4 d-flex flex-column position-static">
-                <strong class="d-inline-block mb-2 text-primary" *ngFor="let categoria of categorias">{{
-                  categoria.nombre
-                  }}</strong>
-                <h3 class="mb-0">{{ entrada.titulo }}</h3>
-                <div class="mb-1 text-muted">{{ entrada.fechaPublicacion }}</div>
-                <p class="card-text mb-auto">{{ entrada.resumen }}</p>
-                <a href="#" class="stretched-link">Continuar leyendo...</a>
-              </div>
-              <div class="col-auto d-none d-lg-block">
-                <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" role="img"
-                  aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
-                  <title>Placeholder</title>
-                  <rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef"
-                    dy=".3em">Thumbnail</text>
-                </svg>
-
-              </div>
-            </div>
-          </div>
-        </div>
+        <c-row>
+          <ng-container *ngFor="let entrada of pagedEntradas.slice(1)">
+            <c-col [md]="4" class="mb-4">
+              <c-card>
+                <img src="../../../../assets/img/brand/coreui-base.svg" class="card-img-top">
+                <c-card-body>
+                  <h5 cCardTitle>{{ entrada.titulo }}</h5>
+                  <p cCardText>{{ entrada.resumen }}</p>
+                  <button cButton color="primary">Continuar leyendo...</button>
+                </c-card-body>
+                <c-card-footer>
+                  <small class="text-medium-emphasis">
+                    Fecha publicación: {{ entrada.fechaPublicacion ? entrada.fechaPublicacion : 'No Publicada' }}
+                  </small>
+                  <div *ngFor="let categoria of entrada.categorias">
+                    <small class="text-medium-emphasis">Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small>
+                  </div>
+                </c-card-footer>
+              </c-card>
+            </c-col>
+          </ng-container>
+        </c-row>
       </div>
-      <!--./fin entradas-->
 
+      <c-pagination aria-label="Paginación de entradas" size="sm" *ngIf="entradas.length > 0">
+        <li cPageItem [active]="page === 1">
+          <a cPageLink (click)="onPageChange(page - 1)" [routerLink]><span aria-hidden="true">&laquo;</span></a>
+        </li>
+        <li cPageItem *ngFor="let p of getPages()" [active]="p === page">
+          <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
+        </li>
+        <li cPageItem [active]="page === numberOfPages">
+          <a cPageLink (click)="onPageChange(page + 1)" [routerLink]><span aria-hidden="true">&raquo;</span></a>
+        </li>
+      </c-pagination>
     </c-card-body>
     <c-card-footer class="text-medium-emphasis">
       2 days ago
     </c-card-footer>
   </c-card>
-
 </main>

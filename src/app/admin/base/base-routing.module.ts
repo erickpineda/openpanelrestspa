@@ -8,25 +8,24 @@ import { BaseComponent } from './base.component';
 
 
 const routes: Routes = [
-  {path: '', component: BaseComponent, children: [
-    {
-      path: 'entradas', children: [
-        { path: '', component: ListadoEntradasComponent },
-        { path: ':idEntrada', component: CrearEditarEntrada },
-        { path: 'crear', component: CrearEditarEntrada },
-      ]
-    },
-    {
-      path: 'comentarios', children: [
-        { path: '', component: ListadoComentariosComponent },
-        { path: ':idComentario', component: CrearEditarComentario },
-        { path: 'crear', component: CrearEditarComentario },
-      ]
-    }
-  ]}
-
-  
-  
+  {
+    path: '', component: BaseComponent, children: [
+      {
+        path: 'entradas', children: [
+          { path: '', component: ListadoEntradasComponent },
+          { path: ':idEntrada', component: CrearEditarEntrada },
+          { path: 'crear', component: CrearEditarEntrada },
+        ]
+      },
+      {
+        path: 'comentarios', children: [
+          { path: '', component: ListadoComentariosComponent },
+          { path: ':idComentario', component: CrearEditarComentario },
+          { path: 'crear', component: CrearEditarComentario },
+        ]
+      }
+    ]
+  }
 ];
 
 @NgModule({

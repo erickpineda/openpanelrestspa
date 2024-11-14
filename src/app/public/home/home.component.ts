@@ -26,6 +26,10 @@ export class HomeComponent implements OnInit {
   entradas: Entrada[];
   categorias: Categoria[];
 
+  page = 1;
+  pageSize = 5;
+  pagedEntradas: any[] = [];
+
   constructor(private entradaService: EntradaService, public loader: LoadingService, private http: HttpClient) {
     this.entradas = [];
     this.categorias = [];
@@ -39,6 +43,7 @@ export class HomeComponent implements OnInit {
       listaRes.forEach((entradaRes) => {
         entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
       });
+      this.refreshEntradas(); // Refrescar las entradas después de obtener la lista
     });
   }
 
@@ -82,8 +87,28 @@ export class HomeComponent implements OnInit {
       });
   }
 
+  refreshEntradas() {
+    this.pagedEntradas = this.entradas.slice(
+      (this.page - 1) * this.pageSize,
+      (this.page - 1) * this.pageSize + this.pageSize
+    );
+  }
+
+  onPageChange(page: number) {
+    if (page < 1 || page > this.numberOfPages) return;
+    this.page = page;
+    this.refreshEntradas();
+  }
+
+  get numberOfPages(): number {
+    return Math.ceil(this.entradas.length / this.pageSize);
+  }
+
+  getPages(): number[] {
+    return Array.from({ length: this.numberOfPages }, (v, k) => k + 1);
+  }
+
   public refrescarPagina(): void {
     window.location.reload();
   }
-
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { TokenStorageService } from 'src/app/core/services/token-storage.service';
 import { cilUser, cilLockLocked } from '@coreui/icons';
@@ -22,6 +22,7 @@ export class LoginComponent extends CommonFunctionalityComponent implements OnIn
   };
   isLoggedIn = false;
   isLoginFailed = false;
+  isLoading = false; // Nueva variable de estado de carga
   errorMessage = '';
   roles: string[] = [];
 
@@ -29,9 +30,10 @@ export class LoginComponent extends CommonFunctionalityComponent implements OnIn
     protected override datePipe: DatePipe,
     protected override router: Router,
     private authService: AuthService,
-    private tokenStorage: TokenStorageService
-    ) {
-      super(router, datePipe);
+    private tokenStorage: TokenStorageService,
+    private cdr: ChangeDetectorRef
+  ) {
+    super(router, datePipe);
   }
   
   override ngOnInit(): void {
@@ -40,7 +42,9 @@ export class LoginComponent extends CommonFunctionalityComponent implements OnIn
       this.roles = this.tokenStorage.getUser().roles;
     }
   }
+
   onSubmit(): void {
+    this.isLoading = true; // Inicia el estado de carga
     const { username, password } = this.form;
     this.authService.login(username, password).subscribe({
       next: data => {
@@ -49,15 +53,20 @@ export class LoginComponent extends CommonFunctionalityComponent implements OnIn
         this.isLoginFailed = false;
         this.isLoggedIn = true;
         this.roles = this.tokenStorage.getUser().roles;
-        //this.reloadPage();
-        this.reloadComponent(false, '/admin');
+        this.isLoading = false; // Finaliza el estado de carga
+        setTimeout(() => {
+          this.reloadComponent(false, '/admin'); // Añade un retraso antes de la navegación
+        }, 500); // Retraso de 500ms
       },
       error: err => {
         this.errorMessage = err.error.message;
         this.isLoginFailed = true;
+        this.isLoading = false; // Finaliza el estado de carga
+        this.cdr.detectChanges(); // Forzar detección de cambios
       }
     });
   }
+
   override reloadPage(): void {
     window.location.reload();
   }
