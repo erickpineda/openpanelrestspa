@@ -29,7 +29,7 @@
     </div>
     <hr>
     
-    <table cTable hover *ngIf="listaComentarios.length > 0">
+    <table cTable hover *ngIf="listaComentarios.length >= 0">
       <thead cTableColor="dark">
         <tr>
           <th scope="col">ID</th>
@@ -41,10 +41,10 @@
           <th scope="col">Cuarentena</th>
         </tr>
       </thead>
-      <tbody>
-        <tr *ngFor="let coment of listaComentarios" (click)="navigate('/admin/control/comentarios/'+coment.idComentario)" style="cursor: pointer">
+      <tbody *ngFor="let coment of listaComentarios">
+        <tr (click)="navigate('/admin/control/comentarios/'+coment.idComentario)" style="cursor: pointer">
           <td scope="row">{{coment.idComentario}}</td>
-          <td>{{coment.contenido}}</td>
+          <td>{{ truncateContent(coment.contenido) }}</td>
           <td>{{coment.username}}</td>
           <td>{{coment.tituloEntrada}}</td>
           <td>{{coment.fechaCreacionParseada}}</td>
@@ -58,15 +58,15 @@
         </tr>
       </tbody>
     </table>
-    <c-pagination aria-label="Paginación de comentarios" size="sm" *ngIf="listaComentarios.length > 0">
-      <li cPageItem>
-        <a cPageLink aria-label="Previous" (click)="onPreviousPage()"><span aria-hidden="true">&laquo;</span></a>
+    <c-pagination aria-label="Paginación de comentarios" size="sm" *ngIf="listaComentarios.length >= 0">
+      <li cPageItem [active]="page === 1">
+        <a cPageLink (click)="onPageChange(page - 1)" [routerLink]><span aria-hidden="true">&laquo;</span></a>
       </li>
-      <li cPageItem *ngFor="let page of pages">
-        <a cPageLink (click)="onPageChange(page)">{{ page }}</a>
+      <li cPageItem *ngFor="let p of getPages()" [active]="p === page">
+        <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
       </li>
-      <li cPageItem>
-        <a cPageLink aria-label="Next" (click)="onNextPage()"><span aria-hidden="true">&raquo;</span></a>
+      <li cPageItem [active]="page === numberOfPages">
+        <a cPageLink (click)="onPageChange(page + 1)" [routerLink]><span aria-hidden="true">&raquo;</span></a>
       </li>
     </c-pagination>
 

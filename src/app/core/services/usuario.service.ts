@@ -3,7 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { Usuario } from "../models/usuario.model";
 import { CrudService } from "../_utils/crud.service";
 import { TokenStorageService } from "./token-storage.service";
-import { Observable } from "rxjs";
+import { lastValueFrom, Observable } from "rxjs";
 import { PerfilResponse } from "../models/perfil-response.model";
 
 @Injectable({
@@ -23,6 +23,19 @@ export class UsuarioService extends CrudService<Usuario> {
     return this.http.get<PerfilResponse>(url, {
       observe: 'body', headers: this.setHeaders(),
     });
+  }
+
+  async getUsernameActual(): Promise<string | void> {
+    try {
+      const perfil = await lastValueFrom(this.obtenerDatosSesionActual());
+      if (perfil) {
+        return perfil.username;
+      } else {
+        console.log('El perfil es undefined');
+      }
+    } catch (err) {
+      console.log('Ha habido algun problema para recuperar el usuario en sesion');
+    }
   }
 
 }

@@ -3,6 +3,7 @@ import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { Comentario } from "src/app/core/models/comentario.model";
 import { Entrada } from "src/app/core/models/entrada.model";
+import { PaginaResponse } from "src/app/core/models/pagina-response.model";
 import { Usuario } from "src/app/core/models/usuario.model";
 import { ComentarioService } from "src/app/core/services/comentario.service";
 import { EntradaService } from "src/app/core/services/entrada.service";
@@ -18,9 +19,13 @@ import { CommonFunctionalityComponent } from "src/app/shared/components/funciona
 export class ListadoComentariosComponent extends CommonFunctionalityComponent implements OnInit {
 
   listaComentarios: Comentario[] = [];
-  currentPage = 1;
-  totalPages = 5; // Ajusta este valor según tus necesidades
-  pages: number[] = [];
+
+  page = 1;
+  pageSize = 5;
+  pageCurrent = 0;
+  pagedComentarios: any[] = [];
+
+  estaVacio: boolean = false;
 
   constructor(
     protected override router: Router,
@@ -30,35 +35,26 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
     protected override datePipe: DatePipe
   ) {
     super(router, datePipe);
-    this.initList();
-    this.initPages();
+    
   }
 
-  private async initList() {
+  override ngOnInit(): void {
+    this.initList();
+  }
+
+  private initList() {
     try {
-      const listaRes = await this.obtenerListaComentarios(this.currentPage);
-      if (listaRes) {
-        this.totalPages = listaRes.totalPages;
-        for (const res of listaRes.data) {
-          if (res) {
-            res.fechaCreacionParseada = this.transformaFecha(res.fechaCreacion, 'dd/MM/yyyy', false);
-            const usuario = await this.obtenerDatosUsuario(res.idUsuario);
-            if (usuario) {
-              res.username = usuario.username;
-            }
-            const entrada = await this.obtenerDatosEntrada(res.idEntrada);
-            if (entrada) {
-              res.tituloEntrada = entrada.titulo;
-            }
-          }
+      this.obtenerListaComentarios().then((listaRes: PaginaResponse) => {
+        this.listaComentarios = listaRes.data;
+        this.estaVacio = listaRes.empty;
+        if (!this.estaVacio) {
+          this.refreshComentarios();
         }
-      }
+      });
     } catch (error) {
       console.error("Error initializing list:", error);
     }
   }
-
-  override ngOnInit(): void {}
 
   navigate(urlToNavigate: string) {
     this.router.navigate([urlToNavigate])
@@ -90,12 +86,11 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
     });
   }
 
-  private async obtenerListaComentarios(page: number): Promise<{ data: Comentario[], totalPages: number }> {
+  private async obtenerListaComentarios(): Promise<PaginaResponse> {
     return new Promise((resolve, reject) => {
-      this.comentarioService.listarPagina(page,10).subscribe({
+      this.comentarioService.listarPagina(this.pageCurrent, this.pageSize).subscribe({
         next: data => {
-          this.listaComentarios = data.data;
-          resolve({ data: this.listaComentarios, totalPages: data.totalPages });
+          resolve(data);
         },
         error: (err: any) => {
           if (err && err.status == 404 && err.error && err.error.message) {
@@ -107,37 +102,50 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
     });
   }
 
-  private initPages() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-    this.initList();
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.initList();
-  }
-
-  onPreviousPage() {
-    if (this.currentPage > 1) {
-      this.onPageChange(this.currentPage - 1);
-    }
-  }
-
-  onNextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.onPageChange(this.currentPage + 1);
-    }
-  }
-
   public checkTrueOrFalseToString(toCheck: boolean) {
     return toCheck ? 'Si' : 'No';
   }
 
-  crearEntrada() {}
+  truncateContent(content: string): string {
+    return content.length > 20 ? content.substring(0, 20) + '...' : content;
+  }
 
-  actualizarEntrada(id: number) {}
+  refreshComentarios() {
+    this.pagedComentarios= this.listaComentarios.slice(
+      (this.page - 1) * this.pageSize,
+      (this.page - 1) * this.pageSize + this.pageSize
+    );
+  }
 
-  borrarEntrada(id: number) {}
+  onPageChange(page: number) {
+    //if (page < 1 || page > this.numberOfPages) return;
+    
+    if (page < 1) return;
+
+    if (page > this.numberOfPages) {
+      this.pageCurrent = page;
+      this.obtenerListaComentarios().then((listaRes: PaginaResponse) => {
+        this.listaComentarios = listaRes.data;
+        this.estaVacio = listaRes.empty;
+        if (this.estaVacio) {
+          this.page = this.pageCurrent;
+          return;
+        } else {
+          this.refreshComentarios();
+        }
+      });
+    }
+
+    this.page = page;
+  }
+
+  get numberOfPages(): number {
+    return this.listaComentarios.length === 0? 1: Math.ceil(this.listaComentarios.length / this.pageSize);
+  }
+
+  getPages(): number[] {
+    return Array.from({ length: this.numberOfPages }, (v, k) => k + 1);
+  }
 
   public refrescarPagina(): void {
     window.location.reload();

@@ -174,7 +174,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
       imagenDestacada: null,
       votos: 0,
       cantidadComentarios: 0,
-      categorias: [],
+      categorias: [Categoria, [Validators.required]],
       categoriasConComas: [''],
       etiquetas: [],
     });
@@ -217,6 +217,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   guardar() {
     if (this.onValidate()) {
         var ent: Entrada = this.entradaForm.value;
+        ent.categorias = ent.categorias ? ent.categorias : [];
         if (this.isCreatingNewEntry()) {
             this.creaEntrada(ent);
         } else {

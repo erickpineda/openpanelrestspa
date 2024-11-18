@@ -58,6 +58,9 @@ export class ListadoEntradasComponent extends CommonFunctionalityComponent imple
           resolve(this.listaEntradas);
         },
         error: err => {
+          if (err && err.status == 404 && err.error && err.error.message) {
+            this.listaEntradas = [];
+          }
           reject(err);
         }
       });

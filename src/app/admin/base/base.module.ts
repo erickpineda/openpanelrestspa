@@ -19,6 +19,8 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { EntradaService } from 'src/app/core/services/entrada.service';
 import { TokenStorageService } from 'src/app/core/services/token-storage.service';
 import { UsuarioService } from 'src/app/core/services/usuario.service';
+import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
+import { CrearEditarCategoria } from './categorias/crear-editar/crear-editar-categoria.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -62,6 +64,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     CrearEditarEntrada,
     ListadoComentariosComponent,
     CrearEditarComentario,
+    ListadoCategoriasComponent,
+    CrearEditarCategoria,
   ],
   providers: [
     DatePipe,
