@@ -9,14 +9,14 @@ import { ComentarioService } from "../../../../core/services/comentario.service"
 import { EntradaService } from "../../../../core/services/entrada.service";
 import { TokenStorageService } from "../../../../core/services/token-storage.service";
 import { UsuarioService } from "../../../../core/services/usuario.service";
-import { CommonFunctionalityComponent } from "../../../../shared/components/funcionalidades-comunes/common-functionality.component";
+import { CommonFunctionalityService } from "src/app/shared/services/common-functionality.service";
 
 @Component({
   selector: 'app-crear-editar-comentario',
   templateUrl: './crear-editar-comentario.component.html',
   styleUrls: ['./crear-editar-comentario.component.scss'],
 })
-export class CrearEditarComentario extends CommonFunctionalityComponent implements OnInit {
+export class CrearEditarComentario implements OnInit {
   comentarioForm!: UntypedFormGroup;
   comentario: Comentario = new Comentario();
   usuarioEnSesion: Usuario = new Usuario;
@@ -25,8 +25,7 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
   submitted = false;
 
   constructor(
-    protected override router: Router,
-    protected override datePipe: DatePipe,
+    private commonFuncService: CommonFunctionalityService,
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     public entradaService: EntradaService,
@@ -34,7 +33,6 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
     public usuarioService: UsuarioService,
     public tokenStorageService: TokenStorageService,
   ) {
-    super(router, datePipe);
     this.createForm();
 
     new Promise<void>((resolve, _reject) => {
@@ -42,7 +40,7 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
     });
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
   }
 
   private obtenerDatos() {
@@ -159,7 +157,7 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
     this.comentarioService.crear(coment).subscribe((data: Comentario)=> {
       if (data) {
         this.comentario = data;
-        this.reloadComponent(false, '/admin/control/comentarios');
+        this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
       }
     });
   }
@@ -168,7 +166,7 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
     this.comentarioService.actualizar(coment.idComentario, coment).subscribe((data: Comentario)=> {
       if (data) {
         this.comentario = data;
-        this.reloadComponent(false, '/admin/control/comentarios');
+        this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
       }
     });
   }

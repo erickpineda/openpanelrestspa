@@ -28,7 +28,6 @@ export class BaseComponent implements OnInit {
       .subscribe((loading) => {
         this.loading = loading;
         this.cargaFinalizada = !loading;
-        console.log(this.cargaFinalizada);
       });
   }
 }

@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TokenStorageService } from '../../core/services/token-storage.service';
-import { CommonFunctionalityComponent } from '../../shared/components/funcionalidades-comunes/common-functionality.component';
+import { CommonFunctionalityService } from 'src/app/shared/services/common-functionality.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +12,7 @@ import { CommonFunctionalityComponent } from '../../shared/components/funcionali
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent extends CommonFunctionalityComponent implements OnInit {
+export class LoginComponent implements OnInit {
 
   icons = { cilUser, cilLockLocked };
 
@@ -27,16 +27,14 @@ export class LoginComponent extends CommonFunctionalityComponent implements OnIn
   roles: string[] = [];
 
   constructor(
-    protected override datePipe: DatePipe,
-    protected override router: Router,
+    private commonFuncService: CommonFunctionalityService,
     private authService: AuthService,
     private tokenStorage: TokenStorageService,
     private cdr: ChangeDetectorRef
   ) {
-    super(router, datePipe);
   }
   
-  override ngOnInit(): void {
+  ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
       this.isLoggedIn = true;
       this.roles = this.tokenStorage.getUser().roles;
@@ -55,7 +53,7 @@ export class LoginComponent extends CommonFunctionalityComponent implements OnIn
         this.roles = this.tokenStorage.getUser().roles;
         this.isLoading = false; // Finaliza el estado de carga
         setTimeout(() => {
-          this.reloadComponent(false, '/admin'); // Añade un retraso antes de la navegación
+          this.commonFuncService.reloadComponent(false, '/admin'); // Añade un retraso antes de la navegación
         }, 500); // Retraso de 500ms
       },
       error: err => {
@@ -67,7 +65,7 @@ export class LoginComponent extends CommonFunctionalityComponent implements OnIn
     });
   }
 
-  override reloadPage(): void {
+  reloadPage(): void {
     window.location.reload();
   }
 }

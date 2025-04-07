@@ -7,14 +7,14 @@ import { Usuario } from '../../../core/models/usuario.model';
 import { EntradaService } from '../../../core/services/entrada.service';
 import { LoadingService } from '../../../core/services/loading.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
-import { CommonFunctionalityComponent } from '../../../shared/components/funcionalidades-comunes/common-functionality.component';
+import { CommonFunctionalityService } from 'src/app/shared/services/common-functionality.service';
 
 @Component({
   selector: 'app-listado-entradas',
   templateUrl: './listado-entradas.component.html',
   styleUrls: ['./listado-entradas.component.scss']
 })
-export class ListadoEntradasComponent extends CommonFunctionalityComponent implements OnInit {
+export class ListadoEntradasComponent implements OnInit {
   entrada: Entrada = new Entrada();
   listaEntradas: Entrada[] = [];
   nombresCategoriasConComas: string = '';
@@ -25,17 +25,15 @@ export class ListadoEntradasComponent extends CommonFunctionalityComponent imple
   pagedEntradas: any[] = [];
 
   constructor(
-    protected override router: Router,
+    private commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
     private usuarioService: UsuarioService,
-    protected override datePipe: DatePipe,
     public loader: LoadingService
   ) {
-    super(router, datePipe);
     
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
     this.obtenerListaEntradas().then((listaRes: Entrada[]) => {
       listaRes.forEach((entradaRes) => {
         entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
@@ -81,7 +79,7 @@ export class ListadoEntradasComponent extends CommonFunctionalityComponent imple
   }
 
   public checkFechaPublicacion(fechaPublicacion: Date): string {
-    return fechaPublicacion ? this.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false) : 'No publicada';
+    return fechaPublicacion ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false) : 'No publicada';
   }
 
   crearEntrada() {}

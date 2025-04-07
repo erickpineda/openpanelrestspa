@@ -10,22 +10,21 @@ import { CategoriaService } from "../../../../core/services/categoria.service";
 import { EntradaService } from "../../../../core/services/entrada.service";
 import { TokenStorageService } from "../../../../core/services/token-storage.service";
 import { UsuarioService } from "../../../../core/services/usuario.service";
-import { CommonFunctionalityComponent } from "../../../../shared/components/funcionalidades-comunes/common-functionality.component";
+import { CommonFunctionalityService } from "src/app/shared/services/common-functionality.service";
 
 @Component({
   selector: 'app-crear-editar-categoria',
   templateUrl: './crear-editar-categoria.component.html',
   styleUrls: ['./crear-editar-categoria.component.scss'],
 })
-export class CrearEditarCategoria extends CommonFunctionalityComponent implements OnInit {
+export class CrearEditarCategoria implements OnInit {
   categoriaForm!: FormGroup;
   usuarioEnSesion: PerfilResponse = new PerfilResponse();
   submitted = false;
   listaCategorias: Categoria[] = [];
 
   constructor(
-    protected override router: Router,
-    protected override datePipe: DatePipe,
+    private commonFuncService: CommonFunctionalityService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
     public tokenStorageService: TokenStorageService,
@@ -33,12 +32,11 @@ export class CrearEditarCategoria extends CommonFunctionalityComponent implement
     public usuarioService: UsuarioService,
     private entradaService: EntradaService
   ) {
-    super(router, datePipe);
     
     this.createForm();
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
     this.obtenerDatos();
   }
 
@@ -134,13 +132,13 @@ export class CrearEditarCategoria extends CommonFunctionalityComponent implement
 
   private crea(cat: Categoria) {
     this.categoriaService.crear(cat).subscribe(() => {
-      this.reloadComponent(false, '/admin/control/categorias');
+      this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
     });
   }
 
   private actualiza(cat: Categoria) {
     this.categoriaService.actualizar(cat.idCategoria, cat).subscribe(() => {
-      this.reloadComponent(false, '/admin/control/categorias');
+      this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
     });
   }
 

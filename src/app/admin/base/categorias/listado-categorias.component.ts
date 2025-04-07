@@ -5,28 +5,27 @@ import { Categoria } from "../../../core/models/categoria.model";
 import { CategoriaService } from "../../../core/services/categoria.service";
 import { TokenStorageService } from "../../../core/services/token-storage.service";
 import { UsuarioService } from "../../../core/services/usuario.service";
-import { CommonFunctionalityComponent } from "../../../shared/components/funcionalidades-comunes/common-functionality.component";
+import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 
 @Component({
   selector: 'app-listado-categorias',
   templateUrl: './listado-categorias.component.html',
   styleUrls: ['./listado-categorias.component.scss']
 })
-export class ListadoCategoriasComponent extends CommonFunctionalityComponent implements OnInit {
+export class ListadoCategoriasComponent implements OnInit {
 
   listaCategorias: Categoria[] = [];
 
   constructor(
-    protected override router: Router,
+    private router: Router,
     private categoriaService: CategoriaService,
     private usuarioService: UsuarioService,
     private tokenStorageService: TokenStorageService,
-    protected override datePipe: DatePipe
+    private commonFuncService: CommonFunctionalityService,
   ) {
-    super(router, datePipe);
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
     this.initList();
   }
 

@@ -8,7 +8,7 @@ import { Usuario } from "../../../core/models/usuario.model";
 import { ComentarioService } from "../../../core/services/comentario.service";
 import { EntradaService } from "../../../core/services/entrada.service";
 import { UsuarioService } from "../../../core/services/usuario.service";
-import { CommonFunctionalityComponent } from "../../../shared/components/funcionalidades-comunes/common-functionality.component";
+import { CommonFunctionalityService } from "src/app/shared/services/common-functionality.service";
 
 @Component({
   selector: 'app-listado-comentarios',
@@ -16,7 +16,7 @@ import { CommonFunctionalityComponent } from "../../../shared/components/funcion
   styleUrls: ['./listado-comentarios.component.scss']
 })
 
-export class ListadoComentariosComponent extends CommonFunctionalityComponent implements OnInit {
+export class ListadoComentariosComponent implements OnInit {
 
   listaComentarios: Comentario[] = [];
 
@@ -28,17 +28,16 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
   estaVacio: boolean = false;
 
   constructor(
-    protected override router: Router,
+    private router: Router,
     private comentarioService: ComentarioService,
     private usuarioService: UsuarioService,
     private entradaService: EntradaService,
-    protected override datePipe: DatePipe
+    private commonFuncService: CommonFunctionalityService,
   ) {
-    super(router, datePipe);
     
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
     this.initList();
   }
 

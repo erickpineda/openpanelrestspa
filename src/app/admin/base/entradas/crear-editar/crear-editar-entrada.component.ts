@@ -11,8 +11,8 @@ import { CategoriaService } from '../../../../core/services/categoria.service';
 import { EntradaService } from '../../../../core/services/entrada.service';
 import { UsuarioService } from '../../../../core/services/usuario.service';
 import { ValidationEntradaFormsService } from '../../../../core/services/validation-entrada-forms.service';
-import { CommonFunctionalityComponent } from '../../../../shared/components/funcionalidades-comunes/common-functionality.component';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { CommonFunctionalityService } from 'src/app/shared/services/common-functionality.service';
 
 @Component({
   selector: 'app-crear-editar-entrada',
@@ -20,7 +20,7 @@ import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms
   styleUrls: ['./crear-editar-entrada.component.scss'],
   providers: [ValidationEntradaFormsService],
 })
-export class CrearEditarEntrada extends CommonFunctionalityComponent implements OnInit, AfterViewInit {
+export class CrearEditarEntrada implements OnInit, AfterViewInit {
   public Editor = ClassicEditor;
   entradaForm!: UntypedFormGroup;
   submitted = false;
@@ -33,27 +33,25 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   usuarioEnSesion: PerfilResponse = new PerfilResponse;
 
   constructor(
-    protected override router: Router,
+    private commonFuncService: CommonFunctionalityService,
     private route: ActivatedRoute,
     private fb: UntypedFormBuilder,
     public vf: ValidationEntradaFormsService,
     public entradaService: EntradaService,
     public categoriaService: CategoriaService,
     public usuarioService: UsuarioService,
-    protected override datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
   ) {
-    super(router, datePipe);
     this.formErrors = this.vf.errorMessages;
     this.createForm();
     this.initializeData();
   }
 
-  override ngOnInit(): void { }
+  ngOnInit(): void { }
 
   ngAfterViewInit(): void {
-  this.initializeEditor();
-}
+    this.initializeEditor();
+  }
 
   private async initializeData() {
     await this.obtenerDatos();
@@ -210,7 +208,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     this.resetForm(this.entradaForm);
     this.obtenerDatos();
     alert('¡Se borraran los datos!');
-    this.reloadComponent(false, '/admin/control/entradas');
+    this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
   }
 
   onValidate() {
@@ -239,7 +237,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     this.entradaService.crear(ent).subscribe((data: Entrada) => {
       if (data) {
         this.entrada = data;
-        this.reloadComponent(false, '/admin/control/entradas');
+        this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
       }
     });
   }
@@ -249,7 +247,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     this.entradaService.actualizar(ent.idEntrada, ent).subscribe((data: Entrada) => {
       if (data) {
         this.entrada = data;
-        this.reloadComponent(false, '/admin/control/entradas');
+        this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
       }
     });
   }
