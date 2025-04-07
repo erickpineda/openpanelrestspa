@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { TokenStorageService } from 'src/app/core/services/token-storage.service';
+import { TokenStorageService } from '../../core/services/token-storage.service';
 
 @Component({
   selector: 'app-nav-bar-public',

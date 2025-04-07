@@ -1,7 +1,7 @@
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { TokenStorageService } from '../services/token-storage.service';
+import { environment } from '../../../environments/environment.dev.es';
 
 @Injectable()
 export abstract class BaseService {

@@ -1,7 +1,7 @@
 import { Injectable, ErrorHandler, Injector, NgZone } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { LoggerService } from 'src/app/core/services/logger.service';
+import { LoggerService } from '../../services/logger.service';
 
 @Injectable()
 export class GlobalErrorHandlerService implements ErrorHandler {

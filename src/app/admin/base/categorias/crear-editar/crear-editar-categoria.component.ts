@@ -2,16 +2,15 @@ import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Categoria } from "src/app/core/models/categoria.model";
-import { Entrada } from "src/app/core/models/entrada.model";
-import { PaginaResponse } from "src/app/core/models/pagina-response.model";
-import { PerfilResponse } from "src/app/core/models/perfil-response.model";
-import { Usuario } from "src/app/core/models/usuario.model";
-import { CategoriaService } from "src/app/core/services/categoria.service";
-import { EntradaService } from "src/app/core/services/entrada.service";
-import { TokenStorageService } from "src/app/core/services/token-storage.service";
-import { UsuarioService } from "src/app/core/services/usuario.service";
-import { CommonFunctionalityComponent } from "src/app/shared/components/funcionalidades-comunes/common-functionality.component";
+import { Categoria } from "../../../../core/models/categoria.model";
+import { Entrada } from "../../../../core/models/entrada.model";
+import { PaginaResponse } from "../../../../core/models/pagina-response.model";
+import { PerfilResponse } from "../../../../core/models/perfil-response.model";
+import { CategoriaService } from "../../../../core/services/categoria.service";
+import { EntradaService } from "../../../../core/services/entrada.service";
+import { TokenStorageService } from "../../../../core/services/token-storage.service";
+import { UsuarioService } from "../../../../core/services/usuario.service";
+import { CommonFunctionalityComponent } from "../../../../shared/components/funcionalidades-comunes/common-functionality.component";
 
 @Component({
   selector: 'app-crear-editar-categoria',

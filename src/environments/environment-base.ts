@@ -7,7 +7,7 @@ export let base = {
     apiConsumerCredentials: null,
     users: null,
     backend: {
-        host: 'https://zany-spoon-g9rxv6gp5rhpwj4-8080.app.github.dev/',
+        host: 'http://localhost:8080/',
         uri: 'api/v1',
         applicationId: '1234567890',
         timeoutThreshold: 0.9

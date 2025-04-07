@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { delay } from 'rxjs';
-import { Categoria } from 'src/app/core/models/categoria.model';
-import { Entrada } from 'src/app/core/models/entrada.model';
-import { EntradaService } from 'src/app/core/services/entrada.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+import { Categoria } from '../../core/models/categoria.model';
+import { Entrada } from '../../core/models/entrada.model';
+import { EntradaService } from '../../core/services/entrada.service';
+import { LoadingService } from '../../core/services/loading.service';
 
 @Component({
   selector: 'app-home',

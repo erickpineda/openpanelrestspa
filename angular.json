@@ -44,7 +44,8 @@
             "allowedCommonJsDependencies": [
               "chart.js",
               "@coreui/chartjs/dist/js/coreui-chartjs.js",
-              "lodash"
+              "lodash",
+              "@ckeditor/ckeditor5-build-classic"
             ]
           },
           "configurations": {
@@ -58,7 +59,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumError": "11kb"
                 }
               ],
               "fileReplacements": [

@@ -3,7 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
 import { TokenStorageService } from './token-storage.service';
-const AUTH_API = 'https://zany-spoon-g9rxv6gp5rhpwj4-8080.app.github.dev/';
+import { environment } from 'src/environments/environment';
+
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json',
   
@@ -25,7 +26,7 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post(AUTH_API + 'login', { // + 'signin'
+    return this.http.post(environment.backend.host + 'login', { // + 'signin'
       username,
       password
     }, {
@@ -38,7 +39,7 @@ export class AuthService {
     );
   }
   register(username: string, email: string, password: string): Observable<any> {
-    return this.http.post(AUTH_API + 'registerUser', {
+    return this.http.post(environment.backend.host + 'registerUser', {
       username,
       email,
       password

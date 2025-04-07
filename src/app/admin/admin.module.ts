@@ -1,10 +1,9 @@
-import { LocationStrategy, HashLocationStrategy } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { LocationStrategy, HashLocationStrategy, CommonModule } from '@angular/common';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { ReactiveFormsModule } from '@angular/forms';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { PerfectScrollbarConfigInterface, PerfectScrollbarModule, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
-import { SharedModule, AvatarModule, BadgeModule, BreadcrumbModule, ButtonGroupModule, ButtonModule, CardModule, DropdownModule, FooterModule, FormModule, GridModule, HeaderModule, ListGroupModule, NavModule, ProgressModule, SidebarModule, SpinnerModule, TabsModule, UtilitiesModule, PaginationModule } from '@coreui/angular';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { SharedModule, AvatarModule, BadgeModule, BreadcrumbModule, ButtonGroupModule, ButtonModule, CardModule, DropdownModule, FooterModule, FormModule, GridModule, HeaderModule, ListGroupModule, NavModule, ProgressModule,  SpinnerModule, TabsModule, UtilitiesModule, PaginationModule, SidebarModule } from '@coreui/angular';
 import { IconModule, IconSetService } from '@coreui/icons-angular';
 
 import { AdminRoutingModule } from './admin-routing.module';
@@ -20,9 +19,7 @@ import { EntradaService } from '../core/services/entrada.service';
 import { TokenStorageService } from '../core/services/token-storage.service';
 import { UsuarioService } from '../core/services/usuario.service';
 
-const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-  suppressScrollX: true,
-};
+import { NgScrollbarModule } from 'ngx-scrollbar';
 
 const APP_CONTAINERS = [
   DefaultFooterComponent,
@@ -41,10 +38,6 @@ const APP_CONTAINERS = [
       provide: LocationStrategy,
       useClass: HashLocationStrategy,
     },
-    {
-      provide: PERFECT_SCROLLBAR_CONFIG,
-      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
-    },
     IconSetService,
     Title,
     AuthService,
@@ -55,7 +48,12 @@ const APP_CONTAINERS = [
     { provide: HTTP_INTERCEPTORS, useClass: NetworkInterceptor, multi: true },
   ],
   imports: [
+    CommonModule,
     AdminRoutingModule,
+    //HttpClientModule,
+    //FormsModule,
+    ReactiveFormsModule,
+    NgScrollbarModule,
     AvatarModule,
     BadgeModule,
     BreadcrumbModule,
@@ -71,9 +69,7 @@ const APP_CONTAINERS = [
     ListGroupModule,
     NavModule,
     PaginationModule,
-    PerfectScrollbarModule,
     ProgressModule,
-    ReactiveFormsModule,
     SharedModule,
     SidebarModule,
     SpinnerModule,

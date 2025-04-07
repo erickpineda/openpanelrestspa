@@ -2,12 +2,12 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { delay } from 'rxjs';
-import { Entrada } from 'src/app/core/models/entrada.model';
-import { Usuario } from 'src/app/core/models/usuario.model';
-import { EntradaService } from 'src/app/core/services/entrada.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
-import { UsuarioService } from 'src/app/core/services/usuario.service';
-import { CommonFunctionalityComponent } from 'src/app/shared/components/funcionalidades-comunes/common-functionality.component';
+import { Entrada } from '../../../core/models/entrada.model';
+import { Usuario } from '../../../core/models/usuario.model';
+import { EntradaService } from '../../../core/services/entrada.service';
+import { LoadingService } from '../../../core/services/loading.service';
+import { UsuarioService } from '../../../core/services/usuario.service';
+import { CommonFunctionalityComponent } from '../../../shared/components/funcionalidades-comunes/common-functionality.component';
 
 @Component({
   selector: 'app-listado-entradas',

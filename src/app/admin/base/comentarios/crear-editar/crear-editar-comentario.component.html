@@ -92,7 +92,8 @@
                           <small>Comentario que ha sido aprobado</small>
                         </div>
                         <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['aprobado']" formControlName="aprobado">
+                          <input cFormCheckInput type="checkbox" [checked]="f['aprobado'].value" formControlName="aprobado">
+
                         </c-form-check>
                       </li>
                       <li cListGroupItem 
@@ -102,7 +103,7 @@
                           <small>Comentario que está en cuarentena</small>
                         </div>
                         <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['cuarentena']" formControlName="cuarentena">
+                          <input cFormCheckInput type="checkbox" [checked]="f['cuarentena'].value" formControlName="cuarentena">
                         </c-form-check>
                       </li>
                     </ul>

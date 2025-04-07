@@ -1,12 +1,11 @@
 import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { Categoria } from "src/app/core/models/categoria.model";
-import { Usuario } from "src/app/core/models/usuario.model";
-import { CategoriaService } from "src/app/core/services/categoria.service";
-import { TokenStorageService } from "src/app/core/services/token-storage.service";
-import { UsuarioService } from "src/app/core/services/usuario.service";
-import { CommonFunctionalityComponent } from "src/app/shared/components/funcionalidades-comunes/common-functionality.component";
+import { Categoria } from "../../../core/models/categoria.model";
+import { CategoriaService } from "../../../core/services/categoria.service";
+import { TokenStorageService } from "../../../core/services/token-storage.service";
+import { UsuarioService } from "../../../core/services/usuario.service";
+import { CommonFunctionalityComponent } from "../../../shared/components/funcionalidades-comunes/common-functionality.component";
 
 @Component({
   selector: 'app-listado-categorias',

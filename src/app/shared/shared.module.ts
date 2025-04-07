@@ -4,7 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from "@angular/router";
 
 import { FormsModule } from "@angular/forms";
-import { CommonModule } from "@angular/common";
+import { CommonModule, DatePipe } from "@angular/common";
 import { NotFoundComponent } from "../core/errors/not-found/not-found.component";
 
 @NgModule({
@@ -25,7 +25,6 @@ import { NotFoundComponent } from "../core/errors/not-found/not-found.component"
         FormsModule
     ],
     providers: [
-        
     ]
 })
 

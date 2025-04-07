@@ -19,7 +19,6 @@ export class AdminComponent implements OnInit {
   public loading$ = this.loader.loading$;
   public loading: boolean = false;
   public cargaFinalizada: boolean = false;
-  public perfectScrollbarConfig = { suppressScrollX: true };
 
   constructor(
     private router: Router,

@@ -106,7 +106,7 @@
             <c-card class="mb-4">
               <c-card-body>
                 <h3 cCardTitle class="h6 card-title">Contenido de la entrada</h3>
-                <ckeditor [editor]="Editor" tagName="textarea"
+                <ckeditor id="ckeditor" [editor]="Editor" tagName="textarea"
                   cFormControl rows="10" 
                   formControlName="contenido"
                   autocomplete="none"
@@ -119,6 +119,7 @@
               </c-card-body>
             </c-card>
           </c-col>
+                   
           <c-col lg="12">
             <c-row>
               <c-col lg="8">
@@ -179,7 +180,7 @@
                           <small>Entrará en la sección destacadas</small>
                         </div>
                         <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['publicada']" formControlName="publicada">
+                          <input cFormCheckInput type="checkbox" [checked]="f['publicada'].value" formControlName="publicada">
                         </c-form-check>
                       </li>
                       <li cListGroupItem 
@@ -189,7 +190,7 @@
                           <small>Sólo puede ser vista por el autor/administrador</small>
                         </div>
                         <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['privado']" formControlName="privado">
+                          <input cFormCheckInput type="checkbox" [checked]="f['privado'].value" formControlName="privado">
                         </c-form-check>
                       </li>
                       <li cListGroupItem 
@@ -199,7 +200,7 @@
                           <small>La entrada permitirá comentarios o no</small>
                         </div>
                         <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['permitirComentario']" formControlName="permitirComentario">
+                          <input cFormCheckInput type="checkbox" [checked]="f['permitirComentario'].value" formControlName="permitirComentario">
                         </c-form-check>
                       </li>
                     </ul>
