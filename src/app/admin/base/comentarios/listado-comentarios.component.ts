@@ -8,7 +8,8 @@ import { Usuario } from "../../../core/models/usuario.model";
 import { ComentarioService } from "../../../core/services/comentario.service";
 import { EntradaService } from "../../../core/services/entrada.service";
 import { UsuarioService } from "../../../core/services/usuario.service";
-import { CommonFunctionalityService } from "src/app/shared/services/common-functionality.service";
+import { CommonFunctionalityService } from "../../../shared/services/common-functionality.service";
+import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-response.model";
 
 @Component({
   selector: 'app-listado-comentarios',
@@ -44,7 +45,7 @@ export class ListadoComentariosComponent implements OnInit {
   private initList() {
     try {
       this.obtenerListaComentarios().then((listaRes: PaginaResponse) => {
-        this.listaComentarios = listaRes.data;
+        this.listaComentarios = listaRes.elements;
         this.estaVacio = listaRes.empty;
         if (!this.estaVacio) {
           this.refreshComentarios();
@@ -62,8 +63,9 @@ export class ListadoComentariosComponent implements OnInit {
   private async obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerPorId(idUsuario).subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const usuario: Usuario = (response.data) ? response.data : Usuario;
+          resolve(usuario)
         },
         error: (err: any) => {
           reject(err);
@@ -75,8 +77,9 @@ export class ListadoComentariosComponent implements OnInit {
   private async obtenerDatosEntrada(idEntrada: number): Promise<Entrada> {
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(idEntrada).subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const entrada: Entrada = (response.data) ? response.data.elements : Entrada;
+          resolve(entrada)
         },
         error: (err: any) => {
           reject(err);
@@ -88,18 +91,23 @@ export class ListadoComentariosComponent implements OnInit {
   private async obtenerListaComentarios(): Promise<PaginaResponse> {
     return new Promise((resolve, reject) => {
       this.comentarioService.listarPagina(this.pageCurrent, this.pageSize).subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const pResp: PaginaResponse = (response.data) ? response.data : PaginaResponse;
+          pResp.elements = response.data?.elements;
+          resolve(pResp);
         },
         error: (err: any) => {
-          if (err && err.status == 404 && err.error && err.error.message) {
+          if (err?.status === 404) {
+            console.warn("No se encontraron comentarios, asignando lista vacía.");
             this.listaComentarios = [];
+            resolve(new PaginaResponse()); // o ajusta según el modelo específico
+          } else {
+            reject(err);
           }
-          reject(err);
         }
       });
     });
-  }
+  }  
 
   public checkTrueOrFalseToString(toCheck: boolean) {
     return toCheck ? 'Si' : 'No';
@@ -124,7 +132,7 @@ export class ListadoComentariosComponent implements OnInit {
     if (page > this.numberOfPages) {
       this.pageCurrent = page;
       this.obtenerListaComentarios().then((listaRes: PaginaResponse) => {
-        this.listaComentarios = listaRes.data;
+        this.listaComentarios = listaRes.elements;
         this.estaVacio = listaRes.empty;
         if (this.estaVacio) {
           this.page = this.pageCurrent;

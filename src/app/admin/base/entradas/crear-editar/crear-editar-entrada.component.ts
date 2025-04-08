@@ -12,7 +12,9 @@ import { EntradaService } from '../../../../core/services/entrada.service';
 import { UsuarioService } from '../../../../core/services/usuario.service';
 import { ValidationEntradaFormsService } from '../../../../core/services/validation-entrada-forms.service';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { CommonFunctionalityService } from 'src/app/shared/services/common-functionality.service';
+import { CommonFunctionalityService } from '../../../../shared/services/common-functionality.service';
+import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-response.model';
+import { Usuario } from '../../../../core/models/usuario.model';
 
 @Component({
   selector: 'app-crear-editar-entrada',
@@ -83,8 +85,9 @@ export class CrearEditarEntrada implements OnInit, AfterViewInit {
   private obtenerDatosTipoEntrada(): Promise<TipoEntrada[]> {
     return new Promise((resolve, reject) => {
       this.entradaService.listarTiposEntradas().subscribe({
-        next: data => {
-          resolve(data.tiposEntradas);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const lista: TipoEntrada[] = Array.isArray(response.data?.tiposEntradas) ? response.data?.tiposEntradas : [];
+          resolve(lista);
         },
         error: err => {
           reject(err);
@@ -96,8 +99,9 @@ export class CrearEditarEntrada implements OnInit, AfterViewInit {
   private obtenerDatosEstadosEntrada(): Promise<EstadoEntrada[]> {
     return new Promise((resolve, reject) => {
       this.entradaService.listarEstadosEntradas().subscribe({
-        next: data => {
-          resolve(data.estadosEntradas);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const lista: EstadoEntrada[] = Array.isArray(response.data?.estadosEntradas) ? response.data.estadosEntradas : [];
+          resolve(lista);
         },
         error: err => {
           reject(err);
@@ -109,22 +113,24 @@ export class CrearEditarEntrada implements OnInit, AfterViewInit {
   private obtenerDatosCategorias(): Promise<Categoria[]> {
     return new Promise((resolve, reject) => {
       this.categoriaService.listar().subscribe({
-        next: data => {
-          resolve(data.data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const categorias: Categoria[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
+          resolve(categorias);
         },
-        error: err => {
+        error: (err) => {
           reject(err);
         }
       });
-    })
-  }
+    });
+  }  
 
   private obtenerDatosEntrada(): Promise<Entrada> {
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(this.getEntradaId('idEntrada'))
         .subscribe({
-          next: data => {
-            resolve(data);
+          next: (response: OpenpanelApiResponse<any>) => {
+            const entrada: Entrada = (response.data) ? response.data : Entrada;
+            resolve(entrada);
           },
           error: err => {
             reject(err);
@@ -136,8 +142,9 @@ export class CrearEditarEntrada implements OnInit, AfterViewInit {
   private obtenerDatosUsuarioActual(): Promise<PerfilResponse> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerDatosSesionActual().subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const usuario: Usuario = (response.data) ? response.data : Usuario;
+          resolve(usuario);
         },
         error: err => {
           reject(err);
@@ -234,21 +241,19 @@ export class CrearEditarEntrada implements OnInit, AfterViewInit {
 
   private creaEntrada(ent: Entrada) {
     ent.idUsuario = this.usuarioEnSesion.idUsuario;
-    this.entradaService.crear(ent).subscribe((data: Entrada) => {
-      if (data) {
-        this.entrada = data;
-        this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
-      }
+    this.entradaService.crear(ent).subscribe((response: OpenpanelApiResponse<any>) => {
+      const entrada: Entrada = (response.data) ? response.data : Entrada;
+      this.entrada = entrada;
+      this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
     });
   }
 
   private actualizaEntrada(ent: Entrada) {
     ent.idUsuarioEditado = this.usuarioEnSesion.idUsuario;
-    this.entradaService.actualizar(ent.idEntrada, ent).subscribe((data: Entrada) => {
-      if (data) {
-        this.entrada = data;
-        this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
-      }
+    this.entradaService.actualizar(ent.idEntrada, ent).subscribe((response: OpenpanelApiResponse<any>) => {
+      const entrada: Entrada = (response.data) ? response.data : Entrada;
+      this.entrada = entrada;
+      this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
     });
   }
 

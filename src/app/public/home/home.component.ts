@@ -5,6 +5,7 @@ import { Categoria } from '../../core/models/categoria.model';
 import { Entrada } from '../../core/models/entrada.model';
 import { EntradaService } from '../../core/services/entrada.service';
 import { LoadingService } from '../../core/services/loading.service';
+import { OpenpanelApiResponse } from '../../core/models/openpanel-api-response.model';
 
 @Component({
   selector: 'app-home',
@@ -13,7 +14,7 @@ import { LoadingService } from '../../core/services/loading.service';
 })
 
 export class HomeComponent implements OnInit {
-  loading$ = this.loader.loading$;
+  loading$: any;
 
   loading: boolean = false;
   cargaFinalizada: boolean = false;
@@ -38,6 +39,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loading$ = this.loader.loading$;
     this.listenToLoading();
     this.obtenerListaEntradas().then((listaRes: Entrada[]) => {
       listaRes.forEach((entradaRes) => {
@@ -50,25 +52,24 @@ export class HomeComponent implements OnInit {
   obtenerListaEntradas(): Promise<Entrada[]> {
     return new Promise((resolve, reject) => {
       this.entradaService.listar().subscribe({
-        next: data => {
-          if (data) {
-            if (data.data.length < 1 || undefined) {
-              this.noHayEntradas = false
-            }
-            this.entradas = data.data;
-            this.entradas.forEach(_categorias => {
-              this.categorias = _categorias.categorias;
-            })
+        next: (response: OpenpanelApiResponse<any>) => {
+          const entradas: Entrada[] = Array.isArray(response.data.elements) ? response.data.elements : [];
+          if (entradas.length < 1) {
+            this.noHayEntradas = false;
+          } else {
+            this.entradas = entradas;
+            
+            this.entradas.forEach(entrada => {
+              if (entrada.categorias) {
+                this.categorias = entrada.categorias;
+              }
+            });
           }
           resolve(this.entradas);
         },
         error: err => {
           this.noHayEntradas = false;
-          if (err.error instanceof ErrorEvent) {
-            this.errorMsg = `Error: ${err.error.message}`;
-          } else {
-            this.errorMsg = "A client-side or network error occurred";
-          }
+          this.errorMsg = err.error instanceof ErrorEvent ? `Error: ${err.error.message}` : "Error de cliente o de red ocurrió";
           console.log("Desde HOME -> " + this.errorMsg);
           reject(err);
         }

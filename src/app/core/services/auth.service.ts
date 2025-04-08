@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
 import { TokenStorageService } from './token-storage.service';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../../environments/environment.dev.es';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json',

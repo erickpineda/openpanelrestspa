@@ -6,6 +6,7 @@ import { CategoriaService } from "../../../core/services/categoria.service";
 import { TokenStorageService } from "../../../core/services/token-storage.service";
 import { UsuarioService } from "../../../core/services/usuario.service";
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
+import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-response.model";
 
 @Component({
   selector: 'app-listado-categorias',
@@ -47,16 +48,22 @@ export class ListadoCategoriasComponent implements OnInit {
   private obtenerListaCategorias(): Promise<Categoria[]> {
     return new Promise((resolve, reject) => {
       this.categoriaService.listar().subscribe({
-        next: data => resolve(data.data),
-        error: err => {
-          if (err?.status == 404) {
+        next: (response: OpenpanelApiResponse<any>) => {
+          const categorias: Categoria[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
+          resolve(categorias);
+        },
+        error: (err) => {
+          if (err?.status === 404) {
             this.listaCategorias = [];
+            console.warn('No se encontraron categorías. Estableciendo lista vacía.');
+            resolve([]);
+          } else {
+            reject(err);
           }
-          reject(err);
         }
       });
     });
-  }
+  }  
 
   public refrescarPagina(): void {
     window.location.reload();

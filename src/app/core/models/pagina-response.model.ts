@@ -5,7 +5,7 @@ export class PaginaResponse {
   numberOfElements: number = 0;
   empty: boolean = false;
   hasMore: boolean = false;
-  data: any;
+  elements: any;
 
   constructor() {
 
@@ -19,5 +19,5 @@ export interface PaginaResponse {
   numberOfElements: number;
   empty: boolean;
   hasMore: boolean;
-  data: any;
+  elements: any;
 }

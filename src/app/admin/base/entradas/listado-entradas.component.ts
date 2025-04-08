@@ -7,7 +7,8 @@ import { Usuario } from '../../../core/models/usuario.model';
 import { EntradaService } from '../../../core/services/entrada.service';
 import { LoadingService } from '../../../core/services/loading.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
-import { CommonFunctionalityService } from 'src/app/shared/services/common-functionality.service';
+import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
+import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -51,25 +52,32 @@ export class ListadoEntradasComponent implements OnInit {
   private obtenerListaEntradas(): Promise<Entrada[]> {
     return new Promise((resolve, reject) => {
       this.entradaService.listar().subscribe({
-        next: data => {
-          this.listaEntradas = data.data;
-          resolve(this.listaEntradas);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const entradas: Entrada[] = Array.isArray(response.data.elements) ? response.data.elements : [];
+          if (entradas) {
+            this.listaEntradas = entradas;
+            resolve(this.listaEntradas);
+          } else {
+            resolve([]);
+          }
         },
         error: err => {
           if (err && err.status == 404 && err.error && err.error.message) {
             this.listaEntradas = [];
+            resolve(this.listaEntradas);
           }
           reject(err);
         }
       });
     });
-  }
+  }  
 
   private obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerPorId(idUsuario).subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const usuario: Usuario = (response.data) ? response.data : Usuario;
+          resolve(usuario);
         },
         error: err => {
           reject(err);

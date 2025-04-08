@@ -10,7 +10,8 @@ import { CategoriaService } from "../../../../core/services/categoria.service";
 import { EntradaService } from "../../../../core/services/entrada.service";
 import { TokenStorageService } from "../../../../core/services/token-storage.service";
 import { UsuarioService } from "../../../../core/services/usuario.service";
-import { CommonFunctionalityService } from "src/app/shared/services/common-functionality.service";
+import { OpenpanelApiResponse } from "../../../../core/models/openpanel-api-response.model";
+import { CommonFunctionalityService } from "../../../../shared/services/common-functionality.service";
 
 @Component({
   selector: 'app-crear-editar-categoria',
@@ -60,7 +61,10 @@ export class CrearEditarCategoria implements OnInit {
   private obtenerDatosCategoria(): Promise<Categoria> {
     return new Promise((resolve, reject) => {
       this.categoriaService.obtenerPorId(this.getCategoriaId('idCategoria')).subscribe({
-        next: (data: Categoria) => resolve(data),
+        next: (response: OpenpanelApiResponse<any>) => {
+          const categoria: Categoria = (response.data) ? response.data : Categoria;
+          resolve(categoria)
+        },
         error: (err: any) => reject(err)
       });
     });
@@ -69,8 +73,9 @@ export class CrearEditarCategoria implements OnInit {
   private obtenerListaCategorias(): Promise<Categoria[]> {
     return new Promise((resolve, reject) => {
       this.categoriaService.listar().subscribe({
-        next: (data: PaginaResponse) => {
-          resolve(data.data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const categorias: Categoria[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
+          resolve(categorias)
         },
         error: (err) => {
           reject(err);
@@ -82,8 +87,9 @@ export class CrearEditarCategoria implements OnInit {
   private obtenerDatosUsuarioActual(): Promise<PerfilResponse> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerDatosSesionActual().subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const perfil: PerfilResponse = (response.data) ? response.data : PerfilResponse;
+          resolve(perfil);
         },
         error: err => {
           reject(err);
@@ -95,7 +101,10 @@ export class CrearEditarCategoria implements OnInit {
   private obtenerDatosEntrada(idEntrada: number): Promise<Entrada> {
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(idEntrada).subscribe({
-        next: (data: Entrada) => resolve(data),
+        next: (response: OpenpanelApiResponse<any>) => {
+          const entrada: Entrada = (response.data) ? response.data : Entrada;
+          resolve(entrada)
+        },
         error: (err: any) => reject(err)
       });
     });

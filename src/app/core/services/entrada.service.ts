@@ -8,6 +8,7 @@ import { CambiarEstadoEntradaReq } from "../models/cambiar-estado-entrada.model"
 import { RespuestaModelResp } from "../models/respuesta.model";
 import { TipoEntradaResponse } from "../models/tipo-entrada-response.model";
 import { EstadoEntradaResponse } from "../models/estado-entrada-response.model";
+import { OpenpanelApiResponse } from "../models/openpanel-api-response.model";
 
 @Injectable({
   providedIn: "root"
@@ -21,16 +22,16 @@ export class EntradaService extends CrudService<Entrada> {
     super(http, token);
   }
 
-  listarTiposEntradas(): Observable<TipoEntradaResponse> {
+  listarTiposEntradas(): Observable<OpenpanelApiResponse<any>> {
     const url = `${this.path}/tiposEntradas`;
-    return this.http.get<TipoEntradaResponse>(url, {
+    return this.http.get<OpenpanelApiResponse<any>>(url, {
       observe: 'body', headers: this.setHeaders(),
     });
   }
 
-  listarEstadosEntradas(): Observable<EstadoEntradaResponse> {
+  listarEstadosEntradas(): Observable<OpenpanelApiResponse<any>> {
     const url = `${this.path}/estadosEntradas`;
-    return this.http.get<EstadoEntradaResponse>(url, {
+    return this.http.get<OpenpanelApiResponse<any>>(url, {
       observe: 'body', headers: this.setHeaders(),
     });
   }
