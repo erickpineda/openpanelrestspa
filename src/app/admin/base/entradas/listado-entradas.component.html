@@ -1,5 +1,5 @@
 <c-card>
-  <c-card-header class="d-flex align-items-center">
+  <c-card-header class="d-flex align-items-center" #entradasInicio>
     <c-col [sm]="6">
       <h6 cCardTitle>Listado de entradas</h6>
     </c-col>
@@ -37,6 +37,17 @@
       </c-card-body>
       <hr>
     </c-card>-->
+    <c-pagination align="end" aria-label="Paginación de entradas" size="sm" *ngIf="listaEntradas.length > 0">
+      <li cPageItem [disabled]="currentPage === 0">
+        <a cPageLink (click)="cambiarPagina(-1)" aria-label="Anterior"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li cPageItem [active]="pageNumber === currentPage" *ngFor="let pageNumber of paginasVisibles">
+        <a cPageLink (click)="obtenerListaEntradas(pageNumber)">{{pageNumber + 1}}</a>
+      </li>
+      <li cPageItem [disabled]="!hasMore">
+        <a cPageLink (click)="cambiarPagina(1)" aria-label="Posterior"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+    </c-pagination>
     <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length >= 0">
       <thead cTableColor="dark">
         <tr>
@@ -65,14 +76,14 @@
       </tbody>
     </table>
     <c-pagination aria-label="Paginación de entradas" size="sm" *ngIf="listaEntradas.length > 0">
-      <li cPageItem [active]="page === 1">
-        <a cPageLink (click)="onPageChange(page - 1)" [routerLink]><span aria-hidden="true">&laquo;</span></a>
+      <li cPageItem [disabled]="currentPage === 0">
+        <a cPageLink (click)="cambiarPagina(-1)" aria-label="Anterior"><span aria-hidden="true">&laquo;</span></a>
       </li>
-      <li cPageItem *ngFor="let p of getPages()" [active]="p === page">
-        <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
+      <li cPageItem [active]="pageNumber === currentPage" *ngFor="let pageNumber of paginasVisibles">
+        <a cPageLink (click)="obtenerListaEntradas(pageNumber)">{{pageNumber + 1}}</a>
       </li>
-      <li cPageItem [active]="page === numberOfPages">
-        <a cPageLink (click)="onPageChange(page + 1)" [routerLink]><span aria-hidden="true">&raquo;</span></a>
+      <li cPageItem [disabled]="!hasMore">
+        <a cPageLink (click)="cambiarPagina(1)" aria-label="Posterior"><span aria-hidden="true">&raquo;</span></a>
       </li>
     </c-pagination>
   </c-card-body>

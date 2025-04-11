@@ -10,6 +10,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
 import { CustomPreloadingStrategyService } from './core/preloading/custom-preloading-strategy.service';
 import { DatePipe } from '@angular/common';
+import { ErrorInterceptor } from './core/interceptor/error.interceptor';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,11 @@ import { DatePipe } from '@angular/common';
   ],
   providers: [
     DatePipe,
-    GlobalErrorHandlerService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true
+    },
     { provide: ErrorHandler, useClass: GlobalErrorHandlerService },
     CustomPreloadingStrategyService
   ],

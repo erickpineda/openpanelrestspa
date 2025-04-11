@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -15,6 +15,7 @@ import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms
 import { CommonFunctionalityService } from '../../../../shared/services/common-functionality.service';
 import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-response.model';
 import { Usuario } from '../../../../core/models/usuario.model';
+import { OPModalComponent } from '../../../../shared/components/op-modal/op-modal.component';
 
 @Component({
   selector: 'app-crear-editar-entrada',

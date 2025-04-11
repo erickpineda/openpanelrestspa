@@ -1,3 +1,5 @@
+import { OPConstants } from "../app/shared/constants/op-global.constants";
+
 export let base = {
     mock: false,
     getSessionInfo: false,
@@ -7,8 +9,8 @@ export let base = {
     apiConsumerCredentials: null,
     users: null,
     backend: {
-        host: 'http://localhost:8080/',
-        uri: 'api/v1',
+        host: OPConstants.API.HOST,
+        uri: OPConstants.API.BASE_URL,
         applicationId: '1234567890',
         timeoutThreshold: 0.9
     }

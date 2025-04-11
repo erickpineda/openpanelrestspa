@@ -1,6 +1,6 @@
 import { BaseService } from './base.service';
-import { catchError, Observable, Subscriber, throwError } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { TokenStorageService } from '../services/token-storage.service';
 import { OpenpanelApiResponse } from '../models/openpanel-api-response.model';
 
@@ -13,43 +13,29 @@ export abstract class CrudService<C> extends BaseService {
         super(token);
     }
 
-    public listar(): Observable<OpenpanelApiResponse<C[]>> {
-        const url = `${this.path}`;
-        return this.http.get<OpenpanelApiResponse<C[]>>(url, { observe: 'body', headers: this.setHeaders(), responseType: 'json' });
+    public listar(): Observable<OpenpanelApiResponse<any>> {
+      return this.http.get<OpenpanelApiResponse<any>>(this.path, { headers: this.setHeaders() });
     }
 
-    public listarPagina(pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<any>> {
-        let params = new HttpParams();
-        params = params.append('pageNo', pageNo.toString());
-        params = params.append('pageSize', pageSize.toString());
-        const url = `${this.path}`;
-        return this.http.get<OpenpanelApiResponse<any>>(url, { observe: 'body', headers: this.setHeaders(), responseType: 'json' });
-    }    
+    public listarPagina(pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<C[]>> {
+        const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+        return this.http.get<OpenpanelApiResponse<C[]>>(this.path, { headers: this.setHeaders(), params });
+    }
 
-    public crear(entity: C): Observable<OpenpanelApiResponse<any>> {
-        const url = `${this.path}/crear`;
-        return this.http.post<OpenpanelApiResponse<any>>(url, entity, { headers: this.setHeaders() });
+    public crear(entity: C): Observable<OpenpanelApiResponse<C>> {
+        return this.http.post<OpenpanelApiResponse<C>>(this.buildUrl('/crear'), entity, { headers: this.setHeaders() });
     }
 
     public obtenerPorId(id: number): Observable<OpenpanelApiResponse<C>> {
-        const url = `${this.path}/obtenerPorId/${id}`;
-        return this.http.get<OpenpanelApiResponse<C>>(url, { observe: 'body', headers: this.setHeaders() })
-            .pipe(catchError(this.handleError));;
+        return this.http.get<OpenpanelApiResponse<C>>(this.buildUrl(`/obtenerPorId/${id}`), { headers: this.setHeaders() });
     }
 
-    public actualizar(id: number, entity: C): Observable<OpenpanelApiResponse<any>> {
-        const url = `${this.path}/${id}`;
-        return this.http.put<OpenpanelApiResponse<any>>(url, entity, { headers: this.setHeaders() });
+    public actualizar(id: number, entity: C): Observable<OpenpanelApiResponse<C>> {
+        return this.http.put<OpenpanelApiResponse<C>>(this.buildUrl(`/${id}`), entity, { headers: this.setHeaders() });
     }
 
-    public borrar(id: number): Observable<OpenpanelApiResponse<any>> {
-        const url = `${this.path}/${id}`;
-        return this.http.delete<OpenpanelApiResponse<any>>(url, { headers: this.setHeaders() });
-    }
-
-    protected handleError(error: any): Observable<never> {
-        console.error('An error occurred:', error);
-        return throwError(() => new Error('Something bad happened; please try again later.'));
+    public borrar(id: number): Observable<OpenpanelApiResponse<C>> {
+        return this.http.delete<OpenpanelApiResponse<C>>(this.buildUrl(`/${id}`), { headers: this.setHeaders() });
     }
 
 }

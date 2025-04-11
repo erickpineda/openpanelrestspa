@@ -20,6 +20,7 @@ import { IconModule } from '@coreui/icons-angular';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { EntradaService } from '../../core/services/entrada.service';
 import { UsuarioService } from '../../core/services/usuario.service';
+import { OPModalComponent } from '../../shared/components/op-modal/op-modal.component';
 
 @NgModule({
   imports: [
@@ -52,6 +53,7 @@ import { UsuarioService } from '../../core/services/usuario.service';
     TableModule,
     TabsModule,
     UtilitiesModule,
+    OPModalComponent,
   ],
   declarations: [
     BaseComponent,

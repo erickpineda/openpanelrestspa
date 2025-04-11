@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TokenStorageService } from '../../core/services/token-storage.service';
-import { CommonFunctionalityService } from 'src/app/shared/services/common-functionality.service';
+import { CommonFunctionalityService } from '../../shared/services/common-functionality.service';
 
 @Component({
   selector: 'app-login',
