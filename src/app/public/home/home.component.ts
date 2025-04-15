@@ -1,87 +1,76 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { delay } from 'rxjs';
-import { Categoria } from 'src/app/core/models/categoria.model';
-import { Entrada } from 'src/app/core/models/entrada.model';
-import { EntradaService } from 'src/app/core/services/entrada.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+import { Entrada } from '../../core/models/entrada.model';
+import { Categoria } from '../../core/models/categoria.model';
+import { EntradaService } from '../../core/services/entrada.service';
+import { LoadingService } from '../../core/services/loading.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-
 export class HomeComponent implements OnInit {
-  loading$ = this.loader.loading$;
-
+  loading$: any;
   loading: boolean = false;
   cargaFinalizada: boolean = false;
-
-  characters: any;
-  continents: any;
-  noHayEntradas: boolean;
-  errorMsg: string;
-
-  entradas: Entrada[];
-  categorias: Categoria[];
+  noHayEntradas: boolean = true;
+  errorMsg: string = '';
+  entradas: Entrada[] = [];
+  categorias: Categoria[] = [];
 
   page = 1;
   pageSize = 5;
   pagedEntradas: any[] = [];
 
-  constructor(private entradaService: EntradaService, public loader: LoadingService, private http: HttpClient) {
-    this.entradas = [];
-    this.categorias = [];
-    this.noHayEntradas = true;
-    this.errorMsg = "";
-  }
+  constructor(
+    private entradaService: EntradaService,
+    public loader: LoadingService
+  ) {}
 
   ngOnInit(): void {
+    this.loading$ = this.loader.loading$;
     this.listenToLoading();
-    this.obtenerListaEntradas().then((listaRes: Entrada[]) => {
-      listaRes.forEach((entradaRes) => {
-        entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
+    this.obtenerListaEntradas()
+      .then((listaRes: Entrada[]) => {
+        listaRes.forEach((entradaRes) => {
+          entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
+        });
+        this.refreshEntradas(); // Refrescar las entradas después de obtener la lista
+      })
+      .catch((error) => {
+        console.error('Error al obtener lista de entradas:', error.message);
+        this.errorMsg = 'No se pudieron cargar las entradas, intenta nuevamente más tarde.';
+        console.log(this.errorMsg);
       });
-      this.refreshEntradas(); // Refrescar las entradas después de obtener la lista
-    });
   }
 
   obtenerListaEntradas(): Promise<Entrada[]> {
     return new Promise((resolve, reject) => {
-      this.entradaService.listar().subscribe({
-        next: data => {
-          if (data) {
-            if (data.data.length < 1 || undefined) {
-              this.noHayEntradas = false
+      this.entradaService.listar()
+        .subscribe({
+          next: (response) => {
+            const entradas: Entrada[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
+            if (entradas.length < 1) {
+              this.noHayEntradas = false;
+            } else {
+              this.entradas = entradas;
+              this.categorias = this.entradas.flatMap(e => e.categorias);
             }
-            this.entradas = data.data;
-            this.entradas.forEach(_categorias => {
-              this.categorias = _categorias.categorias;
-            })
+            resolve(this.entradas);
+          },
+          error: (error) => {
+            this.noHayEntradas = false;
+            reject(error);
           }
-          resolve(this.entradas);
-        },
-        error: err => {
-          this.noHayEntradas = false;
-          if (err.error instanceof ErrorEvent) {
-            this.errorMsg = `Error: ${err.error.message}`;
-          } else {
-            this.errorMsg = "A client-side or network error occurred";
-          }
-          console.log("Desde HOME -> " + this.errorMsg);
-          reject(err);
-        }
-      });
+        });
     });
   }
 
   listenToLoading(): void {
     this.loader.loadingSub
-      .pipe(delay(0)) // This prevents a ExpressionChangedAfterItHasBeenCheckedError for subsequent requests
       .subscribe((loading) => {
         this.loading = loading;
-        if (loading === false) {
+        if (!loading) {
           this.cargaFinalizada = true;
         }
       });

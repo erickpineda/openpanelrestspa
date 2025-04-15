@@ -1,33 +1,32 @@
 import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { Categoria } from "src/app/core/models/categoria.model";
-import { Usuario } from "src/app/core/models/usuario.model";
-import { CategoriaService } from "src/app/core/services/categoria.service";
-import { TokenStorageService } from "src/app/core/services/token-storage.service";
-import { UsuarioService } from "src/app/core/services/usuario.service";
-import { CommonFunctionalityComponent } from "src/app/shared/components/funcionalidades-comunes/common-functionality.component";
+import { Categoria } from "../../../core/models/categoria.model";
+import { CategoriaService } from "../../../core/services/categoria.service";
+import { TokenStorageService } from "../../../core/services/token-storage.service";
+import { UsuarioService } from "../../../core/services/usuario.service";
+import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
+import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-response.model";
 
 @Component({
   selector: 'app-listado-categorias',
   templateUrl: './listado-categorias.component.html',
   styleUrls: ['./listado-categorias.component.scss']
 })
-export class ListadoCategoriasComponent extends CommonFunctionalityComponent implements OnInit {
+export class ListadoCategoriasComponent implements OnInit {
 
   listaCategorias: Categoria[] = [];
 
   constructor(
-    protected override router: Router,
+    private router: Router,
     private categoriaService: CategoriaService,
     private usuarioService: UsuarioService,
     private tokenStorageService: TokenStorageService,
-    protected override datePipe: DatePipe
+    private commonFuncService: CommonFunctionalityService,
   ) {
-    super(router, datePipe);
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
     this.initList();
   }
 
@@ -49,16 +48,22 @@ export class ListadoCategoriasComponent extends CommonFunctionalityComponent imp
   private obtenerListaCategorias(): Promise<Categoria[]> {
     return new Promise((resolve, reject) => {
       this.categoriaService.listar().subscribe({
-        next: data => resolve(data.data),
-        error: err => {
-          if (err?.status == 404) {
+        next: (response: OpenpanelApiResponse<any>) => {
+          const categorias: Categoria[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
+          resolve(categorias);
+        },
+        error: (err) => {
+          if (err?.status === 404) {
             this.listaCategorias = [];
+            console.warn('No se encontraron categorías. Estableciendo lista vacía.');
+            resolve([]);
+          } else {
+            reject(err);
           }
-          reject(err);
         }
       });
     });
-  }
+  }  
 
   public refrescarPagina(): void {
     window.location.reload();

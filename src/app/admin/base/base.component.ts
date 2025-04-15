@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { delay } from 'rxjs';
-import { LoadingService } from 'src/app/core/services/loading.service';
+import { LoadingService } from '../../core/services/loading.service';
 
 @Component({
   selector: 'app-base',
@@ -28,7 +28,6 @@ export class BaseComponent implements OnInit {
       .subscribe((loading) => {
         this.loading = loading;
         this.cargaFinalizada = !loading;
-        console.log(this.cargaFinalizada);
       });
   }
 }

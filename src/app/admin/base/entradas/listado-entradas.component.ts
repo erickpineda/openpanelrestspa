@@ -1,77 +1,59 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { delay } from 'rxjs';
-import { Entrada } from 'src/app/core/models/entrada.model';
-import { Usuario } from 'src/app/core/models/usuario.model';
-import { EntradaService } from 'src/app/core/services/entrada.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
-import { UsuarioService } from 'src/app/core/services/usuario.service';
-import { CommonFunctionalityComponent } from 'src/app/shared/components/funcionalidades-comunes/common-functionality.component';
+import { Entrada } from '../../../core/models/entrada.model';
+import { Usuario } from '../../../core/models/usuario.model';
+import { EntradaService } from '../../../core/services/entrada.service';
+import { LoadingService } from '../../../core/services/loading.service';
+import { UsuarioService } from '../../../core/services/usuario.service';
+import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
+import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
 
 @Component({
   selector: 'app-listado-entradas',
   templateUrl: './listado-entradas.component.html',
   styleUrls: ['./listado-entradas.component.scss']
 })
-export class ListadoEntradasComponent extends CommonFunctionalityComponent implements OnInit {
+export class ListadoEntradasComponent implements OnInit {
   entrada: Entrada = new Entrada();
   listaEntradas: Entrada[] = [];
   nombresCategoriasConComas: string = '';
-  
-  // Propiedades para la paginación
-  page = 1;
-  pageSize = 5;
-  pagedEntradas: any[] = [];
+
+  totalPages: number = 0;
+  currentPage: number = 0;
+  pageSize: number = 20;
 
   constructor(
-    protected override router: Router,
+    private commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
-    private usuarioService: UsuarioService,
-    protected override datePipe: DatePipe,
-    public loader: LoadingService
-  ) {
-    super(router, datePipe);
-    
+    private usuarioService: UsuarioService
+  ) {}
+
+  ngOnInit(): void {
+    this.obtenerListaEntradas(this.currentPage);
   }
 
-  override ngOnInit(): void {
-    this.obtenerListaEntradas().then((listaRes: Entrada[]) => {
-      listaRes.forEach((entradaRes) => {
-        entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
-
-        this.obtenerDatosUsuario(entradaRes.idUsuario).then((usu: Usuario) => {
-          if (usu) {
-            entradaRes.username = usu.username;
-          }
-        });
-      });
-      this.refreshEntradas();
-    });
-  }
-
-  private obtenerListaEntradas(): Promise<Entrada[]> {
-    return new Promise((resolve, reject) => {
-      this.entradaService.listar().subscribe({
-        next: data => {
-          this.listaEntradas = data.data;
-          resolve(this.listaEntradas);
-        },
-        error: err => {
-          if (err && err.status == 404 && err.error && err.error.message) {
-            this.listaEntradas = [];
-          }
-          reject(err);
+  obtenerListaEntradas(page: number): void {
+    this.currentPage = page;
+    this.entradaService.listarPagina(page, this.pageSize).subscribe({
+      next: (response: OpenpanelApiResponse<any>) => {
+        this.listaEntradas = response.data.elements || [];
+        this.totalPages = response.data.totalPages;
+      },
+      error: err => {
+        if (err?.status === 404) {
+          this.listaEntradas = [];
         }
-      });
+      }
     });
   }
 
   private obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerPorId(idUsuario).subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const usuario: Usuario = (response.data) ? response.data : Usuario;
+          resolve(usuario);
         },
         error: err => {
           reject(err);
@@ -81,7 +63,7 @@ export class ListadoEntradasComponent extends CommonFunctionalityComponent imple
   }
 
   public checkFechaPublicacion(fechaPublicacion: Date): string {
-    return fechaPublicacion ? this.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false) : 'No publicada';
+    return fechaPublicacion ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false) : 'No publicada';
   }
 
   crearEntrada() {}
@@ -94,25 +76,4 @@ export class ListadoEntradasComponent extends CommonFunctionalityComponent imple
     window.location.reload();
   }
 
-  // Métodos para la paginación
-  refreshEntradas() {
-    this.pagedEntradas = this.listaEntradas.slice(
-      (this.page - 1) * this.pageSize,
-      (this.page - 1) * this.pageSize + this.pageSize
-    );
-  }
-
-  onPageChange(page: number) {
-    if (page < 1 || page > this.numberOfPages) return;
-    this.page = page;
-    this.refreshEntradas();
-  }
-
-  get numberOfPages(): number {
-    return Math.ceil(this.listaEntradas.length / this.pageSize);
-  }
-
-  getPages(): number[] {
-    return Array.from({ length: this.numberOfPages }, (v, k) => k + 1);
-  }
 }

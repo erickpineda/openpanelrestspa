@@ -1,0 +1,17 @@
+<c-pagination align="end" aria-label="Paginación" size="sm">
+  <li cPageItem [disabled]="currentPage === 0">
+    <a cPageLink (click)="cambiarPagina(-1)" aria-label="Anterior">
+      <span aria-hidden="true">&laquo;</span>
+    </a>
+  </li>
+  <li cPageItem [active]="pageNumber === currentPage" *ngFor="let pageNumber of paginasVisibles">
+    <a cPageLink (click)="pageChange.emit(pageNumber)">
+      {{ pageNumber + 1 }}
+    </a>
+  </li>
+  <li cPageItem [disabled]="currentPage >= totalPages - 1">
+    <a cPageLink (click)="cambiarPagina(1)" aria-label="Siguiente">
+      <span aria-hidden="true">&raquo;</span>
+    </a>
+  </li>
+</c-pagination>

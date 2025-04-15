@@ -1,5 +1,5 @@
 <c-card>
-  <c-card-header class="d-flex align-items-center">
+  <c-card-header class="d-flex align-items-center" #entradasInicio>
     <c-col [sm]="6">
       <h6 cCardTitle>Listado de entradas</h6>
     </c-col>
@@ -37,6 +37,12 @@
       </c-card-body>
       <hr>
     </c-card>-->
+    <app-op-pagination 
+      [totalPages]="totalPages"
+      [currentPage]="currentPage"
+      [align]="'end'"
+      (pageChange)="obtenerListaEntradas($event)">
+    </app-op-pagination>
     <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length >= 0">
       <thead cTableColor="dark">
         <tr>
@@ -64,16 +70,10 @@
         </tr>
       </tbody>
     </table>
-    <c-pagination aria-label="Paginación de entradas" size="sm" *ngIf="listaEntradas.length > 0">
-      <li cPageItem [active]="page === 1">
-        <a cPageLink (click)="onPageChange(page - 1)" [routerLink]><span aria-hidden="true">&laquo;</span></a>
-      </li>
-      <li cPageItem *ngFor="let p of getPages()" [active]="p === page">
-        <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
-      </li>
-      <li cPageItem [active]="page === numberOfPages">
-        <a cPageLink (click)="onPageChange(page + 1)" [routerLink]><span aria-hidden="true">&raquo;</span></a>
-      </li>
-    </c-pagination>
+    <app-op-pagination
+      [totalPages]="totalPages"
+      [currentPage]="currentPage"
+      (pageChange)="obtenerListaEntradas($event)">
+    </app-op-pagination>
   </c-card-body>
 </c-card>

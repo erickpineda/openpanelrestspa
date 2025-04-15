@@ -1,54 +1,66 @@
-import { Injectable, ErrorHandler, Injector, NgZone } from '@angular/core';
+import { ErrorHandler, Injectable, Injector } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { LoggerService } from 'src/app/core/services/logger.service';
+import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class GlobalErrorHandlerService implements ErrorHandler {
-  constructor(private injector: Injector) { }
 
-  handleError(error: any) {
-    let status: number = -1;
-    let message: string;
-    let router = this.injector.get(Router);
-    console.log('URL: ' + router.url);
+  constructor(private injector: Injector) {}
 
-    let loggerService = this.injector.get(LoggerService);
-    loggerService.log(error);
+  handleError(error: any): void {
+    const router = this.injector.get(Router);
+    let errorMessage = 'Ha ocurrido un error desconocido';
+    let errorResponse: OpenpanelApiResponse<any>;
 
     if (error instanceof HttpErrorResponse) {
-      //Backend returns unsuccessful response codes such as 404, 500 etc.
-      status = error.status;
-      message = this.getServerErrorMessage(error);
+      errorResponse = this.mapHttpErrorToApiResponse(error);
+      errorMessage = error.status === 0 ? 
+        'Error de conexión: No se puede conectar al servidor.' : 
+        `Error del servidor: ${errorResponse.error?.details?.join(', ') || error.message}`;
+    } else if (error.rejection && error.rejection.error?.result) {
+      // Si el error proviene de una promesa rechazadas
+      errorResponse = error.rejection.error;
+      errorMessage = errorResponse.error?.details?.join(', ') || 'Error inesperado';
     } else {
-      //A client-side or network error occurred.	          
-      console.error('An error occurred:', error.message);
-      message = error.message;
+      // Error del cliente
+      errorResponse = {
+        result: {
+          trackingId: '',
+          timestamp: new Date().toISOString(),
+          success: false,
+          message: error.message ? error.message : 'Error inesperado'
+        }
+      };
+      errorMessage = errorResponse.result.message;
     }
 
-    console.error('Status code:', status);
-    console.error('Message error:', message);
+    console.error(`Global Error Handler: ${errorMessage}`);
 
-    if (status == 500) {
+    if (errorResponse.error && errorResponse.error.status === 500) {
       router.navigate(['/error']);
     }
 
+    // Aquí puedes integrar servicios como ngx-toastr para notificar al usuario
   }
 
-  private getServerErrorMessage(error: HttpErrorResponse): string {
-    switch (error.status) {
-      case 404: {
-        return `Not Found: ${error.message}`;
+  private mapHttpErrorToApiResponse(error: HttpErrorResponse): OpenpanelApiResponse<any> {
+    return {
+      result: {
+        trackingId: error.error?.result?.trackingId || '',
+        timestamp: error.error?.result?.timestamp || new Date().toISOString(),
+        success: error.error?.result?.success || false,
+        message: error.error?.result?.message || error.message
+      },
+      error: {
+        timestamp: error.error?.error?.timestamp || new Date().toISOString(),
+        status: error.error?.error?.status || error.status,
+        message: error.message || 'Unknown Error',
+        path: error.url || '',
+        details: error.error?.error?.details || []
       }
-      case 403: {
-        return `Access Denied: ${error.message}`;
-      }
-      case 500: {
-        return `Internal Server Error: ${error.message}`;
-      }
-      default: {
-        return `Unknown Server Error: ${error.message}`;
-      }
-    }
+    };
   }
 }

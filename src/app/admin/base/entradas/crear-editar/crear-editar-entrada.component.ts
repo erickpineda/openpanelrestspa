@@ -1,18 +1,20 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { ValidationEntradaFormsService } from 'src/app/core/services/validation-entrada-forms.service';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { EntradaService } from 'src/app/core/services/entrada.service';
-import { Entrada } from 'src/app/core/models/entrada.model';
-import { Categoria } from 'src/app/core/models/categoria.model';
-import { TipoEntrada } from 'src/app/core/models/tipo-entrada.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CategoriaService } from 'src/app/core/services/categoria.service';
-import { EstadoEntrada } from 'src/app/core/models/estado-entrada.model';
-import { CommonFunctionalityComponent } from 'src/app/shared/components/funcionalidades-comunes/common-functionality.component';
-import { UsuarioService } from 'src/app/core/services/usuario.service';
 import { DatePipe } from '@angular/common';
-import { PerfilResponse } from 'src/app/core/models/perfil-response.model';
+import { Categoria } from '../../../../core/models/categoria.model';
+import { Entrada } from '../../../../core/models/entrada.model';
+import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
+import { PerfilResponse } from '../../../../core/models/perfil-response.model';
+import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
+import { CategoriaService } from '../../../../core/services/categoria.service';
+import { EntradaService } from '../../../../core/services/entrada.service';
+import { UsuarioService } from '../../../../core/services/usuario.service';
+import { ValidationEntradaFormsService } from '../../../../core/services/validation-entrada-forms.service';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { CommonFunctionalityService } from '../../../../shared/services/common-functionality.service';
+import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-response.model';
+import { Usuario } from '../../../../core/models/usuario.model';
 
 @Component({
   selector: 'app-crear-editar-entrada',
@@ -20,7 +22,7 @@ import { PerfilResponse } from 'src/app/core/models/perfil-response.model';
   styleUrls: ['./crear-editar-entrada.component.scss'],
   providers: [ValidationEntradaFormsService],
 })
-export class CrearEditarEntrada extends CommonFunctionalityComponent implements OnInit {
+export class CrearEditarEntrada implements OnInit, AfterViewInit {
   public Editor = ClassicEditor;
   entradaForm!: UntypedFormGroup;
   submitted = false;
@@ -33,23 +35,25 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   usuarioEnSesion: PerfilResponse = new PerfilResponse;
 
   constructor(
-    protected override router: Router,
+    private commonFuncService: CommonFunctionalityService,
     private route: ActivatedRoute,
     private fb: UntypedFormBuilder,
     public vf: ValidationEntradaFormsService,
     public entradaService: EntradaService,
     public categoriaService: CategoriaService,
     public usuarioService: UsuarioService,
-    protected override datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
   ) {
-    super(router, datePipe);
     this.formErrors = this.vf.errorMessages;
     this.createForm();
     this.initializeData();
   }
 
-  override ngOnInit(): void { }
+  ngOnInit(): void { }
+
+  ngAfterViewInit(): void {
+    this.initializeEditor();
+  }
 
   private async initializeData() {
     await this.obtenerDatos();
@@ -81,8 +85,9 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   private obtenerDatosTipoEntrada(): Promise<TipoEntrada[]> {
     return new Promise((resolve, reject) => {
       this.entradaService.listarTiposEntradas().subscribe({
-        next: data => {
-          resolve(data.tiposEntradas);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const lista: TipoEntrada[] = Array.isArray(response.data?.tiposEntradas) ? response.data?.tiposEntradas : [];
+          resolve(lista);
         },
         error: err => {
           reject(err);
@@ -94,8 +99,9 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   private obtenerDatosEstadosEntrada(): Promise<EstadoEntrada[]> {
     return new Promise((resolve, reject) => {
       this.entradaService.listarEstadosEntradas().subscribe({
-        next: data => {
-          resolve(data.estadosEntradas);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const lista: EstadoEntrada[] = Array.isArray(response.data?.estadosEntradas) ? response.data.estadosEntradas : [];
+          resolve(lista);
         },
         error: err => {
           reject(err);
@@ -107,22 +113,24 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   private obtenerDatosCategorias(): Promise<Categoria[]> {
     return new Promise((resolve, reject) => {
       this.categoriaService.listar().subscribe({
-        next: data => {
-          resolve(data.data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const categorias: Categoria[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
+          resolve(categorias);
         },
-        error: err => {
+        error: (err) => {
           reject(err);
         }
       });
-    })
-  }
+    });
+  }  
 
   private obtenerDatosEntrada(): Promise<Entrada> {
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(this.getEntradaId('idEntrada'))
         .subscribe({
-          next: data => {
-            resolve(data);
+          next: (response: OpenpanelApiResponse<any>) => {
+            const entrada: Entrada = (response.data) ? response.data : Entrada;
+            resolve(entrada);
           },
           error: err => {
             reject(err);
@@ -134,8 +142,9 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
   private obtenerDatosUsuarioActual(): Promise<PerfilResponse> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerDatosSesionActual().subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const usuario: Usuario = (response.data) ? response.data : Usuario;
+          resolve(usuario);
         },
         error: err => {
           reject(err);
@@ -206,7 +215,7 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
     this.resetForm(this.entradaForm);
     this.obtenerDatos();
     alert('¡Se borraran los datos!');
-    this.reloadComponent(false, '/admin/control/entradas');
+    this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
   }
 
   onValidate() {
@@ -232,26 +241,51 @@ export class CrearEditarEntrada extends CommonFunctionalityComponent implements 
 
   private creaEntrada(ent: Entrada) {
     ent.idUsuario = this.usuarioEnSesion.idUsuario;
-    this.entradaService.crear(ent).subscribe((data: Entrada) => {
-      if (data) {
-        this.entrada = data;
-        this.reloadComponent(false, '/admin/control/entradas');
-      }
+    this.entradaService.crear(ent).subscribe((response: OpenpanelApiResponse<any>) => {
+      const entrada: Entrada = (response.data) ? response.data : Entrada;
+      this.entrada = entrada;
+      this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
     });
   }
 
   private actualizaEntrada(ent: Entrada) {
     ent.idUsuarioEditado = this.usuarioEnSesion.idUsuario;
-    this.entradaService.actualizar(ent.idEntrada, ent).subscribe((data: Entrada) => {
-      if (data) {
-        this.entrada = data;
-        this.reloadComponent(false, '/admin/control/entradas');
-      }
+    this.entradaService.actualizar(ent.idEntrada, ent).subscribe((response: OpenpanelApiResponse<any>) => {
+      const entrada: Entrada = (response.data) ? response.data : Entrada;
+      this.entrada = entrada;
+      this.commonFuncService.reloadComponent(false, '/admin/control/entradas');
     });
   }
 
   editarEntrada() {
     this.entradaForm.enable();
   }
+
+  private initializeEditor() {
+    ClassicEditor.defaultConfig = {
+      licenseKey: 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NDUwMjA3OTksImp0aSI6IjFjMzBkNTBiLTM4MTUtNGFlNS04YTA5LTQxNmQ1MDFhNGI1YyIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJ2YyI6IjYyMzUyNjg0In0.lnrFu_caAXepP6Q2VnZZM_kfUMmT_Lp7gFqAeZCWztxj2VXt4RiOAk5ALG-vpkaXe5oRLMZpc0Vpagapyi9ORg',
+      //licenseKey: 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NzUzNDcxOTksImp0aSI6ImJiZDc3ODU5LTUyZWItNDgyNS04MjExLTFmNzJhNGQ0YzExZCIsImxpY2Vuc2VkSG9zdHMiOlsiMTI3LjAuMC4xIiwibG9jYWxob3N0IiwiMTkyLjE2OC4qLioiLCIxMC4qLiouKiIsIjE3Mi4qLiouKiIsIioudGVzdCIsIioubG9jYWxob3N0IiwiKi5sb2NhbCJdLCJ1c2FnZUVuZHBvaW50IjoiaHR0cHM6Ly9wcm94eS1ldmVudC5ja2VkaXRvci5jb20iLCJkaXN0cmlidXRpb25DaGFubmVsIjpbImNsb3VkIiwiZHJ1cGFsIl0sImxpY2Vuc2VUeXBlIjoiZGV2ZWxvcG1lbnQiLCJmZWF0dXJlcyI6WyJEUlVQIl0sInZjIjoiODM1ZjhiY2UifQ.mPEoabXhIRdVjvwwmk6d6O5OFiwKj61M8tdD-amuoSMMMJEe05VyLeCGUKluwRHO_FuP08iHtw2020bA7VTytw',
+      toolbar: {
+        items: [
+          'heading', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote',
+          'imageUpload', 'insertTable', 'mediaEmbed', 'undo', 'redo'
+          //'heading', 'bold', 'italic', 'link', 'undo', 'redo'
+        ],
+        shouldNotGroupWhenFull: true
+      },
+      image: {
+        toolbar: [
+          'imageStyle:full', 'imageStyle:side', 'imageTextAlternative'
+        ]
+      },
+      table: {
+        contentToolbar: [
+          'tableColumn', 'tableRow', 'mergeTableCells'
+        ]
+      },
+    };
+  }  
+  
+
 }
 

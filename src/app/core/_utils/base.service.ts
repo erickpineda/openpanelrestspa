@@ -1,29 +1,38 @@
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { TokenStorageService } from '../services/token-storage.service';
+import { environment } from '../../../environments/environment.dev.es';
 
 @Injectable()
 export abstract class BaseService {
 
-    protected abstract resource: any;
-    constructor(protected token: TokenStorageService) {
-    }
+    protected abstract resource: string;
 
+    constructor(protected token: TokenStorageService) { }
+
+    // Método simplificado para obtener el path de la API
     protected get path(): string {
-        return environment.backend.host + environment.backend.uri + this.resource;;
+        return `${environment.backend.host}${environment.backend.uri}${this.resource}`;
     }
 
-    protected getPath(resource: string): string {
-        return environment.backend.host + environment.backend.uri + resource;;
+    // Método adicional para construir paths dinámicos
+    protected buildUrl(endpoint: string): string {
+        return `${this.path}${endpoint}`;
     }
 
-    protected setHeaders(): HttpHeaders {
-        let headers = new HttpHeaders();
-        headers = headers.append("Content-Type", "application/json");
-        headers = headers.append("Accept", "application/json");
+    // Método para configurar headers comunes
+    protected setHeaders(additionalHeaders?: { [header: string]: string | string[] }): HttpHeaders {
+        let headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        });
         if (this.token.getToken()) {
-            headers = headers.append("Authorization", "Bearer " + this.token.getToken());
+            headers = headers.append('Authorization', `Bearer ${this.token.getToken()}`);
+        }
+        if (additionalHeaders) {
+            Object.keys(additionalHeaders).forEach(key => {
+                headers = headers.append(key, additionalHeaders[key]);
+            });
         }
         return headers;
     }

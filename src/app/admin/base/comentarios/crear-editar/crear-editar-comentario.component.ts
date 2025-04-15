@@ -1,22 +1,23 @@
 import { DatePipe } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Comentario } from "src/app/core/models/comentario.model";
-import { Entrada } from "src/app/core/models/entrada.model";
-import { Usuario } from "src/app/core/models/usuario.model";
-import { ComentarioService } from "src/app/core/services/comentario.service";
-import { EntradaService } from "src/app/core/services/entrada.service";
-import { TokenStorageService } from "src/app/core/services/token-storage.service";
-import { UsuarioService } from "src/app/core/services/usuario.service";
-import { CommonFunctionalityComponent } from "src/app/shared/components/funcionalidades-comunes/common-functionality.component";
+import { Comentario } from "../../../../core/models/comentario.model";
+import { Entrada } from "../../../../core/models/entrada.model";
+import { Usuario } from "../../../../core/models/usuario.model";
+import { ComentarioService } from "../../../../core/services/comentario.service";
+import { EntradaService } from "../../../../core/services/entrada.service";
+import { TokenStorageService } from "../../../../core/services/token-storage.service";
+import { UsuarioService } from "../../../../core/services/usuario.service";
+import { OpenpanelApiResponse } from "../../../../core/models/openpanel-api-response.model";
+import { CommonFunctionalityService } from "../../../../shared/services/common-functionality.service";
 
 @Component({
   selector: 'app-crear-editar-comentario',
   templateUrl: './crear-editar-comentario.component.html',
   styleUrls: ['./crear-editar-comentario.component.scss'],
 })
-export class CrearEditarComentario extends CommonFunctionalityComponent implements OnInit {
+export class CrearEditarComentario implements OnInit {
   comentarioForm!: UntypedFormGroup;
   comentario: Comentario = new Comentario();
   usuarioEnSesion: Usuario = new Usuario;
@@ -25,16 +26,15 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
   submitted = false;
 
   constructor(
-    protected override router: Router,
-    protected override datePipe: DatePipe,
+    private commonFuncService: CommonFunctionalityService,
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     public entradaService: EntradaService,
     public comentarioService: ComentarioService,
     public usuarioService: UsuarioService,
     public tokenStorageService: TokenStorageService,
+    private cdr: ChangeDetectorRef,
   ) {
-    super(router, datePipe);
     this.createForm();
 
     new Promise<void>((resolve, _reject) => {
@@ -42,7 +42,11 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
     });
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    this.cdr.detectChanges();
   }
 
   private obtenerDatos() {
@@ -76,8 +80,9 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
     return new Promise((resolve, reject) => {
       this.comentarioService.obtenerPorId(this.getComentarioId('idComentario'))
         .subscribe({
-          next: data => {
-            resolve(data);
+          next: (response: OpenpanelApiResponse<any>) => {
+            const comentario: Comentario = (response.data) ? response.data : Comentario;
+            resolve(comentario);
           },
           error: err => {
             reject(err);
@@ -89,8 +94,9 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
   private obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerPorId(idUsuario).subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const usuario: Usuario = (response.data) ? response.data : Usuario;
+          resolve(usuario);
         },
         error: err => {
           reject(err);
@@ -103,8 +109,9 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(idEntrada)
         .subscribe({
-          next: data => {
-            resolve(data);
+          next: (response: OpenpanelApiResponse<any>) => {
+            const entrada: Entrada = (response.data) ? response.data : Entrada;
+            resolve(entrada);
           },
           error: err => {
             reject(err);
@@ -122,8 +129,8 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
         username: null,
         tituloEntrada: null,
         email: null,
-        aprobado: null,
-        cuarentena: null,
+        aprobado: [false],
+        cuarentena: [false],
         votos: null,
         fechaCreacion: null,
         fechaEdicion: null,
@@ -156,20 +163,17 @@ export class CrearEditarComentario extends CommonFunctionalityComponent implemen
 
   private crea(coment: Comentario) {
     coment.idUsuario = this.tokenStorageService.getUser().id;
-    this.comentarioService.crear(coment).subscribe((data: Comentario)=> {
-      if (data) {
-        this.comentario = data;
-        this.reloadComponent(false, '/admin/control/comentarios');
-      }
+    this.comentarioService.crear(coment).subscribe((response: OpenpanelApiResponse<any>)=> {
+      const comentario: Comentario = (response.data) ? response.data : Comentario;
+      this.comentario = comentario;
+      this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
     });
   }
 
   private actualiza(coment: Comentario) {
-    this.comentarioService.actualizar(coment.idComentario, coment).subscribe((data: Comentario)=> {
-      if (data) {
-        this.comentario = data;
-        this.reloadComponent(false, '/admin/control/comentarios');
-      }
+    this.comentarioService.actualizar(coment.idComentario, coment).subscribe((response: OpenpanelApiResponse<any>)=> {
+      console.log('Se ha actualizado el comentario ' + coment.idComentario)
+      this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
     });
   }
 

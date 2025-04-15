@@ -3,7 +3,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
 import { TokenStorageService } from './token-storage.service';
-const AUTH_API = 'https://zany-spoon-g9rxv6gp5rhpwj4-8080.app.github.dev/';
+import { environment } from '../../../environments/environment.dev.es';
+import { OPConstants } from '../../shared/constants/op-global.constants';
+
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json',
   
@@ -14,6 +16,9 @@ const httpOptions = {
 })
 export class AuthService {
   private userSubject: BehaviorSubject<Usuario | null>;
+  private urlBase = environment.backend.host;
+  private urlLogin = OPConstants.Methods.AUTH.LOGIN;
+  private urlRegis = OPConstants.Methods.AUTH.REGISTER_USER;
 
   constructor(private http: HttpClient, private tokenStorageService: TokenStorageService) {
 
@@ -25,7 +30,7 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post(AUTH_API + 'login', { // + 'signin'
+    return this.http.post(this.urlBase + this.urlLogin, { // + 'signin'
       username,
       password
     }, {
@@ -38,7 +43,7 @@ export class AuthService {
     );
   }
   register(username: string, email: string, password: string): Observable<any> {
-    return this.http.post(AUTH_API + 'registerUser', {
+    return this.http.post(this.urlBase + this.urlRegis, {
       username,
       email,
       password

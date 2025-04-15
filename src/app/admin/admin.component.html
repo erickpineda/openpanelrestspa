@@ -21,9 +21,9 @@
     routerLink="./"
   >
   </c-sidebar-brand>
-  <perfect-scrollbar [config]="perfectScrollbarConfig">
+  <ng-scrollbar pointerEventsMethod="scrollbar">
     <c-sidebar-nav [navItems]="navItems"></c-sidebar-nav>
-  </perfect-scrollbar>
+  </ng-scrollbar>
   <c-sidebar-toggler
     *ngIf="!sidebar.narrow"
     toggle="unfoldable"

@@ -2,31 +2,30 @@ import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Categoria } from "src/app/core/models/categoria.model";
-import { Entrada } from "src/app/core/models/entrada.model";
-import { PaginaResponse } from "src/app/core/models/pagina-response.model";
-import { PerfilResponse } from "src/app/core/models/perfil-response.model";
-import { Usuario } from "src/app/core/models/usuario.model";
-import { CategoriaService } from "src/app/core/services/categoria.service";
-import { EntradaService } from "src/app/core/services/entrada.service";
-import { TokenStorageService } from "src/app/core/services/token-storage.service";
-import { UsuarioService } from "src/app/core/services/usuario.service";
-import { CommonFunctionalityComponent } from "src/app/shared/components/funcionalidades-comunes/common-functionality.component";
+import { Categoria } from "../../../../core/models/categoria.model";
+import { Entrada } from "../../../../core/models/entrada.model";
+import { PaginaResponse } from "../../../../core/models/pagina-response.model";
+import { PerfilResponse } from "../../../../core/models/perfil-response.model";
+import { CategoriaService } from "../../../../core/services/categoria.service";
+import { EntradaService } from "../../../../core/services/entrada.service";
+import { TokenStorageService } from "../../../../core/services/token-storage.service";
+import { UsuarioService } from "../../../../core/services/usuario.service";
+import { OpenpanelApiResponse } from "../../../../core/models/openpanel-api-response.model";
+import { CommonFunctionalityService } from "../../../../shared/services/common-functionality.service";
 
 @Component({
   selector: 'app-crear-editar-categoria',
   templateUrl: './crear-editar-categoria.component.html',
   styleUrls: ['./crear-editar-categoria.component.scss'],
 })
-export class CrearEditarCategoria extends CommonFunctionalityComponent implements OnInit {
+export class CrearEditarCategoria implements OnInit {
   categoriaForm!: FormGroup;
   usuarioEnSesion: PerfilResponse = new PerfilResponse();
   submitted = false;
   listaCategorias: Categoria[] = [];
 
   constructor(
-    protected override router: Router,
-    protected override datePipe: DatePipe,
+    private commonFuncService: CommonFunctionalityService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
     public tokenStorageService: TokenStorageService,
@@ -34,12 +33,11 @@ export class CrearEditarCategoria extends CommonFunctionalityComponent implement
     public usuarioService: UsuarioService,
     private entradaService: EntradaService
   ) {
-    super(router, datePipe);
     
     this.createForm();
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
     this.obtenerDatos();
   }
 
@@ -63,7 +61,10 @@ export class CrearEditarCategoria extends CommonFunctionalityComponent implement
   private obtenerDatosCategoria(): Promise<Categoria> {
     return new Promise((resolve, reject) => {
       this.categoriaService.obtenerPorId(this.getCategoriaId('idCategoria')).subscribe({
-        next: (data: Categoria) => resolve(data),
+        next: (response: OpenpanelApiResponse<any>) => {
+          const categoria: Categoria = (response.data) ? response.data : Categoria;
+          resolve(categoria)
+        },
         error: (err: any) => reject(err)
       });
     });
@@ -72,8 +73,9 @@ export class CrearEditarCategoria extends CommonFunctionalityComponent implement
   private obtenerListaCategorias(): Promise<Categoria[]> {
     return new Promise((resolve, reject) => {
       this.categoriaService.listar().subscribe({
-        next: (data: PaginaResponse) => {
-          resolve(data.data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const categorias: Categoria[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
+          resolve(categorias)
         },
         error: (err) => {
           reject(err);
@@ -85,8 +87,9 @@ export class CrearEditarCategoria extends CommonFunctionalityComponent implement
   private obtenerDatosUsuarioActual(): Promise<PerfilResponse> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerDatosSesionActual().subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const perfil: PerfilResponse = (response.data) ? response.data : PerfilResponse;
+          resolve(perfil);
         },
         error: err => {
           reject(err);
@@ -98,7 +101,10 @@ export class CrearEditarCategoria extends CommonFunctionalityComponent implement
   private obtenerDatosEntrada(idEntrada: number): Promise<Entrada> {
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(idEntrada).subscribe({
-        next: (data: Entrada) => resolve(data),
+        next: (response: OpenpanelApiResponse<any>) => {
+          const entrada: Entrada = (response.data) ? response.data : Entrada;
+          resolve(entrada)
+        },
         error: (err: any) => reject(err)
       });
     });
@@ -135,13 +141,13 @@ export class CrearEditarCategoria extends CommonFunctionalityComponent implement
 
   private crea(cat: Categoria) {
     this.categoriaService.crear(cat).subscribe(() => {
-      this.reloadComponent(false, '/admin/control/categorias');
+      this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
     });
   }
 
   private actualiza(cat: Categoria) {
     this.categoriaService.actualizar(cat.idCategoria, cat).subscribe(() => {
-      this.reloadComponent(false, '/admin/control/categorias');
+      this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
     });
   }
 

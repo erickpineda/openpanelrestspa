@@ -1,14 +1,15 @@
 import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { Comentario } from "src/app/core/models/comentario.model";
-import { Entrada } from "src/app/core/models/entrada.model";
-import { PaginaResponse } from "src/app/core/models/pagina-response.model";
-import { Usuario } from "src/app/core/models/usuario.model";
-import { ComentarioService } from "src/app/core/services/comentario.service";
-import { EntradaService } from "src/app/core/services/entrada.service";
-import { UsuarioService } from "src/app/core/services/usuario.service";
-import { CommonFunctionalityComponent } from "src/app/shared/components/funcionalidades-comunes/common-functionality.component";
+import { Comentario } from "../../../core/models/comentario.model";
+import { Entrada } from "../../../core/models/entrada.model";
+import { PaginaResponse } from "../../../core/models/pagina-response.model";
+import { Usuario } from "../../../core/models/usuario.model";
+import { ComentarioService } from "../../../core/services/comentario.service";
+import { EntradaService } from "../../../core/services/entrada.service";
+import { UsuarioService } from "../../../core/services/usuario.service";
+import { CommonFunctionalityService } from "../../../shared/services/common-functionality.service";
+import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-response.model";
 
 @Component({
   selector: 'app-listado-comentarios',
@@ -16,7 +17,7 @@ import { CommonFunctionalityComponent } from "src/app/shared/components/funciona
   styleUrls: ['./listado-comentarios.component.scss']
 })
 
-export class ListadoComentariosComponent extends CommonFunctionalityComponent implements OnInit {
+export class ListadoComentariosComponent implements OnInit {
 
   listaComentarios: Comentario[] = [];
 
@@ -28,24 +29,23 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
   estaVacio: boolean = false;
 
   constructor(
-    protected override router: Router,
+    private router: Router,
     private comentarioService: ComentarioService,
     private usuarioService: UsuarioService,
     private entradaService: EntradaService,
-    protected override datePipe: DatePipe
+    private commonFuncService: CommonFunctionalityService,
   ) {
-    super(router, datePipe);
     
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
     this.initList();
   }
 
   private initList() {
     try {
       this.obtenerListaComentarios().then((listaRes: PaginaResponse) => {
-        this.listaComentarios = listaRes.data;
+        this.listaComentarios = listaRes.elements;
         this.estaVacio = listaRes.empty;
         if (!this.estaVacio) {
           this.refreshComentarios();
@@ -63,8 +63,9 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
   private async obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerPorId(idUsuario).subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const usuario: Usuario = (response.data) ? response.data : Usuario;
+          resolve(usuario)
         },
         error: (err: any) => {
           reject(err);
@@ -76,8 +77,9 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
   private async obtenerDatosEntrada(idEntrada: number): Promise<Entrada> {
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(idEntrada).subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const entrada: Entrada = (response.data) ? response.data.elements : Entrada;
+          resolve(entrada)
         },
         error: (err: any) => {
           reject(err);
@@ -89,18 +91,23 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
   private async obtenerListaComentarios(): Promise<PaginaResponse> {
     return new Promise((resolve, reject) => {
       this.comentarioService.listarPagina(this.pageCurrent, this.pageSize).subscribe({
-        next: data => {
-          resolve(data);
+        next: (response: OpenpanelApiResponse<any>) => {
+          const pResp: PaginaResponse = (response.data) ? response.data : PaginaResponse;
+          pResp.elements = response.data?.elements;
+          resolve(pResp);
         },
         error: (err: any) => {
-          if (err && err.status == 404 && err.error && err.error.message) {
+          if (err?.status === 404) {
+            console.warn("No se encontraron comentarios, asignando lista vacía.");
             this.listaComentarios = [];
+            resolve(new PaginaResponse()); // o ajusta según el modelo específico
+          } else {
+            reject(err);
           }
-          reject(err);
         }
       });
     });
-  }
+  }  
 
   public checkTrueOrFalseToString(toCheck: boolean) {
     return toCheck ? 'Si' : 'No';
@@ -125,7 +132,7 @@ export class ListadoComentariosComponent extends CommonFunctionalityComponent im
     if (page > this.numberOfPages) {
       this.pageCurrent = page;
       this.obtenerListaComentarios().then((listaRes: PaginaResponse) => {
-        this.listaComentarios = listaRes.data;
+        this.listaComentarios = listaRes.elements;
         this.estaVacio = listaRes.empty;
         if (this.estaVacio) {
           this.page = this.pageCurrent;
