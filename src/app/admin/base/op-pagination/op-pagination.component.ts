@@ -9,7 +9,10 @@ export class OpPaginationComponent implements OnChanges {
   @Input() totalPages: number = 0;
   @Input() currentPage: number = 0;
   @Input() paginasRange: number = 4;
-  @Input() align: string = 'end';  // Alineación con valor por defecto 'end'
+  
+  // Definir el tipo correcto para la alineación
+  @Input() align: '' | 'start' | 'center' | 'end' = 'end';  
+
   @Output() pageChange: EventEmitter<number> = new EventEmitter<number>();
 
   paginasVisibles: number[] = [];

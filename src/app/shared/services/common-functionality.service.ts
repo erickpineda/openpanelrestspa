@@ -32,6 +32,13 @@ export class CommonFunctionalityService {
     });
   }
 
+  acortarTexto(texto: string, maxLength: number = 40): string {
+    if (texto.length > maxLength) {
+      return texto.substring(0, maxLength) + '...';
+    }
+    return texto;
+  }
+
   reloadPage() {
     window.location.reload();
   }

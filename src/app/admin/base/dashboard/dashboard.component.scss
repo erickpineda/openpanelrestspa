@@ -1,0 +1,17 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.card {
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 1.5em;
+}
+
+.chart-container {
+  width: 100%;  // Ajusta el tamaño según lo necesites
+  //max-width: 400px;  // Opcional: limita el tamaño máximo si es necesario
+  margin: auto;  // Centra el gráfico en el contenedor
+}

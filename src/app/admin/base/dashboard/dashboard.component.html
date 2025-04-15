@@ -1,1 +1,64 @@
-Hola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola DashboardHola Dashboard
+<c-card>
+  <c-card-header class="d-flex align-items-center">
+    <c-col [sm]="6">
+      <h6 cCardTitle>Dashboard de Estadísticas</h6>
+    </c-col>
+    <c-col [sm]="6">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button cButton color="primary" size="sm">
+          <svg cIcon name="cilChart" style="padding-right: 2px" size="sm" title="Ver Gráfico"></svg>
+          Ver Gráfico
+        </button>
+        <button cButton color="info" size="sm">
+          <svg cIcon name="cilDataTransferDown" style="padding-right: 2px" size="sm" title="Descargar Datos"></svg>
+          Descargar Datos
+        </button>
+      </div>
+    </c-col>
+  </c-card-header>
+  <c-card-body>
+    <div class="d-flex justify-content-between align-items-end">
+      <h5 cCardTitle>Estadísticas Rápidas</h5>
+      <div class="hstack gap-3">
+        <button cButton color="success" size="sm">
+          <svg cIcon name="cilSettings" style="padding-right: 2px" size="sm" title="Ajustar Parámetros"></svg>
+          Ajustar Parámetros
+        </button>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-3">
+        <c-card>
+          <c-card-body>
+            <h5 class="card-title">Usuarios Activos</h5>
+            <p class="card-text">{{cantidadUsuariosActivos}}</p>
+          </c-card-body>
+        </c-card>
+      </div>
+      <div class="col-md-3">
+        <c-card>
+          <c-card-body>
+            <h5 class="card-title">Total de Entradas</h5>
+            <p class="card-text">{{totalEntradas}}</p>
+          </c-card-body>
+        </c-card>
+      </div>
+      <!-- Otros widgets similares pueden ser añadidos aquí -->
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-12">
+        <c-card>
+          <c-card-body>
+            <h5 class="card-title">Resumen general</h5>
+            <!-- Aquí podrías añadir un gráfico -->
+            <div class="chart-container">
+              <c-chart [data]="data" type="bar"></c-chart>
+            </div>
+          </c-card-body>
+        </c-card>
+      </div>
+    </div>
+  </c-card-body>
+</c-card>

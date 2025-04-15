@@ -4,7 +4,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { AvatarModule, BadgeModule, BreadcrumbModule, ButtonGroupModule, ButtonModule, CardModule, DropdownModule, FooterModule, FormModule, GridModule, HeaderModule, ListGroupModule, NavModule, PaginationModule, ProgressModule, SharedModule, SidebarModule, SpinnerModule, TableModule, TabsModule, UtilitiesModule } from '@coreui/angular';
-
+import { ChartjsModule } from '@coreui/angular-chartjs';
 
 import { BaseRoutingModule } from './base-routing.module';
 import { BaseComponent } from './base.component';
@@ -31,6 +31,7 @@ import { OpPaginationComponent } from './op-pagination/op-pagination.component';
     ReactiveFormsModule,
     NgScrollbarModule,
     CKEditorModule,
+    ChartjsModule,
     AvatarModule,
     BadgeModule,
     BreadcrumbModule,

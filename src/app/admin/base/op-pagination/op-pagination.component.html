@@ -1,4 +1,4 @@
-<c-pagination align="end" aria-label="Paginación" size="sm">
+<c-pagination [align]="align" aria-label="Paginación" size="sm">
   <li cPageItem [disabled]="currentPage === 0">
     <a cPageLink (click)="cambiarPagina(-1)" aria-label="Anterior">
       <span aria-hidden="true">&laquo;</span>

@@ -27,20 +27,11 @@
       </div>
     </div>
     <hr>
-    <!--<c-card *ngIf="listaEntradas.length <= 0">
-      <c-card-body>
-        <div>
-          <h5 cCardTitle>No hay entradas</h5>
-          <p cCardText>No se han encontrado registros en el sistema...</p>
-          <button cButton href="#" color="primary" (click)="refrescarPagina()">Refrescar</button>
-        </div>
-      </c-card-body>
-      <hr>
-    </c-card>-->
     <app-op-pagination 
+      [align]="'end'"
+      *ngIf="listaEntradas.length > 0"
       [totalPages]="totalPages"
       [currentPage]="currentPage"
-      [align]="'end'"
       (pageChange)="obtenerListaEntradas($event)">
     </app-op-pagination>
     <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length >= 0">
@@ -49,18 +40,16 @@
           <th scope="col">ID</th>
           <th scope="col">Título</th>
           <th scope="col">Autor</th>
-          <th scope="col">Fecha Publicación</th>
-          <th class="w-25" scope="col">Resumen</th>
+          <th scope="col">Publicación</th>
           <th class="w-10" scope="col">Categorias</th>
         </tr>
       </thead>
       <tbody *ngFor="let entr of listaEntradas">
         <tr [routerLink]="['/admin/control/entradas', entr.idEntrada]" style="cursor: pointer" cAlign="middle">
           <td scope="row">{{entr.idEntrada}}</td>
-          <td>{{entr.titulo}}</td>
+          <td>{{commonFuncService.acortarTexto(entr.titulo)}}</td>
           <td>{{entr.username}}</td>
           <td>{{checkFechaPublicacion(entr.fechaPublicacion)}}</td>
-          <td>{{entr.resumen}}</td>
           <td>{{entr.categoriasConComas}}</td>
         </tr>
       </tbody>
@@ -71,6 +60,8 @@
       </tbody>
     </table>
     <app-op-pagination
+      [align]="'start'"
+      *ngIf="listaEntradas.length > 0"
       [totalPages]="totalPages"
       [currentPage]="currentPage"
       (pageChange)="obtenerListaEntradas($event)">

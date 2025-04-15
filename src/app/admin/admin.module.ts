@@ -20,6 +20,7 @@ import { TokenStorageService } from '../core/services/token-storage.service';
 import { UsuarioService } from '../core/services/usuario.service';
 
 import { NgScrollbarModule } from 'ngx-scrollbar';
+import { ChartjsModule } from '@coreui/angular-chartjs';
 
 const APP_CONTAINERS = [
   DefaultFooterComponent,
@@ -56,6 +57,7 @@ const APP_CONTAINERS = [
     NgScrollbarModule,
     AvatarModule,
     BadgeModule,
+    ChartjsModule,
     BreadcrumbModule,
     ButtonGroupModule,
     ButtonModule,

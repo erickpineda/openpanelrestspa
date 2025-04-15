@@ -17,14 +17,13 @@ import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-respons
 export class ListadoEntradasComponent implements OnInit {
   entrada: Entrada = new Entrada();
   listaEntradas: Entrada[] = [];
-  nombresCategoriasConComas: string = '';
 
   totalPages: number = 0;
   currentPage: number = 0;
   pageSize: number = 20;
 
   constructor(
-    private commonFuncService: CommonFunctionalityService,
+    public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
     private usuarioService: UsuarioService
   ) {}
@@ -36,9 +35,24 @@ export class ListadoEntradasComponent implements OnInit {
   obtenerListaEntradas(page: number): void {
     this.currentPage = page;
     this.entradaService.listarPagina(page, this.pageSize).subscribe({
-      next: (response: OpenpanelApiResponse<any>) => {
+      next: async (response: OpenpanelApiResponse<any>) => {
+        
+        // Obtener los elementos y total de páginas
         this.listaEntradas = response.data.elements || [];
         this.totalPages = response.data.totalPages;
+  
+        // Manejamos los valores asincrónicos de manera correcta usando Promise.all
+        this.listaEntradas = await Promise.all(
+          this.listaEntradas.map(async entrada => {
+            const usuario = await this.obtenerDatosUsuario(entrada.idUsuario);
+            return {
+              ...entrada,
+              categoriasConComas: entrada.categorias.map(e => e.nombre).join(', '),
+              username: usuario.username
+            };
+          })
+        );
+  
       },
       error: err => {
         if (err?.status === 404) {
@@ -46,7 +60,7 @@ export class ListadoEntradasComponent implements OnInit {
         }
       }
     });
-  }
+  }  
 
   private obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
     return new Promise((resolve, reject) => {

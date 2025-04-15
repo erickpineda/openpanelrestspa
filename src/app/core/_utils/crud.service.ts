@@ -17,25 +17,25 @@ export abstract class CrudService<C> extends BaseService {
       return this.http.get<OpenpanelApiResponse<any>>(this.path, { headers: this.setHeaders() });
     }
 
-    public listarPagina(pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<C[]>> {
+    public listarPagina(pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<any>> {
         const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-        return this.http.get<OpenpanelApiResponse<C[]>>(this.path, { headers: this.setHeaders(), params });
+        return this.http.get<OpenpanelApiResponse<any>>(this.path, { headers: this.setHeaders(), params });
     }
 
-    public crear(entity: C): Observable<OpenpanelApiResponse<C>> {
-        return this.http.post<OpenpanelApiResponse<C>>(this.buildUrl('/crear'), entity, { headers: this.setHeaders() });
+    public crear(entity: C): Observable<OpenpanelApiResponse<any>> {
+        return this.http.post<OpenpanelApiResponse<any>>(this.buildUrl('/crear'), entity, { headers: this.setHeaders() });
     }
 
-    public obtenerPorId(id: number): Observable<OpenpanelApiResponse<C>> {
-        return this.http.get<OpenpanelApiResponse<C>>(this.buildUrl(`/obtenerPorId/${id}`), { headers: this.setHeaders() });
+    public obtenerPorId(id: number): Observable<OpenpanelApiResponse<any>> {
+        return this.http.get<OpenpanelApiResponse<any>>(this.buildUrl(`/obtenerPorId/${id}`), { headers: this.setHeaders() });
     }
 
-    public actualizar(id: number, entity: C): Observable<OpenpanelApiResponse<C>> {
-        return this.http.put<OpenpanelApiResponse<C>>(this.buildUrl(`/${id}`), entity, { headers: this.setHeaders() });
+    public actualizar(id: number, entity: C): Observable<OpenpanelApiResponse<any>> {
+        return this.http.put<OpenpanelApiResponse<any>>(this.buildUrl(`/${id}`), entity, { headers: this.setHeaders() });
     }
 
-    public borrar(id: number): Observable<OpenpanelApiResponse<C>> {
-        return this.http.delete<OpenpanelApiResponse<C>>(this.buildUrl(`/${id}`), { headers: this.setHeaders() });
+    public borrar(id: number): Observable<OpenpanelApiResponse<any>> {
+        return this.http.delete<OpenpanelApiResponse<any>>(this.buildUrl(`/${id}`), { headers: this.setHeaders() });
     }
 
 }
