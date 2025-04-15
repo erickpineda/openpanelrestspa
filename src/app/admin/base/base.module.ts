@@ -20,7 +20,7 @@ import { IconModule } from '@coreui/icons-angular';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { EntradaService } from '../../core/services/entrada.service';
 import { UsuarioService } from '../../core/services/usuario.service';
-import { OPModalComponent } from '../../shared/components/op-modal/op-modal.component';
+import { OpPaginationComponent } from './op-pagination/op-pagination.component';
 
 @NgModule({
   imports: [
@@ -53,7 +53,6 @@ import { OPModalComponent } from '../../shared/components/op-modal/op-modal.comp
     TableModule,
     TabsModule,
     UtilitiesModule,
-    OPModalComponent,
   ],
   declarations: [
     BaseComponent,
@@ -63,6 +62,7 @@ import { OPModalComponent } from '../../shared/components/op-modal/op-modal.comp
     CrearEditarComentario,
     ListadoCategoriasComponent,
     CrearEditarCategoria,
+    OpPaginationComponent
  //   MyCKEditorComponent
   ],
   providers: [

@@ -37,17 +37,12 @@
       </c-card-body>
       <hr>
     </c-card>-->
-    <c-pagination align="end" aria-label="Paginación de entradas" size="sm" *ngIf="listaEntradas.length > 0">
-      <li cPageItem [disabled]="currentPage === 0">
-        <a cPageLink (click)="cambiarPagina(-1)" aria-label="Anterior"><span aria-hidden="true">&laquo;</span></a>
-      </li>
-      <li cPageItem [active]="pageNumber === currentPage" *ngFor="let pageNumber of paginasVisibles">
-        <a cPageLink (click)="obtenerListaEntradas(pageNumber)">{{pageNumber + 1}}</a>
-      </li>
-      <li cPageItem [disabled]="!hasMore">
-        <a cPageLink (click)="cambiarPagina(1)" aria-label="Posterior"><span aria-hidden="true">&raquo;</span></a>
-      </li>
-    </c-pagination>
+    <app-op-pagination 
+      [totalPages]="totalPages"
+      [currentPage]="currentPage"
+      [align]="'end'"
+      (pageChange)="obtenerListaEntradas($event)">
+    </app-op-pagination>
     <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length >= 0">
       <thead cTableColor="dark">
         <tr>
@@ -75,16 +70,10 @@
         </tr>
       </tbody>
     </table>
-    <c-pagination aria-label="Paginación de entradas" size="sm" *ngIf="listaEntradas.length > 0">
-      <li cPageItem [disabled]="currentPage === 0">
-        <a cPageLink (click)="cambiarPagina(-1)" aria-label="Anterior"><span aria-hidden="true">&laquo;</span></a>
-      </li>
-      <li cPageItem [active]="pageNumber === currentPage" *ngFor="let pageNumber of paginasVisibles">
-        <a cPageLink (click)="obtenerListaEntradas(pageNumber)">{{pageNumber + 1}}</a>
-      </li>
-      <li cPageItem [disabled]="!hasMore">
-        <a cPageLink (click)="cambiarPagina(1)" aria-label="Posterior"><span aria-hidden="true">&raquo;</span></a>
-      </li>
-    </c-pagination>
+    <app-op-pagination
+      [totalPages]="totalPages"
+      [currentPage]="currentPage"
+      (pageChange)="obtenerListaEntradas($event)">
+    </app-op-pagination>
   </c-card-body>
 </c-card>
