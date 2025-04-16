@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Entrada } from '../../../core/models/entrada.model';
 import { Usuario } from '../../../core/models/usuario.model';
 import { EntradaService } from '../../../core/services/entrada.service';
-import { LoadingService } from '../../../core/services/loading.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
@@ -17,10 +16,14 @@ import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-respons
 export class ListadoEntradasComponent implements OnInit {
   entrada: Entrada = new Entrada();
   listaEntradas: Entrada[] = [];
+  entradaABorrar: Entrada | null = null;
 
   totalPages: number = 0;
   currentPage: number = 0;
   pageSize: number = 20;
+
+  public visible = false;
+  public toastVisible = false;
 
   constructor(
     public commonFuncService: CommonFunctionalityService,
@@ -84,7 +87,43 @@ export class ListadoEntradasComponent implements OnInit {
 
   actualizarEntrada(id: number) {}
 
-  borrarEntrada(id: number) {}
+  borrarEntrada(id: number): void {
+    this.entradaABorrar = this.listaEntradas.find(entr => entr.idEntrada === id) || null;
+    this.visible = true; // Mostrar el modal
+  }
+
+  confirmarBorrado(): void {
+    if (this.entradaABorrar) {
+      this.entradaService.borrar(this.entradaABorrar.idEntrada).subscribe({
+        next: (response) => {
+          console.log('Entrada eliminada:', response);
+          this.obtenerListaEntradas(this.currentPage);
+          this.entradaABorrar = null;
+          this.visible = false;
+          this.mostrarToast();
+        },
+        error: (err) => {
+          console.error('Error al eliminar la entrada:', err);
+          this.visible = false;
+        }
+      });
+    }
+  }
+
+  mostrarToast(): void {
+    this.toastVisible = true;
+    setTimeout(() => {
+      this.toastVisible = false;
+    }, 3000); // Ocultar el toast después de 3 segundos
+  }
+
+  toggleModal() {
+    this.visible = !this.visible;
+  }
+
+  visibleModal(event: any) {
+    this.visible = event;
+  }
 
   public refrescarPagina(): void {
     window.location.reload();

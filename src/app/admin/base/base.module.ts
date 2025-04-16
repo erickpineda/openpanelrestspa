@@ -3,7 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { AvatarModule, BadgeModule, BreadcrumbModule, ButtonGroupModule, ButtonModule, CardModule, DropdownModule, FooterModule, FormModule, GridModule, HeaderModule, ListGroupModule, NavModule, PaginationModule, ProgressModule, SharedModule, SidebarModule, SpinnerModule, TableModule, TabsModule, UtilitiesModule } from '@coreui/angular';
+import { AvatarModule, BadgeModule, BreadcrumbModule, ButtonGroupModule, ButtonModule, CardModule, DropdownModule, FooterModule, FormModule, GridModule, HeaderModule, ListGroupModule, ModalModule, NavModule, PaginationModule, ProgressModule, SharedModule, SidebarModule, SpinnerModule, TableModule, TabsModule, ToastModule, UtilitiesModule } from '@coreui/angular';
 import { ChartjsModule } from '@coreui/angular-chartjs';
 
 import { BaseRoutingModule } from './base-routing.module';
@@ -54,6 +54,8 @@ import { OpPaginationComponent } from './op-pagination/op-pagination.component';
     TableModule,
     TabsModule,
     UtilitiesModule,
+    ModalModule,
+    ToastModule
   ],
   declarations: [
     BaseComponent,
