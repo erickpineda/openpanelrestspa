@@ -21,6 +21,7 @@ import { UsuarioService } from '../core/services/usuario.service';
 
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { ChartjsModule } from '@coreui/angular-chartjs';
+import { SearchUtilService } from '../core/services/search-util.service';
 
 const APP_CONTAINERS = [
   DefaultFooterComponent,
@@ -45,6 +46,7 @@ const APP_CONTAINERS = [
     TokenStorageService,
     UsuarioService,
     EntradaService,
+    SearchUtilService,
     authInterceptorProviders,
     { provide: HTTP_INTERCEPTORS, useClass: NetworkInterceptor, multi: true },
   ],

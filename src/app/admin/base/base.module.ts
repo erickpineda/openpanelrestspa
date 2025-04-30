@@ -21,6 +21,7 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { EntradaService } from '../../core/services/entrada.service';
 import { UsuarioService } from '../../core/services/usuario.service';
 import { OpPaginationComponent } from './op-pagination/op-pagination.component';
+import { SearchUtilService } from '../../core/services/search-util.service';
 
 @NgModule({
   imports: [
@@ -72,6 +73,7 @@ import { OpPaginationComponent } from './op-pagination/op-pagination.component';
     DatePipe,
     UsuarioService,
     EntradaService,
+    SearchUtilService,
     authInterceptorProviders,
     { provide: HTTP_INTERCEPTORS, useClass: NetworkInterceptor, multi: true },
   ]

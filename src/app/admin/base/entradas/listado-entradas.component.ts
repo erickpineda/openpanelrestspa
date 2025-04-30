@@ -1,12 +1,12 @@
-import { DatePipe } from '@angular/common';
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { debounceTime, Subject } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
 import { Usuario } from '../../../core/models/usuario.model';
 import { EntradaService } from '../../../core/services/entrada.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
+import { SearchUtilService } from '../../../core/services/search-util.service';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -25,54 +25,109 @@ export class ListadoEntradasComponent implements OnInit {
   public visible = false;
   public toastVisible = false;
 
+  searchTerm: string = '';
+  private searchSubject: Subject<void> = new Subject();
+
+  // Campos disponibles para el filtro
+  camposDisponibles = [
+    { nombre: 'Título', valor: 'titulo' },
+    { nombre: 'Categorías', valor: 'categoriasConComas' },
+    { nombre: 'Usuario', valor: 'username' }
+  ];
+
+  operacionesDisponibles: { nombre: string; valor: string }[] = [];
+  campoSeleccionado: string = this.camposDisponibles[0].valor;
+  operacionSeleccionada: string = '';
+  valorBusqueda: string = '';
+  dataOptionSeleccionada: string = 'AND'; // Por defecto usamos AND
+
+  // Opciones para combinar criterios
+  combinacionesDisponibles = ['AND', 'OR'];
+
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private searchUtilService: SearchUtilService
   ) {}
 
   ngOnInit(): void {
     this.obtenerListaEntradas(this.currentPage);
+
+    // Cargar operaciones disponibles desde el servicio
+    this.operacionesDisponibles = this.searchUtilService.getOperacionesDisponibles();
+    this.operacionSeleccionada = this.operacionesDisponibles[0].valor;
+
+    // Configurar debounce para la búsqueda
+    this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
+      this.buscarEntradas();
+    });
+  }
+
+  buscarEntradas(): void {
+    // Construir el objeto de la solicitud
+    const searchRequest = {
+      dataOption: this.dataOptionSeleccionada,
+      searchCriteriaList: [
+        {
+          filterKey: this.campoSeleccionado,
+          value: this.valorBusqueda,
+          operation: this.operacionSeleccionada,
+          clazzName: 'Entrada' // Clase asociada al filtro
+        }
+      ]
+    };
+
+    // Llamar al servicio con los criterios de búsqueda
+    this.entradaService.buscar(searchRequest).subscribe({
+      next: (response: OpenpanelApiResponse<any>) => {
+        this.listaEntradas = response.data.elements || [];
+      },
+      error: (err) => {
+        console.error('Error al buscar entradas:', err);
+        this.listaEntradas = [];
+      }
+    });
+  }
+
+  onInputChange(): void {
+    this.searchSubject.next();
   }
 
   obtenerListaEntradas(page: number): void {
     this.currentPage = page;
     this.entradaService.listarPagina(page, this.pageSize).subscribe({
       next: async (response: OpenpanelApiResponse<any>) => {
-        
-        // Obtener los elementos y total de páginas
         this.listaEntradas = response.data.elements || [];
         this.totalPages = response.data.totalPages;
-  
-        // Manejamos los valores asincrónicos de manera correcta usando Promise.all
+
         this.listaEntradas = await Promise.all(
-          this.listaEntradas.map(async entrada => {
+          this.listaEntradas.map(async (entrada) => {
             const usuario = await this.obtenerDatosUsuario(entrada.idUsuario);
             return {
               ...entrada,
-              categoriasConComas: entrada.categorias.map(e => e.nombre).join(', '),
+              categoriasConComas: entrada.categorias.map((e) => e.nombre).join(', '),
               username: usuario.username
             };
           })
         );
-  
       },
-      error: err => {
+      error: (err) => {
         if (err?.status === 404) {
           this.listaEntradas = [];
         }
       }
     });
-  }  
+  }
 
   private obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerPorId(idUsuario).subscribe({
         next: (response: OpenpanelApiResponse<any>) => {
-          const usuario: Usuario = (response.data) ? response.data : Usuario;
+          const usuario: Usuario = response.data ? response.data : Usuario;
           resolve(usuario);
         },
-        error: err => {
+        error: (err) => {
           reject(err);
         }
       });
@@ -80,7 +135,9 @@ export class ListadoEntradasComponent implements OnInit {
   }
 
   public checkFechaPublicacion(fechaPublicacion: Date): string {
-    return fechaPublicacion ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false) : 'No publicada';
+    return fechaPublicacion
+      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false)
+      : 'No publicada';
   }
 
   crearEntrada() {}
@@ -88,7 +145,7 @@ export class ListadoEntradasComponent implements OnInit {
   actualizarEntrada(id: number) {}
 
   borrarEntrada(id: number): void {
-    this.entradaABorrar = this.listaEntradas.find(entr => entr.idEntrada === id) || null;
+    this.entradaABorrar = this.listaEntradas.find((entr) => entr.idEntrada === id) || null;
     this.visible = true; // Mostrar el modal
   }
 
@@ -128,5 +185,4 @@ export class ListadoEntradasComponent implements OnInit {
   public refrescarPagina(): void {
     window.location.reload();
   }
-
 }
