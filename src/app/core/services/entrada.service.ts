@@ -23,13 +23,6 @@ export class EntradaService extends CrudService<Entrada> {
     super(http, token);
   }
 
-  buscar(req: any): Observable<OpenpanelApiResponse<any>> {
-    const url = this.buildUrl('/buscar');
-    return this.http.post<OpenpanelApiResponse<any>>(url, req, {
-      headers: this.setHeaders()
-    });
-  }
-
   // Método específico para listar tipos de entradas
   listarTiposEntradas(): Observable<OpenpanelApiResponse<any>> {
     const url = this.buildUrl('/tiposEntradas');

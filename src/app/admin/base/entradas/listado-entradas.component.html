@@ -83,7 +83,7 @@
             [cTableColor]="entr.publicada ? 'success' : 'warning'">
           <td scope="row" [routerLink]="['/admin/control/entradas', entr.idEntrada]">{{entr.idEntrada}}</td>
           <td>{{commonFuncService.acortarTexto(entr.titulo)}}</td>
-          <td>{{entr.username}}</td>
+          <td>{{entr.usernameCreador}}</td>
           <td>{{checkFechaPublicacion(entr.fechaPublicacion)}}</td>
           <td>{{entr.categoriasConComas}}</td>
           <td>

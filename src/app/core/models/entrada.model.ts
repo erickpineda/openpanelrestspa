@@ -31,7 +31,8 @@ export class Entrada {
 
   // Fuera del backend
   categoriasConComas: string = '';
-  username: string = "";
+  usernameCreador: string = "";
+  usernameModificador: string = "";
 
   constructor() {
 
@@ -67,7 +68,8 @@ export interface Entrada {
 
   // Fuera del backend
   categoriasConComas: string;
-  username: string;
+  usernameCreador: string;
+  usernameModificador: string;
 
 }
 

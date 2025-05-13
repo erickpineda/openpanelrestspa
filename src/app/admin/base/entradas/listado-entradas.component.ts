@@ -79,7 +79,7 @@ export class ListadoEntradasComponent implements OnInit {
     };
 
     // Llamar al servicio con los criterios de búsqueda
-    this.entradaService.buscar(searchRequest).subscribe({
+    this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize).subscribe({
       next: (response: OpenpanelApiResponse<any>) => {
         this.listaEntradas = response.data.elements || [];
       },
@@ -96,18 +96,30 @@ export class ListadoEntradasComponent implements OnInit {
 
   obtenerListaEntradas(page: number): void {
     this.currentPage = page;
-    this.entradaService.listarPagina(page, this.pageSize).subscribe({
+
+    // Construir el objeto de la solicitud
+    const searchRequest = {
+      dataOption: this.dataOptionSeleccionada,
+      searchCriteriaList: [
+        {
+          filterKey: this.campoSeleccionado,
+          value: this.valorBusqueda,
+          operation: this.operacionSeleccionada || 'cn',
+          clazzName: 'Entrada' // Clase asociada al filtro
+        }
+      ]
+    };
+
+    this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize).subscribe({
       next: async (response: OpenpanelApiResponse<any>) => {
         this.listaEntradas = response.data.elements || [];
         this.totalPages = response.data.totalPages;
 
         this.listaEntradas = await Promise.all(
           this.listaEntradas.map(async (entrada) => {
-            const usuario = await this.obtenerDatosUsuario(entrada.idUsuario);
             return {
               ...entrada,
-              categoriasConComas: entrada.categorias.map((e) => e.nombre).join(', '),
-              username: usuario.username
+              categoriasConComas: entrada.categorias.map((e) => e.nombre).join(', ')
             };
           })
         );
