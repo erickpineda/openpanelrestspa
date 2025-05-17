@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { debounceTime, Subject } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
 import { Usuario } from '../../../core/models/usuario.model';
@@ -7,14 +7,14 @@ import { UsuarioService } from '../../../core/services/usuario.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
 import { SearchUtilService } from '../../../core/services/search-util.service';
+import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 
 @Component({
   selector: 'app-listado-entradas',
   templateUrl: './listado-entradas.component.html',
   styleUrls: ['./listado-entradas.component.scss']
 })
-export class ListadoEntradasComponent implements OnInit {
-  entrada: Entrada = new Entrada();
+export class ListadoEntradasComponent implements OnInit, OnDestroy  {
   listaEntradas: Entrada[] = [];
   entradaABorrar: Entrada | null = null;
 
@@ -25,10 +25,9 @@ export class ListadoEntradasComponent implements OnInit {
   public visible = false;
   public toastVisible = false;
 
-  searchTerm: string = '';
-  private searchSubject: Subject<void> = new Subject();
+  private destroy$ = new Subject<void>();
 
-  // Campos disponibles para el filtro
+  // Campos para el filtro
   camposDisponibles = [
     { nombre: 'Título', valor: 'titulo' },
     { nombre: 'Categorías', valor: 'categoriasConComas' },
@@ -39,114 +38,87 @@ export class ListadoEntradasComponent implements OnInit {
   campoSeleccionado: string = this.camposDisponibles[0].valor;
   operacionSeleccionada: string = '';
   valorBusqueda: string = '';
-  dataOptionSeleccionada: string = 'AND'; // Por defecto usamos AND
+  dataOptionSeleccionada: string = 'AND';
 
-  // Opciones para combinar criterios
   combinacionesDisponibles = ['AND', 'OR'];
 
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
-    private usuarioService: UsuarioService,
-    private searchUtilService: SearchUtilService
+    private searchUtilService: SearchUtilService,
+    private busquedaService: BusquedaService,
   ) {}
 
   ngOnInit(): void {
-    this.obtenerListaEntradas(this.currentPage);
-
     // Cargar operaciones disponibles desde el servicio
     this.operacionesDisponibles = this.searchUtilService.getOperacionesDisponibles();
     this.operacionSeleccionada = this.operacionesDisponibles[0].valor;
 
-    // Configurar debounce para la búsqueda
-    this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
-      this.buscarEntradas();
+    this.busquedaService.iniciarBusqueda(
+      (term) => this.realizarBusquedaEntradas(term),
+      (response) => this.procesarResultadosBusqueda(response)
+    );
+    
+    // Disparar búsqueda inicial
+    this.busquedaService.triggerBusqueda('');
+  }
+
+  // Asegurar que se llama al método de limpieza
+  ngOnDestroy(): void {
+    this.busquedaService.limpiarBusqueda();
+  }
+
+  private realizarBusquedaInicial(): void {
+    const searchRequest = {
+      dataOption: this.dataOptionSeleccionada,
+      searchCriteriaList: [{
+        filterKey: this.campoSeleccionado,
+        value: '', // Término vacío para obtener todos los registros
+        operation: this.operacionSeleccionada,
+        clazzName: 'Entrada'
+      }]
+    };
+
+    this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize).subscribe({
+      next: (response) => this.procesarResultadosBusqueda(response),
+      error: (err) => console.error('Error en búsqueda inicial:', err)
     });
   }
 
-  buscarEntradas(): void {
-    // Construir el objeto de la solicitud
+  private realizarBusquedaEntradas(term: string) {
     const searchRequest = {
       dataOption: this.dataOptionSeleccionada,
-      searchCriteriaList: [
-        {
-          filterKey: this.campoSeleccionado,
-          value: this.valorBusqueda,
-          operation: this.operacionSeleccionada,
-          clazzName: 'Entrada' // Clase asociada al filtro
-        }
-      ]
+      searchCriteriaList: [{
+        filterKey: this.campoSeleccionado,
+        value: term,
+        operation: this.operacionSeleccionada,
+        clazzName: 'Entrada'
+      }]
     };
+    return this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize);
+  }
 
-    // Llamar al servicio con los criterios de búsqueda
-    this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize).subscribe({
-      next: (response: OpenpanelApiResponse<any>) => {
-        this.listaEntradas = response.data.elements || [];
-      },
-      error: (err) => {
-        console.error('Error al buscar entradas:', err);
-        this.listaEntradas = [];
-      }
-    });
+  private procesarResultadosBusqueda(response: any) {
+    this.listaEntradas = response.data.elements || [];
+    this.totalPages = response.data.totalPages;
+    
+    // Procesar categorías si es necesario
+    this.listaEntradas = this.listaEntradas.map(entrada => ({
+      ...entrada,
+      categoriasConComas: entrada.categorias?.map(e => e.nombre).join(', ') || ''
+    }));
   }
 
   onInputChange(): void {
-    this.searchSubject.next();
+    this.busquedaService.triggerBusqueda(this.valorBusqueda);
   }
 
   obtenerListaEntradas(page: number): void {
     this.currentPage = page;
-
-    // Construir el objeto de la solicitud
-    const searchRequest = {
-      dataOption: this.dataOptionSeleccionada,
-      searchCriteriaList: [
-        {
-          filterKey: this.campoSeleccionado,
-          value: this.valorBusqueda,
-          operation: this.operacionSeleccionada || 'cn',
-          clazzName: 'Entrada' // Clase asociada al filtro
-        }
-      ]
-    };
-
-    this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize).subscribe({
-      next: async (response: OpenpanelApiResponse<any>) => {
-        this.listaEntradas = response.data.elements || [];
-        this.totalPages = response.data.totalPages;
-
-        this.listaEntradas = await Promise.all(
-          this.listaEntradas.map(async (entrada) => {
-            return {
-              ...entrada,
-              categoriasConComas: entrada.categorias.map((e) => e.nombre).join(', ')
-            };
-          })
-        );
-      },
-      error: (err) => {
-        if (err?.status === 404) {
-          this.listaEntradas = [];
-        }
-      }
-    });
+    this.busquedaService.triggerBusqueda(this.valorBusqueda);
   }
 
-  private obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
-    return new Promise((resolve, reject) => {
-      this.usuarioService.obtenerPorId(idUsuario).subscribe({
-        next: (response: OpenpanelApiResponse<any>) => {
-          const usuario: Usuario = response.data ? response.data : Usuario;
-          resolve(usuario);
-        },
-        error: (err) => {
-          reject(err);
-        }
-      });
-    });
-  }
-
-  public checkFechaPublicacion(fechaPublicacion: Date): string {
+  checkFechaPublicacion(fechaPublicacion: Date): string {
     return fechaPublicacion
       ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false)
       : 'No publicada';
