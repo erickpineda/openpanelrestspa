@@ -31,7 +31,13 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
   camposDisponibles = [
     { nombre: 'Título', valor: 'titulo' },
     { nombre: 'Categorías', valor: 'categoriasConComas' },
-    { nombre: 'Usuario', valor: 'username' }
+    { nombre: 'Usuario', valor: 'idUsuario' }
+  ];
+
+  clazzesDisponibles = [
+    { nombre: 'Entrada'},
+    { nombre: 'Categoria' },
+    { nombre: 'Usuario' }
   ];
 
   operacionesDisponibles: { nombre: string; valor: string }[] = [];
@@ -54,16 +60,16 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     this.operacionesDisponibles = this.searchUtilService.getOperacionesDisponibles();
     this.operacionSeleccionada = this.operacionesDisponibles[0].valor;
 
+    // Configurar servicio solo una vez
     this.busquedaService.iniciarBusqueda(
       (term) => this.realizarBusquedaEntradas(term),
       (response) => this.procesarResultadosBusqueda(response)
     );
     
-    // Disparar búsqueda inicial
+    // Búsqueda inicial
     this.busquedaService.triggerBusqueda('');
   }
 
-  // Asegurar que se llama al método de limpieza
   ngOnDestroy(): void {
     this.busquedaService.limpiarBusqueda();
   }
@@ -75,7 +81,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
         filterKey: this.campoSeleccionado,
         value: '', // Término vacío para obtener todos los registros
         operation: this.operacionSeleccionada,
-        clazzName: 'Entrada'
+        clazzName: this.clazzesDisponibles[0].nombre ||  this.clazzesDisponibles[1].nombre || this.clazzesDisponibles[2].nombre
       }]
     };
 
@@ -92,21 +98,28 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
         filterKey: this.campoSeleccionado,
         value: term,
         operation: this.operacionSeleccionada,
-        clazzName: 'Entrada'
+        clazzName: (this.campoSeleccionado=='idUsuario')? 'Usuario': this.clazzesDisponibles[0].nombre
       }]
-    };
+    };console.log(this.campoSeleccionado);
     return this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize);
   }
 
   private procesarResultadosBusqueda(response: any) {
-    this.listaEntradas = response.data.elements || [];
-    this.totalPages = response.data.totalPages;
-    
-    // Procesar categorías si es necesario
-    this.listaEntradas = this.listaEntradas.map(entrada => ({
-      ...entrada,
-      categoriasConComas: entrada.categorias?.map(e => e.nombre).join(', ') || ''
-    }));
+    if (response.result?.success) {
+      this.listaEntradas = response.data.elements || [];
+      this.totalPages = response.data.totalPages;
+      
+      // Procesar categorías si es necesario
+      this.listaEntradas = this.listaEntradas.map(entrada => ({
+        ...entrada,
+        categoriasConComas: entrada.categorias?.map(e => e.nombre).join(', ') || ''
+      }));
+    } else {
+      console.error('Error en búsqueda:', response.error);
+      this.listaEntradas = [];
+      this.operacionesDisponibles = this.searchUtilService.getOperacionesDisponibles();
+      this.operacionSeleccionada = this.operacionesDisponibles[0].valor;
+    }
   }
 
   onInputChange(): void {
