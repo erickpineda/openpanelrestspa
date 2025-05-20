@@ -30,14 +30,16 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
   // Campos para el filtro
   camposDisponibles = [
     { nombre: 'Título', valor: 'titulo' },
-    { nombre: 'Categorías', valor: 'categoriasConComas' },
+    { nombre: 'Categorías', valor: 'categorias' },
+    { nombre: 'Estado', valor: 'estadoEntrada' },
     { nombre: 'Usuario', valor: 'idUsuario' }
   ];
 
   clazzesDisponibles = [
-    { nombre: 'Entrada'},
-    { nombre: 'Categoria' },
-    { nombre: 'Usuario' }
+    { nombre: 'Entrada', valor: 'titulo' },
+    { nombre: 'Categoria', valor: 'categorias' },
+    { nombre: 'EstadoEntrada', valor: 'estadoEntrada' },
+    { nombre: 'Usuario', valor: 'idUsuario' }
   ];
 
   operacionesDisponibles: { nombre: string; valor: string }[] = [];
@@ -74,23 +76,6 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     this.busquedaService.limpiarBusqueda();
   }
 
-  private realizarBusquedaInicial(): void {
-    const searchRequest = {
-      dataOption: this.dataOptionSeleccionada,
-      searchCriteriaList: [{
-        filterKey: this.campoSeleccionado,
-        value: '', // Término vacío para obtener todos los registros
-        operation: this.operacionSeleccionada,
-        clazzName: this.clazzesDisponibles[0].nombre ||  this.clazzesDisponibles[1].nombre || this.clazzesDisponibles[2].nombre
-      }]
-    };
-
-    this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize).subscribe({
-      next: (response) => this.procesarResultadosBusqueda(response),
-      error: (err) => console.error('Error en búsqueda inicial:', err)
-    });
-  }
-
   private realizarBusquedaEntradas(term: string) {
     const searchRequest = {
       dataOption: this.dataOptionSeleccionada,
@@ -98,7 +83,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
         filterKey: this.campoSeleccionado,
         value: term,
         operation: this.operacionSeleccionada,
-        clazzName: (this.campoSeleccionado=='idUsuario')? 'Usuario': this.clazzesDisponibles[0].nombre
+        clazzName: (this.campoSeleccionado=='idUsuario') ? 'Usuario': this.clazzesDisponibles[0].nombre
       }]
     };console.log(this.campoSeleccionado);
     return this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize);
@@ -117,12 +102,12 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     } else {
       console.error('Error en búsqueda:', response.error);
       this.listaEntradas = [];
-      this.operacionesDisponibles = this.searchUtilService.getOperacionesDisponibles();
-      this.operacionSeleccionada = this.operacionesDisponibles[0].valor;
+      this.currentPage = 0;
     }
   }
 
   onInputChange(): void {
+    this.currentPage = (this.currentPage > 0) ? 0 : this.currentPage;
     this.busquedaService.triggerBusqueda(this.valorBusqueda);
   }
 
