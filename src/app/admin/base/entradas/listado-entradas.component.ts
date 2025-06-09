@@ -106,9 +106,16 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
       next: (response) => {
         if (response.result?.success) {
           const definiciones = response.data;
+          const campos = (definiciones.filterKeySegunClazzNamePermitido as string[]);
+
+          // Ordenar alfabéticamente, pero asegurando que "titulo" esté al principio
+          const camposOrdenados = [
+            ...campos.filter(k => k === 'titulo'),
+            ...campos.filter(k => k !== 'titulo').sort((a, b) => a.localeCompare(b))
+          ];
 
           // Campos disponibles para filtros
-          this.camposDisponibles = definiciones.filterKeySegunClazzNamePermitido.map((key: string) => ({
+          this.camposDisponibles = camposOrdenados.map((key: string) => ({
             nombre: this.traducirCampo(key),
             valor: key
           }));
