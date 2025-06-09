@@ -127,10 +127,14 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
           }));
 
           // Operaciones disponibles
-          this.operacionesDisponibles = Object.entries(definiciones.operationPermitido).map(([key, value]) => ({
-            nombre: value,
-            valor: key
-          }));
+          const operacionesLargas = Object.entries(definiciones.operationPermitido)
+            .filter(([key, _]) => key.length > 2 && key.includes('_')) // Filtra solo los nombres largos
+            .map(([key, value]) => ({
+              nombre: value,
+              valor: key
+            }));
+
+          this.operacionesDisponibles = operacionesLargas;
 
           this.operacionSeleccionada = this.operacionesDisponibles[0]?.valor || '';
         }
