@@ -1,11 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { debounceTime, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
-import { Usuario } from '../../../core/models/usuario.model';
 import { EntradaService } from '../../../core/services/entrada.service';
-import { UsuarioService } from '../../../core/services/usuario.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
-import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
 import { SearchUtilService } from '../../../core/services/search-util.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 
@@ -30,19 +27,13 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
   // Campos para el filtro
   camposDisponibles = [
     { nombre: 'Título', valor: 'titulo' },
-    { nombre: 'Categorías', valor: 'categorias' },
-    { nombre: 'Estado', valor: 'estadoEntrada' },
-    { nombre: 'Usuario', valor: 'idUsuario' }
   ];
 
   clazzesDisponibles = [
     { nombre: 'Entrada', valor: 'titulo' },
-    { nombre: 'Categoria', valor: 'categorias' },
-    { nombre: 'EstadoEntrada', valor: 'estadoEntrada' },
-    { nombre: 'Usuario', valor: 'idUsuario' }
   ];
 
-  operacionesDisponibles: { nombre: string; valor: string }[] = [];
+  operacionesDisponibles: any;
   campoSeleccionado: string = this.camposDisponibles[0].valor;
   operacionSeleccionada: string = '';
   valorBusqueda: string = '';
@@ -58,9 +49,8 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
   ) {}
 
   ngOnInit(): void {
-    // Cargar operaciones disponibles desde el servicio
-    this.operacionesDisponibles = this.searchUtilService.getOperacionesDisponibles();
-    this.operacionSeleccionada = this.operacionesDisponibles[0].valor;
+    // Cargar definiciones disponibles desde el servicio
+    this.cargarDefinicionesBuscador();
 
     // Configurar servicio solo una vez
     this.busquedaService.iniciarBusqueda(
@@ -83,10 +73,15 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
         filterKey: this.campoSeleccionado,
         value: term,
         operation: this.operacionSeleccionada,
-        clazzName: (this.campoSeleccionado=='idUsuario') ? 'Usuario': this.clazzesDisponibles[0].nombre
+        clazzName: this.obtenerNombreClase(this.campoSeleccionado)
       }]
-    };console.log(this.campoSeleccionado);
+    };
     return this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize);
+  }
+
+  private obtenerNombreClase(filterKey: string): string {
+    const match = this.clazzesDisponibles.find(clazz => clazz.valor === filterKey);
+    return match ? match.nombre : 'Entrada';
   }
 
   private procesarResultadosBusqueda(response: any) {
@@ -104,6 +99,51 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
       this.listaEntradas = [];
       this.currentPage = 0;
     }
+  }
+
+  private cargarDefinicionesBuscador(): void {
+    this.entradaService.obtenerDefinicionesBuscador().subscribe({
+      next: (response) => {
+        if (response.result?.success) {
+          const definiciones = response.data;
+
+          // Campos disponibles para filtros
+          this.camposDisponibles = definiciones.filterKeySegunClazzNamePermitido.map((key: string) => ({
+            nombre: this.traducirCampo(key),
+            valor: key
+          }));
+
+          // Clases disponibles
+          this.clazzesDisponibles = definiciones.clazzNamePermitido.map((clazzName: string) => ({
+            nombre: clazzName,
+            valor: clazzName
+          }));
+
+          // Operaciones disponibles
+          this.operacionesDisponibles = Object.entries(definiciones.operationPermitido).map(([key, value]) => ({
+            nombre: value,
+            valor: key
+          }));
+
+          this.operacionSeleccionada = this.operacionesDisponibles[0]?.valor || '';
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar definiciones del buscador:', error);
+      }
+    });
+  }
+
+  private traducirCampo(campo: string): string {
+    const traducciones: { [key: string]: string } = {
+      'titulo': 'Título',
+      'estadoEntrada.nombre': 'Estado',
+      'tipoEntrada.nombre': 'Tipo',
+      'usuario.username': 'Usuario',
+      'categorias.nombre': 'Categoria',
+      'etiquetas.nombre': 'Etiqueta',
+    };
+    return traducciones[campo] || campo;
   }
 
   onInputChange(): void {
