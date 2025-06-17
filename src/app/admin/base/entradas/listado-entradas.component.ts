@@ -41,6 +41,8 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
 
   combinacionesDisponibles = ['AND', 'OR'];
 
+  private definiciones: any;
+
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
@@ -105,8 +107,8 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     this.entradaService.obtenerDefinicionesBuscador().subscribe({
       next: (response) => {
         if (response.result?.success) {
-          const definiciones = response.data;
-          const campos = (definiciones.filterKeySegunClazzNamePermitido as string[]);
+          this.definiciones = response.data;
+          const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]);
 
           // Ordenar alfabéticamente, pero asegurando que "titulo" esté al principio
           const camposOrdenados = [
@@ -121,22 +123,13 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
           }));
 
           // Clases disponibles
-          this.clazzesDisponibles = definiciones.clazzNamePermitido.map((clazzName: string) => ({
+          this.clazzesDisponibles = this.definiciones.clazzNamePermitido.map((clazzName: string) => ({
             nombre: clazzName,
             valor: clazzName
           }));
 
-          // Operaciones disponibles
-          const operacionesLargas = Object.entries(definiciones.operationPermitido)
-            .filter(([key, _]) => key.length > 2 && key.includes('_')) // Filtra solo los nombres largos
-            .map(([key, value]) => ({
-              nombre: value,
-              valor: key
-            }));
-
-          this.operacionesDisponibles = operacionesLargas;
-
-          this.operacionSeleccionada = this.operacionesDisponibles[0]?.valor || '';
+          this.campoSeleccionado = this.camposDisponibles[0]?.valor || '';
+          this.actualizarOperacionesDisponibles();
         }
       },
       error: (error) => {
@@ -145,12 +138,57 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     });
   }
 
+  public actualizarOperacionesDisponibles(): void {
+    if (
+      !this.definiciones ||
+      !this.definiciones.operationPermitido ||
+      !this.campoSeleccionado ||
+      !this.definiciones.operationPermitido[this.campoSeleccionado]
+    ) {
+      this.operacionesDisponibles = [];
+      this.operacionSeleccionada = '';
+      return;
+    }
+
+    const operacionesCampo = (this.definiciones.operationPermitido[this.campoSeleccionado] as string[] || [])
+      .map((op: string) => ({
+        nombre: this.traducirOperacion(op),
+        valor: op
+      }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+    this.operacionesDisponibles = operacionesCampo;
+    this.operacionSeleccionada = this.operacionesDisponibles[0]?.valor || '';
+  }
+
+  // Ejemplo de método para traducir operaciones (puedes expandirlo)
+  private traducirOperacion(op: string): string {
+    const traducciones: { [key: string]: string } = {
+      'CONTAINS': 'Contiene',
+      'DOES_NOT_CONTAIN': 'No contiene',
+      'EQUAL': 'Igual a',
+      'NOT_EQUAL': 'Distinto de',
+      'BEGINS_WITH': 'Comienza con',
+      'DOES_NOT_BEGIN_WITH': 'No comienza con',
+      'ENDS_WITH': 'Termina con',
+      'DOES_NOT_END_WITH': 'No termina con',
+      'NULL': 'Vacío',
+      'NOT_NULL': 'No vacío',
+      'GREATER_THAN': 'Mayor que',
+      'GREATER_THAN_EQUAL': 'Mayor o igual que',
+      'LESS_THAN': 'Menor que',
+      'LESS_THAN_EQUAL': 'Menor o igual que'
+    };
+    return traducciones[op] || op;
+  }
+
   private traducirCampo(campo: string): string {
     const traducciones: { [key: string]: string } = {
       'titulo': 'Título',
       'estadoEntrada.nombre': 'Estado',
       'tipoEntrada.nombre': 'Tipo',
-      'usuario.username': 'Usuario',
+      'usernameCreador': 'Usuario creador',
+      'usernameModificador': 'Usuario modificador',
       'categorias.nombre': 'Categoria',
       'etiquetas.nombre': 'Etiqueta',
     };
