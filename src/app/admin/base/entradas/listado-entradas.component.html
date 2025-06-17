@@ -30,6 +30,13 @@
 
     <!-- Buscador -->
     <div class="mb-4">
+      <app-buscador-avanzado
+      [definiciones]="definiciones"
+      (filtroSeleccionado)="aplicarFiltro($event)">
+    </app-buscador-avanzado>
+     </div>
+    <!-- 
+    <div class="mb-4">
       <form cForm class="row g-3">
         <c-col lg="3">
           <label for="campoFiltro" cLabel>Campo</label>
@@ -65,7 +72,12 @@
           />
         </c-col>
       </form>
-    </div>
+    </div>-->
+
+  <button cButton color="primary" disabled *ngIf="loading">
+    <c-spinner aria-hidden="true" size="sm"></c-spinner>
+    Cargando datos...
+  </button>
 
     <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length >= 0">
       <thead cTableColor="dark">
