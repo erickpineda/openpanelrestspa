@@ -162,7 +162,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     this.toastVisible = true;
     setTimeout(() => {
       this.toastVisible = false;
-    }, 3000);
+    }, 5000);
   }
 
   toggleModal() {

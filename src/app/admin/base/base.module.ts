@@ -22,6 +22,7 @@ import { EntradaService } from '../../core/services/entrada.service';
 import { UsuarioService } from '../../core/services/usuario.service';
 import { OpPaginationComponent } from './op-pagination/op-pagination.component';
 import { SearchUtilService } from '../../core/services/search-util.service';
+import { SharedOPModule } from '../../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -56,7 +57,8 @@ import { SearchUtilService } from '../../core/services/search-util.service';
     TabsModule,
     UtilitiesModule,
     ModalModule,
-    ToastModule
+    ToastModule,
+    SharedOPModule,
   ],
   declarations: [
     BaseComponent,
