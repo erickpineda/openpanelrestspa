@@ -9,7 +9,6 @@ import { ChartjsModule } from '@coreui/angular-chartjs';
 import { BaseRoutingModule } from './base-routing.module';
 import { BaseComponent } from './base.component';
 import { ListadoEntradasComponent } from './entradas/listado-entradas.component';
-import { CrearEditarEntrada } from './entradas/crear-editar/crear-editar-entrada.component';
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
 import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
@@ -23,6 +22,9 @@ import { UsuarioService } from '../../core/services/usuario.service';
 import { OpPaginationComponent } from './op-pagination/op-pagination.component';
 import { SearchUtilService } from '../../core/services/search-util.service';
 import { SharedOPModule } from '../../shared/shared.module';
+import { CrearEntradaComponent } from './entradas/crear/crear-entrada.component';
+import { EditarEntradaComponent } from './entradas/editar/editar-entrada.component';
+import { EntradaFormComponent } from './entradas/entrada-form/entrada-form.component';
 
 @NgModule({
   imports: [
@@ -63,7 +65,9 @@ import { SharedOPModule } from '../../shared/shared.module';
   declarations: [
     BaseComponent,
     ListadoEntradasComponent,
-    CrearEditarEntrada,
+    EntradaFormComponent,
+    CrearEntradaComponent,
+    EditarEntradaComponent,
     ListadoComentariosComponent,
     CrearEditarComentario,
     ListadoCategoriasComponent,
