@@ -85,7 +85,10 @@
                     <div>
                       <label cCol cLabel="col">Estado</label>
                       <select cSelect cFormControl formControlName="estadoEntrada" *ngIf="estadosEntr?.length">
-                        <option *ngFor="let ee of estadosEntr" [ngValue]="ee">{{ ee.nombre }}</option>
+                        <option *ngFor="let ee of estadosEntr" [ngValue]="ee" cCardTitle required
+                         >
+                            {{ ee.nombre }}
+                        </option>
                       </select>
                     </div>
                   </c-col>

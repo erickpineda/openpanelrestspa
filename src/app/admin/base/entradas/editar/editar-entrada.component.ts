@@ -3,7 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntradaFacadeService } from '../entrada-form/srv/entrada-facade.service';
 import { ValidationEntradaFormsService } from '../entrada-form/srv/validation-entrada-forms.service';
-import { UntypedFormArray, UntypedFormControl } from '@angular/forms';
+import { UntypedFormArray, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { Entrada } from '../../../../core/models/entrada.model';
 
 @Component({
   selector: 'app-editar-entrada',
@@ -23,11 +24,11 @@ import { UntypedFormArray, UntypedFormControl } from '@angular/forms';
   `
 })
 export class EditarEntradaComponent implements OnInit {
-  entradaForm : any;
+  entradaForm : UntypedFormGroup;
   tiposEntr: any[] = [];
   estadosEntr: any[] = [];
   categorias: any[] = [];
-  entrada: any = null;
+  entrada: Entrada = new Entrada();
   modoLectura = true;
   submitted = false;
   idEntrada!: number;
@@ -38,7 +39,7 @@ export class EditarEntradaComponent implements OnInit {
     private facade: EntradaFacadeService,
     private router: Router
   ) {
-    this.entradaForm = this.vf.buildForm();
+    this.entradaForm = this.vf.buildForm(this.entrada);
   }
 
   async ngOnInit() {
@@ -49,7 +50,7 @@ export class EditarEntradaComponent implements OnInit {
     this.categorias = data.categorias;
 
     // Cargar entrada
-    this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: any) => {
+    await this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: Entrada) => {
       if (!ent) return;
       this.entrada = ent;
       // Populate form values

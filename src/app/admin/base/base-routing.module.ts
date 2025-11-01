@@ -16,7 +16,7 @@ const routes: Routes = [
       {
         path: 'entradas', children: [
           { path: '', component: ListadoEntradasComponent },
-          { path: ':idEntrada', component: EditarEntradaComponent },
+          { path: 'editar/:idEntrada', component: EditarEntradaComponent },
           { path: 'crear', component: CrearEntradaComponent },
         ]
       },

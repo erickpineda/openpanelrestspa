@@ -93,7 +93,7 @@
       <tbody *ngFor="let entr of listaEntradas">
         <tr style="cursor: pointer" cAlign="middle" 
             [cTableColor]="entr.publicada ? 'success' : 'warning'">
-          <td scope="row" [routerLink]="['/admin/control/entradas', entr.idEntrada]">{{entr.idEntrada}}</td>
+          <td scope="row" [routerLink]="['/admin/control/entradas/editar', entr.idEntrada]">{{entr.idEntrada}}</td>
           <td>{{commonFuncService.acortarTexto(entr.titulo)}}</td>
           <td>{{entr.usernameCreador}}</td>
           <td>{{checkFechaPublicacion(entr.fechaPublicacion)}}</td>

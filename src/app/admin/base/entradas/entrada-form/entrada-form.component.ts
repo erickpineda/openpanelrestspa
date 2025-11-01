@@ -4,6 +4,7 @@ import { UntypedFormGroup, FormArray, FormControl } from '@angular/forms';
 import { Categoria } from '../../../../core/models/categoria.model';
 import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
 import { Entrada } from '../../../../core/models/entrada.model';
+import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
 
 @Component({
   selector: 'app-entrada-form',
@@ -36,7 +37,7 @@ export class EntradaFormComponent {
   };
   @Input() form!: UntypedFormGroup; // el FormGroup lo crea el contenedor (buildForm)
   @Input() tiposEntr: TipoEntrada[] = [];
-  @Input() estadosEntr: any[] = [];
+  @Input() estadosEntr: EstadoEntrada[] = [];
   @Input() categorias: Categoria[] = []; // lista maestra de categorías para mostrar
   @Input() modoLectura = false; // si true, el componente mostrará el botón "Editar"
   @Input() entrada?: Entrada; // opcional: datos actuales de la entrada (para checked inicial)
@@ -48,6 +49,7 @@ export class EntradaFormComponent {
   @Output() preview = new EventEmitter<Entrada>();
 
   constructor() {
+    console.log(this.entrada)
   }
 
   onSubmit() {

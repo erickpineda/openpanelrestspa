@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, UntypedFormArray } from '@angular/forms';
+import { EstadoEntrada } from '../../../../../core/models/estado-entrada.model';
+import { TipoEntrada } from '../../../../../core/models/tipo-entrada.model';
 
 @Injectable({
   providedIn: 'root'
@@ -44,41 +46,42 @@ export class ValidationEntradaFormsService {
   constructor(private fb: UntypedFormBuilder) {}
 
   // buildForm() crea y devuelve el FormGroup listo para usar.
-  public buildForm(): UntypedFormGroup {
+  public buildForm(entrada?: any): UntypedFormGroup {
     return this.fb.group({
-      idEntrada: [null],
-      idUsuario: [null],
-      idUsuarioEditado: [null],
-      titulo: ['', [
+      idEntrada: [entrada?.idEntrada ?? null],
+      idUsuario: [entrada?.idUsuario ?? null],
+      idUsuarioEditado: [entrada?.idUsuarioEditado ?? null],
+      titulo: [entrada?.titulo ?? '', [
         Validators.required,
         Validators.minLength(this.formRules.tituloMin),
         Validators.maxLength(this.formRules.tituloMax)
       ]],
-      subtitulo: ['', [
+      subtitulo: [entrada?.subtitulo ?? '', [
         Validators.maxLength(this.formRules.subtituloMax)
       ]],
-      contenido: ['', [
+      contenido: [entrada?.contenido ?? '', [
         Validators.required,
         Validators.minLength(this.formRules.contenidoMin)
       ]],
-      notas: [null],
-      tipoEntrada: [null, [Validators.required]],
-      resumen: [null],
-      fechaPublicacion: [null],
-      fechaEdicion: [null],
-      borrador: [true],
-      publicada: [false],
-      password: [null],
-      privado: [false],
-      estadoEntrada: [null, [Validators.required]],
-      fechaPublicacionProgramada: [null],
-      permitirComentario: [true],
-      imagenDestacada: [null],
-      votos: [0],
-      cantidadComentarios: [0],
-      categorias: this.fb.array([]), // <-- FormArray para categorías
-      categoriasConComas: [''],
-      etiquetas: [[]],
+      notas: [entrada?.notas ?? null],
+      tipoEntrada: [entrada?.tipoEntrada ?? TipoEntrada, [Validators.required]],
+      resumen: [entrada?.resumen ?? null],
+      fechaPublicacion: [entrada?.fechaPublicacion ?? null],
+      fechaEdicion: [entrada?.fechaEdicion ?? null],
+      borrador: [entrada?.borrador ?? true],
+      publicada: [entrada?.publicada ?? false],
+      password: [entrada?.password ?? null],
+      privado: [entrada?.privado ?? false],
+      estadoEntrada: [entrada?.estadoEntrada ?? EstadoEntrada, [Validators.required]],
+      fechaPublicacionProgramada: [entrada?.fechaPublicacionProgramada ?? null],
+      permitirComentario: [entrada?.permitirComentario ?? true],
+      imagenDestacada: [entrada?.imagenDestacada ?? null],
+      votos: [entrada?.votos ?? 0],
+      cantidadComentarios: [entrada?.cantidadComentarios ?? 0],
+      categorias: this.fb.array(entrada?.categorias ? entrada.categorias.map((c: any) => this.fb.control(c)) : []),
+      categoriasConComas: [entrada?.categoriasConComas ?? ''],
+      etiquetas: [entrada?.etiquetas ?? []],
     });
   }
+
 }
