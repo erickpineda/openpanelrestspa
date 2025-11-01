@@ -50,13 +50,25 @@ export class EditarEntradaComponent implements OnInit {
     this.categorias = data.categorias;
 
     // Cargar entrada
-    await this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: Entrada) => {
+    this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: Entrada) => {
       if (!ent) return;
       this.entrada = ent;
-      // Populate form values
-      this.entradaForm.patchValue(ent);
 
-      // Rellenar FormArray de categorías (si hay)
+      // Busca los objetos reales por referencia
+      const estadoCorrecto = this.estadosEntr.find(
+        e => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada
+      );
+      const tipoCorrecto = this.tiposEntr.find(
+        t => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada
+      );
+
+      this.entradaForm.patchValue({
+        ...ent,
+        estadoEntrada: estadoCorrecto ?? null,
+        tipoEntrada: tipoCorrecto ?? null
+      });
+
+      // Rellenar categorías igual que antes
       const arr = this.entradaForm.get('categorias') as UntypedFormArray;
       if (ent.categorias && Array.isArray(ent.categorias)) {
         ent.categorias.forEach((cat: any) => arr.push(new UntypedFormControl(cat)));
