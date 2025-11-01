@@ -8,6 +8,7 @@ import { Entrada } from '../../../../core/models/entrada.model';
 @Component({
   selector: 'app-entrada-form',
   templateUrl: './entrada-form.component.html',
+  styleUrls: ['./entrada-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntradaFormComponent {

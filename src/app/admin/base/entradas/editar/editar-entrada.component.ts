@@ -1,8 +1,8 @@
 // editar-entrada.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EntradaFacadeService } from '../entrada-form/entrada-facade.service';
-import { ValidationEntradaFormsService } from '../entrada-form/validation-entrada-forms.service';
+import { EntradaFacadeService } from '../entrada-form/srv/entrada-facade.service';
+import { ValidationEntradaFormsService } from '../entrada-form/srv/validation-entrada-forms.service';
 import { UntypedFormArray, UntypedFormControl } from '@angular/forms';
 
 @Component({

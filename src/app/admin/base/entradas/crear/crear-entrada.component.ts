@@ -1,8 +1,8 @@
 // crear-entrada.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { EntradaFacadeService } from '../entrada-form/entrada-facade.service';
-import { ValidationEntradaFormsService } from '../entrada-form/validation-entrada-forms.service';
+import { EntradaFacadeService } from '../entrada-form/srv/entrada-facade.service';
+import { ValidationEntradaFormsService } from '../entrada-form/srv/validation-entrada-forms.service';
 
 @Component({
   selector: 'app-crear-entrada',

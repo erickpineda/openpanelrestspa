@@ -7,10 +7,13 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators, UntypedFormArray } fr
 export class ValidationEntradaFormsService {
   // Reglas que ya tenías en tu servicio original
   formRules = {
+    nonEmpty: '^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$',
+    tituloFormato: '[a-zA-Z ]{1,254}',
     tituloMin: 1,
-    tituloMax: 30,
-    subtituloMax: 100,
-    contenidoMin: 5
+    tituloMax: 150,
+    subtituloFormato: '[a-zA-Z ]{1,254}',
+    subtituloMax: 200,
+    contenidoMin: 1,
   };
 
   // Mensajes de error (puedes mantener los tuyos)
@@ -20,9 +23,22 @@ export class ValidationEntradaFormsService {
       minlength: `El título debe tener al menos ${this.formRules.tituloMin} caracteres`,
       maxlength: `El título no puede exceder ${this.formRules.tituloMax} caracteres`
     },
+    subtitulo: {
+      maxLength: `El subtítulo ha de tener máximo ${this.formRules.subtituloMax} caracteres`,
+    },
+    textoContenidoEntrada: {
+      required: 'El texto del contenido de la entrada es obligatorio',
+      minLength: `Escribe algo no seas vago`,
+    },
     contenido: {
       required: 'Escribe algo en la entrada'
     }
+  };
+
+  formErrors = {
+    titulo: '',
+    subtitulo: '',
+    textoContenidoEntrada: ''
   };
 
   constructor(private fb: UntypedFormBuilder) {}
