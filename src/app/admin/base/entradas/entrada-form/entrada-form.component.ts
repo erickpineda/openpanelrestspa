@@ -13,7 +13,26 @@ import { Entrada } from '../../../../core/models/entrada.model';
 export class EntradaFormComponent {
   public Editor = ClassicEditor;
 
-  @Input() editorConfig: any = null;
+  @Input() editorConfig: any = {
+    licenseKey: 'GPL',
+    toolbar: {
+      items: [
+        'heading', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote',
+        'imageUpload', 'insertTable', 'mediaEmbed', 'undo', 'redo'
+      ],
+      shouldNotGroupWhenFull: true
+    },
+    image: {
+      toolbar: [
+        'imageStyle:full', 'imageStyle:side', 'imageTextAlternative'
+      ]
+    },
+    table: {
+      contentToolbar: [
+        'tableColumn', 'tableRow', 'mergeTableCells'
+      ]
+    },
+  };
   @Input() form!: UntypedFormGroup; // el FormGroup lo crea el contenedor (buildForm)
   @Input() tiposEntr: TipoEntrada[] = [];
   @Input() estadosEntr: any[] = [];
@@ -28,7 +47,6 @@ export class EntradaFormComponent {
   @Output() preview = new EventEmitter<Entrada>();
 
   constructor() {
-    this.cargarEditor();
   }
 
   onSubmit() {
@@ -83,30 +101,5 @@ export class EntradaFormComponent {
     }
 
     arr.markAsDirty();
-  }
-
-  private cargarEditor() {
-    if (!ClassicEditor.defaultConfig) {
-      ClassicEditor.defaultConfig = {
-        licenseKey: 'GPL',
-        toolbar: {
-          items: [
-            'heading', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote',
-            'imageUpload', 'insertTable', 'mediaEmbed', 'undo', 'redo'
-          ],
-          shouldNotGroupWhenFull: true
-        },
-        image: {
-          toolbar: [
-            'imageStyle:full', 'imageStyle:side', 'imageTextAlternative'
-          ]
-        },
-        table: {
-          contentToolbar: [
-            'tableColumn', 'tableRow', 'mergeTableCells'
-          ]
-        },
-      };
-    }
   }
 }
