@@ -29,7 +29,7 @@
               Guardar
             </button>
 
-            <button cButton color="info" size="sm" type="button" (click)="onPreview()" [disabled]="!form.valid" [tabindex]="'0'">
+            <button cButton color="info" size="sm" type="button" (click)="onPreview()" [disabled]="!form.valid && !estaEditando" [tabindex]="'0'">
               <svg cIcon name="cilExternalLink" style="padding-right: 2px" size="sm" title="Previa"></svg>
               Previa
             </button>
