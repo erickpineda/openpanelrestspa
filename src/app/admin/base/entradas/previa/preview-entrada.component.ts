@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { UntypedFormGroup } from '@angular/forms';
-import { Categoria } from '../../../../../core/models/categoria.model';
-import { Entrada } from '../../../../../core/models/entrada.model';
+import { Entrada } from '../../../../core/models/entrada.model';
+import { Categoria } from '../../../../core/models/categoria.model';
 
 @Component({
   selector: 'app-previa-entrada',
