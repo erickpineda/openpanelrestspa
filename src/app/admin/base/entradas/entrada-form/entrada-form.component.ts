@@ -49,7 +49,7 @@ export class EntradaFormComponent {
   @Output() preview = new EventEmitter<Entrada>();
 
   constructor() {
-    console.log(this.entrada)
+    
   }
 
   onSubmit() {

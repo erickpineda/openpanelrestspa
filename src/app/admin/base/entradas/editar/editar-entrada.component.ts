@@ -5,33 +5,28 @@ import { EntradaFacadeService } from '../entrada-form/srv/entrada-facade.service
 import { ValidationEntradaFormsService } from '../entrada-form/srv/validation-entrada-forms.service';
 import { UntypedFormArray, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Entrada } from '../../../../core/models/entrada.model';
+import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
+import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
+import { Categoria } from '../../../../core/models/categoria.model';
 
 @Component({
   selector: 'app-editar-entrada',
-  template: `
-    <app-entrada-form
-      [form]="entradaForm"
-      [tiposEntr]="tiposEntr"
-      [estadosEntr]="estadosEntr"
-      [categorias]="categorias"
-      [entrada]="entrada"
-      [modoLectura]="modoLectura"
-      [submitted]="submitted"
-      (submitForm)="onGuardar($event)"
-      (editar)="onEditar()"
-      (cancelar)="onCancelar()"
-    ></app-entrada-form>
-  `
+  templateUrl: './editar-entrada.component.html',
+  styleUrls: ['./editar-entrada.component.scss'],
 })
 export class EditarEntradaComponent implements OnInit {
   entradaForm : UntypedFormGroup;
-  tiposEntr: any[] = [];
-  estadosEntr: any[] = [];
-  categorias: any[] = [];
+  tiposEntr: TipoEntrada[] = [];
+  estadosEntr: EstadoEntrada[] = [];
+  categorias: Categoria[] = [];
   entrada: Entrada = new Entrada();
   modoLectura = true;
   submitted = false;
   idEntrada!: number;
+
+  // Preview state
+  modalPreviaVisible = false;
+  entradaParaPrevia?: Entrada;
 
   constructor(
     private route: ActivatedRoute,
@@ -93,6 +88,22 @@ export class EditarEntradaComponent implements OnInit {
     this.facade.actualizarEntrada(this.idEntrada, ent).subscribe(() => {
       this.router.navigateByUrl('/admin/control/entradas');
     });
+  }
+
+  onPreviewEmit(payload: Partial<Entrada>) {
+    this.entradaParaPrevia = { ...(this.entradaParaPrevia || {}), ...(payload as Entrada) } as Entrada;
+    this.modalPreviaVisible = true;
+  }
+
+  onEditarDesdePreview() {
+    // Cierra la previa y deja el formulario listo para editar
+    this.modalPreviaVisible = false;
+    // opcional: enfocar el título u otra interacción
+    // document.getElementById('titulo')?.focus();
+  }
+
+  onCerrarPreview() {
+    this.modalPreviaVisible = false;
   }
 
   onCancelar() {

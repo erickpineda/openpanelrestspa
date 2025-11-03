@@ -85,8 +85,7 @@
                     <div>
                       <label cCol cLabel="col">Estado</label>
                       <select cSelect cFormControl formControlName="estadoEntrada" *ngIf="estadosEntr?.length">
-                        <option *ngFor="let ee of estadosEntr" [ngValue]="ee" cCardTitle required
-                         >
+                        <option *ngFor="let ee of estadosEntr" [ngValue]="ee" cCardTitle required>
                             {{ ee.nombre }}
                         </option>
                       </select>
@@ -169,7 +168,7 @@
                     <h3 cCardTitle class="h6 card-title">Categorias</h3>
                     <c-form-check class="mb-3 form-check" *ngFor="let categ of categorias">
 
-                      <input cFormCheckInput
+                      <input cFormCheckInput 
                         type="checkbox"
                         [checked]="isCategoriaChecked(categ)"
                         (change)="onToggleCategoria(categ, $any($event.target).checked)">

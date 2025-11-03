@@ -25,6 +25,7 @@ import { SharedOPModule } from '../../shared/shared.module';
 import { CrearEntradaComponent } from './entradas/crear/crear-entrada.component';
 import { EditarEntradaComponent } from './entradas/editar/editar-entrada.component';
 import { EntradaFormComponent } from './entradas/entrada-form/entrada-form.component';
+import { PreviaEntradaComponent } from './entradas/entrada-form/previa/preview-entrada.component';
 
 @NgModule({
   imports: [
@@ -72,6 +73,7 @@ import { EntradaFormComponent } from './entradas/entrada-form/entrada-form.compo
     CrearEditarComentario,
     ListadoCategoriasComponent,
     CrearEditarCategoria,
+    PreviaEntradaComponent,
     OpPaginationComponent
  //   MyCKEditorComponent
   ],
