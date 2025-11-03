@@ -19,7 +19,6 @@ import { IconModule } from '@coreui/icons-angular';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { EntradaService } from '../../core/services/entrada.service';
 import { UsuarioService } from '../../core/services/usuario.service';
-import { OpPaginationComponent } from './op-pagination/op-pagination.component';
 import { SearchUtilService } from '../../core/services/search-util.service';
 import { SharedOPModule } from '../../shared/shared.module';
 import { CrearEntradaComponent } from './entradas/crear/crear-entrada.component';
@@ -51,8 +50,8 @@ import { PreviaEntradaComponent } from './entradas/previa/preview-entrada.compon
     IconModule,
     ListGroupModule,
     NavModule,
-    PaginationModule,
     ProgressModule,
+    PaginationModule,
     SharedModule,
     SidebarModule,
     SpinnerModule,
@@ -74,7 +73,6 @@ import { PreviaEntradaComponent } from './entradas/previa/preview-entrada.compon
     ListadoCategoriasComponent,
     CrearEditarCategoria,
     PreviaEntradaComponent,
-    OpPaginationComponent
  //   MyCKEditorComponent
   ],
   providers: [

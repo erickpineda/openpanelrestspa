@@ -9,6 +9,7 @@ import { FormsModule } from "@angular/forms";
 import { CommonModule, DatePipe } from "@angular/common";
 import { NotFoundComponent } from "../core/errors/not-found/not-found.component";
 import { BuscadorAvanzadoComponent } from "./components/buscador-avanzado/buscador-avanzado.component";
+import { OpPaginationComponent } from "./components/op-pagination/op-pagination.component";
 
 @NgModule({
     imports: [
@@ -43,7 +44,8 @@ import { BuscadorAvanzadoComponent } from "./components/buscador-avanzado/buscad
     ],
     declarations: [
         NotFoundComponent,
-        BuscadorAvanzadoComponent
+        BuscadorAvanzadoComponent,
+        OpPaginationComponent
     ],
     exports: [
         HttpClientModule,
@@ -51,7 +53,8 @@ import { BuscadorAvanzadoComponent } from "./components/buscador-avanzado/buscad
         CommonModule,
         NotFoundComponent,
         FormsModule,
-        BuscadorAvanzadoComponent
+        BuscadorAvanzadoComponent,
+        OpPaginationComponent
     ],
     providers: [
     ]
