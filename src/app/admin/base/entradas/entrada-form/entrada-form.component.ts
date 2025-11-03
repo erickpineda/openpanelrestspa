@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit, OnChanges } from '@angular/core';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { UntypedFormGroup, FormArray, FormControl } from '@angular/forms';
 import { Categoria } from '../../../../core/models/categoria.model';
@@ -12,8 +12,9 @@ import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
   styleUrls: ['./entrada-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EntradaFormComponent {
+export class EntradaFormComponent implements OnChanges {
   public Editor = ClassicEditor;
+  public estaEditando = false;
 
   @Input() editorConfig: any = {
     licenseKey: 'GPL',
@@ -50,6 +51,12 @@ export class EntradaFormComponent {
 
   constructor() {
     
+  }
+  
+  ngOnChanges(): void {
+    if (this.entrada && this.entrada.idEntrada) {
+      this.estaEditando = true
+    }
   }
 
   onSubmit() {
