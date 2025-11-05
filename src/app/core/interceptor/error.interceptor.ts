@@ -13,7 +13,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         this.errorHandler.handleError(error);
-        return throwError(() => new Error(error.message));
+        return throwError(() => new Error(error.error?.error?.message || error.message));
       })
     );
   }

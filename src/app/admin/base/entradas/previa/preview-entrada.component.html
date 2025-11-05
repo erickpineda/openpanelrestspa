@@ -1,0 +1,34 @@
+<c-card class="preview-entrada-card">
+  <c-card-header>
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <div>
+        <h3 class="h5 mb-0">{{ tituloMostrar || 'Sin título' }}</h3>
+        <small *ngIf="categoriasMostrar?.length" class="text-muted">
+          Categorías:
+          <span *ngFor="let c of categoriasMostrar; let last = last">
+            {{ c.nombre || c }}<span *ngIf="!last">, </span>
+          </span>
+        </small>
+      </div>
+
+      <div class="d-flex gap-2" *ngIf="mostrarBotonesAccion">
+        <button cButton color="warning" size="sm" (click)="onEditar()">
+          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Editar entrada"></svg>
+          Editar
+        </button>
+        <button cButton color="danger" size="sm" (click)="onCerrar()">
+          <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cerrar"></svg>
+          Cerrar
+        </button>
+        <button cButton color="success" size="sm" (click)="onPublicar()">
+          <svg cIcon name="cilPaperPlane" style="padding-right: 2px" size="sm" title="Publicar"></svg>
+          Publicar
+        </button>
+      </div>
+    </div>
+  </c-card-header>
+
+  <c-card-body>
+    <div class="preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
+  </c-card-body>
+</c-card>

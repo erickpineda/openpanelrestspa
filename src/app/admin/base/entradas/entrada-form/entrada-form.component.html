@@ -2,41 +2,42 @@
   <c-card-header>
     <div class="d-flex justify-content-between align-items-end">
       <h2 cCardTitle class="h5 mb-3 mb-lg-0">Entrada</h2>
-      <div class="hstack gap-3" *ngIf="this.getEntradaId('idEntrada') != 'crear'">
-        <button cButton color="light" size="sm">
-          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear con estos datos"></svg>
-          Crear nueva entrada con estos datos
-        </button>
-        <button cButton color="warning" size="sm" (click)="editarEntrada()" [disabled]="this.entradaForm.enabled">
+      <div class="hstack gap-3" *ngIf="modoLectura">
+        <button cButton color="warning" size="sm" (click)="onEditar()" [disabled]="form.enabled">
           <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Editar entrada"></svg>
           Editar entrada
         </button>
       </div>
     </div>
   </c-card-header>
+
   <c-card-body>
     <c-container fluid>
-      <form cForm [formGroup]="entradaForm" novalidate (ngSubmit)="guardar()" class="needs-validation">
+      <form cForm [formGroup]="form" novalidate (ngSubmit)="onSubmit()" class="needs-validation" (reset)="onReset()">
+
         <div class="d-flex justify-content-between align-items-end">
-          <h2 cCardTitle class="h5 mb-3 mb-lg-0">Crear/Editar Entrada</h2>
+          <h2 cCardTitle class="h5 mb-3 mb-lg-0">{{ estaEditando ? 'Editar Entrada' : 'Crear Entrada' }}</h2>
           <div class="hstack gap-3">
-            <button cButton color="danger" size="sm" type="reset" (click)="onReset()" [tabindex]="'0'">
+            <button cButton color="danger" size="sm" type="reset" [tabindex]="'0'">
               <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
               Cancelar
             </button>
-            <button cButton color="success" size="sm" type="submit" 
-                [disabled]="entradaForm.pristine || entradaForm.invalid" [tabindex]="'0'">
-                <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
-                Guardar
+
+            <button cButton color="success" size="sm" type="submit"
+              [disabled]="form.pristine || form.invalid" [tabindex]="'0'">
+              <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
+              Guardar
             </button>
-            <button cButton color="info" size="sm" [disabled]="!entradaForm.valid" (click)="onValidate()" [tabindex]="'0'">
-              <svg cIcon name="cilExternalLink" style="padding-right: 2px" size="sm"
-                title="Previa"></svg>
-                Previa
+
+            <button cButton color="info" size="sm" type="button" (click)="onPreview()" [disabled]="!form.valid && !estaEditando" [tabindex]="'0'">
+              <svg cIcon name="cilExternalLink" style="padding-right: 2px" size="sm" title="Previa"></svg>
+              Previa
             </button>
           </div>
         </div>
+
         <hr>
+
         <c-row>
           <!-- Título -->
           <c-col lg="8">
@@ -47,20 +48,23 @@
                   <c-col lg="12">
                     <div>
                       <label cCol cLabel="col">Título</label>
-                      <input type="text" cFormControl 
+                      <input type="text" cFormControl
                         formControlName="titulo"
                         autocomplete="none"
                         required
                         [autofocus]="true"
-                        [ngClass]="{ 'is-invalid': (submitted || f['titulo'].touched) && f['titulo'].invalid }" >
+                        [ngClass]="{ 'is-invalid': (submitted || control('titulo')?.touched) && control('titulo')?.invalid }">
+
                       <small id="passwordHelpInline" class="text-muted">
                         <abbr title="El título de la entrada ha de tener entre 1 y 30 caracteres">Mínimo 1, Máximo 30 caracteres.</abbr>
                       </small>
-                      <div *ngIf="submitted || f['titulo'].invalid" class="invalid-feedback">
-                        <div *ngIf="f['titulo'].errors?.['required']">El título es obligatorio</div>
+
+                      <div *ngIf="(submitted || control('titulo')?.touched) && control('titulo')?.invalid" class="invalid-feedback">
+                        <div *ngIf="control('titulo')?.errors?.['required']">El título es obligatorio</div>
                       </div>
                     </div>
                   </c-col>
+
                   <c-col lg="12">
                     <div>
                       <label cCol cLabel="col">Subtitulo</label>
@@ -71,6 +75,7 @@
               </c-card-body>
             </c-card>
           </c-col>
+
           <!-- Derecha -> Estado -->
           <c-col lg="4">
             <c-card class="mb-4">
@@ -79,22 +84,19 @@
                   <c-col lg="12">
                     <div>
                       <label cCol cLabel="col">Estado</label>
-                      <select cSelect cFormControl formControlName="estadoEntrada" *ngIf="estadosEntr.length">
-                        <option *ngFor="let ee of estadosEntr" [ngValue]="ee" cCardTitle required
-                          [selected]="entrada.estadoEntrada != null && ee.idEstadoEntrada == entrada.estadoEntrada.idEstadoEntrada">
+                      <select cSelect cFormControl formControlName="estadoEntrada" *ngIf="estadosEntr?.length">
+                        <option *ngFor="let ee of estadosEntr" [ngValue]="ee" cCardTitle required>
                             {{ ee.nombre }}
                         </option>
                       </select>
                     </div>
                   </c-col>
+
                   <c-col lg="12">
                     <div>
-                      <label cCol cLabel="col" >Tipo entrada</label>
-                      <select cSelect cFormControl formControlName="tipoEntrada" *ngIf="tiposEntr.length">
-                        <option *ngFor="let te of tiposEntr" [ngValue]="te" cCardTitle required
-                          [selected]="entrada.tipoEntrada!= null && te.idTipoEntrada == entrada.tipoEntrada.idTipoEntrada">
-                            {{ te.nombre }}
-                        </option>
+                      <label cCol cLabel="col">Tipo entrada</label>
+                      <select cSelect cFormControl formControlName="tipoEntrada" *ngIf="tiposEntr?.length">
+                        <option *ngFor="let te of tiposEntr" [ngValue]="te">{{ te.nombre }}</option>
                       </select>
                     </div>
                   </c-col>
@@ -102,24 +104,26 @@
               </c-card-body>
             </c-card>
           </c-col>
+
           <c-col lg="12">
             <c-card class="mb-4">
               <c-card-body>
                 <h3 cCardTitle class="h6 card-title">Contenido de la entrada</h3>
-                <ckeditor id="ckeditor" [editor]="Editor" tagName="textarea"
-                  cFormControl rows="10" 
+                <ckeditor id="ckeditor" [editor]="Editor" [config]="editorConfig" tagName="textarea"
+                  cFormControl rows="10"
                   formControlName="contenido"
                   autocomplete="none"
                   required
-                  [ngClass]="{ 'is-invalid': (submitted || f['contenido'].touched) && f['contenido'].invalid }"
-                ></ckeditor>
-                <div *ngIf="f['contenido'].invalid" class="invalid-feedback">
-                  <div *ngIf="f['contenido'].errors?.['required']">Escribe algo en la entrada vago</div>
+                  [ngClass]="{ 'is-invalid': (submitted || control('contenido')?.touched) && control('contenido')?.invalid }">
+                </ckeditor>
+
+                <div *ngIf="(submitted || control('contenido')?.touched) && control('contenido')?.invalid" class="invalid-feedback">
+                  <div *ngIf="control('contenido')?.errors?.['required']">Escribe algo en la entrada vago</div>
                 </div>
               </c-card-body>
             </c-card>
           </c-col>
-                   
+
           <c-col lg="12">
             <c-row>
               <c-col lg="8">
@@ -127,24 +131,26 @@
                   <c-card-body>
                     <h3 cCardTitle class="h6 card-title">Imagen destacada</h3>
                     <c-input-group>
-                      <input aria-describedby="inputGroupFileAddon04" aria-label="Upload" cFormControl 
+                      <input aria-describedby="inputGroupFileAddon04" aria-label="Upload" cFormControl
                         id="selImagenDestacada" type="file" formControlName="imagenDestacada">
                       <button cButton color="secondary" id="inputGroupFileAddon04" type="button" variant="outline"
-                        color="secondary" class="btn btn-outline-secondary"> Quitar </button>
+                        class="btn btn-outline-secondary"> Quitar </button>
                     </c-input-group>
                   </c-card-body>
                 </c-card>
               </c-col>
+
               <c-col lg="4">
                 <c-card class="mb-6 card">
                   <c-card-body>
                     <h3 cCardTitle class="h6 card-title">Contraseña</h3>
-                    <input aria-label="Contraseña" cFormControl 
+                    <input aria-label="Contraseña" cFormControl
                       formControlName="password" placeholder="Si quiere que la entrada tenga contraseña" type="text">
                   </c-card-body>
                 </c-card>
               </c-col>
             </c-row>
+
             <c-row>
               <c-col lg="4">
                 <c-card class="mb-4">
@@ -155,61 +161,71 @@
                   </c-card-body>
                 </c-card>
               </c-col>
+
               <c-col lg="4">
                 <c-card>
                   <c-card-body>
                     <h3 cCardTitle class="h6 card-title">Categorias</h3>
-                    <c-form-check class="mb-3 form-check" cFormControl
-                      *ngFor="let categ of categorias" ngValue="categ">
-                      <input cFormCheckInput formControlName="categorias" 
-                        type="checkbox" [checked]="inputCheckedCategorias(categ,entrada.categorias)">
+                    <c-form-check class="mb-3 form-check" *ngFor="let categ of categorias">
+
+                      <input cFormCheckInput 
+                        type="checkbox"
+                        [checked]="isCategoriaChecked(categ)"
+                        (change)="onToggleCategoria(categ, $any($event.target).checked)">
+
                       <label cFormCheckLabel>{{categ.nombre}}</label>
+
                     </c-form-check>
                   </c-card-body>
                 </c-card>
               </c-col>
+
               <c-col lg="4">
                 <c-card class="mb-4">
                   <c-card-body>
                     <h3 cCardTitle class="h6 card-title">Configuración</h3>
                     <ul cListGroup class="mx-n2 list-group list-group-flush">
-                      <li cListGroupItem 
-                        class="px-0 d-flex justify-content-between align-items-start list-group-item" aria-current="false">
+
+                      <li cListGroupItem class="px-0 d-flex justify-content-between align-items-start list-group-item">
                         <div class="ms-2 me-auto">
                           <h6 class="mb-0">Destacada</h6>
                           <small>Entrará en la sección destacadas</small>
                         </div>
                         <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['publicada'].value" formControlName="publicada">
+                          <input cFormCheckInput type="checkbox" [checked]="control('publicada')?.value" formControlName="publicada">
                         </c-form-check>
                       </li>
-                      <li cListGroupItem 
-                        class="px-0 d-flex justify-content-between align-items-start list-group-item" aria-current="false">
+
+                      <li cListGroupItem class="px-0 d-flex justify-content-between align-items-start list-group-item">
                         <div class="ms-2 me-auto">
                           <h6 class="mb-0">Privada</h6>
                           <small>Sólo puede ser vista por el autor/administrador</small>
                         </div>
                         <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['privado'].value" formControlName="privado">
+                          <input cFormCheckInput type="checkbox" [checked]="control('privado')?.value" formControlName="privado">
                         </c-form-check>
                       </li>
-                      <li cListGroupItem 
-                        class="px-0 d-flex justify-content-between align-items-start list-group-item" aria-current="false">
+
+                      <li cListGroupItem class="px-0 d-flex justify-content-between align-items-start list-group-item">
                         <div class="ms-2 me-auto">
                           <h6 class="mb-0">Comentarios</h6>
                           <small>La entrada permitirá comentarios o no</small>
                         </div>
                         <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['permitirComentario'].value" formControlName="permitirComentario">
+                          <input cFormCheckInput type="checkbox" [checked]="control('permitirComentario')?.value" formControlName="permitirComentario">
                         </c-form-check>
                       </li>
+
                     </ul>
                   </c-card-body>
                 </c-card>
               </c-col>
+
             </c-row>
+
           </c-col>
         </c-row>
+
       </form>
     </c-container>
   </c-card-body>

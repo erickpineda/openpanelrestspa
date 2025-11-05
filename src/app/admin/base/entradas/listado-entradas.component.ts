@@ -5,6 +5,7 @@ import { EntradaService } from '../../../core/services/entrada.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 import { SearchUtilService } from '../../../core/services/search-util.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
+import { ToastService } from '../../../core/op-toast/toast.service';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -37,6 +38,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     private entradaService: EntradaService,
     private searchUtilService: SearchUtilService,
     private busquedaService: BusquedaService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -88,6 +90,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
       console.error('Error en búsqueda:', response.error);
       this.listaEntradas = [];
       this.currentPage = 0;
+      this.msgToast('Error en búsqueda: ' + response.error);
     }
   }
 
@@ -116,6 +119,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
       error: (error) => {
         console.error('Error al cargar definiciones del buscador:', error);
         this.ocultarLoader();
+        this.msgToast(error.error?.error?.message);
       }
     });
   }
@@ -153,6 +157,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
         error: (err) => {
           console.error('Error al eliminar la entrada:', err);
           this.visible = false;
+          this.msgToast('Error al eliminar la entrada: ' + err);
         }
       });
     }
@@ -163,6 +168,10 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     setTimeout(() => {
       this.toastVisible = false;
     }, 5000);
+  }
+
+  private msgToast(str: any) {
+    this.toastService.showError(str, 'Error');
   }
 
   toggleModal() {

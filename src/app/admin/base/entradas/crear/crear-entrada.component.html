@@ -1,0 +1,27 @@
+<app-entrada-form 
+  [form]="entradaForm" 
+  [tiposEntr]="tiposEntr" 
+  [estadosEntr]="estadosEntr" 
+  [categorias]="categorias"
+  [submitted]="submitted" 
+  (submitForm)="onGuardar($event)" 
+  (cancelar)="onCancelar()"
+  (preview)="onPreviewEmit($event)">
+</app-entrada-form>
+
+<!-- Modal -->
+<c-modal #modalXl id="modalXl" size="xl" backdrop="static" [visible]="modalPreviaVisible" (close)="onCerrarPreview()">
+  <c-modal-header>
+    <h5 cModalTitle>Previa de la entrada</h5>
+  </c-modal-header>
+
+  <c-modal-body>
+    <app-previa-entrada [entrada]="entradaParaPrevia" [categoriasMeta]="categorias"
+      (editar)="onEditarDesdePreview(); modalPreviaVisible = false" (cerrar)="onCerrarPreview()">
+    </app-previa-entrada>
+  </c-modal-body>
+
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="onCerrarPreview()">Cerrar</button>
+  </c-modal-footer>
+</c-modal>

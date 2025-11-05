@@ -57,6 +57,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.totalEntradas = response.data.totalElements;
       const entradas = response.data.elements || [];
       
+      // Depuración: muestra cuántas no publicadas hay
+      console.log('Entradas:', entradas);
+      console.log('No publicadas:', entradas.filter((e: any) => !e.publicada));
+
       entradas.forEach((entrada: any) => {
         const fechaPublicacion = entrada.fechaPublicacion;
         if (fechaPublicacion) {
