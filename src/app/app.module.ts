@@ -11,18 +11,22 @@ import { GlobalErrorHandlerService } from './core/errors/global-error/global-err
 import { CustomPreloadingStrategyService } from './core/preloading/custom-preloading-strategy.service';
 import { DatePipe } from '@angular/common';
 import { ErrorInterceptor } from './core/interceptor/error.interceptor';
+import { ToastsContainerComponent } from './core/op-toast/toasts-container.component';
+import { ToastModule } from '@coreui/angular';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GlobalErrorComponent
+    GlobalErrorComponent,
+    ToastsContainerComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    CoreModule
+    CoreModule,
+    ToastModule
   ],
   providers: [
     DatePipe,

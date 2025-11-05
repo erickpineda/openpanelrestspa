@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EntradaService } from '../../../core/services/entrada.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { Subscription } from 'rxjs';
@@ -36,41 +36,53 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private usuarioService: UsuarioService,
-    private entradaService: EntradaService
+    private entradaService: EntradaService,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
-    this.cargarEstadisticas();
+  async ngOnInit(): Promise<void> {
+    await this.cargarEstadisticas();
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 
-  cargarEstadisticas(): void {
-    const usuarioSub = this.usuarioService.listarPagina(0, 50).subscribe(response => {
+  async cargarEstadisticas(): Promise<void> {
+    const usuarioSub = await this.usuarioService.listarPagina(0, 50).subscribe(response => {
       this.cantidadUsuariosActivos = response.data.totalElements;
     });
 
-    const entradaSub = this.entradaService.listarPagina(0, 50).subscribe(response => {
+    const entradaSub = await this.entradaService.listarPagina(0, 50).subscribe(response => {
       this.totalEntradas = response.data.totalElements;
       const entradas = response.data.elements || [];
       
+      // Depuración: muestra cuántas no publicadas hay
+      console.log('Entradas:', entradas);
+      console.log('No publicadas:', entradas.filter((e: any) => !e.publicada));
+
       entradas.forEach((entrada: any) => {
         const fechaPublicacion = entrada.fechaPublicacion;
         if (fechaPublicacion) {
-          const mes = new Date(fechaPublicacion).getMonth();
+          // Parsear fecha en formato 'DD-MM-YYYY HH:mm:ss'
+          const [fecha, hora] = fechaPublicacion.split(' ');
+          const [dia, mes, anio] = fecha.split('-').map(Number);
+          // Recuerda: los meses en JS van de 0 (enero) a 11 (diciembre)
+          const jsDate = new Date(anio, mes - 1, dia);
+          const mesJs = jsDate.getMonth();
+
           if (entrada.publicada) {
-            this.entradasMesPublicadas[mes] += 1;
+            this.entradasMesPublicadas[mesJs] += 1;
           } else {
-            this.entradasMesNoPublicadas[mes] += 1;
+            this.entradasMesNoPublicadas[mesJs] += 1;
           }
         } else {
-          this.entradasMesNoPublicadas[0] += 1; // Si no hay fecha, cuenta como no publicada
+          this.entradasMesNoPublicadas[0] += 1;
         }
       });
 
       this.actualizarGrafico();
+      this.cdr.detectChanges();
     });
 
     this.subscription.add(usuarioSub);
@@ -78,7 +90,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   actualizarGrafico(): void {
-    this.data.datasets[0].data = [...this.entradasMesPublicadas];
-    this.data.datasets[1].data = [...this.entradasMesNoPublicadas];
+    this.data = {
+      ...this.data,
+      datasets: [
+        {
+          ...this.data.datasets[0],
+          data: [...this.entradasMesPublicadas]
+        },
+        {
+          ...this.data.datasets[1],
+          data: [...this.entradasMesNoPublicadas]
+        }
+      ]
+    };
   }
 }

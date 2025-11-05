@@ -1,20 +1,18 @@
-import { DatePipe } from '@angular/common';
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
-import { Usuario } from '../../../core/models/usuario.model';
 import { EntradaService } from '../../../core/services/entrada.service';
-import { UsuarioService } from '../../../core/services/usuario.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
-import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
+import { SearchUtilService } from '../../../core/services/search-util.service';
+import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
+import { ToastService } from '../../../core/op-toast/toast.service';
 
 @Component({
   selector: 'app-listado-entradas',
   templateUrl: './listado-entradas.component.html',
   styleUrls: ['./listado-entradas.component.scss']
 })
-export class ListadoEntradasComponent implements OnInit {
-  entrada: Entrada = new Entrada();
+export class ListadoEntradasComponent implements OnInit, OnDestroy  {
   listaEntradas: Entrada[] = [];
   entradaABorrar: Entrada | null = null;
 
@@ -24,63 +22,117 @@ export class ListadoEntradasComponent implements OnInit {
 
   public visible = false;
   public toastVisible = false;
+  public loading: boolean = false;
+
+  private destroy$ = new Subject<void>();
+
+  campoSeleccionado: string = '';
+  operacionSeleccionada: string = '';
+  valorBusqueda: string = '';
+  dataOptionSeleccionada: string = 'AND';
+
+  public definiciones: any;
 
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
-    private usuarioService: UsuarioService
+    private searchUtilService: SearchUtilService,
+    private busquedaService: BusquedaService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
-    this.obtenerListaEntradas(this.currentPage);
+    this.cargarDefinicionesBuscador();
+    this.busquedaService.iniciarBusqueda(
+      (term) => this.realizarBusquedaEntradas(term),
+      (response) => this.procesarResultadosBusqueda(response)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.busquedaService.limpiarBusqueda();
+  }
+
+  private realizarBusquedaEntradas(term: string) {
+    const searchRequest = {
+      dataOption: this.dataOptionSeleccionada,
+      searchCriteriaList: [{
+        filterKey: this.campoSeleccionado,
+        value: term,
+        operation: this.operacionSeleccionada,
+        clazzName: 'Entrada'
+      }]
+    };
+    return this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize);
+  }
+
+  public aplicarFiltro(filtro: any): void {
+    this.campoSeleccionado = filtro.campo;
+    this.operacionSeleccionada = filtro.operacion;
+    this.valorBusqueda = filtro.valor;
+    this.currentPage = 0;
+    this.mostrarLoader();
+    if (this.campoSeleccionado && this.operacionSeleccionada) {
+      this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    }
+  }
+
+  private procesarResultadosBusqueda(response: any) {
+    this.ocultarLoader();
+    if (response.result?.success) {
+      this.listaEntradas = response.data.elements || [];
+      this.totalPages = response.data.totalPages;
+      this.listaEntradas = this.listaEntradas.map(entrada => ({
+        ...entrada,
+        categoriasConComas: entrada.categorias?.map(e => e.nombre).join(', ') || ''
+      }));
+    } else {
+      console.error('Error en búsqueda:', response.error);
+      this.listaEntradas = [];
+      this.currentPage = 0;
+      this.msgToast('Error en búsqueda: ' + response.error);
+    }
+  }
+
+  private cargarDefinicionesBuscador(): void {
+    this.mostrarLoader();
+    this.entradaService.obtenerDefinicionesBuscador().subscribe({
+      next: (response) => {
+        if (response.result?.success) {
+          this.definiciones = response.data;
+          const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]);
+          const camposOrdenados = [
+            ...campos.filter(k => k === 'titulo'),
+            ...campos.filter(k => k !== 'titulo').sort((a, b) => a.localeCompare(b))
+          ];
+          this.campoSeleccionado = camposOrdenados[0] || '';
+          const operaciones = this.definiciones.operationPermitido?.[this.campoSeleccionado];
+          this.operacionSeleccionada = Array.isArray(operaciones) ? operaciones[0] : '';
+          this.valorBusqueda = '';
+          this.currentPage = 0;
+          if (this.campoSeleccionado && this.operacionSeleccionada) {
+            this.busquedaService.triggerBusqueda(this.valorBusqueda);
+          }
+        }
+        this.ocultarLoader();
+      },
+      error: (error) => {
+        console.error('Error al cargar definiciones del buscador:', error);
+        this.ocultarLoader();
+        this.msgToast(error.error?.error?.message);
+      }
+    });
   }
 
   obtenerListaEntradas(page: number): void {
     this.currentPage = page;
-    this.entradaService.listarPagina(page, this.pageSize).subscribe({
-      next: async (response: OpenpanelApiResponse<any>) => {
-        
-        // Obtener los elementos y total de páginas
-        this.listaEntradas = response.data.elements || [];
-        this.totalPages = response.data.totalPages;
-  
-        // Manejamos los valores asincrónicos de manera correcta usando Promise.all
-        this.listaEntradas = await Promise.all(
-          this.listaEntradas.map(async entrada => {
-            const usuario = await this.obtenerDatosUsuario(entrada.idUsuario);
-            return {
-              ...entrada,
-              categoriasConComas: entrada.categorias.map(e => e.nombre).join(', '),
-              username: usuario.username
-            };
-          })
-        );
-  
-      },
-      error: err => {
-        if (err?.status === 404) {
-          this.listaEntradas = [];
-        }
-      }
-    });
-  }  
-
-  private obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
-    return new Promise((resolve, reject) => {
-      this.usuarioService.obtenerPorId(idUsuario).subscribe({
-        next: (response: OpenpanelApiResponse<any>) => {
-          const usuario: Usuario = (response.data) ? response.data : Usuario;
-          resolve(usuario);
-        },
-        error: err => {
-          reject(err);
-        }
-      });
-    });
+    this.busquedaService.triggerBusqueda(this.valorBusqueda);
   }
 
-  public checkFechaPublicacion(fechaPublicacion: Date): string {
-    return fechaPublicacion ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false) : 'No publicada';
+  checkFechaPublicacion(fechaPublicacion: Date): string {
+    return fechaPublicacion
+      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false)
+      : 'No publicada';
   }
 
   crearEntrada() {}
@@ -88,8 +140,8 @@ export class ListadoEntradasComponent implements OnInit {
   actualizarEntrada(id: number) {}
 
   borrarEntrada(id: number): void {
-    this.entradaABorrar = this.listaEntradas.find(entr => entr.idEntrada === id) || null;
-    this.visible = true; // Mostrar el modal
+    this.entradaABorrar = this.listaEntradas.find((entr) => entr.idEntrada === id) || null;
+    this.visible = true;
   }
 
   confirmarBorrado(): void {
@@ -105,6 +157,7 @@ export class ListadoEntradasComponent implements OnInit {
         error: (err) => {
           console.error('Error al eliminar la entrada:', err);
           this.visible = false;
+          this.msgToast('Error al eliminar la entrada: ' + err);
         }
       });
     }
@@ -114,7 +167,11 @@ export class ListadoEntradasComponent implements OnInit {
     this.toastVisible = true;
     setTimeout(() => {
       this.toastVisible = false;
-    }, 3000); // Ocultar el toast después de 3 segundos
+    }, 5000);
+  }
+
+  private msgToast(str: any) {
+    this.toastService.showError(str, 'Error');
   }
 
   toggleModal() {
@@ -125,8 +182,15 @@ export class ListadoEntradasComponent implements OnInit {
     this.visible = event;
   }
 
+  private mostrarLoader(): void {
+    this.loading = true;
+  }
+
+  private ocultarLoader(): void {
+    this.loading = false;
+  }
+
   public refrescarPagina(): void {
     window.location.reload();
   }
-
 }

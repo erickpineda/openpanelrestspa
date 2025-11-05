@@ -38,4 +38,12 @@ export abstract class CrudService<C> extends BaseService {
         return this.http.delete<OpenpanelApiResponse<any>>(this.buildUrl(`/${id}`), { headers: this.setHeaders() });
     }
 
+    buscar(req: any, pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<any>> {
+      const url = this.buildUrl('/buscar');
+      const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+      return this.http.post<OpenpanelApiResponse<any>>(url, req, {
+        headers: this.setHeaders(), params
+      });
+    }
+
 }
