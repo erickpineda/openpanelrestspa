@@ -93,17 +93,20 @@
       <tbody *ngFor="let entr of listaEntradas">
         <tr style="cursor: pointer" cAlign="middle" 
             [cTableColor]="entr.publicada ? 'success' : 'warning'">
-          <td scope="row" [routerLink]="['/admin/control/entradas/editar', entr.idEntrada]">{{entr.idEntrada}}</td>
+          <td scope="row">{{entr.idEntrada}}</td>
           <td>{{commonFuncService.acortarTexto(entr.titulo)}}</td>
           <td>{{entr.usernameCreador}}</td>
           <td>{{checkFechaPublicacion(entr.fechaPublicacion)}}</td>
           <td>{{entr.categoriasConComas}}</td>
           <td>
-            <button cButton color="info" size="sm" (click)="actualizarEntrada(entr.idEntrada)">
+            <button cButton color="warning" size="sm" (click)="actualizarEntrada(entr.idEntrada)" [routerLink]="['/admin/control/entradas/editar', entr.idEntrada]">
               <svg cIcon name="cilPen" size="sm" title="Editar"></svg>
             </button>
             <button cButton color="danger" size="sm" (click)="borrarEntrada(entr.idEntrada)" [cModalToggle]="staticBackdropModal.id">
               <svg cIcon name="cilTrash" size="sm" title="Borrar"></svg>
+            </button>
+            <button cButton color="info" size="sm">
+              <svg cIcon name="cilExternalLink" size="sm" title="Previa"></svg>
             </button>
           </td>          
         </tr>

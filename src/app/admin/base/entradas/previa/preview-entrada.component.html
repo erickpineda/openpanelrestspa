@@ -12,9 +12,18 @@
       </div>
 
       <div class="d-flex gap-2" *ngIf="mostrarBotonesAccion">
-        <button cButton color="secondary" size="sm" (click)="onEditar()">Editar</button>
-        <button cButton color="danger" size="sm" (click)="onCerrar()">Cerrar</button>
-        <button cButton color="success" size="sm" (click)="onPublicar()">Publicar</button>
+        <button cButton color="warning" size="sm" (click)="onEditar()">
+          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Editar entrada"></svg>
+          Editar
+        </button>
+        <button cButton color="danger" size="sm" (click)="onCerrar()">
+          <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cerrar"></svg>
+          Cerrar
+        </button>
+        <button cButton color="success" size="sm" (click)="onPublicar()">
+          <svg cIcon name="cilPaperPlane" style="padding-right: 2px" size="sm" title="Publicar"></svg>
+          Publicar
+        </button>
       </div>
     </div>
   </c-card-header>

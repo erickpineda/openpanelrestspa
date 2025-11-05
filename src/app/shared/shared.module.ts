@@ -38,14 +38,13 @@ import { OpPaginationComponent } from "./components/op-pagination/op-pagination.
         SidebarModule, 
         SpinnerModule, 
         TableModule, 
-        TabsModule, 
-        ToastModule, 
+        TabsModule,
         UtilitiesModule
     ],
     declarations: [
         NotFoundComponent,
         BuscadorAvanzadoComponent,
-        OpPaginationComponent
+        OpPaginationComponent,
     ],
     exports: [
         HttpClientModule,
@@ -54,7 +53,7 @@ import { OpPaginationComponent } from "./components/op-pagination/op-pagination.
         NotFoundComponent,
         FormsModule,
         BuscadorAvanzadoComponent,
-        OpPaginationComponent
+        OpPaginationComponent,
     ],
     providers: [
     ]
