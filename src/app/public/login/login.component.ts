@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TokenStorageService } from '../../core/services/token-storage.service';
 import { CommonFunctionalityService } from '../../shared/services/common-functionality.service';
+import { AuthSyncService } from '../../core/services/auth-sync.service';
 
 @Component({
   selector: 'app-login',
@@ -27,23 +28,23 @@ export class LoginComponent implements OnInit {
   roles: string[] = [];
 
   constructor(
-    private commonFuncService: CommonFunctionalityService,
     private authService: AuthService,
     private tokenStorage: TokenStorageService,
+    private router: Router, // ✅ Usar Router en lugar del servicio custom
+    private authSync: AuthSyncService,
     private cdr: ChangeDetectorRef
-  ) {
-  }
-  
+  ) {}
+
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
-      this.isLoggedIn = true;
-      this.roles = this.tokenStorage.getUser().roles;
+      this.router.navigate(['/admin']); // ✅ Redirección limpia
     }
   }
 
   onSubmit(): void {
-    this.isLoading = true; // Inicia el estado de carga
+    this.isLoading = true;
     const { username, password } = this.form;
+    
     this.authService.login(username, password).subscribe({
       next: data => {
         this.tokenStorage.saveToken(data.jwttoken);
@@ -51,16 +52,20 @@ export class LoginComponent implements OnInit {
         this.isLoginFailed = false;
         this.isLoggedIn = true;
         this.roles = this.tokenStorage.getUser().roles;
-        this.isLoading = false; // Finaliza el estado de carga
+        this.isLoading = false;
+        
+        // ✅ Notificar a otras pestañas del login
+        this.authSync.notifyLogin();
+        
         setTimeout(() => {
-          this.commonFuncService.reloadComponent(false, '/admin'); // Añade un retraso antes de la navegación
-        }, 500); // Retraso de 500ms
+          this.router.navigate(['/admin']); // ✅ Navegación estándar
+        }, 500);
       },
-      error: err => {
+      error: (err) => {
         this.errorMessage = err.error.message;
         this.isLoginFailed = true;
-        this.isLoading = false; // Finaliza el estado de carga
-        this.cdr.detectChanges(); // Forzar detección de cambios
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }

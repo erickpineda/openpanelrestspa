@@ -75,3 +75,13 @@ html {
     text-align: center;
   }
 }
+
+a.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}

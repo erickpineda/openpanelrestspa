@@ -13,12 +13,20 @@ import { DatePipe } from '@angular/common';
 import { ErrorInterceptor } from './core/interceptor/error.interceptor';
 import { ToastsContainerComponent } from './core/op-toast/toasts-container.component';
 import { ToastModule } from '@coreui/angular';
+import { UnsavedWorkDirective } from './core/directives/unsaved-work.directive';
+import { SessionExpiredComponent } from './core/features/session-expired.component';
+import { UnsavedWorkModalComponent } from './core/features/unsaved-work-modal.component';
+import { SessionManagerService } from './core/services/session-manager.service';
+import { UnsavedWorkService } from './core/services/unsaved-work.service';
 
 @NgModule({
   declarations: [
     AppComponent,
     GlobalErrorComponent,
-    ToastsContainerComponent
+    ToastsContainerComponent,
+    SessionExpiredComponent,
+    UnsavedWorkModalComponent,
+    UnsavedWorkDirective
   ],
   imports: [
     BrowserModule,
@@ -36,7 +44,9 @@ import { ToastModule } from '@coreui/angular';
       multi: true
     },
     { provide: ErrorHandler, useClass: GlobalErrorHandlerService },
-    CustomPreloadingStrategyService
+    CustomPreloadingStrategyService,
+    SessionManagerService,
+    UnsavedWorkService
   ],
   bootstrap: [AppComponent]
 })

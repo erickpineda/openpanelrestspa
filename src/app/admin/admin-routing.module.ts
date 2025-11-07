@@ -2,11 +2,13 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './admin.component';
 import { DashboardComponent } from './base/dashboard/dashboard.component';
+import { AuthGuard } from '../core/_helpers/auth.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: AdminComponent,
+    canActivate: [AuthGuard], // 🔐 Protección aquí
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {

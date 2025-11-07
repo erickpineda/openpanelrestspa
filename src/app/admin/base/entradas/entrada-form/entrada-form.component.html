@@ -13,7 +13,7 @@
 
   <c-card-body>
     <c-container fluid>
-      <form cForm [formGroup]="form" novalidate (ngSubmit)="onSubmit()" class="needs-validation" (reset)="onReset()">
+      <form cForm [formGroup]="form" novalidate (ngSubmit)="onSubmit()" appUnsavedWork="unsaved-entrada-form" class="needs-validation" (reset)="onReset()">
 
         <div class="d-flex justify-content-between align-items-end">
           <h2 cCardTitle class="h5 mb-3 mb-lg-0">{{ estaEditando ? 'Editar Entrada' : 'Crear Entrada' }}</h2>
