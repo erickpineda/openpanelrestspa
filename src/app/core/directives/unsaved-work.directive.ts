@@ -6,14 +6,15 @@ import { UnsavedWorkService } from '../services/unsaved-work.service';
 })
 export class UnsavedWorkDirective implements OnInit, OnDestroy {
   @Input() appUnsavedWork: string = '';
-  @Input() initialValue: any;
 
-  private formId: string | any;
+  private formId: any;
 
   constructor(
     private el: ElementRef,
     private unsavedWorkService: UnsavedWorkService
-  ) {}
+  ) {
+    console.log('🔄 UnsavedWorkDirective: Creando directiva para:', this.appUnsavedWork);
+  }
 
   ngOnInit(): void {
     const form = this.el.nativeElement;
@@ -21,8 +22,8 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     
     console.log(`📝 Registrando formulario: ${this.formId}`);
     
-    // Registrar formulario con valor inicial
-    this.unsavedWorkService.registerForm(this.formId, this.initialValue);
+    // Registrar formulario
+    this.unsavedWorkService.registerForm(this.formId);
     
     // Escuchar cambios en todos los inputs del formulario
     const inputs = form.querySelectorAll('input, select, textarea');
@@ -36,6 +37,9 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     
     // Marcar visualmente el formulario
     form.classList.add('unsaved-work-tracked');
+    form.setAttribute('data-tracked-form', this.formId);
+    
+    console.log(`✅ Formulario ${this.formId} registrado correctamente`);
   }
 
   ngOnDestroy(): void {
@@ -44,39 +48,22 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
 
   private onInputChange(): void {
     const form = this.el.nativeElement;
-    const formData = this.getFormData(form);
+    console.log(`📝 Formulario ${this.formId} modificado`);
     
-    console.log(`📝 Formulario ${this.formId} modificado:`, formData);
-    this.unsavedWorkService.updateFormValue(this.formId, formData);
-    
-    // Marcar visualmente
-    form.setAttribute('data-unsaved', 'true');
+    // Marcar como modificado
     form.classList.add('unsaved-work-modified');
+    form.setAttribute('data-unsaved', 'true');
+    
+    // También marcar el formulario de Angular como dirty/touched
+    form.classList.add('ng-dirty');
+    form.classList.add('ng-touched');
   }
 
   private onFormSubmit(): void {
     console.log(`📝 Formulario ${this.formId} enviado - marcando como guardado`);
-    this.unsavedWorkService.markFormAsSaved(this.formId);
     
     const form = this.el.nativeElement;
-    form.removeAttribute('data-unsaved');
     form.classList.remove('unsaved-work-modified');
-  }
-
-  private getFormData(form: any): any {
-    const formData: any = {};
-    const inputs = form.querySelectorAll('input, select, textarea');
-    
-    inputs.forEach((input: any) => {
-      if (input.name) {
-        if (input.type === 'checkbox' || input.type === 'radio') {
-          formData[input.name] = input.checked;
-        } else {
-          formData[input.name] = input.value;
-        }
-      }
-    });
-    
-    return formData;
+    form.removeAttribute('data-unsaved');
   }
 }

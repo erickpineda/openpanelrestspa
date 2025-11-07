@@ -17,7 +17,7 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private sessionManager: SessionManagerService,
-    private unsavedWorkService: UnsavedWorkService // ✅ Inyectar servicio
+    private unsavedWorkService: UnsavedWorkService
   ) {}
 
   ngOnInit(): void {
@@ -27,73 +27,28 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
       this.sessionManager.sessionExpired$.subscribe(data => {
         console.log('📡 UnsavedWorkModalComponent: Evento recibido:', data);
         
-        // ✅ Usar el servicio para detectar trabajo sin guardar
-        const hasUnsavedWork = this.unsavedWorkService.hasUnsavedWork();
-        console.log('🔍 Trabajo sin guardar (servicio):', hasUnsavedWork);
+        // ✅ Verificar específicamente que sea LOGOUT y allowSave sea true
+        const isLogoutWithSave = data.type === 'LOGOUT' && data.allowSave === true;
+        console.log('🔍 Es logout con allowSave:', isLogoutWithSave);
         
-        // ✅ Verificar también con método de respaldo
-        const hasUnsavedWorkBackup = this.hasUnsavedWorkBackup();
-        console.log('🔍 Trabajo sin guardar (respaldo):', hasUnsavedWorkBackup);
-        
-        const shouldShowModal = data.allowSave && (hasUnsavedWork || hasUnsavedWorkBackup);
-        
-        if (shouldShowModal) {
-          console.log('✅ Mostrando modal...');
+        if (isLogoutWithSave) {
+          console.log('✅ Mostrando modal porque es LOGOUT con allowSave');
           this.sessionData = data;
           this.showModal();
         } else {
-          console.log('❌ No se muestra modal, redirigiendo...');
+          console.log('❌ No se muestra modal, redirigiendo... Tipo:', data.type, 'allowSave:', data.allowSave);
           this.sessionManager.performLogout(data);
         }
       })
     );
 
     window.addEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
-  }
-
-  private hasUnsavedWorkBackup(): boolean {
-    // Método de respaldo para detectar trabajo sin guardar
-    const selectors = [
-      'form[data-unsaved="true"]',
-      '.unsaved-work-modified',
-      'form.ng-dirty',
-      'form.ng-touched'
-    ];
-    
-    let totalElements = 0;
-    selectors.forEach(selector => {
-      const elements = document.querySelectorAll(selector);
-      console.log(`🔍 Selector "${selector}": ${elements.length} elementos`);
-      totalElements += elements.length;
-    });
-    
-    console.log('📊 Total elementos sin guardar (respaldo):', totalElements);
-    return totalElements > 0;
+    console.log('✅ UnsavedWorkModalComponent: Inicializado correctamente');
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
     window.removeEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
-  }
-
-  private hasUnsavedWork(): boolean {
-    // Método más específico para detectar trabajo sin guardar
-    const selectors = [
-      'form.ng-dirty',
-      'form.ng-touched', 
-      '[data-unsaved="true"]',
-      'form[appUnsavedWork]'
-    ];
-    
-    let totalElements = 0;
-    selectors.forEach(selector => {
-      const elements = document.querySelectorAll(selector);
-      console.log(`🔍 Selector "${selector}": ${elements.length} elementos`);
-      totalElements += elements.length;
-    });
-    
-    console.log('📊 Total elementos sin guardar:', totalElements);
-    return totalElements > 0;
   }
 
   private showModal(): void {
