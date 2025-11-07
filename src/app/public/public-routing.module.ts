@@ -5,6 +5,7 @@ import { ContactComponent } from "./contact/containers/contact.component";
 import { HomeComponent } from "./home/home.component";
 import { LoginComponent } from "./login/login.component";
 import { PublicComponent } from "./public.component";
+import { SessionExpiredComponent } from "../core/features/session-expired.component";
 
 const routes: Routes = [
     {
@@ -13,7 +14,8 @@ const routes: Routes = [
             { path: 'home', component: HomeComponent },
             { path: 'about', component: AboutComponent },
             { path: 'contact', component: ContactComponent },
-            { path: 'login', component: LoginComponent }
+            { path: 'login', component: LoginComponent },
+            { path: 'session-expired', component: SessionExpiredComponent }
         ]
     }
 ];
