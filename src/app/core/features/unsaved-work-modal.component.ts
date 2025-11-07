@@ -1,7 +1,9 @@
+// unsaved-work-modal.component.ts
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SessionManagerService, SessionExpirationData } from '../../core/services/session-manager.service';
 import { UnsavedWorkService } from '../services/unsaved-work.service';
+import { TemporaryStorageService } from '../../core/services/temporary-storage.service';
 
 @Component({
   selector: 'app-unsaved-work-modal',
@@ -15,12 +17,10 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   saveInProgress = false;
   saveCompleted = false;
 
-  // Guardamos la referencia ligada para poder remover el listener correctamente
-  private boundHandleSaveWork = this.handleSaveWork.bind(this);
-
   constructor(
     private sessionManager: SessionManagerService,
-    private unsavedWorkService: UnsavedWorkService
+    private unsavedWorkService: UnsavedWorkService,
+    private temporaryStorage: TemporaryStorageService
   ) {}
 
   ngOnInit(): void {
@@ -38,30 +38,24 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
           this.sessionData = data;
           this.showModal();
         } else {
-          console.log('❌ No se muestra modal, redirigiendo... Tipo:', data.type, 'allowSave:', data.allowSave);
+          console.log('❌ No se muestra modal, redirigiendo...');
           this.sessionManager.performLogout(data);
         }
       })
     );
 
-    // Usamos la referencia ligada ya almacenada
-    window.addEventListener('saveWorkBeforeLogout', this.boundHandleSaveWork);
+    window.addEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
     console.log('✅ UnsavedWorkModalComponent: Inicializado correctamente');
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    // Quitamos exactamente la misma referencia que añadimos
-    window.removeEventListener('saveWorkBeforeLogout', this.boundHandleSaveWork);
+    window.removeEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
   }
 
   private showModal(): void {
     console.log('🎬 Mostrando modal...');
     this.isVisible = true;
-    // Forzar detección de cambios si fuera necesario
-    setTimeout(() => {
-      console.log('👁️ Modal visible:', this.isVisible);
-    }, 0);
   }
 
   private hideModal(): void {
@@ -75,23 +69,24 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   startSaveProcess(): void {
     this.saveInProgress = true;
     
-    // Emitir evento para que los componentes guarden su trabajo
+    // Disparar evento para que los componentes guarden
     const saveEvent = new CustomEvent('saveUnsavedWork');
     window.dispatchEvent(saveEvent);
     
-    // Simular proceso de guardado (reemplazar con lógica real)
+    // Esperar un poco para que se complete el guardado temporal
     setTimeout(() => {
       this.saveInProgress = false;
       this.saveCompleted = true;
       
-      // Cerrar modal después de 2 segundos y hacer logout
+      console.log('✅ Guardado temporal completado');
+      
       setTimeout(() => {
         this.hideModal();
         if (this.sessionData) {
           this.sessionManager.performLogout(this.sessionData);
         }
-      }, 10000);
-    }, 30000);
+      }, 2000);
+    }, 2000); // Reducido a 2 segundos para el guardado temporal
   }
 
   saveAndContinue(): void {
@@ -99,6 +94,9 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   }
 
   logoutWithoutSaving(): void {
+    // Limpiar datos temporales si el usuario elige no guardar
+    this.temporaryStorage.clearAllTemporaryEntries();
+    
     this.hideModal();
     if (this.sessionData) {
       this.sessionManager.performLogout(this.sessionData);
