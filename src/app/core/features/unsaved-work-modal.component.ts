@@ -90,8 +90,8 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
         if (this.sessionData) {
           this.sessionManager.performLogout(this.sessionData);
         }
-      }, 2000);
-    }, 3000);
+      }, 10000);
+    }, 30000);
   }
 
   saveAndContinue(): void {
