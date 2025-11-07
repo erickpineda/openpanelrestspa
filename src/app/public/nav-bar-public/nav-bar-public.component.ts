@@ -1,3 +1,4 @@
+// nav-bar-public.component.ts
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { TokenStorageService } from '../../core/services/token-storage.service';
@@ -27,12 +28,19 @@ export class NavBarPublicComponent implements OnInit {
   constructor(
     private tokenStorageService: TokenStorageService,
     private authService: AuthService,
-    private authSync: AuthSyncService, // ✅ Inyectar servicio de sync
+    private authSync: AuthSyncService,
     private router: Router
   ) {
-    // Verificar estado de autenticación cuando la página se vuelve visible
+    // Escuchar cambios de estado de autenticación
+    window.addEventListener('authStateChanged', () => {
+      console.log('🔄 NavBar: Estado de autenticación cambiado');
+      this.checkAuthStatus();
+    });
+
+    // Verificar cuando la página se vuelve visible
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
+        this.authSync.initializeAuthState();
         this.checkAuthStatus();
       }
     });
@@ -40,10 +48,13 @@ export class NavBarPublicComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkAuthStatus();
+    this.authSync.initializeAuthState(); // Sincronizar al iniciar
   }
 
   private checkAuthStatus(): void {
     this.isLoggedIn = this.tokenStorageService.isLoggedIn();
+    console.log('🔐 NavBar - Estado de autenticación:', this.isLoggedIn);
+    
     if (this.isLoggedIn) {
       const user = this.tokenStorageService.getUser();
       this.roles = user.roles;
@@ -70,15 +81,14 @@ export class NavBarPublicComponent implements OnInit {
     this.authService.logout().subscribe({
       next: () => {
         this.isLoadingLogout = false;
-        this.checkAuthStatus(); // ✅ Actualizar estado local
+        this.checkAuthStatus();
         this.router.navigate(['/']);
       },
       error: (err) => {
         console.error('Error en logout:', err);
-        // Forzar logout local incluso si el backend falla
         this.authService.performLogout();
         this.isLoadingLogout = false;
-        this.checkAuthStatus(); // ✅ Actualizar estado local
+        this.checkAuthStatus();
         this.router.navigate(['/']);
       }
     });

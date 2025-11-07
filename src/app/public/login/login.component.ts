@@ -36,8 +36,11 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Sincronizar estado al iniciar
+    this.authSync.initializeAuthState();
+    
     if (this.tokenStorage.getToken()) {
-      this.router.navigate(['/admin']); // ✅ Redirección limpia
+      this.router.navigate(['/admin']);
     }
   }
 

@@ -41,7 +41,8 @@ export class AuthService {
         this.tokenStorage.saveToken(data.jwttoken);
         this.tokenStorage.saveUser(data);
         this.userSubject.next(data);
-        this.authSync.notifyLogin(); // ✅ Notificar a otras pestañas
+        this.authSync.notifyLogin();
+        //this.authSync.setSessionActive(); // ✅ NUEVO: Marcar sesión como activa
       })
     );
   }
@@ -66,6 +67,7 @@ export class AuthService {
   public performLogout(): void {
     this.tokenStorage.signOut();
     this.userSubject.next(null);
-    this.authSync.notifyLogout(); // ✅ Notificar a otras pestañas
+    this.authSync.notifyLogout();
+    //this.authSync.setSessionInactive(); // ✅ NUEVO: Marcar sesión como inactiva
   }
 }

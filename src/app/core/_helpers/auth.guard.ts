@@ -1,3 +1,4 @@
+// auth.guard.ts
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { TokenStorageService } from '../services/token-storage.service';
@@ -15,11 +16,14 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
-    // Verificar sincronización inmediatamente
-    this.authSync.checkAuthStatus();
+    // ✅ Sincronizar antes de verificar
+    this.authSync.initializeAuthState();
 
     const token = this.tokenStorage.getToken();
     const user = this.tokenStorage.getUser();
+
+    console.log('🔐 AuthGuard - Token presente:', !!token);
+    console.log('🔐 AuthGuard - Usuario presente:', !!user);
 
     if (token && user?.roles) {
       // Verificar roles si es necesario

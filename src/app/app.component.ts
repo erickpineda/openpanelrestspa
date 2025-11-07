@@ -1,15 +1,28 @@
-import { Component } from '@angular/core';
+// app.component.ts
+import { Component, OnInit } from '@angular/core';
+import { AuthSyncService } from './core/services/auth-sync.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'openpanelspa';
   loading: boolean = false;
 
   constructor(
-    
+    private authSync: AuthSyncService
   ){ }
+
+  ngOnInit(): void {
+    // ✅ Inicializar sincronización de autenticación
+    this.authSync.initializeAuthState();
+    
+    // Escuchar cambios de estado de autenticación
+    window.addEventListener('authStateChanged', () => {
+      console.log('🔄 Estado de autenticación cambiado, actualizando interfaz...');
+      // Aquí podrías forzar la actualización de componentes si es necesario
+    });
+  }
 }

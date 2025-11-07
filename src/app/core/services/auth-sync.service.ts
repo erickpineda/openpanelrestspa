@@ -1,3 +1,4 @@
+// auth-sync.service.ts
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { TokenStorageService } from './token-storage.service';
@@ -8,7 +9,6 @@ import { SessionManagerService } from './session-manager.service';
 })
 export class AuthSyncService {
   private readonly AUTH_SYNC_KEY = 'auth-sync';
-  private readonly AUTH_TIMESTAMP_KEY = 'auth-sync-timestamp';
 
   constructor(
     private tokenStorage: TokenStorageService,
@@ -19,44 +19,27 @@ export class AuthSyncService {
   }
 
   private setupSync(): void {
-    // Verificar eventos pendientes al iniciar
-    this.checkPendingAuthEvents();
+    // Verificar sincronización al iniciar
+    this.initializeAuthState();
 
     window.addEventListener('storage', (event) => {
       if (event.key === this.AUTH_SYNC_KEY && event.newValue) {
         this.handleAuthChange(event.newValue);
+      } else if (event.key === 'sync-auth-token' || event.key === 'sync-auth-user') {
+        // ✅ NUEVO: Sincronizar cuando cambian los datos de autenticación
+        console.log('🔄 Cambio detectado en datos de autenticación');
+        this.tokenStorage.syncFromLocalStorage();
+        
+        // Disparar evento para que los componentes se actualicen
+        window.dispatchEvent(new Event('authStateChanged'));
       }
     });
-
-    // Verificar periódicamente
-    setInterval(() => {
-      this.checkPendingAuthEvents();
-    }, 5000);
 
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
-        this.checkPendingAuthEvents();
-        this.checkAuthStatus();
+        this.initializeAuthState();
       }
     });
-  }
-
-  private checkPendingAuthEvents(): void {
-    const pendingEvent = localStorage.getItem(this.AUTH_SYNC_KEY);
-    const eventTimestamp = localStorage.getItem(this.AUTH_TIMESTAMP_KEY);
-    
-    if (pendingEvent && eventTimestamp) {
-      const timestamp = parseInt(eventTimestamp, 10);
-      const now = Date.now();
-      const eventAge = now - timestamp;
-      
-      if (eventAge < 30000) {
-        console.log('📥 Evento auth pendiente encontrado:', pendingEvent);
-        this.handleAuthChange(pendingEvent);
-      } else {
-        this.cleanupAuthData();
-      }
-    }
   }
 
   private handleAuthChange(authData: string): void {
@@ -71,21 +54,17 @@ export class AuthSyncService {
     }
   }
 
-  public checkAuthStatus(): void {
-    const token = this.tokenStorage.getToken();
-    if (!token) {
-      const recentLogout = localStorage.getItem(this.AUTH_SYNC_KEY);
-      if (recentLogout) {
-        try {
-          const data = JSON.parse(recentLogout);
-          if (data.type === 'LOGOUT') {
-            console.log('🔐 Sesión cerrada recientemente, redirigiendo...');
-            this.router.navigate(['/session-expired']);
-          }
-        } catch (e) {
-          console.error('Error parsing recent logout:', e);
-        }
-      }
+  // ✅ NUEVO: Método simplificado para inicializar estado
+  public initializeAuthState(): void {
+    console.log('🔄 AuthSyncService: Inicializando estado de autenticación');
+    
+    // Sincronizar desde localStorage
+    const synced = this.tokenStorage.syncFromLocalStorage();
+    
+    if (synced) {
+      console.log('✅ Estado de autenticación sincronizado correctamente');
+      // Disparar evento para que los componentes se actualicen
+      window.dispatchEvent(new Event('authStateChanged'));
     }
   }
 
@@ -96,11 +75,10 @@ export class AuthSyncService {
     };
     
     localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(data));
-    localStorage.setItem(this.AUTH_TIMESTAMP_KEY, Date.now().toString());
     
     setTimeout(() => {
-      this.cleanupAuthData();
-    }, 10000);
+      localStorage.removeItem(this.AUTH_SYNC_KEY);
+    }, 1000);
   }
 
   public notifyLogout(): void {
@@ -110,28 +88,9 @@ export class AuthSyncService {
     };
     
     localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(data));
-    localStorage.setItem(this.AUTH_TIMESTAMP_KEY, Date.now().toString());
     
     setTimeout(() => {
-      this.cleanupAuthData();
-    }, 30000);
-  }
-
-  private cleanupAuthData(): void {
-    localStorage.removeItem(this.AUTH_SYNC_KEY);
-    localStorage.removeItem(this.AUTH_TIMESTAMP_KEY);
-  }
-
-  private forceLogout(): void {
-    this.tokenStorage.signOut();
-    
-    const currentPath = window.location.pathname;
-    if (currentPath.startsWith('/admin')) {
-      this.router.navigate(['/login']);
-    }
-    
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
+      localStorage.removeItem(this.AUTH_SYNC_KEY);
+    }, 1000);
   }
 }
