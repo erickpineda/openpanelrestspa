@@ -8,27 +8,55 @@ import { SessionManagerService } from './session-manager.service';
 })
 export class AuthSyncService {
   private readonly AUTH_SYNC_KEY = 'auth-sync';
+  private readonly AUTH_TIMESTAMP_KEY = 'auth-sync-timestamp';
 
   constructor(
     private tokenStorage: TokenStorageService,
-    private sessionManager: SessionManagerService, // ✅ Inyectar SessionManager
+    private sessionManager: SessionManagerService,
     private router: Router
   ) {
     this.setupSync();
   }
 
   private setupSync(): void {
+    // Verificar eventos pendientes al iniciar
+    this.checkPendingAuthEvents();
+
     window.addEventListener('storage', (event) => {
-      if (event.key === 'auth-sync' && event.newValue) {
+      if (event.key === this.AUTH_SYNC_KEY && event.newValue) {
         this.handleAuthChange(event.newValue);
       }
     });
 
+    // Verificar periódicamente
+    setInterval(() => {
+      this.checkPendingAuthEvents();
+    }, 5000);
+
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
+        this.checkPendingAuthEvents();
         this.checkAuthStatus();
       }
     });
+  }
+
+  private checkPendingAuthEvents(): void {
+    const pendingEvent = localStorage.getItem(this.AUTH_SYNC_KEY);
+    const eventTimestamp = localStorage.getItem(this.AUTH_TIMESTAMP_KEY);
+    
+    if (pendingEvent && eventTimestamp) {
+      const timestamp = parseInt(eventTimestamp, 10);
+      const now = Date.now();
+      const eventAge = now - timestamp;
+      
+      if (eventAge < 30000) {
+        console.log('📥 Evento auth pendiente encontrado:', pendingEvent);
+        this.handleAuthChange(pendingEvent);
+      } else {
+        this.cleanupAuthData();
+      }
+    }
   }
 
   private handleAuthChange(authData: string): void {
@@ -36,7 +64,6 @@ export class AuthSyncService {
       const data = JSON.parse(authData);
       
       if (data.type === 'LOGOUT') {
-        // ✅ Usar SessionManager en lugar de forceLogout directo
         this.sessionManager.handleLogoutFromSync(data);
       }
     } catch (e) {
@@ -47,16 +74,19 @@ export class AuthSyncService {
   public checkAuthStatus(): void {
     const token = this.tokenStorage.getToken();
     if (!token) {
-      this.forceLogout();
-    } else {
-      // Opcional: Verificar token con backend
-      this.validateTokenWithBackend();
+      const recentLogout = localStorage.getItem(this.AUTH_SYNC_KEY);
+      if (recentLogout) {
+        try {
+          const data = JSON.parse(recentLogout);
+          if (data.type === 'LOGOUT') {
+            console.log('🔐 Sesión cerrada recientemente, redirigiendo...');
+            this.router.navigate(['/session-expired']);
+          }
+        } catch (e) {
+          console.error('Error parsing recent logout:', e);
+        }
+      }
     }
-  }
-
-  private validateTokenWithBackend(): void {
-    // Aquí puedes hacer una llamada rápida al backend para verificar el token
-    // Por simplicidad, solo verificamos la existencia del token localmente
   }
 
   public notifyLogin(): void {
@@ -64,12 +94,13 @@ export class AuthSyncService {
       type: 'LOGIN',
       timestamp: Date.now()
     };
-    localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(data));
     
-    // Limpiar después de un tiempo
+    localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(data));
+    localStorage.setItem(this.AUTH_TIMESTAMP_KEY, Date.now().toString());
+    
     setTimeout(() => {
-      localStorage.removeItem(this.AUTH_SYNC_KEY);
-    }, 1000);
+      this.cleanupAuthData();
+    }, 10000);
   }
 
   public notifyLogout(): void {
@@ -77,24 +108,28 @@ export class AuthSyncService {
       type: 'LOGOUT',
       timestamp: Date.now()
     };
-    localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(data));
     
-    // Limpiar después de un tiempo
+    localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(data));
+    localStorage.setItem(this.AUTH_TIMESTAMP_KEY, Date.now().toString());
+    
     setTimeout(() => {
-      localStorage.removeItem(this.AUTH_SYNC_KEY);
-    }, 1000);
+      this.cleanupAuthData();
+    }, 30000);
+  }
+
+  private cleanupAuthData(): void {
+    localStorage.removeItem(this.AUTH_SYNC_KEY);
+    localStorage.removeItem(this.AUTH_TIMESTAMP_KEY);
   }
 
   private forceLogout(): void {
     this.tokenStorage.signOut();
     
-    // Redirigir a login si estamos en una ruta protegida
     const currentPath = window.location.pathname;
     if (currentPath.startsWith('/admin')) {
       this.router.navigate(['/login']);
     }
     
-    // Forzar recarga si es necesario
     setTimeout(() => {
       window.location.reload();
     }, 100);

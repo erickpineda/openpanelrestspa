@@ -15,6 +15,9 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   saveInProgress = false;
   saveCompleted = false;
 
+  // Guardamos la referencia ligada para poder remover el listener correctamente
+  private boundHandleSaveWork = this.handleSaveWork.bind(this);
+
   constructor(
     private sessionManager: SessionManagerService,
     private unsavedWorkService: UnsavedWorkService
@@ -27,7 +30,6 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
       this.sessionManager.sessionExpired$.subscribe(data => {
         console.log('📡 UnsavedWorkModalComponent: Evento recibido:', data);
         
-        // ✅ Verificar específicamente que sea LOGOUT y allowSave sea true
         const isLogoutWithSave = data.type === 'LOGOUT' && data.allowSave === true;
         console.log('🔍 Es logout con allowSave:', isLogoutWithSave);
         
@@ -42,19 +44,21 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
       })
     );
 
-    window.addEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
+    // Usamos la referencia ligada ya almacenada
+    window.addEventListener('saveWorkBeforeLogout', this.boundHandleSaveWork);
     console.log('✅ UnsavedWorkModalComponent: Inicializado correctamente');
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    window.removeEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
+    // Quitamos exactamente la misma referencia que añadimos
+    window.removeEventListener('saveWorkBeforeLogout', this.boundHandleSaveWork);
   }
 
   private showModal(): void {
     console.log('🎬 Mostrando modal...');
     this.isVisible = true;
-    // Forzar detección de cambios
+    // Forzar detección de cambios si fuera necesario
     setTimeout(() => {
       console.log('👁️ Modal visible:', this.isVisible);
     }, 0);

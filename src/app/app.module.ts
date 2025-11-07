@@ -12,7 +12,7 @@ import { CustomPreloadingStrategyService } from './core/preloading/custom-preloa
 import { DatePipe } from '@angular/common';
 import { ErrorInterceptor } from './core/interceptor/error.interceptor';
 import { ToastsContainerComponent } from './core/op-toast/toasts-container.component';
-import { ToastModule } from '@coreui/angular';
+import { ModalModule, ToastModule } from '@coreui/angular';
 import { UnsavedWorkDirective } from './core/directives/unsaved-work.directive';
 import { SessionExpiredComponent } from './core/features/session-expired.component';
 import { UnsavedWorkModalComponent } from './core/features/unsaved-work-modal.component';
@@ -34,7 +34,8 @@ import { UnsavedWorkService } from './core/services/unsaved-work.service';
     HttpClientModule,
     BrowserAnimationsModule,
     CoreModule,
-    ToastModule
+    ToastModule,
+    ModalModule
   ],
   providers: [
     DatePipe,
