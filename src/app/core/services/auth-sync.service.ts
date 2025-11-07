@@ -78,7 +78,7 @@ export class AuthSyncService {
     
     setTimeout(() => {
       localStorage.removeItem(this.AUTH_SYNC_KEY);
-    }, 1000);
+    }, 20000);
   }
 
   public notifyLogout(): void {
@@ -91,6 +91,6 @@ export class AuthSyncService {
     
     setTimeout(() => {
       localStorage.removeItem(this.AUTH_SYNC_KEY);
-    }, 1000);
+    }, 30000);
   }
 }
