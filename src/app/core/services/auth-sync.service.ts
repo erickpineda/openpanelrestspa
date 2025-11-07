@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { TokenStorageService } from './token-storage.service';
+import { SessionManagerService } from './session-manager.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,20 +11,19 @@ export class AuthSyncService {
 
   constructor(
     private tokenStorage: TokenStorageService,
+    private sessionManager: SessionManagerService, // ✅ Inyectar SessionManager
     private router: Router
   ) {
     this.setupSync();
   }
 
   private setupSync(): void {
-    // Escuchar eventos de almacenamiento entre pestañas
     window.addEventListener('storage', (event) => {
-      if (event.key === this.AUTH_SYNC_KEY && event.newValue) {
+      if (event.key === 'auth-sync' && event.newValue) {
         this.handleAuthChange(event.newValue);
       }
     });
 
-    // Escuchar eventos de visibilidad de página
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
         this.checkAuthStatus();
@@ -36,9 +36,8 @@ export class AuthSyncService {
       const data = JSON.parse(authData);
       
       if (data.type === 'LOGOUT') {
-        this.forceLogout();
-      } else if (data.type === 'LOGIN') {
-        this.checkAuthStatus();
+        // ✅ Usar SessionManager en lugar de forceLogout directo
+        this.sessionManager.handleLogoutFromSync(data);
       }
     } catch (e) {
       console.error('Error parsing auth sync data:', e);

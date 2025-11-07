@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SessionManagerService, SessionExpirationData } from '../../core/services/session-manager.service';
+import { UnsavedWorkService } from '../services/unsaved-work.service';
 
 @Component({
   selector: 'app-unsaved-work-modal',
@@ -14,22 +15,60 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   saveInProgress = false;
   saveCompleted = false;
 
-  constructor(private sessionManager: SessionManagerService) {}
+  constructor(
+    private sessionManager: SessionManagerService,
+    private unsavedWorkService: UnsavedWorkService // ✅ Inyectar servicio
+  ) {}
 
   ngOnInit(): void {
+    console.log('🔄 UnsavedWorkModalComponent: Inicializando...');
+    
     this.subscription.add(
       this.sessionManager.sessionExpired$.subscribe(data => {
-        if (data.allowSave && this.hasUnsavedWork()) {
+        console.log('📡 UnsavedWorkModalComponent: Evento recibido:', data);
+        
+        // ✅ Usar el servicio para detectar trabajo sin guardar
+        const hasUnsavedWork = this.unsavedWorkService.hasUnsavedWork();
+        console.log('🔍 Trabajo sin guardar (servicio):', hasUnsavedWork);
+        
+        // ✅ Verificar también con método de respaldo
+        const hasUnsavedWorkBackup = this.hasUnsavedWorkBackup();
+        console.log('🔍 Trabajo sin guardar (respaldo):', hasUnsavedWorkBackup);
+        
+        const shouldShowModal = data.allowSave && (hasUnsavedWork || hasUnsavedWorkBackup);
+        
+        if (shouldShowModal) {
+          console.log('✅ Mostrando modal...');
           this.sessionData = data;
           this.showModal();
         } else {
+          console.log('❌ No se muestra modal, redirigiendo...');
           this.sessionManager.performLogout(data);
         }
       })
     );
 
-    // Escuchar evento para guardar trabajo
     window.addEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
+  }
+
+  private hasUnsavedWorkBackup(): boolean {
+    // Método de respaldo para detectar trabajo sin guardar
+    const selectors = [
+      'form[data-unsaved="true"]',
+      '.unsaved-work-modified',
+      'form.ng-dirty',
+      'form.ng-touched'
+    ];
+    
+    let totalElements = 0;
+    selectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      console.log(`🔍 Selector "${selector}": ${elements.length} elementos`);
+      totalElements += elements.length;
+    });
+    
+    console.log('📊 Total elementos sin guardar (respaldo):', totalElements);
+    return totalElements > 0;
   }
 
   ngOnDestroy(): void {
@@ -38,12 +77,32 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   }
 
   private hasUnsavedWork(): boolean {
-    // Lógica para detectar trabajo sin guardar
-    return document.querySelectorAll('form.ng-dirty, [data-unsaved="true"]').length > 0;
+    // Método más específico para detectar trabajo sin guardar
+    const selectors = [
+      'form.ng-dirty',
+      'form.ng-touched', 
+      '[data-unsaved="true"]',
+      'form[appUnsavedWork]'
+    ];
+    
+    let totalElements = 0;
+    selectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      console.log(`🔍 Selector "${selector}": ${elements.length} elementos`);
+      totalElements += elements.length;
+    });
+    
+    console.log('📊 Total elementos sin guardar:', totalElements);
+    return totalElements > 0;
   }
 
   private showModal(): void {
+    console.log('🎬 Mostrando modal...');
     this.isVisible = true;
+    // Forzar detección de cambios
+    setTimeout(() => {
+      console.log('👁️ Modal visible:', this.isVisible);
+    }, 0);
   }
 
   private hideModal(): void {

@@ -6,32 +6,41 @@ import { Subject } from 'rxjs';
 })
 export class UnsavedWorkService {
   private unsavedWorkSubject = new Subject<boolean>();
-  public unsavedWork$ = this.unsavedWorkSubject.asObservable();
-
-  private unsavedForms = new Set<string>();
+  private unsavedForms = new Map<string, boolean>();
+  private formValues = new Map<string, any>();
 
   constructor() {
-    // Escuchar evento para guardar trabajo antes del logout
     window.addEventListener('saveUnsavedWork', this.saveAllUnsavedWork.bind(this));
   }
 
-  public registerForm(formId: string): void {
-    this.unsavedForms.add(formId);
+  public registerForm(formId: string, initialValue?: any): void {
+    this.unsavedForms.set(formId, false);
+    if (initialValue) {
+      this.formValues.set(formId, JSON.stringify(initialValue));
+    }
     this.updateUnsavedWorkStatus();
   }
 
-  public unregisterForm(formId: string): void {
-    this.unsavedForms.delete(formId);
+  public updateFormValue(formId: string, currentValue: any): void {
+    const initialValue = this.formValues.get(formId);
+    const currentValueStr = JSON.stringify(currentValue);
+    
+    const hasChanged = initialValue !== currentValueStr;
+    this.unsavedForms.set(formId, hasChanged);
     this.updateUnsavedWorkStatus();
   }
 
   public markFormAsSaved(formId: string): void {
-    this.unsavedForms.delete(formId);
+    this.unsavedForms.set(formId, false);
     this.updateUnsavedWorkStatus();
   }
 
-  public markFormAsUnsaved(formId: string): void {
-    this.unsavedForms.add(formId);
+  public hasUnsavedWork(): boolean {
+    return Array.from(this.unsavedForms.values()).some(hasUnsaved => hasUnsaved);
+  }
+
+  public unregisterForm(formId: string): void {
+    this.unsavedForms.delete(formId);
     this.updateUnsavedWorkStatus();
   }
 
@@ -53,7 +62,4 @@ export class UnsavedWorkService {
     console.log('Guardando formularios:', Array.from(this.unsavedForms));
   }
 
-  public hasUnsavedWork(): boolean {
-    return this.unsavedForms.size > 0;
-  }
 }
