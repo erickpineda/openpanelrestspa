@@ -1,4 +1,12 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit, OnChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  OnInit,
+  OnChanges,
+} from '@angular/core';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { UntypedFormGroup, FormArray, FormControl } from '@angular/forms';
 import { Categoria } from '../../../../core/models/categoria.model';
@@ -11,35 +19,33 @@ import { TemporaryStorageService } from '../../../../core/services/temporary-sto
   selector: 'app-entrada-form',
   templateUrl: './entrada-form.component.html',
   styleUrls: ['./entrada-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntradaFormComponent implements OnInit, OnChanges {
-  public Editor = ClassicEditor;
-  public estaEditando = false;
-
-  // ✅ NUEVO: Propiedad para controlar la visibilidad de la notificación
-  showRecoveryNotification = false;
-  temporaryData: any = null;
-  temporaryEntriesCount = 0;
-
   @Input() editorConfig: any = {
     licenseKey: 'GPL',
     toolbar: {
       items: [
-        'heading', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote',
-        'imageUpload', 'insertTable', 'mediaEmbed', 'undo', 'redo'
+        'heading',
+        'bold',
+        'italic',
+        'link',
+        'bulletedList',
+        'numberedList',
+        'blockQuote',
+        'imageUpload',
+        'insertTable',
+        'mediaEmbed',
+        'undo',
+        'redo',
       ],
-      shouldNotGroupWhenFull: true
+      shouldNotGroupWhenFull: true,
     },
     image: {
-      toolbar: [
-        'imageStyle:full', 'imageStyle:side', 'imageTextAlternative'
-      ]
+      toolbar: ['imageStyle:full', 'imageStyle:side', 'imageTextAlternative'],
     },
     table: {
-      contentToolbar: [
-        'tableColumn', 'tableRow', 'mergeTableCells'
-      ]
+      contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
     },
   };
   @Input() form!: UntypedFormGroup; // el FormGroup lo crea el contenedor (buildForm)
@@ -55,33 +61,46 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   @Output() editar = new EventEmitter<void>();
   @Output() preview = new EventEmitter<Entrada>();
 
-    constructor(
-    private temporaryStorage: TemporaryStorageService
-  ) {}
+  public Editor = ClassicEditor;
+  public estaEditando = false;
+
+  // ✅ NUEVO: Propiedad para controlar la visibilidad de la notificación
+  showRecoveryNotification = false;
+  temporaryData: any = null;
+  temporaryEntriesCount = 0;
+
+  constructor(private temporaryStorage: TemporaryStorageService) {}
 
   ngOnInit(): void {
-    window.addEventListener('saveUnsavedWork', this.saveBeforeLogout.bind(this));
-    
+    window.addEventListener(
+      'saveUnsavedWork',
+      this.saveBeforeLogout.bind(this)
+    );
+
     if (!this.estaEditando) {
       this.checkForTemporaryData();
     }
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('saveUnsavedWork', this.saveBeforeLogout.bind(this));
+    window.removeEventListener(
+      'saveUnsavedWork',
+      this.saveBeforeLogout.bind(this)
+    );
   }
 
   private checkForTemporaryData(): void {
     const formId = 'unsaved-entrada-form';
     this.temporaryData = this.temporaryStorage.getTemporaryEntry(formId);
-    
+
     if (this.temporaryData && !this.estaEditando) {
-      console.log('📥 Datos temporales encontrados en formulario:', this.temporaryData);
-      console.log('showRecoveryNotification', this.showRecoveryNotification);
+      console.log(
+        '📥 Datos temporales encontrados en formulario:',
+        this.temporaryData
+      );
+      
       // Mostrar la notificación elegante en lugar del confirm
-      setTimeout(() => {
-        this.showRecoveryNotification = true;
-      }, 1000);
+      this.showRecoveryNotification = true;
     }
   }
 
@@ -106,7 +125,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   private recoverTemporaryData(formData: any): void {
     try {
       console.log('🔄 Recuperando datos temporales...', formData);
-      
+
       // Actualizar el formulario con los datos temporales
       this.form.patchValue({
         titulo: formData.titulo || '',
@@ -120,12 +139,12 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       if (formData.categorias && Array.isArray(formData.categorias)) {
         const categoriasArray = this.categoriasArray();
         categoriasArray.clear();
-        
+
         formData.categorias.forEach((categoria: Categoria) => {
           categoriasArray.push(new FormControl(categoria));
         });
       }
-      
+
       // Recuperar estados booleanos
       if (formData.publicada !== undefined) {
         this.form.patchValue({ publicada: formData.publicada });
@@ -134,14 +153,15 @@ export class EntradaFormComponent implements OnInit, OnChanges {
         this.form.patchValue({ privado: formData.privado });
       }
       if (formData.permitirComentario !== undefined) {
-        this.form.patchValue({ permitirComentario: formData.permitirComentario });
+        this.form.patchValue({
+          permitirComentario: formData.permitirComentario,
+        });
       }
-      
+
       console.log('✅ Datos temporales recuperados correctamente');
-      
+
       // Limpiar datos temporales después de recuperarlos
       this.temporaryStorage.removeTemporaryEntry('unsaved-entrada-form');
-      
     } catch (error) {
       console.error('❌ Error al recuperar datos temporales:', error);
     }
@@ -155,11 +175,11 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   private saveBeforeLogout(): void {
     console.log('💾 Guardando entrada antes del logout...');
-    
+
     if (this.form.valid) {
       // Primero intentar guardar normalmente
       this.onSubmit();
-      
+
       // Como fallback, guardar también temporalmente
       this.saveToTemporaryStorage();
     } else {
@@ -172,7 +192,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     try {
       const formId = 'unsaved-entrada-form';
       const formData = this.form.value;
-      
+
       this.temporaryStorage.saveTemporaryEntry(formId, formData);
       console.log('✅ Datos guardados en almacenamiento temporal');
     } catch (error) {
@@ -182,11 +202,11 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   onSubmit() {
     if (!this.form) return;
-    
+
     if (this.form.valid) {
       console.log('💾 Intentando guardar entrada...');
       this.submitForm.emit(this.form.value as Entrada);
-      
+
       // Si se guarda exitosamente, limpiar datos temporales
       this.temporaryStorage.removeTemporaryEntry('unsaved-entrada-form');
     } else {
@@ -225,12 +245,22 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   isCategoriaChecked(categ: Categoria): boolean {
     const arr = this.categoriasArray();
-    return arr.controls.some(c => c.value && (c.value.idCategoria === categ.idCategoria || c.value.nombre === categ.nombre));
+    return arr.controls.some(
+      (c) =>
+        c.value &&
+        (c.value.idCategoria === categ.idCategoria ||
+          c.value.nombre === categ.nombre)
+    );
   }
 
   onToggleCategoria(categ: Categoria, checked: boolean) {
     const arr = this.categoriasArray();
-    const existsIndex = arr.controls.findIndex(c => c.value && (c.value.idCategoria === categ.idCategoria || c.value.nombre === categ.nombre));
+    const existsIndex = arr.controls.findIndex(
+      (c) =>
+        c.value &&
+        (c.value.idCategoria === categ.idCategoria ||
+          c.value.nombre === categ.nombre)
+    );
 
     if (checked && existsIndex === -1) {
       arr.push(new FormControl(categ));

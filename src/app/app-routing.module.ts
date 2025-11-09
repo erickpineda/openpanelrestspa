@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { GlobalErrorComponent } from './core/errors/global-error/global-error.component';
-import { NotFoundComponent } from './core/errors/not-found/not-found.component';
 import { CustomPreloadingStrategyService } from './core/preloading/custom-preloading-strategy.service';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 
 const routes: Routes = [
   { path: '', data: { preload: true, delay:1000 }, loadChildren: () => import('./public/public.module').then(m => m.PublicModule) },

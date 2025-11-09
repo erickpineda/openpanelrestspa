@@ -1,69 +1,39 @@
 import { NgModule } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { AvatarModule, BadgeModule, BreadcrumbModule, ButtonGroupModule, ButtonModule, CardModule, DropdownModule, FooterModule, FormModule, GridModule, HeaderModule, ListGroupModule, ModalModule, NavModule, PaginationModule, ProgressModule, SharedModule, SidebarModule, SpinnerModule, TableModule, TabsModule, ToastModule, UtilitiesModule } from '@coreui/angular';
-import { ChartjsModule } from '@coreui/angular-chartjs';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { BaseRoutingModule } from './base-routing.module';
 import { BaseComponent } from './base.component';
+
+// Componentes específicos de Base
 import { ListadoEntradasComponent } from './entradas/listado-entradas.component';
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
 import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
 import { CrearEditarCategoria } from './categorias/crear-editar/crear-editar-categoria.component';
-import { authInterceptorProviders } from '../../core/interceptor/auth.interceptor';
-import { NetworkInterceptor } from '../../core/interceptor/network.interceptor';
-import { IconModule } from '@coreui/icons-angular';
-import { NgScrollbarModule } from 'ngx-scrollbar';
-import { EntradaService } from '../../core/services/entrada.service';
-import { UsuarioService } from '../../core/services/usuario.service';
-import { SearchUtilService } from '../../core/services/search-util.service';
-import { SharedOPModule } from '../../shared/shared.module';
 import { CrearEntradaComponent } from './entradas/crear/crear-entrada.component';
 import { EditarEntradaComponent } from './entradas/editar/editar-entrada.component';
 import { EntradaFormComponent } from './entradas/entrada-form/entrada-form.component';
 import { PreviaEntradaComponent } from './entradas/previa/preview-entrada.component';
 
+// Módulos externos
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { SharedOPModule } from '../../shared/shared.module';
+
 @NgModule({
   imports: [
     BaseRoutingModule,
     CommonModule,
-    HttpClientModule,
-    FormsModule,
     ReactiveFormsModule,
-    NgScrollbarModule,
-    CKEditorModule,
-    ChartjsModule,
-    AvatarModule,
-    BadgeModule,
-    BreadcrumbModule,
-    ButtonGroupModule,
-    ButtonModule,
-    CardModule,
-    DropdownModule,
-    FooterModule,
-    FormModule,
-    GridModule,
-    HeaderModule,
-    IconModule,
-    ListGroupModule,
-    NavModule,
-    ProgressModule,
-    PaginationModule,
-    SharedModule,
-    SidebarModule,
-    SpinnerModule,
+
+    // ✅ Shared Module (contiene componentes compartidos)
     SharedOPModule,
-    TableModule,
-    TabsModule,
-    UtilitiesModule,
-    ModalModule,
-    ToastModule,
-    
+
+    // Módulos específicos de Base
+    CKEditorModule,
   ],
   declarations: [
+    // ✅ Solo componentes específicos de Base
     BaseComponent,
     ListadoEntradasComponent,
     EntradaFormComponent,
@@ -74,15 +44,6 @@ import { PreviaEntradaComponent } from './entradas/previa/preview-entrada.compon
     ListadoCategoriasComponent,
     CrearEditarCategoria,
     PreviaEntradaComponent,
- //   MyCKEditorComponent
   ],
-  providers: [
-    DatePipe,
-    UsuarioService,
-    EntradaService,
-    SearchUtilService,
-    authInterceptorProviders,
-    { provide: HTTP_INTERCEPTORS, useClass: NetworkInterceptor, multi: true },
-  ]
 })
-export class BaseModule { }
+export class BaseModule {}
