@@ -55,12 +55,13 @@ import { PreviaEntradaComponent } from './entradas/previa/preview-entrada.compon
     SharedModule,
     SidebarModule,
     SpinnerModule,
+    SharedOPModule,
     TableModule,
     TabsModule,
     UtilitiesModule,
     ModalModule,
     ToastModule,
-    SharedOPModule,
+    
   ],
   declarations: [
     BaseComponent,

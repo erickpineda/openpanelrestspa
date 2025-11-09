@@ -13,6 +13,7 @@ export interface TemporaryEntry {
 })
 export class TemporaryStorageService {
   private readonly STORAGE_KEY = 'temporary-entries';
+  private readonly NOTIFICATION_SHOWN_KEY = 'recovery-notification-shown';
 
   constructor() { }
 
@@ -56,6 +57,29 @@ export class TemporaryStorageService {
 
   private getTemporaryEntries(): { [key: string]: TemporaryEntry } {
     const stored = localStorage.getItem(this.STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {};
+  }
+
+  // ✅ NUEVO: Controlar si ya se mostró la notificación
+  setRecoveryNotificationShown(formId: string): void {
+    const shown = this.getRecoveryNotificationsShown();
+    shown[formId] = true;
+    localStorage.setItem(this.NOTIFICATION_SHOWN_KEY, JSON.stringify(shown));
+  }
+
+  isRecoveryNotificationShown(formId: string): boolean {
+    const shown = this.getRecoveryNotificationsShown();
+    return shown[formId] === true;
+  }
+
+  clearRecoveryNotification(formId: string): void {
+    const shown = this.getRecoveryNotificationsShown();
+    delete shown[formId];
+    localStorage.setItem(this.NOTIFICATION_SHOWN_KEY, JSON.stringify(shown));
+  }
+
+  private getRecoveryNotificationsShown(): { [formId: string]: boolean } {
+    const stored = localStorage.getItem(this.NOTIFICATION_SHOWN_KEY);
     return stored ? JSON.parse(stored) : {};
   }
 }

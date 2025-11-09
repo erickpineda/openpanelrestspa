@@ -17,6 +17,11 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   public Editor = ClassicEditor;
   public estaEditando = false;
 
+  // ✅ NUEVO: Propiedad para controlar la visibilidad de la notificación
+  showRecoveryNotification = false;
+  temporaryData: any = null;
+  temporaryEntriesCount = 0;
+
   @Input() editorConfig: any = {
     licenseKey: 'GPL',
     toolbar: {
@@ -55,10 +60,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    // Escuchar evento de guardado antes del logout
     window.addEventListener('saveUnsavedWork', this.saveBeforeLogout.bind(this));
     
-    // Verificar datos temporales solo si estamos creando una nueva entrada
     if (!this.estaEditando) {
       this.checkForTemporaryData();
     }
@@ -70,28 +73,34 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   private checkForTemporaryData(): void {
     const formId = 'unsaved-entrada-form';
-    const temporaryData = this.temporaryStorage.getTemporaryEntry(formId);
+    this.temporaryData = this.temporaryStorage.getTemporaryEntry(formId);
     
-    if (temporaryData && !this.estaEditando) {
-      console.log('📥 Datos temporales encontrados en formulario:', temporaryData);
-      
-      // Usar un setTimeout para asegurar que el formulario esté completamente renderizado
+    if (this.temporaryData && !this.estaEditando) {
+      console.log('📥 Datos temporales encontrados en formulario:', this.temporaryData);
+      console.log('showRecoveryNotification', this.showRecoveryNotification);
+      // Mostrar la notificación elegante en lugar del confirm
       setTimeout(() => {
-        const shouldRecover = confirm(
-          'Se encontraron datos no guardados de una sesión anterior. ¿Desea recuperarlos en este formulario?'
-        );
-        
-        if (shouldRecover) {
-          this.recoverTemporaryData(temporaryData.formData);
-        } else {
-          // Preguntar si quiere descartar
-          const shouldDiscard = confirm('¿Deseas descartar estos datos permanentemente?');
-          if (shouldDiscard) {
-            this.temporaryStorage.removeTemporaryEntry(formId);
-          }
-        }
-      }, 500);
+        this.showRecoveryNotification = true;
+      }, 1000);
     }
+  }
+
+  // ✅ NUEVO: Métodos para manejar las acciones de la notificación
+  onRecoverData(): void {
+    this.showRecoveryNotification = false;
+    this.recoverTemporaryData(this.temporaryData.formData);
+  }
+
+  onIgnoreData(): void {
+    this.showRecoveryNotification = false;
+    console.log('ℹ️ Usuario eligió ignorar los datos temporales por ahora');
+    // Los datos permanecen en almacenamiento temporal para recuperar después
+  }
+
+  onDiscardData(): void {
+    this.showRecoveryNotification = false;
+    this.temporaryStorage.removeTemporaryEntry('unsaved-entrada-form');
+    console.log('🗑️ Usuario descartó los datos temporales permanentemente');
   }
 
   private recoverTemporaryData(formData: any): void {

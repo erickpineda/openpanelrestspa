@@ -12,6 +12,20 @@
   </c-card-header>
 
   <c-card-body>
+    <!-- ✅ NUEVO: Notificación de recuperación de datos -->
+     <div *ngIf="this.showRecoveryNotification" class="container mt-3">
+      <app-data-recovery-notification
+        title="📥 Datos pendientes"
+        message="Tienes {{this.temporaryData.length}} entrada(s) no guardada(s) de sesiones anteriores."
+        recoverText="Ver entradas"
+        ignoreText="Más tarde"
+        discardText="Eliminar todo"
+        (onRecover)="onRecoverData()"
+        (onIgnore)="onIgnoreData()"
+        (onDiscard)="onDiscardData()">
+      </app-data-recovery-notification>
+     </div>
+
     <c-container fluid>
       <form cForm [formGroup]="form" novalidate (ngSubmit)="onSubmit()" appUnsavedWork="unsaved-entrada-form" class="needs-validation" (reset)="onReset()">
 

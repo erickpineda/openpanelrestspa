@@ -15,6 +15,9 @@ import { TemporaryStorageService } from '../core/services/temporary-storage.serv
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent implements OnInit {
+   // ✅ NUEVO: Propiedades para controlar la notificación
+  showGlobalRecoveryNotification = false;
+  temporaryEntriesCount = 0;
 
   public navItems = navItems;
   public loading$ : any;
@@ -41,28 +44,32 @@ export class AdminComponent implements OnInit {
 
   private checkForTemporaryData(): void {
     const temporaryEntries = this.temporaryStorage.getAllTemporaryEntries();
+    this.temporaryEntriesCount = temporaryEntries.length;
     
-    if (temporaryEntries.length > 0) {
+    if (this.temporaryEntriesCount > 0) {
       console.log('📥 Datos temporales encontrados en admin:', temporaryEntries);
       
-      // Esperar un poco para que la UI se cargue completamente
       setTimeout(() => {
-        const shouldRecover = confirm(
-          `Tienes ${temporaryEntries.length} entrada(s) no guardada(s) de sesiones anteriores. ¿Deseas recuperarlas ahora?`
-        );
-        
-        if (shouldRecover) {
-          // Navegar a la página de creación de entradas
-          this.router.navigate(['/admin/control/entradas/crear']);
-        } else {
-          // Opcional: preguntar si quiere descartar los datos
-          const shouldDiscard = confirm('¿Deseas descartar estos datos permanentemente?');
-          if (shouldDiscard) {
-            this.temporaryStorage.clearAllTemporaryEntries();
-          }
-        }
+        this.showGlobalRecoveryNotification = true;
       }, 1000);
     }
+  }
+
+  // ✅ NUEVO: Métodos para manejar las acciones
+  onGlobalRecover(): void {
+    this.showGlobalRecoveryNotification = false;
+    this.router.navigate(['/admin/control/entradas/crear']);
+  }
+
+  onGlobalIgnore(): void {
+    this.showGlobalRecoveryNotification = false;
+    console.log('ℹ️ Usuario ignoró la notificación global de recuperación');
+  }
+
+  onGlobalDiscard(): void {
+    this.showGlobalRecoveryNotification = false;
+    this.temporaryStorage.clearAllTemporaryEntries();
+    console.log('🗑️ Usuario descartó todos los datos temporales');
   }
 
   private listenToLoading(): void {

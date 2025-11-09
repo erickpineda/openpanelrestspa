@@ -22,6 +22,7 @@ import { UsuarioService } from '../core/services/usuario.service';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { ChartjsModule } from '@coreui/angular-chartjs';
 import { SearchUtilService } from '../core/services/search-util.service';
+import { DataRecoveryNotificationComponent } from '../shared/components/data-recovery-notification.component';
 
 const APP_CONTAINERS = [
   DefaultFooterComponent,
@@ -33,7 +34,8 @@ const APP_CONTAINERS = [
   declarations: [
     ...APP_CONTAINERS,
     UserComponent,
-    DashboardComponent
+    DashboardComponent,
+    DataRecoveryNotificationComponent
   ],
   providers: [
     {

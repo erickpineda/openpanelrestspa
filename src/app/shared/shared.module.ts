@@ -10,6 +10,7 @@ import { CommonModule, DatePipe } from "@angular/common";
 import { NotFoundComponent } from "../core/errors/not-found/not-found.component";
 import { BuscadorAvanzadoComponent } from "./components/buscador-avanzado/buscador-avanzado.component";
 import { OpPaginationComponent } from "./components/op-pagination/op-pagination.component";
+import { DataRecoveryNotificationComponent } from "./components/data-recovery-notification.component";
 
 @NgModule({
     imports: [
@@ -45,6 +46,7 @@ import { OpPaginationComponent } from "./components/op-pagination/op-pagination.
         NotFoundComponent,
         BuscadorAvanzadoComponent,
         OpPaginationComponent,
+        DataRecoveryNotificationComponent
     ],
     exports: [
         HttpClientModule,
@@ -54,6 +56,7 @@ import { OpPaginationComponent } from "./components/op-pagination/op-pagination.
         FormsModule,
         BuscadorAvanzadoComponent,
         OpPaginationComponent,
+        DataRecoveryNotificationComponent
     ],
     providers: [
     ]
