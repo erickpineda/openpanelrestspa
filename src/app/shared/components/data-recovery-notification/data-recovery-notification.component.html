@@ -1,15 +1,29 @@
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  <strong>📥 {{ title }}</strong>
-  <p class="mb-2">{{ message }}</p>
-  <div class="btn-group">
-    <button type="button" class="btn btn-success btn-sm" (click)="onRecover.emit()">
-      <i class="fas fa-download me-1"></i> {{ recoverText }}
-    </button>
-    <button type="button" class="btn btn-secondary btn-sm" (click)="onIgnore.emit()">
-      <i class="fas fa-times me-1"></i> {{ ignoreText }}
-    </button>
-    <button type="button" class="btn btn-danger btn-sm" (click)="onDiscard.emit()">
-      <i class="fas fa-trash me-1"></i> {{ discardText }}
-    </button>
+<c-alert
+  color="warning"
+  dismissible
+  visible="true"
+  class="shadow-sm"
+  role="alert"
+>
+  <div class="d-flex align-items-start">
+    <i class="fas fa-exclamation-triangle fa-lg text-warning me-2 mt-1"></i>
+    <div class="flex-fill">
+      <strong>{{ title }}</strong>
+      <p class="mb-3">{{ message }}</p>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <button cButton color="success" size="sm" (click)="onRecover.emit()">
+          <i class="fas fa-download me-1"></i> {{ recoverText }}
+        </button>
+
+        <button cButton color="secondary" size="sm" (click)="onIgnore.emit()">
+          <i class="fas fa-times me-1"></i> {{ ignoreText }}
+        </button>
+
+        <button cButton color="danger" size="sm" (click)="onDiscard.emit()">
+          <i class="fas fa-trash me-1"></i> {{ discardText }}
+        </button>
+      </div>
+    </div>
   </div>
-</div>
+</c-alert>

@@ -2,7 +2,8 @@ import { Component, EventEmitter, Output, Input } from '@angular/core';
 
 @Component({
   selector: 'app-data-recovery-notification',
-  templateUrl: './data-recovery-notification.component.html'
+  templateUrl: './data-recovery-notification.component.html',
+  styleUrls: ['./data-recovery-notification.component.scss']
 })
 export class DataRecoveryNotificationComponent {
   @Input() title = 'Datos recuperados';
