@@ -12,7 +12,6 @@ import { UserComponent } from './perfil/user.component';
 import { DashboardComponent } from './base/dashboard/dashboard.component';
 
 // Módulos externos
-import { IconModule } from '@coreui/icons-angular';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { ChartjsModule } from '@coreui/angular-chartjs';
 
@@ -38,7 +37,6 @@ const APP_CONTAINERS = [
     // Módulos específicos de Admin
     NgScrollbarModule,
     ChartjsModule,
-    IconModule,
   ],
 })
 export class AdminModule {}

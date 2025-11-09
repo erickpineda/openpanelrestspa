@@ -18,6 +18,7 @@ import {
   HeaderModule,
   ListGroupModule,
   ModalModule,
+  NavbarModule,
   NavModule,
   PaginationModule,
   ProgressModule,
@@ -34,6 +35,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BuscadorAvanzadoComponent } from './components/buscador-avanzado/buscador-avanzado.component';
 import { OpPaginationComponent } from './components/op-pagination/op-pagination.component';
 import { DataRecoveryNotificationComponent } from './components/data-recovery-notification/data-recovery-notification.component';
+import { IconModule } from '@coreui/icons-angular';
 
 @NgModule({
   imports: [
@@ -54,9 +56,11 @@ import { DataRecoveryNotificationComponent } from './components/data-recovery-no
     FormModule,
     GridModule,
     HeaderModule,
+    IconModule,
     ListGroupModule,
     ModalModule,
     NavModule,
+    NavbarModule,
     PaginationModule,
     ProgressModule,
     SidebarModule,
@@ -91,9 +95,11 @@ import { DataRecoveryNotificationComponent } from './components/data-recovery-no
     FormModule,
     GridModule,
     HeaderModule,
+    IconModule,
     ListGroupModule,
     ModalModule,
     NavModule,
+    NavbarModule,
     PaginationModule,
     ProgressModule,
     SidebarModule,
