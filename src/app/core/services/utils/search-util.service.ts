@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SearchOperation, getSimpleOperation, getDataOption } from '../_utils/search-operation.util';
+import { SearchOperation, getSimpleOperation, getDataOption } from '../../_utils/search-operation.util';
 
 @Injectable({
   providedIn: 'root'

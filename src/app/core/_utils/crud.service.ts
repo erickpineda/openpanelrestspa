@@ -1,7 +1,7 @@
 import { BaseService } from './base.service';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { TokenStorageService } from '../services/token-storage.service';
+import { TokenStorageService } from '../services/auth/token-storage.service';
 import { OpenpanelApiResponse } from '../models/openpanel-api-response.model';
 
 export abstract class CrudService<C> extends BaseService {

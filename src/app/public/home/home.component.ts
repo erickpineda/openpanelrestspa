@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Entrada } from '../../core/models/entrada.model';
 import { Categoria } from '../../core/models/categoria.model';
-import { EntradaService } from '../../core/services/entrada.service';
-import { LoadingService } from '../../core/services/loading.service';
+import { EntradaService } from '../../core/services/data/entrada.service';
+import { LoadingService } from '../../core/services/ui/loading.service';
 
 @Component({
   selector: 'app-home',

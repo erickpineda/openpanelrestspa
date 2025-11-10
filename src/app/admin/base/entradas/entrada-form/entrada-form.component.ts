@@ -14,7 +14,7 @@ import { Categoria } from '../../../../core/models/categoria.model';
 import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
 import { Entrada } from '../../../../core/models/entrada.model';
 import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
-import { TemporaryStorageService } from '../../../../core/services/temporary-storage.service';
+import { TemporaryStorageService } from '../../../../core/services/ui/temporary-storage.service';
 
 @Component({
   selector: 'app-entrada-form',

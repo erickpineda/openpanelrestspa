@@ -1,12 +1,12 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from 'rxjs';
-import { Entrada } from "../models/entrada.model";
-import { TokenStorageService } from "./token-storage.service";
-import { CrudService } from "../_utils/crud.service";
-import { CambiarEstadoEntradaReq } from "../models/cambiar-estado-entrada.model";
-import { RespuestaModelResp } from "../models/respuesta.model";
-import { OpenpanelApiResponse } from "../models/openpanel-api-response.model";
+import { Entrada } from "../../models/entrada.model";
+import { TokenStorageService } from "../auth/token-storage.service";
+import { CrudService } from "../../_utils/crud.service";
+import { CambiarEstadoEntradaReq } from "../../models/cambiar-estado-entrada.model";
+import { RespuestaModelResp } from "../../models/respuesta.model";
+import { OpenpanelApiResponse } from "../../models/openpanel-api-response.model";
 
 @Injectable({
   providedIn: "root"

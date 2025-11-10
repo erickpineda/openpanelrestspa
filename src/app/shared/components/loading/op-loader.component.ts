@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { LoadingService } from '../../../core/services/loading.service';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { LoadingService } from '../../../core/services/ui/loading.service';
 
 @Component({
   selector: 'app-op-loader',

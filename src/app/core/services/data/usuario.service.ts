@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Usuario } from "../models/usuario.model";
-import { CrudService } from "../_utils/crud.service";
-import { TokenStorageService } from "./token-storage.service";
+import { Usuario } from "../../models/usuario.model";
+import { CrudService } from "../../_utils/crud.service";
+import { TokenStorageService } from "../auth/token-storage.service";
 import { catchError, Observable } from "rxjs";
-import { PerfilResponse } from "../models/perfil-response.model";
-import { OpenpanelApiResponse } from "../models/openpanel-api-response.model";
+import { PerfilResponse } from "../../models/perfil-response.model";
+import { OpenpanelApiResponse } from "../../models/openpanel-api-response.model";
 
 @Injectable({
   providedIn: "root"

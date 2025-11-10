@@ -4,12 +4,11 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Categoria } from "../../../../core/models/categoria.model";
 import { Entrada } from "../../../../core/models/entrada.model";
-import { PaginaResponse } from "../../../../core/models/pagina-response.model";
 import { PerfilResponse } from "../../../../core/models/perfil-response.model";
-import { CategoriaService } from "../../../../core/services/categoria.service";
-import { EntradaService } from "../../../../core/services/entrada.service";
-import { TokenStorageService } from "../../../../core/services/token-storage.service";
-import { UsuarioService } from "../../../../core/services/usuario.service";
+import { CategoriaService } from "../../../../core/services/data/categoria.service";
+import { EntradaService } from "../../../../core/services/data/entrada.service";
+import { TokenStorageService } from "../../../../core/services/auth/token-storage.service";
+import { UsuarioService } from "../../../../core/services/data/usuario.service";
 import { OpenpanelApiResponse } from "../../../../core/models/openpanel-api-response.model";
 import { CommonFunctionalityService } from "../../../../shared/services/common-functionality.service";
 

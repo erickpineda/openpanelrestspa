@@ -1,9 +1,9 @@
 // nav-bar-public.component.ts
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { TokenStorageService } from '../../core/services/token-storage.service';
-import { AuthService } from '../../core/services/auth.service';
-import { AuthSyncService } from '../../core/services/auth-sync.service';
+import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
+import { AuthService } from '../../core/services/auth/auth.service';
+import { TokenStorageService } from '../../core/services/auth/token-storage.service';
 
 @Component({
   selector: 'app-nav-bar-public',

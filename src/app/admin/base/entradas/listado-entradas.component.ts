@@ -1,13 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
-import { EntradaService } from '../../../core/services/entrada.service';
+import { EntradaService } from '../../../core/services/data/entrada.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
-import { SearchUtilService } from '../../../core/services/search-util.service';
+import { SearchUtilService } from '../../../core/services/utils/search-util.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { LoadingService } from '../../../core/services/loading.service';
-import { BatchLoadingService } from '../../../core/services/batch-loading.service';
+import { ToastService } from '../../../core/services/ui/toast.service';
+import { BatchLoadingService } from '../../../core/services/ui/batch-loading.service';
 
 @Component({
   selector: 'app-listado-entradas',

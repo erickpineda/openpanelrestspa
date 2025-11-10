@@ -2,15 +2,15 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { Etiqueta } from "../models/etiqueta.model";
-import { CrudService } from "../_utils/crud.service";
-import { TokenStorageService } from "./token-storage.service";
+import { Comentario } from "../../models/comentario.model";
+import { CrudService } from "../../_utils/crud.service";
+import { TokenStorageService } from "../auth/token-storage.service";
 
 @Injectable({
   providedIn: "root"
 })
-export class EtiquetaService extends CrudService<Etiqueta> {
-  protected resource = '/etiquetas';
+export class ComentarioService extends CrudService<Comentario> {
+  protected resource = '/comentarios';
 
   constructor(
     protected override http: HttpClient,

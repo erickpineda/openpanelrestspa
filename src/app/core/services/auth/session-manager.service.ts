@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, Observable } from 'rxjs';
 import { TokenStorageService } from './token-storage.service';
-import { UnsavedWorkService } from './unsaved-work.service';
+import { UnsavedWorkService } from '../utils/unsaved-work.service';
 
 export interface SessionExpirationData {
   type: 'LOGOUT' | 'SESSION_EXPIRED' | 'ANOTHER_DEVICE';

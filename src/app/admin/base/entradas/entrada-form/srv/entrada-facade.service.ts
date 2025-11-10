@@ -2,9 +2,9 @@
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable, map } from 'rxjs';
 import { firstValueFrom } from 'rxjs';
-import { EntradaService } from '../../../../../core/services/entrada.service';
-import { CategoriaService } from '../../../../../core/services/categoria.service';
-import { UsuarioService } from '../../../../../core/services/usuario.service';
+import { EntradaService } from '../../../../../core/services/data/entrada.service';
+import { CategoriaService } from '../../../../../core/services/data/categoria.service';
+import { UsuarioService } from '../../../../../core/services/data/usuario.service';
 import { OpenpanelApiResponse } from '../../../../../core/models/openpanel-api-response.model';
 
 @Injectable({

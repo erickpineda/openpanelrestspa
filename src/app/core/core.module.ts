@@ -3,22 +3,22 @@ import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 // Servicios
-import { AuthService } from './services/auth.service';
-import { TokenStorageService } from './services/token-storage.service';
-import { LoadingService } from './services/loading.service';
-import { TemporaryStorageService } from './services/temporary-storage.service';
-import { SessionManagerService } from './services/session-manager.service';
-import { UnsavedWorkService } from './services/unsaved-work.service';
-import { SearchUtilService } from './services/search-util.service';
-import { EntradaService } from './services/entrada.service';
-import { UsuarioService } from './services/usuario.service';
+import { AuthService } from './services/auth/auth.service';
+import { TokenStorageService } from './services/auth/token-storage.service';
+import { LoadingService } from './services/ui/loading.service';
+import { TemporaryStorageService } from './services/ui/temporary-storage.service';
+import { SessionManagerService } from './services/auth/session-manager.service';
+import { UnsavedWorkService } from './services/utils/unsaved-work.service';
+import { SearchUtilService } from './services/utils/search-util.service';
+import { EntradaService } from './services/data/entrada.service';
+import { UsuarioService } from './services/data/usuario.service';
 
 // Interceptors
 import { AuthInterceptor } from './interceptor/auth.interceptor';
 import { ErrorInterceptor } from './interceptor/error.interceptor';
 import { NetworkInterceptor } from './interceptor/network.interceptor';
 import { GlobalErrorHandlerService } from './errors/global-error/global-error-handler.service';
-import { BatchLoadingService } from './services/batch-loading.service';
+import { BatchLoadingService } from './services/ui/batch-loading.service';
 
 @NgModule({
   imports: [

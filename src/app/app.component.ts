@@ -1,6 +1,6 @@
 // app.component.ts
 import { Component, OnInit } from '@angular/core';
-import { AuthSyncService } from './core/services/auth-sync.service';
+import { AuthSyncService } from './core/services/auth/auth-sync.service';
 
 @Component({
   selector: 'app-root',

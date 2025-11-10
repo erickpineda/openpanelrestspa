@@ -1,9 +1,9 @@
 // unsaved-work-modal.component.ts
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { SessionManagerService, SessionExpirationData } from '../../core/services/session-manager.service';
-import { UnsavedWorkService } from '../services/unsaved-work.service';
-import { TemporaryStorageService } from '../../core/services/temporary-storage.service';
+import { SessionManagerService, SessionExpirationData } from '../../core/services/auth/session-manager.service';
+import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
+import { TemporaryStorageService } from '../../core/services/ui/temporary-storage.service';
 
 @Component({
   selector: 'app-unsaved-work-modal',

@@ -1,8 +1,8 @@
 // auth-sync.service.ts
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { TokenStorageService } from './token-storage.service';
 import { SessionManagerService } from './session-manager.service';
+import { TokenStorageService } from './token-storage.service';
 
 @Injectable({
   providedIn: 'root'

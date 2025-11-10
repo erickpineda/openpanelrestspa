@@ -1,5 +1,5 @@
 import { Directive, ElementRef, OnInit, OnDestroy, Input } from '@angular/core';
-import { UnsavedWorkService } from '../services/unsaved-work.service';
+import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
 
 @Directive({
   selector: '[appUnsavedWork]'

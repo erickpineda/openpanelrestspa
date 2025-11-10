@@ -1,8 +1,8 @@
 // auth.guard.ts
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
-import { TokenStorageService } from '../services/token-storage.service';
-import { AuthSyncService } from '../services/auth-sync.service';
+import { TokenStorageService } from '../services/auth/token-storage.service';
+import { AuthSyncService } from '../services/auth/auth-sync.service';
 
 @Injectable({
   providedIn: 'root'

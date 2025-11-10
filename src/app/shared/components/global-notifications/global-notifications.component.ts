@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NotificationService, Notification } from '../../../core/services/notification.service';
+import { NotificationService, NotificationOptions } from '../../../core/services/ui/notification.service';
 
 @Component({
   selector: 'app-global-notifications',
@@ -21,7 +21,7 @@ import { NotificationService, Notification } from '../../../core/services/notifi
   `
 })
 export class GlobalNotificationsComponent implements OnInit {
-  notifications: Notification[] = [];
+  notifications: NotificationOptions[] = [];
 
   constructor(private notificationService: NotificationService) {}
 
@@ -41,7 +41,7 @@ export class GlobalNotificationsComponent implements OnInit {
     return colors[type] || 'info';
   }
 
-  removeNotification(notification: Notification): void {
+  removeNotification(notification: NotificationOptions): void {
     this.notifications = this.notifications.filter(n => n !== notification);
   }
 }

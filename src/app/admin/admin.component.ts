@@ -6,8 +6,8 @@ import { delay } from 'rxjs';
 
 import { iconSubset } from '../shared/components/icons/icon-subset';
 import { navItems } from './default-layout/_nav';
-import { LoadingService } from '../core/services/loading.service';
-import { TemporaryStorageService } from '../core/services/temporary-storage.service';
+import { LoadingService } from '../core/services/ui/loading.service';
+import { TemporaryStorageService } from '../core/services/ui/temporary-storage.service';
 
 // ... imports existentes
 

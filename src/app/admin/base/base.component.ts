@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { delay } from 'rxjs';
-import { LoadingService } from '../../core/services/loading.service';
+import { LoadingService } from '../../core/services/ui/loading.service';
 
 @Component({
   selector: 'app-base',

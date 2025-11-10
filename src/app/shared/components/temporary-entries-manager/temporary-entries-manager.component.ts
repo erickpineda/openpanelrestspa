@@ -1,7 +1,7 @@
 // temporary-entries-manager.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { TemporaryEntry, TemporaryStorageService } from '../../../core/services/temporary-storage.service';
+import { TemporaryEntry, TemporaryStorageService } from '../../../core/services/ui/temporary-storage.service';
 
 @Component({
   selector: 'app-temporary-entries-manager',

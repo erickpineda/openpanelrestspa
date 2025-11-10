@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { Usuario } from '../models/usuario.model';
+import { Usuario } from '../../models/usuario.model';
 import { TokenStorageService } from './token-storage.service';
-import { environment } from '../../../environments/environment.dev.es';
-import { OPConstants } from '../../shared/constants/op-global.constants';
+import { environment } from '../../../../environments/environment.dev.es';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 import { AuthSyncService } from './auth-sync.service';
 
 const httpOptions = {

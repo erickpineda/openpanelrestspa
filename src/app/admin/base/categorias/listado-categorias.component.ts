@@ -2,9 +2,9 @@ import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { Categoria } from "../../../core/models/categoria.model";
-import { CategoriaService } from "../../../core/services/categoria.service";
-import { TokenStorageService } from "../../../core/services/token-storage.service";
-import { UsuarioService } from "../../../core/services/usuario.service";
+import { CategoriaService } from "../../../core/services/data/categoria.service";
+import { TokenStorageService } from "../../../core/services/auth/token-storage.service";
+import { UsuarioService } from "../../../core/services/data/usuario.service";
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-response.model";
 

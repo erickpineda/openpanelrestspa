@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { ToastMessage } from '../models/toast.model';
+import { ToastMessage } from '../../models/toast.model';
 
 type TimerRecord = {
   timeoutId?: any;

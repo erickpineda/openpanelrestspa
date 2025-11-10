@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { EntradaService } from '../../../core/services/entrada.service';
-import { UsuarioService } from '../../../core/services/usuario.service';
+import { EntradaService } from '../../../core/services/data/entrada.service';
+import { UsuarioService } from '../../../core/services/data/usuario.service';
 import { Subscription } from 'rxjs';
 
 @Component({

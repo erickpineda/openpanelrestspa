@@ -7,7 +7,7 @@ import {
 } from '@angular/common/http';
 import { Observable, of, timer } from 'rxjs';
 import { finalize, delay, switchMap } from 'rxjs/operators';
-import { LoadingService } from '../services/loading.service';
+import { LoadingService } from '../services/ui/loading.service';
 
 @Injectable()
 export class NetworkInterceptor implements HttpInterceptor {

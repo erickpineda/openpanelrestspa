@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { cilUser, cilLockLocked } from '@coreui/icons';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { TokenStorageService } from '../../core/services/token-storage.service';
+import { AuthService } from '../../core/services/auth/auth.service';
+import { TokenStorageService } from '../../core/services/auth/token-storage.service';
 import { CommonFunctionalityService } from '../../shared/services/common-functionality.service';
-import { AuthSyncService } from '../../core/services/auth-sync.service';
+import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
 
 @Component({
   selector: 'app-login',

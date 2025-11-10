@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { SessionManagerService, SessionExpirationData } from '../../core/services/session-manager.service';
+import { SessionManagerService, SessionExpirationData } from '../../core/services/auth/session-manager.service';
 
 @Component({
   selector: 'app-session-expired-modal',

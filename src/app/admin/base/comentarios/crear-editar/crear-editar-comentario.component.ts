@@ -5,10 +5,10 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { Comentario } from "../../../../core/models/comentario.model";
 import { Entrada } from "../../../../core/models/entrada.model";
 import { Usuario } from "../../../../core/models/usuario.model";
-import { ComentarioService } from "../../../../core/services/comentario.service";
-import { EntradaService } from "../../../../core/services/entrada.service";
-import { TokenStorageService } from "../../../../core/services/token-storage.service";
-import { UsuarioService } from "../../../../core/services/usuario.service";
+import { ComentarioService } from "../../../../core/services/data/comentario.service";
+import { EntradaService } from "../../../../core/services/data/entrada.service";
+import { TokenStorageService } from "../../../../core/services/auth/token-storage.service";
+import { UsuarioService } from "../../../../core/services/data/usuario.service";
 import { OpenpanelApiResponse } from "../../../../core/models/openpanel-api-response.model";
 import { CommonFunctionalityService } from "../../../../shared/services/common-functionality.service";
 
