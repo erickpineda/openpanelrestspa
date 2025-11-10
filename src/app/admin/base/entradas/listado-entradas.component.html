@@ -74,10 +74,10 @@
       </form>
     </div>-->
 
-  <button cButton color="primary" disabled *ngIf="loading">
-    <c-spinner aria-hidden="true" size="sm"></c-spinner>
-    Cargando datos...
-  </button>
+    <button cButton color="primary" disabled *ngIf="loading">
+      <c-spinner aria-hidden="true" size="sm"></c-spinner>
+      Cargando datos...
+    </button>
 
     <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length >= 0">
       <thead cTableColor="dark">

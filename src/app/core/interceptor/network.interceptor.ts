@@ -3,40 +3,59 @@ import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
-  HttpInterceptor,
+  HttpInterceptor
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { Observable, of, timer } from 'rxjs';
+import { finalize, delay, switchMap } from 'rxjs/operators';
 import { LoadingService } from '../services/loading.service';
 
 @Injectable()
 export class NetworkInterceptor implements HttpInterceptor {
+  private excludedUrls = [
+    'assets/',
+    'i18n/'
+  ];
 
-  totalRequests = 0;
-  requestsCompleted = 0;
+  private artificialDelay = true;
+  private delayMs = 0;
+  private quickRequestThreshold = 300; // Peticiones menores a 300ms no activan loader
 
-  constructor(private loader: LoadingService) { }
+  constructor(private loadingService: LoadingService) {}
 
-  intercept(
-    request: HttpRequest<unknown>,
-    next: HttpHandler
-  ): Observable<HttpEvent<unknown>> {
-    this.loader.setLoading(true, request.url);
-    this.loader.show();
-    this.totalRequests++;
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    const shouldSkip = this.excludedUrls.some(url => request.url.includes(url));
+    
+    if (shouldSkip) {
+      return next.handle(request);
+    }
 
-    return next.handle(request).pipe(
+    const requestStartTime = Date.now();
+    let showLoader = false;
+    let loaderTimeout: any;
+
+    // Programar mostrar loader después del threshold
+    loaderTimeout = setTimeout(() => {
+      showLoader = true;
+      this.loadingService.setLoading(true, request.url);
+    }, this.quickRequestThreshold);
+
+    let observable = next.handle(request);
+    
+    if (this.artificialDelay) {
+      observable = observable.pipe(delay(this.delayMs));
+    }
+
+    return observable.pipe(
       finalize(() => {
-
-        this.requestsCompleted++;
-
-        //console.log(this.requestsCompleted, this.totalRequests);
-
-        if (this.requestsCompleted === this.totalRequests) {
-          this.loader.hide(); this.loader.setLoading(false, request.url);
-          this.totalRequests = 0;
-          this.requestsCompleted = 0;
+        clearTimeout(loaderTimeout);
+        
+        const requestDuration = Date.now() - requestStartTime;
+        
+        if (showLoader || requestDuration >= this.quickRequestThreshold) {
+          // Si se mostró el loader o la petición fue lenta, ocultarlo
+          this.loadingService.setLoading(false, request.url);
         }
+        // Si fue una petición rápida y no se mostró el loader, no hacer nada
       })
     );
   }

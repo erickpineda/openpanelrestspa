@@ -40,6 +40,7 @@ import { TemporaryEntriesManagerComponent } from './components/temporary-entries
 import { OpLoaderComponent } from './components/loading/op-loader.component';
 import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
 import { ToastsContainerComponent } from './components/op-toast/toasts-container.component';
+import { InlineLoaderComponent } from './components/loading/inline-loader.component';
 
 @NgModule({
   imports: [
@@ -82,7 +83,8 @@ import { ToastsContainerComponent } from './components/op-toast/toasts-container
     TemporaryEntriesManagerComponent,
     OpLoaderComponent,
     ConfirmationModalComponent,
-    ToastsContainerComponent
+    ToastsContainerComponent,
+    InlineLoaderComponent
   ],
   exports: [
     // Módulos Angular
@@ -125,7 +127,8 @@ import { ToastsContainerComponent } from './components/op-toast/toasts-container
     TemporaryEntriesManagerComponent,
     OpLoaderComponent,
     ConfirmationModalComponent,
-    ToastsContainerComponent
+    ToastsContainerComponent,
+    InlineLoaderComponent
   ],
 })
 export class SharedOPModule {}

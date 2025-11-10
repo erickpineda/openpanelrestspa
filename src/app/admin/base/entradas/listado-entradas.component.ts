@@ -6,6 +6,7 @@ import { CommonFunctionalityService } from '../../../shared/services/common-func
 import { SearchUtilService } from '../../../core/services/search-util.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -38,7 +39,8 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     private entradaService: EntradaService,
     private searchUtilService: SearchUtilService,
     private busquedaService: BusquedaService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private loadingService: LoadingService
   ) {}
 
   ngOnInit(): void {

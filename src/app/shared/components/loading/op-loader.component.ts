@@ -1,34 +1,38 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { LoadingService } from '../../../core/services/loading.service';
+import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-op-loader',
-  template: `
-    <div *ngIf="loading" class="loading-overlay">
-      <div class="loading-spinner">
-        <c-spinner variant="grow"></c-spinner>
-        <p class="mt-2">{{ message }}</p>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    .loading-spinner {
-      text-align: center;
-    }
-  `]
+  templateUrl: './op-loader.component.html',
+  styleUrls: ['./op-loader.component.scss']
 })
-export class OpLoaderComponent {
-  @Input() loading = false;
+export class OpLoaderComponent implements OnInit, OnDestroy {
   @Input() message = 'Cargando...';
+  @Input() overlay = true;
+  @Input() fullScreen = true;
+  @Input() debounceTime = 100; // Evita flickering en cambios rápidos
+  
+  loading = false;
+  private loadingSubscription!: Subscription;
+
+  constructor(private loadingService: LoadingService) {}
+
+  ngOnInit(): void {
+    this.loadingSubscription = this.loadingService.loading$
+      .pipe(
+        debounceTime(this.debounceTime),
+        distinctUntilChanged()
+      )
+      .subscribe((loading) => {
+        this.loading = loading;
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.loadingSubscription) {
+      this.loadingSubscription.unsubscribe();
+    }
+  }
 }
