@@ -5,7 +5,7 @@ import { EntradaService } from '../../../core/services/entrada.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 import { SearchUtilService } from '../../../core/services/search-util.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
-import { ToastService } from '../../../core/op-toast/toast.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-listado-entradas',

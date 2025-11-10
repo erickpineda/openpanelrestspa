@@ -37,6 +37,9 @@ import { OpPaginationComponent } from './components/op-pagination/op-pagination.
 import { DataRecoveryNotificationComponent } from './components/data-recovery-notification/data-recovery-notification.component';
 import { IconModule } from '@coreui/icons-angular';
 import { TemporaryEntriesManagerComponent } from './components/temporary-entries-manager/temporary-entries-manager.component';
+import { OpLoaderComponent } from './components/loading/op-loader.component';
+import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
+import { ToastsContainerComponent } from './components/op-toast/toasts-container.component';
 
 @NgModule({
   imports: [
@@ -76,7 +79,10 @@ import { TemporaryEntriesManagerComponent } from './components/temporary-entries
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
     DataRecoveryNotificationComponent, // ✅ Agregado aquí
-    TemporaryEntriesManagerComponent
+    TemporaryEntriesManagerComponent,
+    OpLoaderComponent,
+    ConfirmationModalComponent,
+    ToastsContainerComponent
   ],
   exports: [
     // Módulos Angular
@@ -116,7 +122,10 @@ import { TemporaryEntriesManagerComponent } from './components/temporary-entries
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
     DataRecoveryNotificationComponent, // ✅ Exportado aquí
-    TemporaryEntriesManagerComponent
+    TemporaryEntriesManagerComponent,
+    OpLoaderComponent,
+    ConfirmationModalComponent,
+    ToastsContainerComponent
   ],
 })
 export class SharedOPModule {}

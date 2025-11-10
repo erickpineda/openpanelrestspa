@@ -15,11 +15,13 @@ import { NavBarPublicComponent } from './nav-bar-public/nav-bar-public.component
 // Módulos externos
 import { IconModule } from '@coreui/icons-angular';
 import { SharedOPModule } from '../shared/shared.module';
+import { CoreModule } from '../core/core.module';
 
 @NgModule({
   imports: [
     PublicRoutingModule,
 
+    CoreModule,
     // ✅ Shared Module
     SharedOPModule,
 

@@ -2,7 +2,7 @@ import { ErrorHandler, Injectable, Injector } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
-import { ToastService } from '../../op-toast/toast.service';
+import { ToastService } from '../../services/toast.service';
 
 @Injectable({
   providedIn: 'root'

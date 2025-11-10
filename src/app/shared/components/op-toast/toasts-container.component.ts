@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ToastService } from './toast.service'; // ajusta ruta
-import { ToastMessage } from './toast.model';   // ajusta ruta
+import { ToastService } from '../../../core/services/toast.service'; // ajusta ruta
+import { ToastMessage } from '../../../core/models/toast.model';   // ajusta ruta
 
 @Component({
   selector: 'app-toasts-container',
