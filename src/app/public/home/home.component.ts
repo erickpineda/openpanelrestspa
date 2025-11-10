@@ -10,8 +10,6 @@ import { LoadingService } from '../../core/services/ui/loading.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  loading$: any;
-  loading: boolean = false;
   cargaFinalizada: boolean = false;
   noHayEntradas: boolean = true;
   errorMsg: string = '';
@@ -28,8 +26,6 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loading$ = this.loader.loading$;
-    this.listenToLoading();
     this.obtenerListaEntradas()
       .then((listaRes: Entrada[]) => {
         listaRes.forEach((entradaRes) => {
@@ -64,16 +60,6 @@ export class HomeComponent implements OnInit {
           }
         });
     });
-  }
-
-  listenToLoading(): void {
-    this.loader.loadingSub
-      .subscribe((loading) => {
-        this.loading = loading;
-        if (!loading) {
-          this.cargaFinalizada = true;
-        }
-      });
   }
 
   refreshEntradas() {

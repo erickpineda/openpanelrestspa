@@ -1,5 +1,5 @@
-import { EventEmitter, OnInit, OnDestroy } from "@angular/core";
-import { FormGroup, UntypedFormGroup } from "@angular/forms";
+import { Component, Output, EventEmitter, OnInit, OnDestroy } from "@angular/core";
+import { FormGroup } from "@angular/forms";
 import { Subject } from "rxjs";
 
 @Component({ template: '' })
@@ -24,9 +24,7 @@ export abstract class BaseFormComponent<T> implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  protected onInit(): void {
-    // Para override en componentes hijos
-  }
+  protected onInit(): void { }
 
   onSubmit(): void {
     if (this.form.valid && !this.loading) {
@@ -53,13 +51,4 @@ export abstract class BaseFormComponent<T> implements OnInit, OnDestroy {
       }
     });
   }
-}
-
-function Component(arg0: { template: string; }): (target: typeof BaseFormComponent, context: ClassDecoratorContext<typeof BaseFormComponent>) => void | typeof BaseFormComponent {
-  throw new Error("Function not implemented.");
-}
-
-
-function Output(): (target: undefined, context: ClassFieldDecoratorContext<BaseFormComponent<T>, EventEmitter<T>> & { name: "submitForm"; private: false; static: false; }) => void | ((this: BaseFormComponent<...>, value: EventEmitter<...>) => EventEmitter<...>) {
-  throw new Error("Function not implemented.");
 }

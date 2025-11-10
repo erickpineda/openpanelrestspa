@@ -6,7 +6,6 @@ import { CommonFunctionalityService } from '../../../shared/services/common-func
 import { SearchUtilService } from '../../../core/services/utils/search-util.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 import { ToastService } from '../../../core/services/ui/toast.service';
-import { BatchLoadingService } from '../../../core/services/ui/batch-loading.service';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -23,8 +22,6 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
 
   public visible = false;
   public toastVisible = false;
-  public loading: boolean = false;
-
   private destroy$ = new Subject<void>();
 
   campoSeleccionado: string = '';
@@ -34,28 +31,20 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
 
   public definiciones: any;
 
-  private currentBatchId?: number;
-
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
     private searchUtilService: SearchUtilService,
     private busquedaService: BusquedaService,
     private toastService: ToastService,
-    private batchLoadingService: BatchLoadingService,
   ) {}
 
   ngOnInit(): void {
-    this.currentBatchId = this.batchLoadingService.startBatch();
-    try {
-      this.cargarDefinicionesBuscador();
+    this.cargarDefinicionesBuscador();
       this.busquedaService.iniciarBusqueda(
         (term) => this.realizarBusquedaEntradas(term),
         (response) => this.procesarResultadosBusqueda(response)
       );
-    } finally {
-      this.batchLoadingService.endBatch(this.currentBatchId!);
-    }
   }
 
   ngOnDestroy(): void {
@@ -80,14 +69,12 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     this.operacionSeleccionada = filtro.operacion;
     this.valorBusqueda = filtro.valor;
     this.currentPage = 0;
-    this.mostrarLoader();
     if (this.campoSeleccionado && this.operacionSeleccionada) {
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
   }
 
   private procesarResultadosBusqueda(response: any) {
-    this.ocultarLoader();
     if (response.result?.success) {
       this.listaEntradas = response.data.elements || [];
       this.totalPages = response.data.totalPages;
@@ -104,7 +91,6 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
   }
 
   private cargarDefinicionesBuscador(): void {
-    this.mostrarLoader();
     this.entradaService.obtenerDefinicionesBuscador().subscribe({
       next: (response) => {
         if (response.result?.success) {
@@ -123,11 +109,9 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
             this.busquedaService.triggerBusqueda(this.valorBusqueda);
           }
         }
-        this.ocultarLoader();
       },
       error: (error) => {
         console.error('Error al cargar definiciones del buscador:', error);
-        this.ocultarLoader();
         this.msgToast(error.error?.error?.message);
       }
     });
@@ -189,14 +173,6 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
 
   visibleModal(event: any) {
     this.visible = event;
-  }
-
-  private mostrarLoader(): void {
-    this.loading = true;
-  }
-
-  private ocultarLoader(): void {
-    this.loading = false;
   }
 
   public refrescarPagina(): void {

@@ -18,7 +18,7 @@ import { AuthInterceptor } from './interceptor/auth.interceptor';
 import { ErrorInterceptor } from './interceptor/error.interceptor';
 import { NetworkInterceptor } from './interceptor/network.interceptor';
 import { GlobalErrorHandlerService } from './errors/global-error/global-error-handler.service';
-import { BatchLoadingService } from './services/ui/batch-loading.service';
+import { LoggerService } from './services/logger.service';
 
 @NgModule({
   imports: [
@@ -38,7 +38,7 @@ import { BatchLoadingService } from './services/ui/batch-loading.service';
     SearchUtilService,
     EntradaService,
     UsuarioService,
-    BatchLoadingService,
+    LoggerService,
     
     // Interceptors
     // ✅ SOLO interceptors (los servicios ahora usan providedIn: 'root')

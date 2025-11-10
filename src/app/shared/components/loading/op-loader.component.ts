@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { LoadingService } from '../../../core/services/ui/loading.service';
 
 @Component({
@@ -12,7 +12,8 @@ export class OpLoaderComponent implements OnInit, OnDestroy {
   @Input() message = 'Cargando...';
   @Input() overlay = true;
   @Input() fullScreen = true;
-  @Input() debounceTime = 100; // Evita flickering en cambios rápidos
+  @Input() type: 'global' | 'any' = 'global'; // 'global' solo HTTP, 'any' incluye locales
+  @Input() debounceTime = 100;
   
   loading = false;
   private loadingSubscription!: Subscription;
@@ -20,7 +21,11 @@ export class OpLoaderComponent implements OnInit, OnDestroy {
   constructor(private loadingService: LoadingService) {}
 
   ngOnInit(): void {
-    this.loadingSubscription = this.loadingService.loading$
+    const loading$ = this.type === 'global' 
+      ? this.loadingService.globalLoading$
+      : this.loadingService.state$.pipe(map(state => state.global || this.loadingService.isAnyLocalLoading()));
+
+    this.loadingSubscription = loading$
       .pipe(
         debounceTime(this.debounceTime),
         distinctUntilChanged()
