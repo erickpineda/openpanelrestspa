@@ -8,6 +8,7 @@ import { CrearEditarCategoria } from './categorias/crear-editar/crear-editar-cat
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
 import { CrearEntradaComponent } from './entradas/crear/crear-entrada.component';
 import { EditarEntradaComponent } from './entradas/editar/editar-entrada.component';
+import { TemporaryEntriesManagerComponent } from '../../shared/components/temporary-entries-manager/temporary-entries-manager.component';
 
 
 const routes: Routes = [
@@ -16,6 +17,7 @@ const routes: Routes = [
       {
         path: 'entradas', children: [
           { path: '', component: ListadoEntradasComponent },
+          { path: 'temporary-entries', component: TemporaryEntriesManagerComponent },
           { path: 'editar/:idEntrada', component: EditarEntradaComponent },
           { path: 'crear', component: CrearEntradaComponent },
         ]

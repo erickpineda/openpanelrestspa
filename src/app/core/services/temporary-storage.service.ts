@@ -2,10 +2,12 @@
 import { Injectable } from '@angular/core';
 
 export interface TemporaryEntry {
+  id: string; // ✅ NUEVO: ID único para cada entrada
   formData: any;
   timestamp: string;
-  formId: string;
-  attemptedSave: boolean;
+  formType: string; // ✅ NUEVO: Tipo de formulario (ej: 'entrada')
+  title?: string; // ✅ NUEVO: Título para mostrar al usuario
+  description?: string; // ✅ NUEVO: Descripción opcional
 }
 
 @Injectable({
@@ -17,25 +19,36 @@ export class TemporaryStorageService {
 
   constructor() { }
 
-  saveTemporaryEntry(formId: string, formData: any): void {
-    const entries = this.getTemporaryEntries();
-    
-    const temporaryEntry: TemporaryEntry = {
-      formData,
-      timestamp: new Date().toISOString(),
-      formId,
-      attemptedSave: true
-    };
-
-    entries[formId] = temporaryEntry;
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
-    
-    console.log('💾 Entrada guardada temporalmente:', formId);
+  // ✅ NUEVO: Generar ID único
+  private generateId(): string {
+    return `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  getTemporaryEntry(formId: string): TemporaryEntry | null {
+  // ✅ MODIFICADO: Ahora acepta un objeto completo de entrada temporal
+  saveTemporaryEntry(entry: Omit<TemporaryEntry, 'id'>): string {
     const entries = this.getTemporaryEntries();
-    return entries[formId] || null;
+    
+    const newEntry: TemporaryEntry = {
+      ...entry,
+      id: this.generateId()
+    };
+
+    entries[newEntry.id] = newEntry;
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
+    
+    console.log('💾 Entrada temporal guardada:', newEntry.id, newEntry.title);
+    return newEntry.id;
+  }
+
+  getTemporaryEntry(id: string): TemporaryEntry | null {
+    const entries = this.getTemporaryEntries();
+    return entries[id] || null;
+  }
+
+  // ✅ NUEVO: Obtener entradas por tipo
+  getTemporaryEntriesByType(formType: string): TemporaryEntry[] {
+    const entries = this.getTemporaryEntries();
+    return Object.values(entries).filter(entry => entry.formType === formType);
   }
 
   getAllTemporaryEntries(): TemporaryEntry[] {
@@ -43,16 +56,28 @@ export class TemporaryStorageService {
     return Object.values(entries);
   }
 
-  removeTemporaryEntry(formId: string): void {
+  removeTemporaryEntry(id: string): void {
     const entries = this.getTemporaryEntries();
-    delete entries[formId];
+    delete entries[id];
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
-    console.log('🧹 Entrada temporal removida:', formId);
+    console.log('🧹 Entrada temporal removida:', id);
   }
 
   clearAllTemporaryEntries(): void {
     localStorage.removeItem(this.STORAGE_KEY);
     console.log('🧹 Todas las entradas temporales limpiadas');
+  }
+
+  // ✅ NUEVO: Limpiar entradas por tipo
+  clearTemporaryEntriesByType(formType: string): void {
+    const entries = this.getTemporaryEntries();
+    Object.keys(entries).forEach(id => {
+      if (entries[id].formType === formType) {
+        delete entries[id];
+      }
+    });
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
+    console.log(`🧹 Entradas temporales de tipo ${formType} limpiadas`);
   }
 
   private getTemporaryEntries(): { [key: string]: TemporaryEntry } {

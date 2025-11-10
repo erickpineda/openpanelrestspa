@@ -69,14 +69,14 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   temporaryData: any = null;
   temporaryEntriesCount = 0;
 
+  // ✅ NUEVO: ID único para esta instancia de formulario
+  private currentTemporaryEntryId: string | null = null;
+
   constructor(private temporaryStorage: TemporaryStorageService) {}
 
   ngOnInit(): void {
-    window.addEventListener(
-      'saveUnsavedWork',
-      this.saveBeforeLogout.bind(this)
-    );
-
+    window.addEventListener('saveUnsavedWork', this.saveBeforeLogout.bind(this));
+    
     if (!this.estaEditando) {
       this.checkForTemporaryData();
     }
@@ -90,18 +90,48 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   }
 
   private checkForTemporaryData(): void {
-    const formId = 'unsaved-entrada-form';
-    this.temporaryData = this.temporaryStorage.getTemporaryEntry(formId);
+    // ✅ MODIFICADO: Obtener TODAS las entradas temporales de tipo 'entrada'
+    const temporaryEntries = this.temporaryStorage.getTemporaryEntriesByType('entrada');
+    
+    if (temporaryEntries.length > 0) {
+      console.log('📥 Entradas temporales encontradas:', temporaryEntries);
+      
+      // Si hay múltiples entradas, mostrar selector
+      if (temporaryEntries.length > 1) {
+        this.showMultipleEntriesNotification(temporaryEntries);
+      } else {
+        // Solo una entrada, mostrar notificación normal
+        this.temporaryData = temporaryEntries[0];
+        this.showRecoveryNotification = true;
+      }
+    }
+  }
 
-    if (this.temporaryData && !this.estaEditando) {
-      console.log(
-        '📥 Datos temporales encontrados en formulario:',
-        this.temporaryData
+  // ✅ NUEVO: Método para manejar múltiples entradas
+  private showMultipleEntriesNotification(entries: any[]): void {
+    // Aquí podrías implementar un modal más complejo que liste todas las entradas
+    console.log('Múltiples entradas temporales encontradas:', entries);
+    
+    // Por ahora, mostramos la más reciente y ofrecemos opción de ver todas
+    const mostRecent = entries.sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    )[0];
+    
+    this.temporaryData = mostRecent;
+    
+    setTimeout(() => {
+      const recoverMostRecent = confirm(
+        `Se encontraron ${entries.length} entradas no guardadas. ¿Recuperar la más reciente?\n\n` +
+        `Título: ${mostRecent.title}\n` +
+        `Fecha: ${new Date(mostRecent.timestamp).toLocaleString()}\n\n` +
+        `(Para ver todas las entradas, ve a la sección de administración)`
       );
       
-      // Mostrar la notificación elegante en lugar del confirm
-      this.showRecoveryNotification = true;
-    }
+      if (recoverMostRecent) {
+        this.recoverTemporaryData(mostRecent.formData);
+        this.temporaryStorage.removeTemporaryEntry(mostRecent.id);
+      }
+    }, 500);
   }
 
   // ✅ NUEVO: Métodos para manejar las acciones de la notificación
@@ -125,43 +155,39 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   private recoverTemporaryData(formData: any): void {
     try {
       console.log('🔄 Recuperando datos temporales...', formData);
-
+      
       // Actualizar el formulario con los datos temporales
       this.form.patchValue({
         titulo: formData.titulo || '',
         subtitulo: formData.subtitulo || '',
         contenido: formData.contenido || '',
         resumen: formData.resumen || '',
-        // ... otros campos
+        estadoEntrada: formData.estadoEntrada || null,
+        tipoEntrada: formData.tipoEntrada || null,
+        publicada: formData.publicada || false,
+        privado: formData.privado || false,
+        permitirComentario: formData.permitirComentario || false,
+        password: formData.password || ''
       });
 
       // Recuperar categorías si existen
       if (formData.categorias && Array.isArray(formData.categorias)) {
         const categoriasArray = this.categoriasArray();
         categoriasArray.clear();
-
+        
         formData.categorias.forEach((categoria: Categoria) => {
           categoriasArray.push(new FormControl(categoria));
         });
       }
-
-      // Recuperar estados booleanos
-      if (formData.publicada !== undefined) {
-        this.form.patchValue({ publicada: formData.publicada });
-      }
-      if (formData.privado !== undefined) {
-        this.form.patchValue({ privado: formData.privado });
-      }
-      if (formData.permitirComentario !== undefined) {
-        this.form.patchValue({
-          permitirComentario: formData.permitirComentario,
-        });
-      }
-
+      
       console.log('✅ Datos temporales recuperados correctamente');
-
+      
       // Limpiar datos temporales después de recuperarlos
-      this.temporaryStorage.removeTemporaryEntry('unsaved-entrada-form');
+      if (this.currentTemporaryEntryId) {
+        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
+        this.currentTemporaryEntryId = null;
+      }
+      
     } catch (error) {
       console.error('❌ Error al recuperar datos temporales:', error);
     }
@@ -175,26 +201,37 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   private saveBeforeLogout(): void {
     console.log('💾 Guardando entrada antes del logout...');
-
+    
     if (this.form.valid) {
-      // Primero intentar guardar normalmente
       this.onSubmit();
-
-      // Como fallback, guardar también temporalmente
-      this.saveToTemporaryStorage();
-    } else {
-      console.warn('⚠️ Formulario inválido, guardando temporalmente...');
-      this.saveToTemporaryStorage();
     }
+    
+    // ✅ MODIFICADO: Siempre guardar temporalmente, incluso si el formulario no es válido
+    this.saveToTemporaryStorage();
   }
 
   private saveToTemporaryStorage(): void {
     try {
-      const formId = 'unsaved-entrada-form';
       const formData = this.form.value;
+      
+      // ✅ NUEVO: Crear entrada temporal con metadatos
+      const temporaryEntry = {
+        formData: formData,
+        timestamp: new Date().toISOString(),
+        formType: 'entrada', // Tipo de formulario
+        title: formData.titulo || 'Entrada sin título', // Título para mostrar
+        description: `Creada: ${new Date().toLocaleString()}` // Descripción
+      };
 
-      this.temporaryStorage.saveTemporaryEntry(formId, formData);
-      console.log('✅ Datos guardados en almacenamiento temporal');
+      // Si ya existe una entrada temporal para este formulario, actualizarla
+      if (this.currentTemporaryEntryId) {
+        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
+      }
+
+      // Guardar nueva entrada temporal
+      this.currentTemporaryEntryId = this.temporaryStorage.saveTemporaryEntry(temporaryEntry);
+      
+      console.log('✅ Datos guardados en almacenamiento temporal con ID:', this.currentTemporaryEntryId);
     } catch (error) {
       console.error('❌ Error al guardar temporalmente:', error);
     }
@@ -202,21 +239,27 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   onSubmit() {
     if (!this.form) return;
-
+    
     if (this.form.valid) {
       console.log('💾 Intentando guardar entrada...');
       this.submitForm.emit(this.form.value as Entrada);
-
-      // Si se guarda exitosamente, limpiar datos temporales
-      this.temporaryStorage.removeTemporaryEntry('unsaved-entrada-form');
+      
+      // ✅ MODIFICADO: Limpiar entrada temporal específica al guardar exitosamente
+      if (this.currentTemporaryEntryId) {
+        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
+        this.currentTemporaryEntryId = null;
+      }
     } else {
       this.form.markAllAsTouched();
     }
   }
 
   onReset() {
-    // Limpiar datos temporales al cancelar
-    this.temporaryStorage.removeTemporaryEntry('unsaved-entrada-form');
+    // ✅ MODIFICADO: Limpiar entrada temporal específica al cancelar
+    if (this.currentTemporaryEntryId) {
+      this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
+      this.currentTemporaryEntryId = null;
+    }
     this.cancelar.emit();
   }
 

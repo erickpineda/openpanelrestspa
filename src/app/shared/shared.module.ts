@@ -36,6 +36,7 @@ import { BuscadorAvanzadoComponent } from './components/buscador-avanzado/buscad
 import { OpPaginationComponent } from './components/op-pagination/op-pagination.component';
 import { DataRecoveryNotificationComponent } from './components/data-recovery-notification/data-recovery-notification.component';
 import { IconModule } from '@coreui/icons-angular';
+import { TemporaryEntriesManagerComponent } from './components/temporary-entries-manager/temporary-entries-manager.component';
 
 @NgModule({
   imports: [
@@ -75,6 +76,7 @@ import { IconModule } from '@coreui/icons-angular';
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
     DataRecoveryNotificationComponent, // ✅ Agregado aquí
+    TemporaryEntriesManagerComponent
   ],
   exports: [
     // Módulos Angular
@@ -114,6 +116,7 @@ import { IconModule } from '@coreui/icons-angular';
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
     DataRecoveryNotificationComponent, // ✅ Exportado aquí
+    TemporaryEntriesManagerComponent
   ],
 })
 export class SharedOPModule {}

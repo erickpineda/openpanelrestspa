@@ -16,8 +16,29 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Entradas',
-    url: '/admin/control/entradas',
-    iconComponent: { name: 'cil-pencil' }
+    url: '/admin/control',
+    iconComponent: { name: 'cil-pencil' },
+    children: [
+      {
+        name: 'Listar',
+        url: '/admin/control/entradas',
+        icon: 'cil-save',
+        badge: {
+          color: 'warning',
+          text: ''
+        }
+      },
+      // ✅ NUEVO: Enlace al gestor de entradas temporales
+      {
+        name: 'Entradas Temporales',
+        url: '/admin/control/entradas/temporary-entries',
+        icon: 'cil-save',
+        badge: {
+          color: 'warning',
+          text: '!' // Se podría hacer dinámico mostrando el count
+        }
+      },
+    ]
   },
   {
     name: 'Páginas',
@@ -70,7 +91,7 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-people' },
     children: [
       {
-        name: 'Todos',
+        name: 'Listar',
         url: '/admin/gestion/usuarios'
       },
       {
