@@ -33,18 +33,19 @@
 
 <!-- Main content -->
 <div class="wrapper d-flex flex-column min-vh-100 bg-light dark:bg-transparent">
-  <!-- ✅ NUEVO: Notificación global de recuperación -->
-  <!-- Notificación de recuperación de datos -->
-  <c-container *ngIf="showRecoveryNotification" breakpoint="lg" class="mt-3">
+  <!-- ✅ NOTIFICACIÓN GLOBAL MEJORADA -->
+  <div *ngIf="showGlobalRecoveryNotification" class="container mt-3">
     <app-data-recovery-notification
-      [title]="'Datos no guardados recuperados'"
-      [message]="'Tienes ' + recoveryData.length + ' entrada(s) en borrador de sesiones anteriores.'"
-      recoverText="Ver todas"
-      (onRecover)="onRecoverData()"
-      (onIgnore)="onIgnoreData()"
-      (onDiscard)="onDiscardData()">
+      title="📥 Entradas no guardadas"
+      [message]="'Tienes ' + temporaryEntriesCount + ' entrada(s) no guardada(s) de sesiones anteriores'"
+      recoverText="Ver entradas temporales"
+      ignoreText="Más tarde"
+      discardText="Descartar todas"
+      (onRecover)="onGlobalRecover()"
+      (onIgnore)="onGlobalIgnore()"
+      (onDiscard)="onGlobalDiscard()">
     </app-data-recovery-notification>
-  </c-container>
+  </div>
 
   <!-- Header -->
   <app-default-header

@@ -48,14 +48,13 @@ export class AdminComponent implements OnInit {
 
   private checkForTemporaryData(): void {
     const temporaryEntries = this.temporaryStorage.getAllTemporaryEntries();
-
-    if (temporaryEntries.length > 0) {
-      console.log(
-        '📥 Datos temporales encontrados en admin:',
-        temporaryEntries
-      );
-      this.recoveryData = temporaryEntries;
-      this.showRecoveryNotification = true;
+    this.temporaryEntriesCount = temporaryEntries.length;
+    
+    if (this.temporaryEntriesCount > 0) {
+      console.log('📥 Datos temporales encontrados en admin:', temporaryEntries);
+      
+      // ✅ MODIFICADO: Siempre mostrar notificación múltiple, incluso con una sola entrada
+      this.showGlobalRecoveryNotification = true;
     }
   }
 
@@ -64,14 +63,21 @@ export class AdminComponent implements OnInit {
     this.router.navigate(['/admin/control/entradas/entradas-temporales']);
   }
 
-  onIgnoreData(): void {
-    this.showRecoveryNotification = false;
-    // Solo ocultar, no hacer nada
+  // ✅ MODIFICADO: Siempre redirigir al listado de entradas temporales
+  onGlobalRecover(): void {
+    this.showGlobalRecoveryNotification = false;
+    this.router.navigate(['/admin/control/entradas/entradas-temporales']);
   }
 
-  onDiscardData(): void {
-    this.showRecoveryNotification = false;
+  onGlobalIgnore(): void {
+    this.showGlobalRecoveryNotification = false;
+    console.log('ℹ️ Usuario ignoró la notificación global de recuperación');
+  }
+
+  onGlobalDiscard(): void {
+    this.showGlobalRecoveryNotification = false;
     this.temporaryStorage.clearAllTemporaryEntries();
+    console.log('🗑️ Usuario descartó todos los datos temporales');
   }
 
   private listenToLoading(): void {

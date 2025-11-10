@@ -12,7 +12,7 @@
   </c-card-header>
 
   <c-card-body>
-    <!-- ✅ NOTIFICACIÓN PARA UNA SOLA ENTRADA -->
+    <!-- ✅ REVERTIMOS: Solo notificación individual -->
     <app-data-recovery-notification
       *ngIf="showRecoveryNotification"
       title="📥 Entrada recuperada"
@@ -25,18 +25,8 @@
       (onDiscard)="onDiscardData()">
     </app-data-recovery-notification>
 
-    <!-- ✅ NUEVO: NOTIFICACIÓN PARA MÚLTIPLES ENTRADAS -->
-    <app-data-recovery-notification
-      *ngIf="showMultipleRecoveryNotification"
-      title="📥 Múltiples entradas recuperadas"
-      [message]="'Se encontraron ' + multipleTemporaryEntries.length + ' entradas no guardadas'"
-      recoverText="Recuperar más reciente"
-      ignoreText="Ver todas"
-      discardText="Descartar todas"
-      (onRecover)="onRecoverMostRecent()"
-      (onIgnore)="onGoToManager()"
-      (onDiscard)="onDiscardMultiple()">
-    </app-data-recovery-notification>
+    <!-- ❌ ELIMINAMOS: La notificación múltiple ya no se usa aquí -->
+    <!-- <app-data-recovery-notification *ngIf="showMultipleRecoveryNotification" ...> -->
 
     <c-container fluid>
       <form cForm [formGroup]="form" novalidate (ngSubmit)="onSubmit()" appUnsavedWork="unsaved-entrada-form" class="needs-validation" (reset)="onReset()">
