@@ -16,7 +16,6 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Entradas',
-    url: '/admin/control',
     iconComponent: { name: 'cil-pencil' },
     children: [
       {

@@ -7,6 +7,7 @@ import { SearchUtilService } from '../../../core/services/search-util.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { LoadingService } from '../../../core/services/loading.service';
+import { BatchLoadingService } from '../../../core/services/batch-loading.service';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -34,21 +35,28 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
 
   public definiciones: any;
 
+  private currentBatchId?: number;
+
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
     private searchUtilService: SearchUtilService,
     private busquedaService: BusquedaService,
     private toastService: ToastService,
-    private loadingService: LoadingService
+    private batchLoadingService: BatchLoadingService,
   ) {}
 
   ngOnInit(): void {
-    this.cargarDefinicionesBuscador();
-    this.busquedaService.iniciarBusqueda(
-      (term) => this.realizarBusquedaEntradas(term),
-      (response) => this.procesarResultadosBusqueda(response)
-    );
+    this.currentBatchId = this.batchLoadingService.startBatch();
+    try {
+      this.cargarDefinicionesBuscador();
+      this.busquedaService.iniciarBusqueda(
+        (term) => this.realizarBusquedaEntradas(term),
+        (response) => this.procesarResultadosBusqueda(response)
+      );
+    } finally {
+      this.batchLoadingService.endBatch(this.currentBatchId!);
+    }
   }
 
   ngOnDestroy(): void {
