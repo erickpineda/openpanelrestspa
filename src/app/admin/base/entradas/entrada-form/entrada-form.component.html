@@ -12,19 +12,31 @@
   </c-card-header>
 
   <c-card-body>
-    <!-- ✅ NUEVO: Notificación de recuperación de datos -->
-     <div *ngIf="this.showRecoveryNotification" class="container mt-3">
-      <app-data-recovery-notification
-        title="📥 Datos pendientes"
-        message="Tienes {{this.temporaryData.length}} entrada(s) no guardada(s) de sesiones anteriores."
-        recoverText="Ver entrada"
-        ignoreText="Más tarde"
-        discardText="Eliminar todo"
-        (onRecover)="onRecoverData()"
-        (onIgnore)="onIgnoreData()"
-        (onDiscard)="onDiscardData()">
-      </app-data-recovery-notification>
-     </div>
+    <!-- ✅ NOTIFICACIÓN PARA UNA SOLA ENTRADA -->
+    <app-data-recovery-notification
+      *ngIf="showRecoveryNotification"
+      title="📥 Entrada recuperada"
+      [message]="'Se encontró una entrada no guardada: ' + (temporaryData?.title || 'Sin título')"
+      recoverText="Recuperar"
+      ignoreText="Ignorar"
+      discardText="Descartar"
+      (onRecover)="onRecoverData()"
+      (onIgnore)="onIgnoreData()"
+      (onDiscard)="onDiscardData()">
+    </app-data-recovery-notification>
+
+    <!-- ✅ NUEVO: NOTIFICACIÓN PARA MÚLTIPLES ENTRADAS -->
+    <app-data-recovery-notification
+      *ngIf="showMultipleRecoveryNotification"
+      title="📥 Múltiples entradas recuperadas"
+      [message]="'Se encontraron ' + multipleTemporaryEntries.length + ' entradas no guardadas'"
+      recoverText="Recuperar más reciente"
+      ignoreText="Ver todas"
+      discardText="Descartar todas"
+      (onRecover)="onRecoverMostRecent()"
+      (onIgnore)="onGoToManager()"
+      (onDiscard)="onDiscardMultiple()">
+    </app-data-recovery-notification>
 
     <c-container fluid>
       <form cForm [formGroup]="form" novalidate (ngSubmit)="onSubmit()" appUnsavedWork="unsaved-entrada-form" class="needs-validation" (reset)="onReset()">

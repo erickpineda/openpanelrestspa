@@ -8,13 +8,14 @@ import { LoadingService } from '../../core/services/loading.service';
 })
 export class BaseComponent implements OnInit {
 
-  loading$ = this.loader.loading$;
+  loading$: any;
   loading: boolean = false;
   cargaFinalizada: boolean = false;
 
   constructor(public loader: LoadingService) { }
 
   ngOnInit(): void {
+    this.loading$ = this.loader.loading$;
     this.listenToLoading();
   }
 

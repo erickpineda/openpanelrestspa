@@ -61,7 +61,7 @@ export class AdminComponent implements OnInit {
 
   onRecoverData(): void {
     this.showRecoveryNotification = false;
-    this.router.navigate(['/admin/control/entradas/crear']);
+    this.router.navigate(['/admin/control/entradas/entradas-temporales']);
   }
 
   onIgnoreData(): void {

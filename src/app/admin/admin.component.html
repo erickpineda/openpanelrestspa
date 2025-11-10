@@ -39,6 +39,7 @@
     <app-data-recovery-notification
       [title]="'Datos no guardados recuperados'"
       [message]="'Tienes ' + recoveryData.length + ' entrada(s) en borrador de sesiones anteriores.'"
+      recoverText="Ver todas"
       (onRecover)="onRecoverData()"
       (onIgnore)="onIgnoreData()"
       (onDiscard)="onDiscardData()">

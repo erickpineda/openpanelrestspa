@@ -8,6 +8,7 @@ import {
   OnChanges,
 } from '@angular/core';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { Router } from '@angular/router';
 import { UntypedFormGroup, FormArray, FormControl } from '@angular/forms';
 import { Categoria } from '../../../../core/models/categoria.model';
 import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
@@ -64,19 +65,27 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   public Editor = ClassicEditor;
   public estaEditando = false;
 
-  // ✅ NUEVO: Propiedad para controlar la visibilidad de la notificación
+  // ✅ NUEVO: Propiedades para controlar diferentes tipos de notificaciones
   showRecoveryNotification = false;
+  showMultipleRecoveryNotification = false;
   temporaryData: any = null;
-  temporaryEntriesCount = 0;
+  multipleTemporaryEntries: any[] = [];
 
   // ✅ NUEVO: ID único para esta instancia de formulario
   private currentTemporaryEntryId: string | null = null;
 
-  constructor(private temporaryStorage: TemporaryStorageService) {}
+  constructor(
+    private temporaryStorage: TemporaryStorageService,
+    private router: Router) {
+
+    }
 
   ngOnInit(): void {
     window.addEventListener('saveUnsavedWork', this.saveBeforeLogout.bind(this));
     
+    // ✅ NUEVO: Verificar si venimos de recuperar una entrada temporal
+    this.checkNavigationState();
+
     if (!this.estaEditando) {
       this.checkForTemporaryData();
     }
@@ -89,49 +98,73 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     );
   }
 
+  private checkNavigationState(): void {
+    // Obtener el estado de la navegación actual
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras?.state as any;
+    
+    if (state?.temporaryEntry && state?.recoverData) {
+      console.log('🔄 Recibiendo entrada temporal desde navegación:', state.temporaryEntry);
+      
+      // Recuperar los datos en el formulario
+      this.recoverTemporaryData(state.temporaryEntry.formData);
+      
+      // Eliminar la entrada temporal del almacenamiento
+      this.temporaryStorage.removeTemporaryEntry(state.temporaryEntry.id);
+      
+      // Limpiar el estado de navegación para evitar recuperación múltiple
+      this.router.navigate([], {
+        replaceUrl: true,
+        state: [null]
+      });
+    }
+  }
+
   private checkForTemporaryData(): void {
-    // ✅ MODIFICADO: Obtener TODAS las entradas temporales de tipo 'entrada'
     const temporaryEntries = this.temporaryStorage.getTemporaryEntriesByType('entrada');
     
     if (temporaryEntries.length > 0) {
       console.log('📥 Entradas temporales encontradas:', temporaryEntries);
       
-      // Si hay múltiples entradas, mostrar selector
       if (temporaryEntries.length > 1) {
-        this.showMultipleEntriesNotification(temporaryEntries);
+        // ✅ CAMBIADO: Usar notificación elegante en lugar de confirm
+        this.multipleTemporaryEntries = temporaryEntries;
+        this.showMultipleRecoveryNotification = true;
       } else {
-        // Solo una entrada, mostrar notificación normal
+        // Una sola entrada
         this.temporaryData = temporaryEntries[0];
         this.showRecoveryNotification = true;
       }
     }
   }
 
-  // ✅ NUEVO: Método para manejar múltiples entradas
-  private showMultipleEntriesNotification(entries: any[]): void {
-    // Aquí podrías implementar un modal más complejo que liste todas las entradas
-    console.log('Múltiples entradas temporales encontradas:', entries);
-    
-    // Por ahora, mostramos la más reciente y ofrecemos opción de ver todas
-    const mostRecent = entries.sort((a, b) => 
+  // ✅ NUEVO: Métodos para manejar múltiples entradas con notificación elegante
+  onRecoverMostRecent(): void {
+    this.showMultipleRecoveryNotification = false;
+    const mostRecent = this.multipleTemporaryEntries.sort((a, b) => 
       new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     )[0];
     
-    this.temporaryData = mostRecent;
-    
-    setTimeout(() => {
-      const recoverMostRecent = confirm(
-        `Se encontraron ${entries.length} entradas no guardadas. ¿Recuperar la más reciente?\n\n` +
-        `Título: ${mostRecent.title}\n` +
-        `Fecha: ${new Date(mostRecent.timestamp).toLocaleString()}\n\n` +
-        `(Para ver todas las entradas, ve a la sección de administración)`
-      );
-      
-      if (recoverMostRecent) {
-        this.recoverTemporaryData(mostRecent.formData);
-        this.temporaryStorage.removeTemporaryEntry(mostRecent.id);
-      }
-    }, 500);
+    this.recoverTemporaryData(mostRecent.formData);
+    this.temporaryStorage.removeTemporaryEntry(mostRecent.id);
+  }
+
+  onGoToManager(): void {
+    this.showMultipleRecoveryNotification = false;
+    this.router.navigate(['/admin/control/entradas/entradas-temporales']);
+  }
+
+  onIgnoreMultiple(): void {
+    this.showMultipleRecoveryNotification = false;
+    console.log('ℹ️ Usuario ignoró las múltiples entradas temporales');
+  }
+
+  onDiscardMultiple(): void {
+    this.showMultipleRecoveryNotification = false;
+    this.multipleTemporaryEntries.forEach(entry => {
+      this.temporaryStorage.removeTemporaryEntry(entry.id);
+    });
+    console.log('🗑️ Usuario descartó todas las entradas temporales múltiples');
   }
 
   // ✅ NUEVO: Métodos para manejar las acciones de la notificación

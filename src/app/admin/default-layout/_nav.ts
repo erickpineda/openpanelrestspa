@@ -31,7 +31,7 @@ export const navItems: INavData[] = [
       // ✅ NUEVO: Enlace al gestor de entradas temporales
       {
         name: 'Entradas Temporales',
-        url: '/admin/control/entradas/temporary-entries',
+        url: '/admin/control/entradas/entradas-temporales',
         icon: 'cil-save',
         badge: {
           color: 'warning',

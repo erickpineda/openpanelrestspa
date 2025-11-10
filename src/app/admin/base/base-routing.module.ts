@@ -17,9 +17,9 @@ const routes: Routes = [
       {
         path: 'entradas', children: [
           { path: '', component: ListadoEntradasComponent },
-          { path: 'temporary-entries', component: TemporaryEntriesManagerComponent },
-          { path: 'editar/:idEntrada', component: EditarEntradaComponent },
           { path: 'crear', component: CrearEntradaComponent },
+          { path: 'editar/:idEntrada', component: EditarEntradaComponent },
+          { path: 'entradas-temporales', component: TemporaryEntriesManagerComponent },
         ]
       },
       {
