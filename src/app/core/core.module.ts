@@ -19,11 +19,10 @@ import { ErrorInterceptor } from './interceptor/error.interceptor';
 import { NetworkInterceptor } from './interceptor/network.interceptor';
 import { GlobalErrorHandlerService } from './errors/global-error/global-error-handler.service';
 import { LoggerService } from './services/logger.service';
+import { TimeoutInterceptor } from './interceptor/timeout.interceptor';
 
 @NgModule({
-  imports: [
-    CommonModule
-  ],
+  imports: [CommonModule],
   declarations: [],
   exports: [],
   providers: [
@@ -39,27 +38,30 @@ import { LoggerService } from './services/logger.service';
     EntradaService,
     UsuarioService,
     LoggerService,
-    
-    // Interceptors
-    // ✅ SOLO interceptors (los servicios ahora usan providedIn: 'root')
+
+    // Interceptors en orden de ejecución
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
+      useClass: TimeoutInterceptor,   // 1º: Timeouts específicos
+      multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: ErrorInterceptor,
-      multi: true
+      useClass: AuthInterceptor,     // 2º: Autenticación
+      multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: NetworkInterceptor,
-      multi: true
-    }
-  ]
+      useClass: NetworkInterceptor, // 3º: Loading y manejo de errores
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,  // 4º: Manejo global de errores
+      multi: true,
+    },
+  ],
 })
 export class CoreModule {
-  constructor() {
-  }
+  constructor() {}
 }

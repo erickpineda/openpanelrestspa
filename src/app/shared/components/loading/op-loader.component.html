@@ -1,8 +1,53 @@
-<div *ngIf="loading" 
-     [class]="overlay ? 'loading-overlay' : ''"
-     [class.full-screen]="fullScreen">
-  <div class="loading-spinner">
-    <c-spinner variant="grow" size="sm"></c-spinner>
-    <p class="mt-3 text-muted">{{ message }}</p>
+<div *ngIf="loading" [class]="getCombinedClasses()">
+  
+  <!-- Variante 1: Spinner Clásico (por defecto) -->
+  <div *ngIf="loaderStyle === 'spinner'" class="loader-content spinner-loader">
+    <div class="spinner-container">
+      <c-spinner variant="grow" [size]="'sm'"></c-spinner>
+      <c-spinner variant="grow" [size]="'sm'"></c-spinner>
+      <c-spinner variant="grow" [size]="'sm'"></c-spinner>
+    </div>
+    <p class="loader-message">{{ message }}</p>
   </div>
+
+  <!-- Variante 2: Dots Bouncing -->
+  <div *ngIf="loaderStyle === 'dots'" class="loader-content dots-loader">
+    <div class="dots-container">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <p class="loader-message">{{ message }}</p>
+  </div>
+
+  <!-- Variante 3: Pulse -->
+  <div *ngIf="loaderStyle === 'pulse'" class="loader-content pulse-loader">
+    <div class="pulse-container">
+      <div class="pulse-circle"></div>
+    </div>
+    <p class="loader-message">{{ message }}</p>
+  </div>
+
+  <!-- Variante 4: Progress Bar -->
+  <div *ngIf="loaderStyle === 'progress'" class="loader-content progress-loader">
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+    <p class="loader-message">{{ message }}</p>
+  </div>
+
+  <!-- Variante 5: Modern -->
+  <div *ngIf="loaderStyle === 'modern'" class="loader-content modern-loader">
+    <div class="modern-container">
+      <div class="modern-spinner">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+      </div>
+    </div>
+    <p class="loader-message">{{ message }}</p>
+  </div>
+
 </div>

@@ -1,32 +1,70 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.dev.es';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class LoggerService {
   private isProduction = environment.production;
 
-  log(message: string, ...args: any[]): void {
-    if (!this.isProduction) {
-      console.log(`[LOG] ${message}`, ...args);
-    }
+  // Niveles de log
+  private levels = ['debug', 'info', 'warn', 'error'] as const;
+  private minLevel: typeof this.levels[number] = this.isProduction ? 'warn' : 'debug';
+
+  private shouldLog(level: typeof this.levels[number]): boolean {
+    const levelIndex = this.levels.indexOf(level);
+    const minLevelIndex = this.levels.indexOf(this.minLevel);
+    return levelIndex >= minLevelIndex;
   }
 
-  warn(message: string, ...args: any[]): void {
-    if (!this.isProduction) {
-      console.warn(`[WARN] ${message}`, ...args);
-    }
-  }
+  log(level: typeof this.levels[number], message: string, ...args: any[]): void {
+    if (!this.shouldLog(level)) return;
 
-  error(message: string, error?: any): void {
-    if (!this.isProduction) {
-      console.error(`[ERROR] ${message}`, error);
+    const timestamp = new Date().toISOString();
+    const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
+
+    switch (level) {
+      case 'debug':
+        console.debug(prefix, message, ...args);
+        break;
+      case 'info':
+        console.info(prefix, message, ...args);
+        break;
+      case 'warn':
+        console.warn(prefix, message, ...args);
+        break;
+      case 'error':
+        console.error(prefix, message, ...args);
+        break;
     }
-    // En producción, enviar a servicio de tracking
+
+    // En producción, enviar errores a servicio de tracking
+    if (this.isProduction && level === 'error') {
+      this.sendToTrackingService(message, args);
+    }
   }
 
   debug(message: string, ...args: any[]): void {
-    if (!this.isProduction) {
-      console.debug(`[DEBUG] ${message}`, ...args);
-    }
+    this.log('debug', message, ...args);
+  }
+
+  info(message: string, ...args: any[]): void {
+    this.log('info', message, ...args);
+  }
+
+  warn(message: string, ...args: any[]): void {
+    this.log('warn', message, ...args);
+  }
+
+  error(message: string, error?: any): void {
+    this.log('error', message, error);
+  }
+
+  private sendToTrackingService(message: string, error: any): void {
+    // Integrar con servicio de tracking como Sentry, LogRocket, etc.
+    // Ejemplo:
+    // if (typeof window !== 'undefined' && (window as any).Sentry) {
+    //   (window as any).Sentry.captureException(error);
+    // }
   }
 }

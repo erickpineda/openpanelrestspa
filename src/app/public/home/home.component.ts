@@ -22,7 +22,6 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private entradaService: EntradaService,
-    public loader: LoadingService
   ) {}
 
   ngOnInit(): void {
@@ -51,11 +50,13 @@ export class HomeComponent implements OnInit {
             } else {
               this.entradas = entradas;
               this.categorias = this.entradas.flatMap(e => e.categorias);
+              this.cargaFinalizada = true;
             }
             resolve(this.entradas);
           },
           error: (error) => {
             this.noHayEntradas = false;
+            this.cargaFinalizada = true;
             reject(error);
           }
         });

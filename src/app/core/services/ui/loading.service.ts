@@ -5,113 +5,118 @@ import { LoggerService } from '../logger.service';
 
 export interface LoadingState {
   global: boolean;
-  local: { [key: string]: boolean };
+  requests: Map<string, boolean>; // Track individual requests
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoadingService {
-  // Estado completo del loading
   private stateSubject = new BehaviorSubject<LoadingState>({
     global: false,
-    local: {}
+    requests: new Map()
   });
   
   public state$ = this.stateSubject.asObservable();
-  
-  // Observables separados para diferentes usos
   public globalLoading$: Observable<boolean> = this.state$.pipe(
-    map((state: { global: any; }) => state.global),
+    map(state => state.global),
     distinctUntilChanged()
   );
-  
-  // Contador para peticiones HTTP globales
+
   private httpRequestCount = 0;
   private minimumDisplayTime = 500;
   private loadingStartTime = 0;
+  private loadingTimeout: any;
 
   constructor(private logger: LoggerService) {}
 
-  // ===== MÉTODOS PARA LOADING GLOBAL (HTTP) =====
-  
-  setGlobalLoading(loading: boolean): void {
+  setGlobalLoading(loading: boolean, requestId?: string): void {
     if (loading) {
       this.httpRequestCount++;
+      
       if (this.httpRequestCount === 1) {
         this.loadingStartTime = Date.now();
         this.updateGlobalState(true);
         this.logger.debug('Loading global iniciado');
       }
+
+      // Track individual request if ID provided
+      if (requestId) {
+        this.trackRequest(requestId, true);
+      }
     } else {
       this.httpRequestCount = Math.max(0, this.httpRequestCount - 1);
       
+      // Remove individual request tracking
+      if (requestId) {
+        this.trackRequest(requestId, false);
+      }
+
       if (this.httpRequestCount === 0) {
-        const elapsed = Date.now() - this.loadingStartTime;
-        const remaining = Math.max(0, this.minimumDisplayTime - elapsed);
-        
-        setTimeout(() => {
-          // Verificar que no hayan llegado nuevas peticiones durante la espera
-          if (this.httpRequestCount === 0) {
-            this.updateGlobalState(false);
-            this.logger.debug('Loading global finalizado');
-          }
-        }, remaining);
+        this.scheduleLoadingStop();
       }
     }
   }
 
-  // ===== MÉTODOS PARA LOADING LOCAL (COMPONENTES) =====
-  
-  setLocalLoading(key: string, loading: boolean): void {
-    const currentState = this.stateSubject.value;
-    const newLocalState = { ...currentState.local };
+  private scheduleLoadingStop(): void {
+    const elapsed = Date.now() - this.loadingStartTime;
+    const remaining = Math.max(0, this.minimumDisplayTime - elapsed);
     
-    if (loading) {
-      newLocalState[key] = true;
-    } else {
-      delete newLocalState[key];
+    // Clear existing timeout
+    if (this.loadingTimeout) {
+      clearTimeout(this.loadingTimeout);
     }
     
-    this.stateSubject.next({
-      ...currentState,
-      local: newLocalState
-    });
-    
-    this.logger.debug(`Loading local ${key}: ${loading}`);
+    this.loadingTimeout = setTimeout(() => {
+      // Double-check that no new requests came in during the wait
+      if (this.httpRequestCount === 0) {
+        this.updateGlobalState(false);
+        this.logger.debug('Loading global finalizado');
+      }
+    }, remaining);
   }
 
-  getLocalLoading(key: string): boolean {
-    return this.stateSubject.value.local[key] || false;
-  }
-
-  isAnyLocalLoading(): boolean {
-    return Object.keys(this.stateSubject.value.local).length > 0;
-  }
-
-  // ===== MÉTODOS ÚTILES =====
-  
-  isLoading(): boolean {
-    const state = this.stateSubject.value;
-    return state.global || this.isAnyLocalLoading();
-  }
-
-  reset(): void {
-    this.httpRequestCount = 0;
-    this.stateSubject.next({
-      global: false,
-      local: {}
-    });
-    this.logger.debug('Loading resetado completamente');
-  }
-
-  // ===== MÉTODOS PRIVADOS =====
-  
   private updateGlobalState(global: boolean): void {
     const currentState = this.stateSubject.value;
     this.stateSubject.next({
       ...currentState,
       global
     });
+  }
+
+  private trackRequest(requestId: string, loading: boolean): void {
+    const currentState = this.stateSubject.value;
+    const newRequests = new Map(currentState.requests);
+    
+    if (loading) {
+      newRequests.set(requestId, true);
+    } else {
+      newRequests.delete(requestId);
+    }
+    
+    this.stateSubject.next({
+      ...currentState,
+      requests: newRequests
+    });
+  }
+
+  // Método para forzar el cierre del loading (en casos de error)
+  forceStopLoading(): void {
+    this.httpRequestCount = 0;
+    this.updateGlobalState(false);
+    if (this.loadingTimeout) {
+      clearTimeout(this.loadingTimeout);
+      this.loadingTimeout = null;
+    }
+    this.logger.warn('Loading forzado a detenerse');
+  }
+
+  // Obtener estadísticas
+  getLoadingStats() {
+    return {
+      activeRequests: this.httpRequestCount,
+      trackedRequests: this.stateSubject.value.requests.size,
+      isLoading: this.httpRequestCount > 0
+    };
   }
 }
