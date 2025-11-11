@@ -1,27 +1,28 @@
 <c-card>
-  <c-card-header class="d-flex align-items-center" #entradasInicio>
+  <c-card-header class="d-flex align-items-center">
     <c-col [sm]="6">
       <h6 cCardTitle>Listado de entradas</h6>
     </c-col>
     <c-col [sm]="6">
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button cButton color="light" size="sm">
-          <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
+        <button cButton color="light" size="sm" aria-label="Imprimir listado">
+          <svg cIcon name="cilPrint" class="me-1" size="sm"></svg>
           Imprimir
         </button>
-        <button cButton color="warning" size="sm">
-          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Pendientes de revisión"></svg>
+        <button cButton color="warning" size="sm" aria-label="Ver entradas pendientes de revisión">
+          <svg cIcon name="cilWarning" class="me-1" size="sm"></svg>
           Sin revisar
         </button>
       </div>
     </c-col>
   </c-card-header>
+  
   <c-card-body>
-    <div class="d-flex justify-content-between align-items-end">
+    <div class="d-flex justify-content-between align-items-end mb-3">
       <h5 cCardTitle>Listado de entradas</h5>
-      <div class="hstack gap-3">
-        <button cButton color="success" size="sm" routerLink="crear">
-          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nueva Entrada"></svg>
+      <div class="hstack gap-2">
+        <button cButton color="success" size="sm" routerLink="crear" aria-label="Crear nueva entrada">
+          <svg cIcon name="cilPencil" class="me-1" size="sm"></svg>
           Crear nueva Entrada
         </button>
       </div>
@@ -31,86 +32,102 @@
     <!-- Buscador -->
     <div class="mb-4">
       <app-buscador-avanzado
-      [definiciones]="definiciones"
-      (filtroSeleccionado)="aplicarFiltro($event)">
-    </app-buscador-avanzado>
-     </div>
+        [definiciones]="definiciones"
+        (filtroSeleccionado)="aplicarFiltro($event)">
+      </app-buscador-avanzado>
+    </div>
 
-    <table responsive hover cAlign="top" cTable *ngIf="listaEntradas.length >= 0">
-      <thead cTableColor="dark">
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Título</th>
-          <th scope="col">Autor</th>
-          <th scope="col">Publicación</th>
-          <th class="w-10" scope="col">Categorias</th>
-          <th class="col">Acción</th>
-        </tr>
-      </thead>
-      <tbody *ngFor="let entr of listaEntradas">
-        <tr style="cursor: pointer" cAlign="middle" 
-            [cTableColor]="entr.publicada ? 'success' : 'warning'">
-          <td scope="row">{{entr.idEntrada}}</td>
-          <td>{{commonFuncService.acortarTexto(entr.titulo)}}</td>
-          <td>{{entr.usernameCreador}}</td>
-          <td>{{checkFechaPublicacion(entr.fechaPublicacion)}}</td>
-          <td>{{entr.categoriasConComas}}</td>
-          <td>
-            <button cButton color="warning" size="sm" (click)="actualizarEntrada(entr.idEntrada)" [routerLink]="['/admin/control/entradas/editar', entr.idEntrada]">
-              <svg cIcon name="cilPen" size="sm" title="Editar"></svg>
-            </button>
-            <button cButton color="danger" size="sm" (click)="borrarEntrada(entr.idEntrada)" [cModalToggle]="staticBackdropModal.id">
-              <svg cIcon name="cilTrash" size="sm" title="Borrar"></svg>
-            </button>
-            <button cButton color="info" size="sm">
-              <svg cIcon name="cilExternalLink" size="sm" title="Previa"></svg>
-            </button>
-          </td>          
-        </tr>
-      </tbody>
-      <tbody *ngIf="listaEntradas.length <= 0" cAlign="middle">
-        <tr style="cursor: pointer">
-          <td colSpan="6">No se han encontrado registros en el sistema...</td>
-        </tr>
-      </tbody>
-    </table>
-    <app-op-pagination
-      [align]="'center'"
-      *ngIf="listaEntradas.length > 0"
-      [totalPages]="totalPages"
-      [currentPage]="currentPage"
-      (pageChange)="obtenerListaEntradas($event)">
-    </app-op-pagination>
+    <!-- Loading State -->
+    <div *ngIf="cargando" class="text-center py-4">
+      <c-spinner size="sm"></c-spinner>
+      <p class="mt-2">Cargando entradas...</p>
+    </div>
 
-    <c-modal #staticBackdropModal backdrop="static" id="staticBackdropModal" [visible]="visible" (visibleChange)="visibleModal($event)">
+    <!-- Tabla de Entradas -->
+    <div *ngIf="!cargando">
+      <table responsive hover cAlign="top" cTable class="tabla-con-loader">
+        <thead cTableColor="dark">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Título</th>
+            <th scope="col">Autor</th>
+            <th scope="col">Publicación</th>
+            <th scope="col" class="w-10">Categorías</th>
+            <th scope="col" class="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entrada of listaEntradas; trackBy: trackByEntradaId"
+              cAlign="middle" 
+              [cTableColor]="entrada.publicada ? 'success' : 'warning'"
+              class="cursor-pointer">
+            <td scope="row">{{ entrada.idEntrada }}</td>
+            <td>{{ commonFuncService.acortarTexto(entrada.titulo) }}</td>
+            <td>{{ entrada.usernameCreador }}</td>
+            <td>{{ checkFechaPublicacion(entrada.fechaPublicacion) }}</td>
+            <td>{{ entrada.categoriasConComas }}</td>
+            <td>
+              <div class="btn-group" role="group" aria-label="Acciones de entrada">
+                <button cButton color="warning" size="sm" 
+                        [routerLink]="['/admin/control/entradas/editar', entrada.idEntrada]"
+                        [attr.aria-label]="'Editar entrada ' + entrada.titulo">
+                  <svg cIcon name="cilPen" size="sm"></svg>
+                </button>
+                <button cButton color="danger" size="sm" 
+                        (click)="borrarEntrada(entrada)"
+                        [attr.aria-label]="'Borrar entrada ' + entrada.titulo">
+                  <svg cIcon name="cilTrash" size="sm"></svg>
+                </button>
+                <button cButton color="info" size="sm"
+                        [attr.aria-label]="'Vista previa de ' + entrada.titulo">
+                  <svg cIcon name="cilExternalLink" size="sm"></svg>
+                </button>
+              </div>
+            </td>          
+          </tr>
+          
+          <tr *ngIf="listaEntradas.length === 0" cAlign="middle">
+            <td colspan="6" class="text-center py-4">
+              No se han encontrado registros en el sistema...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Paginación -->
+      <app-op-pagination
+        [align]="'center'"
+        *ngIf="listaEntradas.length > 0"
+        [totalPages]="totalPages"
+        [currentPage]="currentPage"
+        (pageChange)="obtenerListaEntradas($event)">
+      </app-op-pagination>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <c-modal #staticBackdropModal backdrop="static" id="staticBackdropModal" 
+             [visible]="visible" (visibleChange)="onVisibleModalChange($event)">
       <c-modal-header>
-        <h5 cModalTitle>¿Quiere borrar la entrada?</h5>
-        <button (click)="toggleModal()" cButtonClose></button>
+        <h5 cModalTitle>Confirmar eliminación</h5>
+        <button (click)="toggleModal()" cButtonClose aria-label="Cerrar modal"></button>
       </c-modal-header>
       <c-modal-body>
-        ID: {{entradaABorrar?.idEntrada}} - Título: {{entradaABorrar?.titulo}}
+        <p>¿Está seguro de que desea eliminar la siguiente entrada?</p>
+        <div class="alert alert-warning">
+          <strong>ID:</strong> {{ entradaABorrar?.idEntrada }}<br>
+          <strong>Título:</strong> {{ entradaABorrar?.titulo }}
+        </div>
+        <p class="text-danger">Esta acción no se puede deshacer.</p>
       </c-modal-body>
       <c-modal-footer>
         <button (click)="toggleModal()" cButton color="secondary">
-          No
+          Cancelar
         </button>
-        <button cButton color="primary" (click)="confirmarBorrado()">
-          Sí
+        <button cButton color="danger" (click)="confirmarBorrado()">
+          Eliminar
         </button>
       </c-modal-footer>
     </c-modal>
 
-    <c-toaster placement="top-end" position="fixed">
-      <c-toast #toast="cToast" [autohide]="false" [visible]="toastVisible" class="align-items-center text-white border-0" color="primary">
-        <div class="d-flex">
-          <c-toast-body>
-            <span>La entrada se ha borrado correctamente.</span>
-          </c-toast-body>
-          <button aria-label="close" cButtonClose white class="me-2 m-auto" (click)="toastVisible=false"></button>
-        </div>
-      </c-toast>
-    </c-toaster>
-
   </c-card-body>
-  
 </c-card>

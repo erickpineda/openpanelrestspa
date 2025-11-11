@@ -1,18 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
 import { EntradaService } from '../../../core/services/data/entrada.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
-import { SearchUtilService } from '../../../core/services/utils/search-util.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 import { ToastService } from '../../../core/services/ui/toast.service';
 
 @Component({
   selector: 'app-listado-entradas',
   templateUrl: './listado-entradas.component.html',
-  styleUrls: ['./listado-entradas.component.scss']
+  styleUrls: ['./listado-entradas.component.scss'],
 })
-export class ListadoEntradasComponent implements OnInit, OnDestroy  {
+export class ListadoEntradasComponent implements OnInit, OnDestroy {
   listaEntradas: Entrada[] = [];
   entradaABorrar: Entrada | null = null;
 
@@ -21,7 +20,6 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
   pageSize: number = 20;
 
   public visible = false;
-  public toastVisible = false;
   private destroy$ = new Subject<void>();
 
   campoSeleccionado: string = '';
@@ -30,24 +28,26 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
   dataOptionSeleccionada: string = 'AND';
 
   public definiciones: any;
+  public cargando: boolean = false;
 
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
-    private searchUtilService: SearchUtilService,
     private busquedaService: BusquedaService,
     private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
     this.cargarDefinicionesBuscador();
-      this.busquedaService.iniciarBusqueda(
-        (term) => this.realizarBusquedaEntradas(term),
-        (response) => this.procesarResultadosBusqueda(response)
-      );
+    this.busquedaService.iniciarBusqueda(
+      (term) => this.realizarBusquedaEntradas(term),
+      (response) => this.procesarResultadosBusqueda(response)
+    );
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.busquedaService.limpiarBusqueda();
   }
 
@@ -69,6 +69,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     this.operacionSeleccionada = filtro.operacion;
     this.valorBusqueda = filtro.valor;
     this.currentPage = 0;
+    
     if (this.campoSeleccionado && this.operacionSeleccionada) {
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
@@ -78,7 +79,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
     if (response.result?.success) {
       this.listaEntradas = response.data.elements || [];
       this.totalPages = response.data.totalPages;
-      this.listaEntradas = this.listaEntradas.map(entrada => ({
+      this.listaEntradas = this.listaEntradas.map((entrada:Entrada) => ({
         ...entrada,
         categoriasConComas: entrada.categorias?.map(e => e.nombre).join(', ') || ''
       }));
@@ -86,35 +87,49 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
       console.error('Error en búsqueda:', response.error);
       this.listaEntradas = [];
       this.currentPage = 0;
-      this.msgToast('Error en búsqueda: ' + response.error);
+      this.mostrarError('Error en búsqueda: ' + response.error);
     }
   }
 
   private cargarDefinicionesBuscador(): void {
-    this.entradaService.obtenerDefinicionesBuscador().subscribe({
-      next: (response) => {
-        if (response.result?.success) {
-          this.definiciones = response.data;
-          const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]);
-          const camposOrdenados = [
-            ...campos.filter(k => k === 'titulo'),
-            ...campos.filter(k => k !== 'titulo').sort((a, b) => a.localeCompare(b))
-          ];
-          this.campoSeleccionado = camposOrdenados[0] || '';
-          const operaciones = this.definiciones.operationPermitido?.[this.campoSeleccionado];
-          this.operacionSeleccionada = Array.isArray(operaciones) ? operaciones[0] : '';
-          this.valorBusqueda = '';
-          this.currentPage = 0;
-          if (this.campoSeleccionado && this.operacionSeleccionada) {
-            this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    this.cargando = true;
+    
+    this.entradaService.obtenerDefinicionesBuscador()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.cargando = false;
+          if (response.result?.success) {
+            this.definiciones = response.data;
+            this.inicializarCamposBusqueda();
           }
+        },
+        error: (error) => {
+          this.cargando = false;
+          console.error('Error al cargar definiciones del buscador:', error);
+          this.mostrarError(error.error?.error?.message || 'Error al cargar definiciones');
         }
-      },
-      error: (error) => {
-        console.error('Error al cargar definiciones del buscador:', error);
-        this.msgToast(error.error?.error?.message);
-      }
-    });
+      });
+  }
+
+  private inicializarCamposBusqueda(): void {
+    const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]) || [];
+    
+    // Ordenar campos: 'titulo' primero, luego el resto alfabéticamente
+    const camposOrdenados = [
+      ...campos.filter(k => k === 'titulo'),
+      ...campos.filter(k => k !== 'titulo').sort((a, b) => a.localeCompare(b))
+    ];
+    
+    this.campoSeleccionado = camposOrdenados[0] || '';
+    const operaciones = this.definiciones.operationPermitido?.[this.campoSeleccionado];
+    this.operacionSeleccionada = Array.isArray(operaciones) ? operaciones[0] : '';
+    this.valorBusqueda = '';
+    this.currentPage = 0;
+    
+    if (this.campoSeleccionado && this.operacionSeleccionada) {
+      this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    }
   }
 
   obtenerListaEntradas(page: number): void {
@@ -128,54 +143,57 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy  {
       : 'No publicada';
   }
 
-  crearEntrada() {}
-
-  actualizarEntrada(id: number) {}
-
-  borrarEntrada(id: number): void {
-    this.entradaABorrar = this.listaEntradas.find((entr) => entr.idEntrada === id) || null;
+  borrarEntrada(entrada: Entrada): void {
+    this.entradaABorrar = entrada;
     this.visible = true;
   }
 
   confirmarBorrado(): void {
     if (this.entradaABorrar) {
-      this.entradaService.borrar(this.entradaABorrar.idEntrada).subscribe({
-        next: (response) => {
-          console.log('Entrada eliminada:', response);
-          this.obtenerListaEntradas(this.currentPage);
-          this.entradaABorrar = null;
-          this.visible = false;
-          this.mostrarToast();
-        },
-        error: (err) => {
-          console.error('Error al eliminar la entrada:', err);
-          this.visible = false;
-          this.msgToast('Error al eliminar la entrada: ' + err);
-        }
-      });
+      this.entradaService.borrar(this.entradaABorrar.idEntrada)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            console.log('Entrada eliminada:', response);
+            this.obtenerListaEntradas(this.currentPage);
+            this.entradaABorrar = null;
+            this.visible = false;
+            this.toastService.showSuccess('La entrada se ha eliminado correctamente.', 'Entrada eliminada');
+          },
+          error: (error) => {
+            console.error('Error al eliminar la entrada:', error);
+            this.visible = false;
+            this.mostrarError('Error al eliminar la entrada: ' + error.message);
+          }
+        });
     }
   }
 
-  mostrarToast(): void {
-    this.toastVisible = true;
-    setTimeout(() => {
-      this.toastVisible = false;
-    }, 5000);
+  private mostrarError(mensaje: string): void {
+    this.toastService.showError(mensaje, 'Error');
   }
 
-  private msgToast(str: any) {
-    this.toastService.showError(str, 'Error');
-  }
-
-  toggleModal() {
+  toggleModal(): void {
     this.visible = !this.visible;
+    if (!this.visible) {
+      this.entradaABorrar = null;
+    }
   }
 
-  visibleModal(event: any) {
-    this.visible = event;
+  onVisibleModalChange(visible: boolean): void {
+    this.visible = visible;
+    if (!visible) {
+      this.entradaABorrar = null;
+    }
   }
 
-  public refrescarPagina(): void {
-    window.location.reload();
+  refrescarDatos(): void {
+    this.currentPage = 0;
+    this.busquedaService.triggerBusqueda(this.valorBusqueda);
+  }
+
+  // Método para trackBy en *ngFor (mejora rendimiento)
+  trackByEntradaId(index: number, entrada: Entrada): number {
+    return entrada.idEntrada;
   }
 }

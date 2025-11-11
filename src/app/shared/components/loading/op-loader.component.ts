@@ -9,17 +9,23 @@ export type LoaderPosition = 'center' | 'top' | 'fullscreen';
 @Component({
   selector: 'app-op-loader',
   templateUrl: './op-loader.component.html',
-  styleUrls: ['./op-loader.component.scss']
+  styleUrls: ['./op-loader.component.scss'],
 })
 export class OpLoaderComponent implements OnInit, OnDestroy {
   @Input() message = 'Cargando...';
   @Input() overlay = true;
   @Input() fullScreen = true;
-  @Input() position: 'center' | 'top' = 'center';
+  @Input() position: LoaderPosition = 'center';
   @Input() debounceTime = 100;
   @Input() loaderStyle: LoaderStyle = 'progress';
   @Input() size: 'sm' = 'sm';
-  @Input() color: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' = 'primary';
+  @Input() color:
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'danger'
+    | 'warning'
+    | 'info' = 'primary';
 
   loading = false;
   private loadingSubscription!: Subscription;
@@ -27,11 +33,9 @@ export class OpLoaderComponent implements OnInit, OnDestroy {
   constructor(private loadingService: LoadingService) {}
 
   ngOnInit(): void {
+    // Comportamiento original: suscribirse al loading global
     this.loadingSubscription = this.loadingService.globalLoading$
-      .pipe(
-        debounceTime(this.debounceTime),
-        distinctUntilChanged()
-      )
+      .pipe(debounceTime(this.debounceTime), distinctUntilChanged())
       .subscribe((loading) => {
         this.loading = loading;
       });
@@ -45,20 +49,20 @@ export class OpLoaderComponent implements OnInit, OnDestroy {
 
   getCombinedClasses(): string {
     const baseClasses = [];
-    
+
     if (this.overlay) {
       baseClasses.push('loading-overlay');
     }
-    
+
     if (this.fullScreen) {
       baseClasses.push('full-screen');
     }
-    
+
     baseClasses.push(`loader-${this.loaderStyle}`);
     baseClasses.push(`loader-size-${this.size}`);
     baseClasses.push(`loader-color-${this.color}`);
     baseClasses.push(`loader-position-${this.position}`);
-    
+
     return baseClasses.join(' ');
   }
 
