@@ -1,0 +1,25 @@
+<c-modal [visible]="visible" (visibleChange)="onClose()" class="confirmation-modal">
+  <c-modal-header>
+    <h5 cModalTitle [class]="'text-' + getHeaderColor()">
+      <c-icon *ngIf="type === 'warning'" name="cil-warning" class="me-2"></c-icon>
+      <c-icon *ngIf="type === 'danger'" name="cil-warning" class="me-2"></c-icon>
+      <c-icon *ngIf="type === 'info'" name="cil-info" class="me-2"></c-icon>
+      {{ title }}
+    </h5>
+  </c-modal-header>
+  <c-modal-body>
+    <p>{{ message }}</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="onCancel()">
+      {{ cancelText }}
+    </button>
+    <button 
+      cButton 
+      [color]="getHeaderColor()" 
+      (click)="onConfirm()"
+      class="ms-2">
+      {{ confirmText }}
+    </button>
+  </c-modal-footer>
+</c-modal>

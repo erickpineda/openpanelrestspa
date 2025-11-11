@@ -6,6 +6,7 @@ import {
   ChangeDetectionStrategy,
   OnInit,
   OnChanges,
+  ChangeDetectorRef,
 } from '@angular/core';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Router } from '@angular/router';
@@ -79,7 +80,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   constructor(
     private temporaryStorage: TemporaryStorageService,
-    private router: Router) {
+    private router: Router,
+    private cdRef: ChangeDetectorRef) {
 
     }
 
@@ -288,42 +290,99 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     return this.form ? this.form.get(path) : null;
   }
 
-  // Helpers para FormArray de categorías
+  // ===== SISTEMA DE CATEGORÍAS UNIFICADO =====
+
+  // Helpers para FormArray de categorías (OBJETOS COMPLETOS)
   categoriasArray(): FormArray {
     const ctrl = this.form?.get('categorias');
+    
     if (!ctrl) {
-      // si no existe, crea un FormArray vacío en el form (protección)
+      // Si no existe, crea un FormArray vacío en el form
       this.form?.addControl('categorias', new FormArray([]));
       return this.form.get('categorias') as FormArray;
     }
     return ctrl as FormArray;
   }
 
-  isCategoriaChecked(categ: Categoria): boolean {
+  // Verificar si una categoría está seleccionada (por ID)
+  isCategoriaSelected(categoria: Categoria): boolean {
     const arr = this.categoriasArray();
-    return arr.controls.some(
-      (c) =>
-        c.value &&
-        (c.value.idCategoria === categ.idCategoria ||
-          c.value.nombre === categ.nombre)
+    return arr.controls.some(control => 
+      control.value && control.value.nombre === categoria.nombre
     );
   }
 
-  onToggleCategoria(categ: Categoria, checked: boolean) {
-    const arr = this.categoriasArray();
-    const existsIndex = arr.controls.findIndex(
-      (c) =>
-        c.value &&
-        (c.value.idCategoria === categ.idCategoria ||
-          c.value.nombre === categ.nombre)
-    );
-
-    if (checked && existsIndex === -1) {
-      arr.push(new FormControl(categ));
-    } else if (!checked && existsIndex > -1) {
-      arr.removeAt(existsIndex);
+  // Cambiar el estado de una categoría (versión unificada)
+  onCategoriaChange(categoria: Categoria, event: any): void {
+    if (!this.form.enabled) {
+      event.preventDefault();
+      return;
     }
 
+    const arr = this.categoriasArray();
+    
+    if (event.target.checked) {
+      // Agregar la categoría al FormArray si no existe
+      if (!this.isCategoriaSelected(categoria)) {
+        arr.push(new FormControl(categoria));
+      }
+    } else {
+      // Buscar y remover la categoría por nombre
+      const index = arr.controls.findIndex(control => 
+        control.value && control.value.nombre === categoria.nombre
+      );
+      
+      if (index > -1) {
+        arr.removeAt(index);
+      }
+    }
+    
+    // Forzar actualización de la vista
+    setTimeout(() => {
+      this.cdRef.detectChanges();
+    });
+  }
+
+  // Método para seleccionar/deseleccionar todas las categorías (usando FormArray)
+  toggleTodasCategorias(event: any): void {
+    const arr = this.categoriasArray();
+    
+    if (event.target.checked) {
+      // Limpiar el array primero
+      while (arr.length !== 0) {
+        arr.removeAt(0);
+      }
+      // Agregar todas las categorías como objetos completos
+      this.categorias.forEach(categoria => {
+        arr.push(new FormControl(categoria));
+      });
+    } else {
+      // Limpiar todas las categorías
+      while (arr.length !== 0) {
+        arr.removeAt(0);
+      }
+    }
     arr.markAsDirty();
+    this.form.markAsDirty();
+  }
+
+  // Verificar si todas las categorías están seleccionadas
+  estanTodasCategoriasSeleccionadas(): boolean {
+    const arr = this.categoriasArray();
+    return arr.length === this.categorias.length && this.categorias.length > 0;
+  }
+
+  // Verificar si alguna categoría está seleccionada (para estado indeterminado)
+  estanAlgunasCategoriasSeleccionadas(): boolean {
+    const arr = this.categoriasArray();
+    return arr.length > 0 && arr.length < this.categorias.length;
+  }
+
+  // Obtener solo los IDs de las categorías seleccionadas (para enviar al API)
+  getCategoriasIds(): number[] {
+    const arr = this.categoriasArray();
+    return arr.controls
+      .filter(control => control.value)
+      .map(control => control.value.idCategoria);
   }
 }

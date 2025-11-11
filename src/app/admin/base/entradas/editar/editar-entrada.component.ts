@@ -15,7 +15,7 @@ import { Categoria } from '../../../../core/models/categoria.model';
   styleUrls: ['./editar-entrada.component.scss'],
 })
 export class EditarEntradaComponent implements OnInit {
-  entradaForm : UntypedFormGroup;
+  entradaForm!: UntypedFormGroup;
   tiposEntr: TipoEntrada[] = [];
   estadosEntr: EstadoEntrada[] = [];
   categorias: Categoria[] = [];
@@ -34,10 +34,11 @@ export class EditarEntradaComponent implements OnInit {
     private facade: EntradaFacadeService,
     private router: Router
   ) {
-    this.entradaForm = this.vf.buildForm(this.entrada);
+    
   }
 
   async ngOnInit() {
+    this.entradaForm = this.vf.buildForm(this.entrada);
     this.idEntrada = this.route.snapshot.params['idEntrada'];
     const data = await this.facade.loadInitData();
     this.tiposEntr = data.tipos;

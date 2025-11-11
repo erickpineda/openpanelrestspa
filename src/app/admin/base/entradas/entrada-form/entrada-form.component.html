@@ -168,30 +168,87 @@
             </c-row>
 
             <c-row>
+              <!-- Categorías -->
+              <c-col lg="12">
+                <c-card class="mb-4">
+                  <c-card-header class="d-flex justify-content-between align-items-center">
+                    <h3 cCardTitle class="h6 card-title">
+                      <c-icon name="cil-tags" class="me-2"></c-icon>
+                      Categorías
+                    </h3>
+
+                    <!-- Badge con contador -->
+                    <c-badge color="primary" shape="rounded">
+                      {{ categoriasArray().length }}/{{ categorias.length }}
+                    </c-badge>
+                  </c-card-header>
+
+                  <c-card-body>
+                    <!-- Selector todas las categorías -->
+                    <div class="mb-3" *ngIf="categorias.length > 0">
+                      <c-form-check class="mb-3 form-check">
+                        <input
+                          cFormCheckInput
+                          type="checkbox"
+                          id="todas-categorias"
+                          [checked]="estanTodasCategoriasSeleccionadas()"
+                          [indeterminate]="estanAlgunasCategoriasSeleccionadas()"
+                          (change)="toggleTodasCategorias($event)"
+                          [disabled]="!form.enabled"
+                        />
+                        <label cFormCheckLabel for="todas-categorias" >
+                          Seleccionar todas las categorías
+                        </label>
+                      </c-form-check>
+                      <hr class="my-2" />
+                    </div>
+
+                    <!-- Grid de categorías -->
+                    <div class="categorias-grid" *ngIf="categorias.length > 0">
+                      <c-form-check *ngFor="let categoria of categorias" class="categoria-item">
+
+                          <input
+                            cFormCheckInput
+                            type="checkbox"
+                            [id]="'categoria-' + categoria.idCategoria"
+                            [checked]="isCategoriaSelected(categoria)"
+                            (change)="onCategoriaChange(categoria, $event)"
+                            [disabled]="!form.enabled"
+                          />
+                          <label
+                            class="form-check-label"
+                            [for]="'categoria-' + categoria.idCategoria"
+                            [class.text-success]="isCategoriaSelected(categoria)"
+                            [class.text-muted]="!isCategoriaSelected(categoria)"
+                            
+                          >
+                            {{ categoria.nombre }}
+                            <small *ngIf="categoria.descripcion" class="d-block text-muted">
+                              {{ categoria.descripcion }}
+                            </small>
+                          </label>
+                        
+                      </c-form-check>
+                    </div>
+
+                    <!-- Sin categorías -->
+                    <div *ngIf="categorias.length === 0" class="text-center py-3">
+                      <c-icon name="cil-inbox" size="xl" class="text-muted mb-2"></c-icon>
+                      <p class="text-muted mb-0">No hay categorías disponibles</p>
+                    </div>
+                    
+                  </c-card-body>
+                </c-card>
+              </c-col>
+            </c-row>
+
+            <c-row>
               <c-col lg="4">
                 <c-card class="mb-4">
                   <c-card-body>
                     <h3 cCardTitle class="h6 card-title">Resumen</h3>
                     <textarea cFormControl id="resumen" rows="6"
                       type="text" formControlName="resumen"></textarea>
-                  </c-card-body>
-                </c-card>
-              </c-col>
-
-              <c-col lg="4">
-                <c-card>
-                  <c-card-body>
-                    <h3 cCardTitle class="h6 card-title">Categorias</h3>
-                    <c-form-check class="mb-3 form-check" *ngFor="let categ of categorias">
-
-                      <input cFormCheckInput 
-                        type="checkbox"
-                        [checked]="isCategoriaChecked(categ)"
-                        (change)="onToggleCategoria(categ, $any($event.target).checked)">
-
-                      <label cFormCheckLabel>{{categ.nombre}}</label>
-
-                    </c-form-check>
                   </c-card-body>
                 </c-card>
               </c-col>
