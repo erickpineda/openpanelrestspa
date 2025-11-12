@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { LoggerService } from '../logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,12 +12,12 @@ export class UnsavedWorkService {
   private unsavedForms = new Map<string, boolean>();
   private formValues = new Map<string, any>();
 
-  constructor() {
+  constructor(private log: LoggerService) {
     window.addEventListener('saveUnsavedWork', this.saveAllUnsavedWork.bind(this));
   }
 
   public registerForm(formId: string, initialValue?: any): void {
-    console.log(`📝 UnsavedWorkService: Registrando formulario ${formId}`);
+    this.log.info(`📝 UnsavedWorkService: Registrando formulario ${formId}`);
     this.unsavedForms.set(formId, false);
     if (initialValue) {
       this.formValues.set(formId, JSON.stringify(initialValue));
@@ -25,7 +26,7 @@ export class UnsavedWorkService {
   }
 
   public unregisterForm(formId: string): void {
-    console.log(`📝 UnsavedWorkService: Eliminando formulario ${formId}`);
+    this.log.info(`📝 UnsavedWorkService: Eliminando formulario ${formId}`);
     this.unsavedForms.delete(formId);
     this.formValues.delete(formId);
     this.updateUnsavedWorkStatus();
@@ -36,34 +37,34 @@ export class UnsavedWorkService {
     const currentValueStr = JSON.stringify(currentValue);
     
     const hasChanged = initialValue !== currentValueStr;
-    console.log(`📝 UnsavedWorkService: Formulario ${formId} - Cambios: ${hasChanged}`);
+    this.log.info(`📝 UnsavedWorkService: Formulario ${formId} - Cambios: ${hasChanged}`);
     
     this.unsavedForms.set(formId, hasChanged);
     this.updateUnsavedWorkStatus();
   }
 
   public markFormAsSaved(formId: string): void {
-    console.log(`📝 UnsavedWorkService: Formulario ${formId} marcado como guardado`);
+    this.log.info(`📝 UnsavedWorkService: Formulario ${formId} marcado como guardado`);
     this.unsavedForms.set(formId, false);
     this.updateUnsavedWorkStatus();
   }
 
   private updateUnsavedWorkStatus(): void {
     const hasUnsaved = this.hasUnsavedWork();
-    console.log(`📝 UnsavedWorkService: Estado actual - Trabajo sin guardar: ${hasUnsaved}`);
+    this.log.info(`📝 UnsavedWorkService: Estado actual - Trabajo sin guardar: ${hasUnsaved}`);
     this.unsavedWorkSubject.next(hasUnsaved);
     (window as any).__UNSAVED_WORK__ = hasUnsaved;
   }
 
   public hasUnsavedWork(): boolean {
     const hasUnsaved = Array.from(this.unsavedForms.values()).some(hasUnsaved => hasUnsaved);
-    console.log(`📝 UnsavedWorkService: Verificando trabajo sin guardar - Resultado: ${hasUnsaved}`);
+    this.log.info(`📝 UnsavedWorkService: Verificando trabajo sin guardar - Resultado: ${hasUnsaved}`);
     return hasUnsaved;
   }
 
   private saveAllUnsavedWork(): void {
     const formsToSave = Array.from(this.unsavedForms.keys()).filter(formId => this.unsavedForms.get(formId));
-    console.log('💾 UnsavedWorkService: Guardando formularios:', formsToSave);
+    this.log.info('💾 UnsavedWorkService: Guardando formularios:', formsToSave);
     
     const saveEvent = new CustomEvent('saveFormData', {
       detail: { forms: formsToSave }

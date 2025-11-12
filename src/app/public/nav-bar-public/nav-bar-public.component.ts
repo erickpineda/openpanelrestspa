@@ -4,6 +4,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { TokenStorageService } from '../../core/services/auth/token-storage.service';
+import { LoggerService } from '../../core/services/logger.service';
 
 @Component({
   selector: 'app-nav-bar-public',
@@ -29,11 +30,12 @@ export class NavBarPublicComponent implements OnInit {
     private tokenStorageService: TokenStorageService,
     private authService: AuthService,
     private authSync: AuthSyncService,
-    private router: Router
+    private router: Router,
+    private log: LoggerService
   ) {
     // Escuchar cambios de estado de autenticación
     window.addEventListener('authStateChanged', () => {
-      console.log('🔄 NavBar: Estado de autenticación cambiado');
+      this.log.info('🔄 NavBar: Estado de autenticación cambiado');
       this.checkAuthStatus();
     });
 
@@ -53,7 +55,7 @@ export class NavBarPublicComponent implements OnInit {
 
   private checkAuthStatus(): void {
     this.isLoggedIn = this.tokenStorageService.isLoggedIn();
-    console.log('🔐 NavBar - Estado de autenticación:', this.isLoggedIn);
+    this.log.info('🔐 NavBar - Estado de autenticación:', this.isLoggedIn);
     
     if (this.isLoggedIn) {
       const user = this.tokenStorageService.getUser();
@@ -85,7 +87,7 @@ export class NavBarPublicComponent implements OnInit {
         this.router.navigate(['/']);
       },
       error: (err) => {
-        console.error('Error en logout:', err);
+        this.log.error('Error en logout:', err);
         this.authService.performLogout();
         this.isLoadingLogout = false;
         this.checkAuthStatus();

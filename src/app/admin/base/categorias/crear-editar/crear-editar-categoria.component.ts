@@ -11,6 +11,7 @@ import { TokenStorageService } from "../../../../core/services/auth/token-storag
 import { UsuarioService } from "../../../../core/services/data/usuario.service";
 import { OpenpanelApiResponse } from "../../../../core/models/openpanel-api-response.model";
 import { CommonFunctionalityService } from "../../../../shared/services/common-functionality.service";
+import { LoggerService } from "../../../../core/services/logger.service";
 
 @Component({
   selector: 'app-crear-editar-categoria',
@@ -30,7 +31,8 @@ export class CrearEditarCategoria implements OnInit {
     public tokenStorageService: TokenStorageService,
     private categoriaService: CategoriaService,
     public usuarioService: UsuarioService,
-    private entradaService: EntradaService
+    private entradaService: EntradaService,
+    private log: LoggerService
   ) {
     
     this.createForm();
@@ -52,7 +54,7 @@ export class CrearEditarCategoria implements OnInit {
           this.categoriaForm.disable();
         }
       } catch (error) {
-        console.error("Error al obtener datos", error);
+        this.log.error("Error al obtener datos", error);
       }
     }
   }

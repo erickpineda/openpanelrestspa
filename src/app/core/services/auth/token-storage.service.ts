@@ -1,5 +1,6 @@
 // token-storage.service.ts
 import { Injectable } from '@angular/core';
+import { LoggerService } from '../logger.service';
 
 const TOKEN_KEY = 'auth-token';
 const USER_KEY = 'auth-user';
@@ -11,7 +12,7 @@ const SYNC_USER_KEY = 'sync-auth-user';   // Para sincronización entre pestaña
 })
 export class TokenStorageService {
 
-  constructor() { }
+  constructor(private log: LoggerService) { }
 
   signOut(): void {
     // Limpiar sessionStorage
@@ -90,7 +91,7 @@ export class TokenStorageService {
     if (token && user) {
       window.sessionStorage.setItem(TOKEN_KEY, token);
       window.sessionStorage.setItem(USER_KEY, user);
-      console.log('✅ Token y usuario sincronizados desde localStorage');
+      this.log.info('✅ Token y usuario sincronizados desde localStorage');
       return true;
     }
     

@@ -31,10 +31,21 @@
 
     <!-- Buscador -->
     <div class="mb-4">
-      <app-buscador-avanzado
-        [definiciones]="definiciones"
-        (filtroSeleccionado)="aplicarFiltro($event)">
-      </app-buscador-avanzado>
+      <!-- En listado-entradas.component.html -->
+      <app-error-boundary 
+        context="listado-entradas"
+        fallbackMessage="No se pudieron cargar las entradas"
+        fallbackDescription="Verifique su conexión e intente nuevamente."
+        [autoRetry]="true">
+        
+        <app-buscador-avanzado
+          [definiciones]="definiciones"
+          (filtroSeleccionado)="aplicarFiltro($event)">
+        </app-buscador-avanzado>
+        
+        <!-- Tu tabla de entradas aquí -->
+        
+      </app-error-boundary>
     </div>
 
     <!-- Loading State -->

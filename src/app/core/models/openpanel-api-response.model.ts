@@ -20,9 +20,12 @@ export interface OpenpanelApiResponse<T> {
   error?: ApiError;
 }
 
-export interface PaginationInfo {
-  page: number;
-  pageSize: number;
-  totalItems: number;
+export interface PaginatedResponse<T> {
   totalPages: number;
+  totalElements: number;
+  size: number;
+  numberOfElements: number;
+  empty: boolean;
+  hasMore: boolean;
+  elements: T[];
 }

@@ -3,6 +3,7 @@ import { Entrada } from '../../core/models/entrada.model';
 import { Categoria } from '../../core/models/categoria.model';
 import { EntradaService } from '../../core/services/data/entrada.service';
 import { LoadingService } from '../../core/services/ui/loading.service';
+import { LoggerService } from '../../core/services/logger.service';
 
 @Component({
   selector: 'app-home',
@@ -22,6 +23,7 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private entradaService: EntradaService,
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
@@ -33,9 +35,9 @@ export class HomeComponent implements OnInit {
         this.refreshEntradas(); // Refrescar las entradas después de obtener la lista
       })
       .catch((error) => {
-        console.error('Error al obtener lista de entradas:', error.message);
+        this.log.error('Error al obtener lista de entradas:', error.message);
         this.errorMsg = 'No se pudieron cargar las entradas, intenta nuevamente más tarde.';
-        console.log(this.errorMsg);
+        this.log.error(this.errorMsg);
       });
   }
 

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EntradaService } from '../../../core/services/data/entrada.service';
 import { UsuarioService } from '../../../core/services/data/usuario.service';
 import { Subscription } from 'rxjs';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -37,7 +38,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(
     private usuarioService: UsuarioService,
     private entradaService: EntradaService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private log: LoggerService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -58,8 +60,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const entradas = response.data.elements || [];
       
       // Depuración: muestra cuántas no publicadas hay
-      console.log('Entradas:', entradas);
-      console.log('No publicadas:', entradas.filter((e: any) => !e.publicada));
+      this.log.info('Entradas:', entradas);
+      this.log.info('No publicadas:', entradas.filter((e: any) => !e.publicada));
 
       entradas.forEach((entrada: any) => {
         const fechaPublicacion = entrada.fechaPublicacion;

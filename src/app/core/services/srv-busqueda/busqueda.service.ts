@@ -3,6 +3,12 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, switchMap, catchError } from 'rxjs/operators';
 import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
+import { Entrada } from '../../models/entrada.model';
+
+interface BuscarResponse {
+  elements: Entrada[];
+  totalPages: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +27,8 @@ export class BusquedaService {
   }
 
   iniciarBusqueda(
-    searchFunction: (term: string) => Observable<OpenpanelApiResponse<any>>,
-    callback: (results: OpenpanelApiResponse<any>) => void,
+    searchFunction: (term: string) => Observable<BuscarResponse>,
+    callback: (results: BuscarResponse) => void,
     delay: number = 300
   ): void {
     this.limpiarBusqueda();
@@ -31,24 +37,10 @@ export class BusquedaService {
       debounceTime(delay),
       switchMap(term => 
         searchFunction(term).pipe(
-          // Manejar errores dentro del flujo
-          catchError(err => {
-            console.error('Error en búsqueda:', err);
-            callback({
-              result: {
-                trackingId: '',
-                timestamp: new Date().toISOString(),
-                success: false,
-                message: 'Error en la búsqueda'
-              },
-              error: err
-            });
-            return []; // Retornar observable vacío para mantener activo el Subject
-          })
         )
       )
     ).subscribe(response => {
-      if (response?.result?.success) {
+      if (response?.elements) {
         callback(response);
       }
     });

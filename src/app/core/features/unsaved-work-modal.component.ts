@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { SessionManagerService, SessionExpirationData } from '../../core/services/auth/session-manager.service';
 import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
 import { TemporaryStorageService } from '../../core/services/ui/temporary-storage.service';
+import { LoggerService } from '../services/logger.service';
 
 @Component({
   selector: 'app-unsaved-work-modal',
@@ -20,32 +21,33 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   constructor(
     private sessionManager: SessionManagerService,
     private unsavedWorkService: UnsavedWorkService,
-    private temporaryStorage: TemporaryStorageService
+    private temporaryStorage: TemporaryStorageService,
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
-    console.log('🔄 UnsavedWorkModalComponent: Inicializando...');
+    this.log.info('🔄 UnsavedWorkModalComponent: Inicializando...');
     
     this.subscription.add(
       this.sessionManager.sessionExpired$.subscribe(data => {
-        console.log('📡 UnsavedWorkModalComponent: Evento recibido:', data);
+        this.log.info('📡 UnsavedWorkModalComponent: Evento recibido:', data);
         
         const isLogoutWithSave = data.type === 'LOGOUT' && data.allowSave === true;
-        console.log('🔍 Es logout con allowSave:', isLogoutWithSave);
+        this.log.info('🔍 Es logout con allowSave:', isLogoutWithSave);
         
         if (isLogoutWithSave) {
-          console.log('✅ Mostrando modal porque es LOGOUT con allowSave');
+          this.log.info('✅ Mostrando modal porque es LOGOUT con allowSave');
           this.sessionData = data;
           this.showModal();
         } else {
-          console.log('❌ No se muestra modal, redirigiendo...');
+          this.log.info('❌ No se muestra modal, redirigiendo...');
           this.sessionManager.performLogout(data);
         }
       })
     );
 
     window.addEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
-    console.log('✅ UnsavedWorkModalComponent: Inicializado correctamente');
+    this.log.info('✅ UnsavedWorkModalComponent: Inicializado correctamente');
   }
 
   ngOnDestroy(): void {
@@ -54,7 +56,7 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   }
 
   private showModal(): void {
-    console.log('🎬 Mostrando modal...');
+    this.log.info('🎬 Mostrando modal...');
     this.isVisible = true;
   }
 
@@ -78,7 +80,7 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
       this.saveInProgress = false;
       this.saveCompleted = true;
       
-      console.log('✅ Guardado temporal completado');
+      this.log.info('✅ Guardado temporal completado');
       
       setTimeout(() => {
         this.hideModal();

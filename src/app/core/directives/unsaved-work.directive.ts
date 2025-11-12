@@ -1,5 +1,6 @@
 import { Directive, ElementRef, OnInit, OnDestroy, Input } from '@angular/core';
 import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
+import { LoggerService } from '../services/logger.service';
 
 @Directive({
   selector: '[appUnsavedWork]'
@@ -12,14 +13,15 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
 
   constructor(
     private el: ElementRef,
-    private unsavedWorkService: UnsavedWorkService
+    private unsavedWorkService: UnsavedWorkService,
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
     const form = this.el.nativeElement;
     this.formId = this.appUnsavedWork || `form-${Date.now()}`;
     
-    console.log(`📝 UnsavedWorkDirective: Registrando formulario: ${this.formId}`);
+    this.log.info(`📝 UnsavedWorkDirective: Registrando formulario: ${this.formId}`);
     
     // Guardar estado inicial
     this.initialFormData = this.getFormData(form);
@@ -36,7 +38,7 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     form.classList.add('unsaved-work-tracked');
     form.setAttribute('data-tracked-form', this.formId);
     
-    console.log(`✅ UnsavedWorkDirective: Formulario ${this.formId} registrado`);
+    this.log.info(`✅ UnsavedWorkDirective: Formulario ${this.formId} registrado`);
   }
 
   ngOnDestroy(): void {

@@ -1,58 +1,110 @@
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+// core/services/data/entrada.service.ts
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Entrada } from "../../models/entrada.model";
-import { TokenStorageService } from "../auth/token-storage.service";
-import { CrudService } from "../../_utils/crud.service";
-import { CambiarEstadoEntradaReq } from "../../models/cambiar-estado-entrada.model";
-import { RespuestaModelResp } from "../../models/respuesta.model";
-import { OpenpanelApiResponse } from "../../models/openpanel-api-response.model";
+import { map } from 'rxjs/operators';
+import { Entrada } from '../../models/entrada.model';
+import { TipoEntrada } from '../../models/tipo-entrada.model';
+import { EstadoEntrada } from '../../models/estado-entrada.model';
+import { CrudService } from '../../_utils/crud.service';
+
+// Interfaces para las respuestas específicas
+interface TiposEntradasResponse {
+  tiposEntradas: TipoEntrada[];
+}
+
+interface EstadosEntradasResponse {
+  estadosEntradas: EstadoEntrada[];
+}
+
+interface BuscarResponse {
+  elements: Entrada[];
+  totalPages: number;
+}
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
-export class EntradaService extends CrudService<Entrada> {
+export class EntradaService extends CrudService<Entrada, number> {
+  protected endpoint = '/entradas';
 
-  // Definimos la ruta base para las entradas
-  protected override resource = '/entradas';
+  // ✅ MÉTODOS SEGUROS ESPECÍFICOS (nuevos)
 
-  constructor(
-    protected override http: HttpClient,
-    protected override token: TokenStorageService
-  ) {
-    super(http, token);
+  /**
+   * Obtiene tipos de entrada de forma segura
+   */
+  listarTiposEntradasSafe(): Observable<TipoEntrada[]> {
+    return this.safeGetData<TiposEntradasResponse>(
+      `${this.endpoint}/tiposEntradas`,
+      { tiposEntradas: [] },
+      undefined,
+      undefined,
+      'entradas.tiposEntradas'
+    ).pipe(
+      map(response => response.tiposEntradas)
+    );
   }
 
-  // Método específico para listar tipos de entradas
-  obtenerDefinicionesBuscador(): Observable<OpenpanelApiResponse<any>> {
-    const url = this.buildUrl('/buscar/definicionesBuscador');
-    return this.http.get<OpenpanelApiResponse<any>>(url, {
-      headers: this.setHeaders()
-    });
+  /**
+   * Obtiene estados de entrada de forma segura  
+   */
+  listarEstadosEntradasSafe(): Observable<EstadoEntrada[]> {
+    return this.safeGetData<EstadosEntradasResponse>(
+      `${this.endpoint}/estadosEntradas`,
+      { estadosEntradas: [] },
+      undefined,
+      undefined,
+      'entradas.estadosEntradas'
+    ).pipe(
+      map(response => response.estadosEntradas)
+    );
   }
 
-  // Método específico para listar tipos de entradas
-  listarTiposEntradas(): Observable<OpenpanelApiResponse<any>> {
-    const url = this.buildUrl('/tiposEntradas');
-    return this.http.get<OpenpanelApiResponse<any>>(url, {
-      headers: this.setHeaders()
-    });
+  /**
+   * Busca entradas de forma segura
+   */
+  buscarSafe(searchRequest: any, page: number, size: number): Observable<BuscarResponse> {
+    const params = { page: page.toString(), size: size.toString() };
+    return this.safePostData<BuscarResponse>(
+      `${this.endpoint}/buscar`,
+      searchRequest,
+      { elements: [], totalPages: 0 },
+      params,
+      undefined,
+      'entradas.buscar'
+    );
   }
 
-  // Método específico para listar estados de entradas
-  listarEstadosEntradas(): Observable<OpenpanelApiResponse<any>> {
-    const url = this.buildUrl('/estadosEntradas');
-    return this.http.get<OpenpanelApiResponse<any>>(url, {
-      headers: this.setHeaders()
-    });
+  /**
+   * Obtiene definiciones del buscador de forma segura
+   */
+  obtenerDefinicionesBuscadorSafe(): Observable<any> {
+    return this.safeGetData<any>(
+      `${this.endpoint}/buscar/definicionesBuscador`,
+      {},
+      undefined,
+      undefined,
+      'entradas.definicionesBuscador'
+    );
   }
 
-  // Método específico para cambiar el estado de una entrada
-  cambiarEstadoEntrada(req: CambiarEstadoEntradaReq): Observable<RespuestaModelResp> {
-    const url = this.buildUrl('/cambiarEstadoEntrada');
-    return this.http.post<RespuestaModelResp>(url, req, {
-      headers: this.setHeaders()
-    });
+  // ✅ MÉTODOS ORIGINALES (mantener exactamente como están)
+
+  listarTiposEntradas(): Observable<any> {
+    return this.get(`${this.endpoint}/tiposEntradas`);
   }
 
+  listarEstadosEntradas(): Observable<any> {
+    return this.get(`${this.endpoint}/estadosEntradas`);
+  }
+
+  buscar(searchRequest: any, page: number, size: number): Observable<any> {
+    const params = { page: page.toString(), size: size.toString() };
+    return this.post(`${this.endpoint}/buscar`, searchRequest, params);
+  }
+
+  obtenerDefinicionesBuscador(): Observable<any> {
+    return this.get(`${this.endpoint}/buscar/definicionesBuscador`);
+  }
+
+  // ... mantener todos tus otros métodos existentes
 }

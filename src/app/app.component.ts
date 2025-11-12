@@ -1,6 +1,7 @@
 // app.component.ts
 import { Component, OnInit } from '@angular/core';
 import { AuthSyncService } from './core/services/auth/auth-sync.service';
+import { LoggerService } from './core/services/logger.service';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,8 @@ export class AppComponent implements OnInit {
   loading: boolean = false;
 
   constructor(
-    private authSync: AuthSyncService
+    private authSync: AuthSyncService,
+    private log: LoggerService
   ){ }
 
   ngOnInit(): void {
@@ -21,7 +23,7 @@ export class AppComponent implements OnInit {
     
     // Escuchar cambios de estado de autenticación
     window.addEventListener('authStateChanged', () => {
-      console.log('🔄 Estado de autenticación cambiado, actualizando interfaz...');
+      this.log.info('🔄 Estado de autenticación cambiado, actualizando interfaz...');
       // Aquí podrías forzar la actualización de componentes si es necesario
     });
   }

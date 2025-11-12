@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { AuthSyncService } from '../services/auth/auth-sync.service';
+import { LoggerService } from '../services/logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,8 @@ export class AuthGuard implements CanActivate {
   constructor(
     private tokenStorage: TokenStorageService,
     private authSync: AuthSyncService,
-    private router: Router
+    private router: Router,
+    private log: LoggerService
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
@@ -22,8 +24,8 @@ export class AuthGuard implements CanActivate {
     const token = this.tokenStorage.getToken();
     const user = this.tokenStorage.getUser();
 
-    console.log('🔐 AuthGuard - Token presente:', !!token);
-    console.log('🔐 AuthGuard - Usuario presente:', !!user);
+    this.log.info('🔐 AuthGuard - Token presente:', !!token);
+    this.log.info('🔐 AuthGuard - Usuario presente:', !!user);
 
     if (token && user?.roles) {
       // Verificar roles si es necesario

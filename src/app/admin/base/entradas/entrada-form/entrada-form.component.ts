@@ -16,6 +16,7 @@ import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
 import { Entrada } from '../../../../core/models/entrada.model';
 import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
 import { TemporaryStorageService } from '../../../../core/services/ui/temporary-storage.service';
+import { LoggerService } from '../../../../core/services/logger.service';
 
 @Component({
   selector: 'app-entrada-form',
@@ -81,7 +82,9 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   constructor(
     private temporaryStorage: TemporaryStorageService,
     private router: Router,
-    private cdRef: ChangeDetectorRef) {
+    private cdRef: ChangeDetectorRef,
+    private log: LoggerService
+  ) {
 
     }
 
@@ -109,7 +112,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     const state = navigation?.extras?.state as any;
     
     if (state?.temporaryEntry && state?.recoverData) {
-      console.log('🔄 Recibiendo entrada temporal desde navegación:', state.temporaryEntry);
+      this.log.info('🔄 Recibiendo entrada temporal desde navegación:', state.temporaryEntry);
       this.isRecoveringFromNavigation = true;
       
       // Recuperar los datos en el formulario
@@ -130,7 +133,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     const temporaryEntries = this.temporaryStorage.getTemporaryEntriesByType('entrada');
     
     if (temporaryEntries.length > 0 && !this.isRecoveringFromNavigation) {
-      console.log('📥 Entradas temporales encontradas en formulario:', temporaryEntries);
+      this.log.info('📥 Entradas temporales encontradas en formulario:', temporaryEntries);
       
       // ✅ REVERTIMOS: Volvemos al comportamiento original - mostrar individual
       if (temporaryEntries.length === 1) {
@@ -158,18 +161,18 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   onIgnoreData(): void {
     this.showRecoveryNotification = false;
-    console.log('ℹ️ Usuario ignoró los datos temporales');
+    this.log.info('ℹ️ Usuario ignoró los datos temporales');
   }
 
   onDiscardData(): void {
     this.showRecoveryNotification = false;
     this.temporaryStorage.removeTemporaryEntry(this.temporaryData.id);
-    console.log('🗑️ Usuario descartó los datos temporales');
+    this.log.info('🗑️ Usuario descartó los datos temporales');
   }
 
   private recoverTemporaryData(formData: any): void {
     try {
-      console.log('🔄 Recuperando datos temporales...', formData);
+      this.log.info('🔄 Recuperando datos temporales...', formData);
       
       // Actualizar el formulario con los datos temporales
       this.form.patchValue({
@@ -195,7 +198,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
         });
       }
       
-      console.log('✅ Datos temporales recuperados correctamente');
+      this.log.info('✅ Datos temporales recuperados correctamente');
       
       // Limpiar datos temporales después de recuperarlos
       if (this.currentTemporaryEntryId) {
@@ -204,7 +207,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       }
       
     } catch (error) {
-      console.error('❌ Error al recuperar datos temporales:', error);
+      this.log.error('❌ Error al recuperar datos temporales:', error);
     }
   }
 
@@ -215,7 +218,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   }
 
   private saveBeforeLogout(): void {
-    console.log('💾 Guardando entrada antes del logout...');
+    this.log.info('💾 Guardando entrada antes del logout...');
     
     if (this.form.valid) {
       this.onSubmit();
@@ -246,9 +249,9 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       // Guardar nueva entrada temporal
       this.currentTemporaryEntryId = this.temporaryStorage.saveTemporaryEntry(temporaryEntry);
       
-      console.log('✅ Datos guardados en almacenamiento temporal con ID:', this.currentTemporaryEntryId);
+      this.log.info('✅ Datos guardados en almacenamiento temporal con ID:', this.currentTemporaryEntryId);
     } catch (error) {
-      console.error('❌ Error al guardar temporalmente:', error);
+      this.log.error('❌ Error al guardar temporalmente:', error);
     }
   }
 
@@ -256,7 +259,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     if (!this.form) return;
     
     if (this.form.valid) {
-      console.log('💾 Intentando guardar entrada...');
+      this.log.info('💾 Intentando guardar entrada...');
       this.submitForm.emit(this.form.value as Entrada);
       
       // ✅ MODIFICADO: Limpiar entrada temporal específica al guardar exitosamente

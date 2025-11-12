@@ -1,5 +1,6 @@
 // temporary-storage.service.ts
 import { Injectable } from '@angular/core';
+import { LoggerService } from '../logger.service';
 
 export interface TemporaryEntry {
   id: string; // ✅ NUEVO: ID único para cada entrada
@@ -17,7 +18,7 @@ export class TemporaryStorageService {
   private readonly STORAGE_KEY = 'temporary-entries';
   private readonly NOTIFICATION_SHOWN_KEY = 'recovery-notification-shown';
 
-  constructor() { }
+  constructor(private log: LoggerService) { }
 
   // ✅ NUEVO: Generar ID único
   private generateId(): string {
@@ -36,7 +37,7 @@ export class TemporaryStorageService {
     entries[newEntry.id] = newEntry;
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
     
-    console.log('💾 Entrada temporal guardada:', newEntry.id, newEntry.title);
+    this.log.info('💾 Entrada temporal guardada:', newEntry.id, newEntry.title);
     return newEntry.id;
   }
 
@@ -60,12 +61,12 @@ export class TemporaryStorageService {
     const entries = this.getTemporaryEntries();
     delete entries[id];
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
-    console.log('🧹 Entrada temporal removida:', id);
+    this.log.info('🧹 Entrada temporal removida:', id);
   }
 
   clearAllTemporaryEntries(): void {
     localStorage.removeItem(this.STORAGE_KEY);
-    console.log('🧹 Todas las entradas temporales limpiadas');
+    this.log.info('🧹 Todas las entradas temporales limpiadas');
   }
 
   // ✅ NUEVO: Limpiar entradas por tipo
@@ -77,7 +78,7 @@ export class TemporaryStorageService {
       }
     });
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
-    console.log(`🧹 Entradas temporales de tipo ${formType} limpiadas`);
+    this.log.info(`🧹 Entradas temporales de tipo ${formType} limpiadas`);
   }
 
   private getTemporaryEntries(): { [key: string]: TemporaryEntry } {

@@ -1,10 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { catchError, Subject, takeUntil, throwError } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
 import { EntradaService } from '../../../core/services/data/entrada.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 import { ToastService } from '../../../core/services/ui/toast.service';
+import { ErrorBoundaryService } from '../../../core/errors/error-boundary/error-boundary.service';
+import { GlobalErrorHandlerService } from '../../../core/errors/global-error/global-error-handler.service';
+import { ErrorBoundaryComponent } from '../../../shared/components/errors/error-boundary/error-boundary.component';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -29,12 +33,13 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy {
 
   public definiciones: any;
   public cargando: boolean = false;
-
+private readonly boundaryId = 'listado-entradas-main';
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
     private busquedaService: BusquedaService,
-    private toastService: ToastService,
+    private toastService: ToastService,private errorBoundaryService: ErrorBoundaryService,
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
@@ -48,6 +53,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.errorBoundaryService.unregisterBoundary(this.boundaryId);
     this.busquedaService.limpiarBusqueda();
   }
 
@@ -61,7 +67,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy {
         clazzName: 'Entrada'
       }]
     };
-    return this.entradaService.buscar(searchRequest, this.currentPage, this.pageSize);
+    return this.entradaService.buscarSafe(searchRequest, this.currentPage, this.pageSize);
   }
 
   public aplicarFiltro(filtro: any): void {
@@ -76,40 +82,41 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy {
   }
 
   private procesarResultadosBusqueda(response: any) {
-    if (response.result?.success) {
-      this.listaEntradas = response.data.elements || [];
-      this.totalPages = response.data.totalPages;
+    if (response.elements) {
+      this.listaEntradas = response.elements || [];
+      this.totalPages = response.totalPages;
       this.listaEntradas = this.listaEntradas.map((entrada:Entrada) => ({
         ...entrada,
         categoriasConComas: entrada.categorias?.map(e => e.nombre).join(', ') || ''
       }));
     } else {
-      console.error('Error en búsqueda:', response.error);
       this.listaEntradas = [];
       this.currentPage = 0;
-      this.mostrarError('Error en búsqueda: ' + response.error);
+      this.mostrarError('Error en búsqueda: ' + response);
     }
   }
 
   private cargarDefinicionesBuscador(): void {
     this.cargando = true;
     
-    this.entradaService.obtenerDefinicionesBuscador()
-      .pipe(takeUntil(this.destroy$))
+    this.entradaService.obtenerDefinicionesBuscadorSafe()
       .subscribe({
         next: (response) => {
           this.cargando = false;
-          if (response.result?.success) {
-            this.definiciones = response.data;
+          if (response) {
+            this.definiciones = response;
             this.inicializarCamposBusqueda();
           }
         },
         error: (error) => {
           this.cargando = false;
-          console.error('Error al cargar definiciones del buscador:', error);
-          this.mostrarError(error.error?.error?.message || 'Error al cargar definiciones');
+          this.log.error('Error secundario:', error);
         }
       });
+  }
+
+   onBoundaryInit(boundary: ErrorBoundaryComponent): void {
+    this.errorBoundaryService.registerBoundary(this.boundaryId, boundary);
   }
 
   private inicializarCamposBusqueda(): void {
@@ -154,14 +161,13 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
-            console.log('Entrada eliminada:', response);
             this.obtenerListaEntradas(this.currentPage);
             this.entradaABorrar = null;
             this.visible = false;
             this.toastService.showSuccess('La entrada se ha eliminado correctamente.', 'Entrada eliminada');
           },
           error: (error) => {
-            console.error('Error al eliminar la entrada:', error);
+            this.log.error('Error al eliminar la entrada:', error);
             this.visible = false;
             this.mostrarError('Error al eliminar la entrada: ' + error.message);
           }

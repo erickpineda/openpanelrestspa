@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CoreModule } from './core/core.module';
-import { GlobalErrorComponent } from './core/errors/global-error/global-error.component';
 import { HttpClientModule } from '@angular/common/http';
 import { CustomPreloadingStrategyService } from './core/preloading/custom-preloading-strategy.service';
 import { DatePipe } from '@angular/common';
@@ -19,7 +18,6 @@ import { SharedOPModule } from './shared/shared.module';
 @NgModule({
   declarations: [
     AppComponent,
-    GlobalErrorComponent,
     SessionExpiredComponent,
     UnsavedWorkModalComponent,
     UnsavedWorkDirective,

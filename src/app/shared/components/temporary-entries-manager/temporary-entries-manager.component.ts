@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TemporaryEntry, TemporaryStorageService } from '../../../core/services/ui/temporary-storage.service';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-temporary-entries-manager',
@@ -15,7 +16,8 @@ export class TemporaryEntriesManagerComponent implements OnInit {
 
   constructor(
     private temporaryStorage: TemporaryStorageService,
-    private router: Router // ✅ Asegurar que Router esté inyectado
+    private router: Router,
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
@@ -27,7 +29,7 @@ export class TemporaryEntriesManagerComponent implements OnInit {
   }
 
   recoverEntry(entry: TemporaryEntry): void {
-    console.log('📥 Recuperando entrada:', entry);
+    this.log.info('📥 Recuperando entrada:', entry);
     
     // ✅ CORREGIDO: Navegar al formulario de creación con los datos
     this.router.navigate(['/admin/control/entradas/crear'], {

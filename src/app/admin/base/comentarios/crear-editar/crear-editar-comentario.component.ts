@@ -11,6 +11,7 @@ import { TokenStorageService } from "../../../../core/services/auth/token-storag
 import { UsuarioService } from "../../../../core/services/data/usuario.service";
 import { OpenpanelApiResponse } from "../../../../core/models/openpanel-api-response.model";
 import { CommonFunctionalityService } from "../../../../shared/services/common-functionality.service";
+import { LoggerService } from "../../../../core/services/logger.service";
 
 @Component({
   selector: 'app-crear-editar-comentario',
@@ -34,6 +35,7 @@ export class CrearEditarComentario implements OnInit {
     public usuarioService: UsuarioService,
     public tokenStorageService: TokenStorageService,
     private cdr: ChangeDetectorRef,
+    private log: LoggerService
   ) {
     this.createForm();
 
@@ -172,7 +174,7 @@ export class CrearEditarComentario implements OnInit {
 
   private actualiza(coment: Comentario) {
     this.comentarioService.actualizar(coment.idComentario, coment).subscribe((response: OpenpanelApiResponse<any>)=> {
-      console.log('Se ha actualizado el comentario ' + coment.idComentario)
+      this.log.info('Se ha actualizado el comentario ' + coment.idComentario)
       this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
     });
   }

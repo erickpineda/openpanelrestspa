@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { SessionManagerService } from './session-manager.service';
 import { TokenStorageService } from './token-storage.service';
+import { LoggerService } from '../logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class AuthSyncService {
   constructor(
     private tokenStorage: TokenStorageService,
     private sessionManager: SessionManagerService,
-    private router: Router
+    private router: Router,
+    private log: LoggerService
   ) {
     this.setupSync();
   }
@@ -27,7 +29,7 @@ export class AuthSyncService {
         this.handleAuthChange(event.newValue);
       } else if (event.key === 'sync-auth-token' || event.key === 'sync-auth-user') {
         // ✅ NUEVO: Sincronizar cuando cambian los datos de autenticación
-        console.log('🔄 Cambio detectado en datos de autenticación');
+        this.log.info('🔄 Cambio detectado en datos de autenticación');
         this.tokenStorage.syncFromLocalStorage();
         
         // Disparar evento para que los componentes se actualicen
@@ -50,19 +52,19 @@ export class AuthSyncService {
         this.sessionManager.handleLogoutFromSync(data);
       }
     } catch (e) {
-      console.error('Error parsing auth sync data:', e);
+      this.log.error('Error parsing auth sync data:', e);
     }
   }
 
   // ✅ NUEVO: Método simplificado para inicializar estado
   public initializeAuthState(): void {
-    console.log('🔄 AuthSyncService: Inicializando estado de autenticación');
+    this.log.info('🔄 AuthSyncService: Inicializando estado de autenticación');
     
     // Sincronizar desde localStorage
     const synced = this.tokenStorage.syncFromLocalStorage();
     
     if (synced) {
-      console.log('✅ Estado de autenticación sincronizado correctamente');
+      this.log.info('✅ Estado de autenticación sincronizado correctamente');
       // Disparar evento para que los componentes se actualicen
       window.dispatchEvent(new Event('authStateChanged'));
     }

@@ -49,7 +49,7 @@ export class EditarEntradaComponent implements OnInit {
     this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: Entrada) => {
       if (!ent) return;
       this.entrada = ent;
-
+      
       // Busca los objetos reales por referencia
       const estadoCorrecto = this.estadosEntr.find(
         e => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada

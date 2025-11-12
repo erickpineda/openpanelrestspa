@@ -1,7 +1,7 @@
 import { OPConstants } from "../app/shared/constants/op-global.constants";
 
 export let base = {
-    mock: false,
+    mock: true,
     getSessionInfo: false,
     production: false,
     i18n: 'es',

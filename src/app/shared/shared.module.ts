@@ -41,6 +41,8 @@ import { OpLoaderComponent } from './components/loading/op-loader.component';
 import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
 import { ToastsContainerComponent } from './components/op-toast/toasts-container.component';
 import { InlineLoaderComponent } from './components/loading/inline-loader.component';
+import { GlobalErrorComponent } from './components/errors/global/global-error.component';
+import { ErrorBoundaryComponent } from './components/errors/error-boundary/error-boundary.component';
 
 @NgModule({
   imports: [
@@ -76,7 +78,9 @@ import { InlineLoaderComponent } from './components/loading/inline-loader.compon
     UtilitiesModule,
   ],
   declarations: [
+    GlobalErrorComponent,
     NotFoundComponent,
+    ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
     DataRecoveryNotificationComponent, // ✅ Agregado aquí
@@ -120,7 +124,9 @@ import { InlineLoaderComponent } from './components/loading/inline-loader.compon
     UtilitiesModule,
 
     // Componentes compartidos
+    GlobalErrorComponent,
     NotFoundComponent,
+    ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
     DataRecoveryNotificationComponent, // ✅ Exportado aquí

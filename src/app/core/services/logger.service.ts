@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment.dev.es';
   providedIn: 'root'
 })
 export class LoggerService {
-  private isProduction = environment.production;
+  private isProduction = environment.mock;
 
   // Niveles de log
   private levels = ['debug', 'info', 'warn', 'error'] as const;

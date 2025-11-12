@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Subject, Observable } from 'rxjs';
 import { TokenStorageService } from './token-storage.service';
 import { UnsavedWorkService } from '../utils/unsaved-work.service';
+import { LoggerService } from '../logger.service';
 
 export interface SessionExpirationData {
   type: 'LOGOUT' | 'SESSION_EXPIRED' | 'ANOTHER_DEVICE';
@@ -25,13 +26,14 @@ export class SessionManagerService {
   constructor(
     private tokenStorage: TokenStorageService,
     private unsavedWorkService: UnsavedWorkService,
-    private router: Router
+    private router: Router,
+    private log: LoggerService
   ) {
     this.setupSessionSync();
   }
 
   private setupSessionSync(): void {
-    console.log('🔄 SessionManagerService: Configurando sincronización');
+    this.log.info('🔄 SessionManagerService: Configurando sincronización');
     
     // Verificar eventos pendientes al iniciar
     this.checkPendingEvents();
@@ -51,7 +53,7 @@ export class SessionManagerService {
       this.checkPendingEvents();
     }, 5000);
 
-    console.log('✅ SessionManagerService: Sincronización configurada');
+    this.log.info('✅ SessionManagerService: Sincronización configurada');
   }
 
   private checkPendingEvents(): void {
@@ -65,7 +67,7 @@ export class SessionManagerService {
       
       // Procesar eventos de menos de 30 segundos
       if (eventAge < 30000 && !this.isProcessing) {
-        console.log('📥 Evento pendiente encontrado:', pendingEvent);
+        this.log.info('📥 Evento pendiente encontrado:', pendingEvent);
         this.isProcessing = true;
         setTimeout(() => {
           this.handleSessionChange(pendingEvent);
@@ -78,22 +80,22 @@ export class SessionManagerService {
   }
 
   private handleSessionChange(sessionData: string): void {
-    console.log('🔄 SessionManagerService: Manejando cambio de sesión:', sessionData);
+    this.log.info('🔄 SessionManagerService: Manejando cambio de sesión:', sessionData);
     
     try {
       const data = JSON.parse(sessionData);
-      console.log('📊 Datos parseados:', data);
+      this.log.info('📊 Datos parseados:', data);
       
       if (data.type === 'LOGOUT') {
         this.handleLogout(data);
       }
     } catch (e) {
-      console.error('❌ Error parsing session data:', e);
+      this.log.error('❌ Error parsing session data:', e);
     }
   }
 
   private handleLogout(data: any): void {
-    console.log('🚪 SessionManagerService: Manejando logout...');
+    this.log.info('🚪 SessionManagerService: Manejando logout...');
     
     const logoutData: SessionExpirationData = {
       type: 'LOGOUT',
@@ -104,18 +106,18 @@ export class SessionManagerService {
 
     // Verificar trabajo sin guardar
     const hasUnsavedWork = this.unsavedWorkService.hasUnsavedWork();
-    console.log('📝 Trabajo sin guardar (servicio):', hasUnsavedWork);
+    this.log.info('📝 Trabajo sin guardar (servicio):', hasUnsavedWork);
     
     const hasUnsavedWorkBackup = this.checkUnsavedWorkBackup();
-    console.log('📝 Trabajo sin guardar (respaldo):', hasUnsavedWorkBackup);
+    this.log.info('📝 Trabajo sin guardar (respaldo):', hasUnsavedWorkBackup);
     
     const shouldShowModal = hasUnsavedWork || hasUnsavedWorkBackup;
     
     if (shouldShowModal && logoutData.allowSave) {
-      console.log('📢 Emitiendo evento para mostrar modal...');
+      this.log.info('📢 Emitiendo evento para mostrar modal...');
       this.sessionExpiredSubject.next(logoutData);
     } else {
-      console.log('🔓 Forzando logout inmediato...');
+      this.log.info('🔓 Forzando logout inmediato...');
       this.performLogout(logoutData);
     }
   }
@@ -132,16 +134,16 @@ export class SessionManagerService {
     let totalElements = 0;
     selectors.forEach(selector => {
       const elements = document.querySelectorAll(selector);
-      console.log(`🔍 Selector "${selector}": ${elements.length} elementos`);
+      this.log.info(`🔍 Selector "${selector}": ${elements.length} elementos`);
       totalElements += elements.length;
     });
     
-    console.log('📊 Total elementos sin guardar (respaldo):', totalElements);
+    this.log.info('📊 Total elementos sin guardar (respaldo):', totalElements);
     return totalElements > 0;
   }
 
   public notifyLogout(allowSave: boolean = true): void {
-    console.log('📢 SessionManagerService: Notificando logout a otras pestañas...');
+    this.log.info('📢 SessionManagerService: Notificando logout a otras pestañas...');
     
     const data = {
       type: 'LOGOUT',
@@ -152,7 +154,7 @@ export class SessionManagerService {
     localStorage.setItem(this.SESSION_SYNC_KEY, JSON.stringify(data));
     localStorage.setItem(this.SESSION_TIMESTAMP_KEY, Date.now().toString());
     
-    console.log('💾 Datos guardados en localStorage:', data);
+    this.log.info('💾 Datos guardados en localStorage:', data);
     
     setTimeout(() => {
       this.cleanupSyncData();
@@ -162,11 +164,11 @@ export class SessionManagerService {
   private cleanupSyncData(): void {
     localStorage.removeItem(this.SESSION_SYNC_KEY);
     localStorage.removeItem(this.SESSION_TIMESTAMP_KEY);
-    console.log('🧹 Datos de sync limpiados');
+    this.log.info('🧹 Datos de sync limpiados');
   }
 
   public performLogout(data: SessionExpirationData): void {
-    console.log('🚀 SessionManagerService: Ejecutando performLogout...');
+    this.log.info('🚀 SessionManagerService: Ejecutando performLogout...');
     this.tokenStorage.signOut();
     
     this.router.navigate(['/session-expired'], { 
@@ -175,7 +177,7 @@ export class SessionManagerService {
   }
 
   public handleLogoutFromSync(data: any): void {
-    console.log('🔄 SessionManager: Logout desde sync recibido', data);
+    this.log.info('🔄 SessionManager: Logout desde sync recibido', data);
     
     const logoutData: SessionExpirationData = {
       type: 'LOGOUT',

@@ -6,6 +6,7 @@ import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from '../shared/components/icons/icon-subset';
 import { navItems } from './default-layout/_nav';
 import { TemporaryStorageService } from '../core/services/ui/temporary-storage.service';
+import { LoggerService } from '../core/services/logger.service';
 
 // ... imports existentes
 
@@ -30,7 +31,8 @@ export class AdminComponent implements OnInit {
     private router: Router,
     private titleService: Title,
     private iconSetService: IconSetService,
-    private temporaryStorage: TemporaryStorageService
+    private temporaryStorage: TemporaryStorageService,
+    private log: LoggerService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
@@ -44,7 +46,7 @@ export class AdminComponent implements OnInit {
     this.temporaryEntriesCount = temporaryEntries.length;
     
     if (this.temporaryEntriesCount > 0) {
-      console.log('📥 Datos temporales encontrados en admin:', temporaryEntries);
+      this.log.info('📥 Datos temporales encontrados en admin:', temporaryEntries);
       
       // ✅ MODIFICADO: Siempre mostrar notificación múltiple, incluso con una sola entrada
       this.showGlobalRecoveryNotification = true;
@@ -64,12 +66,12 @@ export class AdminComponent implements OnInit {
 
   onGlobalIgnore(): void {
     this.showGlobalRecoveryNotification = false;
-    console.log('ℹ️ Usuario ignoró la notificación global de recuperación');
+    this.log.info('ℹ️ Usuario ignoró la notificación global de recuperación');
   }
 
   onGlobalDiscard(): void {
     this.showGlobalRecoveryNotification = false;
     this.temporaryStorage.clearAllTemporaryEntries();
-    console.log('🗑️ Usuario descartó todos los datos temporales');
+    this.log.info('🗑️ Usuario descartó todos los datos temporales');
   }
 }

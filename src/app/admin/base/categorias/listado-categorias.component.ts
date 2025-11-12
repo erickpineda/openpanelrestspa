@@ -7,6 +7,7 @@ import { TokenStorageService } from "../../../core/services/auth/token-storage.s
 import { UsuarioService } from "../../../core/services/data/usuario.service";
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-response.model";
+import { LoggerService } from "../../../core/services/logger.service";
 
 @Component({
   selector: 'app-listado-categorias',
@@ -23,6 +24,7 @@ export class ListadoCategoriasComponent implements OnInit {
     private usuarioService: UsuarioService,
     private tokenStorageService: TokenStorageService,
     private commonFuncService: CommonFunctionalityService,
+    private log: LoggerService
   ) {
   }
 
@@ -37,7 +39,7 @@ export class ListadoCategoriasComponent implements OnInit {
         this.listaCategorias = listaRes;
       }
     } catch (error) {
-      console.error('Error initializing list:', error);
+      this.log.error('Error initializing list:', error);
     }
   }
 
