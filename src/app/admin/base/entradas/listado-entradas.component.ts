@@ -100,6 +100,19 @@ private readonly boundaryId = 'listado-entradas-main';
     this.cargando = true;
     
     this.entradaService.obtenerDefinicionesBuscadorSafe()
+      .pipe(
+          takeUntil(this.destroy$),
+          catchError((error) => {
+            // Reportar al boundary específico
+            this.errorBoundaryService.reportErrorToBoundary(
+              this.boundaryId, 
+              error,
+              'CargarDefinicionesBuscador'
+            );
+            
+            return throwError(() => error);
+          })
+        )
       .subscribe({
         next: (response) => {
           this.cargando = false;

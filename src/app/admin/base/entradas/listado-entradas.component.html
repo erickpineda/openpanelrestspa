@@ -6,11 +6,11 @@
     <c-col [sm]="6">
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button cButton color="light" size="sm" aria-label="Imprimir listado">
-          <svg cIcon name="cilPrint" class="me-1" size="sm"></svg>
+          <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
           Imprimir
         </button>
-        <button cButton color="warning" size="sm" aria-label="Ver entradas pendientes de revisión">
-          <svg cIcon name="cilWarning" class="me-1" size="sm"></svg>
+        <button cButton color="warning" size="sm">
+          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Entradas sin revisar"></svg>
           Sin revisar
         </button>
       </div>
@@ -18,11 +18,11 @@
   </c-card-header>
   
   <c-card-body>
-    <div class="d-flex justify-content-between align-items-end mb-3">
+    <div class="d-flex justify-content-between align-items-end">
       <h5 cCardTitle>Listado de entradas</h5>
-      <div class="hstack gap-2">
-        <button cButton color="success" size="sm" routerLink="crear" aria-label="Crear nueva entrada">
-          <svg cIcon name="cilPencil" class="me-1" size="sm"></svg>
+      <div class="hstack gap-3">
+        <button cButton color="success" size="sm" routerLink="crear">
+          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nueva entrada"></svg>
           Crear nueva Entrada
         </button>
       </div>
