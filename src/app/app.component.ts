@@ -1,7 +1,8 @@
-// app.component.ts
+// src/app/app.component.ts
 import { Component, OnInit } from '@angular/core';
 import { AuthSyncService } from './core/services/auth/auth-sync.service';
 import { LoggerService } from './core/services/logger.service';
+import { AuthService } from './core/services/auth/auth.service'; // inyectado para comprobar token
 
 @Component({
   selector: 'app-root',
@@ -14,13 +15,17 @@ export class AppComponent implements OnInit {
 
   constructor(
     private authSync: AuthSyncService,
-    private log: LoggerService
+    private log: LoggerService,
+    private authService: AuthService
   ){ }
 
   ngOnInit(): void {
-    // ✅ Inicializar sincronización de autenticación
+    // Inicializar sincronización entre pestañas
     this.authSync.initializeAuthState();
-    
+
+    // Luego comprobar token actual (si está caducado forzará logout)
+    this.authService.ensureTokenValidOnInit();
+
     // Escuchar cambios de estado de autenticación
     window.addEventListener('authStateChanged', () => {
       this.log.info('🔄 Estado de autenticación cambiado, actualizando interfaz...');

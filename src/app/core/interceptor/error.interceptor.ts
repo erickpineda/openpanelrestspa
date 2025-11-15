@@ -24,7 +24,7 @@ export class ErrorInterceptor implements HttpInterceptor {
         const httpError = this.ensureHttpErrorResponse(error);
         
         // No manejar errores de logging para evitar loops
-        if (request.url.includes('/api/errors')) {
+        if (request.url.includes('/error')) {
           return throwError(() => httpError);
         }
 

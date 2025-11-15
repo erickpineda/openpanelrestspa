@@ -1,3 +1,4 @@
+// admin-routing.module.ts
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './admin.component';
@@ -8,7 +9,8 @@ const routes: Routes = [
   {
     path: '',
     component: AdminComponent,
-    canActivate: [AuthGuard], // 🔐 Protección aquí
+    canActivate: [AuthGuard],      // protección del padre
+    canActivateChild: [AuthGuard], // protección de hijos
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
@@ -19,7 +21,8 @@ const routes: Routes = [
       {
         path: 'control',
         loadChildren: () => import('./base/base.module').then(m => m.BaseModule),
-        data: { preload: true, delay: 1000 }
+        data: { preload: true, delay: 1000 },
+        canLoad: [AuthGuard] // evita la carga del módulo si no estamos autenticados
       }
     ]
   }
