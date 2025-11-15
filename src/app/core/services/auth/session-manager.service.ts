@@ -185,13 +185,27 @@ export class SessionManagerService {
   }
 
   public performLogout(data: SessionExpirationData): void {
-    this.log.info('🚀 SessionManagerService: Ejecutando performLogout...');
-    this.tokenStorage.signOut();
+  this.log.info('🚀 SessionManagerService: Ejecutando performLogout...');
 
-    this.router.navigate(['/session-expired'], {
-      state: { sessionData: data }
-    });
+  try {
+    // Guardar la URL actual para que, tras el login, podamos volver a ella.
+    // Usamos localStorage para que otras pestañas también puedan leerla si hace falta.
+    // Guardamos sólo la parte relativa (pathname + search + hash)
+    const currentUrl = window.location.pathname + window.location.search + window.location.hash;
+    localStorage.setItem('post-login-redirect', currentUrl);
+    this.log.info('📌 post-login-redirect guardado:', currentUrl);
+  } catch (e) {
+    this.log.error('❌ No se pudo guardar post-login-redirect', e);
   }
+
+  // Limpiar token/session
+  this.tokenStorage.signOut();
+
+  // Navegar a la pantalla de sesión caducada (tu componente maneja modal/volver a login)
+  this.router.navigate(['/session-expired'], {
+    state: { sessionData: data }
+  });
+}
 
   public handleLogoutFromSync(data: any): void {
     this.log.info('🔄 SessionManager: Logout desde sync recibido', data);

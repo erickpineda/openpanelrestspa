@@ -1,3 +1,4 @@
+// src/app/public/login/login.component.ts
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { cilUser, cilLockLocked } from '@coreui/icons';
 import { DatePipe } from '@angular/common';
@@ -14,13 +15,8 @@ import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-
   icons = { cilUser, cilLockLocked };
-
-  form: any = {
-    username: null,
-    password: null
-  };
+  form: any = { username: null, password: null };
   isLoggedIn = false;
   isLoginFailed = false;
   isLoading = false; // Nueva variable de estado de carga
@@ -38,7 +34,7 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     // Sincronizar estado al iniciar
     this.authSync.initializeAuthState();
-    
+
     if (this.tokenStorage.getToken()) {
       this.router.navigate(['/admin']);
     }
@@ -47,7 +43,7 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     this.isLoading = true;
     const { username, password } = this.form;
-    
+
     this.authService.login(username, password).subscribe({
       next: data => {
         this.tokenStorage.saveToken(data.jwttoken);
@@ -56,16 +52,40 @@ export class LoginComponent implements OnInit {
         this.isLoggedIn = true;
         this.roles = this.tokenStorage.getUser().roles;
         this.isLoading = false;
-        
-        // ✅ Notificar a otras pestañas del login
+
+        // Notificar a otras pestañas del login
         this.authSync.notifyLogin();
-        
-        setTimeout(() => {
-          this.router.navigate(['/admin']); // ✅ Navegación estándar
-        }, 500);
+
+        // ----- NUEVO: redirigir al sitio donde estaba el usuario antes de la expiración -----
+        try {
+          const redirect = localStorage.getItem('post-login-redirect');
+          if (redirect) {
+            // limpiar la clave para que no se reutilice accidentalmente
+            localStorage.removeItem('post-login-redirect');
+
+            // Normalizar a ruta relativa (pathname + search + hash)
+            let target = redirect;
+            try {
+              const u = new URL(redirect, window.location.origin);
+              target = u.pathname + u.search + u.hash;
+            } catch (e) {
+              // si no es una URL válida, usamos el valor tal cual (probablemente ya es relativo)
+            }
+
+            // Navegar respetando querystring y hash
+            this.router.navigateByUrl(target);
+            return;
+          }
+        } catch (e) {
+          // no fatal: si algo falla, caemos al comportamiento por defecto
+          console.error('Error al intentar redirigir post-login:', e);
+        }
+
+        // comportamiento por defecto (si no hay redirect guardado)
+        this.router.navigate(['/admin']);
       },
       error: (err) => {
-        this.errorMessage = err.error.message;
+        this.errorMessage = err.error?.message ?? err.message ?? 'Error en el login';
         this.isLoginFailed = true;
         this.isLoading = false;
         this.cdr.detectChanges();
