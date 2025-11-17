@@ -9,6 +9,7 @@ import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
 import { Categoria } from '../../../../core/models/categoria.model';
 import { UntypedFormGroup } from '@angular/forms';
 import { LoggerService } from '../../../../core/services/logger.service';
+import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
   selector: 'app-crear-entrada',
@@ -30,6 +31,7 @@ export class CrearEntradaComponent implements OnInit {
     private vf: ValidationEntradaFormsService,
     private facade: EntradaFacadeService,
     private router: Router,
+    private toastService: ToastService,
     private log: LoggerService
   ) {
     this.entradaForm = this.vf.buildForm();
@@ -52,6 +54,7 @@ export class CrearEntradaComponent implements OnInit {
     
     this.facade.crearEntrada(ent).subscribe({
       next: () => {
+        this.toastService.showInfo('Se ha creado la entrada correctamente', 'Entrada creada');
         // ✅ Solo navegar si es exitoso
         this.router.navigateByUrl('/admin/control/entradas');
       },
