@@ -40,6 +40,11 @@
         
         <app-buscador-avanzado
           [definiciones]="definiciones"
+          [autoTrigger]="true"
+          [debounceMs]="300"
+          [showButton]="false"
+          [showSearchButton]="true"
+          [showClearButton]="true"
           (filtroSeleccionado)="aplicarFiltro($event)">
         </app-buscador-avanzado>
         

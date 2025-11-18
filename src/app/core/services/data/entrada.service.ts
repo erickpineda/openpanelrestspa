@@ -63,7 +63,7 @@ export class EntradaService extends CrudService<Entrada, number> {
    * Busca entradas de forma segura
    */
   buscarSafe(searchRequest: any, page: number, size: number): Observable<BuscarResponse> {
-    const params = { page: page.toString(), size: size.toString() };
+    const params = { pageNo: page.toString(), size: size.toString() };
     return this.safePostData<BuscarResponse>(
       `${this.endpoint}/buscar`,
       searchRequest,
@@ -98,7 +98,7 @@ export class EntradaService extends CrudService<Entrada, number> {
   }
 
   buscar(searchRequest: any, page: number, size: number): Observable<any> {
-    const params = { page: page.toString(), size: size.toString() };
+    const params = { pageNo: page.toString(), size: size.toString() };
     return this.post(`${this.endpoint}/buscar`, searchRequest, params);
   }
 

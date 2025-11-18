@@ -45,7 +45,7 @@ private readonly boundaryId = 'listado-entradas-main';
   ngOnInit(): void {
     this.cargarDefinicionesBuscador();
     this.busquedaService.iniciarBusqueda(
-      (term) => this.realizarBusquedaEntradas(term),
+      (term, page) => this.realizarBusquedaEntradas(term, page),
       (response) => this.procesarResultadosBusqueda(response)
     );
   }
@@ -57,7 +57,7 @@ private readonly boundaryId = 'listado-entradas-main';
     this.busquedaService.limpiarBusqueda();
   }
 
-  private realizarBusquedaEntradas(term: string) {
+  private realizarBusquedaEntradas(term: string, page?: number) {
     const searchRequest = {
       dataOption: this.dataOptionSeleccionada,
       searchCriteriaList: [{
@@ -67,7 +67,8 @@ private readonly boundaryId = 'listado-entradas-main';
         clazzName: 'Entrada'
       }]
     };
-    return this.entradaService.buscarSafe(searchRequest, this.currentPage, this.pageSize);
+    const pageToUse = page !== undefined ? page : this.currentPage;
+    return this.entradaService.buscarSafe(searchRequest, pageToUse, this.pageSize);
   }
 
   public aplicarFiltro(filtro: any): void {
@@ -154,7 +155,14 @@ private readonly boundaryId = 'listado-entradas-main';
 
   obtenerListaEntradas(page: number): void {
     this.currentPage = page;
-    this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    // Ejecutar la búsqueda inmediatamente a través de BusquedaService para
+    // mantener la misma función de búsqueda registrada y evitar carreras.
+    this.busquedaService.searchNow(this.valorBusqueda, this.currentPage)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => this.procesarResultadosBusqueda(response),
+        error: (error) => this.mostrarError('Error en búsqueda: ' + error)
+      });
   }
 
   checkFechaPublicacion(fechaPublicacion: Date): string {
