@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { SessionManagerService, SessionExpirationData } from '../../core/services/auth/session-manager.service';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { RouteTrackerService } from '../../core/services/auth/route-tracker.service';
+import { PostLoginRedirectService } from '../services/auth/post-login-redirect.service';
 
 @Component({
   selector: 'app-session-expired-modal',
@@ -20,7 +21,8 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
     private router: Router,
     private sessionManager: SessionManagerService,
     private tokenStorage: TokenStorageService,
-    private routeTracker: RouteTrackerService
+    private routeTracker: RouteTrackerService,
+    private postLoginRedirect: PostLoginRedirectService
   ) {}
 
   ngOnInit(): void {
@@ -74,27 +76,17 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
     this.hideModal();
     // Guardar la última ruta válida (no la actual, que es session-expired)
     try {
-      const key = this.tokenStorage.getPostLoginKeyForThisTab();
       let validUrl: string | null = null;
-
       try {
         validUrl = RouteTrackerService.getLastValidUrl();
-      } catch (e) {
-        // Ignorar si por alguna razón la llamada falla
-      }
-
-      // Fallback: intentar leer de sessionStorage (última ruta guardada para esta pestaña)
+      } catch {}
       if (!validUrl) {
-        try { validUrl = window.sessionStorage.getItem(key); } catch (e) { validUrl = null; }
+        validUrl = null;
       }
-
       if (validUrl) {
-        try { window.sessionStorage.setItem(key, validUrl); } catch (e) {}
-        try { localStorage.setItem(key, validUrl); } catch (e) {}
+        this.postLoginRedirect.saveLastValidRoute(validUrl);
       }
-    } catch (e) {
-      // no fatal
-    }
+    } catch {}
 
     // replaceUrl evita que el usuario vuelva con back a la pantalla de sesión finalizada
     this.router.navigate(['/login'], { replaceUrl: true });

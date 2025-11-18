@@ -1,14 +1,15 @@
 // src/app/core/services/auth/token-storage.service.ts
 import { Injectable } from '@angular/core';
 import { LoggerService } from '../logger.service';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 
-export const TOKEN_KEY = 'auth-token';
-export const USER_KEY = 'auth-user';
-export const SYNC_TOKEN_KEY = 'sync-auth-token';
-export const SYNC_USER_KEY = 'sync-auth-user';
+export const TOKEN_KEY = OPConstants.Session.TOKEN_KEY;
+export const USER_KEY = OPConstants.Session.USER_KEY;
+export const SYNC_TOKEN_KEY = OPConstants.Session.SYNC_TOKEN_KEY;
+export const SYNC_USER_KEY = OPConstants.Session.SYNC_USER_KEY;
 
-export const TAB_ID_KEY = 'op-tab-id'; // key en sessionStorage para id de pestaña
-export const POST_LOGIN_PREFIX = 'post-login-redirect-'; // usamos post-login-redirect-{tabId} en sessionStorage
+export const TAB_ID_KEY = OPConstants.Session.TAB_ID_KEY; // key en sessionStorage para id de pestaña
+export const POST_LOGIN_PREFIX = OPConstants.Session.POST_LOGIN_PREFIX; // usamos post-login-redirect-{tabId} en sessionStorage
 
 @Injectable({ providedIn: 'root' })
 export class TokenStorageService {

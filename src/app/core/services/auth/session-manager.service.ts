@@ -6,6 +6,8 @@ import { TokenStorageService } from './token-storage.service';
 import { UnsavedWorkService } from '../utils/unsaved-work.service';
 import { LoggerService } from '../logger.service';
 import { RouteTrackerService } from './route-tracker.service';
+import { PostLoginRedirectService } from './post-login-redirect.service';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 export interface SessionExpirationData {
   type: 'LOGOUT' | 'SESSION_EXPIRED' | 'ANOTHER_DEVICE';
@@ -23,7 +25,8 @@ export class SessionManagerService {
     private tokenStorage: TokenStorageService,
     private unsavedWorkService: UnsavedWorkService,
     private router: Router,
-    private log: LoggerService
+    private log: LoggerService,
+    private postLoginRedirect: PostLoginRedirectService
   ) {
     this.setupListeners();
   }
@@ -36,13 +39,10 @@ export class SessionManagerService {
       // Intentar guardar inmediatamente el post-login redirect PARA ESTA pestaña
       // antes de que cualquier navegación (local o remota) cambie la URL.
       try {
-        const key = this.tokenStorage.getPostLoginKeyForThisTab();
-        // Forzar guardar la última ruta válida (no pública, no /session-expired)
         const lastValid = RouteTrackerService.getLastValidUrl();
         if (lastValid) {
-          try { window.sessionStorage.setItem(key, lastValid); } catch (e) {}
-          try { localStorage.setItem(key, lastValid); } catch (e) {}
-          this.log.info('SessionManager: post-login-redirect (lastValidUrl) guardado al recibir auth:logout', key, lastValid);
+          this.postLoginRedirect.saveLastValidRoute(lastValid);
+          this.log.info('SessionManager: post-login-redirect (lastValidUrl) guardado al recibir auth:logout', lastValid);
         }
       } catch (e) {
         this.log.error('SessionManager: error preparando post-login-redirect en auth:logout', e);
@@ -66,41 +66,22 @@ export class SessionManagerService {
 
         // Si estamos en pantallas de login/session-expired, navegamos al post-login redirect de ESTA pestaña
         const loc = window.location.pathname + window.location.hash;
-        const onLoginPages = loc.includes('/login') || loc.includes('/session-expired');
+        const onLoginPages = loc.includes(OPConstants.Session.ROUTE_LOGIN) || loc.includes(OPConstants.Session.ROUTE_SESSION_EXPIRED);
 
         if (onLoginPages) {
-          const key = this.tokenStorage.getPostLoginKeyForThisTab();
-          let redirect: string | null = null;
-          try { redirect = window.sessionStorage.getItem(key) ?? null; } catch (e) { redirect = null; }
-
-          // fallback legacy
-          if (!redirect) {
-            try { redirect = localStorage.getItem('post-login-redirect'); } catch (e) { redirect = null; }
+          let redirect = this.postLoginRedirect.getAndClearRedirectForTab();
+          if (redirect) {
+            let target = this.postLoginRedirect.normalizeRoute(redirect);
+            this.log.info('SessionManager: Navegando post-login a', target);
+            this.router.navigateByUrl(target);
+            this.postLoginRedirect.markPostLoginHandled();
+            return;
+          } else {
+            this.log.info('SessionManager: sin post-login redirect - no se fuerza navegación');
+            window.dispatchEvent(new Event('authStateChanged'));
+            return;
           }
-
-            if (redirect) {
-              try { window.sessionStorage.removeItem(key); } catch {}
-              try { localStorage.removeItem('post-login-redirect'); } catch {}
-
-              // Normalizar/usar ruta relativa si procede
-              let target = redirect;
-              try {
-                const u = new URL(redirect, window.location.origin);
-                target = u.pathname + u.search + u.hash;
-              } catch (e) { /* dejar redirect tal cual */ }
-
-              this.log.info('SessionManager: Navegando post-login a', target);
-              this.router.navigateByUrl(target);
-              return;
-            } else {
-              // No hay redirect guardado para esta pestaña: no forzamos navegación.
-              // Emitimos evento para que la UI actualice su estado, pero no movemos la pestaña.
-              this.log.info('SessionManager: sin post-login redirect - no se fuerza navegación');
-              window.dispatchEvent(new Event('authStateChanged'));
-              return;
-            }
         } else {
-          // Si no estamos en login/session-expired, solo actualizar UI
           window.dispatchEvent(new Event('authStateChanged'));
         }
       } catch (e) {
@@ -166,20 +147,11 @@ export class SessionManagerService {
     this.log.info('SessionManagerService: performLogout', data);
 
     try {
-      const thisTabId = this.tokenStorage.getOrCreateTabId();
-
-      // Guardar redirect PARA ESTA pestaña (siempre) — así cada pestaña conserva su propia URL previa
-      try {
-        const key = this.tokenStorage.getPostLoginKeyForThisTab();
-        const lastValid = RouteTrackerService.getLastValidUrl();
-        if (lastValid) {
-          window.sessionStorage.setItem(key, lastValid);
-          this.log.info('post-login-redirect (lastValidUrl) guardado en sessionStorage para esta pestaña', key, lastValid);
-        }
-      } catch (e) {
-        this.log.error('No se pudo guardar post-login-redirect en sessionStorage', e);
+      const lastValid = RouteTrackerService.getLastValidUrl();
+      if (lastValid) {
+        this.postLoginRedirect.saveLastValidRoute(lastValid);
+        this.log.info('post-login-redirect (lastValidUrl) guardado en sessionStorage para esta pestaña', lastValid);
       }
-
     } catch (e) {
       this.log.error('Error guardando post-login redirect', e);
     }
@@ -188,7 +160,7 @@ export class SessionManagerService {
     this.tokenStorage.signOut();
 
     // Navegar a pantalla de sesión caducada
-    this.router.navigate(['/session-expired'], {
+    this.router.navigate([OPConstants.Session.ROUTE_SESSION_EXPIRED], {
       state: { sessionData: data }
     });
   }

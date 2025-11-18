@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { TokenStorageService } from './token-storage.service';
+import { PostLoginRedirectService } from './post-login-redirect.service';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 import { LoggerService } from '../logger.service';
 
 @Injectable({ providedIn: 'root' })
@@ -14,7 +16,8 @@ export class RouteTrackerService {
   constructor(
     private router: Router,
     private tokenStorage: TokenStorageService,
-    private log: LoggerService
+    private log: LoggerService,
+    private postLoginRedirect: PostLoginRedirectService
   ) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -23,10 +26,10 @@ export class RouteTrackerService {
           const url = event.urlAfterRedirects || event.url;
           // No guardar rutas públicas, login ni session-expired
           if (
-            url.startsWith('/login') ||
-            url.startsWith('/session-expired') ||
+            url.startsWith(OPConstants.Session.ROUTE_LOGIN) ||
+            url.startsWith(OPConstants.Session.ROUTE_SESSION_EXPIRED) ||
             url.startsWith('/public') ||
-            url === '/' // puedes ajustar según tus rutas públicas
+            url === OPConstants.Session.ROUTE_HOME // puedes ajustar según tus rutas públicas
           ) {
             this.log.info('RouteTracker: ignorando ruta pública o de login/session-expired', url);
             return;
@@ -37,34 +40,16 @@ export class RouteTrackerService {
             return;
           }
 
-          // Protección: si justo se ha manejado un post-login (otra parte escribió
-          // 'post-login-handled-{tabId}' con timestamp), ignoramos guardados durante
-          // un breve periodo para evitar sobrescribir la ruta restaurada.
-          try {
-            const tabKey = this.tokenStorage.getPostLoginKeyForThisTab();
-            const handledKey = 'post-login-handled-' + tabKey;
-            const ts = window.sessionStorage.getItem(handledKey);
-            if (ts) {
-              const age = Date.now() - Number(ts || '0');
-              if (age >= 0 && age < 1000) {
-                // Ignorar este NavigationEnd porque es probable resultado de la restauración post-login
-                this.log.info('RouteTracker: Ignorando guardado por post-login-handled (age ms)', age);
-                return;
-              } else {
-                // Si la marca es vieja, eliminarla
-                try { window.sessionStorage.removeItem(handledKey); } catch (e) {}
-              }
-            }
-          } catch (e) {
-            // ignore errors reading handled flag
+          // Protección anti-race centralizada
+          if (this.postLoginRedirect.shouldIgnoreRouteSave()) {
+            this.log.info('RouteTracker: Ignorando guardado por post-login-handled (anti-race)');
+            return;
           }
           // Guardar en memoria la última ruta válida
           RouteTrackerService.lastValidUrl = url;
-          // Guardar en sessionStorage
-          const key = this.tokenStorage.getPostLoginKeyForThisTab();
-          try { window.sessionStorage.setItem(key, url); } catch (e) {}
-          try { localStorage.setItem(key, url); } catch (e) {}
-          this.log.info('RouteTracker: guardada ruta válida para post-login redirect', key, url);
+          // Guardar usando el servicio centralizado
+          this.postLoginRedirect.saveLastValidRoute(url);
+          this.log.info('RouteTracker: guardada ruta válida para post-login redirect', url);
         } catch (e) {
           this.log.error('RouteTracker: error guardando ruta actual', e);
         }
