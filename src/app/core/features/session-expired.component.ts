@@ -2,6 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SessionManagerService, SessionExpirationData } from '../../core/services/auth/session-manager.service';
+import { TokenStorageService } from '../services/auth/token-storage.service';
+import { RouteTrackerService } from '../../core/services/auth/route-tracker.service';
 
 @Component({
   selector: 'app-session-expired-modal',
@@ -16,7 +18,9 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private sessionManager: SessionManagerService
+    private sessionManager: SessionManagerService,
+    private tokenStorage: TokenStorageService,
+    private routeTracker: RouteTrackerService
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +72,30 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
   goToLogin(): void {
     this.hideModal();
+    // Guardar la última ruta válida (no la actual, que es session-expired)
+    try {
+      const key = this.tokenStorage.getPostLoginKeyForThisTab();
+      let validUrl: string | null = null;
+
+      try {
+        validUrl = RouteTrackerService.getLastValidUrl();
+      } catch (e) {
+        // Ignorar si por alguna razón la llamada falla
+      }
+
+      // Fallback: intentar leer de sessionStorage (última ruta guardada para esta pestaña)
+      if (!validUrl) {
+        try { validUrl = window.sessionStorage.getItem(key); } catch (e) { validUrl = null; }
+      }
+
+      if (validUrl) {
+        try { window.sessionStorage.setItem(key, validUrl); } catch (e) {}
+        try { localStorage.setItem(key, validUrl); } catch (e) {}
+      }
+    } catch (e) {
+      // no fatal
+    }
+
     // replaceUrl evita que el usuario vuelva con back a la pantalla de sesión finalizada
     this.router.navigate(['/login'], { replaceUrl: true });
   }

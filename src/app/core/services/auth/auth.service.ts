@@ -8,6 +8,7 @@ import { environment } from '../../../../environments/environment.dev.es';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
 import { AuthSyncService } from './auth-sync.service';
 import { isJwtExpired } from '../../_utils/jwt.utils';
+import { SessionManagerService } from './session-manager.service';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -27,7 +28,8 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private tokenStorage: TokenStorageService,
-    private authSync: AuthSyncService
+    private authSync: AuthSyncService,
+    private sessionManager: SessionManagerService
   ) {
     this.userSubject = new BehaviorSubject<any | null>(this.tokenStorage.getUser());
     this.user$ = this.userSubject.asObservable();
@@ -65,9 +67,12 @@ export class AuthService {
   }
 
   public performLogout(): void {
-    this.tokenStorage.signOut();
+    // Delegamos: sessionManager guardará el redirect para esta pestaña y luego borrará tokens
+    this.sessionManager.performLogout({ type: 'LOGOUT', message: 'Logout local', allowSave: true, timestamp: Date.now(), originTabId: this.tokenStorage.getOrCreateTabId() });
+    // Notificaremos a las otras pestañas
+    this.authSync.notifyLogout({ originTabId: this.tokenStorage.getOrCreateTabId() });
+    // actualizamos estado local observable
     this.userSubject.next(null);
-    this.authSync.notifyLogout();
   }
 
   // ---------- MÉTODOS NUEVOS (verificación de expiración) ----------

@@ -1,186 +1,149 @@
-// auth-sync.service.ts
+// src/app/core/services/auth/auth-sync.service.ts
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { SessionManagerService } from './session-manager.service';
 import { TokenStorageService } from './token-storage.service';
 import { LoggerService } from '../logger.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+type SyncEvent = { type: 'LOGIN' | 'LOGOUT' | 'CHANGED'; timestamp: number; [k: string]: any };
+
+@Injectable({ providedIn: 'root' })
 export class AuthSyncService {
   private readonly AUTH_SYNC_KEY = 'auth-sync';
-
-  private pollIntervalMs = 2000; // cada 2 segundos (ajusta si quieres)
-  private pollHandle: any = null;
-  private readonly SYNC_TOKEN_KEY = 'sync-auth-token';
-  private readonly SYNC_USER_KEY = 'sync-auth-user';
-  private readonly TOKEN_KEY = 'auth-token';
+  private readonly CHANNEL_NAME = 'auth-sync-channel';
   private bc: BroadcastChannel | null = null;
+  private cleanupTimeoutMs = 30_000;
 
   constructor(
     private tokenStorage: TokenStorageService,
-    private sessionManager: SessionManagerService,
-    private router: Router,
     private log: LoggerService
   ) {
-    this.setupSync();
+    this.setup();
   }
 
-  private setupSync(): void {
-    // Verificar sincronización al iniciar
-    this.initializeAuthState();
+  private setup(): void {
+    this.log.info('AuthSyncService: inicializando');
 
-    window.addEventListener('storage', (event) => {
-      if (event.key === this.AUTH_SYNC_KEY && event.newValue) {
-        this.handleAuthChange(event.newValue);
-      } else if (event.key === 'sync-auth-token' || event.key === 'sync-auth-user') {
-        // ✅ NUEVO: Sincronizar cuando cambian los datos de autenticación
-        this.log.info('🔄 Cambio detectado en datos de autenticación');
-        this.tokenStorage.syncFromLocalStorage();
-        
-        // Disparar evento para que los componentes se actualicen
-        window.dispatchEvent(new Event('authStateChanged'));
-      }
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        this.initializeAuthState();
-      }
-    });
-    this.startPolling();
-    // opcional: limpiar el polling al cerrar la pestaña (mejora cortesía)
-    window.addEventListener('beforeunload', () => this.stopPolling());
-  }
-
-  private handleAuthChange(authData: string): void {
     try {
-      const data = JSON.parse(authData);
-      
-      if (data.type === 'LOGOUT') {
-        this.sessionManager.handleLogoutFromSync(data);
+      if ('BroadcastChannel' in window) {
+        this.bc = new BroadcastChannel(this.CHANNEL_NAME);
+        this.bc.onmessage = (ev) => {
+          const data = ev.data as SyncEvent | undefined;
+          if (!data) return;
+          this.log.info('AuthSyncService: BroadcastChannel received', data);
+          this.emitEventFromSync(data);
+        };
       }
     } catch (e) {
-      this.log.error('Error parsing auth sync data:', e);
+      this.log.error('AuthSyncService: BroadcastChannel no disponible', e);
     }
-  }
 
-  // ✅ NUEVO: Método simplificado para inicializar estado
-  public initializeAuthState(): void {
-    this.log.info('🔄 AuthSyncService: Inicializando estado de autenticación');
-    
-    // Sincronizar desde localStorage
-    const synced = this.tokenStorage.syncFromLocalStorage();
-    
-    if (synced) {
-      this.log.info('✅ Estado de autenticación sincronizado correctamente');
-      // Disparar evento para que los componentes se actualicen
-      window.dispatchEvent(new Event('authStateChanged'));
-    }
-  }
-
-  public notifyLogin(): void {
-    const data = {
-      type: 'LOGIN',
-      timestamp: Date.now()
-    };
-    
-    localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(data));
-    
-    setTimeout(() => {
-      localStorage.removeItem(this.AUTH_SYNC_KEY);
-    }, 20000);
-  }
-
-  public notifyLogout(): void {
-    const data = {
-      type: 'LOGOUT',
-      timestamp: Date.now()
-    };
-    
-    localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(data));
-    
-    setTimeout(() => {
-      localStorage.removeItem(this.AUTH_SYNC_KEY);
-    }, 30000);
-  }
-
-  private startPolling(): void {
-    // evita múltiples pollers
-    if (this.pollHandle) return;
-    this.pollHandle = window.setInterval(() => {
-      try {
-        const localToken = localStorage.getItem(this.SYNC_TOKEN_KEY);
-        const sessionToken = window.sessionStorage.getItem(this.TOKEN_KEY);
-
-        // Caso crítico: sessionStorage tiene token, pero localStorage no --> otra pestaña
-        // hizo logout (o borrado). Forzamos logout en esta pestaña.
-        if (!localToken && sessionToken) {
-          this.log.info('⚠️ AuthSyncService (poll) detectó inconsistencia: token en session pero no en local -> forzando logout');
-          // Usamos sessionManager para manejar logout consistente (ya lo usas en handleAuthChange)
-          this.sessionManager.handleLogoutFromSync({ type: 'LOGOUT', timestamp: Date.now() });
-          // además limpiamos local session para quedar consistente
-          this.tokenStorage.signOut();
-          // notificamos el cambio de estado para UI
-          window.dispatchEvent(new Event('authStateChanged'));
+    // Escuchar storage events (otros tabs)
+    window.addEventListener('storage', (ev: StorageEvent) => {
+      if (ev.key === this.AUTH_SYNC_KEY && ev.newValue) {
+        try {
+          const data = JSON.parse(ev.newValue) as SyncEvent;
+          this.log.info('AuthSyncService: storage event recibido', data);
+          this.emitEventFromSync(data);
+        } catch (e) {
+          this.log.error('AuthSyncService: error parseando storage event', e);
         }
-
-        // Caso inverso: localToken existe pero sessionToken no -> sincronizamos sesión
-        if (localToken && !sessionToken) {
-          this.log.info('🔄 AuthSyncService (poll) detectó token en local pero no en session -> sincronizando');
-          this.tokenStorage.syncFromLocalStorage();
-          window.dispatchEvent(new Event('authStateChanged'));
-        }
-
-      } catch (e) {
-        // evitar que el poller rompa por excepción
-        this.log.error('AuthSyncService poll error', e);
       }
-    }, this.pollIntervalMs);
-  }
+    });
 
-  private stopPolling(): void {
-    if (this.pollHandle) {
-      clearInterval(this.pollHandle);
-      this.pollHandle = null;
-    }
-  }
-
-  private setupBroadcastChannel(): void {
-  try {
-    if ('BroadcastChannel' in window) {
-      this.bc = new BroadcastChannel('auth-sync-channel');
-      this.bc.onmessage = (ev) => {
-        const data = ev.data;
-        if (!data) return;
-        if (data.type === 'LOGOUT') {
-          this.log.info('BroadcastChannel: recibida señal LOGOUT -> manejando logout');
-          this.sessionManager.handleLogoutFromSync(data);
-          this.tokenStorage.signOut();
+    // Cuando la pestaña vuelve a ser visible, sincronizamos (compatibilidad)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.log.info('AuthSyncService: pestaña visible -> sincronizando token local');
+        const synced = this.tokenStorage.syncFromLocalStorage();
+        if (synced) {
+          // Emitimos ambos por compatibilidad y para actualizar UI
           window.dispatchEvent(new Event('authStateChanged'));
-        } else if (data.type === 'LOGIN') {
-          this.log.info('BroadcastChannel: recibida señal LOGIN -> sincronizando token');
-          this.tokenStorage.syncFromLocalStorage();
-          window.dispatchEvent(new Event('authStateChanged'));
+          window.dispatchEvent(new CustomEvent('auth:changed', { detail: { source: 'visibility' } }));
         }
-      };
+      }
+    });
+  }
+
+  /**
+   * Inicializar estado de autenticación al arrancar la app / componente.
+   * Compatibilidad: los componentes llaman a este método esperando que sincronice sessionStorage desde localStorage.
+   */
+  public initializeAuthState(): void {
+    this.log.info('AuthSyncService: initializeAuthState() invoked');
+    try {
+      const synced = this.tokenStorage.syncFromLocalStorage();
+      // Emitir evento legado para los componentes que lo esperan
+      window.dispatchEvent(new Event('authStateChanged'));
+      // También emitir evento moderno para listeners específicos
+      window.dispatchEvent(new CustomEvent('auth:changed', { detail: { synced } }));
+      this.log.info('AuthSyncService: initializeAuthState finished, synced=', synced);
+    } catch (e) {
+      this.log.error('AuthSyncService: error en initializeAuthState', e);
     }
-  } catch (e) {
-    this.log.error('No se pudo inicializar BroadcastChannel:', e);
   }
-}
 
-private broadcastLogoutViaChannel(): void {
-  if (this.bc) {
-    this.bc.postMessage({ type: 'LOGOUT', timestamp: Date.now() });
+  // Public API
+  public notifyLogin(extra: Record<string, any> = {}): void {
+    const payload: SyncEvent = {
+      type: 'LOGIN',
+      timestamp: Date.now(),
+      originTabId: this.tokenStorage.getOrCreateTabId(),
+      ...extra
+    };
+    this.broadcast(payload);
+    this.tokenStorage.syncFromLocalStorage();
+    window.dispatchEvent(new CustomEvent('auth:login', { detail: payload }));
+    window.dispatchEvent(new Event('authStateChanged'));
   }
-}
 
-private broadcastLoginViaChannel(): void {
-  if (this.bc) {
-    this.bc.postMessage({ type: 'LOGIN', timestamp: Date.now() });
+  public notifyLogout(extra: Record<string, any> = {}): void {
+    const payload: SyncEvent = {
+      type: 'LOGOUT',
+      timestamp: Date.now(),
+      originTabId: this.tokenStorage.getOrCreateTabId(),
+      ...extra
+    };
+    this.broadcast(payload);
+    window.dispatchEvent(new CustomEvent('auth:logout', { detail: payload }));
+    window.dispatchEvent(new Event('authStateChanged'));
   }
-}
 
+  private broadcast(payload: SyncEvent): void {
+    try {
+      // 1) localStorage -> disparará storage event en otras pestañas
+      localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(payload));
+      setTimeout(() => {
+        try { localStorage.removeItem(this.AUTH_SYNC_KEY); } catch {}
+      }, this.cleanupTimeoutMs);
+
+      // 2) BroadcastChannel (si está disponible)
+      if (this.bc) {
+        try { this.bc.postMessage(payload); } catch (e) { this.log.error('AuthSync: bc.postMessage falló', e); }
+      }
+
+      this.log.info('AuthSyncService: broadcast enviado', payload);
+    } catch (e) {
+      this.log.error('AuthSyncService: error broadcasting', e);
+    }
+  }
+
+  private emitEventFromSync(data: SyncEvent): void {
+    if (!data) return;
+    // si viene LOGIN, sincronizamos token local->session y avisamos
+    if (data.type === 'LOGIN') {
+      this.tokenStorage.syncFromLocalStorage();
+      window.dispatchEvent(new CustomEvent('auth:login', { detail: data }));
+      window.dispatchEvent(new Event('authStateChanged'));
+      return;
+    }
+
+    if (data.type === 'LOGOUT') {
+      window.dispatchEvent(new CustomEvent('auth:logout', { detail: data }));
+      window.dispatchEvent(new Event('authStateChanged'));
+      return;
+    }
+
+    // CHANGED u otros
+    window.dispatchEvent(new CustomEvent('auth:changed', { detail: data }));
+    window.dispatchEvent(new Event('authStateChanged'));
+  }
 }

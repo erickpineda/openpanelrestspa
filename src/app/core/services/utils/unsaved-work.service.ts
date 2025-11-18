@@ -13,7 +13,9 @@ export class UnsavedWorkService {
   private formValues = new Map<string, any>();
 
   constructor(private log: LoggerService) {
+    // Compatibilidad: escucha evento legacy y evento nuevo
     window.addEventListener('saveUnsavedWork', this.saveAllUnsavedWork.bind(this));
+    window.addEventListener('saveWorkBeforeLogout', this.saveAllUnsavedWork.bind(this));
   }
 
   public registerForm(formId: string, initialValue?: any): void {

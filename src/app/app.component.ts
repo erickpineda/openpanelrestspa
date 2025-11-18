@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthSyncService } from './core/services/auth/auth-sync.service';
 import { LoggerService } from './core/services/logger.service';
 import { AuthService } from './core/services/auth/auth.service'; // inyectado para comprobar token
+import { RouteTrackerService } from './core/services/auth/route-tracker.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,8 @@ export class AppComponent implements OnInit {
   constructor(
     private authSync: AuthSyncService,
     private log: LoggerService,
-    private authService: AuthService
+    private authService: AuthService,
+    private routeTracker: RouteTrackerService // sólo para activar el tracking
   ){ }
 
   ngOnInit(): void {
