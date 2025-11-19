@@ -1,10 +1,8 @@
 import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, OnInit, OnDestroy } from '@angular/core';
-import { Subject, Subscription, forkJoin } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { getBuscadorDefinicionesAmigables, BuscadorDefinicionesAdaptadas, BuscadorCampoDef } from '../../utils/buscador-definiciones.util';
-import { EntradaService } from '../../../core/services/data/entrada.service';
-import { CategoriaService } from '../../../core/services/data/categoria.service';
-import { EtiquetaService } from '../../../core/services/data/etiqueta.service';
+import { EntradaCatalogService } from '../../../core/services/data/entrada-catalog.service';
+import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 
 @Component({
   selector: 'app-buscador-avanzado',
@@ -64,25 +62,14 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   private initialCampoSeleccionado?: string;
   private initialOperacionSeleccionada?: string;
 
-  private valorSubject = new Subject<string>();
-  private valorSub?: Subscription;
+  // Eliminado Subject local: debounce/autotrigger delegado a BusquedaService
 
   private catalogosSub?: Subscription;
 
-  constructor(
-    private entradaService: EntradaService,
-    private categoriaService: CategoriaService,
-    private etiquetaService: EtiquetaService
-  ) {}
+  constructor(private entradaCatalogService: EntradaCatalogService, private busquedaService: BusquedaService) {}
 
   ngOnInit(): void {
-    // Suscribir cambios con debounce para autoTrigger
-    this.valorSub = this.valorSubject.pipe(debounceTime(this.debounceMs)).subscribe((v) => {
-      if (this.autoTrigger) {
-        this.emitirFiltro();
-        this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });
-      }
-    });
+    // Ahora la lógica de debounce/autoTrigger la maneja `BusquedaService`.
   }
 
   // Compatibilidad: si no se provee showSearchButton, usamos el antiguo showButton
@@ -91,8 +78,6 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.valorSub?.unsubscribe();
-    this.valorSubject.complete();
     this.catalogosSub?.unsubscribe();
   }
 
@@ -100,16 +85,8 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     if (changes['definiciones'] && this.definiciones) {
       this.inicializarBuscador();
     }
-    if (changes['debounceMs'] && !changes['debounceMs'].firstChange) {
-      // Reiniciar suscripción con nuevo debounce
-      this.valorSub?.unsubscribe();
-      this.valorSub = this.valorSubject.pipe(debounceTime(this.debounceMs)).subscribe((v) => {
-        if (this.autoTrigger) {
-          this.emitirFiltro();
-          this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });
-        }
-      });
-    }
+    // El debounce ya no se maneja localmente; `debounceMs` deberá ser pasado
+    // al llamar `BusquedaService.iniciarBusqueda(...)` desde el componente padre.
   }
 
   public buscar(): void {
@@ -124,8 +101,12 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     this.operacionSeleccionada = this.initialOperacionSeleccionada || this.operacionesDisponibles[0]?.valor || '';
     // Limpiar el valor de búsqueda y notificar
     this.valorBusqueda = '';
-    // Propagar al subject para que el debounce/autoTrigger lo maneje
-    this.valorSubject.next(this.valorBusqueda);
+    // Si estamos en autoTrigger, primero notificar al padre (para que actualice estado)
+    // y luego delegar el trigger al servicio centralizado.
+    if (this.autoTrigger) {
+      this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });
+      this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    }
     // Emitir filtro con los valores restaurados para que el padre pueda actuar
     this.filtroSeleccionado.emit({
       campo: this.campoSeleccionado,
@@ -144,8 +125,13 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
 
   public onValorChange(v: string): void {
     this.valorBusqueda = v;
-    // push to subject for debounce handling
-    this.valorSubject.next(v);
+    // Delegar autoTrigger al servicio centralizado si está habilitado.
+    // Emitimos `filtroChanged` primero para que el componente padre actualice
+    // su estado (campo/operacion) antes de que el servicio ejecute la búsqueda.
+    if (this.autoTrigger) {
+      this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });
+      this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    }
   }
 
   private inicializarBuscador(): void {
@@ -233,17 +219,9 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     // Evitar volver a cargar si ya lo hicimos
     if (Object.keys(this.catalogOptions).length > 0) return;
     this.catalogosError = null;
-    const tipos$ = this.entradaService.listarTiposEntradasSafe();
-    const estados$ = this.entradaService.listarEstadosEntradasSafe();
-    const categorias$ = this.categoriaService.listarSafe();
-    const etiquetas$ = this.etiquetaService.listarSafe();
-
-    this.catalogosSub = forkJoin([tipos$, estados$, categorias$, etiquetas$]).subscribe({
-      next: ([tipos, estados, categorias, etiquetas]) => {
-        this.catalogOptions['tipoEntrada.nombre'] = (Array.isArray(tipos) ? tipos.map((t: any) => t.nombre) : []);
-        this.catalogOptions['estadoEntrada.nombre'] = (Array.isArray(estados) ? estados.map((e: any) => e.nombre) : []);
-        this.catalogOptions['categoria.nombre'] = (Array.isArray(categorias) ? categorias.map((c: any) => c.nombre) : []);
-        this.catalogOptions['etiqueta.nombre'] = (Array.isArray(etiquetas) ? etiquetas.map((t: any) => t.nombre) : []);
+    this.catalogosSub = this.entradaCatalogService.obtenerCatalogosEntrada().subscribe({
+      next: (mapped) => {
+        this.catalogOptions = { ...mapped };
       },
       error: (err) => {
         this.catalogosError = 'Error al cargar catálogos. Intente recargar la página.';

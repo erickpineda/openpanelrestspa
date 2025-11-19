@@ -9,6 +9,7 @@ import { ErrorBoundaryService } from '../../../core/errors/error-boundary/error-
 import { GlobalErrorHandlerService } from '../../../core/errors/global-error/global-error-handler.service';
 import { ErrorBoundaryComponent } from '../../../shared/components/errors/error-boundary/error-boundary.component';
 import { LoggerService } from '../../../core/services/logger.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -39,7 +40,8 @@ private readonly boundaryId = 'listado-entradas-main';
     private entradaService: EntradaService,
     private busquedaService: BusquedaService,
     private toastService: ToastService,private errorBoundaryService: ErrorBoundaryService,
-    private log: LoggerService
+    private log: LoggerService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -80,6 +82,15 @@ private readonly boundaryId = 'listado-entradas-main';
     if (this.campoSeleccionado && this.operacionSeleccionada) {
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
+  }
+
+  public onFiltroChanged(filtro: any): void {
+    // Actualizar el estado interno pero no volver a disparar la búsqueda,
+    // ya que el buscador centralizado (BusquedaService) será quien la ejecute.
+    this.campoSeleccionado = filtro.campo;
+    this.operacionSeleccionada = filtro.operacion;
+    this.valorBusqueda = filtro.valor;
+    this.currentPage = 0;
   }
 
   private procesarResultadosBusqueda(response: any) {
@@ -217,6 +228,40 @@ private readonly boundaryId = 'listado-entradas-main';
   refrescarDatos(): void {
     this.currentPage = 0;
     this.busquedaService.triggerBusqueda(this.valorBusqueda);
+  }
+
+  // Preview handling
+  public previewEntrada?: Entrada;
+  public previewVisible: boolean = false;
+
+  openPreview(entrada: Entrada): void {
+    this.previewEntrada = entrada;
+    this.previewVisible = true;
+  }
+
+  closePreview(): void {
+    this.previewVisible = false;
+    this.previewEntrada = undefined;
+  }
+
+  onPreviewVisibleChange(visible: boolean): void {
+    this.previewVisible = visible;
+    if (!visible) this.previewEntrada = undefined;
+  }
+
+  onEditarDesdePreview(): void {
+    if (this.previewEntrada && this.previewEntrada.idEntrada) {
+      // Navegar a la ruta de edición
+      this.router.navigate(['/admin/control/entradas/editar', this.previewEntrada.idEntrada]);
+      this.closePreview();
+    }
+  }
+
+  onPublicarDesdePreview(entrada: Entrada): void {
+    // Si existe un endpoint para publicar, se llamaría aquí. Por ahora, cerramos la preview
+    // y mostramos un toast informativo.
+    this.closePreview();
+    this.toastService.showInfo('Solicitud de publicación enviada (acción no implementada).', 'Publicar');
   }
 
   // Método para trackBy en *ngFor (mejora rendimiento)
