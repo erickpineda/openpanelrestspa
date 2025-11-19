@@ -2,40 +2,7 @@
 // Esta versión es tolerante al wrapper de respuesta ({ result, data }) y añade
 // mapeo de operaciones cortas -> tokens del backend. Devuelve también metadatos útiles.
 
-const TRADUCCIONES_CAMPOS: Record<string, string> = {
-  'titulo': 'Título',
-  'auditFechaCancel': 'Fecha de cancelación',
-  'auditFechaCreacion': 'Fecha de creación',
-  'auditFechaModif': 'Fecha de modificación',
-  'auditUsuCancel': 'Usuario cancelador',
-  'auditUsuCreacion': 'Usuario creador',
-  'auditUsuModif': 'Usuario modificador',
-  'borrador': '¿Borrador?',
-  'cantidadComentarios': 'Cantidad de comentarios',
-  'categoria.nombre': 'Categoría',
-  'contenido': 'Contenido',
-  'estadoEntrada.nombre': 'Estado',
-  'etiqueta.nombre': 'Etiqueta',
-  'fechaEdicion': 'Fecha de edición',
-  'fechaPublicacion': 'Fecha de publicación',
-  'fechaPublicacionProgramada': 'Fecha publicación programada',
-  'idEntrada': 'ID Entrada',
-  'idUsuario': 'ID Usuario',
-  'idUsuarioEditado': 'ID Usuario Editado',
-  'notas': 'Notas',
-  'permitirComentario': '¿Permitir comentario?',
-  'privado': '¿Privado?',
-  'publicada': '¿Publicada?',
-  'resumen': 'Resumen',
-  'slug': 'Slug',
-  'subtitulo': 'Subtítulo',
-  'tipoEntrada.nombre': 'Tipo de entrada',
-  'usernameCreador': 'Usuario creador',
-  'usernameModificador': 'Usuario modificador',
-  'usuario.nombre': 'Nombre de usuario',
-  'usuario.username': 'Usuario',
-  'votos': 'Votos',
-};
+import { traducirCampoPorEntidad } from './buscador-traducciones.util';
 
 const TRADUCCIONES_OPERACIONES: Record<string, string> = {
   'CONTAINS': 'Contiene',
@@ -127,7 +94,7 @@ export function getBuscadorDefinicionesAmigables(defs: any, opciones?: {
     }));
     return {
       key,
-      label: TRADUCCIONES_CAMPOS[key] || key,
+      label: traducirCampoPorEntidad(key, d.clazzNamePermitido) || key,
       operaciones
     };
   });

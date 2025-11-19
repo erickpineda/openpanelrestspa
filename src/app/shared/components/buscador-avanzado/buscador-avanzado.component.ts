@@ -173,36 +173,5 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     this.operacionesDisponibles = operacionesCampo;
     this.operacionSeleccionada = this.operacionesDisponibles[0]?.valor || this.operacionSeleccionada || '';
   }
-
-  private traducirCampo(campo: string): string {
-    const traducciones: { [key: string]: string } = {
-      'titulo': 'Título',
-      'estadoEntrada.nombre': 'Estado',
-      'tipoEntrada.nombre': 'Tipo',
-      'usuario.username': 'Usuario',
-      'categorias.nombre': 'Categoria',
-      'etiquetas.nombre': 'Etiqueta',
-    };
-    return traducciones[campo] || campo;
-  }
-
-  private traducirOperacion(op: string): string {
-    const traducciones: { [key: string]: string } = {
-      'CONTAINS': 'Contiene',
-      'DOES_NOT_CONTAIN': 'No contiene',
-      'EQUAL': 'Igual a',
-      'NOT_EQUAL': 'Distinto de',
-      'BEGINS_WITH': 'Comienza con',
-      'DOES_NOT_BEGIN_WITH': 'No comienza con',
-      'ENDS_WITH': 'Termina con',
-      'DOES_NOT_END_WITH': 'No termina con',
-      'NULL': 'Vacío',
-      'NOT_NULL': 'No vacío',
-      'GREATER_THAN': 'Mayor que',
-      'GREATER_THAN_EQUAL': 'Mayor o igual que',
-      'LESS_THAN': 'Menor que',
-      'LESS_THAN_EQUAL': 'Menor o igual que'
-    };
-    return traducciones[op] || op;
-  }
+  
 }
