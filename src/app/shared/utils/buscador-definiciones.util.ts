@@ -1,5 +1,6 @@
 // Utilidad para adaptar y traducir definiciones del backend para el BuscadorAvanzadoComponent
-// Puedes extender los diccionarios para más campos/operaciones
+// Esta versión es tolerante al wrapper de respuesta ({ result, data }) y añade
+// mapeo de operaciones cortas -> tokens del backend. Devuelve también metadatos útiles.
 
 const TRADUCCIONES_CAMPOS: Record<string, string> = {
   'titulo': 'Título',
@@ -54,6 +55,25 @@ const TRADUCCIONES_OPERACIONES: Record<string, string> = {
   'BOOLEAN': 'Sí/No',
 };
 
+// Mapeo de códigos cortos (frontend o ejemplos) a tokens esperados por el backend
+const SHORT_TO_TOKEN: Record<string, string> = {
+  'cn': 'CONTAINS',
+  'nc': 'DOES_NOT_CONTAIN',
+  'eq': 'EQUAL',
+  'ne': 'NOT_EQUAL',
+  'bw': 'BEGINS_WITH',
+  'nbw': 'DOES_NOT_BEGIN_WITH',
+  'ew': 'ENDS_WITH',
+  'new': 'DOES_NOT_END_WITH',
+  'nu': 'NULL',
+  'nn': 'NOT_NULL',
+  'gt': 'GREATER_THAN',
+  'ge': 'GREATER_THAN_EQUAL',
+  'lt': 'LESS_THAN',
+  'le': 'LESS_THAN_EQUAL',
+  'bool': 'BOOLEAN'
+};
+
 export interface BuscadorCampoDef {
   key: string;
   label: string;
@@ -62,7 +82,19 @@ export interface BuscadorCampoDef {
 
 export interface BuscadorDefinicionesAdaptadas {
   campos: BuscadorCampoDef[];
-  // Puedes añadir más si necesitas (dataOption, etc)
+  dataOptionPermitido?: string[];
+  valuePermitido?: string[];
+  clazzNamePermitido?: string[];
+  indicaciones?: string[];
+  ejemplo?: any;
+}
+
+function normalizeOperation(op: string | null | undefined): string | undefined {
+  if (!op) return undefined;
+  // Si ya viene en mayúsculas y en el diccionario, asumir que es token
+  if (TRADUCCIONES_OPERACIONES[op]) return op;
+  const lower = op.toLowerCase();
+  return SHORT_TO_TOKEN[lower] || undefined;
 }
 
 export function getBuscadorDefinicionesAmigables(defs: any, opciones?: {
@@ -70,7 +102,13 @@ export function getBuscadorDefinicionesAmigables(defs: any, opciones?: {
   camposOrden?: string[];   // Si quieres forzar un orden
 }): BuscadorDefinicionesAdaptadas {
   if (!defs) return { campos: [] };
-  let campos = defs.filterKeySegunClazzNamePermitido as string[];
+  // Aceptar tanto el objeto completo ({result, data}) como directamente el `data`
+  const d = defs.data ? defs.data : defs;
+
+  const filterKeys: string[] = d.filterKeySegunClazzNamePermitido || [];
+  const opPermitido = d.operationPermitido || {};
+
+  let campos = Array.isArray(filterKeys) ? filterKeys.slice() : [];
   // Filtrar si se indica
   if (opciones?.camposMostrar) {
     campos = campos.filter(c => opciones.camposMostrar!.includes(c));
@@ -79,14 +117,37 @@ export function getBuscadorDefinicionesAmigables(defs: any, opciones?: {
   if (opciones?.camposOrden) {
     campos = opciones.camposOrden.concat(campos.filter(c => !opciones.camposOrden!.includes(c)));
   }
+
   // Mapear a estructura amigable
-  const camposAdaptados: BuscadorCampoDef[] = campos.map(key => ({
-    key,
-    label: TRADUCCIONES_CAMPOS[key] || key,
-    operaciones: (defs.operationPermitido[key] || []).map((op: string) => ({
+  const camposAdaptados: BuscadorCampoDef[] = campos.map(key => {
+    const opsRaw: string[] = opPermitido[key] || [];
+    const operaciones = opsRaw.map((op: string) => ({
       value: op,
       label: TRADUCCIONES_OPERACIONES[op] || op
-    }))
-  }));
-  return { campos: camposAdaptados };
+    }));
+    return {
+      key,
+      label: TRADUCCIONES_CAMPOS[key] || key,
+      operaciones
+    };
+  });
+
+  const adapted: BuscadorDefinicionesAdaptadas = {
+    campos: camposAdaptados,
+    dataOptionPermitido: d.dataOptionPermitido,
+    valuePermitido: d.valuePermitido,
+    clazzNamePermitido: d.clazzNamePermitido,
+    indicaciones: d.indicaciones,
+    ejemplo: d.ejemplo
+  };
+
+  // Normalizar ejemplo.searchCriteriaList (si existe) para que use tokens del backend
+  if (adapted.ejemplo && Array.isArray(adapted.ejemplo.searchCriteriaList)) {
+    adapted.ejemplo = { ...adapted.ejemplo, searchCriteriaList: adapted.ejemplo.searchCriteriaList.map((sc: any) => ({
+      ...sc,
+      operation: normalizeOperation(sc.operation) || sc.operation
+    })) };
+  }
+
+  return adapted;
 }
