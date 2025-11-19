@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { catchError, Subject, takeUntil, throwError } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
 import { EntradaService } from '../../../core/services/data/entrada.service';
@@ -237,6 +237,15 @@ private readonly boundaryId = 'listado-entradas-main';
   openPreview(entrada: Entrada): void {
     this.previewEntrada = entrada;
     this.previewVisible = true;
+    // Dar foco al botón de cerrar del modal para accesibilidad (delay corto
+    // para esperar a que el modal se renderice).
+    setTimeout(() => {
+      try {
+        this.previewCloseBtn?.nativeElement?.focus();
+      } catch (e) {
+        // ignorar si no está disponible
+      }
+    }, 50);
   }
 
   closePreview(): void {
@@ -263,6 +272,8 @@ private readonly boundaryId = 'listado-entradas-main';
     this.closePreview();
     this.toastService.showInfo('Solicitud de publicación enviada (acción no implementada).', 'Publicar');
   }
+
+  @ViewChild('previewCloseBtn') previewCloseBtn?: ElementRef<HTMLButtonElement>;
 
   // Método para trackBy en *ngFor (mejora rendimiento)
   trackByEntradaId(index: number, entrada: Entrada): number {

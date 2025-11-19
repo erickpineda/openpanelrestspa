@@ -87,18 +87,21 @@
             <td>
               <div class="btn-group" role="group" aria-label="Acciones de entrada">
                 <button cButton color="warning" size="sm" 
-                        [routerLink]="['/admin/control/entradas/editar', entrada.idEntrada]"
-                        [attr.aria-label]="'Editar entrada ' + entrada.titulo">
+                  [routerLink]="['/admin/control/entradas/editar', entrada.idEntrada]"
+                  [attr.aria-label]="'Editar entrada ' + entrada.titulo"
+                  [title]="'Editar entrada ' + entrada.titulo">
                   <svg cIcon name="cilPen" size="sm"></svg>
                 </button>
                 <button cButton color="danger" size="sm" 
-                        (click)="borrarEntrada(entrada)"
-                        [attr.aria-label]="'Borrar entrada ' + entrada.titulo">
+                  (click)="borrarEntrada(entrada)"
+                  [attr.aria-label]="'Borrar entrada ' + entrada.titulo"
+                  [title]="'Borrar entrada ' + entrada.titulo">
                   <svg cIcon name="cilTrash" size="sm"></svg>
                 </button>
                 <button cButton color="info" size="sm"
-                        (click)="openPreview(entrada)"
-                        [attr.aria-label]="'Vista previa de ' + entrada.titulo">
+                  (click)="openPreview(entrada)"
+                  [attr.aria-label]="'Vista previa de ' + entrada.titulo"
+                  [title]="'Vista previa de ' + entrada.titulo">
                   <svg cIcon name="cilExternalLink" size="sm"></svg>
                 </button>
               </div>
@@ -152,7 +155,7 @@
     <c-modal id="previewEntradaModal" [visible]="previewVisible" (visibleChange)="onPreviewVisibleChange($event)">
       <c-modal-header>
         <h5 cModalTitle>Vista previa</h5>
-        <button (click)="closePreview()" cButtonClose aria-label="Cerrar preview"></button>
+        <button #previewCloseBtn (click)="closePreview()" cButtonClose aria-label="Cerrar preview" title="Cerrar vista previa"></button>
       </c-modal-header>
       <c-modal-body>
         <app-previa-entrada
