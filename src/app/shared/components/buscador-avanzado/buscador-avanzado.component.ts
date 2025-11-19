@@ -1,7 +1,10 @@
 import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, OnInit, OnDestroy } from '@angular/core';
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, forkJoin } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { getBuscadorDefinicionesAmigables, BuscadorDefinicionesAdaptadas } from '../../utils/buscador-definiciones.util';
+import { getBuscadorDefinicionesAmigables, BuscadorDefinicionesAdaptadas, BuscadorCampoDef } from '../../utils/buscador-definiciones.util';
+import { EntradaService } from '../../../core/services/data/entrada.service';
+import { CategoriaService } from '../../../core/services/data/categoria.service';
+import { EtiquetaService } from '../../../core/services/data/etiqueta.service';
 
 @Component({
   selector: 'app-buscador-avanzado',
@@ -28,12 +31,49 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   operacionSeleccionada: string = '';
   valorBusqueda: string = '';
 
+  // Getter que devuelve la definición del campo seleccionado (evita lógica en el template)
+  public get campoActual(): BuscadorCampoDef | undefined {
+    return this.adaptedDefs?.campos?.find((c: BuscadorCampoDef) => c.key === this.campoSeleccionado);
+  }
+
+  // Devuelve las opciones para el campo tipo select actualmente seleccionado
+  public get opcionesSelectActual(): string[] {
+    const campo = this.campoActual;
+    if (!campo) return [];
+    // Priorizar opciones cargadas desde catálogos dinámicos
+    if (this.catalogOptions && this.catalogOptions[campo.key]) {
+      return this.catalogOptions[campo.key];
+    }
+    // Luego usar lo que venga en adaptedDefs.dataOptionPermitido
+    const defs = this.adaptedDefs;
+    if (defs && defs.dataOptionPermitido) {
+      if (Array.isArray(defs.dataOptionPermitido)) {
+        return defs.dataOptionPermitido;
+      } else if (typeof defs.dataOptionPermitido === 'object' && defs.dataOptionPermitido !== null) {
+        return defs.dataOptionPermitido[campo.key] || [];
+      }
+    }
+    return [];
+  }
+
+  // Opciones cargadas desde servicios de catálogo (clave -> lista de nombres)
+  private catalogOptions: { [key: string]: string[] } = {};
+  public catalogosError: string | null = null;
+
   // Valores iniciales que representan el estado por defecto después de inicializar definiciones
   private initialCampoSeleccionado?: string;
   private initialOperacionSeleccionada?: string;
 
   private valorSubject = new Subject<string>();
   private valorSub?: Subscription;
+
+  private catalogosSub?: Subscription;
+
+  constructor(
+    private entradaService: EntradaService,
+    private categoriaService: CategoriaService,
+    private etiquetaService: EtiquetaService
+  ) {}
 
   ngOnInit(): void {
     // Suscribir cambios con debounce para autoTrigger
@@ -53,6 +93,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.valorSub?.unsubscribe();
     this.valorSubject.complete();
+    this.catalogosSub?.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -138,6 +179,16 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     // Actualizar operaciones ahora que tenemos el campo seleccionado
     this.actualizarOperacionesDisponibles();
 
+    // Si las definiciones permiten la clase 'Entrada' o contienen campos de catálogo,
+    // cargar catálogos relevantes para poblar selects.
+    const clazzAllowed = this.adaptedDefs?.clazzNamePermitido || [];
+    const contieneCamposCatalogo = this.camposDisponibles.some(cd => [
+      'tipoEntrada.nombre', 'estadoEntrada.nombre', 'categoria.nombre', 'etiqueta.nombre'
+    ].includes(cd.valor));
+    if ((Array.isArray(clazzAllowed) && clazzAllowed.includes('Entrada')) || contieneCamposCatalogo) {
+      this.cargarCatalogosEntrada();
+    }
+
     // Si hay ejemplo, intentar precargar operación y valor (si operación es válida para el campo)
     if (ejemplo && Array.isArray(ejemplo.searchCriteriaList) && ejemplo.searchCriteriaList.length > 0) {
       const first = ejemplo.searchCriteriaList[0];
@@ -172,6 +223,33 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
       .sort((a: any, b: any) => a.nombre.localeCompare(b.nombre));
     this.operacionesDisponibles = operacionesCampo;
     this.operacionSeleccionada = this.operacionesDisponibles[0]?.valor || this.operacionSeleccionada || '';
+  }
+  
+  /**
+   * Carga catálogos relevantes para `Entrada`: tipos, estados, categorías y etiquetas.
+   * Almacena los nombres en `catalogOptions` para que los selects tipo `select` los muestren.
+   */
+  public cargarCatalogosEntrada(): void {
+    // Evitar volver a cargar si ya lo hicimos
+    if (Object.keys(this.catalogOptions).length > 0) return;
+    this.catalogosError = null;
+    const tipos$ = this.entradaService.listarTiposEntradasSafe();
+    const estados$ = this.entradaService.listarEstadosEntradasSafe();
+    const categorias$ = this.categoriaService.listarSafe();
+    const etiquetas$ = this.etiquetaService.listarSafe();
+
+    this.catalogosSub = forkJoin([tipos$, estados$, categorias$, etiquetas$]).subscribe({
+      next: ([tipos, estados, categorias, etiquetas]) => {
+        this.catalogOptions['tipoEntrada.nombre'] = (Array.isArray(tipos) ? tipos.map((t: any) => t.nombre) : []);
+        this.catalogOptions['estadoEntrada.nombre'] = (Array.isArray(estados) ? estados.map((e: any) => e.nombre) : []);
+        this.catalogOptions['categoria.nombre'] = (Array.isArray(categorias) ? categorias.map((c: any) => c.nombre) : []);
+        this.catalogOptions['etiqueta.nombre'] = (Array.isArray(etiquetas) ? etiquetas.map((t: any) => t.nombre) : []);
+      },
+      error: (err) => {
+        this.catalogosError = 'Error al cargar catálogos. Intente recargar la página.';
+        console.error('Error cargando catálogos de Entrada:', err);
+      }
+    });
   }
   
 }

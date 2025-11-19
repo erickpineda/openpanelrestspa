@@ -11,12 +11,51 @@
       </select>
     </c-col>
     <c-col xs="12" md="4">
-      <input type="text"
-             cFormControl
-             [placeholder]="placeholder"
-             [(ngModel)]="valorBusqueda"
-             (ngModelChange)="onValorChange($event)"
-             (keyup.enter)="buscar()" />
+      <!-- Input contextual según el tipo de campo (usar el getter campoActual en TS) -->
+      <ng-container *ngIf="campoActual">
+        <!-- String -->
+        <input *ngIf="campoActual.tipo === 'string'" type="text"
+               cFormControl
+               [placeholder]="placeholder"
+               [(ngModel)]="valorBusqueda"
+               (ngModelChange)="onValorChange($event)"
+               (keyup.enter)="buscar()" />
+        <!-- Number -->
+        <input *ngIf="campoActual.tipo === 'number'" type="number"
+               cFormControl
+               [placeholder]="placeholder"
+               [(ngModel)]="valorBusqueda"
+               (ngModelChange)="onValorChange($event)"
+               (keyup.enter)="buscar()" />
+        <!-- Date -->
+        <input *ngIf="campoActual.tipo === 'date'" type="date"
+               cFormControl
+               [placeholder]="placeholder"
+               [(ngModel)]="valorBusqueda"
+               (ngModelChange)="onValorChange($event)"
+               (keyup.enter)="buscar()" />
+        <!-- Boolean -->
+        <select *ngIf="campoActual.tipo === 'boolean'" cSelect cFormControl
+                [(ngModel)]="valorBusqueda"
+                (ngModelChange)="onValorChange($event)">
+          <option [ngValue]="''">--</option>
+          <option [ngValue]="true">Sí</option>
+          <option [ngValue]="false">No</option>
+        </select>
+        <!-- Select (catálogos) -->
+        <ng-container *ngIf="campoActual.tipo === 'select'">
+          <select cSelect cFormControl
+                  [(ngModel)]="valorBusqueda"
+                  (ngModelChange)="onValorChange($event)"
+                  [disabled]="!!catalogosError">
+            <option [ngValue]="''">Seleccione...</option>
+            <option *ngFor="let opt of opcionesSelectActual" [ngValue]="opt">{{ opt }}</option>
+          </select>
+          <div *ngIf="catalogosError" class="text-danger small mt-1">
+            {{ catalogosError }}
+          </div>
+        </ng-container>
+      </ng-container>
     </c-col>
     <c-col xs="12" md="2" class="d-flex gap-1 justify-content-md-end mt-2 mt-md-0" *ngIf="debeMostrarBotonBusqueda() || showClearButton">
       <button *ngIf="debeMostrarBotonBusqueda()" cButton color="primary" (click)="buscar()">Buscar</button>

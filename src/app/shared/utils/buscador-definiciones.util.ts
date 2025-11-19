@@ -3,6 +3,7 @@
 // mapeo de operaciones cortas -> tokens del backend. Devuelve también metadatos útiles.
 
 import { traducirCampoPorEntidad } from './buscador-traducciones.util';
+import { obtenerTipoCampoBuscador, TipoCampoBuscador } from './buscador-tipos-campos.util';
 
 const TRADUCCIONES_OPERACIONES: Record<string, string> = {
   'CONTAINS': 'Contiene',
@@ -41,9 +42,11 @@ const SHORT_TO_TOKEN: Record<string, string> = {
   'bool': 'BOOLEAN'
 };
 
+
 export interface BuscadorCampoDef {
   key: string;
   label: string;
+  tipo: TipoCampoBuscador;
   operaciones: { value: string; label: string }[];
 }
 
@@ -95,6 +98,7 @@ export function getBuscadorDefinicionesAmigables(defs: any, opciones?: {
     return {
       key,
       label: traducirCampoPorEntidad(key, d.clazzNamePermitido) || key,
+      tipo: obtenerTipoCampoBuscador(key, d.clazzNamePermitido),
       operaciones
     };
   });
