@@ -6,7 +6,11 @@
         <h2 class="np-title">Página no encontrada</h2>
         <p class="np-sub">Lo sentimos — la página que buscas no existe o ha sido movida.</p>
         <div class="np-actions">
-            <button class="btn btn-primary" (click)="goHome()" cib-button>Volver al inicio</button>
+            <button class="btn btn-outline-primary me-2" (click)="goBack()" cib-button>
+                <i class="cil-arrow-left"></i>
+                Volver
+            </button>
+            <button class="btn btn-primary me-2" (click)="goHome()" cib-button>Ir al inicio</button>
             <button class="btn btn-secondary" (click)="contactSupport()" cib-button>Contactar soporte</button>
         </div>
     </div>
