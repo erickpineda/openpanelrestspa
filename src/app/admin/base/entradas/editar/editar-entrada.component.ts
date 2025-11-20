@@ -8,6 +8,7 @@ import { Entrada } from '../../../../core/models/entrada.model';
 import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
 import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
 import { Categoria } from '../../../../core/models/categoria.model';
+import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
   selector: 'app-editar-entrada',
@@ -32,13 +33,15 @@ export class EditarEntradaComponent implements OnInit {
     private route: ActivatedRoute,
     private vf: ValidationEntradaFormsService,
     private facade: EntradaFacadeService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {
     
   }
 
   async ngOnInit() {
     this.entradaForm = this.vf.buildForm(this.entrada);
+    this.entradaForm.disable(); // Deshabilitar por defecto
     this.idEntrada = this.route.snapshot.params['idEntrada'];
     const data = await this.facade.loadInitData();
     this.tiposEntr = data.tipos;
@@ -74,11 +77,19 @@ export class EditarEntradaComponent implements OnInit {
       this.entradaForm.disable();
       this.modoLectura = true;
     });
+
+    // Activar dirty en cualquier cambio, incluidas categorías
+    this.entradaForm.valueChanges.subscribe(() => {
+      if (this.entradaForm.pristine) {
+        this.entradaForm.markAsDirty();
+      }
+    });
   }
 
   onEditar() {
     this.modoLectura = false;
     this.entradaForm.enable();
+    this.entradaForm.markAsPristine();
   }
 
   async onGuardar(ent: any) {
@@ -87,6 +98,7 @@ export class EditarEntradaComponent implements OnInit {
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuarioEditado = usuario?.idUsuario ?? null;
     this.facade.actualizarEntrada(this.idEntrada, ent).subscribe(() => {
+      this.toastService.showSuccess('La entrada se ha actualizado correctamente.', 'Entrada actualizada');
       this.router.navigateByUrl('/admin/control/entradas');
     });
   }

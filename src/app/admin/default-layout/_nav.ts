@@ -49,7 +49,7 @@ export const navItems: INavData[] = [
   {
     name: 'Categorías',
     url: '/admin/control/categorias',
-    linkProps: { fragment: 'someAnchor' },
+    linkProps: { fragment: '' },
     iconComponent: { name: 'cil-spreadsheet' }
   },
   {

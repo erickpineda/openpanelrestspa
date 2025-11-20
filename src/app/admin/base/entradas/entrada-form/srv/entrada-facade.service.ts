@@ -56,7 +56,7 @@ export class EntradaFacadeService {
   }
 
   actualizarEntrada(id: any, ent: any): Observable<any> {
-    return this.entradaService.actualizarSafe(id, ent);
+    return this.entradaService.actualizar(id, ent);
   }
 
   async getUsuarioSesion(): Promise<PerfilResponse> {

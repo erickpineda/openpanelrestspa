@@ -65,7 +65,7 @@ export class ValidationEntradaFormsService {
         Validators.minLength(this.formRules.contenidoMin)
       ]],
       notas: [entrada?.notas ?? null],
-      tipoEntrada: [entrada?.tipoEntrada ?? TipoEntrada, [Validators.required]],
+      tipoEntrada: [entrada?.tipoEntrada ?? null, [Validators.required]],
       resumen: [entrada?.resumen ?? null],
       fechaPublicacion: [entrada?.fechaPublicacion ?? null],
       fechaEdicion: [entrada?.fechaEdicion ?? null],
@@ -73,7 +73,7 @@ export class ValidationEntradaFormsService {
       publicada: [entrada?.publicada ?? false],
       password: [entrada?.password ?? null],
       privado: [entrada?.privado ?? false],
-      estadoEntrada: [entrada?.estadoEntrada ?? EstadoEntrada, [Validators.required]],
+      estadoEntrada: [entrada?.estadoEntrada ?? null, [Validators.required]],
       fechaPublicacionProgramada: [entrada?.fechaPublicacionProgramada ?? null],
       permitirComentario: [entrada?.permitirComentario ?? true],
       imagenDestacada: [entrada?.imagenDestacada ?? null],

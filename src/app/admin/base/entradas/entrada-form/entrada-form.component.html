@@ -40,7 +40,7 @@
             </button>
 
             <button cButton color="success" size="sm" type="submit"
-              [disabled]="form.pristine || form.invalid" [tabindex]="'0'">
+              [disabled]="modoLectura || form.pristine || form.invalid" [tabindex]="'0'">
               <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
               Guardar
             </button>
@@ -69,14 +69,17 @@
                         autocomplete="none"
                         required
                         [autofocus]="true"
-                        [ngClass]="{ 'is-invalid': (submitted || control('titulo')?.touched) && control('titulo')?.invalid }">
+                        [ngClass]="{ 'is-invalid': (submitted || control('titulo')?.touched) && control('titulo')?.invalid, 'is-valid': control('titulo')?.valid && (submitted || control('titulo')?.touched) }">
 
                       <small id="passwordHelpInline" class="text-muted">
                         <abbr title="El título de la entrada ha de tener entre 1 y 30 caracteres">Mínimo 1, Máximo 30 caracteres.</abbr>
                       </small>
 
-                      <div *ngIf="(submitted || control('titulo')?.touched) && control('titulo')?.invalid" class="invalid-feedback">
+                      <div *ngIf="(submitted || control('titulo')?.touched) && control('titulo')?.invalid" class="invalid-feedback animated-fade">
                         <div *ngIf="control('titulo')?.errors?.['required']">El título es obligatorio</div>
+                      </div>
+                      <div *ngIf="control('titulo')?.valid && (submitted || control('titulo')?.touched)" class="valid-feedback animated-fade">
+                        ¡Título válido!
                       </div>
                     </div>
                   </c-col>
@@ -100,20 +103,34 @@
                   <c-col lg="12">
                     <div>
                       <label cCol cLabel="col">Estado</label>
-                      <select cSelect cFormControl formControlName="estadoEntrada" *ngIf="estadosEntr?.length">
-                        <option *ngFor="let ee of estadosEntr" [ngValue]="ee" cCardTitle required>
-                            {{ ee.nombre }}
-                        </option>
+                      <select cSelect cFormControl formControlName="estadoEntrada" *ngIf="estadosEntr?.length"
+                        [ngClass]="{ 'is-invalid': (submitted || control('estadoEntrada')?.touched) && control('estadoEntrada')?.invalid, 'is-valid': control('estadoEntrada')?.valid && (submitted || control('estadoEntrada')?.touched) }">
+                        <option [ngValue]="null" disabled>Selecciona un estado</option>
+                        <option *ngFor="let ee of estadosEntr" [ngValue]="ee">{{ ee.nombre }}</option>
                       </select>
+                      <div *ngIf="(submitted || control('estadoEntrada')?.touched) && control('estadoEntrada')?.invalid" class="invalid-feedback animated-fade">
+                        <div *ngIf="control('estadoEntrada')?.errors?.['required']">El estado es obligatorio</div>
+                      </div>
+                      <div *ngIf="control('estadoEntrada')?.valid && (submitted || control('estadoEntrada')?.touched)" class="valid-feedback animated-fade">
+                        ¡Estado válido!
+                      </div>
                     </div>
                   </c-col>
 
                   <c-col lg="12">
                     <div>
                       <label cCol cLabel="col">Tipo entrada</label>
-                      <select cSelect cFormControl formControlName="tipoEntrada" *ngIf="tiposEntr?.length">
+                      <select cSelect cFormControl formControlName="tipoEntrada" *ngIf="tiposEntr?.length"
+                        [ngClass]="{ 'is-invalid': (submitted || control('tipoEntrada')?.touched) && control('tipoEntrada')?.invalid, 'is-valid': control('tipoEntrada')?.valid && (submitted || control('tipoEntrada')?.touched) }">
+                        <option [ngValue]="null" disabled>Selecciona un tipo</option>
                         <option *ngFor="let te of tiposEntr" [ngValue]="te">{{ te.nombre }}</option>
                       </select>
+                      <div *ngIf="(submitted || control('tipoEntrada')?.touched) && control('tipoEntrada')?.invalid" class="invalid-feedback animated-fade">
+                        <div *ngIf="control('tipoEntrada')?.errors?.['required']">El tipo de entrada es obligatorio</div>
+                      </div>
+                      <div *ngIf="control('tipoEntrada')?.valid && (submitted || control('tipoEntrada')?.touched)" class="valid-feedback animated-fade">
+                        ¡Tipo de entrada válido!
+                      </div>
                     </div>
                   </c-col>
                 </c-row>
@@ -125,16 +142,20 @@
             <c-card class="mb-4">
               <c-card-body>
                 <h3 cCardTitle class="h6 card-title">Contenido de la entrada</h3>
-                <ckeditor id="ckeditor" [editor]="Editor" [config]="editorConfig" tagName="textarea"
-                  cFormControl rows="10"
-                  formControlName="contenido"
-                  autocomplete="none"
-                  required
-                  [ngClass]="{ 'is-invalid': (submitted || control('contenido')?.touched) && control('contenido')?.invalid }">
+                  <ckeditor id="ckeditor" [editor]="Editor" [config]="editorConfig" tagName="textarea"
+                    cFormControl rows="10"
+                    formControlName="contenido"
+                    autocomplete="none"
+                    required
+                    (blur)="control('contenido')?.markAsTouched()"
+                    [ngClass]="{ 'is-invalid': (submitted || control('contenido')?.touched) && control('contenido')?.invalid, 'is-valid': control('contenido')?.valid && (submitted || control('contenido')?.touched) }">
                 </ckeditor>
 
-                <div *ngIf="(submitted || control('contenido')?.touched) && control('contenido')?.invalid" class="invalid-feedback">
+                <div *ngIf="(submitted || control('contenido')?.touched) && control('contenido')?.invalid" class="invalid-feedback animated-fade">
                   <div *ngIf="control('contenido')?.errors?.['required']">Escribe algo en la entrada vago</div>
+                </div>
+                <div *ngIf="control('contenido')?.valid && (submitted || control('contenido')?.touched)" class="valid-feedback animated-fade">
+                  ¡Contenido válido!
                 </div>
               </c-card-body>
             </c-card>

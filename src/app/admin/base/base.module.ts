@@ -10,7 +10,9 @@ import { ListadoEntradasComponent } from './entradas/listado-entradas.component'
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
 import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
-import { CrearEditarCategoria } from './categorias/crear-editar/crear-editar-categoria.component';
+import { CrearCategoriaComponent } from './categorias/crear/crear-categoria.component';
+import { EditarCategoriaComponent } from './categorias/editar/editar-categoria.component';
+import { CategoriaFormComponent } from './categorias/categoria-form/categoria-form.component';
 import { CrearEntradaComponent } from './entradas/crear/crear-entrada.component';
 import { EditarEntradaComponent } from './entradas/editar/editar-entrada.component';
 import { EntradaFormComponent } from './entradas/entrada-form/entrada-form.component';
@@ -42,7 +44,9 @@ import { SharedOPModule } from '../../shared/shared.module';
     ListadoComentariosComponent,
     CrearEditarComentario,
     ListadoCategoriasComponent,
-    CrearEditarCategoria,
+    CrearCategoriaComponent,
+    EditarCategoriaComponent,
+    CategoriaFormComponent,
     PreviaEntradaComponent,
   ],
 })

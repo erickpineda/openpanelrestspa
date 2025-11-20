@@ -1,12 +1,7 @@
-import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { Categoria } from "../../../core/models/categoria.model";
 import { CategoriaService } from "../../../core/services/data/categoria.service";
-import { TokenStorageService } from "../../../core/services/auth/token-storage.service";
-import { UsuarioService } from "../../../core/services/data/usuario.service";
-import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
-import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-response.model";
 import { LoggerService } from "../../../core/services/logger.service";
 
 @Component({
@@ -15,64 +10,61 @@ import { LoggerService } from "../../../core/services/logger.service";
   styleUrls: ['./listado-categorias.component.scss']
 })
 export class ListadoCategoriasComponent implements OnInit {
-
   listaCategorias: Categoria[] = [];
+  cargando = false;
+  errorMsg: string | null = null;
 
   constructor(
     private router: Router,
     private categoriaService: CategoriaService,
-    private usuarioService: UsuarioService,
-    private tokenStorageService: TokenStorageService,
-    private commonFuncService: CommonFunctionalityService,
     private log: LoggerService
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.initList();
+    this.obtenerListaCategorias();
   }
 
-  private async initList() {
-    try {
-      const listaRes = await this.obtenerListaCategorias();
-      if (listaRes) {
-        this.listaCategorias = listaRes;
-      }
-    } catch (error) {
-      this.log.error('Error initializing list:', error);
-    }
-  }
-
-  navigate(urlToNavigate: string) {
-    this.router.navigate([urlToNavigate])
-  }
-
-  private obtenerListaCategorias(): Promise<Categoria[]> {
-    return new Promise((resolve, reject) => {
-      this.categoriaService.listar().subscribe({
-        next: (response: OpenpanelApiResponse<any>) => {
-          const categorias: Categoria[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
-          resolve(categorias);
-        },
-        error: (err) => {
-          if (err?.status === 404) {
-            this.listaCategorias = [];
-            console.warn('No se encontraron categorías. Estableciendo lista vacía.');
-            resolve([]);
-          } else {
-            reject(err);
-          }
+  obtenerListaCategorias(): void {
+    this.cargando = true;
+    this.errorMsg = null;
+    this.categoriaService.listar().subscribe({
+      next: (response: any) => {
+        const categorias: Categoria[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
+        this.listaCategorias = categorias;
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.cargando = false;
+        if (err?.status === 404) {
+          this.listaCategorias = [];
+          this.errorMsg = 'No se encontraron categorías.';
+        } else {
+          this.errorMsg = 'Error al cargar categorías.';
+          this.log.error('Error al cargar categorías:', err);
         }
-      });
+      }
     });
-  }  
-
-  public refrescarPagina(): void {
-    window.location.reload();
   }
 
-  crearCategoria() {}
-  actualizarCategoria(id: number) {}
-  borrarCategoria(id: number) {}
+  refrescar(): void {
+    this.obtenerListaCategorias();
+  }
 
+  crearCategoria(): void {
+    this.router.navigate(['/admin/control/categorias/crear']);
+  }
+
+  editarCategoria(id: number): void {
+    this.router.navigate(['/admin/control/categorias/editar', id]);
+  }
+
+  borrarCategoria(id: number): void {
+    // Aquí podrías abrir un modal de confirmación y luego llamar al servicio para borrar
+    // this.categoriaService.borrar(id).subscribe(...)
+    alert('Funcionalidad de borrado no implementada');
+  }
+
+  trackByCategoriaId(index: number, categoria: Categoria): number {
+    return categoria.idCategoria;
+  }
 }
