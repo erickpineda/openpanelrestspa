@@ -1,48 +1,253 @@
-import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, OnInit, OnDestroy } from '@angular/core';
+/**
+ * Componente genérico reutilizable para construir un buscador avanzado sobre cualquier entidad.
+ * Permite definir dinámicamente los campos, operaciones y catálogos a utilizar, así como la lógica de búsqueda y autotrigger.
+ * Principales características:
+ * - Soporta campos dinámicos y operaciones configurables.
+ * - Permite priorizar campos en el orden de presentación.
+ * - Soporta carga dinámica de catálogos para selects.
+ * - Puede emitir eventos de búsqueda automáticamente (autoTrigger) o bajo demanda.
+ * - Es fácilmente integrable con servicios externos y componentes padres.
+ * Uso recomendado:
+ * 1. Definir las definiciones de campos y operaciones desde el padre.
+ * 2. Configurar los campos prioritarios y de catálogo según la entidad.
+ * 3. Proveer la función de carga de catálogos si es necesario.
+ * 4. Escuchar los eventos de filtro para ejecutar la búsqueda.
+ * 
+ * Ejemplo de uso del componente `buscador-avanzado` desde un componente padre:
+ *
+ * En el archivo TypeScript del componente padre (por ejemplo, `app.component.ts`):
+ *
+ * ```typescript
+ * import { Component } from '@angular/core';
+ *
+ * @Component({
+ *   selector: 'app-root',
+ *   templateUrl: './app.component.html',
+ *   styleUrls: ['./app.component.css']
+ * })
+ * export class AppComponent {
+ *   campos = [
+ *     { nombre: 'Nombre', tipo: 'texto' },
+ *     { nombre: 'Edad', tipo: 'número' },
+ *     { nombre: 'Fecha de registro', tipo: 'fecha' }
+ *   ];
+ *
+ *   operaciones = [
+ *     { nombre: 'Contiene', valor: 'contiene' },
+ *     { nombre: 'Igual a', valor: 'igual' },
+ *     { nombre: 'Mayor que', valor: 'mayor' }
+ *   ];
+ *
+ *   filtrosAplicados: any[] = [];
+ *
+ *   onBuscar(filtros: any[]) {
+ *     console.log('Filtros aplicados:', filtros);
+ *     this.filtrosAplicados = filtros;
+ *   }
+ *
+ *   onLimpiar() {
+ *     console.log('Filtros limpiados');
+ *     this.filtrosAplicados = [];
+ *   }
+ * }
+ * ```
+ *
+ * En el archivo HTML del componente padre (por ejemplo, `app.component.html`):
+ *
+ * ```html
+ * <div>
+ *   <h1>Ejemplo de uso del Buscador Avanzado</h1>
+ *
+ *   <app-buscador-avanzado
+ *     [campos]="campos"
+ *     [operaciones]="operaciones"
+ *     (buscar)="onBuscar($event)"
+ *     (limpiar)="onLimpiar()"
+ *   ></app-buscador-avanzado>
+ *
+ *   <div *ngIf="filtrosAplicados.length > 0">
+ *     <h2>Filtros Aplicados:</h2>
+ *     <ul>
+ *       <li *ngFor="let filtro of filtrosAplicados">
+ *         {{ filtro.campo }} {{ filtro.operacion }} {{ filtro.valor }}
+ *       </li>
+ *     </ul>
+ *   </div>
+ * </div>
+ * ```
+ */
+import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { getBuscadorDefinicionesAmigables, BuscadorDefinicionesAdaptadas, BuscadorCampoDef } from '../../utils/buscador-definiciones.util';
-import { EntradaCatalogService } from '../../../core/services/data/entrada-catalog.service';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 
 @Component({
   selector: 'app-buscador-avanzado',
-  templateUrl: './buscador-avanzado.component.html'
+  templateUrl: './buscador-avanzado.component.html',
+  styleUrls: ['./buscador-avanzado.component.scss'],
+  
 })
+
 export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
+  // =================== Inputs ===================
+  /**
+   * Definiciones de campos y operaciones para el buscador.
+   * Debe ser un objeto compatible con la utilidad getBuscadorDefinicionesAmigables.
+   */
   @Input() definiciones: any;
-  // Configuraciones para hacerlo genérico
-  @Input() autoTrigger: boolean = false; // si true, emite búsquedas automáticamente al escribir
-  @Input() debounceMs: number = 300; // tiempo de debounce para autoTrigger
-  @Input() showButton: boolean = true; // mostrar/ocultar botón Buscar (legacy)
-  @Input() showSearchButton?: boolean; // nuevo: control fino del botón Buscar
-  @Input() showClearButton: boolean = false; // nuevo: mostrar botón Limpiar
+  /**
+   * Si es true, emite búsquedas automáticamente al escribir (autoTrigger).
+   */
+  @Input() autoTrigger: boolean = false;
+  /**
+   * Tiempo de debounce en ms para autoTrigger.
+   */
+  @Input() debounceMs: number = 300;
+  /**
+   * Mostrar/ocultar botón Buscar (legacy).
+   */
+  @Input() showButton: boolean = true;
+  /**
+   * Control fino del botón Buscar (nuevo).
+   */
+  @Input() showSearchButton?: boolean;
+  /**
+   * Mostrar botón Limpiar (nuevo).
+   */
+  @Input() showClearButton: boolean = false;
+  /**
+   * Placeholder para el input de búsqueda.
+   */
   @Input() placeholder: string = 'Ingrese valor a buscar';
-  @Input() defaultField?: string; // campo por defecto que puede proveer el padre para mantener el componente genérico
+  /**
+   * Campo por defecto que puede proveer el padre para mantener el componente genérico.
+   */
+  @Input() defaultField?: string;
+  /**
+   * Lista de claves de campos que deben aparecer primero en el orden de presentación.
+   * Ejemplo: ['titulo']
+   */
+  @Input() camposPrioritarios: string[] = [];
+  /**
+   * Lista de claves de campos que requieren catálogo externo.
+   * Ejemplo: ['tipoEntrada.nombre', 'estadoEntrada.nombre']
+   */
+  @Input() camposCatalogo: string[] = [];
+  /**
+   * Función para cargar catálogos externos, debe devolver un Observable<{ [key: string]: string[] }>.
+   * El padre debe proveer la función adecuada según la entidad.
+   */
+  @Input() cargarCatalogosFn?: () => import('rxjs').Observable<{ [key: string]: string[] }>;
 
+  // =================== Outputs ===================
+  /**
+   * Evento que se emite cuando se selecciona o ejecuta un filtro de búsqueda.
+   */
   @Output() filtroSeleccionado = new EventEmitter<any>();
-  @Output() filtroChanged = new EventEmitter<any>(); // emite en cada cambio (si autoTrigger)
+  /**
+   * Evento que se emite en cada cambio de filtro (si autoTrigger está activo).
+   */
+  @Output() filtroChanged = new EventEmitter<any>();
 
-  camposDisponibles: any[] = [];
-  operacionesDisponibles: any[] = [];
-  adaptedDefs?: BuscadorDefinicionesAdaptadas;
-  campoSeleccionado: string = '';
-  operacionSeleccionada: string = '';
-  valorBusqueda: string = '';
+  // =================== Propiedades públicas ===================
+  /**
+   * Lista de campos disponibles para búsqueda, adaptados para el selector.
+   */
+  public camposDisponibles: any[] = [];
+  /**
+   * Lista de operaciones disponibles para el campo seleccionado.
+   */
+  public operacionesDisponibles: any[] = [];
+  /**
+   * Definiciones adaptadas del buscador (campos, operaciones, etc).
+   */
+  public adaptedDefs?: BuscadorDefinicionesAdaptadas;
+  /**
+   * Campo actualmente seleccionado para buscar.
+   */
+  public campoSeleccionado: string = '';
+  /**
+   * Operación actualmente seleccionada para el campo.
+   */
+  public operacionSeleccionada: string = '';
+  /**
+   * Valor actual del input de búsqueda.
+   */
+  public valorBusqueda: string = '';
+  /**
+   * Mensaje de error si falla la carga de catálogos.
+   */
+  public catalogosError: string | null = null;
 
-  // Getter que devuelve la definición del campo seleccionado (evita lógica en el template)
+  // =================== Propiedades privadas ===================
+  /**
+   * Opciones de catálogo cargadas dinámicamente (clave -> lista de nombres).
+   */
+  private catalogOptions: { [key: string]: string[] } = {};
+  /**
+   * Estado inicial del campo seleccionado (para restaurar en limpiar).
+   */
+  private initialCampoSeleccionado?: string;
+  /**
+   * Estado inicial de la operación seleccionada (para restaurar en limpiar).
+   */
+  private initialOperacionSeleccionada?: string;
+  /**
+   * Suscripción a la carga de catálogos (para limpiar en OnDestroy).
+   */
+  private catalogosSub?: Subscription;
+
+  // =================== Constructor ===================
+  /**
+   * Constructor: inyecta el servicio de búsqueda.
+   */
+  constructor(private busquedaService: BusquedaService) {}
+
+  // =================== Ciclo de vida ===================
+  /**
+   * Hook de inicialización. La lógica de debounce/autoTrigger la maneja BusquedaService.
+   */
+  ngOnInit(): void {
+    // Ahora la lógica de debounce/autoTrigger la maneja `BusquedaService`.
+  }
+
+  /**
+   * Hook de cambios en los inputs. Si cambian las definiciones, reinicializa el buscador.
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['definiciones'] && this.definiciones) {
+      this.inicializarBuscador();
+    }
+    // El debounce ya no se maneja localmente; `debounceMs` deberá ser pasado
+    // al llamar `BusquedaService.iniciarBusqueda(...)` desde el componente padre.
+  }
+
+  /**
+   * Hook de destrucción. Limpia la suscripción a catálogos si existe.
+   */
+  ngOnDestroy(): void {
+    this.catalogosSub?.unsubscribe();
+  }
+
+  // =================== Getters ===================
+  /**
+   * Devuelve la definición del campo actualmente seleccionado.
+   * Evita lógica en el template.
+   */
   public get campoActual(): BuscadorCampoDef | undefined {
     return this.adaptedDefs?.campos?.find((c: BuscadorCampoDef) => c.key === this.campoSeleccionado);
   }
 
-  // Devuelve las opciones para el campo tipo select actualmente seleccionado
+  /**
+   * Devuelve las opciones para el campo tipo select actualmente seleccionado.
+   * Prioriza las opciones cargadas dinámicamente desde catálogos.
+   */
   public get opcionesSelectActual(): string[] {
     const campo = this.campoActual;
     if (!campo) return [];
-    // Priorizar opciones cargadas desde catálogos dinámicos
     if (this.catalogOptions && this.catalogOptions[campo.key]) {
       return this.catalogOptions[campo.key];
     }
-    // Luego usar lo que venga en adaptedDefs.dataOptionPermitido
     const defs = this.adaptedDefs;
     if (defs && defs.dataOptionPermitido) {
       if (Array.isArray(defs.dataOptionPermitido)) {
@@ -54,60 +259,34 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     return [];
   }
 
-  // Opciones cargadas desde servicios de catálogo (clave -> lista de nombres)
-  private catalogOptions: { [key: string]: string[] } = {};
-  public catalogosError: string | null = null;
-
-  // Valores iniciales que representan el estado por defecto después de inicializar definiciones
-  private initialCampoSeleccionado?: string;
-  private initialOperacionSeleccionada?: string;
-
-  // Eliminado Subject local: debounce/autotrigger delegado a BusquedaService
-
-  private catalogosSub?: Subscription;
-
-  constructor(private entradaCatalogService: EntradaCatalogService, private busquedaService: BusquedaService) {}
-
-  ngOnInit(): void {
-    // Ahora la lógica de debounce/autoTrigger la maneja `BusquedaService`.
-  }
-
-  // Compatibilidad: si no se provee showSearchButton, usamos el antiguo showButton
+  // =================== Métodos públicos ===================
+  /**
+   * Determina si se debe mostrar el botón de búsqueda, considerando compatibilidad con showButton.
+   */
   public debeMostrarBotonBusqueda(): boolean {
     return this.showSearchButton !== undefined ? this.showSearchButton : this.showButton;
   }
 
-  ngOnDestroy(): void {
-    this.catalogosSub?.unsubscribe();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['definiciones'] && this.definiciones) {
-      this.inicializarBuscador();
-    }
-    // El debounce ya no se maneja localmente; `debounceMs` deberá ser pasado
-    // al llamar `BusquedaService.iniciarBusqueda(...)` desde el componente padre.
-  }
-
+  /**
+   * Ejecuta la búsqueda y emite el filtro seleccionado.
+   */
   public buscar(): void {
     this.emitirFiltro();
   }
 
+  /**
+   * Restaura los valores iniciales del buscador y emite el filtro restaurado.
+   * Si autoTrigger está activo, también emite filtroChanged y dispara búsqueda.
+   */
   public limpiar(): void {
-    // Restaurar valores por defecto (los calculados en inicializarBuscador)
     this.campoSeleccionado = this.initialCampoSeleccionado || this.camposDisponibles[0]?.valor || '';
-    // Actualizar operaciones disponibles para el campo restaurado
     this.actualizarOperacionesDisponibles();
     this.operacionSeleccionada = this.initialOperacionSeleccionada || this.operacionesDisponibles[0]?.valor || '';
-    // Limpiar el valor de búsqueda y notificar
     this.valorBusqueda = '';
-    // Si estamos en autoTrigger, primero notificar al padre (para que actualice estado)
-    // y luego delegar el trigger al servicio centralizado.
     if (this.autoTrigger) {
       this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
-    // Emitir filtro con los valores restaurados para que el padre pueda actuar
     this.filtroSeleccionado.emit({
       campo: this.campoSeleccionado,
       operacion: this.operacionSeleccionada,
@@ -115,6 +294,42 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Maneja el cambio de valor en el input de búsqueda.
+   * Si autoTrigger está activo, emite filtroChanged y dispara búsqueda.
+   */
+  public onValorChange(v: string): void {
+    this.valorBusqueda = v;
+    if (this.autoTrigger) {
+      this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });
+      this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    }
+  }
+
+  /**
+   * Carga catálogos usando la función genérica proporcionada por el padre.
+   * Almacena los nombres en catalogOptions para que los selects tipo select los muestren.
+   * Si ya están cargados, no vuelve a cargar.
+   */
+  public cargarCatalogosGenerico(): void {
+    if (Object.keys(this.catalogOptions).length > 0) return;
+    this.catalogosError = null;
+    if (!this.cargarCatalogosFn) return;
+    this.catalogosSub = this.cargarCatalogosFn().subscribe({
+      next: (mapped) => {
+        this.catalogOptions = { ...mapped };
+      },
+      error: (err) => {
+        this.catalogosError = 'Error al cargar catálogos. Intente recargar la página.';
+        console.error('Error cargando catálogos:', err);
+      }
+    });
+  }
+
+  // =================== Métodos privados ===================
+  /**
+   * Emite el filtro seleccionado actual al padre.
+   */
   private emitirFiltro(): void {
     this.filtroSeleccionado.emit({
       campo: this.campoSeleccionado,
@@ -123,26 +338,19 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     });
   }
 
-  public onValorChange(v: string): void {
-    this.valorBusqueda = v;
-    // Delegar autoTrigger al servicio centralizado si está habilitado.
-    // Emitimos `filtroChanged` primero para que el componente padre actualice
-    // su estado (campo/operacion) antes de que el servicio ejecute la búsqueda.
-    if (this.autoTrigger) {
-      this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });
-      this.busquedaService.triggerBusqueda(this.valorBusqueda);
-    }
-  }
-
+  /**
+   * Inicializa el buscador con las definiciones recibidas.
+   * Ordena los campos, determina el campo inicial, carga catálogos si es necesario,
+   * y precarga ejemplos si están definidos.
+   */
   private inicializarBuscador(): void {
     if (!this.definiciones) return;
-    // Usar la utilidad para obtener definiciones amigables (acepta wrapper {result,data} o el data directamente)
     this.adaptedDefs = getBuscadorDefinicionesAmigables(this.definiciones);
     const campos = this.adaptedDefs.campos || [];
-    // Dar preferencia a 'titulo' en el orden de presentación
+    // Ordenar campos priorizando los definidos en camposPrioritarios
     const camposOrdenados = [
-      ...campos.filter((c: any) => c.key === 'titulo'),
-      ...campos.filter((c: any) => c.key !== 'titulo').sort((a: any, b: any) => a.label.localeCompare(b.label))
+      ...campos.filter((c: any) => this.camposPrioritarios.includes(c.key)),
+      ...campos.filter((c: any) => !this.camposPrioritarios.includes(c.key)).sort((a: any, b: any) => a.label.localeCompare(b.label))
     ];
     this.camposDisponibles = camposOrdenados.map((c: any) => ({ nombre: c.label, valor: c.key }));
     // Determinar campo inicial: preferir el `defaultField` provisto por el padre si existe en las definiciones;
@@ -165,14 +373,10 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     // Actualizar operaciones ahora que tenemos el campo seleccionado
     this.actualizarOperacionesDisponibles();
 
-    // Si las definiciones permiten la clase 'Entrada' o contienen campos de catálogo,
-    // cargar catálogos relevantes para poblar selects.
-    const clazzAllowed = this.adaptedDefs?.clazzNamePermitido || [];
-    const contieneCamposCatalogo = this.camposDisponibles.some(cd => [
-      'tipoEntrada.nombre', 'estadoEntrada.nombre', 'categoria.nombre', 'etiqueta.nombre'
-    ].includes(cd.valor));
-    if ((Array.isArray(clazzAllowed) && clazzAllowed.includes('Entrada')) || contieneCamposCatalogo) {
-      this.cargarCatalogosEntrada();
+    // Si hay campos de catálogo definidos y función de carga, cargar catálogos
+    const contieneCamposCatalogo = this.camposDisponibles.some(cd => this.camposCatalogo.includes(cd.valor));
+    if (contieneCamposCatalogo && this.cargarCatalogosFn) {
+      this.cargarCatalogosGenerico();
     }
 
     // Si hay ejemplo, intentar precargar operación y valor (si operación es válida para el campo)
@@ -185,7 +389,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
         this.operacionSeleccionada = opEjemplo;
       }
       // No prefijar el input con el valor de ejemplo: usarlo como placeholder si el placeholder
-      // actual es el por defecto. Dejar `valorBusqueda` vacío para que el usuario escriba.
+      // actual es el por defecto. Dejar valorBusqueda vacío para que el usuario escriba.
       const DEFAULT_PLACEHOLDER = 'Ingrese valor a buscar';
       if (valorEjemplo !== undefined && this.placeholder === DEFAULT_PLACEHOLDER) {
         this.placeholder = valorEjemplo;
@@ -197,6 +401,10 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     this.initialOperacionSeleccionada = this.operacionSeleccionada;
   }
 
+  /**
+   * Actualiza la lista de operaciones disponibles para el campo seleccionado.
+   * Si no hay definiciones, limpia las operaciones.
+   */
   actualizarOperacionesDisponibles(): void {
     if (!this.adaptedDefs) {
       this.operacionesDisponibles = [];
@@ -209,25 +417,6 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
       .sort((a: any, b: any) => a.nombre.localeCompare(b.nombre));
     this.operacionesDisponibles = operacionesCampo;
     this.operacionSeleccionada = this.operacionesDisponibles[0]?.valor || this.operacionSeleccionada || '';
-  }
-  
-  /**
-   * Carga catálogos relevantes para `Entrada`: tipos, estados, categorías y etiquetas.
-   * Almacena los nombres en `catalogOptions` para que los selects tipo `select` los muestren.
-   */
-  public cargarCatalogosEntrada(): void {
-    // Evitar volver a cargar si ya lo hicimos
-    if (Object.keys(this.catalogOptions).length > 0) return;
-    this.catalogosError = null;
-    this.catalogosSub = this.entradaCatalogService.obtenerCatalogosEntrada().subscribe({
-      next: (mapped) => {
-        this.catalogOptions = { ...mapped };
-      },
-      error: (err) => {
-        this.catalogosError = 'Error al cargar catálogos. Intente recargar la página.';
-        console.error('Error cargando catálogos de Entrada:', err);
-      }
-    });
   }
   
 }

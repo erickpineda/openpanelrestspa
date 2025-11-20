@@ -9,14 +9,14 @@ import {
   DefaultHeaderComponent,
 } from './default-layout';
 import { UserComponent } from './perfil/user.component';
-import { DashboardComponent } from './base/dashboard/dashboard.component';
 
 // Módulos externos
 import { NgScrollbarModule } from 'ngx-scrollbar';
-import { ChartjsModule } from '@coreui/angular-chartjs';
+// Dashboard moved to lazy DashboardModule (includes Chartjs)
 
 // Shared Module
-import { SharedOPModule } from '../shared/shared.module';
+import { SharedCoreUiModule } from '../shared/shared-coreui.module';
+import { SharedWidgetsModule } from '../shared/shared-widgets.module';
 
 const APP_CONTAINERS = [
   DefaultFooterComponent,
@@ -25,18 +25,19 @@ const APP_CONTAINERS = [
 ];
 
 @NgModule({
-  declarations: [...APP_CONTAINERS, UserComponent, DashboardComponent],
+  declarations: [...APP_CONTAINERS, UserComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,
     ReactiveFormsModule,
 
-    // ✅ Shared Module (contiene todos los componentes compartidos)
-    SharedOPModule,
+    // Solo los módulos CoreUI necesarios para el layout
+    SharedCoreUiModule,
+    // Widgets y notificaciones compartidas
+    SharedWidgetsModule,
 
-    // Módulos específicos de Admin
+    // Módulos específicos de Admin (Dashboard/Chartjs se cargan en su propio módulo)
     NgScrollbarModule,
-    ChartjsModule,
   ],
 })
 export class AdminModule {}

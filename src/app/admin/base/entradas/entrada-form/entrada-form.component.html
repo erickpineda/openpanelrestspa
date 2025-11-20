@@ -142,14 +142,21 @@
             <c-card class="mb-4">
               <c-card-body>
                 <h3 cCardTitle class="h6 card-title">Contenido de la entrada</h3>
-                  <ckeditor id="ckeditor" [editor]="Editor" [config]="editorConfig" tagName="textarea"
-                    cFormControl rows="10"
-                    formControlName="contenido"
-                    autocomplete="none"
-                    required
-                    (blur)="control('contenido')?.markAsTouched()"
-                    [ngClass]="{ 'is-invalid': (submitted || control('contenido')?.touched) && control('contenido')?.invalid, 'is-valid': control('contenido')?.valid && (submitted || control('contenido')?.touched) }">
-                </ckeditor>
+                  <ng-container *ngIf="Editor; else editorLoadingTpl">
+                    <ckeditor id="ckeditor" [editor]="Editor" [config]="editorConfig" tagName="textarea"
+                      cFormControl rows="10"
+                      formControlName="contenido"
+                      autocomplete="none"
+                      required
+                      (blur)="control('contenido')?.markAsTouched()"
+                      [ngClass]="{ 'is-invalid': (submitted || control('contenido')?.touched) && control('contenido')?.invalid, 'is-valid': control('contenido')?.valid && (submitted || control('contenido')?.touched) }">
+                    </ckeditor>
+                  </ng-container>
+                  <ng-template #editorLoadingTpl>
+                    <div class="text-center py-3">
+                      <small class="text-muted">Cargando editor...</small>
+                    </div>
+                  </ng-template>
 
                 <div *ngIf="(submitted || control('contenido')?.touched) && control('contenido')?.invalid" class="invalid-feedback animated-fade">
                   <div *ngIf="control('contenido')?.errors?.['required']">Escribe algo en la entrada vago</div>

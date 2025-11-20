@@ -8,7 +8,6 @@ import {
   OnChanges,
   ChangeDetectorRef,
 } from '@angular/core';
-import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Router } from '@angular/router';
 import { UntypedFormGroup, FormArray, FormControl } from '@angular/forms';
 import { Categoria } from '../../../../core/models/categoria.model';
@@ -64,7 +63,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   @Output() editar = new EventEmitter<void>();
   @Output() preview = new EventEmitter<Entrada>();
 
-  public Editor = ClassicEditor;
+  public Editor: any = null;
+  public editorLoading = false;
   public estaEditando = false;
 
   // ✅ REVERTIMOS: Volvemos a notificación individual
@@ -97,6 +97,24 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     // Solo verificar datos temporales si no estamos recuperando desde navegación
     if (!this.estaEditando && !this.isRecoveringFromNavigation) {
       this.checkForTemporaryData();
+    }
+
+    // Cargar dinámicamente el build de CKEditor solo cuando el componente se inicializa
+    this.loadEditorBuild();
+  }
+
+  // Carga dinámica del build pesado de CKEditor para reducir tamaño del chunk inicial
+  private async loadEditorBuild(): Promise<void> {
+    try {
+      this.editorLoading = true;
+      const mod = await import('@ckeditor/ckeditor5-build-classic');
+      // Algunos empaquetados exportan por defecto en default
+      this.Editor = (mod && (mod as any).default) ? (mod as any).default : mod;
+    } catch (error) {
+      this.log.error('❌ Error cargando CKEditor build dinámicamente:', error);
+    } finally {
+      this.editorLoading = false;
+      this.cdRef.detectChanges();
     }
   }
 

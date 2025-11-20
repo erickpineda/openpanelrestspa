@@ -2,7 +2,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './admin.component';
-import { DashboardComponent } from './base/dashboard/dashboard.component';
 import { AuthGuard } from '../core/_helpers/auth.guard';
 
 const routes: Routes = [
@@ -15,7 +14,7 @@ const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        component: DashboardComponent,
+        loadChildren: () => import('./base/dashboard/dashboard.module').then(m => m.DashboardModule),
         data: { preload: true, delay: 1000 }
       },
       {

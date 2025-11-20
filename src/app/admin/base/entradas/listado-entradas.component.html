@@ -46,6 +46,9 @@
           [showSearchButton]="true"
           [showClearButton]="true"
           [defaultField]="'titulo'"
+          [camposPrioritarios]="['titulo']"
+          [camposCatalogo]="['tipoEntrada.nombre', 'estadoEntrada.nombre', 'categoria.nombre', 'etiqueta.nombre']"
+          [cargarCatalogosFn]="cargarCatalogosEntrada"
           (filtroSeleccionado)="aplicarFiltro($event)"
           (filtroChanged)="onFiltroChanged($event)">
         </app-buscador-avanzado>

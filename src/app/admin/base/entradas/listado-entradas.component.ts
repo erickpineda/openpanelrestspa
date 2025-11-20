@@ -1,4 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Observable } from 'rxjs';
+import { EntradaCatalogService } from '../../../core/services/data/entrada-catalog.service';
 import { catchError, Subject, takeUntil, throwError } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
 import { EntradaService } from '../../../core/services/data/entrada.service';
@@ -34,14 +36,21 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy {
 
   public definiciones: any;
   public cargando: boolean = false;
+
+  // Para el buscador avanzado genérico
+  public cargarCatalogosEntrada = (): Observable<{ [key: string]: string[] }> => {
+    return this.entradaCatalogService.obtenerCatalogosEntrada();
+  };
 private readonly boundaryId = 'listado-entradas-main';
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
     private busquedaService: BusquedaService,
-    private toastService: ToastService,private errorBoundaryService: ErrorBoundaryService,
+    private toastService: ToastService,
+    private errorBoundaryService: ErrorBoundaryService,
     private log: LoggerService,
-    private router: Router
+    private router: Router,
+    private entradaCatalogService: EntradaCatalogService
   ) {}
 
   ngOnInit(): void {

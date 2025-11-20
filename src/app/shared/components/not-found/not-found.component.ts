@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-not-found',
@@ -6,6 +7,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./not-found.component.scss']
 })
 export class NotFoundComponent implements OnInit {
-  constructor() {  }
-  ngOnInit() {  }
+  constructor(private router: Router) { }
+  ngOnInit() { }
+  
+  goHome() {
+    this.router.navigate(['/']);
+  }
+
+  contactSupport() {
+    this.router.navigate(['/contact']);
+  }
 }

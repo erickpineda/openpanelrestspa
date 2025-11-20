@@ -15,6 +15,7 @@ import { NavBarPublicComponent } from './nav-bar-public/nav-bar-public.component
 // Módulos externos
 import { IconModule } from '@coreui/icons-angular';
 import { SharedOPModule } from '../shared/shared.module';
+import { SharedCoreUiModule } from '../shared/shared-coreui.module';
 import { CoreModule } from '../core/core.module';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -26,6 +27,7 @@ import { HttpClientModule } from '@angular/common/http';
     CoreModule,
     // ✅ Shared Module
     SharedOPModule,
+    SharedCoreUiModule,
 
     // Módulos específicos de Public
     IconModule,

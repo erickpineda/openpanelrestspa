@@ -6,21 +6,16 @@ import { BaseRoutingModule } from './base-routing.module';
 import { BaseComponent } from './base.component';
 
 // Componentes específicos de Base
-import { ListadoEntradasComponent } from './entradas/listado-entradas.component';
+// Entradas moved to lazy EntradasModule
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
 import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
 import { CrearCategoriaComponent } from './categorias/crear/crear-categoria.component';
 import { EditarCategoriaComponent } from './categorias/editar/editar-categoria.component';
 import { CategoriaFormComponent } from './categorias/categoria-form/categoria-form.component';
-import { CrearEntradaComponent } from './entradas/crear/crear-entrada.component';
-import { EditarEntradaComponent } from './entradas/editar/editar-entrada.component';
-import { EntradaFormComponent } from './entradas/entrada-form/entrada-form.component';
-import { PreviaEntradaComponent } from './entradas/previa/preview-entrada.component';
-
-// Módulos externos
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+// Entradas components are now lazy in EntradasModule; CKEditor moved there
 import { SharedOPModule } from '../../shared/shared.module';
+import { SharedCoreUiModule } from '../../shared/shared-coreui.module';
 
 @NgModule({
   imports: [
@@ -30,24 +25,19 @@ import { SharedOPModule } from '../../shared/shared.module';
 
     // ✅ Shared Module (contiene componentes compartidos)
     SharedOPModule,
-
-    // Módulos específicos de Base
-    CKEditorModule,
+    SharedCoreUiModule,
   ],
   declarations: [
     // ✅ Solo componentes específicos de Base
     BaseComponent,
-    ListadoEntradasComponent,
-    EntradaFormComponent,
-    CrearEntradaComponent,
-    EditarEntradaComponent,
+    // Entradas components declared in EntradasModule (lazy)
     ListadoComentariosComponent,
     CrearEditarComentario,
     ListadoCategoriasComponent,
     CrearCategoriaComponent,
     EditarCategoriaComponent,
     CategoriaFormComponent,
-    PreviaEntradaComponent,
+    
   ],
 })
 export class BaseModule {}
