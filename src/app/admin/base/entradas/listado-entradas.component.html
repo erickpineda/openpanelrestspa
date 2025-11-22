@@ -58,14 +58,20 @@
       </app-error-boundary>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="cargando" class="text-center py-4">
-      <c-spinner size="sm"></c-spinner>
-      <p class="mt-2">Cargando entradas...</p>
-    </div>
+    <!-- Tabla de Entradas con loader local -->
+    <div class="tabla-con-loader-wrapper position-relative">
+      <app-op-loader
+        [useGlobal]="false"
+        [active]="cargandoTabla"
+        [overlay]="true"
+        [fullScreen]="false"
+        [position]="'center'"
+        [loaderStyle]="'pulse'"
+        [size]="'sm'"
+        [color]="'primary'"
+        [message]="'Cargando entradas...'">
+      </app-op-loader>
 
-    <!-- Tabla de Entradas -->
-    <div *ngIf="!cargando">
       <table responsive hover cAlign="top" cTable class="tabla-con-loader">
         <thead cTableColor="dark">
           <tr>

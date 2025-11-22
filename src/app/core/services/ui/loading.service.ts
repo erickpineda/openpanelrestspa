@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
+import { NotificationService } from './notification.service';
 import { LoggerService } from '../logger.service';
 
 export interface LoadingState {
   global: boolean;
   requests: Map<string, boolean>; // Track individual requests
+}
+
+export interface LoadingErrorState {
+  active: boolean;
+  message?: string;
+  code?: string;
 }
 
 @Injectable({
@@ -27,8 +34,15 @@ export class LoadingService {
   private minimumDisplayTime = 500;
   private loadingStartTime = 0;
   private loadingTimeout: any;
+  private maxWaitMs = 30000;
+  private maxWaitTimer: any;
 
-  constructor(private logger: LoggerService) {}
+  private errorSubject = new BehaviorSubject<LoadingErrorState>({ active: false });
+  public error$ = this.errorSubject.asObservable();
+
+  private retryHandler?: () => void;
+
+  constructor(private logger: LoggerService, private notifications: NotificationService) {}
 
   setGlobalLoading(loading: boolean, requestId?: string): void {
     if (loading) {
@@ -38,6 +52,9 @@ export class LoadingService {
         this.loadingStartTime = Date.now();
         this.updateGlobalState(true);
         this.logger.debug('Loading global iniciado');
+
+        // Iniciar temporizador de espera máxima
+        this.startMaxWaitTimer();
       }
 
       // Track individual request if ID provided
@@ -54,6 +71,8 @@ export class LoadingService {
 
       if (this.httpRequestCount === 0) {
         this.scheduleLoadingStop();
+        this.clearMaxWaitTimer();
+        this.clearError();
       }
     }
   }
@@ -74,6 +93,28 @@ export class LoadingService {
         this.logger.debug('Loading global finalizado');
       }
     }, remaining);
+  }
+
+  private startMaxWaitTimer(): void {
+    this.clearMaxWaitTimer();
+    this.maxWaitTimer = setTimeout(() => {
+      // Si sigue cargando después del tiempo máximo, disparar error
+      if (this.httpRequestCount > 0) {
+        const msg = 'Tiempo de espera agotado. El servidor no responde.';
+        this.setError(msg, 'TIMEOUT');
+        this.notifications.error(msg, 'Error de conexión');
+        this.logger.error('Loading global timeout alcanzado (30s): backend no responde');
+        // Detener loader
+        this.forceStopLoading();
+      }
+    }, this.maxWaitMs);
+  }
+
+  private clearMaxWaitTimer(): void {
+    if (this.maxWaitTimer) {
+      clearTimeout(this.maxWaitTimer);
+      this.maxWaitTimer = null;
+    }
   }
 
   private updateGlobalState(global: boolean): void {
@@ -108,7 +149,41 @@ export class LoadingService {
       clearTimeout(this.loadingTimeout);
       this.loadingTimeout = null;
     }
+    this.clearMaxWaitTimer();
     this.logger.warn('Loading forzado a detenerse');
+  }
+
+  // Estado de error
+  setError(message: string, code?: string): void {
+    this.errorSubject.next({ active: true, message, code });
+  }
+
+  clearError(): void {
+    this.errorSubject.next({ active: false });
+  }
+
+  // Reintento configurable
+  registerRetryHandler(handler: () => void): void {
+    this.retryHandler = handler;
+  }
+
+  triggerRetry(): void {
+    this.logger.info('Loading: usuario solicitó reintento');
+    this.clearError();
+    // Reiniciar loader
+    this.setGlobalLoading(true);
+    try {
+      if (this.retryHandler) {
+        this.retryHandler();
+      } else {
+        // Fallback: recargar página
+        window.location.reload();
+      }
+    } catch (e) {
+      this.logger.error('Error ejecutando retryHandler', e);
+      this.notifications.error('No se pudo reintentar la operación');
+      this.forceStopLoading();
+    }
   }
 
   // Obtener estadísticas

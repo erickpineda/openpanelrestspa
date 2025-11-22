@@ -1,8 +1,10 @@
 /* ===== ESTILOS BASE ===== */
 .loading-overlay {
-  position: fixed;
+  position: absolute; /* modo local por defecto */
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
   background: rgba(255, 255, 255, 0.95);
   display: flex;
@@ -12,7 +14,6 @@
 
 /* Posición centrada (por defecto) */
 .loader-position-center {
-  height: 100%;
   align-items: center;
 }
 
@@ -30,6 +31,7 @@
 }
 
 .full-screen {
+  position: fixed; /* modo pantalla completa */
   height: 100vh;
 }
 

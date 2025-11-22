@@ -91,6 +91,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   refreshDashboard(): void {
+    this.loadingService.registerRetryHandler(() => this.refreshDashboard());
     this.loadingService.setGlobalLoading(true);
     const summary$ = this.dashboardApi.getSummary(true);
     const series$ = this.dashboardApi.getSeriesActivity(this.seriesDays, true, this.seriesGranularity);
@@ -147,6 +148,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   async cargarEstadisticas(): Promise<void> {
     // Preferir endpoint centralizado del backend (summary + series)
+    this.loadingService.registerRetryHandler(() => this.cargarEstadisticas());
     this.loadingService.setGlobalLoading(true);
     const summarySub = this.dashboardApi.getSummary().subscribe({
       next: (summary: SummaryDTO) => {

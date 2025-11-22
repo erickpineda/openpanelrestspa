@@ -8,6 +8,7 @@ import {
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, finalize, timeout } from 'rxjs/operators';
+import { HttpContextToken } from '@angular/common/http';
 import { LoadingService } from '../services/ui/loading.service';
 import { NotificationService } from '../services/ui/notification.service';
 import { LoggerService } from '../services/logger.service';
@@ -40,6 +41,9 @@ export class NetworkInterceptor implements HttpInterceptor {
     private notificationService: NotificationService,
     private logger: LoggerService
   ) {}
+
+  // Contexto para saltar loader global sin enviar cabeceras al servidor (evita CORS)
+  public static readonly SKIP_GLOBAL_LOADER = new HttpContextToken<boolean>(() => false);
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const requestKey = this.generateRequestKey(request);
@@ -94,6 +98,8 @@ export class NetworkInterceptor implements HttpInterceptor {
   }
 
   private shouldSkipLoading(request: HttpRequest<unknown>): boolean {
+    const skipByContext = request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER) === true;
+    if (skipByContext) return true;
     return this.excludedUrls.some(url => request.url.includes(url));
   }
 

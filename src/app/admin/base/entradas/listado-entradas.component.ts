@@ -36,6 +36,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy {
 
   public definiciones: any;
   public cargando: boolean = false;
+  public cargandoTabla: boolean = false;
 
   // Para el buscador avanzado genérico
   public cargarCatalogosEntrada = (): Observable<{ [key: string]: string[] }> => {
@@ -69,6 +70,7 @@ private readonly boundaryId = 'listado-entradas-main';
   }
 
   private realizarBusquedaEntradas(term: string, page?: number) {
+    this.cargandoTabla = true;
     const searchRequest = {
       dataOption: this.dataOptionSeleccionada,
       searchCriteriaList: [{
@@ -115,6 +117,7 @@ private readonly boundaryId = 'listado-entradas-main';
       this.currentPage = 0;
       this.mostrarError('Error en búsqueda: ' + response);
     }
+    this.cargandoTabla = false;
   }
 
   private cargarDefinicionesBuscador(): void {
@@ -218,6 +221,7 @@ private readonly boundaryId = 'listado-entradas-main';
 
   private mostrarError(mensaje: string): void {
     this.toastService.showError(mensaje, 'Error');
+    this.cargandoTabla = false;
   }
 
   toggleModal(): void {

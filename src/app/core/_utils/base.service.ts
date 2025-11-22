@@ -1,6 +1,6 @@
 // core/_utils/base.service.ts
 import { Injectable  } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders, HttpContext } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment.dev.es';
@@ -44,27 +44,27 @@ export class BaseService {
   }
 
   // ✅ MÉTODOS ORIGINALES ACTUALIZADOS PARA USAR SETHEADERS POR DEFECTO
-  protected get<T>(url: string, params?: any, headers?: HttpHeaders): Observable<OpenpanelApiResponse<T>> {
+  protected get<T>(url: string, params?: any, headers?: HttpHeaders, context?: HttpContext): Observable<OpenpanelApiResponse<T>> {
     const finalHeaders = headers || this.setHeaders();
-    const options = { params: this.getParams(params), headers: finalHeaders };
+    const options = { params: this.getParams(params), headers: finalHeaders, context };
     return this.http.get<OpenpanelApiResponse<T>>(`${this.host}${this.uri}${url}`, options);
   }
 
-  protected post<T>(url: string, body: any, params?: any, headers?: HttpHeaders): Observable<OpenpanelApiResponse<T>> {
+  protected post<T>(url: string, body: any, params?: any, headers?: HttpHeaders, context?: HttpContext): Observable<OpenpanelApiResponse<T>> {
     const finalHeaders = headers || this.setHeaders();
-    const options = { params: this.getParams(params), headers: finalHeaders };
+    const options = { params: this.getParams(params), headers: finalHeaders, context };
     return this.http.post<OpenpanelApiResponse<T>>(`${this.host}${this.uri}${url}`, body, options);
   }
 
-  protected put<T>(url: string, body: any, params?: any, headers?: HttpHeaders): Observable<OpenpanelApiResponse<T>> {
+  protected put<T>(url: string, body: any, params?: any, headers?: HttpHeaders, context?: HttpContext): Observable<OpenpanelApiResponse<T>> {
     const finalHeaders = headers || this.setHeaders();
-    const options = { params: this.getParams(params), headers: finalHeaders };
+    const options = { params: this.getParams(params), headers: finalHeaders, context };
     return this.http.put<OpenpanelApiResponse<T>>(`${this.host}${this.uri}${url}`, body, options);
   }
 
-  protected delete<T>(url: string, params?: any, headers?: HttpHeaders): Observable<OpenpanelApiResponse<T>> {
+  protected delete<T>(url: string, params?: any, headers?: HttpHeaders, context?: HttpContext): Observable<OpenpanelApiResponse<T>> {
     const finalHeaders = headers || this.setHeaders();
-    const options = { params: this.getParams(params), headers: finalHeaders };
+    const options = { params: this.getParams(params), headers: finalHeaders, context };
     return this.http.delete<OpenpanelApiResponse<T>>(`${this.host}${this.uri}${url}`, options);
   }
 
@@ -108,10 +108,11 @@ protected safeOperationWithState<T>(
     defaultValue: T, 
     params?: any, 
     headers?: HttpHeaders, 
-    context?: string
+    context?: string,
+    contextHttp?: HttpContext
   ): Observable<T> {
     const finalHeaders = headers || this.setHeaders();
-    return this.get<T>(url, params, finalHeaders).pipe(
+    return this.get<T>(url, params, finalHeaders, contextHttp).pipe(
       map(response => response.data ?? defaultValue),
       catchError(error => {
         this.logSafeError(context || `GET ${url}`, error);
@@ -124,10 +125,11 @@ protected safeOperationWithState<T>(
     url: string, 
     params?: any, 
     headers?: HttpHeaders, 
-    context?: string
+    context?: string,
+    contextHttp?: HttpContext
   ): Observable<T[]> {
     const finalHeaders = headers || this.setHeaders();
-    return this.get<PaginatedResponse<T>>(url, params, finalHeaders).pipe(
+    return this.get<PaginatedResponse<T>>(url, params, finalHeaders, contextHttp).pipe(
       map(response => response.data?.elements ?? []),
       catchError(error => {
         this.logSafeError(context || `GET ${url}`, error);
@@ -142,10 +144,11 @@ protected safeOperationWithState<T>(
     defaultValue: T, 
     params?: any, 
     headers?: HttpHeaders, 
-    context?: string
+    context?: string,
+    contextHttp?: HttpContext
   ): Observable<T> {
     const finalHeaders = headers || this.setHeaders();
-    return this.post<T>(url, body, params, finalHeaders).pipe(
+    return this.post<T>(url, body, params, finalHeaders, contextHttp).pipe(
       map(response => response.data ?? defaultValue),
       catchError(error => {
         this.logSafeError(context || `POST ${url}`, error);
@@ -159,10 +162,11 @@ protected safeOperationWithState<T>(
     body: any, 
     params?: any, 
     headers?: HttpHeaders, 
-    context?: string
+    context?: string,
+    contextHttp?: HttpContext
   ): Observable<boolean> {
     const finalHeaders = headers || this.setHeaders();
-    return this.post<any>(url, body, params, finalHeaders).pipe(
+    return this.post<any>(url, body, params, finalHeaders, contextHttp).pipe(
       map(response => response.result?.success === true),
       catchError(error => {
         this.logSafeError(context || `POST ${url}`, error);
@@ -177,10 +181,11 @@ protected safeOperationWithState<T>(
     defaultValue: T, 
     params?: any, 
     headers?: HttpHeaders, 
-    context?: string
+    context?: string,
+    contextHttp?: HttpContext
   ): Observable<T> {
     const finalHeaders = headers || this.setHeaders();
-    return this.put<T>(url, body, params, finalHeaders).pipe(
+    return this.put<T>(url, body, params, finalHeaders, contextHttp).pipe(
       map(response => response.data ?? defaultValue),
       catchError(error => {
         this.logSafeError(context || `PUT ${url}`, error);
@@ -193,10 +198,11 @@ protected safeOperationWithState<T>(
     url: string, 
     params?: any, 
     headers?: HttpHeaders, 
-    context?: string
+    context?: string,
+    contextHttp?: HttpContext
   ): Observable<boolean> {
     const finalHeaders = headers || this.setHeaders();
-    return this.delete<any>(url, params, finalHeaders).pipe(
+    return this.delete<any>(url, params, finalHeaders, contextHttp).pipe(
       map(response => response.result?.success === true),
       catchError(error => {
         this.logSafeError(context || `DELETE ${url}`, error);

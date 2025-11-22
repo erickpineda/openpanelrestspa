@@ -281,7 +281,12 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   public limpiar(): void {
     this.campoSeleccionado = this.initialCampoSeleccionado || this.camposDisponibles[0]?.valor || '';
     this.actualizarOperacionesDisponibles();
-    this.operacionSeleccionada = this.initialOperacionSeleccionada || this.operacionesDisponibles[0]?.valor || '';
+    const ops = (this.operacionesDisponibles || []).map(o => o.valor);
+    const initialOp = this.initialOperacionSeleccionada || '';
+    const prefersBeginsWith = ops.includes('BEGINS_WITH');
+    this.operacionSeleccionada = prefersBeginsWith
+      ? 'BEGINS_WITH'
+      : (ops.includes(initialOp) ? initialOp : (ops[0] || ''));
     this.valorBusqueda = '';
     if (this.autoTrigger) {
       this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });

@@ -24,11 +24,20 @@
     </div>
     <hr>
     
-    <div *ngIf="cargando" class="text-center py-4">
-      <c-spinner size="sm"></c-spinner>
-      <p class="mt-2">Cargando categorías...</p>
-    </div>
-    <table cTable hover *ngIf="!cargando">
+    <div class="tabla-con-loader-wrapper position-relative">
+      <app-op-loader
+        [useGlobal]="false"
+        [active]="cargando"
+        [overlay]="true"
+        [fullScreen]="false"
+        [position]="'center'"
+        [loaderStyle]="'spinner'"
+        [size]="'sm'"
+        [color]="'primary'"
+        [message]="'Cargando categorías...'">
+      </app-op-loader>
+
+      <table cTable hover>
       <thead cTableColor="dark">
         <tr>
           <th scope="col">ID</th>
@@ -65,6 +74,7 @@
           </td>
         </tr>
       </tbody>
-    </table>
+      </table>
+    </div>
   </c-card-body>
 </c-card>
