@@ -21,6 +21,8 @@ import {
   SpinnerModule,
   ToastModule,
   UtilitiesModule,
+  WidgetModule,
+  TemplateIdDirective,
 } from '@coreui/angular';
 
 @NgModule({
@@ -45,9 +47,11 @@ import {
     ModalModule,
     SpinnerModule,
     UtilitiesModule,
+    WidgetModule,
     CardModule,
     GridModule,
     AlertModule,
+    TemplateIdDirective,
   ],
   exports: [
     CommonModule,
@@ -70,9 +74,11 @@ import {
     ModalModule,
     SpinnerModule,
     UtilitiesModule,
+    WidgetModule,
     CardModule,
     GridModule,
     AlertModule,
+    TemplateIdDirective,
   ],
 })
 export class SharedCoreUiModule {}

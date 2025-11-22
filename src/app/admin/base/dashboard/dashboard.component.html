@@ -5,7 +5,7 @@
     </c-col>
     <c-col [sm]="6">
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button cButton color="primary" size="sm">
+        <button cButton color="primary" size="sm" (click)="refreshDashboard()">
           <svg cIcon name="cilChart" style="padding-right: 2px" size="sm" title="Ver Gráfico"></svg>
           Ver Gráfico
         </button>
@@ -27,34 +27,256 @@
       </div>
     </div>
     <hr>
-    <div class="row">
-      <div class="col-md-3">
-        <c-card>
-          <c-card-body>
-            <h5 class="card-title">Usuarios Activos</h5>
-            <p class="card-text">{{cantidadUsuariosActivos}}</p>
-          </c-card-body>
-        </c-card>
+    <div class="row g-3">
+      <div class="col-6 col-md-3">
+        <app-kpi-card label="Usuarios Activos" [value]="cantidadUsuariosActivos"></app-kpi-card>
       </div>
-      <div class="col-md-3">
-        <c-card>
-          <c-card-body>
-            <h5 class="card-title">Total de Entradas</h5>
-            <p class="card-text">{{totalEntradas}}</p>
-          </c-card-body>
-        </c-card>
+      <div class="col-6 col-md-3">
+        <app-kpi-card label="Total Entradas" [value]="totalEntradas"></app-kpi-card>
       </div>
-      <!-- Otros widgets similares pueden ser añadidos aquí -->
+      <div class="col-6 col-md-3">
+        <app-kpi-card label="Publicadas ({{seriesDays}}d)" [value]="sumEntradas30d"></app-kpi-card>
+      </div>
+      <div class="col-6 col-md-3">
+        <app-kpi-card label="No publicadas ({{seriesDays}}d)" [value]="sumNoPublicadas30d"></app-kpi-card>
+      </div>
     </div>
     <hr>
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-lg-8">
         <c-card>
           <c-card-body>
-            <h5 class="card-title">Resumen general</h5>
-            <!-- Aquí podrías añadir un gráfico -->
-            <div class="chart-container">
-              <c-chart [data]="data" type="bar"></c-chart>
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0">Resumen general</h5>
+              <div class="btn-group" role="group" aria-label="Rango">
+                <button cButton color="secondary" size="sm" [disabled]="seriesDays===7" (click)="changeSeriesDays(7)">7d</button>
+                <button cButton color="secondary" size="sm" [disabled]="seriesDays===30" (click)="changeSeriesDays(30)">30d</button>
+                <button cButton color="secondary" size="sm" [disabled]="seriesDays===90" (click)="changeSeriesDays(90)">90d</button>
+              </div>
+              <div class="btn-group ms-2" role="group" aria-label="Granularidad">
+                <button cButton color="secondary" size="sm" [disabled]="seriesGranularity==='day'" (click)="changeSeriesGranularity('day')">Día</button>
+                <button cButton color="secondary" size="sm" [disabled]="seriesGranularity==='week'" (click)="changeSeriesGranularity('week')">Semana</button>
+                <button cButton color="secondary" size="sm" [disabled]="seriesGranularity==='month'" (click)="changeSeriesGranularity('month')">Mes</button>
+              </div>
+            </div>
+            <div class="chart-container mb-3">
+              <app-dashboard-chart [data]="data" type="line"></app-dashboard-chart>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-6 col-md-4">
+                <c-widget-stat-b value="{{ sumEntradasPublicadas }}" title="Últimas Entradas" [color]="kpiUltimasEntradasColor"></c-widget-stat-b>
+              </div>
+              <div class="col-6 col-md-4">
+                <c-widget-stat-b value="{{ sumComentarios }}" title="Comentarios ({{seriesDays}}d)" [color]="kpiComentariosColor"></c-widget-stat-b>
+              </div>
+              <div class="col-12 col-md-4">
+                <c-widget-stat-b value="{{ sumUsuarios }}" title="Nuevos Usuarios ({{seriesDays}}d)" [color]="kpiNuevosUsuariosColor"></c-widget-stat-b>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <c-card>
+                <c-card-header class="d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0">Serie por estado nominal</h6>
+                  <div class="d-inline-flex align-items-center gap-2">
+                    <div class="btn-group" role="group" aria-label="Tipo">
+                      <button cButton color="secondary" size="sm" [disabled]="estadoNominalChartType==='line'" (click)="setEstadoNominalChartType('line')">Línea</button>
+                      <button cButton color="secondary" size="sm" [disabled]="estadoNominalChartType==='bar'" (click)="setEstadoNominalChartType('bar')">Barras</button>
+                    </div>
+                    <button cButton color="secondary" size="sm" [disabled]="estadoNominalChartType!=='bar'" (click)="toggleEstadoNominalStacked()">{{ estadoNominalStacked ? 'Apiladas' : 'No apiladas' }}</button>
+                  </div>
+                </c-card-header>
+                <c-card-body>
+                  <div class="chart-container mb-2" *ngIf="seriesEntriesSplitEstadoNombreData">
+                    <app-dashboard-chart [data]="seriesEntriesSplitEstadoNombreData" [type]="estadoNominalChartType" [options]="estadoNominalChartOptions"></app-dashboard-chart>
+                  </div>
+                  <div *ngIf="!seriesEntriesSplitEstadoNombreData" class="text-muted small">Sin datos</div>
+                </c-card-body>
+              </c-card>
+            </div>
+          </c-card-body>
+        </c-card>
+      </div>
+
+      <div class="col-lg-4">
+        <c-card>
+          <c-card-header class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Actividad Reciente</h6>
+            <div class="d-inline-flex align-items-center gap-2">
+              <label class="form-label mb-0">Tamaño</label>
+              <select cSelect [(ngModel)]="recentSize" (ngModelChange)="onRecentSizeChange($event)" style="max-width:100px;">
+                <option [ngValue]="5">5</option>
+                <option [ngValue]="10">10</option>
+                <option [ngValue]="20">20</option>
+              </select>
+            </div>
+          </c-card-header>
+          <c-card-body>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="small text-muted">Últimos items</div>
+              <app-op-pagination [totalPages]="recentTotalPages" [currentPage]="recentPage" [align]="'end'" (pageChange)="onRecentPageChange($event)"></app-op-pagination>
+            </div>
+            <div *ngIf="loadingRecent" class="mb-2"><c-spinner></c-spinner></div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item" *ngFor="let e of recentItems">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <strong>{{ e?.titulo || e?.contenidoCorto || e?.username || e?.name || 'Item' }}</strong>
+                    <div class="small text-muted">{{ e?.fechaCreacion || e?.fechaRegistro || e?.date }}</div>
+                  </div>
+                  <div class="text-end">
+                    <c-badge color="secondary" *ngIf="e?.estado">{{ e?.estado }}</c-badge>
+                  </div>
+                </div>
+              </li>
+              <li *ngIf="!recentItems || recentItems.length === 0" class="list-group-item text-muted">No hay actividad reciente</li>
+            </ul>
+          </c-card-body>
+        </c-card>
+
+        <c-card class="mt-3">
+          <c-card-header>
+            <h6 class="mb-0">Almacenamiento</h6>
+          </c-card-header>
+          <c-card-body>
+            <div *ngIf="loadingStorage" class="mb-2"><c-spinner></c-spinner></div>
+            <div class="mb-2 small text-muted">Ficheros: {{ storage?.totalFiles || 0 }}</div>
+            <div class="mb-2 small text-muted">Bytes: {{ formatBytes(storage?.storageBytes) }}</div>
+          </c-card-body>
+        </c-card>
+      </div>
+    </div>
+
+    <hr>
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <c-card>
+          <c-card-header class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Top Usuarios</h6>
+            <div class="d-inline-flex align-items-center gap-2">
+              <input cFormControl type="number" min="1" max="200" [(ngModel)]="topLimit" (ngModelChange)="onChangeTopLimit($event)" style="max-width:90px;" />
+              <div class="btn-group" role="group" aria-label="Periodo">
+                <button cButton color="secondary" size="sm" [disabled]="topPeriodDays===7" (click)="topPeriodDays=7; loadTopWidgets();">7d</button>
+                <button cButton color="secondary" size="sm" [disabled]="topPeriodDays===30" (click)="topPeriodDays=30; loadTopWidgets();">30d</button>
+                <button cButton color="secondary" size="sm" [disabled]="topPeriodDays===90" (click)="topPeriodDays=90; loadTopWidgets();">90d</button>
+              </div>
+            </div>
+          </c-card-header>
+          <c-card-body>
+            <div *ngIf="loadingTopUsers" class="mb-2"><c-spinner></c-spinner></div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between" *ngFor="let u of topUsers">
+                <span>{{ u.name }}</span>
+                <c-badge color="primary">{{ u.count }}</c-badge>
+              </li>
+              <li *ngIf="!topUsers || topUsers.length === 0" class="list-group-item text-muted">Sin datos</li>
+            </ul>
+          </c-card-body>
+        </c-card>
+      </div>
+      <div class="col-lg-6">
+        <c-card>
+          <c-card-header>
+            <h6 class="mb-0">Top Categorías</h6>
+          </c-card-header>
+          <c-card-body>
+            <div *ngIf="loadingTopCategories" class="mb-2"><c-spinner></c-spinner></div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between" *ngFor="let c of topCategories">
+                <span>{{ c.name }}</span>
+                <c-badge color="info">{{ c.count }}</c-badge>
+              </li>
+              <li *ngIf="!topCategories || topCategories.length === 0" class="list-group-item text-muted">Sin datos</li>
+            </ul>
+          </c-card-body>
+        </c-card>
+      </div>
+      <div class="col-lg-6">
+        <c-card>
+          <c-card-header>
+            <h6 class="mb-0">Top Tags</h6>
+          </c-card-header>
+          <c-card-body>
+            <div *ngIf="loadingTopTags" class="mb-2"><c-spinner></c-spinner></div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between" *ngFor="let t of topTags">
+                <span>{{ t.name }}</span>
+                <c-badge color="warning" class="text-dark">{{ t.count }}</c-badge>
+              </li>
+              <li *ngIf="!topTags || topTags.length === 0" class="list-group-item text-muted">Sin datos</li>
+            </ul>
+          </c-card-body>
+        </c-card>
+      </div>
+    </div>
+
+    <hr>
+    <div class="row g-3">
+      <div class="col-12">
+        <c-card>
+          <c-card-header>
+            <h6 class="mb-0">Estadísticas de Contenido</h6>
+          </c-card-header>
+          <c-card-body>
+            <div *ngIf="loadingContentStats" class="mb-2"><c-spinner></c-spinner></div>
+              <div class="row g-3">
+              <div class="col-6 col-md-3">
+                <c-widget-stat-f value="{{ contentStats?.totalUsuarios || 0 }}" title="Usuarios" [color]="kpiUsuariosTotalColor" padding="true">
+                  <ng-template cTemplateId="widgetIconTemplate">
+                    <svg cIcon name="cilUser"></svg>
+                  </ng-template>
+                </c-widget-stat-f>
+              </div>
+              <div class="col-6 col-md-3">
+                <c-widget-stat-f value="{{ contentStats?.totalEntradas || 0 }}" title="Entradas" [color]="kpiEntradasTotalColor" padding="true">
+                  <ng-template cTemplateId="widgetIconTemplate">
+                    <svg cIcon name="cilNotes"></svg>
+                  </ng-template>
+                </c-widget-stat-f>
+              </div>
+              <div class="col-6 col-md-3">
+                <c-widget-stat-f value="{{ contentStats?.totalComentarios || 0 }}" title="Comentarios" [color]="kpiComentariosTotalColor" padding="true">
+                  <ng-template cTemplateId="widgetIconTemplate">
+                    <svg cIcon name="cilCommentSquare"></svg>
+                  </ng-template>
+                </c-widget-stat-f>
+              </div>
+              <div class="col-6 col-md-3">
+                <c-widget-stat-f value="{{ contentStats?.totalFicheros || 0 }}" title="Ficheros" [color]="kpiFicherosTotalColor" padding="true">
+                  <ng-template cTemplateId="widgetIconTemplate">
+                    <svg cIcon name="cilFile"></svg>
+                  </ng-template>
+                </c-widget-stat-f>
+              </div>
+              </div>
+            <div class="mt-3">
+              <h6 class="text-muted">Entradas por estado</h6>
+              <div class="row">
+                <div class="col-md-6">
+                  <app-dashboard-chart *ngIf="contentStatsChartData" [data]="contentStatsChartData" type="doughnut"></app-dashboard-chart>
+                  <div *ngIf="!contentStatsChartData" class="text-muted small">Sin datos</div>
+                </div>
+              </div>
+              <div class="mt-3">
+                  <table class="table table-sm align-middle">
+                    <thead>
+                      <tr>
+                        <th>Estado</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-end">%</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let row of contentEstadoRows">
+                        <td>{{ row.estado }}</td>
+                        <td class="text-end"><c-badge color="secondary">{{ row.total }}</c-badge></td>
+                        <td class="text-end"><c-badge color="light" class="text-dark">{{ row.porcentaje }}%</c-badge></td>
+                      </tr>
+                    <tr *ngIf="!contentEstadoRows || contentEstadoRows.length===0"><td colspan="3" class="text-muted">Sin datos</td></tr>
+                    </tbody>
+                  </table>
+              </div>
             </div>
           </c-card-body>
         </c-card>
