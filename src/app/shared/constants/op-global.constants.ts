@@ -6,6 +6,7 @@ export const OPConstants: any = {
   Session: {
     // Prefijos y claves de storage
     POST_LOGIN_PREFIX: 'post-login-redirect-',
+    POST_LOGIN_REDIRECT: 'post-login-redirect',
     TAB_ID_KEY: 'op-tab-id',
     TOKEN_KEY: 'auth-token',
     USER_KEY: 'auth-user',

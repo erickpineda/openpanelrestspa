@@ -1,5 +1,6 @@
 // src/app/app.component.ts
 import { Component, OnInit } from '@angular/core';
+import { TokenStorageService } from './core/services/auth/token-storage.service';
 import { AuthSyncService } from './core/services/auth/auth-sync.service';
 import { LoggerService } from './core/services/logger.service';
 import { AuthService } from './core/services/auth/auth.service'; // inyectado para comprobar token
@@ -18,7 +19,8 @@ export class AppComponent implements OnInit {
     private authSync: AuthSyncService,
     private log: LoggerService,
     private authService: AuthService,
-    private routeTracker: RouteTrackerService // sólo para activar el tracking
+    private routeTracker: RouteTrackerService, // sólo para activar el tracking
+    private tokenStorage: TokenStorageService
   ){ }
 
   ngOnInit(): void {
@@ -27,6 +29,10 @@ export class AppComponent implements OnInit {
 
     // Luego comprobar token actual (si está caducado forzará logout)
     this.authService.ensureTokenValidOnInit();
+
+    // Mantenimiento periódico de post-login-redirect + limpieza inicial
+    this.tokenStorage.cleanExpiredPostLoginRedirects();
+    this.tokenStorage.startPostLoginRedirectMaintenance(60 * 60 * 1000);
 
     // Escuchar cambios de estado de autenticación
     window.addEventListener('authStateChanged', () => {

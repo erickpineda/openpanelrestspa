@@ -64,7 +64,7 @@ export class DashboardApiService {
     return this.http.get<any>(`${this.base}/recent-activity`, { params }).pipe(map(r => r && r.data ? r.data : r));
   }
 
-  getSeriesActivity(days = 30, force = false, granularity: 'day' | 'week' | 'month' = 'day'): Observable<ActivityPointDTO[]> {
+  getSeriesActivity(days = 30, force = false, granularity: 'hour' | 'day' | 'week' | 'month' = 'day'): Observable<ActivityPointDTO[]> {
     const dRaw = Number(days) || 30;
     const d = Math.max(1, Math.min(365, dRaw));
     const key = `dashboard:series:activity:days:${d}:gran:${granularity}`;
@@ -78,7 +78,7 @@ export class DashboardApiService {
   }
 
   // Propuesto: nueva serie separando publicadas vs no publicadas
-  getSeriesEntriesSplitEstado(days = 30, granularity: 'day' | 'week' | 'month' = 'day', force = false): Observable<{ date: string, publicadas: number, noPublicadas: number }[]> {
+  getSeriesEntriesSplitEstado(days = 30, granularity: 'hour' | 'day' | 'week' | 'month' = 'day', force = false): Observable<{ date: string, publicadas: number, noPublicadas: number }[]> {
     const dRaw = Number(days) || 30;
     const d = Math.max(1, Math.min(365, dRaw));
     const key = `dashboard:series:entries:split:estado:days:${d}:gran:${granularity}`;
@@ -91,7 +91,7 @@ export class DashboardApiService {
     );
   }
 
-  getSeriesEntriesSplitEstadoNombre(days = 30, granularity: 'day' | 'week' | 'month' = 'day', force = false): Observable<any[]> {
+  getSeriesEntriesSplitEstadoNombre(days = 30, granularity: 'hour' | 'day' | 'week' | 'month' = 'day', force = false): Observable<any[]> {
     const dRaw = Number(days) || 30;
     const d = Math.max(1, Math.min(365, dRaw));
     const key = `dashboard:series:entries:split:estadoNombre:days:${d}:gran:${granularity}`;

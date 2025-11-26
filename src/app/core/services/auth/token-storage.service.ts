@@ -10,10 +10,14 @@ export const SYNC_USER_KEY = OPConstants.Session.SYNC_USER_KEY;
 
 export const TAB_ID_KEY = OPConstants.Session.TAB_ID_KEY; // key en sessionStorage para id de pestaña
 export const POST_LOGIN_PREFIX = OPConstants.Session.POST_LOGIN_PREFIX; // usamos post-login-redirect-{tabId} en sessionStorage
+export const POST_LOGIN_REDIRECT = OPConstants.Session.POST_LOGIN_REDIRECT;
 
 @Injectable({ providedIn: 'root' })
 export class TokenStorageService {
   constructor(private log: LoggerService) { }
+
+  private readonly POST_LOGIN_TTL_MS = 24 * 60 * 60 * 1000;
+  private postLoginMaintenanceTimer: any = null;
 
   public getOrCreateTabId(): string {
     try {
@@ -34,6 +38,94 @@ export class TokenStorageService {
   public getPostLoginKeyForThisTab(): string {
     const tabId = this.getOrCreateTabId();
     return POST_LOGIN_PREFIX + tabId;
+  }
+
+  public savePostLoginRedirectBase(value: string): void {
+    try { localStorage.setItem(POST_LOGIN_REDIRECT, `${value}|${new Date().toISOString()}`); } catch {}
+  }
+
+  public getPostLoginRedirectBase(): string | null {
+    try {
+      const raw = localStorage.getItem(POST_LOGIN_REDIRECT);
+      if (!raw) return null;
+      const [val, iso] = raw.split('|');
+      const ts = Date.parse(iso || '');
+      if (isNaN(ts)) return val || null;
+      const age = Date.now() - ts;
+      if (age > this.POST_LOGIN_TTL_MS) {
+        localStorage.removeItem(POST_LOGIN_REDIRECT);
+        return null;
+      }
+      return val || null;
+    } catch { return null; }
+  }
+
+  public removePostLoginRedirectBase(): void {
+    try { localStorage.removeItem(POST_LOGIN_REDIRECT); } catch {}
+  }
+
+  public savePostLoginRedirectForTab(value: string): void {
+    const key = this.getPostLoginKeyForThisTab();
+    try { window.sessionStorage.setItem(key, `${value}|${new Date().toISOString()}`); } catch {}
+  }
+
+  public getPostLoginRedirectForTab(): string | null {
+    const key = this.getPostLoginKeyForThisTab();
+    try {
+      const raw = window.sessionStorage.getItem(key);
+      if (!raw) return null;
+      const [val, iso] = raw.split('|');
+      const ts = Date.parse(iso || '');
+      if (isNaN(ts)) return val || null;
+      const age = Date.now() - ts;
+      if (age > this.POST_LOGIN_TTL_MS) {
+        window.sessionStorage.removeItem(key);
+        return null;
+      }
+      return val || null;
+    } catch { return null; }
+  }
+
+  public removePostLoginRedirectForTab(): void {
+    const key = this.getPostLoginKeyForThisTab();
+    try { window.sessionStorage.removeItem(key); } catch {}
+  }
+
+  public cleanExpiredPostLoginRedirects(): void {
+    try {
+      const raw = localStorage.getItem(POST_LOGIN_REDIRECT);
+      if (raw) {
+        const iso = raw.split('|')[1] || '';
+        const ts = Date.parse(iso);
+        if (!isNaN(ts) && Date.now() - ts > this.POST_LOGIN_TTL_MS) {
+          localStorage.removeItem(POST_LOGIN_REDIRECT);
+        }
+      }
+    } catch {}
+    try {
+      for (let i = 0; i < window.sessionStorage.length; i++) {
+        const k = window.sessionStorage.key(i);
+        if (!k || k.indexOf(POST_LOGIN_PREFIX) !== 0) continue;
+        const raw = window.sessionStorage.getItem(k) || '';
+        const iso = raw.split('|')[1] || '';
+        const ts = Date.parse(iso);
+        if (!isNaN(ts) && Date.now() - ts > this.POST_LOGIN_TTL_MS) {
+          window.sessionStorage.removeItem(k);
+        }
+      }
+    } catch {}
+  }
+
+  public startPostLoginRedirectMaintenance(intervalMs = 15 * 60 * 1000): void {
+    if (this.postLoginMaintenanceTimer) return;
+    this.postLoginMaintenanceTimer = setInterval(() => this.cleanExpiredPostLoginRedirects(), intervalMs);
+  }
+
+  public stopPostLoginRedirectMaintenance(): void {
+    if (this.postLoginMaintenanceTimer) {
+      clearInterval(this.postLoginMaintenanceTimer);
+      this.postLoginMaintenanceTimer = null;
+    }
   }
 
   // token-storage.service.ts

@@ -93,7 +93,7 @@ export class LoginComponent implements OnInit {
         return;
       }
     } catch (e) { /* ignore */ }
-    this.router.navigate(['/']);
+    this.router.navigate(['/admin']);
   }
 
   reloadPage(): void {

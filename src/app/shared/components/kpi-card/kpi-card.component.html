@@ -1,11 +1,6 @@
-<c-card class="kpi-card">
-  <c-card-body>
-    <div class="d-flex justify-content-between align-items-start">
-      <div>
-        <h6 class="mb-1">{{ label }}</h6>
-        <h3 class="mb-0">{{ value }}</h3>
-        <small *ngIf="subtitle" class="text-muted">{{ subtitle }}</small>
-      </div>
-    </div>
-  </c-card-body>
-</c-card>
+<c-widget-stat-f [value]="value" [title]="label" padding="true" [color]="resolvedColor">
+  <ng-template cTemplateId="widgetIconTemplate">
+    <svg cIcon [name]="resolvedIcon"></svg>
+  </ng-template>
+</c-widget-stat-f>
+<small *ngIf="subtitle" class="text-muted d-block mt-1">{{ subtitle }}</small>

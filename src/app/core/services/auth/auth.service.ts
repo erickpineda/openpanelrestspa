@@ -41,6 +41,8 @@ export class AuthService {
       password
     }).pipe(
       tap((data: any) => {
+        this.tokenStorage.cleanExpiredPostLoginRedirects();
+        this.tokenStorage.startPostLoginRedirectMaintenance(60 * 60 * 1000);
         this.tokenStorage.saveToken(data.jwttoken);
         this.tokenStorage.saveUser(data);
         this.userSubject.next(data);
@@ -67,6 +69,7 @@ export class AuthService {
   }
 
   public performLogout(): void {
+    this.tokenStorage.cleanExpiredPostLoginRedirects();
     // Delegamos: sessionManager guardará el redirect para esta pestaña y luego borrará tokens
     this.sessionManager.performLogout({ type: 'LOGOUT', message: 'Logout local', allowSave: true, timestamp: Date.now(), originTabId: this.tokenStorage.getOrCreateTabId() });
     // Notificaremos a las otras pestañas
