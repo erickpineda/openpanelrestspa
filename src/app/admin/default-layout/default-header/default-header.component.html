@@ -52,7 +52,10 @@
   </c-container>
   <c-header-divider></c-header-divider>
   <c-container [fluid]="true">
-    <c-breadcrumb-router class="ms-2"></c-breadcrumb-router>
+    <c-breadcrumb class="ms-2">
+      <li class="breadcrumb-item"><a routerLink="/admin">Inicio</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Página actual</li>
+    </c-breadcrumb>
   </c-container>
 </ng-container>
 <!--</c-header>-->

@@ -1,3 +1,5 @@
+<app-toasts-container></app-toasts-container>
+
 <!-- Sidebar -->
 <c-sidebar
   #sidebar="cSidebar"
@@ -33,6 +35,20 @@
 
 <!-- Main content -->
 <div class="wrapper d-flex flex-column min-vh-100 bg-light dark:bg-transparent">
+  <!-- ✅ NOTIFICACIÓN GLOBAL MEJORADA -->
+  <div *ngIf="showGlobalRecoveryNotification" class="container mt-3">
+    <app-data-recovery-notification
+      title="📥 Entradas no guardadas"
+      [message]="'Tienes ' + temporaryEntriesCount + ' entrada(s) no guardada(s) de sesiones anteriores'"
+      recoverText="Ver entradas temporales"
+      ignoreText="Más tarde"
+      discardText="Descartar todas"
+      (onRecover)="onGlobalRecover()"
+      (onIgnore)="onGlobalIgnore()"
+      (onDiscard)="onGlobalDiscard()">
+    </app-data-recovery-notification>
+  </div>
+
   <!-- Header -->
   <app-default-header
     class="mb-4 d-print-none header header-sticky"

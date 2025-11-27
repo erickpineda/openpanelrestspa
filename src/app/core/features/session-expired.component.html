@@ -1,0 +1,46 @@
+<!-- session-expired.component.html -->
+<c-modal
+  [visible]="isVisible"
+  [backdrop]="'static'"
+  [keyboard]="false"
+  alignment="center"
+  aria-labelledby="sessionExpiredLabel"
+  role="dialog"
+  (visibleChange)="onVisibleChange($event)"
+>
+  <c-modal-header class="bg-warning text-dark">
+    <h5 cModalTitle id="sessionExpiredLabel">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      Sesión Finalizada
+    </h5>
+    <!-- No close button: forzamos acción del usuario -->
+  </c-modal-header>
+
+  <c-modal-body>
+    <c-alert [color]="'info'">
+      <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+      <span>{{ sessionData?.message || 'Su sesión ha finalizado' }}</span>
+    </c-alert>
+
+    <div class="mb-2" *ngIf="sessionData?.type === 'LOGOUT'">
+      <p class="mb-0">La sesión se cerró desde otro dispositivo o pestaña.</p>
+    </div>
+
+    <div class="mb-2" *ngIf="sessionData?.type === 'SESSION_EXPIRED'">
+      <p class="mb-0">Su sesión ha caducado por inactividad.</p>
+    </div>
+  </c-modal-body>
+
+  <c-modal-footer>
+    <div class="d-grid gap-2 w-100">
+      <button type="button" class="btn btn-primary" (click)="goToLogin()">
+        <i class="fas fa-sign-in-alt me-2" aria-hidden="true"></i>
+        Iniciar Sesión Nuevamente
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="goToHome()">
+        <i class="fas fa-home me-2" aria-hidden="true"></i>
+        Volver al Inicio
+      </button>
+    </div>
+  </c-modal-footer>
+</c-modal>

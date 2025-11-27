@@ -1,0 +1,48 @@
+/* Compact 'guay' not-found styles */
+
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem 1rem;
+  background: linear-gradient(180deg, #fbfdff 0%, #ffffff 60%);
+  color: #102027;
+}
+
+.np-card {
+  width: 100%;
+  max-width: 640px;
+  text-align: center;
+  padding: 1.4rem 1.2rem;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(16, 32, 48, 0.06);
+}
+
+.np-emoji {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 0.9rem auto;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #fff4f0, #ffecec);
+  color: #c0392b;
+  font-weight: 800;
+  font-size: 2.1rem;
+  box-shadow: 0 8px 20px rgba(192, 57, 43, 0.06);
+}
+
+.np-code { font-weight: 800; font-size: 2.1rem; line-height: 1; }
+.np-title { margin: 0.45rem 0 0.25rem; font-size: 1.25rem; font-weight: 700; }
+.np-sub { color: #516271; font-size: 0.98rem; margin-bottom: 1rem; }
+
+.np-actions { display: inline-flex; gap: 0.6rem; }
+.btn-primary { background: #0b74de; color: #fff; padding: 0.5rem 0.95rem; border-radius: 8px; font-weight: 700; border: none; box-shadow: 0 8px 20px rgba(11, 116, 222, 0.08); }
+.btn-ghost { background: transparent; color: #0b74de; padding: 0.5rem 0.95rem; border-radius: 8px; font-weight: 700; border: 1px solid rgba(11, 116, 222, 0.12); }
+
+@keyframes np-mini-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.np-card { animation: np-mini-fade 360ms ease both; }
+
+@media (max-width: 520px) { .np-emoji { width: 80px; height: 80px; font-size: 1.9rem; } .np-title { font-size: 1.12rem; } }

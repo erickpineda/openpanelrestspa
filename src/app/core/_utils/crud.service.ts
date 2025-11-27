@@ -1,49 +1,126 @@
-import { BaseService } from './base.service';
+// core/_utils/crud.service.ts
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { TokenStorageService } from '../services/token-storage.service';
+import { BaseService } from './base.service';
 import { OpenpanelApiResponse } from '../models/openpanel-api-response.model';
+import { TokenStorageService } from '../services/auth/token-storage.service';
+import { HttpClient } from '@angular/common/http';
 
-export abstract class CrudService<C> extends BaseService {
+@Injectable({
+  providedIn: 'root',
+})
+export abstract class CrudService<T, ID> extends BaseService {
+  protected abstract endpoint: string;
 
-    constructor(
-        protected http: HttpClient,
-        protected override token: TokenStorageService
-    ) {
-        super(token);
-    }
+  constructor(
+    protected override http: HttpClient,
+    protected override tokenStorageService: TokenStorageService
+  ) {
+    super(http, tokenStorageService);
+  }
 
-    public listar(): Observable<OpenpanelApiResponse<any>> {
-      return this.http.get<OpenpanelApiResponse<any>>(this.path, { headers: this.setHeaders() });
-    }
+  /**
+   * Lista elementos de forma segura, retornando array vacío en caso de error
+   */
+  listarSafe(): Observable<T[]> {
+    return this.safeGetList<T>(
+      this.endpoint,
+      undefined,
+      undefined,
+      `${this.endpoint}.listar`
+    );
+  }
 
-    public listarPagina(pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<any>> {
-        const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-        return this.http.get<OpenpanelApiResponse<any>>(this.path, { headers: this.setHeaders(), params });
-    }
+  /**
+   * Obtiene un elemento por ID de forma segura, retornando null en caso de error
+   */
+  obtenerPorIdSafe(id: ID): Observable<T> {
+    return this.safeGetData<T>(
+      `${this.endpoint}/obtenerPorId/${id}`,
+      {} as T, // ✅ Cast simple a T
+      undefined,
+      undefined,
+      `${this.endpoint}.obtenerPorId`
+    );
+  }
 
-    public crear(entity: C): Observable<OpenpanelApiResponse<any>> {
-        return this.http.post<OpenpanelApiResponse<any>>(this.buildUrl('/crear'), entity, { headers: this.setHeaders() });
-    }
+  /**
+   * Crea un elemento de forma segura, retornando null en caso de error
+   */
+  crearSafe(entity: T): Observable<T> {
+    return this.safePostData<T>(
+      `${this.endpoint}/crear`,
+      entity,
+      {} as T, // ✅ Cast simple a T
+      undefined,
+      undefined,
+      `${this.endpoint}.crear`
+    );
+  }
 
-    public obtenerPorId(id: number): Observable<OpenpanelApiResponse<any>> {
-        return this.http.get<OpenpanelApiResponse<any>>(this.buildUrl(`/obtenerPorId/${id}`), { headers: this.setHeaders() });
-    }
+  /**
+   * Crear elemento con estado
+   */
+  crearConEstado(entity: T): Observable<{ success: boolean; data?: T; error?: any }> {
+    return this.safeOperationWithState<T>(
+      this.post<T>(`${this.endpoint}/crear`, entity),
+      `${this.endpoint}.crear`
+    );
+  }
 
-    public actualizar(id: number, entity: C): Observable<OpenpanelApiResponse<any>> {
-        return this.http.put<OpenpanelApiResponse<any>>(this.buildUrl(`/${id}`), entity, { headers: this.setHeaders() });
-    }
+  /**
+   * Actualiza un elemento de forma segura, retornando null en caso de error
+   */
+  actualizarSafe(id: ID, entity: T): Observable<T> {
+    return this.safePutData<T>(
+      `${this.endpoint}/${id}`,
+      entity,
+      {} as T, // ✅ Cast simple a T
+      undefined,
+      undefined,
+      `${this.endpoint}.actualizar`
+    );
+  }
 
-    public borrar(id: number): Observable<OpenpanelApiResponse<any>> {
-        return this.http.delete<OpenpanelApiResponse<any>>(this.buildUrl(`/${id}`), { headers: this.setHeaders() });
-    }
+  /**
+   * Elimina un elemento de forma segura, retornando false en caso de error
+   */
+  eliminarSafe(id: ID): Observable<boolean> {
+    return this.safeDeleteOperation(
+      `${this.endpoint}/${id}`,
+      undefined,
+      undefined,
+      `${this.endpoint}.eliminar`
+    );
+  }
 
-    buscar(req: any, pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<any>> {
-      const url = this.buildUrl('/buscar');
-      const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-      return this.http.post<OpenpanelApiResponse<any>>(url, req, {
-        headers: this.setHeaders(), params
-      });
-    }
+  // ✅ MÉTODOS ORIGINALES (mantener exactamente como están)
 
+  listar(): Observable<OpenpanelApiResponse<any>> {
+    return this.get<any>(this.endpoint);
+  }
+
+  public listarPagina(
+    pageNo: number,
+    pageSize: number
+  ): Observable<OpenpanelApiResponse<any>> {
+    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+    return this.get<any>(this.endpoint, { params });
+  }
+
+  obtenerPorId(id: ID): Observable<OpenpanelApiResponse<any>> {
+    return this.get<any>(`${this.endpoint}/obtenerPorId/${id}`);
+  }
+
+  crear(entity: T): Observable<any> {
+    return this.post<any>(`${this.endpoint}/crear`, entity);
+  }
+
+  actualizar(id: ID, entity: T): Observable<OpenpanelApiResponse<any>> {
+    return this.put<any>(`${this.endpoint}/${id}`, entity);
+  }
+
+  borrar(id: ID): Observable<OpenpanelApiResponse<any>> {
+    return this.delete<any>(`${this.endpoint}/${id}`);
+  }
 }

@@ -1,10 +1,11 @@
+// src/app/public/login/login.component.ts
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { cilUser, cilLockLocked } from '@coreui/icons';
-import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { TokenStorageService } from '../../core/services/token-storage.service';
-import { CommonFunctionalityService } from '../../shared/services/common-functionality.service';
+import { AuthService } from '../../core/services/auth/auth.service';
+import { TokenStorageService } from '../../core/services/auth/token-storage.service';
+import { PostLoginRedirectService } from '../../core/services/auth/post-login-redirect.service';
+import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
 
 @Component({
   selector: 'app-login',
@@ -13,13 +14,8 @@ import { CommonFunctionalityService } from '../../shared/services/common-functio
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-
   icons = { cilUser, cilLockLocked };
-
-  form: any = {
-    username: null,
-    password: null
-  };
+  form: any = { username: null, password: null };
   isLoggedIn = false;
   isLoginFailed = false;
   isLoading = false; // Nueva variable de estado de carga
@@ -27,23 +23,27 @@ export class LoginComponent implements OnInit {
   roles: string[] = [];
 
   constructor(
-    private commonFuncService: CommonFunctionalityService,
     private authService: AuthService,
     private tokenStorage: TokenStorageService,
-    private cdr: ChangeDetectorRef
-  ) {
-  }
-  
+    private router: Router, // ✅ Usar Router en lugar del servicio custom
+    private authSync: AuthSyncService,
+    private cdr: ChangeDetectorRef,
+    private postLoginRedirect: PostLoginRedirectService
+  ) {}
+
   ngOnInit(): void {
+    // Sincronizar estado al iniciar
+    this.authSync.initializeAuthState();
+
     if (this.tokenStorage.getToken()) {
-      this.isLoggedIn = true;
-      this.roles = this.tokenStorage.getUser().roles;
+      this.tryRedirectToLastRoute('ngOnInit');
     }
   }
 
   onSubmit(): void {
-    this.isLoading = true; // Inicia el estado de carga
+    this.isLoading = true;
     const { username, password } = this.form;
+
     this.authService.login(username, password).subscribe({
       next: data => {
         this.tokenStorage.saveToken(data.jwttoken);
@@ -51,18 +51,49 @@ export class LoginComponent implements OnInit {
         this.isLoginFailed = false;
         this.isLoggedIn = true;
         this.roles = this.tokenStorage.getUser().roles;
-        this.isLoading = false; // Finaliza el estado de carga
-        setTimeout(() => {
-          this.commonFuncService.reloadComponent(false, '/admin'); // Añade un retraso antes de la navegación
-        }, 500); // Retraso de 500ms
+        this.isLoading = false;
+
+        // Intentar redirigir localmente primero (evita que handlers globales borren la clave antes de leerla)
+        this.tryRedirectToLastRoute('manual');
+
+        // Notificar a otras pestañas del login
+        this.authSync.notifyLogin();
+        this.cdr.detectChanges();
       },
-      error: err => {
-        this.errorMessage = err.error.message;
+      error: (err) => {
+        this.errorMessage = err.error?.message ?? err.message ?? 'Error en el login';
         this.isLoginFailed = true;
-        this.isLoading = false; // Finaliza el estado de carga
-        this.cdr.detectChanges(); // Forzar detección de cambios
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  private tryRedirectToLastRoute(context: string): void {
+    try {
+      let redirect = this.postLoginRedirect.getAndClearRedirectForTab();
+      if (redirect) {
+        let target = this.postLoginRedirect.normalizeRoute(redirect);
+        try {
+          const tree = this.router.parseUrl(target);
+          this.router.navigateByUrl(tree);
+          this.postLoginRedirect.markPostLoginHandled();
+          setTimeout(() => {
+            try {
+              const current = window.location.pathname + window.location.hash;
+              if (!(current.indexOf('#' + target) >= 0 || current.endsWith(target))) {
+                try { window.location.hash = target; } catch (e) { /* ignore */ }
+              }
+            } catch (e) { /* ignore */ }
+          }, 150);
+        } catch (e) {
+          this.router.navigateByUrl(target);
+          this.postLoginRedirect.markPostLoginHandled();
+        }
+        return;
+      }
+    } catch (e) { /* ignore */ }
+    this.router.navigate(['/admin']);
   }
 
   reloadPage(): void {

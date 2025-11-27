@@ -1,0 +1,74 @@
+<!-- temporary-entries-manager.component.html -->
+<c-card>
+  <c-card-header>
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h2 cCardTitle>Entradas Temporales No Guardadas</h2>
+        <p class="text-muted">Estas son las entradas que se guardaron temporalmente durante cierres de sesión.</p>
+      </div>
+      <button cButton color="primary" (click)="createNewEntry()">
+        <i class="cil-plus me-1"></i> Nueva Entrada
+      </button>
+    </div>
+  </c-card-header>
+  <c-card-body>
+    <div *ngIf="entries.length === 0" class="text-center py-4">
+      <p>No hay entradas temporales guardadas.</p>
+    </div>
+
+    <c-row *ngIf="entries.length > 0">
+      <c-col lg="6" *ngFor="let entry of entries">
+        <c-card class="mb-3">
+          <c-card-body>
+            <h5 class="card-title">{{ entry.title || 'Sin título' }}</h5>
+            <p class="card-text text-muted small">
+              {{ entry.description || 'Entrada sin descripción' }}
+            </p>
+            <p class="card-text">
+              <small class="text-muted">
+                Guardado: {{ entry.timestamp | date:'medium' }}
+              </small>
+            </p>
+            <div class="btn-group">
+              <button cButton color="success" size="sm" (click)="recoverEntry(entry)">
+                <i class="cil-download me-1"></i> Recuperar
+              </button>
+              <button cButton color="secondary" size="sm" (click)="viewEntry(entry)">
+                <i class="cil-eye me-1"></i> Ver
+              </button>
+              <button cButton color="danger" size="sm" (click)="deleteEntry(entry.id)">
+                <i class="cil-trash me-1"></i> Eliminar
+              </button>
+            </div>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+
+    <div *ngIf="entries.length > 0" class="text-center mt-3">
+      <button cButton color="outline-danger" (click)="clearAll()">
+        <i class="cil-broom me-1"></i> Limpiar Todas
+      </button>
+    </div>
+  </c-card-body>
+</c-card>
+
+<!-- Modal para ver detalles -->
+<c-modal id="viewEntryModal" [visible]="viewModalVisible" (visibleChange)="viewModalVisible = $event">
+  <c-modal-header>
+    <h5 cModalTitle>Vista Previa: {{ selectedEntry?.title }}</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <div *ngIf="selectedEntry">
+      <p><strong>Título:</strong> {{ selectedEntry.formData.titulo || 'Sin título' }}</p>
+      <p><strong>Subtítulo:</strong> {{ selectedEntry.formData.subtitulo || 'Sin subtítulo' }}</p>
+      <p><strong>Resumen:</strong> {{ selectedEntry.formData.resumen || 'Sin resumen' }}</p>
+      <p><strong>Contenido:</strong></p>
+      <div class="border p-2 bg-light" [innerHTML]="selectedEntry.formData.contenido || 'Sin contenido'"></div>
+    </div>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="viewModalVisible = false">Cerrar</button>
+    <button cButton color="primary" (click)="recoverSelectedEntry()">Recuperar</button>
+  </c-modal-footer>
+</c-modal>

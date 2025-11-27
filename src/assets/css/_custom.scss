@@ -91,3 +91,55 @@ header.masthead .site-heading .h1 {
   /* bring your own prefixes */
   transform: translate(-50%, -50%);
 }
+
+// Mantener visible botón toggle del sidebar
+.header-toggler {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.25rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  line-height: 1;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 1020;
+}
+
+.header-toggler:focus-visible {
+  outline: 2px solid rgba(0, 123, 255, 0.6);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+.header-toggler + .d-none.d-lg-flex {
+  margin-left: 0.5rem;
+}
+
+@media (max-width: 360px) {
+  .header-toggler {
+    min-width: 40px;
+    min-height: 40px;
+    margin-left: 0.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-toggler {
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-toggler {
+    margin-right: 0.75rem;
+  }
+}
+
+.app-default-header .c-container {
+  overflow-x: hidden;
+}

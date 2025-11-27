@@ -1,0 +1,59 @@
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Usuario } from "../../models/usuario.model";
+import { CrudService } from "../../_utils/crud.service";
+import { TokenStorageService } from "../auth/token-storage.service";
+import { catchError, Observable, map, firstValueFrom, of } from "rxjs";
+import { PerfilResponse } from "../../models/perfil-response.model";
+import { OpenpanelApiResponse } from "../../models/openpanel-api-response.model";
+
+@Injectable({
+  providedIn: "root"
+})
+export class UsuarioService extends CrudService<Usuario, number> {
+  protected override endpoint = '/usuarios';
+
+  constructor(
+    protected override http: HttpClient,
+    protected override tokenStorageService: TokenStorageService
+  ) {
+    super(http, tokenStorageService);
+  }
+
+  // ✅ SOLO los métodos esenciales seguros
+
+  /**
+   * Método seguro principal para obtener datos de sesión
+   */
+  obtenerDatosSesionActualSafe(): Observable<PerfilResponse> {
+    return this.safeGetData<PerfilResponse>(
+      `${this.endpoint}/perfil/yo`,
+      {} as PerfilResponse,
+      undefined,
+      undefined,
+      'usuarios.obtenerDatosSesionActual'
+    );
+  }
+
+  /**
+   * Método mejorado para obtener username
+   */
+  async getUsernameActual(): Promise<string> {
+    try {
+      const perfil = await firstValueFrom(this.obtenerDatosSesionActualSafe());
+      return perfil?.username || 'Usuario no disponible';
+    } catch (err) {
+      return 'Usuario no disponible';
+    }
+  }
+
+  // ✅ Mantener método original por compatibilidad
+  obtenerDatosSesionActual(): Observable<OpenpanelApiResponse<PerfilResponse>> {
+    return this.get<PerfilResponse>(`${this.endpoint}/perfil/yo`);
+  }
+
+  // ✅ Implementación mínima requerida
+  protected createDefaultEntity(): Usuario {
+    return {} as Usuario;
+  }
+}

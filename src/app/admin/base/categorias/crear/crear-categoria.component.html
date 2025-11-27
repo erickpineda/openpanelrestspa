@@ -1,0 +1,10 @@
+<div class="crear-categoria-wrapper">
+  <app-categoria-form
+    [listaCategorias]="listaCategorias"
+    [submitted]="submitted"
+    [disabled]="false"
+    (submitCategoria)="crear($event)"
+    (onReset)="onReset()"
+    (onValidate)="onValidate()"
+  ></app-categoria-form>
+</div>

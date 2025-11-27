@@ -1,8 +1,14 @@
 // busqueda.service.ts
 import { Injectable } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { debounceTime, switchMap, catchError } from 'rxjs/operators';
+import { Observable, Subject, Subscription, of } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
+import { Entrada } from '../../models/entrada.model';
+
+interface BuscarResponse {
+  elements: Entrada[];
+  totalPages: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +16,7 @@ import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-respons
 export class BusquedaService {
   private searchSubject = new Subject<string>();
   private currentSubscription?: Subscription;
+  private searchFunction?: (term: string, page?: number) => Observable<BuscarResponse>;
 
   // Modificar método de limpieza
   limpiarBusqueda(): void {
@@ -21,34 +28,22 @@ export class BusquedaService {
   }
 
   iniciarBusqueda(
-    searchFunction: (term: string) => Observable<OpenpanelApiResponse<any>>,
-    callback: (results: OpenpanelApiResponse<any>) => void,
+    searchFunction: (term: string, page?: number) => Observable<BuscarResponse>,
+    callback: (results: BuscarResponse) => void,
     delay: number = 300
   ): void {
     this.limpiarBusqueda();
+    this.searchFunction = searchFunction;
 
     this.currentSubscription = this.searchSubject.pipe(
       debounceTime(delay),
-      switchMap(term => 
-        searchFunction(term).pipe(
-          // Manejar errores dentro del flujo
-          catchError(err => {
-            console.error('Error en búsqueda:', err);
-            callback({
-              result: {
-                trackingId: '',
-                timestamp: new Date().toISOString(),
-                success: false,
-                message: 'Error en la búsqueda'
-              },
-              error: err
-            });
-            return []; // Retornar observable vacío para mantener activo el Subject
-          })
-        )
+      switchMap(term =>
+        // use stored function; when invoked by the subject we rely on the component
+        // to manage currentPage internally (searchFunction may use component state)
+        this.searchFunction ? this.searchFunction(term) : of({ elements: [], totalPages: 0 })
       )
     ).subscribe(response => {
-      if (response?.result?.success) {
+      if (response?.elements) {
         callback(response);
       }
     });
@@ -56,5 +51,16 @@ export class BusquedaService {
 
   triggerBusqueda(term: string): void {
     this.searchSubject.next(term);
+  }
+
+  /**
+   * Ejecuta la búsqueda inmediatamente (sin debounce), usando la función de búsqueda
+   * registrada en `iniciarBusqueda` y permitiendo pasar el número de página explícito.
+   */
+  searchNow(term: string, page?: number): Observable<BuscarResponse> {
+    if (!this.searchFunction) {
+      return of({ elements: [], totalPages: 0 });
+    }
+    return this.searchFunction(term, page);
   }
 }

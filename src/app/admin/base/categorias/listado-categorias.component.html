@@ -24,26 +24,57 @@
     </div>
     <hr>
     
-    <table cTable hover *ngIf="listaCategorias.length >= 0">
+    <div class="tabla-con-loader-wrapper position-relative">
+      <app-op-loader
+        [useGlobal]="false"
+        [active]="cargando"
+        [overlay]="true"
+        [fullScreen]="false"
+        [position]="'center'"
+        [loaderStyle]="'spinner'"
+        [size]="'sm'"
+        [color]="'primary'"
+        [message]="'Cargando categorías...'">
+      </app-op-loader>
+
+      <table cTable hover>
       <thead cTableColor="dark">
         <tr>
           <th scope="col">ID</th>
           <th scope="col">Nombre</th>
           <th scope="col">Descripción</th>
+          <th scope="col" class="col">Acciones</th>
         </tr>
       </thead>
-      <tbody *ngFor="let categ of listaCategorias">
-        <tr (click)="navigate('/admin/control/categorias/'+categ.idCategoria)" style="cursor: pointer">
+      <tbody>
+        <tr *ngFor="let categ of listaCategorias; trackBy: trackByCategoriaId">
           <td scope="row">{{categ.idCategoria}}</td>
           <td>{{categ.nombre}}</td>
           <td>{{categ.descripcion}}</td>
+          <td>
+            <div class="btn-group" role="group" aria-label="Acciones de categoría">
+              <button cButton color="warning" size="sm"
+                      (click)="editarCategoria(categ.idCategoria)"
+                      [attr.aria-label]="'Editar categoría ' + categ.nombre"
+                      [title]="'Editar categoría ' + categ.nombre">
+                <svg cIcon name="cilPen" size="sm"></svg>
+              </button>
+              <button cButton color="danger" size="sm"
+                      (click)="borrarCategoria(categ.idCategoria)"
+                      [attr.aria-label]="'Borrar categoría ' + categ.nombre"
+                      [title]="'Borrar categoría ' + categ.nombre">
+                <svg cIcon name="cilTrash" size="sm"></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="listaCategorias.length === 0">
+          <td colspan="4" class="text-center py-4">
+            {{ errorMsg || 'No se han encontrado registros en el sistema...' }}
+          </td>
         </tr>
       </tbody>
-      <tbody *ngIf="listaCategorias.length === 0" cAlign="middle">
-        <tr style="cursor: pointer">
-          <td colSpan="3">No se han encontrado registros en el sistema...</td>
-        </tr>
-      </tbody>
-    </table>
+      </table>
+    </div>
   </c-card-body>
 </c-card>

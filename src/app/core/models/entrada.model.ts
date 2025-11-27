@@ -73,3 +73,11 @@ export interface Entrada {
 
 }
 
+export interface EntradaFormData {
+  titulo: string;
+  contenido: string;
+  resumen: string;
+  categorias: Categoria[];
+  estadoEntrada: EstadoEntrada;
+}
+

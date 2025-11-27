@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Entrada } from '../../core/models/entrada.model';
 import { Categoria } from '../../core/models/categoria.model';
-import { EntradaService } from '../../core/services/entrada.service';
-import { LoadingService } from '../../core/services/loading.service';
+import { EntradaService } from '../../core/services/data/entrada.service';
+import { LoadingService } from '../../core/services/ui/loading.service';
+import { LoggerService } from '../../core/services/logger.service';
 
 @Component({
   selector: 'app-home',
@@ -10,8 +11,6 @@ import { LoadingService } from '../../core/services/loading.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  loading$: any;
-  loading: boolean = false;
   cargaFinalizada: boolean = false;
   noHayEntradas: boolean = true;
   errorMsg: string = '';
@@ -24,12 +23,10 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private entradaService: EntradaService,
-    public loader: LoadingService
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
-    this.loading$ = this.loader.loading$;
-    this.listenToLoading();
     this.obtenerListaEntradas()
       .then((listaRes: Entrada[]) => {
         listaRes.forEach((entradaRes) => {
@@ -38,9 +35,9 @@ export class HomeComponent implements OnInit {
         this.refreshEntradas(); // Refrescar las entradas después de obtener la lista
       })
       .catch((error) => {
-        console.error('Error al obtener lista de entradas:', error.message);
+        this.log.error('Error al obtener lista de entradas:', error.message);
         this.errorMsg = 'No se pudieron cargar las entradas, intenta nuevamente más tarde.';
-        console.log(this.errorMsg);
+        this.log.error(this.errorMsg);
       });
   }
 
@@ -55,25 +52,17 @@ export class HomeComponent implements OnInit {
             } else {
               this.entradas = entradas;
               this.categorias = this.entradas.flatMap(e => e.categorias);
+              this.cargaFinalizada = true;
             }
             resolve(this.entradas);
           },
           error: (error) => {
             this.noHayEntradas = false;
+            this.cargaFinalizada = true;
             reject(error);
           }
         });
     });
-  }
-
-  listenToLoading(): void {
-    this.loader.loadingSub
-      .subscribe((loading) => {
-        this.loading = loading;
-        if (!loading) {
-          this.cargaFinalizada = true;
-        }
-      });
   }
 
   refreshEntradas() {

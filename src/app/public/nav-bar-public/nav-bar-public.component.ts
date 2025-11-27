@@ -1,6 +1,10 @@
+// nav-bar-public.component.ts
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { TokenStorageService } from '../../core/services/token-storage.service';
+import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
+import { AuthService } from '../../core/services/auth/auth.service';
+import { TokenStorageService } from '../../core/services/auth/token-storage.service';
+import { LoggerService } from '../../core/services/logger.service';
 
 @Component({
   selector: 'app-nav-bar-public',
@@ -14,39 +18,81 @@ export class NavBarPublicComponent implements OnInit {
   showAdminBoard = false;
   showModeratorBoard = false;
   username?: string;
-
   isShrink: boolean = false;
+  isLoadingLogout = false;
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.isShrink = window.pageYOffset > 100;
   }
 
-  constructor(private tokenStorageService: TokenStorageService, private router: Router) {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.scrollToTop();
+  constructor(
+    private tokenStorageService: TokenStorageService,
+    private authService: AuthService,
+    private authSync: AuthSyncService,
+    private router: Router,
+    private log: LoggerService
+  ) {
+    // Escuchar cambios de estado de autenticación
+    window.addEventListener('authStateChanged', () => {
+      this.log.info('🔄 NavBar: Estado de autenticación cambiado');
+      this.checkAuthStatus();
+    });
+
+    // Verificar cuando la página se vuelve visible
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.authSync.initializeAuthState();
+        this.checkAuthStatus();
       }
     });
   }
 
   ngOnInit(): void {
-    this.isLoggedIn = !!this.tokenStorageService.getToken();
+    this.checkAuthStatus();
+    this.authSync.initializeAuthState(); // Sincronizar al iniciar
+  }
+
+  private checkAuthStatus(): void {
+    this.isLoggedIn = this.tokenStorageService.isLoggedIn();
+    this.log.info('🔐 NavBar - Estado de autenticación:', this.isLoggedIn);
+    
     if (this.isLoggedIn) {
       const user = this.tokenStorageService.getUser();
       this.roles = user.roles;
       this.showAdminBoard = this.roles.includes('ROLE_ADMIN');
       this.showModeratorBoard = this.roles.includes('ROLE_MODERATOR');
       this.username = user.username;
+    } else {
+      this.roles = [];
+      this.showAdminBoard = false;
+      this.showModeratorBoard = false;
+      this.username = undefined;
     }
   }
 
-  logout(): void {
-    this.tokenStorageService.signOut();
-    window.location.reload();
+  navigateToRoute(route: string): void {
+    this.router.navigate([route]);
   }
 
-  private scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  logout(): void {
+    if (this.isLoadingLogout) return;
+    
+    this.isLoadingLogout = true;
+    
+    this.authService.logout().subscribe({
+      next: () => {
+        this.isLoadingLogout = false;
+        this.checkAuthStatus();
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.log.error('Error en logout:', err);
+        this.authService.performLogout();
+        this.isLoadingLogout = false;
+        this.checkAuthStatus();
+        this.router.navigate(['/']);
+      }
+    });
   }
 }

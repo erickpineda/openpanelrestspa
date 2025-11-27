@@ -4,10 +4,6 @@
       <h5>Entradas</h5>
     </c-card-header>
     <c-card-body>
-      <button cButton color="primary" disabled *ngIf="loading">
-        <c-spinner aria-hidden="true" size="sm"></c-spinner>
-        Cargando datos...
-      </button>
 
       <div *ngIf="!noHayEntradas">
         <h5 cCardTitle>No hay entradas</h5>

@@ -1,0 +1,25 @@
+<c-card class="text-center mx-auto my-5" style="max-width: 420px;">
+    <c-card-header class="bg-light">
+        <div class="d-flex flex-column align-items-center">
+            <span class="display-4 fw-bold text-primary">404</span>
+        </div>
+    </c-card-header>
+    <c-card-body>
+        <h2 class="mb-2">Página no encontrada</h2>
+        <p class="text-muted mb-4">Lo sentimos — la página que buscas no existe o ha sido movida.</p>
+        <div class="d-flex justify-content-center gap-2">
+            <button cButton color="primary" variant="outline" (click)="goBack()">
+                <svg cIcon name="cilArrowLeft" class="me-2"></svg>
+                Volver
+            </button>
+            <button cButton color="primary" (click)="goHome()">
+                <svg cIcon name="cilHome" class="me-2"></svg>
+                Ir al inicio
+            </button>
+            <button cButton color="secondary" (click)="contactSupport()">
+                <svg cIcon name="cilContact" class="me-2"></svg>
+                Contactar soporte
+            </button>
+        </div>
+    </c-card-body>
+</c-card>

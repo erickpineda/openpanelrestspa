@@ -5,11 +5,12 @@ import { Comentario } from "../../../core/models/comentario.model";
 import { Entrada } from "../../../core/models/entrada.model";
 import { PaginaResponse } from "../../../core/models/pagina-response.model";
 import { Usuario } from "../../../core/models/usuario.model";
-import { ComentarioService } from "../../../core/services/comentario.service";
-import { EntradaService } from "../../../core/services/entrada.service";
-import { UsuarioService } from "../../../core/services/usuario.service";
+import { ComentarioService } from "../../../core/services/data/comentario.service";
+import { EntradaService } from "../../../core/services/data/entrada.service";
+import { UsuarioService } from "../../../core/services/data/usuario.service";
 import { CommonFunctionalityService } from "../../../shared/services/common-functionality.service";
 import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-response.model";
+import { LoggerService } from "../../../core/services/logger.service";
 
 @Component({
   selector: 'app-listado-comentarios',
@@ -34,6 +35,7 @@ export class ListadoComentariosComponent implements OnInit {
     private usuarioService: UsuarioService,
     private entradaService: EntradaService,
     private commonFuncService: CommonFunctionalityService,
+    private log: LoggerService
   ) {
     
   }
@@ -52,7 +54,7 @@ export class ListadoComentariosComponent implements OnInit {
         }
       });
     } catch (error) {
-      console.error("Error initializing list:", error);
+      this.log.error("Error initializing list:", error);
     }
   }
 
@@ -98,7 +100,7 @@ export class ListadoComentariosComponent implements OnInit {
         },
         error: (err: any) => {
           if (err?.status === 404) {
-            console.warn("No se encontraron comentarios, asignando lista vacía.");
+            this.log.warn("No se encontraron comentarios, asignando lista vacía.");
             this.listaComentarios = [];
             resolve(new PaginaResponse()); // o ajusta según el modelo específico
           } else {

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Rol } from 'src/app/core/models/rol.model';
-import { RolService } from 'src/app/core/services/rol.service';
+import { LoggerService } from '../../../core/services/logger.service';
+import { RolService } from '../../../core/services/data/rol.service';
+import { Rol } from '../../../core/models/rol.model';
 
 @Component({
   selector: 'app-listado-roles',
@@ -16,7 +17,8 @@ export class ListadoRolesComponent implements OnInit {
 
   constructor(
     private rolService: RolService,
-    private router: Router
+    private router: Router,
+    private log: LoggerService
   ) { }
 
   ngOnInit(): void {
@@ -26,11 +28,11 @@ export class ListadoRolesComponent implements OnInit {
   cargarRoles(page: number = 0): void {
     this.rolService.listarPagina(page, this.pageSize)
       .subscribe({
-        next: (data) => {
+        next: (data: any) => {
           this.roles = data.data;
           this.currentPage = page;
         },
-        error: (error) => console.error('Error cargando roles:', error)
+        error: (error: any) => this.log.error('Error cargando roles:', error)
       });
   }
 
@@ -42,7 +44,7 @@ export class ListadoRolesComponent implements OnInit {
     if (confirm('¿Está seguro de eliminar este rol?')) {
       this.rolService.borrar(id).subscribe({
         next: () => this.cargarRoles(),
-        error: (error) => console.error('Error eliminando rol:', error)
+        error: (error: any) => this.log.error('Error eliminando rol:', error)
       });
     }
   }

@@ -8,6 +8,8 @@ import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
 import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
 import { Categoria } from '../../../../core/models/categoria.model';
 import { UntypedFormGroup } from '@angular/forms';
+import { LoggerService } from '../../../../core/services/logger.service';
+import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
   selector: 'app-crear-entrada',
@@ -28,7 +30,9 @@ export class CrearEntradaComponent implements OnInit {
   constructor(
     private vf: ValidationEntradaFormsService,
     private facade: EntradaFacadeService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService,
+    private log: LoggerService
   ) {
     this.entradaForm = this.vf.buildForm();
   }
@@ -44,10 +48,20 @@ export class CrearEntradaComponent implements OnInit {
   async onGuardar(ent: any) {
     this.submitted = true;
     if (this.entradaForm.invalid) return;
+    
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuario = usuario?.idUsuario ?? null;
-    this.facade.crearEntrada(ent).subscribe(() => {
-      this.router.navigateByUrl('/admin/control/entradas');
+    
+    this.facade.crearEntrada(ent).subscribe({
+      next: () => {
+        this.toastService.showInfo('Se ha creado la entrada correctamente', 'Entrada creada');
+        // ✅ Solo navegar si es exitoso
+        this.router.navigateByUrl('/admin/control/entradas');
+      },
+      error: (error) => {
+        // ❌ Error - mostrar mensaje y mantener en formulario
+        this.log.error('Error creando entrada:', error);
+      }
     });
   }
 

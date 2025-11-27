@@ -1,31 +1,65 @@
-<form cForm class="row g-3">
-  <c-col lg="3">
-    <label for="campoFiltro" cLabel>Campo</label>
-    <select id="campoFiltro" cSelect [(ngModel)]="campoSeleccionado" (change)="actualizarOperacionesDisponibles()" name="campoFiltro">
-      <option *ngFor="let campo of camposDisponibles" [value]="campo.valor">{{ campo.nombre }}</option>
-    </select>
-  </c-col>
-
-  <c-col lg="3">
-    <label for="operacionFiltro" cLabel>Operación</label>
-    <select id="operacionFiltro" cSelect [(ngModel)]="operacionSeleccionada" name="operacionFiltro">
-      <option *ngFor="let operacion of operacionesDisponibles" [value]="operacion.valor">{{ operacion.nombre }}</option>
-    </select>
-  </c-col>
-
-  <c-col lg="3">
-    <label for="valorBusqueda" cLabel>Buscar</label>
-    <input
-      id="valorBusqueda"
-      cFormControl
-      type="text"
-      placeholder="Ingrese valor a buscar"
-      [(ngModel)]="valorBusqueda"
-      name="valorBusqueda"
-    />
-  </c-col>
-
-  <c-col lg="3" class="d-flex align-items-end">
-    <button type="button" (click)="buscar()" cButton>Buscar</button>
-  </c-col>
-</form>
+<div class="buscador-avanzado">
+  <c-row class="g-2 align-items-end flex-column flex-md-row">
+    <c-col xs="12" md="3">
+      <select cSelect cFormControl [(ngModel)]="campoSeleccionado" (change)="actualizarOperacionesDisponibles()">
+        <option *ngFor="let c of camposDisponibles" [value]="c.valor">{{ c.nombre }}</option>
+      </select>
+    </c-col>
+    <c-col xs="12" md="3">
+      <select cSelect cFormControl [(ngModel)]="operacionSeleccionada">
+        <option *ngFor="let o of operacionesDisponibles" [value]="o.valor">{{ o.nombre }}</option>
+      </select>
+    </c-col>
+    <c-col xs="12" md="4">
+      <!-- Input contextual según el tipo de campo (usar el getter campoActual en TS) -->
+      <ng-container *ngIf="campoActual">
+        <!-- String -->
+        <input *ngIf="campoActual.tipo === 'string'" type="text"
+               cFormControl
+               [placeholder]="placeholder"
+               [(ngModel)]="valorBusqueda"
+               (ngModelChange)="onValorChange($event)"
+               (keyup.enter)="buscar()" />
+        <!-- Number -->
+        <input *ngIf="campoActual.tipo === 'number'" type="number"
+               cFormControl
+               [placeholder]="placeholder"
+               [(ngModel)]="valorBusqueda"
+               (ngModelChange)="onValorChange($event)"
+               (keyup.enter)="buscar()" />
+        <!-- Date -->
+        <input *ngIf="campoActual.tipo === 'date'" type="date"
+               cFormControl
+               [placeholder]="placeholder"
+               [(ngModel)]="valorBusqueda"
+               (ngModelChange)="onValorChange($event)"
+               (keyup.enter)="buscar()" />
+        <!-- Boolean -->
+        <select *ngIf="campoActual.tipo === 'boolean'" cSelect cFormControl
+                [(ngModel)]="valorBusqueda"
+                (ngModelChange)="onValorChange($event)">
+          <option [ngValue]="''">--</option>
+          <option [ngValue]="true">Sí</option>
+          <option [ngValue]="false">No</option>
+        </select>
+        <!-- Select (catálogos) -->
+        <ng-container *ngIf="campoActual.tipo === 'select'">
+          <select cSelect cFormControl
+                  [(ngModel)]="valorBusqueda"
+                  (ngModelChange)="onValorChange($event)"
+                  [disabled]="!!catalogosError">
+            <option [ngValue]="''">Seleccione...</option>
+            <option *ngFor="let opt of opcionesSelectActual" [ngValue]="opt">{{ opt }}</option>
+          </select>
+          <div *ngIf="catalogosError" class="text-danger small mt-1">
+            {{ catalogosError }}
+          </div>
+        </ng-container>
+      </ng-container>
+    </c-col>
+    <c-col xs="12" md="2" class="d-flex gap-1 justify-content-md-end mt-2 mt-md-0" *ngIf="debeMostrarBotonBusqueda() || showClearButton">
+      <button *ngIf="debeMostrarBotonBusqueda()" cButton color="primary" (click)="buscar()">Buscar</button>
+      <button *ngIf="showClearButton" cButton color="secondary" (click)="limpiar()">Limpiar</button>
+    </c-col>
+  </c-row>
+</div>

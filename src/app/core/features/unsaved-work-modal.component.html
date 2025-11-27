@@ -1,0 +1,50 @@
+<!-- Unsaved work modal (CoreUI Angular) -->
+<c-modal
+  [visible]="isVisible"
+  [backdrop]="'static'"
+  [keyboard]="false"
+  alignment="center"
+  aria-labelledby="unsavedWorkLabel"
+  role="dialog"
+  (visibleChange)="isVisible = $event"
+>
+  <c-modal-header class="bg-warning">
+    <h5 cModalTitle id="unsavedWorkLabel">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      Trabajo Sin Guardar
+    </h5>
+    <!-- intentionally no close button -->
+  </c-modal-header>
+
+  <c-modal-body>
+    <div *ngIf="!saveInProgress && !saveCompleted">
+      <p>{{ sessionData?.message }}</p>
+      <p class="text-danger">
+        <strong>Tiene trabajo sin guardar que se perderá si cierra la sesión.</strong>
+      </p>
+    </div>
+
+    <div *ngIf="saveInProgress" class="text-center">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Guardando...</span>
+      </div>
+      <p>Guardando su trabajo... Por favor espere.</p>
+    </div>
+
+    <div *ngIf="saveCompleted" class="text-center text-success">
+      <i class="fas fa-check-circle fa-2x mb-3"></i>
+      <p>¡Trabajo guardado correctamente!</p>
+    </div>
+  </c-modal-body>
+
+  <c-modal-footer *ngIf="!saveInProgress && !saveCompleted">
+    <button type="button" class="btn btn-success" (click)="saveAndContinue()">
+      <i class="fas fa-save me-2"></i>
+      Guardar y Cerrar Sesión
+    </button>
+    <button type="button" class="btn btn-danger" (click)="logoutWithoutSaving()">
+      <i class="fas fa-times me-2"></i>
+      Cerrar Sin Guardar
+    </button>
+  </c-modal-footer>
+</c-modal>

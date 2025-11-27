@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, UntypedFormArray } from '@angular/forms';
 import { EstadoEntrada } from '../../../../../core/models/estado-entrada.model';
 import { TipoEntrada } from '../../../../../core/models/tipo-entrada.model';
+import { Categoria } from '../../../../../core/models/categoria.model';
 
 @Injectable({
   providedIn: 'root'
@@ -64,7 +65,7 @@ export class ValidationEntradaFormsService {
         Validators.minLength(this.formRules.contenidoMin)
       ]],
       notas: [entrada?.notas ?? null],
-      tipoEntrada: [entrada?.tipoEntrada ?? TipoEntrada, [Validators.required]],
+      tipoEntrada: [entrada?.tipoEntrada ?? null, [Validators.required]],
       resumen: [entrada?.resumen ?? null],
       fechaPublicacion: [entrada?.fechaPublicacion ?? null],
       fechaEdicion: [entrada?.fechaEdicion ?? null],
@@ -72,13 +73,13 @@ export class ValidationEntradaFormsService {
       publicada: [entrada?.publicada ?? false],
       password: [entrada?.password ?? null],
       privado: [entrada?.privado ?? false],
-      estadoEntrada: [entrada?.estadoEntrada ?? EstadoEntrada, [Validators.required]],
+      estadoEntrada: [entrada?.estadoEntrada ?? null, [Validators.required]],
       fechaPublicacionProgramada: [entrada?.fechaPublicacionProgramada ?? null],
       permitirComentario: [entrada?.permitirComentario ?? true],
       imagenDestacada: [entrada?.imagenDestacada ?? null],
       votos: [entrada?.votos ?? 0],
       cantidadComentarios: [entrada?.cantidadComentarios ?? 0],
-      categorias: this.fb.array(entrada?.categorias ? entrada.categorias.map((c: any) => this.fb.control(c)) : []),
+      categorias: this.fb.array(entrada?.categorias ? entrada.categorias.map((c: Categoria) => this.fb.control(c)) : []),
       categoriasConComas: [entrada?.categoriasConComas ?? ''],
       etiquetas: [entrada?.etiquetas ?? []],
     });

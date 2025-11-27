@@ -1,0 +1,12 @@
+<div class="editar-categoria-wrapper">
+  <app-categoria-form
+    [categoria]="categoria"
+    [listaCategorias]="listaCategorias"
+    [submitted]="submitted"
+    [disabled]="formDisabled"
+    (submitCategoria)="editar($event)"
+    (onReset)="onReset()"
+    (onValidate)="onValidate()"
+    (editarCategoria)="habilitarEdicion()"
+  ></app-categoria-form>
+</div>
