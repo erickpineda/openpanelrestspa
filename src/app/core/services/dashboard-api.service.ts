@@ -136,10 +136,19 @@ export class DashboardApiService {
   // Invalidar cache desde SPA si es necesario
   evictSummary() { this.cache.delete('dashboard:summary'); }
   evictSeries(days?: number) {
-    if (days) this.cache.delete(`dashboard:series:activity:days:${days}`);
-    else {
-      // delete any key that starts with dashboard:series:activity
-      Array.from(this.cache.keys()).forEach(k => { if (k.startsWith('dashboard:series:activity')) this.cache.delete(k); });
+    if (days) {
+      const prefix = `dashboard:series:activity:days:${Math.max(1, Math.min(365, Number(days) || 30))}:gran:`;
+      Array.from(this.cache.keys()).forEach(k => { if (k.startsWith(prefix)) this.cache.delete(k); });
+      const splitEstadoPrefix = `dashboard:series:entries:split:estado:days:${Math.max(1, Math.min(365, Number(days) || 30))}:gran:`;
+      Array.from(this.cache.keys()).forEach(k => { if (k.startsWith(splitEstadoPrefix)) this.cache.delete(k); });
+      const splitEstadoNombrePrefix = `dashboard:series:entries:split:estadoNombre:days:${Math.max(1, Math.min(365, Number(days) || 30))}:gran:`;
+      Array.from(this.cache.keys()).forEach(k => { if (k.startsWith(splitEstadoNombrePrefix)) this.cache.delete(k); });
+    } else {
+      Array.from(this.cache.keys()).forEach(k => {
+        if (k.startsWith('dashboard:series:activity')) this.cache.delete(k);
+        if (k.startsWith('dashboard:series:entries:split:estado')) this.cache.delete(k);
+        if (k.startsWith('dashboard:series:entries:split:estadoNombre')) this.cache.delete(k);
+      });
     }
   }
   evictTop(type?: string) {

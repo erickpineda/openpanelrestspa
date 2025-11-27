@@ -8,6 +8,7 @@ import { LoggerService } from '../../../core/services/logger.service';
 import { DashboardApiService } from '../../../core/services/dashboard-api.service';
 import { LoadingService } from '../../../core/services/ui/loading.service';
 import { ActivityPointDTO, SummaryDTO, SummaryEntryDTO, TopItemDTO, StorageDTO, ContentStatsDTO } from '../../../shared/models/dashboard.models';
+import { ToastService } from '../../../core/services/ui/toast.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,6 +16,9 @@ import { ActivityPointDTO, SummaryDTO, SummaryEntryDTO, TopItemDTO, StorageDTO, 
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+        errorSummary: string | null = null;
+        errorSplitEstadoNombre: string | null = null;
+      // showRefreshFeedback eliminado, se usará ToastService
     // Suma total de un estado específico en el periodo actual
     getKpiPorEstado(estado: string): number {
       if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
@@ -83,21 +87,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadingStorage = false;
   loadingContentStats = false;
   loadingRecent = false;
+  errorRecent: string | null = null;
 
-  data = {
-    labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    datasets: [
-      {
-        label: 'Entradas Publicadas',
-        backgroundColor: '#007bff',
-        data: this.entradasMesPublicadas
-      },
-      {
-        label: 'Entradas No Publicadas',
-        backgroundColor: '#ff0000',
-        data: this.entradasMesNoPublicadas
-      }
-    ]
+  data: any = {
+    labels: [],
+    datasets: []
   };
 
   seriesDays = 30;
@@ -131,23 +125,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private log: LoggerService,
     private dashboardApi: DashboardApiService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private toastService: ToastService
   ) {}
 
+  private initDefaultData(): void {
+    const labels: string[] = [];
+    const now = new Date();
+    for (let i = this.seriesDays - 1; i >= 0; i--) {
+      const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+      d.setUTCDate(d.getUTCDate() - i);
+      const s = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+      labels.push(this.formatLabelFromDate(s, 'day', false));
+    }
+    const zeros = Array(labels.length).fill(0);
+    this.data = {
+      labels,
+      datasets: [
+        { label: 'Entradas', backgroundColor: '#007bff', data: [...zeros] },
+        { label: 'Comentarios', backgroundColor: '#ff7f0e', data: [...zeros] },
+        { label: 'Usuarios', backgroundColor: '#2ca02c', data: [...zeros] }
+      ]
+    };
+  }
+
   async ngOnInit(): Promise<void> {
-    await this.cargarEstadisticas();
-    this.loadTopWidgets();
-    this.loadStorage();
-    this.loadContentStats();
+    this.initDefaultData();
+    this.refreshDashboard();
     this.loadRecentActivity();
-    this.loadSeriesEntriesSplitEstado();
-    this.loadSeriesEntriesSplitEstadoNombre();
-    this.updateEstadoNominalOptions();
   }
 
   refreshDashboard(): void {
     this.loadingService.registerRetryHandler(() => this.refreshDashboard());
     this.loadingService.setGlobalLoading(true);
+    this.errorSummary = null;
     const summary$ = this.dashboardApi.getSummary(true);
     const series$ = this.dashboardApi.getSeriesActivity(this.seriesDays, true, this.seriesGranularity);
     const topUsers$ = this.dashboardApi.getTop('users', this.topLimit, true);
@@ -185,12 +196,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
           // Refrescar splits por estado y nombre de estado
           this.loadSeriesEntriesSplitEstado();
           this.loadSeriesEntriesSplitEstadoNombre();
+          // Mostrar feedback visual usando ToastService
+          this.toastService.showSuccess('Datos actualizados', 'Dashboard');
           this.cdr.detectChanges();
         } finally {
           this.loadingService.setGlobalLoading(false);
         }
       },
       error: (err) => {
+        this.errorSummary = 'Error refrescando dashboard';
         this.log.error('Error refrescando dashboard', err);
         this.loadingService.forceStopLoading();
       }
@@ -207,6 +221,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Preferir endpoint centralizado del backend (summary + series)
     this.loadingService.registerRetryHandler(() => this.cargarEstadisticas());
     this.loadingService.setGlobalLoading(true);
+    this.errorSummary = null;
     const summarySub = this.dashboardApi.getSummary().subscribe({
       next: (summary: SummaryDTO) => {
         this.totalEntradas = summary.totalEntradas || 0;
@@ -226,16 +241,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
           });
         }
 
-        this.actualizarGrafico();
         this.cdr.detectChanges();
       },
-      error: (err: any) => this.log.error('Error obteniendo summary', err)
+      error: (err: any) => { this.errorSummary = 'Error obteniendo summary'; this.log.error('Error obteniendo summary', err); }
     });
 
     this.subscription.add(summarySub);
 
     // Cargar series de actividad para gráfico principal
-    const seriesSub = this.dashboardApi.getSeriesActivity(this.seriesDays, false, this.seriesGranularity).subscribe({
+    const seriesSub = this.dashboardApi.getSeriesActivity(this.seriesDays, true, this.seriesGranularity).subscribe({
       next: (points: ActivityPointDTO[]) => {
         if (points && points.length) {
           this.data = {
@@ -251,7 +265,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.loadingService.setGlobalLoading(false);
         }
       },
-      error: (err: any) => this.log.error('Error obteniendo series', err)
+      error: (err: any) => { this.errorSummary = 'Error obteniendo series'; this.log.error('Error obteniendo series', err); }
     });
 
     this.subscription.add(seriesSub);
@@ -307,6 +321,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadRecentActivity(): void {
     this.loadingRecent = true;
+    this.errorRecent = null;
     const sub = this.dashboardApi.getRecentActivity(this.recentPage, this.recentSize).subscribe({
       next: (r: any) => {
         if (Array.isArray(r)) {
@@ -320,7 +335,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.recentItems = r.elements;
           this.recentTotalPages = Number(r.totalPages) || 0;
         } else if (r && Array.isArray(r.ultimasEntradas)) {
-          // Fallback: algunos backends devuelven las últimas entradas bajo 'ultimasEntradas'
           this.recentItems = r.ultimasEntradas;
           this.recentTotalPages = 1;
         } else {
@@ -330,7 +344,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.loadingRecent = false;
         this.cdr.detectChanges();
       },
-      error: () => { this.loadingRecent = false; }
+      error: () => { this.errorRecent = 'Error obteniendo actividad reciente'; this.loadingRecent = false; }
     });
     this.subscription.add(sub);
   }
@@ -822,6 +836,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.saveCsv(`dashboard_latest_entries_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
   }
 
+  downloadCsvRecentActivity(): void {
+    const items = this.recentItems;
+    if (!Array.isArray(items) || !items.length) return;
+    const now = new Date();
+    const datePart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const timePart = `${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+    const headers = ['titulo/name', 'fecha', 'estado'];
+    const rows = items.map((e: any) => [
+      e?.titulo || e?.contenidoCorto || e?.username || e?.name || '',
+      e?.fechaCreacion || e?.fechaRegistro || e?.date || '',
+      e?.estado || ''
+    ]);
+    this.saveCsv(`dashboard_recent_activity_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
+  }
+
   loadSeriesEntriesSplitEstado(): void {
     const sub = this.dashboardApi.getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, true).subscribe({
       next: (arr: any[]) => {
@@ -855,7 +884,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             }
             return p;
           });
-          const labels = flatArr.map(p => this.formatLabelFromDate(p.date));
+          const labels = flatArr.map(p => this.formatLabelFromDate(p.date, 'day'));
           const allKeys = new Set<string>();
           flatArr.forEach(p => Object.keys(p).forEach(k => { if (k !== 'date') allKeys.add(k); }));
           const keys = Array.from(allKeys);
@@ -872,7 +901,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           this.updateEstadoNominalOptions();
         }
-      }
+      },
+      error: () => { this.errorSplitEstadoNombre = 'Error obteniendo serie por estado nominal'; }
     });
     this.subscription.add(sub);
   }
@@ -1108,37 +1138,85 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  private formatLabelFromDate(dateStr?: string): string {
+  // Formatea etiquetas para el eje del gráfico principal según granularidad:
+  // - hour: HH:mm
+  // - day: dd/MM/yyyy
+  // - week: dd/MM/yyyy - dd/MM/yyyy (domingo a sábado)
+  // - month: en móviles 'Ene 2025'; en escritorio 'Enero 2025'
+  private formatLabelFromDate(dateStr?: string, granularity?: string, mobile?: boolean): string {
     const s = String(dateStr || '');
-    if (this.seriesGranularity === 'hour') {
-      const m = s.match(/\b(\d{2}:\d{2})\b/);
-      if (m && m[1]) return m[1];
-      const d = new Date(s);
-      if (!isNaN(d.getTime())) return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-      const parts = s.split(' ');
-      if (parts.length > 1) {
-        const ts = parts[1].split(':');
-        if (ts.length >= 2) return `${String(ts[0]).padStart(2,'0')}:${String(ts[1]).padStart(2,'0')}`;
+    const gran = granularity || this.seriesGranularity;
+    const parsed = this.parseBackendDate(s);
+    const fmtDMY = (d: Date) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    const cap = (str: string) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
+    const isMobile = mobile ?? this.isSmallScreen();
+    const monthLabel = (year: number, month1to12: number, short: boolean) => {
+      const ref = new Date(year, month1to12 - 1, 1);
+      let name = new Intl.DateTimeFormat('es-ES', { month: short ? 'short' : 'long' }).format(ref);
+      name = name.replace(/\.$/, '');
+      return `${cap(name)} ${year}`;
+    };
+
+    if (gran === 'month') {
+      let y: number | null = null;
+      let m: number | null = null;
+      let matched = false;
+      const iso = s.match(/^(\d{4})-(\d{2})(?:-\d{2})?/);
+      const isoFull = s.match(/^(\d{4})-(\d{2})-(\d{2})T/);
+      const myDash = s.match(/^(\d{2})-(\d{4})$/);
+      const mySlash = s.match(/^(\d{2})\/(\d{4})$/);
+      const yyyymm = s.match(/^(\d{4})(\d{2})$/);
+      const dmyDash = s.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+      if (isoFull) { y = Number(isoFull[1]); m = Number(isoFull[2]); matched = true; }
+      else if (iso) { y = Number(iso[1]); m = Number(iso[2]); matched = true; }
+      else if (myDash) { m = Number(myDash[1]); y = Number(myDash[2]); matched = true; }
+      else if (mySlash) { m = Number(mySlash[1]); y = Number(mySlash[2]); matched = true; }
+      else if (yyyymm) { y = Number(yyyymm[1]); m = Number(yyyymm[2]); matched = true; }
+      else if (dmyDash) { y = Number(dmyDash[3]); m = Number(dmyDash[2]); matched = true; }
+      if (matched && y && m && m >= 1 && m <= 12) {
+        const label = monthLabel(y, m, isMobile);
+        try { this.log.debug('formatLabelFromDate(month):', { in: s, resolved: label }); } catch {}
+        return label;
       }
+      if (parsed) {
+        const label = monthLabel(parsed.getFullYear(), parsed.getMonth() + 1, isMobile);
+        try { this.log.debug('formatLabelFromDate(month,fallback):', { in: s, resolved: label }); } catch {}
+        return label;
+      }
+      return s;
     }
-    return s;
+
+    if (!parsed) {
+      if (gran === 'day' && /^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        const [y,m,d] = s.split('-').map(Number);
+        return fmtDMY(new Date(y, m-1, d));
+      }
+      return s;
+    }
+    if (gran === 'hour') {
+      return `${String(parsed.getHours()).padStart(2,'0')}:${String(parsed.getMinutes()).padStart(2,'0')}`;
+    }
+    if (gran === 'day') {
+      return fmtDMY(parsed);
+    }
+    if (gran === 'week') {
+      const day = parsed.getDay();
+      const start = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate() - day);
+      const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+      return `${fmtDMY(start)} - ${fmtDMY(end)}`;
+    }
+    return fmtDMY(parsed);
   }
 
-  actualizarGrafico(): void {
-    this.data = {
-      ...this.data,
-      datasets: [
-        {
-          ...this.data.datasets[0],
-          data: [...this.entradasMesPublicadas]
-        },
-        {
-          ...this.data.datasets[1],
-          data: [...this.entradasMesNoPublicadas]
-        }
-      ]
-    };
+  private isSmallScreen(): boolean {
+    try {
+      return (window && window.innerWidth && window.innerWidth < 576) || false;
+    } catch {
+      return false;
+    }
   }
+
+  
 
   // Restaurado: suma de entradasMesPublicadas (usado por gráficos y splits)
   get sumEntradasPublicadas(): number {
