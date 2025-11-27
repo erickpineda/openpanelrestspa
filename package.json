@@ -11,7 +11,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:firefox": "ng test --watch=false --browsers=Firefox",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
+    "test:coverage": "ng test --watch=false --code-coverage --browsers=ChromeHeadless"
   },
   "private": true,
   "dependencies": {
@@ -64,8 +67,10 @@
     "karma": "~6.4.2",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.1",
+    "karma-firefox-launcher": "^2.1.3",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "puppeteer": "^24.31.0",
     "typescript": "~4.9.5"
   },
   "engines": {
