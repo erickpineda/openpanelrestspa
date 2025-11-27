@@ -155,17 +155,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadRecentActivity();
   }
 
-  refreshDashboard(): void {
-    this.loadingService.registerRetryHandler(() => this.refreshDashboard());
+  private loadAllDashboardData(force: boolean = true): void {
+    this.loadingService.registerRetryHandler(() => this.loadAllDashboardData(true));
     this.loadingService.setGlobalLoading(true);
+    this.loadingSeries = true;
     this.errorSummary = null;
-    const summary$ = this.dashboardApi.getSummary(true);
-    const series$ = this.dashboardApi.getSeriesActivity(this.seriesDays, true, this.seriesGranularity);
-    const topUsers$ = this.dashboardApi.getTop('users', this.topLimit, true);
-    const topCategories$ = this.dashboardApi.getTop('categories', this.topLimit, true);
+    const summary$ = this.dashboardApi.getSummary(force);
+    const series$ = this.dashboardApi.getSeriesActivity(this.seriesDays, force, this.seriesGranularity);
+    const topUsers$ = this.dashboardApi.getTop('users', this.topLimit, force);
+    const topCategories$ = this.dashboardApi.getTop('categories', this.topLimit, force);
     const storage$ = this.dashboardApi.getStorage();
     const contentStats$ = this.dashboardApi.getContentStats();
-    const topTags$ = this.dashboardApi.getTop('tags', this.topLimit, true);
+    const topTags$ = this.dashboardApi.getTop('tags', this.topLimit, force);
     const sub = forkJoin([summary$, series$, topUsers$, topCategories$, topTags$, storage$, contentStats$]).subscribe({
       next: ([summary, series, topUsers, topCategories, topTags, storage, contentStats]) => {
         try {
@@ -193,24 +194,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
           if (contentStats && (contentStats as ContentStatsDTO).entradasByEstado) {
             this.updateContentStatsChart(contentStats as ContentStatsDTO);
           }
-          // Refrescar splits por estado y nombre de estado
           this.loadSeriesEntriesSplitEstado();
           this.loadSeriesEntriesSplitEstadoNombre();
-          // Mostrar feedback visual usando ToastService
           this.toastService.showSuccess('Datos actualizados', 'Dashboard');
           this.cdr.detectChanges();
         } finally {
+          this.loadingSeries = false;
           this.loadingService.setGlobalLoading(false);
         }
       },
       error: (err) => {
         this.errorSummary = 'Error refrescando dashboard';
         this.log.error('Error refrescando dashboard', err);
+        this.loadingSeries = false;
         this.loadingService.forceStopLoading();
       }
     });
-
     this.subscription.add(sub);
+  }
+
+  refreshDashboard(): void {
+    this.loadAllDashboardData(true);
   }
 
   ngOnDestroy(): void {

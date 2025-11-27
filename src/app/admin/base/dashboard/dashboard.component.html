@@ -76,7 +76,8 @@
                 </div>
               </div>
             </div>
-            <div class="chart-container mb-3">
+            <div *ngIf="loadingSeries" class="mb-2" aria-live="polite" aria-busy="true"><c-spinner></c-spinner></div>
+            <div class="chart-container mb-3" [attr.aria-busy]="loadingSeries ? 'true' : null">
               <app-dashboard-chart [data]="data" type="line"></app-dashboard-chart>
             </div>
             <c-row>
