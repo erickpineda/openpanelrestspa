@@ -87,12 +87,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadingStorage = false;
   loadingContentStats = false;
   loadingRecent = false;
+  loadingSplitEstado = false;
+  loadingSplitEstadoNombre = false;
   errorRecent: string | null = null;
-
+  
   data: any = {
     labels: [],
     datasets: []
   };
+  private dataRawLabels: string[] = [];
 
   seriesDays = 30;
   seriesGranularity: 'hour' | 'day' | 'week' | 'month' = 'day';
@@ -131,12 +134,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private initDefaultData(): void {
     const labels: string[] = [];
+    const rawLabels: string[] = [];
     const now = new Date();
     for (let i = this.seriesDays - 1; i >= 0; i--) {
       const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
       d.setUTCDate(d.getUTCDate() - i);
       const s = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
       labels.push(this.formatLabelFromDate(s, 'day', false));
+      rawLabels.push(s);
     }
     const zeros = Array(labels.length).fill(0);
     this.data = {
@@ -147,6 +152,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         { label: 'Usuarios', backgroundColor: '#2ca02c', data: [...zeros] }
       ]
     };
+    this.dataRawLabels = rawLabels;
   }
 
   async ngOnInit(): Promise<void> {
@@ -176,16 +182,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.latestEntries = (summary as SummaryDTO).ultimasEntradas || [];
           }
 
-          if (Array.isArray(series)) {
-            this.data = {
-              labels: (series as ActivityPointDTO[]).map(p => this.formatLabelFromDate(p.date)),
-              datasets: [
-                { label: 'Entradas', backgroundColor: '#007bff', data: (series as ActivityPointDTO[]).map(p => p.entradas) },
-                { label: 'Comentarios', backgroundColor: '#ff7f0e', data: (series as ActivityPointDTO[]).map(p => p.comentarios) },
-                { label: 'Usuarios', backgroundColor: '#2ca02c', data: (series as ActivityPointDTO[]).map(p => p.usuarios) }
-              ]
-            };
-          }
+      if (Array.isArray(series)) {
+        this.data = {
+          labels: (series as ActivityPointDTO[]).map(p => this.formatLabelFromDate(p.date)),
+          datasets: [
+            { label: 'Entradas', backgroundColor: '#007bff', data: (series as ActivityPointDTO[]).map(p => p.entradas) },
+            { label: 'Comentarios', backgroundColor: '#ff7f0e', data: (series as ActivityPointDTO[]).map(p => p.comentarios) },
+            { label: 'Usuarios', backgroundColor: '#2ca02c', data: (series as ActivityPointDTO[]).map(p => p.usuarios) }
+          ]
+        };
+        this.dataRawLabels = (series as ActivityPointDTO[]).map(p => String(p.date || ''));
+      }
           this.topUsers = Array.isArray(topUsers) ? topUsers : this.topUsers;
           this.topCategories = Array.isArray(topCategories) ? topCategories : this.topCategories;
           this.topTags = Array.isArray(topTags) ? topTags : this.topTags;
@@ -264,6 +271,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               { label: 'Usuarios', backgroundColor: '#2ca02c', data: points.map(p => p.usuarios) }
             ]
           };
+          this.dataRawLabels = points.map(p => String(p.date || ''));
           this.cdr.detectChanges();
           // Si summary ya terminó, detener loader; lo controlamos también en refresh
           this.loadingService.setGlobalLoading(false);
@@ -721,9 +729,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const now = new Date();
       const datePart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
       const timePart = `${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
-      const headers = ['date', ...this.data.datasets.map((ds: any) => String(ds.label || 'serie'))];
+      const headers = ['date', 'date_raw', ...this.data.datasets.map((ds: any) => String(ds.label || 'serie'))];
       const rows: any[][] = (this.data.labels as string[]).map((d: string, i: number) => [
         d,
+        this.dataRawLabels?.[i] ?? '',
         ...this.data.datasets.map((ds: any) => Array.isArray(ds.data) ? ds.data[i] ?? '' : '')
       ]);
       this.saveCsv(`dashboard_series_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
@@ -735,9 +744,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const now = new Date();
       const datePart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
       const timePart = `${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
-      const headers = ['date', ...this.seriesEntriesSplitData.datasets.map((ds: any) => String(ds.label || 'valor'))];
+      const headers = ['date', 'date_raw', ...this.seriesEntriesSplitData.datasets.map((ds: any) => String(ds.label || 'valor'))];
+      const raw = (this.seriesEntriesSplitData as any)._rawLabels as string[] || [];
       const rows: any[][] = (this.seriesEntriesSplitData.labels as string[]).map((d: string, i: number) => [
         d,
+        raw?.[i] ?? '',
         ...this.seriesEntriesSplitData.datasets.map((ds: any) => Array.isArray(ds.data) ? ds.data[i] ?? '' : '')
       ]);
       this.saveCsv(`dashboard_series_split_estado_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
@@ -749,9 +760,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const now = new Date();
       const datePart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
       const timePart = `${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
-      const headers = ['date', ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) => String(ds.label || 'estado'))];
+      const headers = ['date', 'date_raw', ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) => String(ds.label || 'estado'))];
+      const raw = (this.seriesEntriesSplitEstadoNombreData as any)._rawLabels as string[] || [];
       const rows: any[][] = (this.seriesEntriesSplitEstadoNombreData.labels as string[]).map((d: string, i: number) => [
         d,
+        raw?.[i] ?? '',
         ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) => Array.isArray(ds.data) ? ds.data[i] ?? '' : '')
       ]);
       this.saveCsv(`dashboard_series_split_estado_nombre_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
@@ -856,6 +869,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadSeriesEntriesSplitEstado(): void {
+    this.loadingSplitEstado = true;
     const sub = this.dashboardApi.getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, true).subscribe({
       next: (arr: any[]) => {
         if (arr && arr.length) {
@@ -870,14 +884,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
               data: arr.map(p => Number(p.entradasByEstado?.[estado]) || 0)
             }))
           };
+          (this.seriesEntriesSplitData as any)._rawLabels = arr.map(p => String(p.date || ''));
           this.cdr.detectChanges();
         }
+        this.loadingSplitEstado = false;
+      },
+      error: () => {
+        this.loadingSplitEstado = false;
       }
     });
     this.subscription.add(sub);
   }
 
   loadSeriesEntriesSplitEstadoNombre(): void {
+    this.loadingSplitEstadoNombre = true;
     const sub = this.dashboardApi.getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, true).subscribe({
       next: (arr: any[]) => {
         if (arr && arr.length) {
@@ -902,11 +922,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
             data: flatArr.map(p => Number(p[k]) || 0)
           }));
           this.seriesEntriesSplitEstadoNombreData = { labels, datasets };
+          (this.seriesEntriesSplitEstadoNombreData as any)._rawLabels = flatArr.map(p => String(p.date || ''));
           this.cdr.detectChanges();
           this.updateEstadoNominalOptions();
         }
+        this.loadingSplitEstadoNombre = false;
       },
-      error: () => { this.errorSplitEstadoNombre = 'Error obteniendo serie por estado nominal'; }
+      error: () => { this.errorSplitEstadoNombre = 'Error obteniendo serie por estado nominal'; this.loadingSplitEstadoNombre = false; }
     });
     this.subscription.add(sub);
   }
