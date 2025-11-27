@@ -96,6 +96,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     datasets: []
   };
   private dataRawLabels: string[] = [];
+  private colorPalette: string[] = ['#4e79a7','#f28e2b','#e15759','#76b7b2','#59a14f','#edc948','#b07aa1','#ff9da7','#9c755f','#bab0ab','#1f77b4','#d62728'];
+  private colorForLabel(label: string, i: number = 0): string {
+    let h = 0;
+    for (let k = 0; k < label.length; k++) h = (h * 31 + label.charCodeAt(k)) >>> 0;
+    const idx = (h + i) % this.colorPalette.length;
+    return this.colorPalette[idx];
+  }
 
   seriesDays = 30;
   seriesGranularity: 'hour' | 'day' | 'week' | 'month' = 'day';
@@ -162,6 +169,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private loadAllDashboardData(force: boolean = true): void {
+    const t0 = Date.now();
     this.loadingService.registerRetryHandler(() => this.loadAllDashboardData(true));
     this.loadingService.setGlobalLoading(true);
     this.loadingSeries = true;
@@ -208,6 +216,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         } finally {
           this.loadingSeries = false;
           this.loadingService.setGlobalLoading(false);
+          try { this.log.debug('Dashboard loadAll total ms', Date.now() - t0); } catch {}
         }
       },
       error: (err) => {
@@ -875,12 +884,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (arr && arr.length) {
           // Detectar todos los estados presentes en la serie
           const estados = Array.from(new Set(arr.flatMap(p => Object.keys(p.entradasByEstado || {}))));
-          const colores = ['#1f77b4','#d62728','#e15759','#76b7b2','#59a14f','#edc948','#b07aa1','#ff9da7','#9c755f','#bab0ab'];
+          const colores = this.colorPalette;
           this.seriesEntriesSplitData = {
             labels: arr.map(p => this.formatLabelFromDate(p.date)),
             datasets: estados.map((estado, i) => ({
               label: estado,
-              backgroundColor: colores[i % colores.length],
+              backgroundColor: this.colorForLabel(estado, i),
               data: arr.map(p => Number(p.entradasByEstado?.[estado]) || 0)
             }))
           };
@@ -912,11 +921,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const allKeys = new Set<string>();
           flatArr.forEach(p => Object.keys(p).forEach(k => { if (k !== 'date') allKeys.add(k); }));
           const keys = Array.from(allKeys);
-          const colors = ['#4e79a7','#f28e2b','#e15759','#76b7b2','#59a14f','#edc948','#b07aa1','#ff9da7','#9c755f','#bab0ab'];
+          const colors = this.colorPalette;
           const datasets = keys.map((k, i) => ({
             label: k,
-            backgroundColor: colors[i % colors.length],
-            borderColor: colors[i % colors.length],
+            backgroundColor: this.colorForLabel(k, i),
+            borderColor: this.colorForLabel(k, i),
             fill: false,
             tension: 0.2,
             data: flatArr.map(p => Number(p[k]) || 0)
@@ -996,13 +1005,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const entries = cs && cs.entradasByEstado ? Object.entries(cs.entradasByEstado) : [];
     const labels = entries.map(([k]) => k);
     const values = entries.map(([, v]) => Number(v) || 0);
-    const colors = ['#4e79a7','#f28e2b','#e15759','#76b7b2','#59a14f','#edc948','#b07aa1','#ff9da7','#9c755f','#bab0ab'];
+    const colors = labels.map((l, i) => this.colorForLabel(l, i));
     this.contentStatsChartData = {
       labels,
       datasets: [
         {
           label: 'Entradas por estado',
-          backgroundColor: labels.map((_, i) => colors[i % colors.length]),
+          backgroundColor: colors,
           data: values
         }
       ]

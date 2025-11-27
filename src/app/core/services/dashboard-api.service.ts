@@ -26,9 +26,9 @@ export class DashboardApiService {
   private cache = new Map<string, CacheEntry>();
 
   // Defaults (según contrato)
-  private ttlSummary = 60 * 1000; // ms
-  private ttlSeries = 300 * 1000;
-  private ttlTop = 600 * 1000;
+  private ttlSummary = 60 * 1000;
+  private ttlSeries = 120 * 1000;
+  private ttlTop = 300 * 1000;
 
   constructor(private http: HttpClient) {}
 
