@@ -192,9 +192,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   metricsVisible(): boolean {
     try {
-      const qp = new URL(typeof window !== 'undefined' ? window.location.href : '').searchParams.get('metrics');
-      return (environment as any).mock === true || qp === '1';
-    } catch { return (environment as any).mock === true; }
+      const win = typeof window !== 'undefined' ? window : null;
+      const searchFlag = win ? new URLSearchParams(win.location.search).get('metrics') === '1' : false;
+      const hash = win ? (win.location.hash || '') : '';
+      const qm = hash.indexOf('?');
+      const hashFlag = qm >= 0 ? new URLSearchParams(hash.substring(qm + 1)).get('metrics') === '1' : false;
+      const urlFlag = searchFlag || hashFlag;
+      return this.isLocalEnv() && (this.metricsExpanded || urlFlag);
+    } catch { return false; }
   }
 
   private setHashParam(key: string, value: string | null): void {

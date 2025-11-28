@@ -74,7 +74,7 @@
                 <div class="btn-group" role="group" aria-label="Descargas">
                   <button cButton color="secondary" size="sm" (click)="downloadCsvSeries()" title="Descargar serie en CSV" aria-label="Descargar serie en CSV" data-testid="btn-csv-series">CSV</button>
                 </div>
-                <div class="btn-group" role="group" aria-label="Herramientas">
+                <div class="btn-group" role="group" aria-label="Herramientas" *ngIf="isLocalEnv() && metricsVisible()">
                   <button cButton color="light" size="sm" (click)="metricsToggle()" [disabled]="!isLocalEnv()" [attr.aria-disabled]="!isLocalEnv() ? 'true' : null" [attr.aria-expanded]="metricsExpanded ? 'true' : 'false'" aria-controls="metrics-panel" title="Mostrar/Ocultar métricas" aria-label="Mostrar/ocultar métricas">
                     Métricas
                     <svg cIcon [name]="metricsExpanded ? 'cilChevronTop' : 'cilChevronBottom'" size="sm" class="ms-1"></svg>
