@@ -34,7 +34,7 @@
 </c-sidebar>
 
 <!-- Main content -->
-<div class="wrapper d-flex flex-column min-vh-100 bg-light dark:bg-transparent">
+<div class="wrapper d-flex flex-column min-vh-100 bg-light dark:bg-transparent" data-testid="admin-root">
   <!-- ✅ NOTIFICACIÓN GLOBAL MEJORADA -->
   <div *ngIf="showGlobalRecoveryNotification" class="container mt-3">
     <app-data-recovery-notification
@@ -59,7 +59,7 @@
   <!-- Body -->
   <div class="body flex-grow-1 px-3">
     <c-container breakpoint="lg" class="h-auto">
-      <router-outlet [hidden]="!cargaFinalizada"></router-outlet>
+      <router-outlet></router-outlet>
     </c-container>
   </div>
 

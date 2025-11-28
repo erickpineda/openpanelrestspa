@@ -30,12 +30,12 @@ describe('DashboardComponent', () => {
 
   it('formatea etiquetas por día', () => {
     const label = (component as any).formatLabelFromDate('15-11-2025', 'day');
-    expect(label).toBe('15/11/2025');
+    expect(label).toBe('15-11-2025');
   });
 
   it('formatea rango semanal', () => {
     const label = (component as any).formatLabelFromDate('2025-11-15', 'week');
-    expect(label).toMatch(/^\d{2}\/\d{2}\/\d{4} - \d{2}\/\d{2}\/\d{4}$/);
+    expect(label).toMatch(/^\d{2}-\d{2}-\d{4} - \d{2}-\d{2}-\d{4}$/);
   });
 
   it('formatea mensual con nombre de mes', () => {
@@ -114,7 +114,7 @@ describe('DashboardComponent', () => {
     const csv = String(args[1]);
     const lines = csv.trim().split('\n');
     expect(lines[0]).toContain('date,date_raw');
-    expect(lines[1]).toContain('01/02/2025');
+    expect(lines[1]).toContain('01-02-2025');
     expect(lines[1]).toContain('2025-02-01');
   });
 
@@ -134,7 +134,44 @@ describe('DashboardComponent', () => {
     const csv = String(args[1]);
     const lines = csv.trim().split('\n');
     expect(lines[0]).toContain('date,date_raw');
-    expect(lines[1]).toContain('01/02/2025');
+    expect(lines[1]).toContain('01-02-2025');
     expect(lines[1]).toContain('2025-02-01');
+  });
+
+  it('CSV de split estado incluye date_raw', () => {
+    (component as any).seriesEntriesSplitData = {
+      labels: ['01/02/2025','02/02/2025'],
+      datasets: [
+        { label: 'PUBLICADA', data: [1,2] },
+        { label: 'NO PUBLICADA', data: [0,1] }
+      ],
+      _rawLabels: ['2025-02-01','2025-02-02']
+    };
+    const spy = spyOn(component as any, 'saveCsv');
+    component.downloadCsvSeriesSplitEstado();
+    expect(spy).toHaveBeenCalledTimes(1);
+    const args = (spy.calls.mostRecent().args);
+    const csv = String(args[1]);
+    const lines = csv.trim().split('\n');
+    expect(lines[0]).toContain('date,date_raw');
+    expect(lines[1]).toContain('01-02-2025');
+    expect(lines[1]).toContain('2025-02-01');
+  });
+
+  it('muestra banner de error Top Usuarios cuando hay error', () => {
+    (component as any).errorTopUsers = 'Error obteniendo Top Usuarios';
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement as HTMLElement;
+    const alerts = el.querySelectorAll('div.alert[role="alert"]');
+    expect(alerts.length).toBeGreaterThan(0);
+  });
+
+  it('marca aria-busy en contenedor de split estado al cargar', () => {
+    (component as any).seriesEntriesSplitData = { labels: [], datasets: [] };
+    (component as any).loadingSplitEstado = true;
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement as HTMLElement;
+    const busy = el.querySelector('[aria-busy="true"]');
+    expect(!!busy).toBeTrue();
   });
 });

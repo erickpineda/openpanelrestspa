@@ -39,6 +39,7 @@ export class AdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkForTemporaryData();
+    this.cargaFinalizada = true;
   }
 
   private checkForTemporaryData(): void {

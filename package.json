@@ -9,12 +9,15 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:mem": "set NODE_OPTIONS=--max-old-space-size=4096 && ng serve",
     "build": "ng build",
+    "build:mem": "set NODE_OPTIONS=--max-old-space-size=4096 && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:firefox": "ng test --watch=false --browsers=Firefox",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
-    "test:coverage": "ng test --watch=false --code-coverage --browsers=ChromeHeadless"
+    "test:coverage": "ng test --watch=false --code-coverage --browsers=ChromeHeadless",
+    "e2e": "playwright test"
   },
   "private": true,
   "dependencies": {
@@ -60,6 +63,7 @@
     "@angular/cli": "^16.2.10",
     "@angular/compiler-cli": "^16.2.12",
     "@angular/localize": "^16.2.12",
+    "@playwright/test": "^1.57.0",
     "@types/file-saver": "^2.0.7",
     "@types/jasmine": "^5.1.4",
     "@types/node": "^18.18.13",

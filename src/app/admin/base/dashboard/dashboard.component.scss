@@ -80,6 +80,21 @@
   flex-wrap: wrap;
 }
 
+.metrics-panel {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height .25s ease, opacity .25s ease;
+}
+.metrics-panel.expanded {
+  max-height: 260px;
+  opacity: 1;
+}
+.metrics-panel.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
 @media (max-width: 576px) {
   .dashboard-header {
     align-items: flex-start;

@@ -4,11 +4,13 @@ import saveAs from 'file-saver';
 import { EntradaService } from '../../../core/services/data/entrada.service';
 import { UsuarioService } from '../../../core/services/data/usuario.service';
 import { Subscription, forkJoin } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { LoggerService } from '../../../core/services/logger.service';
 import { DashboardApiService } from '../../../core/services/dashboard-api.service';
 import { LoadingService } from '../../../core/services/ui/loading.service';
 import { ActivityPointDTO, SummaryDTO, SummaryEntryDTO, TopItemDTO, StorageDTO, ContentStatsDTO } from '../../../shared/models/dashboard.models';
 import { ToastService } from '../../../core/services/ui/toast.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard',
@@ -90,6 +92,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadingSplitEstado = false;
   loadingSplitEstadoNombre = false;
   errorRecent: string | null = null;
+  errorTopUsers: string | null = null;
+  errorTopCategories: string | null = null;
+  errorTopTags: string | null = null;
+  errorStorage: string | null = null;
+  errorContentStats: string | null = null;
+  errorSplitEstado: string | null = null;
   
   data: any = {
     labels: [],
@@ -128,6 +136,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   exportError: string | null = null;
 
   private subscription: Subscription = new Subscription();
+  perf: Record<string, number> = {};
+  perfUpdatedAt: Date | null = null;
+  metricsExpanded: boolean = false;
 
   constructor(
     private usuarioService: UsuarioService,
@@ -164,8 +175,70 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     this.initDefaultData();
+    try { const s = sessionStorage.getItem('dash_metrics_expanded'); this.metricsExpanded = s === '1'; } catch {}
+    try { if ((window as any).__E2E_POPULATE_DASHBOARD__ === true) { this.populateMockForE2E(); } } catch {}
     this.refreshDashboard();
     this.loadRecentActivity();
+  }
+
+  private markPerf(t0: number, name: string): void {
+    try {
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      const elapsed = Math.round(now - t0);
+      this.perf[name] = elapsed;
+      this.perfUpdatedAt = new Date();
+    } catch {}
+  }
+
+  metricsVisible(): boolean {
+    try {
+      const qp = new URL(typeof window !== 'undefined' ? window.location.href : '').searchParams.get('metrics');
+      return (environment as any).mock === true || qp === '1';
+    } catch { return (environment as any).mock === true; }
+  }
+
+  private setHashParam(key: string, value: string | null): void {
+    try {
+      const h = typeof window !== 'undefined' ? window.location.hash : '';
+      const raw = h.startsWith('#') ? h.substring(1) : h;
+      const qm = raw.indexOf('?');
+      const base = qm >= 0 ? raw.substring(0, qm) : raw;
+      const qs = qm >= 0 ? raw.substring(qm + 1) : '';
+      const sp = new URLSearchParams(qs);
+      if (value === null) sp.delete(key); else sp.set(key, value);
+      const next = '#' + base + (sp.toString() ? '?' + sp.toString() : '');
+      if (typeof window !== 'undefined') window.location.hash = next;
+    } catch {}
+  }
+
+  metricsToggle(): void {
+    if (!this.isLocalEnv()) return;
+    this.metricsExpanded = !this.metricsExpanded;
+    try { sessionStorage.setItem('dash_metrics_expanded', this.metricsExpanded ? '1' : '0'); } catch {}
+  }
+
+  async copyPerfToClipboard(): Promise<void> {
+    try {
+      const payload = { updatedAt: this.perfUpdatedAt ? this.perfUpdatedAt.toISOString() : null, perf: this.perf };
+      const text = JSON.stringify(payload, null, 2);
+      if (navigator && (navigator as any).clipboard && (navigator as any).clipboard.writeText) {
+        await (navigator as any).clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      this.toastService.showSuccess('Métricas copiadas', 'Dashboard');
+    } catch {
+      this.toastService.showError('No se pudieron copiar las métricas', 'Dashboard');
+    }
+  }
+
+  isLocalEnv(): boolean {
+    return (environment as any).production === false;
   }
 
   private loadAllDashboardData(force: boolean = true): void {
@@ -174,13 +247,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadingService.setGlobalLoading(true);
     this.loadingSeries = true;
     this.errorSummary = null;
-    const summary$ = this.dashboardApi.getSummary(force);
-    const series$ = this.dashboardApi.getSeriesActivity(this.seriesDays, force, this.seriesGranularity);
-    const topUsers$ = this.dashboardApi.getTop('users', this.topLimit, force);
-    const topCategories$ = this.dashboardApi.getTop('categories', this.topLimit, force);
-    const storage$ = this.dashboardApi.getStorage();
-    const contentStats$ = this.dashboardApi.getContentStats();
-    const topTags$ = this.dashboardApi.getTop('tags', this.topLimit, force);
+    const start = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const mark = (name: string) => { try { const now = typeof performance !== 'undefined' ? performance.now() : Date.now(); this.log.debug(`[perf] ${name} ms`, Math.round(now - start)); this.markPerf(start, name); } catch {} };
+    const summary$ = this.dashboardApi.getSummary(force).pipe(tap({ next: () => mark('summary'), error: () => mark('summary:error') }));
+    const series$ = this.dashboardApi.getSeriesActivity(this.seriesDays, force, this.seriesGranularity).pipe(tap({ next: () => mark('series'), error: () => mark('series:error') }));
+    const topUsers$ = this.dashboardApi.getTop('users', this.topLimit, force).pipe(tap({ next: () => mark('topUsers'), error: () => mark('topUsers:error') }));
+    const topCategories$ = this.dashboardApi.getTop('categories', this.topLimit, force).pipe(tap({ next: () => mark('topCategories'), error: () => mark('topCategories:error') }));
+    const storage$ = this.dashboardApi.getStorage().pipe(tap({ next: () => mark('storage'), error: () => mark('storage:error') }));
+    const contentStats$ = this.dashboardApi.getContentStats().pipe(tap({ next: () => mark('contentStats'), error: () => mark('contentStats:error') }));
+    const topTags$ = this.dashboardApi.getTop('tags', this.topLimit, force).pipe(tap({ next: () => mark('topTags'), error: () => mark('topTags:error') }));
     const sub = forkJoin([summary$, series$, topUsers$, topCategories$, topTags$, storage$, contentStats$]).subscribe({
       next: ([summary, series, topUsers, topCategories, topTags, storage, contentStats]) => {
         try {
@@ -222,6 +297,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.errorSummary = 'Error refrescando dashboard';
         this.log.error('Error refrescando dashboard', err);
+        this.focusRetry('.retry-btn-summary');
         this.loadingSeries = false;
         this.loadingService.forceStopLoading();
       }
@@ -238,7 +314,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   async cargarEstadisticas(): Promise<void> {
-    // Preferir endpoint centralizado del backend (summary + series)
+    const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const mark = (name: string) => { try { const now = typeof performance !== 'undefined' ? performance.now() : Date.now(); this.log.debug(`[perf] ${name} ms`, Math.round(now - t0)); this.markPerf(t0, name); } catch {} };
     this.loadingService.registerRetryHandler(() => this.cargarEstadisticas());
     this.loadingService.setGlobalLoading(true);
     this.errorSummary = null;
@@ -261,9 +338,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
           });
         }
 
+        mark('summary(cargar)');
         this.cdr.detectChanges();
       },
-      error: (err: any) => { this.errorSummary = 'Error obteniendo summary'; this.log.error('Error obteniendo summary', err); }
+      error: (err: any) => { this.errorSummary = 'Error obteniendo summary'; mark('summary(cargar):error'); this.log.error('Error obteniendo summary', err); }
     });
 
     this.subscription.add(summarySub);
@@ -281,35 +359,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
             ]
           };
           this.dataRawLabels = points.map(p => String(p.date || ''));
+          mark('series(cargar)');
           this.cdr.detectChanges();
           // Si summary ya terminó, detener loader; lo controlamos también en refresh
           this.loadingService.setGlobalLoading(false);
         }
       },
-      error: (err: any) => { this.errorSummary = 'Error obteniendo series'; this.log.error('Error obteniendo series', err); }
+      error: (err: any) => { this.errorSummary = 'Error obteniendo series'; mark('series(cargar):error'); this.log.error('Error obteniendo series', err); }
     });
 
     this.subscription.add(seriesSub);
   }
 
   loadTopWidgets(): void {
+    const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const mark = (name: string) => { try { const now = typeof performance !== 'undefined' ? performance.now() : Date.now(); this.log.debug(`[perf] ${name} ms`, Math.round(now - t0)); this.markPerf(t0, name); } catch {} };
     this.loadingTopUsers = true;
     this.loadingTopCategories = true;
     this.loadingTopTags = true;
+    this.errorTopUsers = null;
+    this.errorTopCategories = null;
+    this.errorTopTags = null;
     const { startDate, endDate } = this.topCustomStartDate && this.topCustomEndDate
       ? { startDate: this.topCustomStartDate, endDate: this.topCustomEndDate }
       : this.getPeriodDates(this.topPeriodDays);
     const subTopUsers = this.dashboardApi.getTop('users', this.topLimit, false, startDate, endDate).subscribe({
-      next: (items: TopItemDTO[]) => { this.topUsers = items || []; this.loadingTopUsers = false; this.cdr.detectChanges(); },
-      error: () => { this.loadingTopUsers = false; }
+      next: (items: TopItemDTO[]) => { this.topUsers = items || []; this.loadingTopUsers = false; mark('topUsers'); this.cdr.detectChanges(); },
+      error: () => { this.loadingTopUsers = false; this.errorTopUsers = 'Error obteniendo Top Usuarios'; mark('topUsers:error'); this.focusRetry('.retry-btn-top-users'); }
     });
     const subTopCategories = this.dashboardApi.getTop('categories', this.topLimit, false, startDate, endDate).subscribe({
-      next: (items: TopItemDTO[]) => { this.topCategories = items || []; this.loadingTopCategories = false; this.cdr.detectChanges(); },
-      error: () => { this.loadingTopCategories = false; }
+      next: (items: TopItemDTO[]) => { this.topCategories = items || []; this.loadingTopCategories = false; mark('topCategories'); this.cdr.detectChanges(); },
+      error: () => { this.loadingTopCategories = false; this.errorTopCategories = 'Error obteniendo Top Categorías'; mark('topCategories:error'); this.focusRetry('.retry-btn-top-categories'); }
     });
     const subTopTags = this.dashboardApi.getTop('tags', this.topLimit, false, startDate, endDate).subscribe({
-      next: (items: TopItemDTO[]) => { this.topTags = items || []; this.loadingTopTags = false; this.cdr.detectChanges(); },
-      error: () => { this.loadingTopTags = false; }
+      next: (items: TopItemDTO[]) => { this.topTags = items || []; this.loadingTopTags = false; mark('topTags'); this.cdr.detectChanges(); },
+      error: () => { this.loadingTopTags = false; this.errorTopTags = 'Error obteniendo Top Tags'; mark('topTags:error'); this.focusRetry('.retry-btn-top-tags'); }
     });
     this.subscription.add(subTopUsers);
     this.subscription.add(subTopCategories);
@@ -324,23 +408,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadStorage(): void {
     this.loadingStorage = true;
+    this.errorStorage = null;
     const sub = this.dashboardApi.getStorage().subscribe({
       next: (s: StorageDTO) => { this.storage = s; this.loadingStorage = false; this.cdr.detectChanges(); },
-      error: () => { this.loadingStorage = false; }
+      error: () => { this.loadingStorage = false; this.errorStorage = 'Error obteniendo almacenamiento'; this.focusRetry('.retry-btn-storage'); }
     });
     this.subscription.add(sub);
   }
 
   loadContentStats(): void {
+    const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const mark = (name: string) => { try { const now = typeof performance !== 'undefined' ? performance.now() : Date.now(); this.log.debug(`[perf] ${name} ms`, Math.round(now - t0)); this.markPerf(t0, name); } catch {} };
     this.loadingContentStats = true;
+    this.errorContentStats = null;
     const sub = this.dashboardApi.getContentStats().subscribe({
-      next: (cs: ContentStatsDTO) => { this.contentStats = cs; this.updateContentStatsChart(cs); this.loadingContentStats = false; this.cdr.detectChanges(); },
-      error: () => { this.loadingContentStats = false; }
+      next: (cs: ContentStatsDTO) => { this.contentStats = cs; this.updateContentStatsChart(cs); this.loadingContentStats = false; mark('contentStats(load)'); this.cdr.detectChanges(); },
+      error: () => { this.loadingContentStats = false; this.errorContentStats = 'Error obteniendo estadísticas de contenido'; mark('contentStats(load):error'); this.focusRetry('.retry-btn-content'); }
     });
     this.subscription.add(sub);
   }
 
   loadRecentActivity(): void {
+    const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const mark = (name: string) => { try { const now = typeof performance !== 'undefined' ? performance.now() : Date.now(); this.log.debug(`[perf] ${name} ms`, Math.round(now - t0)); } catch {} };
     this.loadingRecent = true;
     this.errorRecent = null;
     const sub = this.dashboardApi.getRecentActivity(this.recentPage, this.recentSize).subscribe({
@@ -362,10 +452,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.recentItems = [];
           this.recentTotalPages = 0;
         }
-        this.loadingRecent = false;
+        this.loadingRecent = false; mark('recent');
         this.cdr.detectChanges();
       },
-      error: () => { this.errorRecent = 'Error obteniendo actividad reciente'; this.loadingRecent = false; }
+      error: () => { this.errorRecent = 'Error obteniendo actividad reciente'; this.loadingRecent = false; mark('recent:error'); this.focusRetry('.retry-btn-recent'); }
     });
     this.subscription.add(sub);
   }
@@ -739,9 +829,49 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const datePart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
       const timePart = `${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
       const headers = ['date', 'date_raw', ...this.data.datasets.map((ds: any) => String(ds.label || 'serie'))];
-      const rows: any[][] = (this.data.labels as string[]).map((d: string, i: number) => [
-        d,
-        this.dataRawLabels?.[i] ?? '',
+      const fmt = (raw: string): string => {
+        const g = this.seriesGranularity;
+        if (g === 'hour') {
+          const p = this.parseBackendDate(raw);
+          if (p) {
+            const dd = String(p.getDate()).padStart(2,'0');
+            const mm = String(p.getMonth()+1).padStart(2,'0');
+            const yy = p.getFullYear();
+            const hh = String(p.getHours()).padStart(2,'0');
+            const mi = String(p.getMinutes()).padStart(2,'0');
+            const ss = String(p.getSeconds()).padStart(2,'0');
+            return `${dd}-${mm}-${yy} ${hh}:${mi}:${ss}`;
+          }
+        }
+        if (g === 'day') {
+          const p = this.parseBackendDate(raw);
+          if (p) {
+            const dd = String(p.getDate()).padStart(2,'0');
+            const mm = String(p.getMonth()+1).padStart(2,'0');
+            const yy = p.getFullYear();
+            return `${dd}-${mm}-${yy}`;
+          }
+        }
+        if (g === 'week') {
+          const p = this.parseBackendDate(raw);
+          if (p) {
+            const day = p.getDay();
+            const start = new Date(p.getFullYear(), p.getMonth(), p.getDate() - day);
+            const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+            const s = `${String(start.getDate()).padStart(2,'0')}-${String(start.getMonth()+1).padStart(2,'0')}-${start.getFullYear()}`;
+            const e = `${String(end.getDate()).padStart(2,'0')}-${String(end.getMonth()+1).padStart(2,'0')}-${end.getFullYear()}`;
+            return `${s} - ${e}`;
+          }
+        }
+        if (g === 'month') {
+          const label = this.formatLabelFromDate(raw, 'month', this.isSmallScreen());
+          return label;
+        }
+        return raw;
+      };
+      const rows: any[][] = (this.dataRawLabels as string[]).map((raw: string, i: number) => [
+        fmt(raw),
+        raw,
         ...this.data.datasets.map((ds: any) => Array.isArray(ds.data) ? ds.data[i] ?? '' : '')
       ]);
       this.saveCsv(`dashboard_series_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
@@ -755,9 +885,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const timePart = `${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
       const headers = ['date', 'date_raw', ...this.seriesEntriesSplitData.datasets.map((ds: any) => String(ds.label || 'valor'))];
       const raw = (this.seriesEntriesSplitData as any)._rawLabels as string[] || [];
-      const rows: any[][] = (this.seriesEntriesSplitData.labels as string[]).map((d: string, i: number) => [
-        d,
-        raw?.[i] ?? '',
+      const rows: any[][] = raw.map((r: string, i: number) => [
+        this.formatLabelFromDate(r, this.seriesGranularity),
+        r,
         ...this.seriesEntriesSplitData.datasets.map((ds: any) => Array.isArray(ds.data) ? ds.data[i] ?? '' : '')
       ]);
       this.saveCsv(`dashboard_series_split_estado_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
@@ -771,9 +901,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const timePart = `${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
       const headers = ['date', 'date_raw', ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) => String(ds.label || 'estado'))];
       const raw = (this.seriesEntriesSplitEstadoNombreData as any)._rawLabels as string[] || [];
-      const rows: any[][] = (this.seriesEntriesSplitEstadoNombreData.labels as string[]).map((d: string, i: number) => [
-        d,
-        raw?.[i] ?? '',
+      const rows: any[][] = raw.map((r: string, i: number) => [
+        this.formatLabelFromDate(r, this.seriesGranularity),
+        r,
         ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) => Array.isArray(ds.data) ? ds.data[i] ?? '' : '')
       ]);
       this.saveCsv(`dashboard_series_split_estado_nombre_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
@@ -897,9 +1027,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
         this.loadingSplitEstado = false;
+        this.errorSplitEstado = null;
       },
       error: () => {
         this.loadingSplitEstado = false;
+        this.errorSplitEstado = 'Error obteniendo serie por estado';
+        this.focusRetry('.retry-btn-split-estado');
       }
     });
     this.subscription.add(sub);
@@ -937,7 +1070,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
         this.loadingSplitEstadoNombre = false;
       },
-      error: () => { this.errorSplitEstadoNombre = 'Error obteniendo serie por estado nominal'; this.loadingSplitEstadoNombre = false; }
+      error: () => { this.errorSplitEstadoNombre = 'Error obteniendo serie por estado nominal'; this.loadingSplitEstadoNombre = false; this.focusRetry('.retry-btn-split-nominal'); }
     });
     this.subscription.add(sub);
   }
@@ -999,6 +1132,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const start = new Date(startMs);
     const fmt = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
     return { startDate: fmt(start), endDate: fmt(end) };
+  }
+
+  private populateMockForE2E(): void {
+    const labels = this.data.labels && Array.isArray(this.data.labels) ? this.data.labels.slice(0, 2) : ['01-02-2025','02-02-2025'];
+    const raw = ['2025-02-01','2025-02-02'];
+    this.seriesEntriesSplitData = {
+      labels,
+      datasets: [
+        { label: 'PUBLICADA', data: [1,2] },
+        { label: 'NO PUBLICADA', data: [0,1] }
+      ],
+      _rawLabels: raw
+    } as any;
+    this.seriesEntriesSplitEstadoNombreData = {
+      labels,
+      datasets: [
+        { label: 'PUBLICADA', data: [1,2] },
+        { label: 'NO PUBLICADA', data: [0,1] }
+      ],
+      _rawLabels: raw
+    } as any;
+    this.topUsers = [{ name: 'user1', count: 3 }, { name: 'user2', count: 1 }];
+    this.topCategories = [{ name: 'cat1', count: 5 }, { name: 'cat2', count: 2 }];
+    this.topTags = [{ name: 'tag1', count: 4 }, { name: 'tag2', count: 1 }];
+    this.contentStats = {
+      totalUsuarios: 10,
+      totalEntradas: 20,
+      totalComentarios: 5,
+      totalFicheros: 2,
+      storageBytes: 1024,
+      entradasByEstado: { PUBLICADA: 15, 'NO PUBLICADA': 5 }
+    } as any;
+    this.storage = { totalFiles: 12, storageBytes: 2048 } as any;
   }
 
   private updateContentStatsChart(cs: ContentStatsDTO): void {
@@ -1229,16 +1395,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return s;
     }
     if (gran === 'hour') {
-      return `${String(parsed.getHours()).padStart(2,'0')}:${String(parsed.getMinutes()).padStart(2,'0')}`;
+      const dd = String(parsed.getDate()).padStart(2,'0');
+      const mm = String(parsed.getMonth()+1).padStart(2,'0');
+      const yyyy = parsed.getFullYear();
+      const hh = String(parsed.getHours()).padStart(2,'0');
+      const mi = String(parsed.getMinutes()).padStart(2,'0');
+      const ss = String(parsed.getSeconds()).padStart(2,'0');
+      return `${dd}-${mm}-${yyyy} ${hh}:${mi}:${ss}`;
     }
     if (gran === 'day') {
-      return fmtDMY(parsed);
+      const dd = String(parsed.getDate()).padStart(2,'0');
+      const mm = String(parsed.getMonth()+1).padStart(2,'0');
+      const yyyy = parsed.getFullYear();
+      return `${dd}-${mm}-${yyyy}`;
     }
     if (gran === 'week') {
       const day = parsed.getDay();
       const start = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate() - day);
       const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
-      return `${fmtDMY(start)} - ${fmtDMY(end)}`;
+      const sdd = String(start.getDate()).padStart(2,'0');
+      const smm = String(start.getMonth()+1).padStart(2,'0');
+      const syy = start.getFullYear();
+      const edd = String(end.getDate()).padStart(2,'0');
+      const emm = String(end.getMonth()+1).padStart(2,'0');
+      const eyy = end.getFullYear();
+      return `${sdd}-${smm}-${syy} - ${edd}-${emm}-${eyy}`;
     }
     return fmtDMY(parsed);
   }
@@ -1268,5 +1449,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   get sumEntradasNoPublicadas(): number {
     return Array.isArray(this.entradasMesNoPublicadas) ? this.entradasMesNoPublicadas.reduce((acc, v) => acc + (v || 0), 0) : 0;
+  }
+
+  private focusRetry(sel: string): void {
+    try {
+      setTimeout(() => {
+        const el = document.querySelector(sel) as HTMLButtonElement | null;
+        if (el) el.focus();
+      }, 0);
+    } catch {}
   }
 }

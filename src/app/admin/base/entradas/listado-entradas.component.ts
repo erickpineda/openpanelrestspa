@@ -190,7 +190,7 @@ private readonly boundaryId = 'listado-entradas-main';
 
   checkFechaPublicacion(fechaPublicacion: Date): string {
     return fechaPublicacion
-      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd/MM/yyyy', false)
+      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy HH:mm:ss', false)
       : 'No publicada';
   }
 

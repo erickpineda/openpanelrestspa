@@ -46,7 +46,9 @@
               "chart.js",
               "@coreui/chartjs/dist/js/coreui-chartjs.js",
               "lodash",
-              "@ckeditor/ckeditor5-build-classic"
+              "@ckeditor/ckeditor5-build-classic",
+              "file-saver",
+              "jszip"
             ]
           },
           "configurations": {
