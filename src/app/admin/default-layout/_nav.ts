@@ -65,6 +65,7 @@ export const navItems: INavData[] = [
   {
     name: 'Multimedia',
     iconComponent: { name: 'cil-puzzle' },
+    url: '/admin/control/contenido/imagenes',
     children: [
       {
         name: 'Imágenes',
@@ -78,7 +79,7 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Etiquetas',
-    url: '/admin/control/contenido/etiquetas',
+    url: '/admin/control/etiquetas',
     iconComponent: { name: 'cil-pin' }
   },
   {
@@ -88,6 +89,7 @@ export const navItems: INavData[] = [
   {
     name: 'Usuarios',
     iconComponent: { name: 'cil-people' },
+    url: '/admin/control/gestion/usuarios',
     children: [
       {
         name: 'Listar',
@@ -106,6 +108,7 @@ export const navItems: INavData[] = [
   {
     name: 'Configruración',
     iconComponent: { name: 'cil-cog' },
+    url: '/admin/control/configuracion/temas',
     children: [
       {
         name: 'Temas',

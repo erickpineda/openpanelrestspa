@@ -1,0 +1,104 @@
+<c-container class="container-fluid" data-testid="etiquetas-list">
+  <c-card>
+    <c-card-header class="d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Gestión de Etiquetas</h5>
+      <button cButton color="primary" (click)="onCreate()" [attr.aria-label]="'Crear nueva etiqueta'" data-testid="btn-nueva-etiqueta">
+        <svg cIcon name="cilPlus" size="sm" class="me-2"></svg> Nueva Etiqueta
+      </button>
+    </c-card-header>
+    
+    <c-card-body [attr.aria-busy]="loading ? 'true' : null">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="text-muted small">Total {{ totalItems }}</div>
+        <div class="btn-group" role="group">
+          <select cSelect [value]="pageSize" (change)="pageSize = +$any($event.target).value; onPageChange(1)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+      </div>
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="mb-4">
+        <div class="row">
+          <div class="col-md-4">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" id="nombre" cFormControl formControlName="nombre" placeholder="Buscar por nombre..." [attr.aria-label]="'Buscar etiqueta por nombre'">
+          </div>
+          <div class="col-md-4">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <input type="text" id="descripcion" cFormControl formControlName="descripcion" placeholder="Buscar por descripción..." [attr.aria-label]="'Buscar etiqueta por descripción'">
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" cButton color="primary" variant="outline" class="me-2" [attr.aria-label]="'Buscar etiquetas'" data-testid="btn-buscar">
+              <svg cIcon name="cilSearch"></svg> Buscar
+            </button>
+            <button type="button" cButton color="secondary" variant="outline" (click)="searchForm.reset(); onSearch()" [attr.aria-label]="'Limpiar filtros de búsqueda'" data-testid="btn-limpiar">
+              <svg cIcon name="cilReload"></svg> Limpiar
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="table-responsive" *ngIf="!loading; else loadingTemplate">
+        <table class="table table-hover" role="table" aria-label="Tabla de etiquetas">
+          <thead>
+            <tr>
+              <th scope="col">Color</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Fecha de Creación</th>
+              <th scope="col" class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let etiqueta of etiquetas; let i = index" role="row">
+              <td>
+                <span class="badge" [style.background-color]="etiqueta.color" [attr.aria-label]="'Color de etiqueta'">&nbsp;&nbsp;&nbsp;</span>
+              </td>
+              <td class="text-truncate" style="max-width: 240px;" [title]="etiqueta.nombre">{{ etiqueta.nombre }}</td>
+              <td class="text-truncate" style="max-width: 300px;" [title]="etiqueta.descripcion || ''">{{ etiqueta.descripcion || '-' }}</td>
+              <td>{{ etiqueta.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
+              <td class="text-center">
+                <button cButton size="sm" color="primary" variant="outline" class="me-1" (click)="onEdit(etiqueta)" [attr.aria-label]="'Editar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-editar-etiqueta-' + etiqueta.id">
+                  <svg cIcon name="cilPencil"></svg>
+                </button>
+                <button cButton size="sm" color="danger" variant="outline" (click)="onDelete(etiqueta)" [attr.aria-label]="'Eliminar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-eliminar-etiqueta-' + etiqueta.id">
+                  <svg cIcon name="cilTrash"></svg>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="etiquetas.length === 0">
+              <td colspan="5" class="text-center text-muted">No se encontraron etiquetas</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <nav *ngIf="totalItems > pageSize" aria-label="Paginación de etiquetas">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="onPageChange(currentPage - 1)" [attr.aria-label]="'Página anterior'"><span aria-hidden="true">&laquo;</span></a>
+          </li>
+          <li class="page-item" *ngFor="let page of getPaginationArray()" [class.active]="page === currentPage">
+            <a class="page-link" (click)="onPageChange(page)" [attr.aria-label]="'Página ' + page">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage >= getTotalPages()">
+            <a class="page-link" (click)="onPageChange(currentPage + 1)" [attr.aria-label]="'Página siguiente'"><span aria-hidden="true">&raquo;</span></a>
+          </li>
+        </ul>
+      </nav>
+    </c-card-body>
+  </c-card>
+</c-container>
+
+<c-modal [visible]="showCreateModal || showEditModal" (visibleChange)="(showCreateModal = $event) && (!showCreateModal && (showEditModal = false))" [attr.data-testid]="showCreateModal ? 'crear-etiqueta-modal' : 'editar-etiqueta-modal'">
+  <c-modal-header><h5 cModalTitle>{{ showCreateModal ? 'Crear Nueva Etiqueta' : 'Editar Etiqueta' }}</h5></c-modal-header>
+  <c-modal-body>
+    <app-etiqueta-form [etiqueta]="selectedEtiqueta" [isEdit]="showEditModal" (save)="onModalSave()" (cancel)="onModalClose()"></app-etiqueta-form>
+  </c-modal-body>
+  <c-modal-footer><button cButton color="secondary" (click)="onModalClose()">Cerrar</button></c-modal-footer>
+</c-modal>
+
+<ng-template #loadingTemplate>
+  <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando etiquetas'"></c-spinner><p class="mt-2 text-muted">Cargando etiquetas...</p></div>
+</ng-template>

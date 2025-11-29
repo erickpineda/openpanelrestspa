@@ -34,8 +34,9 @@ export class UsuariosListComponent implements OnInit {
     const hasFilters = !!(this.filtroUsuario || this.filtroRolId != null || this.filtroEmailConfirmado != null);
     const handleResponse = (r: any) => {
       const data = r?.data || r;
-      this.usuarios = Array.isArray(data?.content) ? data.content : (Array.isArray(data) ? data : []);
-      this.totalElements = Number(data?.totalElements || this.usuarios.length || 0);
+      const list = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
+      this.usuarios = list;
+      this.totalElements = Number(data?.totalElements || list.length || 0);
       this.loading = false;
     };
     const handleError = (err: any) => { this.error = 'Error cargando usuarios'; this.loading = false; this.log.error('usuarios listar', err); };
@@ -66,13 +67,38 @@ export class UsuariosListComponent implements OnInit {
   next(): void { const maxPage = this.totalElements ? Math.ceil(this.totalElements / this.pageSize) - 1 : this.pageNo + 1; if (this.pageNo < maxPage) { this.pageNo++; this.load(); } }
 
   openEdit(u: UsuarioDTO): void { this.editUser = { ...u }; this.editModalVisible = true; }
+  openCreate(): void { this.editUser = { idUsuario: undefined, username: '', nombre: '', apellido: '', email: '', idRol: undefined } as UsuarioDTO; this.editModalVisible = true; }
   closeEdit(): void { this.editModalVisible = false; this.editUser = null; }
+  isEmailValid(e?: string): boolean { if (!e) return false; const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; return re.test(e); }
+  isUserFormValid(): boolean { return !!(this.editUser && this.editUser.username && this.isEmailValid(this.editUser.email) && this.editUser.idRol != null); }
+  getUserErrors(): string[] {
+    const errs: string[] = [];
+    if (!this.editUser) return errs;
+    if (!this.editUser.username) errs.push('Usuario requerido');
+    if (!this.isEmailValid(this.editUser.email)) errs.push('Email inválido');
+    if (this.editUser.idRol == null) errs.push('Rol requerido');
+    return errs;
+  }
+  getRolNombre(id?: number): string {
+    if (id == null) return '';
+    const r = this.roles.find(x => x.id === id);
+    return r && r.nombre ? r.nombre : String(id);
+  }
   saveEdit(): void {
-    if (!this.editUser || !this.editUser.idUsuario) return;
+    if (!this.editUser) return;
     this.loading = true;
-    this.usuariosService.actualizar(this.editUser.idUsuario, this.editUser).subscribe({
-      next: () => { this.toast.showSuccess('Usuario actualizado', 'Usuarios'); this.loading = false; this.editModalVisible = false; this.load(); },
-      error: (err: any) => { this.toast.showError('Error actualizando', 'Usuarios'); this.log.error('usuarios actualizar', err); this.loading = false; }
+    const hasId = !!this.editUser.idUsuario;
+    const op$ = hasId ? this.usuariosService.actualizar(this.editUser.idUsuario!, this.editUser) : this.usuariosService.crear(this.editUser);
+    op$.subscribe({
+      next: () => {
+        this.toast.showSuccess(hasId ? 'Usuario actualizado' : 'Usuario creado', 'Usuarios');
+        this.loading = false; this.editModalVisible = false; this.load();
+      },
+      error: (err: any) => {
+        this.toast.showError(hasId ? 'Error actualizando' : 'Error creando', 'Usuarios');
+        this.log.error(hasId ? 'usuarios actualizar' : 'usuarios crear', err);
+        this.loading = false;
+      }
     });
   }
 

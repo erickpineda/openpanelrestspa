@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ConfiguracionRoutingModule } from './configuracion-routing.module';
 import { TemasComponent } from './temas/temas.component';
 import { AjustesComponent } from './ajustes/ajustes.component';
-import { IconModule } from '@coreui/icons-angular';
+import { ReactiveFormsModule } from '@angular/forms';
+import { SharedOPModule } from '../../../shared/shared.module';
 
 @NgModule({
   declarations: [TemasComponent, AjustesComponent],
-  imports: [CommonModule, ConfiguracionRoutingModule, IconModule]
+  imports: [CommonModule, ConfiguracionRoutingModule, ReactiveFormsModule, SharedOPModule]
 })
 export class ConfiguracionModule {}

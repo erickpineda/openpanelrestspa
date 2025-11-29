@@ -13,6 +13,11 @@ export class ImagenesComponent implements OnInit {
   items: MediaItem[] = [];
   pageNo = 0;
   pageSize = 12;
+  totalPages = 0;
+  filtroNombre = '';
+  filtroMime = '';
+  fechaDesde = '';
+  fechaHasta = '';
 
   constructor(private imagenes: ImagenesService) {}
 
@@ -20,9 +25,23 @@ export class ImagenesComponent implements OnInit {
 
   load(pageNo = this.pageNo): void {
     this.loading = true; this.error = null;
-    this.imagenes.listarSafe(pageNo, this.pageSize).subscribe({
-      next: (list: MediaItem[]) => { this.items = Array.isArray(list) ? list : []; this.loading = false; },
-      error: () => { this.error = 'Error cargando imágenes'; this.loading = false; }
-    });
+    const hasFilters = !!this.filtroNombre;
+    if (!hasFilters) {
+      this.imagenes.listarSafe(pageNo, this.pageSize).subscribe({
+        next: (list: MediaItem[]) => { this.items = Array.isArray(list) ? list : []; this.totalPages = 0; this.loading = false; },
+        error: () => { this.error = 'Error cargando imágenes'; this.loading = false; }
+      });
+    } else {
+      const payload = { nombre: this.filtroNombre, tipoMime: this.filtroMime, fechaDesde: this.fechaDesde, fechaHasta: this.fechaHasta } as any;
+      this.imagenes.buscarSafe(payload, pageNo, this.pageSize).subscribe({
+        next: (resp) => { this.items = resp?.elements || []; this.totalPages = Number(resp?.totalPages || 0); this.loading = false; },
+        error: () => { this.error = 'Error buscando imágenes'; this.loading = false; }
+      });
+    }
   }
+
+  search(): void { this.pageNo = 0; this.load(); }
+  reset(): void { this.filtroNombre = ''; this.pageNo = 0; this.load(); }
+  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.load(); } }
+  next(): void { if (this.totalPages ? this.pageNo < this.totalPages - 1 : true) { this.pageNo++; this.load(); } }
 }

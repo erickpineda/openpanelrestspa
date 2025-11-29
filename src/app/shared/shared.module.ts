@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AlertModule, BadgeModule, ButtonModule, CardModule, GridModule, ListGroupModule, PaginationModule } from '@coreui/angular';
+import { AlertModule, BadgeModule, ButtonModule, CardModule, GridModule, ListGroupModule, PaginationModule, FormModule } from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
 
 import { NotFoundComponent } from './components/not-found/not-found.component';
@@ -23,6 +23,7 @@ import { SharedWidgetsModule } from './shared-widgets.module';
     GridModule,
     ListGroupModule,
     PaginationModule,
+    FormModule,
     IconModule,
     SharedWidgetsModule
   ],
@@ -44,6 +45,7 @@ import { SharedWidgetsModule } from './shared-widgets.module';
     GridModule,
     ListGroupModule,
     PaginationModule,
+    FormModule,
     IconModule,
     GlobalErrorComponent,
     NotFoundComponent,

@@ -3,16 +3,16 @@ import { CommonModule } from '@angular/common';
 import { ContenidoRoutingModule } from './contenido-routing.module';
 import { ImagenesComponent } from './imagenes/imagenes.component';
 import { ArchivosComponent } from './archivos/archivos.component';
-import { EtiquetasModule } from './etiquetas/etiquetas.module';
-import { IconModule } from '@coreui/icons-angular';
+import { FormsModule } from '@angular/forms';
+import { SharedOPModule } from '../../../shared/shared.module';
 
 @NgModule({
   declarations: [ImagenesComponent, ArchivosComponent],
   imports: [
     CommonModule,
     ContenidoRoutingModule,
-    IconModule,
-    EtiquetasModule
+    SharedOPModule,
+    FormsModule
   ]
 })
 export class ContenidoModule {}

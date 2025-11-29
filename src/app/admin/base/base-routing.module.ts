@@ -17,6 +17,7 @@ const routes: Routes = [
       { path: 'configuracion', loadChildren: () => import('./configuracion/configuracion.module').then(m => m.ConfiguracionModule) },
       { path: 'contenido', loadChildren: () => import('./contenido/contenido.module').then(m => m.ContenidoModule) },
       { path: 'gestion', loadChildren: () => import('./gestion/gestion.module').then(m => m.GestionModule) },
+      { path: 'etiquetas', loadChildren: () => import('./etiquetas/etiquetas.module').then(m => m.EtiquetasModule) },
       {
         path: 'categorias', children: [
           { path: '', component: ListadoCategoriasComponent },
