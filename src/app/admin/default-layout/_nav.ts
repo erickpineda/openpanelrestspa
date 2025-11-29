@@ -53,12 +53,6 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-spreadsheet' }
   },
   {
-    name: 'Etiquetas',
-    url: '/admin/control/etiquetas',
-    linkProps: { fragment: 'someAnchor' },
-    iconComponent: { name: 'cil-pin' }
-  },
-  {
     name: 'Comentarios',
     url: '/admin/control/comentarios',
     linkProps: { fragment: 'listadoComentarios' },
@@ -74,13 +68,18 @@ export const navItems: INavData[] = [
     children: [
       {
         name: 'Imágenes',
-        url: '/admin/contenido/imagenes'
+        url: '/admin/control/contenido/imagenes'
       },
       {
         name: 'Archivos',
-        url: '/admin/contenido/archivos'
+        url: '/admin/control/contenido/archivos'
       },
     ]
+  },
+  {
+    name: 'Etiquetas',
+    url: '/admin/control/contenido/etiquetas',
+    iconComponent: { name: 'cil-pin' }
   },
   {
     title: true,
@@ -92,15 +91,15 @@ export const navItems: INavData[] = [
     children: [
       {
         name: 'Listar',
-        url: '/admin/gestion/usuarios'
+        url: '/admin/control/gestion/usuarios'
       },
       {
         name: 'Mi Perfil',
-        url: '/admin/gestion/miperfil'
+        url: '/admin/control/gestion/miperfil'
       },
       {
         name: 'Cambiar contraseña',
-        url: '/admin/gestion/changepassword'
+        url: '/admin/control/gestion/changepassword'
       },
     ]
   },
@@ -110,11 +109,11 @@ export const navItems: INavData[] = [
     children: [
       {
         name: 'Temas',
-        url: '/admin/configuracion/temas'
+        url: '/admin/control/configuracion/temas'
       },
       {
         name: 'Ajustes',
-        url: '/admin/configuracion/ajustes'
+        url: '/admin/control/configuracion/ajustes'
       },
     ]
   },

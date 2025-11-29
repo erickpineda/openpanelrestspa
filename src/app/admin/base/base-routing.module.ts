@@ -13,6 +13,10 @@ const routes: Routes = [
   {
     path: '', component: BaseComponent, children: [
       { path: 'entradas', loadChildren: () => import('./entradas/entradas.module').then(m => m.EntradasModule) },
+      // Secciones reubicadas bajo base
+      { path: 'configuracion', loadChildren: () => import('./configuracion/configuracion.module').then(m => m.ConfiguracionModule) },
+      { path: 'contenido', loadChildren: () => import('./contenido/contenido.module').then(m => m.ContenidoModule) },
+      { path: 'gestion', loadChildren: () => import('./gestion/gestion.module').then(m => m.GestionModule) },
       {
         path: 'categorias', children: [
           { path: '', component: ListadoCategoriasComponent },

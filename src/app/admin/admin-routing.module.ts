@@ -23,6 +23,22 @@ const routes: Routes = [
         data: { preload: true, delay: 1000 },
         canLoad: [AuthGuard] // evita la carga del módulo si no estamos autenticados
       }
+      ,
+      {
+        path: 'contenido',
+        redirectTo: 'control/contenido',
+        pathMatch: 'prefix'
+      },
+      {
+        path: 'gestion',
+        redirectTo: 'control/gestion',
+        pathMatch: 'prefix'
+      },
+      {
+        path: 'configuracion',
+        redirectTo: 'control/configuracion',
+        pathMatch: 'prefix'
+      }
     ]
   }
 ];

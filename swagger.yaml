@@ -1,0 +1,2294 @@
+openapi: 3.0.3
+info:
+  title: OpenPanel REST API
+  version: 1.0.0
+  description: API REST de OpenPanel, incluye todos los endpoints y modelos de datos principales.
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Entradas
+    description: Operaciones relacionadas con las entradas.
+  - name: Usuarios
+    description: Operaciones relacionadas con los usuarios.
+  - name: Roles
+    description: Operaciones relacionadas con los roles.
+  - name: Privilegios
+    description: Operaciones relacionadas con los privilegios.
+  - name: Categorias
+    description: Operaciones relacionadas con las categorías.
+  - name: Comentarios
+    description: Operaciones relacionadas con los comentarios.
+  - name: Etiquetas
+    description: Operaciones relacionadas con las etiquetas.
+  - name: EstadoFlujos
+    description: Operaciones relacionadas con los flujos de estado de entrada.
+  - name: HerramientasAuxiliar
+    description: Operaciones relacionadas con las herramientas auxiliares.
+  - name: Dashboard
+    description: Operaciones relacionadas con el dashboard y estadísticas.
+paths:
+  /entradas:
+    get:
+      summary: Listar entradas
+      tags:
+        - Entradas
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de entradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /entradas/obtenerPorId/{id}:
+    get:
+      summary: Obtener entrada por ID
+      tags:
+        - Entradas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Entrada encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEntrada'
+  /entradas/crear:
+    post:
+      summary: Crear entrada
+      tags:
+        - Entradas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntradaDTO'
+      responses:
+        '201':
+          description: Entrada creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEntrada'
+  /entradas/{id}:
+    put:
+      summary: Actualizar entrada
+      tags:
+        - Entradas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntradaDTO'
+      responses:
+        '200':
+          description: Entrada actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEntrada'
+    delete:
+      summary: Borrar entrada
+      tags:
+        - Entradas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /entradas/listarPorIdUsuario/{idUsuario}:
+    get:
+      summary: Listar entradas por usuario
+      tags:
+        - Entradas
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de entradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /entradas/tiposEntradas:
+    get:
+      summary: Listar tipos de entrada
+      tags:
+        - Entradas
+      responses:
+        '200':
+          description: Tipos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseTipoEntradaResponse'
+  /entradas/estadosEntradas:
+    get:
+      summary: Listar estados de entrada
+      tags:
+        - Entradas
+      responses:
+        '200':
+          description: Estados de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEstadoEntradaResponse'
+  /entradas/cambiarEstadoEntrada:
+    post:
+      summary: Cambiar estado de entrada
+      tags:
+        - Entradas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CambiarEstadoEntradaDTO'
+      responses:
+        '200':
+          description: Estado actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /entradas/buscar:
+    post:
+      summary: Buscar entradas por criterios
+      tags:
+        - Entradas
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequestDTO'
+      responses:
+        '200':
+          description: Resultados de búsqueda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /entradas/buscar/definicionesBuscador:
+    get:
+      summary: Obtener definiciones del buscador
+      tags:
+        - Entradas
+      responses:
+        '200':
+          description: Definiciones del buscador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseCriterioBusquedaEntrada'
+  /usuarios:
+    get:
+      summary: Listar usuarios
+      tags:
+        - Usuarios
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de usuarios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /usuarios/obtenerPorId/{id}:
+    get:
+      summary: Obtener usuario por ID
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseUsuario'
+  /usuarios/crear:
+    post:
+      summary: Crear usuario
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioDTO'
+      responses:
+        '201':
+          description: Usuario creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseUsuario'
+  /usuarios/{id}:
+    put:
+      summary: Actualizar usuario
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioDTO'
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseUsuario'
+    delete:
+      summary: Borrar usuario
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /usuarios/buscar:
+    post:
+      summary: Buscar usuarios por criterios
+      tags:
+        - Usuarios
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequestDTO'
+      responses:
+        '200':
+          description: Resultados de búsqueda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /usuarios/definicionesBuscador:
+    get:
+      summary: Obtener definiciones del buscador de usuarios
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Definiciones del buscador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseCriterioBusquedaEntrada'
+  /usuarios/perfil/yo:
+    get:
+      summary: Obtener perfil del usuario actual
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Perfil del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePerfil'
+  /usuarios/checkUsernameAvailability:
+    post:
+      summary: Verificar disponibilidad de username
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckUsernameDTO'
+      responses:
+        '200':
+          description: Resultado de verificación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRespuesta'
+  /usuarios/perfil/{id}:
+    patch:
+      summary: Actualizar perfil por lotes
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerfilDTO'
+      responses:
+        '200':
+          description: Perfil actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePerfil'
+  /usuarios/changePassword:
+    post:
+      summary: Cambiar contraseña de usuario
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordDTO'
+      responses:
+        '200':
+          description: Contraseña cambiada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRespuesta'
+  /usuarios/changeUsername:
+    post:
+      summary: Cambiar username de usuario
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeUsernameDTO'
+      responses:
+        '200':
+          description: Username cambiado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRespuesta'
+  /usuarios/confirmarRegistro:
+    get:
+      summary: Confirmar registro de usuario
+      tags:
+        - Usuarios
+      parameters:
+        - name: verifyToken
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Registro confirmado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRespuesta'
+  /usuarios/obtenerMetadatosPerfil/{id}:
+    get:
+      summary: Obtener metadatos de perfil de usuario
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Metadatos de perfil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseMetadatosPerfil'
+  /roles:
+    get:
+      summary: Listar roles
+      tags:
+        - Roles
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de roles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /roles/obtenerPorId/{id}:
+    get:
+      summary: Obtener rol por ID
+      tags:
+        - Roles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rol encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRol'
+  /roles/crear:
+    post:
+      summary: Crear rol
+      tags:
+        - Roles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolDTO'
+      responses:
+        '201':
+          description: Rol creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRol'
+  /roles/{id}:
+    put:
+      summary: Actualizar rol
+      tags:
+        - Roles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolDTO'
+      responses:
+        '200':
+          description: Rol actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRol'
+    delete:
+      summary: Borrar rol
+      tags:
+        - Roles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /privilegios:
+    get:
+      summary: Listar privilegios
+      tags:
+        - Privilegios
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de privilegios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /privilegios/obtenerPorId/{id}:
+    get:
+      summary: Obtener privilegio por ID
+      tags:
+        - Privilegios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Privilegio encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePrivilegio'
+  /privilegios/crear:
+    post:
+      summary: Crear privilegio
+      tags:
+        - Privilegios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivilegioDTO'
+      responses:
+        '201':
+          description: Privilegio creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePrivilegio'
+  /privilegios/{id}:
+    put:
+      summary: Actualizar privilegio
+      tags:
+        - Privilegios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivilegioDTO'
+      responses:
+        '200':
+          description: Privilegio actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePrivilegio'
+    delete:
+      summary: Borrar privilegio
+      tags:
+        - Privilegios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /categorias:
+    get:
+      summary: Listar categorías
+      tags:
+        - Categorias
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de categorías
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /categorias/obtenerPorId/{id}:
+    get:
+      summary: Obtener categoría por ID
+      tags:
+        - Categorias
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoría encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseCategoria'
+  /categorias/crear:
+    post:
+      summary: Crear categoría
+      tags:
+        - Categorias
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaDTO'
+      responses:
+        '201':
+          description: Categoría creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseCategoria'
+  /categorias/{id}:
+    put:
+      summary: Actualizar categoría
+      tags:
+        - Categorias
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaDTO'
+      responses:
+        '200':
+          description: Categoría actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseCategoria'
+    delete:
+      summary: Borrar categoría
+      tags:
+        - Categorias
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /comentarios:
+    get:
+      summary: Listar comentarios
+      tags:
+        - Comentarios
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de comentarios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /comentarios/obtenerPorId/{id}:
+    get:
+      summary: Obtener comentario por ID
+      tags:
+        - Comentarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comentario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseComentario'
+  /comentarios/crear:
+    post:
+      summary: Crear comentario
+      tags:
+        - Comentarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComentarioDTO'
+      responses:
+        '201':
+          description: Comentario creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseComentario'
+  /comentarios/{id}:
+    put:
+      summary: Actualizar comentario
+      tags:
+        - Comentarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComentarioDTO'
+      responses:
+        '200':
+          description: Comentario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseComentario'
+    delete:
+      summary: Borrar comentario
+      tags:
+        - Comentarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /etiquetas:
+    get:
+      summary: Listar etiquetas
+      tags:
+        - Etiquetas
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de etiquetas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /etiquetas/obtenerPorId/{id}:
+    get:
+      summary: Obtener etiqueta por ID
+      tags:
+        - Etiquetas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Etiqueta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEtiqueta'
+  /etiquetas/crear:
+    post:
+      summary: Crear etiqueta
+      tags:
+        - Etiquetas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EtiquetaDTO'
+      responses:
+        '201':
+          description: Etiqueta creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEtiqueta'
+  /etiquetas/{id}:
+    put:
+      summary: Actualizar etiqueta
+      tags:
+        - Etiquetas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EtiquetaDTO'
+      responses:
+        '200':
+          description: Etiqueta actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEtiqueta'
+    delete:
+      summary: Borrar etiqueta
+      tags:
+        - Etiquetas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /estadoflujos:
+    get:
+      summary: Listar flujos de estado de entrada
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de flujos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /estadoflujos/obtenerPorId/{id}:
+    get:
+      summary: Obtener flujo por ID
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Flujo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEstadoEntradaFlujo'
+  /estadoflujos/crear:
+    post:
+      summary: Crear flujo de estado
+      tags:
+        - EstadoFlujos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstadoEntradaFlujoDTO'
+      responses:
+        '201':
+          description: Flujo creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEstadoEntradaFlujo'
+  /estadoflujos/{id}:
+    put:
+      summary: Actualizar flujo de estado
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstadoEntradaFlujoDTO'
+      responses:
+        '200':
+          description: Flujo actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEstadoEntradaFlujo'
+    delete:
+      summary: Borrar flujo de estado
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /herramientasauxiliar/listar:
+    get:
+      summary: Listar herramientas auxiliares
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de herramientas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /herramientasauxiliar/obtenerPorId/{id}:
+    get:
+      summary: Obtener herramienta auxiliar por ID
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Herramienta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseHerramientasAuxiliar'
+  /herramientasauxiliar/crear:
+    post:
+      summary: Crear herramienta auxiliar
+      tags:
+        - HerramientasAuxiliar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HerramientasAuxiliarDTO'
+      responses:
+        '201':
+          description: Herramienta creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseHerramientasAuxiliar'
+  /herramientasauxiliar/{id}:
+    put:
+      summary: Actualizar herramienta auxiliar
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HerramientasAuxiliarDTO'
+      responses:
+        '200':
+          description: Herramienta actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseHerramientasAuxiliar'
+    delete:
+      summary: Borrar herramienta auxiliar
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /filestorage/subirFichero:
+    post:
+      summary: Subir fichero
+      tags:
+        - HerramientasAuxiliar
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Fichero subido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /redis/guardar:
+    post:
+      summary: Guardar valor en Redis
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: value
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: ttl
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Valor guardado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /redis/recuperar:
+    get:
+      summary: Recuperar valor de Redis
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Valor recuperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /redis/borrar:
+    delete:
+      summary: Borrar valor en Redis
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Valor borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /redis/ttl:
+    get:
+      summary: Obtener TTL de clave en Redis
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: TTL obtenido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /dashboard/summary:
+    get:
+      summary: Obtener resumen del dashboard
+      tags:
+        - Dashboard
+      responses:
+        '200':
+          description: Resumen del dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+  /dashboard/recent-activity:
+    get:
+      summary: Actividad reciente
+      tags:
+        - Dashboard
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: size
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Actividad reciente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+  /dashboard/series/activity:
+    get:
+      summary: Serie de actividad
+      tags:
+        - Dashboard
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: granularity
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Serie de actividad
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/ActivityPointDTO'
+                    - $ref: '#/components/schemas/ActivityHourPointDTO'
+  /dashboard/series/entries:
+    get:
+      summary: Serie de entradas por estado
+      tags:
+        - Dashboard
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: split
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: granularity
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Serie de entradas por estado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EntriesSplitPointDTO'
+  /dashboard/top:
+    get:
+      summary: Top usuarios/contenido
+      tags:
+        - Dashboard
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: startDate
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: endDate
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Top usuarios/contenido
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TopItemDTO'
+  /dashboard/storage:
+    get:
+      summary: Estadísticas de almacenamiento
+      tags:
+        - Dashboard
+      responses:
+        '200':
+          description: Estadísticas de almacenamiento
+          content:
+            application/json:
+              schema:
+                type: object
+  /dashboard/content-stats:
+    get:
+      summary: Estadísticas de contenido
+      tags:
+        - Dashboard
+      responses:
+        '200':
+          description: Estadísticas de contenido
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    EntradaDTO:
+      type: object
+      properties:
+        idEntrada:
+          type: integer
+        titulo:
+          type: string
+        subtitulo:
+          type: string
+        slug:
+          type: string
+        contenido:
+          type: string
+        notas:
+          type: string
+        tipoEntrada:
+          $ref: '#/components/schemas/TipoEntradaDTO'
+        resumen:
+          type: string
+        fechaPublicacion:
+          type: string
+          format: date-time
+        fechaEdicion:
+          type: string
+          format: date-time
+        borrador:
+          type: boolean
+        publicada:
+          type: boolean
+        password:
+          type: string
+        privado:
+          type: boolean
+        estadoEntrada:
+          $ref: '#/components/schemas/EstadoEntradaDTO'
+        fechaPublicacionProgramada:
+          type: string
+          format: date-time
+        permitirComentario:
+          type: boolean
+        imagenDestacada:
+          type: string
+          format: byte
+        votos:
+          type: integer
+        cantidadComentarios:
+          type: integer
+        idUsuario:
+          type: integer
+        usernameCreador:
+          type: string
+    TipoEntradaDTO:
+      type: object
+      properties:
+        idTipoEntrada:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+    EstadoEntradaDTO:
+      type: object
+      properties:
+        idEstadoEntrada:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+    CambiarEstadoEntradaDTO:
+      type: object
+      properties:
+        idEntrada:
+          type: integer
+        idUsuarioEditado:
+          type: integer
+        idEstadoEntrada:
+          type: integer
+    SearchRequestDTO:
+      type: object
+      properties:
+        dataOption:
+          type: string
+        searchCriteriaList:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchCriteriaDTO'
+    SearchCriteriaDTO:
+      type: object
+      properties:
+        filterKey:
+          type: string
+        value:
+          type: string
+        operation:
+          type: string
+        dataOption:
+          type: string
+        clazzName:
+          type: string
+    TipoEntradaResponseDTO:
+      type: object
+      properties:
+        tiposEntradas:
+          type: array
+          items:
+            $ref: '#/components/schemas/TipoEntradaDTO'
+    EstadoEntradaResponseDTO:
+      type: object
+      properties:
+        estadosEntradas:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstadoEntradaDTO'
+    CriterioBusquedaEntradaDTO:
+      type: object
+      properties:
+        ejemplo:
+          $ref: '#/components/schemas/SearchRequestDTO'
+        dataOptionPermitido:
+          type: array
+          items:
+            type: string
+        indicaciones:
+          type: array
+          items:
+            type: string
+        operationPermitido:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        valuePermitido:
+          type: array
+          items:
+            type: string
+        clazzNamePermitido:
+          type: array
+          items:
+            type: string
+        filterKeySegunClazzNamePermitido:
+          type: array
+          items:
+            type: string
+    OpenpanelApiResponseEntrada:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/EntradaDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponsePagina:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          type: object
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseTipoEntradaResponse:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/TipoEntradaResponseDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseEstadoEntradaResponse:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/EstadoEntradaResponseDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseCriterioBusquedaEntrada:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/CriterioBusquedaEntradaDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseString:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          type: string
+        error:
+          $ref: '#/components/schemas/ApiError'
+    ResultApiResponse:
+      type: object
+      properties:
+        trackingId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        success:
+          type: boolean
+        message:
+          type: string
+    ApiError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        message:
+          type: string
+        path:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+        stacktrace:
+          type: string
+    UsuarioDTO:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+        idRol:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        fechaNacimiento:
+          type: string
+          format: date
+        email:
+          type: string
+        genero:
+          type: string
+        telefono:
+          type: integer
+        emailConfirmado:
+          type: boolean
+        fechaEmailConfirmado:
+          type: string
+          format: date-time
+        website:
+          type: string
+        imagen:
+          type: string
+          format: byte
+        infouser:
+          type: string
+        tokenExpirationDate:
+          type: string
+          format: date-time
+    PerfilDTO:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+        idRol:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        fechaNacimiento:
+          type: string
+          format: date
+        email:
+          type: string
+        genero:
+          type: string
+        telefono:
+          type: integer
+        emailConfirmado:
+          type: boolean
+        website:
+          type: string
+        imagen:
+          type: string
+          format: byte
+        infouser:
+          type: string
+    CheckUsernameDTO:
+      type: object
+      properties:
+        username:
+          type: string
+    ChangePasswordDTO:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+    ChangeUsernameDTO:
+      type: object
+      properties:
+        usernameAntiguo:
+          type: string
+        usernameNuevo:
+          type: string
+    ConfirmarRegistroUsuarioDTO:
+      type: object
+      properties:
+        verifyToken:
+          type: string
+    MetadatosPerfilDTO:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+        idRol:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        fechaNacimiento:
+          type: string
+          format: date
+        email:
+          type: string
+        refreshToken:
+          type: array
+          items:
+            $ref: '#/components/schemas/SesionUsuarioDTO'
+        deviceMetadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceMetadataDTO'
+    SesionUsuarioDTO:
+      type: object
+      properties:
+        uuidSesionUsuario:
+          type: string
+        idUsuario:
+          type: integer
+        tokenType:
+          type: string
+        estaRevocado:
+          type: boolean
+        estaExpirado:
+          type: boolean
+        fPrimeraSesion:
+          type: string
+          format: date-time
+        fUltimaSesion:
+          type: string
+          format: date-time
+        fechaExpiracion:
+          type: string
+          format: date-time
+        fPrimeraSesionRT:
+          type: string
+          format: date-time
+        fUltimaSesionRT:
+          type: string
+          format: date-time
+        fechaExpiracionRT:
+          type: string
+          format: date-time
+        hashSesionToken:
+          type: string
+        hashRefreshToken:
+          type: string
+    DeviceMetadataDTO:
+      type: object
+      properties:
+        idDeviceMetadata:
+          type: integer
+        idUsuario:
+          type: integer
+        deviceDetails:
+          type: string
+        location:
+          type: string
+        lastLoggedIn:
+          type: string
+          format: date-time
+        ipAddress:
+          type: string
+    RespuestaDTO:
+      type: object
+      properties:
+        respuesta:
+          type: string
+    OpenpanelApiResponseUsuario:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/UsuarioDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponsePerfil:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/PerfilDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseRespuesta:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/RespuestaDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseMetadatosPerfil:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/MetadatosPerfilDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseRol:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/RolDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponsePrivilegio:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/PrivilegioDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseCategoria:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/CategoriaDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseComentario:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/ComentarioDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseEtiqueta:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/EtiquetaDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseEstadoEntradaFlujo:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/EstadoEntradaFlujoDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseHerramientasAuxiliar:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/HerramientasAuxiliarDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    ActivityPointDTO:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        value:
+          type: integer
+    ActivityHourPointDTO:
+      type: object
+      properties:
+        hour:
+          type: string
+        value:
+          type: integer
+    EntriesSplitPointDTO:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        estado:
+          type: string
+        value:
+          type: integer
+    TopItemDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        valor:
+          type: integer
+    RolDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+    PrivilegioDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+    CategoriaDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+    ComentarioDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        contenido:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        idUsuario:
+          type: integer
+        idEntrada:
+          type: integer
+    EtiquetaDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        color:
+          type: string
+    EstadoEntradaFlujoDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+    HerramientasAuxiliarDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        tipo:
+          type: string
+        descripcion:
+          type: string
+    Dashboard:
+      type: object
+      properties:
+        resumen:
+          type: object
+        actividadReciente:
+          type: array
+          items:
+            type: object
+        series:
+          type: array
+          items:
+            type: object
+        top:
+          type: array
+          items:
+            type: object
+        storage:
+          type: object
+        contentStats:
+          type: object
+  /dashboard/summary:
+    get:
+      summary: Obtener resumen del dashboard
+      tags:
+        - Dashboard
+      responses:
+        '200':
+          description: Resumen del dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseSummary'
+  /dashboard/recent-activity:
+    get:
+      summary: Obtener actividad reciente
+      tags:
+        - Dashboard
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer }
+          required: false
+        - name: size
+          in: query
+          schema: { type: integer }
+          required: false
+      responses:
+        '200':
+          description: Actividad reciente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseActividadReciente'
+  /dashboard/series/activity:
+    get:
+      summary: Serie de actividad
+      tags:
+        - Dashboard
+      parameters:
+        - name: days
+          in: query
+          schema: { type: integer }
+          required: false
+        - name: granularity
+          in: query
+          schema: { type: string, enum: [hour, day, week, month] }
+          required: false
+      responses:
+        '200':
+          description: Puntos de actividad
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseActivityPoints'
+  /dashboard/series/entries:
+    get:
+      summary: Serie de entradas con split
+      tags:
+        - Dashboard
+      parameters:
+        - name: days
+          in: query
+          schema: { type: integer }
+        - name: granularity
+          in: query
+          schema: { type: string, enum: [hour, day, week, month] }
+        - name: split
+          in: query
+          schema: { type: string, enum: [estado, estadoNombre] }
+      responses:
+        '200':
+          description: Serie de entradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEntriesSplit'
+  /dashboard/top:
+    get:
+      summary: Top elementos
+      tags:
+        - Dashboard
+      parameters:
+        - name: type
+          in: query
+          schema: { type: string, enum: [users, categories, tags] }
+        - name: limit
+          in: query
+          schema: { type: integer }
+        - name: startDate
+          in: query
+          schema: { type: string, format: date }
+        - name: endDate
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Top items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseTopItems'
+  /dashboard/storage:
+    get:
+      summary: Estado de almacenamiento
+      tags:
+        - Dashboard
+      responses:
+        '200':
+          description: Métricas de almacenamiento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseStorage'
+  /dashboard/content-stats:
+    get:
+      summary: Estadísticas de contenido
+      tags:
+        - Dashboard
+      responses:
+        '200':
+          description: Métricas de contenido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseContentStats'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    SummaryDTO:
+      type: object
+      properties:
+        totalEntradas: { type: integer }
+        totalUsuarios: { type: integer }
+        ultimasEntradas: { type: array, items: { $ref: '#/components/schemas/EntradaDTO' } }
+    ActivityPointDTO:
+      type: object
+      properties:
+        date: { type: string }
+        entradas: { type: integer }
+        comentarios: { type: integer }
+        usuarios: { type: integer }
+    TopItemDTO:
+      type: object
+      properties:
+        name: { type: string }
+        count: { type: integer }
+    StorageDTO:
+      type: object
+      properties:
+        totalFiles: { type: integer }
+        storageBytes: { type: integer }
+    ContentStatsDTO:
+      type: object
+      properties:
+        totalUsuarios: { type: integer }
+        totalEntradas: { type: integer }
+        totalComentarios: { type: integer }
+        totalFicheros: { type: integer }
+        storageBytes: { type: integer }
+    OpenpanelApiResponseSummary:
+      type: object
+      properties:
+        data: { $ref: '#/components/schemas/SummaryDTO' }
+    OpenpanelApiResponseActivityPoints:
+      type: object
+      properties:
+        data: { type: array, items: { $ref: '#/components/schemas/ActivityPointDTO' } }
+    OpenpanelApiResponseEntriesSplit:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              date: { type: string }
+              publicadas: { type: integer }
+              noPublicadas: { type: integer }
+    OpenpanelApiResponseTopItems:
+      type: object
+      properties:
+        data: { type: array, items: { $ref: '#/components/schemas/TopItemDTO' } }
+    OpenpanelApiResponseStorage:
+      type: object
+      properties:
+        data: { $ref: '#/components/schemas/StorageDTO' }
+    OpenpanelApiResponseContentStats:
+      type: object
+      properties:
+        data: { $ref: '#/components/schemas/ContentStatsDTO' }

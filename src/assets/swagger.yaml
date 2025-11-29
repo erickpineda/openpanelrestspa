@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  title: OpenPanel REST API
+  version: 1.0.0
+  description: API REST de OpenPanel, incluye todos los endpoints y modelos de datos principales.
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Entradas
+    description: Operaciones relacionadas con las entradas.
+  - name: Usuarios
+    description: Operaciones relacionadas con los usuarios.
+  - name: Roles
+    description: Operaciones relacionadas con los roles.
+  - name: Privilegios
+    description: Operaciones relacionadas con los privilegios.
+  - name: Categorias
+    description: Operaciones relacionadas con las categorías.
+  - name: Comentarios
+    description: Operaciones relacionadas con los comentarios.
+  - name: Etiquetas
+    description: Operaciones relacionadas con las etiquetas.
+  - name: EstadoFlujos
+    description: Operaciones relacionadas con los flujos de estado de entrada.
+  - name: HerramientasAuxiliar
+    description: Operaciones relacionadas con las herramientas auxiliares.
+  - name: Dashboard
+    description: Operaciones relacionadas con el dashboard y estadísticas.
+paths:
+  /entradas:
+    get:
+      summary: Listar entradas
+      tags:
+        - Entradas
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de entradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /entradas/obtenerPorId/{id}:
+    get:
+      summary: Obtener entrada por ID
+      tags:
+        - Entradas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Entrada encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEntrada'
+  /entradas/crear:
+    post:
+      summary: Crear entrada
+      tags:
+        - Entradas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntradaDTO'
+      responses:
+        '201':
+          description: Entrada creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEntrada'
+  /entradas/{id}:
+    put:
+      summary: Actualizar entrada
+      tags:
+        - Entradas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntradaDTO'
+      responses:
+        '200':
+          description: Entrada actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEntrada'
+    delete:
+      summary: Borrar entrada
+      tags:
+        - Entradas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /entradas/listarPorIdUsuario/{idUsuario}:
+    get:
+      summary: Listar entradas por usuario
+      tags:
+        - Entradas
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de entradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  # ... (contenido idéntico al swagger.yaml raíz, incluyendo Dashboard y components)

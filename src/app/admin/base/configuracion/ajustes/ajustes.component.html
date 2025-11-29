@@ -1,0 +1,25 @@
+<div class="card">
+  <div class="card-header">
+    Ajustes
+  </div>
+  <div class="card-body" [attr.aria-busy]="loading ? 'true' : null">
+    <div *ngIf="error" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
+      <span>{{ error }}</span>
+      <button class="btn btn-sm btn-danger" (click)="load()">Reintentar</button>
+    </div>
+    <div *ngIf="loading" class="py-3 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>
+    <div *ngIf="!loading">
+      <table class="table table-hover" role="table">
+        <thead><tr><th>Categoria</th><th>Clave</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let a of ajustes">
+            <td>{{ a.categoria }}</td>
+            <td>{{ a.clave }}</td>
+            <td class="text-truncate">{{ a.valor }}</td>
+          </tr>
+          <tr *ngIf="ajustes.length === 0"><td colspan="3" class="text-muted text-center">Sin ajustes</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
