@@ -1,12 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { IconSetService } from '@coreui/icons-angular';
+import { DashboardApiService } from '../core/services/dashboard-api.service';
 
 import { iconSubset } from '../shared/components/icons/icon-subset';
 import { navItems } from './default-layout/_nav';
 import { TemporaryStorageService } from '../core/services/ui/temporary-storage.service';
 import { LoggerService } from '../core/services/logger.service';
+import { LoadingService } from '../core/services/ui/loading.service';
+import { ToastService } from '../core/services/ui/toast.service';
 
 // ... imports existentes
 
@@ -14,14 +17,20 @@ import { LoggerService } from '../core/services/logger.service';
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, AfterViewInit {
   // ✅ NUEVO: Propiedades para controlar la notificación
   showGlobalRecoveryNotification = false;
   temporaryEntriesCount = 0;
 
   public navItems = navItems;
   public cargaFinalizada: boolean = false;
+  public projectsCount: number = 0;
+  public notificationsCount: number = 0;
+  public tasksCount: number = 0;
+  public messagesCount: number = 0;
+  public commentsCount: number = 0;
 
   // Propiedades para el componente de recuperación
   showRecoveryNotification = false;
@@ -32,14 +41,53 @@ export class AdminComponent implements OnInit {
     private titleService: Title,
     private iconSetService: IconSetService,
     private temporaryStorage: TemporaryStorageService,
-    private log: LoggerService
+    private log: LoggerService,
+    public loadingService: LoadingService,
+    private toastService: ToastService,
+    private dashboardApi: DashboardApiService,
+    private cdr: ChangeDetectorRef
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
 
+  // Etiquetas del header (para i18n/bindings)
+  public labelDashboard = 'Escritorio';
+  public labelUsers = 'Usuarios';
+  public labelGoHome = 'Ir a inicio';
+  public labelAccount = 'Account';
+  public labelUpdates = 'Updates';
+  public labelMessages = 'Messages';
+  public labelTasks = 'Tasks';
+  public labelComments = 'Comments';
+  public labelSettings = 'Settings';
+  public labelProfile = 'Profile';
+  // eliminado: etiqueta de pagos
+  public labelProjects = 'Projects';
+  public labelLockAccount = 'Lock Account';
+
   ngOnInit(): void {
     this.checkForTemporaryData();
     this.cargaFinalizada = true;
+    const locale = (navigator && navigator.language) ? navigator.language : 'es-ES';
+    this.setHeaderLabels(locale);
+    this.dashboardApi.getContentStats().subscribe(stats => {
+      this.projectsCount = Number(stats?.totalEntradas) || 0;
+      this.commentsCount = Number(stats?.totalComentarios) || 0;
+      this.messagesCount = this.commentsCount; // mapeo provisional
+      this.cdr.markForCheck();
+    });
+    this.toastService.toasts$.subscribe(list => {
+      this.notificationsCount = Array.isArray(list) ? list.length : 0;
+      this.cdr.markForCheck();
+    });
+    this.tasksCount = this.temporaryEntriesCount;
+    this.cdr.markForCheck();
+  }
+
+  ngAfterViewInit(): void {
+    try {
+      this.cdr.detectChanges();
+    } catch {}
   }
 
   private checkForTemporaryData(): void {
@@ -74,5 +122,21 @@ export class AdminComponent implements OnInit {
     this.showGlobalRecoveryNotification = false;
     this.temporaryStorage.clearAllTemporaryEntries();
     this.log.info('🗑️ Usuario descartó todos los datos temporales');
+  }
+
+  private setHeaderLabels(locale: string): void {
+    this.labelDashboard = 'Escritorio';
+    this.labelUsers = 'Usuarios';
+    this.labelGoHome = 'Ir a inicio';
+    this.labelAccount = 'Cuenta';
+    this.labelUpdates = 'Actualizaciones';
+    this.labelMessages = 'Mensajes';
+    this.labelTasks = 'Tareas';
+    this.labelComments = 'Comentarios';
+    this.labelSettings = 'Ajustes';
+    this.labelProfile = 'Perfil';
+    // eliminado: etiqueta de pagos
+    this.labelProjects = 'Proyectos';
+    this.labelLockAccount = 'Bloquear cuenta';
   }
 }

@@ -42,7 +42,7 @@ import {
   cilClone,
   cilCode,
   cilCommentSquare,
-  cilCreditCard,
+  
   cilCursor,
   cilDataTransferDown,
   cilDataTransferUp,
@@ -153,7 +153,7 @@ export const iconSubset = {
   cilCode,
   cilCommentSquare,
   cilContact,
-  cilCreditCard,
+  
   cilCursor,
   cilDataTransferDown,
   cilDataTransferUp,
@@ -264,7 +264,7 @@ export enum IconSubset {
   cilCode = 'cilCode',
   cilCommentSquare = 'cilCommentSquare',
   cilContact = 'cilContact',
-  cilCreditCard = 'cilCreditCard',
+  
   cilCursor = 'cilCursor',
   cilDataTransferDown = 'cilDataTransferDown',
   cilDataTransferUp = 'cilDataTransferUp',

@@ -12,12 +12,12 @@ import { ListadoCategoriasComponent } from './categorias/listado-categorias.comp
 const routes: Routes = [
   {
     path: '', component: BaseComponent, children: [
-      { path: 'entradas', loadChildren: () => import('./entradas/entradas.module').then(m => m.EntradasModule) },
+      { path: 'entradas', loadChildren: () => import('./entradas/entradas.module').then(m => m.EntradasModule), data: { preload: true, delay: 1000 } },
       // Secciones reubicadas bajo base
-      { path: 'configuracion', loadChildren: () => import('./configuracion/configuracion.module').then(m => m.ConfiguracionModule) },
-      { path: 'contenido', loadChildren: () => import('./contenido/contenido.module').then(m => m.ContenidoModule) },
-      { path: 'gestion', loadChildren: () => import('./gestion/gestion.module').then(m => m.GestionModule) },
-      { path: 'etiquetas', loadChildren: () => import('./etiquetas/etiquetas.module').then(m => m.EtiquetasModule) },
+      { path: 'configuracion', loadChildren: () => import('./configuracion/configuracion.module').then(m => m.ConfiguracionModule), data: { preload: true, delay: 1200 } },
+      { path: 'contenido', loadChildren: () => import('./contenido/contenido.module').then(m => m.ContenidoModule), data: { preload: true, delay: 1400 } },
+      { path: 'gestion', loadChildren: () => import('./gestion/gestion.module').then(m => m.GestionModule), data: { preload: true, delay: 1600 } },
+      { path: 'etiquetas', loadChildren: () => import('./etiquetas/etiquetas.module').then(m => m.EtiquetasModule), data: { preload: true, delay: 1800 } },
       {
         path: 'categorias', children: [
           { path: '', component: ListadoCategoriasComponent },

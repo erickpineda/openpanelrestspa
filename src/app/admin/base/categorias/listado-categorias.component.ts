@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { finalize } from 'rxjs/operators';
 import { Router } from "@angular/router";
 import { Categoria } from "../../../core/models/categoria.model";
 import { CategoriaService } from "../../../core/services/data/categoria.service";
@@ -27,14 +28,14 @@ export class ListadoCategoriasComponent implements OnInit {
   obtenerListaCategorias(): void {
     this.cargando = true;
     this.errorMsg = null;
-    this.categoriaService.listarSinGlobalLoader().subscribe({
+    this.categoriaService.listarSinGlobalLoader()
+      .pipe(finalize(() => { this.cargando = false; }))
+      .subscribe({
       next: (response: any) => {
         const categorias: Categoria[] = Array.isArray(response) ? response : [];
         this.listaCategorias = categorias;
-        this.cargando = false;
       },
       error: (err: any) => {
-        this.cargando = false;
         if (err?.status === 404) {
           this.listaCategorias = [];
           this.errorMsg = 'No se encontraron categorías.';

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AdminComponent } from './admin.component';
+import { of } from 'rxjs';
+import { DashboardApiService } from '../core/services/dashboard-api.service';
 
 
 describe('AdminComponent', () => {
@@ -10,6 +12,9 @@ describe('AdminComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ AdminComponent ],
+      providers: [
+        { provide: DashboardApiService, useValue: { getContentStats: () => of({ totalEntradas: 0 }) } }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();

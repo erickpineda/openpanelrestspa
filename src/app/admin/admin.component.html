@@ -54,6 +54,21 @@
     class="mb-4 d-print-none header header-sticky"
     position="sticky"
     sidebarId="sidebar"
+    [busy]="(loadingService.globalLoading$ | async) ?? false"
+    [labelDashboard]="labelDashboard"
+    [labelUsers]="labelUsers"
+    [labelGoHome]="labelGoHome"
+    [labelAccount]="labelAccount"
+    [labelUpdates]="labelUpdates"
+    [labelMessages]="labelMessages"
+    [labelTasks]="labelTasks"
+    [labelComments]="labelComments"
+    [labelSettings]="labelSettings"
+    [labelProfile]="labelProfile"
+    [labelProjects]="labelProjects"
+    [projectsCount]="projectsCount"
+    [userCounts]="{ notifications: notificationsCount, tasks: tasksCount, messages: messagesCount, comments: commentsCount }"
+    [labelLockAccount]="labelLockAccount"
   ></app-default-header>
 
   <!-- Body -->

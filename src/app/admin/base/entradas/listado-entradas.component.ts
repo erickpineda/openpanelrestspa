@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef, NgZone, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { EntradaCatalogService } from '../../../core/services/data/entrada-catalog.service';
 import { catchError, Subject, takeUntil, throwError } from 'rxjs';
@@ -17,8 +17,9 @@ import { Router } from '@angular/router';
   selector: 'app-listado-entradas',
   templateUrl: './listado-entradas.component.html',
   styleUrls: ['./listado-entradas.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListadoEntradasComponent implements OnInit, OnDestroy {
+export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewInit {
   listaEntradas: Entrada[] = [];
   entradaABorrar: Entrada | null = null;
 
@@ -51,7 +52,9 @@ private readonly boundaryId = 'listado-entradas-main';
     private errorBoundaryService: ErrorBoundaryService,
     private log: LoggerService,
     private router: Router,
-    private entradaCatalogService: EntradaCatalogService
+    private entradaCatalogService: EntradaCatalogService,
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +63,10 @@ private readonly boundaryId = 'listado-entradas-main';
       (term, page) => this.realizarBusquedaEntradas(term, page),
       (response) => this.procesarResultadosBusqueda(response)
     );
+  }
+
+  ngAfterViewInit(): void {
+    try { this.cdr.detectChanges(); } catch {}
   }
 
   ngOnDestroy(): void {
@@ -71,6 +78,7 @@ private readonly boundaryId = 'listado-entradas-main';
 
   private realizarBusquedaEntradas(term: string, page?: number) {
     this.cargandoTabla = true;
+    this.cdr.markForCheck();
     const searchRequest = {
       dataOption: this.dataOptionSeleccionada,
       searchCriteriaList: [{
@@ -89,6 +97,7 @@ private readonly boundaryId = 'listado-entradas-main';
     this.operacionSeleccionada = filtro.operacion;
     this.valorBusqueda = filtro.valor;
     this.currentPage = 0;
+    this.cdr.markForCheck();
     
     if (this.campoSeleccionado && this.operacionSeleccionada) {
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
@@ -118,10 +127,13 @@ private readonly boundaryId = 'listado-entradas-main';
       this.mostrarError('Error en búsqueda: ' + response);
     }
     this.cargandoTabla = false;
+    this.cdr.markForCheck();
+    try { this.cdr.detectChanges(); } catch {}
   }
 
   private cargarDefinicionesBuscador(): void {
     this.cargando = true;
+    this.cdr.markForCheck();
     
     this.entradaService.obtenerDefinicionesBuscadorSafe()
       .pipe(
@@ -144,10 +156,12 @@ private readonly boundaryId = 'listado-entradas-main';
             this.definiciones = response;
             this.inicializarCamposBusqueda();
           }
+          this.cdr.markForCheck();
         },
         error: (error) => {
           this.cargando = false;
           this.log.error('Error secundario:', error);
+          this.cdr.markForCheck();
         }
       });
   }
@@ -172,7 +186,7 @@ private readonly boundaryId = 'listado-entradas-main';
     this.currentPage = 0;
     
     if (this.campoSeleccionado && this.operacionSeleccionada) {
-      this.busquedaService.triggerBusqueda(this.valorBusqueda);
+      this.zone.run(() => setTimeout(() => this.busquedaService.triggerBusqueda(this.valorBusqueda), 0));
     }
   }
 
@@ -186,6 +200,7 @@ private readonly boundaryId = 'listado-entradas-main';
         next: (response) => this.procesarResultadosBusqueda(response),
         error: (error) => this.mostrarError('Error en búsqueda: ' + error)
       });
+    this.cdr.markForCheck();
   }
 
   checkFechaPublicacion(fechaPublicacion: Date): string {
@@ -197,6 +212,7 @@ private readonly boundaryId = 'listado-entradas-main';
   borrarEntrada(entrada: Entrada): void {
     this.entradaABorrar = entrada;
     this.visible = true;
+    this.cdr.markForCheck();
   }
 
   confirmarBorrado(): void {
@@ -209,11 +225,13 @@ private readonly boundaryId = 'listado-entradas-main';
             this.entradaABorrar = null;
             this.visible = false;
             this.toastService.showSuccess('La entrada se ha eliminado correctamente.', 'Entrada eliminada');
+            this.cdr.markForCheck();
           },
           error: (error) => {
             this.log.error('Error al eliminar la entrada:', error);
             this.visible = false;
             this.mostrarError('Error al eliminar la entrada: ' + error.message);
+            this.cdr.markForCheck();
           }
         });
     }
@@ -222,6 +240,7 @@ private readonly boundaryId = 'listado-entradas-main';
   private mostrarError(mensaje: string): void {
     this.toastService.showError(mensaje, 'Error');
     this.cargandoTabla = false;
+    this.cdr.markForCheck();
   }
 
   toggleModal(): void {
@@ -229,6 +248,7 @@ private readonly boundaryId = 'listado-entradas-main';
     if (!this.visible) {
       this.entradaABorrar = null;
     }
+    this.cdr.markForCheck();
   }
 
   onVisibleModalChange(visible: boolean): void {
@@ -236,6 +256,8 @@ private readonly boundaryId = 'listado-entradas-main';
     if (!visible) {
       this.entradaABorrar = null;
     }
+    this.cdr.markForCheck();
+    try { this.cdr.detectChanges(); } catch {}
   }
 
   refrescarDatos(): void {
@@ -264,11 +286,13 @@ private readonly boundaryId = 'listado-entradas-main';
   closePreview(): void {
     this.previewVisible = false;
     this.previewEntrada = undefined;
+    this.cdr.markForCheck();
   }
 
   onPreviewVisibleChange(visible: boolean): void {
     this.previewVisible = visible;
     if (!visible) this.previewEntrada = undefined;
+    this.cdr.markForCheck();
   }
 
   onEditarDesdePreview(): void {

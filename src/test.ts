@@ -31,3 +31,8 @@ import './app/shared/components/op-pagination/op-pagination.component.spec';
 import './app/shared/components/buscador-avanzado/buscador-avanzado.component.spec';
 import './app/public/about/containers/about.component.spec';
 import './app/public/contact/containers/contact.component.spec';
+import './app/core/preloading/custom-preloading-strategy.service.spec';
+import './app/admin/admin.component.ng0100.spec';
+import './app/admin/base/entradas/listado-entradas.component.ng0100.spec';
+import './app/admin/base/comentarios/crear-editar/crear-editar-comentario.component.spec';
+import './app/admin/base/categorias/listado-categorias.component.spec';

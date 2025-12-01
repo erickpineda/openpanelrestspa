@@ -30,6 +30,7 @@ export class CrearEditarComentario implements OnInit {
     private commonFuncService: CommonFunctionalityService,
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
+    private router: Router,
     public entradaService: EntradaService,
     public comentarioService: ComentarioService,
     public usuarioService: UsuarioService,
@@ -181,6 +182,10 @@ export class CrearEditarComentario implements OnInit {
 
   onReset() {
     this.submitted = false;
+  }
+
+  cancelar() {
+    this.router.navigate(["/admin/control/comentarios"]);
   }
 
   getComentarioId(param: string) {
