@@ -107,6 +107,18 @@ export class AuthSyncService {
     window.dispatchEvent(new Event('authStateChanged'));
   }
 
+  public notifyChanged(extra: Record<string, any> = {}): void {
+    const payload: SyncEvent = {
+      type: 'CHANGED',
+      timestamp: Date.now(),
+      originTabId: this.tokenStorage.getOrCreateTabId(),
+      ...extra
+    };
+    this.broadcast(payload);
+    window.dispatchEvent(new CustomEvent('auth:changed', { detail: payload }));
+    window.dispatchEvent(new Event('authStateChanged'));
+  }
+
   private broadcast(payload: SyncEvent): void {
     try {
       // 1) localStorage -> disparará storage event en otras pestañas

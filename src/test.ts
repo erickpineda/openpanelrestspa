@@ -36,3 +36,4 @@ import './app/admin/admin.component.ng0100.spec';
 import './app/admin/base/entradas/listado-entradas.component.ng0100.spec';
 import './app/admin/base/comentarios/crear-editar/crear-editar-comentario.component.spec';
 import './app/admin/base/categorias/listado-categorias.component.spec';
+import './app/core/services/dashboard-api.service.spec';

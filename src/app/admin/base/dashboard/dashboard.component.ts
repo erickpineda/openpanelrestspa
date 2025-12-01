@@ -11,6 +11,7 @@ import { LoadingService } from '../../../core/services/ui/loading.service';
 import { ActivityPointDTO, SummaryDTO, SummaryEntryDTO, TopItemDTO, StorageDTO, ContentStatsDTO } from '../../../shared/models/dashboard.models';
 import { ToastService } from '../../../core/services/ui/toast.service';
 import { environment } from '../../../../environments/environment';
+import { AuthSyncService } from '../../../core/services/auth/auth-sync.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -139,6 +140,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   perf: Record<string, number> = {};
   perfUpdatedAt: Date | null = null;
   metricsExpanded: boolean = false;
+  forceFromDb: boolean = false;
+  private onAuthChangedHandler?: (ev: any) => void;
 
   constructor(
     private usuarioService: UsuarioService,
@@ -147,7 +150,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private log: LoggerService,
     private dashboardApi: DashboardApiService,
     private loadingService: LoadingService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private authSync: AuthSyncService
   ) {}
 
   private initDefaultData(): void {
@@ -176,9 +180,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.initDefaultData();
     try { const s = sessionStorage.getItem('dash_metrics_expanded'); this.metricsExpanded = s === '1'; } catch {}
+    try { const f = sessionStorage.getItem('dash_force_db'); if (f === '1') this.forceFromDb = true; else if (f === '0') this.forceFromDb = false; } catch {}
     try { if ((window as any).__E2E_POPULATE_DASHBOARD__ === true) { this.populateMockForE2E(); } } catch {}
     this.refreshDashboard();
     this.loadRecentActivity();
+    this.onAuthChangedHandler = (ev: any) => {
+      const d = ev && ev.detail ? ev.detail : null;
+      const key = d && d.key ? String(d.key) : '';
+      if (key === 'dash_force_db') {
+        const v = d && d.value ? String(d.value) : '';
+        this.forceFromDb = v === '1';
+        try { this.cdr.detectChanges(); } catch {}
+      }
+    };
+    try { window.addEventListener('auth:changed', this.onAuthChangedHandler as any); } catch {}
   }
 
   private markPerf(t0: number, name: string): void {
@@ -222,6 +237,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     try { sessionStorage.setItem('dash_metrics_expanded', this.metricsExpanded ? '1' : '0'); } catch {}
   }
 
+  toggleForceFromDb(): void {
+    this.forceFromDb = !this.forceFromDb;
+    try { sessionStorage.setItem('dash_force_db', this.forceFromDb ? '1' : '0'); } catch {}
+    try { this.authSync.notifyChanged({ key: 'dash_force_db', value: this.forceFromDb ? '1' : '0' }); } catch {}
+  }
+
   async copyPerfToClipboard(): Promise<void> {
     try {
       const payload = { updatedAt: this.perfUpdatedAt ? this.perfUpdatedAt.toISOString() : null, perf: this.perf };
@@ -252,6 +273,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadingService.setGlobalLoading(true);
     this.loadingSeries = true;
     this.errorSummary = null;
+    if (!force) {
+      try {
+        this.dashboardApi.evictSummary();
+        this.dashboardApi.evictSeries(this.seriesDays);
+        this.dashboardApi.evictTop();
+        this.dashboardApi.evictContentStats();
+      } catch {}
+    }
     const start = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const mark = (name: string) => { try { const now = typeof performance !== 'undefined' ? performance.now() : Date.now(); this.log.debug(`[perf] ${name} ms`, Math.round(now - start)); this.markPerf(start, name); } catch {} };
     const summary$ = this.dashboardApi.getSummary(force).pipe(tap({ next: () => mark('summary'), error: () => mark('summary:error') }));
@@ -311,11 +340,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   refreshDashboard(): void {
-    this.loadAllDashboardData(true);
+    this.loadAllDashboardData(this.forceFromDb === true);
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    try { if (this.onAuthChangedHandler) window.removeEventListener('auth:changed', this.onAuthChangedHandler as any); } catch {}
   }
 
   async cargarEstadisticas(): Promise<void> {
@@ -1014,7 +1044,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadSeriesEntriesSplitEstado(): void {
     this.loadingSplitEstado = true;
-    const sub = this.dashboardApi.getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, true).subscribe({
+    const sub = this.dashboardApi.getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, this.forceFromDb === true).subscribe({
       next: (arr: any[]) => {
         if (arr && arr.length) {
           // Detectar todos los estados presentes en la serie
@@ -1045,7 +1075,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadSeriesEntriesSplitEstadoNombre(): void {
     this.loadingSplitEstadoNombre = true;
-    const sub = this.dashboardApi.getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, true).subscribe({
+    const sub = this.dashboardApi.getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, this.forceFromDb === true).subscribe({
       next: (arr: any[]) => {
         if (arr && arr.length) {
           // Desanidar si los estados vienen en 'entradasByEstado'

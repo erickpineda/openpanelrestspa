@@ -10,6 +10,9 @@
             <svg cIcon name="cilChart" style="padding-right: 2px" size="sm" title="Ver Gráfico"></svg>
             Refrescar Gráficos
           </button>
+          <button cButton color="secondary" size="sm" (click)="toggleForceFromDb()" [active]="forceFromDb" title="Forzar datos desde BD" [attr.aria-pressed]="forceFromDb ? 'true' : 'false'">
+            Forzar BD: {{ forceFromDb ? 'On' : 'Off' }}
+          </button>
           <button cButton color="info" size="sm" (click)="downloadCurrentData()" aria-label="Descargar datos" title="Descargar datos en JSON">
             <svg cIcon name="cilDataTransferDown" style="padding-right: 2px" size="sm" title="Descargar Datos"></svg>
             Descargar Datos
