@@ -7,6 +7,7 @@ import { Subscription, forkJoin } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { LoggerService } from '../../../core/services/logger.service';
 import { DashboardApiService } from '../../../core/services/dashboard-api.service';
+import { DashboardFacadeService } from './srv/dashboard-facade.service';
 import { LoadingService } from '../../../core/services/ui/loading.service';
 import { ActivityPointDTO, SummaryDTO, SummaryEntryDTO, TopItemDTO, StorageDTO, ContentStatsDTO } from '../../../shared/models/dashboard.models';
 import { ToastService } from '../../../core/services/ui/toast.service';
@@ -20,29 +21,29 @@ import { OPConstants } from '../../../shared/constants/op-global.constants';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-        errorSummary: string | null = null;
-        errorSplitEstadoNombre: string | null = null;
-      // showRefreshFeedback eliminado, se usará ToastService
-    // Suma total de un estado específico en el periodo actual
-    getKpiPorEstado(estado: string): number {
-      if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
-        const ds = this.seriesEntriesSplitData.datasets.find((d: any) => d.label === estado);
-        if (ds && Array.isArray(ds.data)) {
-          return ds.data.reduce((acc: number, v: number) => acc + (Number(v) || 0), 0);
-        }
+  errorSummary: string | null = null;
+  errorSplitEstadoNombre: string | null = null;
+  // showRefreshFeedback eliminado, se usará ToastService
+  // Suma total de un estado específico en el periodo actual
+  getKpiPorEstado(estado: string): number {
+    if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
+      const ds = this.seriesEntriesSplitData.datasets.find((d: any) => d.label === estado);
+      if (ds && Array.isArray(ds.data)) {
+        return ds.data.reduce((acc: number, v: number) => acc + (Number(v) || 0), 0);
       }
-      return 0;
     }
+    return 0;
+  }
 
-    // Suma total de todos los estados excepto el indicado
-    getKpiExceptoEstado(estado: string): number {
-      if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
-        return this.seriesEntriesSplitData.datasets
-          .filter((d: any) => d.label !== estado)
-          .reduce((acc: number, ds: any) => acc + (Array.isArray(ds.data) ? ds.data.reduce((a: number, v: number) => a + (Number(v) || 0), 0) : 0), 0);
-      }
-      return 0;
+  // Suma total de todos los estados excepto el indicado
+  getKpiExceptoEstado(estado: string): number {
+    if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
+      return this.seriesEntriesSplitData.datasets
+        .filter((d: any) => d.label !== estado)
+        .reduce((acc: number, ds: any) => acc + (Array.isArray(ds.data) ? ds.data.reduce((a: number, v: number) => a + (Number(v) || 0), 0) : 0), 0);
     }
+    return 0;
+  }
   // KPI Publicadas: solo el estado 'PUBLICADA'
   get kpiPublicadas(): number {
     if (this.contentStats && this.contentStats.entradasByEstado) {
@@ -150,6 +151,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private log: LoggerService,
     private dashboardApi: DashboardApiService,
+    private dashboardFacade: DashboardFacadeService,
     private loadingService: LoadingService,
     private toastService: ToastService,
     private authSync: AuthSyncService
@@ -284,14 +286,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
     const start = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const mark = (name: string) => { try { const now = typeof performance !== 'undefined' ? performance.now() : Date.now(); this.log.debug(`[perf] ${name} ms`, Math.round(now - start)); this.markPerf(start, name); } catch {} };
-    const summary$ = this.dashboardApi.getSummary(force).pipe(tap({ next: () => mark('summary'), error: () => mark('summary:error') }));
-    const series$ = this.dashboardApi.getSeriesActivity(this.seriesDays, force, this.seriesGranularity).pipe(tap({ next: () => mark('series'), error: () => mark('series:error') }));
-    const topUsers$ = this.dashboardApi.getTop('users', this.topLimit, force).pipe(tap({ next: () => mark('topUsers'), error: () => mark('topUsers:error') }));
-    const topCategories$ = this.dashboardApi.getTop('categories', this.topLimit, force).pipe(tap({ next: () => mark('topCategories'), error: () => mark('topCategories:error') }));
-    const storage$ = this.dashboardApi.getStorage().pipe(tap({ next: () => mark('storage'), error: () => mark('storage:error') }));
-    const contentStats$ = this.dashboardApi.getContentStats().pipe(tap({ next: () => mark('contentStats'), error: () => mark('contentStats:error') }));
-    const topTags$ = this.dashboardApi.getTop('tags', this.topLimit, force).pipe(tap({ next: () => mark('topTags'), error: () => mark('topTags:error') }));
-    const sub = forkJoin([summary$, series$, topUsers$, topCategories$, topTags$, storage$, contentStats$]).subscribe({
+    const sub = this.dashboardFacade.refreshAll(
+      this.seriesDays,
+      this.seriesGranularity,
+      this.topLimit,
+      force,
+      this.topCustomStartDate,
+      this.topCustomEndDate
+    ).subscribe({
       next: ([summary, series, topUsers, topCategories, topTags, storage, contentStats]) => {
         try {
           if (summary) {
@@ -419,15 +421,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const { startDate, endDate } = this.topCustomStartDate && this.topCustomEndDate
       ? { startDate: this.topCustomStartDate, endDate: this.topCustomEndDate }
       : this.getPeriodDates(this.topPeriodDays);
-    const subTopUsers = this.dashboardApi.getTop('users', this.topLimit, false, startDate, endDate).subscribe({
+    const subTopUsers = this.dashboardFacade.getTop('users', this.topLimit, false, startDate, endDate).subscribe({
       next: (items: TopItemDTO[]) => { this.topUsers = items || []; this.loadingTopUsers = false; mark('topUsers'); this.cdr.detectChanges(); },
       error: () => { this.loadingTopUsers = false; this.errorTopUsers = 'Error obteniendo Top Usuarios'; mark('topUsers:error'); this.focusRetry('.retry-btn-top-users'); }
     });
-    const subTopCategories = this.dashboardApi.getTop('categories', this.topLimit, false, startDate, endDate).subscribe({
+    const subTopCategories = this.dashboardFacade.getTop('categories', this.topLimit, false, startDate, endDate).subscribe({
       next: (items: TopItemDTO[]) => { this.topCategories = items || []; this.loadingTopCategories = false; mark('topCategories'); this.cdr.detectChanges(); },
       error: () => { this.loadingTopCategories = false; this.errorTopCategories = 'Error obteniendo Top Categorías'; mark('topCategories:error'); this.focusRetry('.retry-btn-top-categories'); }
     });
-    const subTopTags = this.dashboardApi.getTop('tags', this.topLimit, false, startDate, endDate).subscribe({
+    const subTopTags = this.dashboardFacade.getTop('tags', this.topLimit, false, startDate, endDate).subscribe({
       next: (items: TopItemDTO[]) => { this.topTags = items || []; this.loadingTopTags = false; mark('topTags'); this.cdr.detectChanges(); },
       error: () => { this.loadingTopTags = false; this.errorTopTags = 'Error obteniendo Top Tags'; mark('topTags:error'); this.focusRetry('.retry-btn-top-tags'); }
     });
@@ -445,7 +447,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadStorage(): void {
     this.loadingStorage = true;
     this.errorStorage = null;
-    const sub = this.dashboardApi.getStorage().subscribe({
+    const sub = this.dashboardFacade.getStorage().subscribe({
       next: (s: StorageDTO) => { this.storage = s; this.loadingStorage = false; this.cdr.detectChanges(); },
       error: () => { this.loadingStorage = false; this.errorStorage = 'Error obteniendo almacenamiento'; this.focusRetry('.retry-btn-storage'); }
     });
@@ -457,7 +459,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const mark = (name: string) => { try { const now = typeof performance !== 'undefined' ? performance.now() : Date.now(); this.log.debug(`[perf] ${name} ms`, Math.round(now - t0)); this.markPerf(t0, name); } catch {} };
     this.loadingContentStats = true;
     this.errorContentStats = null;
-    const sub = this.dashboardApi.getContentStats().subscribe({
+    const sub = this.dashboardFacade.getContentStats().subscribe({
       next: (cs: ContentStatsDTO) => { this.contentStats = cs; this.updateContentStatsChart(cs); this.loadingContentStats = false; mark('contentStats(load)'); this.cdr.detectChanges(); },
       error: () => { this.loadingContentStats = false; this.errorContentStats = 'Error obteniendo estadísticas de contenido'; mark('contentStats(load):error'); this.focusRetry('.retry-btn-content'); }
     });
@@ -469,7 +471,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const mark = (name: string) => { try { const now = typeof performance !== 'undefined' ? performance.now() : Date.now(); this.log.debug(`[perf] ${name} ms`, Math.round(now - t0)); } catch {} };
     this.loadingRecent = true;
     this.errorRecent = null;
-    const sub = this.dashboardApi.getRecentActivity(this.recentPage, this.recentSize).subscribe({
+    const sub = this.dashboardFacade.getRecentActivity(this.recentPage, this.recentSize).subscribe({
       next: (r: any) => {
         if (Array.isArray(r)) {
           this.recentItems = r;
@@ -520,7 +522,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   changeSeriesDays(days: number): void {
     const d = Math.max(1, Math.min(365, Number(days) || 30));
     this.seriesDays = d;
-    const sub = this.dashboardApi.getSeriesActivity(this.seriesDays, true, this.seriesGranularity).subscribe({
+    const sub = this.dashboardFacade.getSeries(this.seriesDays, true, this.seriesGranularity).subscribe({
       next: (points: ActivityPointDTO[]) => {
         this.data = {
           labels: points.map(p => this.formatLabelFromDate(p.date)),
@@ -590,9 +592,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     if (changedDays || changedGran) {
+      this.dashboardFacade.evictSeries(sd);
       this.changeSeriesDays(this.seriesDays);
     }
     if (changedTopLimit || changedTopPeriod || this.topCustomStartDate || this.topCustomEndDate) {
+      this.dashboardFacade.evictTop('users');
+      this.dashboardFacade.evictTop('categories');
+      this.dashboardFacade.evictTop('tags');
       this.loadTopWidgets();
     }
 
@@ -600,11 +606,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   resetSettings(): void {
-    if (this.settingsInitial) {
-      this.settings = { ...this.settingsInitial };
-      this.clearFeedback = 'Campos restablecidos a los valores iniciales';
-      this.cdr.detectChanges();
-    }
+    this.settings = {
+      seriesDays: 30,
+      seriesGranularity: 'day',
+      topLimit: 10,
+      topPeriodDays: 30,
+      topStartDate: undefined,
+      topEndDate: undefined
+    };
+    this.clearFeedback = 'Campos restablecidos a valores por defecto';
+    this.cdr.detectChanges();
   }
 
   private isValidDateRange(s: string, e: string): boolean {
@@ -1045,7 +1056,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadSeriesEntriesSplitEstado(): void {
     this.loadingSplitEstado = true;
-    const sub = this.dashboardApi.getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, this.forceFromDb === true).subscribe({
+    const sub = this.dashboardFacade.getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, this.forceFromDb === true).subscribe({
       next: (arr: any[]) => {
         if (arr && arr.length) {
           // Detectar todos los estados presentes en la serie
@@ -1076,7 +1087,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadSeriesEntriesSplitEstadoNombre(): void {
     this.loadingSplitEstadoNombre = true;
-    const sub = this.dashboardApi.getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, this.forceFromDb === true).subscribe({
+    const sub = this.dashboardFacade.getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, this.forceFromDb === true).subscribe({
       next: (arr: any[]) => {
         if (arr && arr.length) {
           // Desanidar si los estados vienen en 'entradasByEstado'

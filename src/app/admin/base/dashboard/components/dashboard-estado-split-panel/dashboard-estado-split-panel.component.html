@@ -1,0 +1,26 @@
+<c-card>
+  <c-card-header>
+    <c-row class="align-items-center g-2">
+      <c-col xs="12" md="6">
+        <h6 class="mb-0">Serie por estado</h6>
+      </c-col>
+      <c-col xs="12" md="6" class="d-flex justify-content-md-end justify-content-start flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2" aria-label="Acciones">
+          <button cButton color="secondary" size="sm" (click)="downloadCsv.emit()" title="Descargar serie por estado en CSV" [attr.aria-label]="'Descargar serie por estado en CSV'" data-testid="btn-csv-split-estado">CSV</button>
+        </div>
+      </c-col>
+    </c-row>
+  </c-card-header>
+  <c-card-body>
+    <div *ngIf="errorSplitEstado" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert" aria-live="assertive">
+      <span>{{ errorSplitEstado }}</span>
+      <button cButton color="danger" size="sm" class="retry-btn-split-estado" (click)="retry.emit()">Reintentar</button>
+    </div>
+    <div *ngIf="loadingSplitEstado" class="mb-2" aria-live="polite" aria-busy="true"><c-spinner></c-spinner></div>
+    <div class="chart-container mb-2" *ngIf="seriesEntriesSplitData" [attr.aria-busy]="loadingSplitEstado ? 'true' : null">
+      <app-dashboard-chart [data]="seriesEntriesSplitData" type="bar"></app-dashboard-chart>
+    </div>
+    <div *ngIf="!seriesEntriesSplitData" class="text-muted small">Sin datos</div>
+  </c-card-body>
+</c-card>
+
