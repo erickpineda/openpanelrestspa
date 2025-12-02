@@ -1,6 +1,7 @@
 import { Directive, ElementRef, OnInit, OnDestroy, Input } from '@angular/core';
 import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
 import { LoggerService } from '../services/logger.service';
+import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Directive({
   selector: '[appUnsavedWork]'
@@ -46,12 +47,12 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
   }
 
   private saveToLocalStorage(): void {
-    const forms = JSON.parse(localStorage.getItem('unsaved-forms') || '{}');
+    const forms = JSON.parse(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}');
     forms[this.formId] = {
       initialData: this.initialFormData,
       hasChanges: false
     };
-    localStorage.setItem('unsaved-forms', JSON.stringify(forms));
+    localStorage.setItem(OPConstants.Storage.UNSAVED_FORMS_KEY, JSON.stringify(forms));
   }
 
   private setupMutationObserver(form: any): void {
@@ -130,11 +131,11 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     this.unsavedWorkService.updateFormValue(this.formId, currentData);
     
     // Actualizar en localStorage
-    const forms = JSON.parse(localStorage.getItem('unsaved-forms') || '{}');
+    const forms = JSON.parse(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}');
     if (forms[this.formId]) {
       forms[this.formId].hasChanges = true;
       forms[this.formId].currentData = currentData;
-      localStorage.setItem('unsaved-forms', JSON.stringify(forms));
+      localStorage.setItem(OPConstants.Storage.UNSAVED_FORMS_KEY, JSON.stringify(forms));
     }
   }
 
@@ -145,10 +146,10 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     this.unsavedWorkService.markFormAsSaved(this.formId);
     
     // Actualizar en localStorage
-    const forms = JSON.parse(localStorage.getItem('unsaved-forms') || '{}');
+    const forms = JSON.parse(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}');
     if (forms[this.formId]) {
       forms[this.formId].hasChanges = false;
-      localStorage.setItem('unsaved-forms', JSON.stringify(forms));
+      localStorage.setItem(OPConstants.Storage.UNSAVED_FORMS_KEY, JSON.stringify(forms));
     }
   }
 }

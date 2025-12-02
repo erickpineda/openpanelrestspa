@@ -5,6 +5,7 @@ import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { TokenStorageService } from '../../core/services/auth/token-storage.service';
 import { LoggerService } from '../../core/services/logger.service';
+import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-nav-bar-public',
@@ -34,7 +35,7 @@ export class NavBarPublicComponent implements OnInit {
     private log: LoggerService
   ) {
     // Escuchar cambios de estado de autenticación
-    window.addEventListener('authStateChanged', () => {
+    window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, () => {
       this.log.info('🔄 NavBar: Estado de autenticación cambiado');
       this.checkAuthStatus();
     });

@@ -1,6 +1,6 @@
 import { OPRestApiConstants, OPRestMethods } from './op-restapi.constants';
 
-export const OPConstants: any = {
+export const OPConstants = {
   API: OPRestApiConstants,
   Methods: OPRestMethods,
   Session: {
@@ -12,6 +12,10 @@ export const OPConstants: any = {
     USER_KEY: 'auth-user',
     SYNC_TOKEN_KEY: 'sync-auth-token',
     SYNC_USER_KEY: 'sync-auth-user',
+    AUTH_SYNC_KEY: 'auth-sync',
+    AUTH_SYNC_CHANNEL: 'auth-sync-channel',
+    SESSION_ACTIVE_KEY: 'session-active',
+    SESSION_TIMESTAMP_KEY: 'session-timestamp',
     // Rutas especiales del flujo de sesión/post-login
     ROUTE_LOGIN: '/login',
     ROUTE_SESSION_EXPIRED: '/session-expired',
@@ -21,4 +25,23 @@ export const OPConstants: any = {
     // Ventana de protección anti-race (ms)
     IGNORE_WINDOW_MS: 1000,
   },
-};
+  Storage: {
+    UNSAVED_FORMS_KEY: 'unsaved-forms',
+    DASH_METRICS_EXPANDED_KEY: 'dash_metrics_expanded',
+    DASH_FORCE_DB_KEY: 'dash_force_db',
+  },
+  Events: {
+    AUTH_LOGIN: 'auth:login',
+    AUTH_LOGOUT: 'auth:logout',
+    AUTH_CHANGED: 'auth:changed',
+    AUTH_STATE_CHANGED: 'authStateChanged',
+    SAVE_UNSAVED_WORK: 'saveUnsavedWork',
+    SAVE_WORK_BEFORE_LOGOUT: 'saveWorkBeforeLogout',
+    SAVE_FORM_DATA: 'saveFormData',
+  },
+  Sync: {
+    TYPE_LOGIN: 'LOGIN',
+    TYPE_LOGOUT: 'LOGOUT',
+    TYPE_CHANGED: 'CHANGED',
+  }
+} as const;

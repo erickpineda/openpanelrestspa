@@ -5,6 +5,7 @@ import { AuthSyncService } from './core/services/auth/auth-sync.service';
 import { LoggerService } from './core/services/logger.service';
 import { AuthService } from './core/services/auth/auth.service'; // inyectado para comprobar token
 import { RouteTrackerService } from './core/services/auth/route-tracker.service';
+import { OPConstants } from './shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-root',
@@ -35,7 +36,7 @@ export class AppComponent implements OnInit {
     this.tokenStorage.startPostLoginRedirectMaintenance(60 * 60 * 1000);
 
     // Escuchar cambios de estado de autenticación
-    window.addEventListener('authStateChanged', () => {
+    window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, () => {
       this.log.info('🔄 Estado de autenticación cambiado, actualizando interfaz...');
       // Aquí podrías forzar la actualización de componentes si es necesario
     });

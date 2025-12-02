@@ -1,0 +1,16 @@
+{
+  "totalUsuarios": 1240,
+  "totalEntradas": 8421,
+  "totalComentarios": 23145,
+  "totalFicheros": 512,
+  "storageBytes": 1234567890,
+  "ultimasEntradas": [
+    { "id": 1023, "titulo": "Nuevo feature X", "fechaCreacion": "2025-11-20T10:12:00", "idUsuario": 12, "estado": "PUBLICADA" }
+  ],
+  "ultimosComentarios": [
+    { "id": 9987, "contenidoCorto": "Buen artículo!", "fechaCreacion": "2025-11-20T12:01:00", "idUsuario": 99, "idEntrada": 1023 }
+  ],
+  "ultimosUsuarios": [
+    { "id": 2001, "username": "maria", "email": "maria@example.com", "fechaRegistro": "2025-11-19T09:30:00" }
+  ]
+}

@@ -12,6 +12,7 @@ import { ActivityPointDTO, SummaryDTO, SummaryEntryDTO, TopItemDTO, StorageDTO, 
 import { ToastService } from '../../../core/services/ui/toast.service';
 import { environment } from '../../../../environments/environment';
 import { AuthSyncService } from '../../../core/services/auth/auth-sync.service';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-dashboard',
@@ -179,21 +180,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     this.initDefaultData();
-    try { const s = sessionStorage.getItem('dash_metrics_expanded'); this.metricsExpanded = s === '1'; } catch {}
-    try { const f = sessionStorage.getItem('dash_force_db'); if (f === '1') this.forceFromDb = true; else if (f === '0') this.forceFromDb = false; } catch {}
+    try { const s = sessionStorage.getItem(OPConstants.Storage.DASH_METRICS_EXPANDED_KEY); this.metricsExpanded = s === '1'; } catch {}
+    try { const f = sessionStorage.getItem(OPConstants.Storage.DASH_FORCE_DB_KEY); if (f === '1') this.forceFromDb = true; else if (f === '0') this.forceFromDb = false; } catch {}
     try { if ((window as any).__E2E_POPULATE_DASHBOARD__ === true) { this.populateMockForE2E(); } } catch {}
     this.refreshDashboard();
     this.loadRecentActivity();
     this.onAuthChangedHandler = (ev: any) => {
       const d = ev && ev.detail ? ev.detail : null;
       const key = d && d.key ? String(d.key) : '';
-      if (key === 'dash_force_db') {
+      if (key === OPConstants.Storage.DASH_FORCE_DB_KEY) {
         const v = d && d.value ? String(d.value) : '';
         this.forceFromDb = v === '1';
         try { this.cdr.detectChanges(); } catch {}
       }
     };
-    try { window.addEventListener('auth:changed', this.onAuthChangedHandler as any); } catch {}
+    try { window.addEventListener(OPConstants.Events.AUTH_CHANGED, this.onAuthChangedHandler as any); } catch {}
   }
 
   private markPerf(t0: number, name: string): void {
@@ -234,13 +235,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   metricsToggle(): void {
     if (!this.isLocalEnv()) return;
     this.metricsExpanded = !this.metricsExpanded;
-    try { sessionStorage.setItem('dash_metrics_expanded', this.metricsExpanded ? '1' : '0'); } catch {}
+    try { sessionStorage.setItem(OPConstants.Storage.DASH_METRICS_EXPANDED_KEY, this.metricsExpanded ? '1' : '0'); } catch {}
   }
 
   toggleForceFromDb(): void {
     this.forceFromDb = !this.forceFromDb;
-    try { sessionStorage.setItem('dash_force_db', this.forceFromDb ? '1' : '0'); } catch {}
-    try { this.authSync.notifyChanged({ key: 'dash_force_db', value: this.forceFromDb ? '1' : '0' }); } catch {}
+    try { sessionStorage.setItem(OPConstants.Storage.DASH_FORCE_DB_KEY, this.forceFromDb ? '1' : '0'); } catch {}
+    try { this.authSync.notifyChanged({ key: OPConstants.Storage.DASH_FORCE_DB_KEY, value: this.forceFromDb ? '1' : '0' }); } catch {}
   }
 
   async copyPerfToClipboard(): Promise<void> {
@@ -345,7 +346,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    try { if (this.onAuthChangedHandler) window.removeEventListener('auth:changed', this.onAuthChangedHandler as any); } catch {}
+    try { if (this.onAuthChangedHandler) window.removeEventListener(OPConstants.Events.AUTH_CHANGED, this.onAuthChangedHandler as any); } catch {}
   }
 
   async cargarEstadisticas(): Promise<void> {

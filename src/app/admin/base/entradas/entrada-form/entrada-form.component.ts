@@ -16,6 +16,7 @@ import { Entrada } from '../../../../core/models/entrada.model';
 import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
 import { TemporaryStorageService } from '../../../../core/services/ui/temporary-storage.service';
 import { LoggerService } from '../../../../core/services/logger.service';
+import { OPConstants } from '../../../../shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-entrada-form',
@@ -89,7 +90,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     }
 
   ngOnInit(): void {
-    window.addEventListener('saveUnsavedWork', this.saveBeforeLogout.bind(this));
+    window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.saveBeforeLogout.bind(this));
     
     // ✅ MODIFICADO: Primero verificar si venimos de una recuperación
     this.checkNavigationState();
@@ -120,7 +121,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   ngOnDestroy(): void {
     window.removeEventListener(
-      'saveUnsavedWork',
+      OPConstants.Events.SAVE_UNSAVED_WORK,
       this.saveBeforeLogout.bind(this)
     );
   }

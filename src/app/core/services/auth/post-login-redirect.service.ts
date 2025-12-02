@@ -26,7 +26,7 @@ export class PostLoginRedirectService {
       try { redirect = localStorage.getItem(key) ?? null; } catch {}
     }
     if (!redirect) {
-      try { redirect = localStorage.getItem('post-login-redirect'); } catch {}
+      try { redirect = localStorage.getItem(OPConstants.Session.POST_LOGIN_REDIRECT) ?? null; } catch {}
     }
     // Fallback: buscar cualquier clave post-login-redirect- en sessionStorage
     if (!redirect) {
@@ -45,7 +45,7 @@ export class PostLoginRedirectService {
     }
     // Limpiar claves tras uso
     try { window.sessionStorage.removeItem(key); } catch {}
-    try { localStorage.removeItem('post-login-redirect'); } catch {}
+    try { localStorage.removeItem(OPConstants.Session.POST_LOGIN_REDIRECT); } catch {}
     return redirect;
   }
 

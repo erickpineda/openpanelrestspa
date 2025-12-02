@@ -144,6 +144,9 @@
       "get": {
         "summary": "Resumen del dashboard",
         "security": [ { "bearerAuth": [] } ],
+        "parameters": [
+          { "name": "force", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Si true, ignora caché y refresca datos (actualiza caché)" }
+        ],
         "responses": {
           "200": {
             "description": "Resumen (envuelto en OpenpanelApiResponse)",
@@ -200,7 +203,8 @@
         "security": [ { "bearerAuth": [] } ],
         "parameters": [
           { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 }, "description": "Días a mostrar. Normalizado: <=0 -> 30; max 365. Si granularity=hour, 'days' se interpreta como horas." },
-          { "name": "granularity", "in": "query", "schema": { "type": "string", "default": "day", "enum": ["hour","day","week","month"] }, "description": "Granularidad de la serie" }
+          { "name": "granularity", "in": "query", "schema": { "type": "string", "default": "day", "enum": ["hour","day","week","month"] }, "description": "Granularidad de la serie" },
+          { "name": "force", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Si true, ignora caché y refresca datos (actualiza caché)" }
         ],
         "responses": {
           "200": {
@@ -230,7 +234,8 @@
         "parameters": [
           { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 }, "description": "Días a mostrar. Normalizado: <=0 -> 30; max 365" },
           { "name": "split", "in": "query", "schema": { "type": "string", "default": "estado", "enum": ["estado","estadoNombre"] }, "description": "Parámetro legacy/alternativo: estado o estadoNombre; si no soportado devuelve 400" },
-          { "name": "granularity", "in": "query", "schema": { "type": "string", "default": "day", "enum": ["hour","day","week","month"] } }
+          { "name": "granularity", "in": "query", "schema": { "type": "string", "default": "day", "enum": ["hour","day","week","month"] } },
+          { "name": "force", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Si true, ignora caché y refresca datos (actualiza caché)" }
         ],
         "responses": {
           "200": {
@@ -268,7 +273,8 @@
           { "name": "type", "in": "query", "required": false, "schema": { "type": "string", "enum": ["users","categories"], "default": "users" }, "description": "Tipo (users|categories). Default 'users'" },
           { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 }, "description": "Número máximo de elementos. La API normaliza: limit <=0 -> 10; limit >200 -> 200" },
           { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" }, "description": "Fecha inicio (opcional)" },
-          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" }, "description": "Fecha fin (opcional)" }
+          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" }, "description": "Fecha fin (opcional)" },
+          { "name": "force", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Si true, ignora caché y refresca datos (actualiza caché)" }
         ],
         "responses": {
           "200": {

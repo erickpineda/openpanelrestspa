@@ -5,6 +5,8 @@ import { of, BehaviorSubject } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DashboardApiService } from '../core/services/dashboard-api.service';
 import { LoadingService } from '../core/services/ui/loading.service';
+import { TokenStorageService } from '../core/services/auth/token-storage.service';
+import { AuthService } from '../core/services/auth/auth.service';
 
 class MockDashboardApiService { getContentStats = () => of({ totalEntradas: 0, totalComentarios: 0 }); }
 class MockLoadingService { globalLoading$ = new BehaviorSubject<boolean>(false); }
@@ -22,6 +24,8 @@ describe('AdminComponent NG0100 mitigation', () => {
       providers: [
         { provide: DashboardApiService, useClass: MockDashboardApiService },
         { provide: LoadingService, useValue: loading },
+        { provide: TokenStorageService, useValue: { isLoggedIn: () => true } },
+        { provide: AuthService, useValue: { isTokenValid: () => true } },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

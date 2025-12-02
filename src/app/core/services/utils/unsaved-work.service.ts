@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { LoggerService } from '../logger.service';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ export class UnsavedWorkService {
 
   constructor(private log: LoggerService) {
     // Compatibilidad: escucha evento legacy y evento nuevo
-    window.addEventListener('saveUnsavedWork', this.saveAllUnsavedWork.bind(this));
-    window.addEventListener('saveWorkBeforeLogout', this.saveAllUnsavedWork.bind(this));
+    window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.saveAllUnsavedWork.bind(this));
+    window.addEventListener(OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT, this.saveAllUnsavedWork.bind(this));
   }
 
   public registerForm(formId: string, initialValue?: any): void {
@@ -68,13 +69,13 @@ export class UnsavedWorkService {
     const formsToSave = Array.from(this.unsavedForms.keys()).filter(formId => this.unsavedForms.get(formId));
     this.log.info('💾 UnsavedWorkService: Guardando formularios:', formsToSave);
     
-    const saveEvent = new CustomEvent('saveFormData', {
+    const saveEvent = new CustomEvent(OPConstants.Events.SAVE_FORM_DATA, {
       detail: { forms: formsToSave }
     });
     window.dispatchEvent(saveEvent);
   }
 
   public cleanupStorage(): void {
-    localStorage.removeItem('unsaved-forms');
+    localStorage.removeItem(OPConstants.Storage.UNSAVED_FORMS_KEY);
   }
 }

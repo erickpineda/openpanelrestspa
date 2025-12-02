@@ -103,7 +103,7 @@ export class AuthService {
       // Notifica a otras pestañas que se ha hecho logout
       this.authSync.notifyLogout();
       // Disparar evento para que UI reaccione si hace falta
-      window.dispatchEvent(new Event('authStateChanged'));
+      window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
     } finally {
       // Redirigir al login con recarga completa (evita problemas de estado parcial)
       // Ajusta la ruta si tu login no está en '/login'

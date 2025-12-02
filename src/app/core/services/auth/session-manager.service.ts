@@ -33,7 +33,7 @@ export class SessionManagerService {
 
   private setupListeners(): void {
     // Escuchar eventos emitidos por AuthSyncService (storage / bc)
-    window.addEventListener('auth:logout', (ev: Event) => {
+    window.addEventListener(OPConstants.Events.AUTH_LOGOUT as string, (ev: Event) => {
       const evC = ev as CustomEvent;
       this.log.info('SessionManager: auth:logout recibido', evC.detail);
       // Intentar guardar inmediatamente el post-login redirect PARA ESTA pestaña
@@ -52,7 +52,7 @@ export class SessionManagerService {
     });
 
     // También reaccionar a eventos auth:login si quieres (p. ej. para cerrar modal)
-    window.addEventListener('auth:login', (ev: Event) => {
+    window.addEventListener(OPConstants.Events.AUTH_LOGIN as string, (ev: Event) => {
       const evC = ev as CustomEvent;
       this.log.info('SessionManager: auth:login recibido', evC.detail);
 
@@ -60,7 +60,7 @@ export class SessionManagerService {
         // Solo actuamos si ya hay token en esta pestaña (sincronizado por AuthSyncService/TokenStorage)
         if (!this.tokenStorage.isLoggedIn()) {
           this.log.info('SessionManager: auth:login pero no hay token en esta pestaña -> solo emitimos authStateChanged');
-          window.dispatchEvent(new Event('authStateChanged'));
+          window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
           return;
         }
 
@@ -78,15 +78,15 @@ export class SessionManagerService {
             return;
           } else {
             this.log.info('SessionManager: sin post-login redirect - no se fuerza navegación');
-            window.dispatchEvent(new Event('authStateChanged'));
+            window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
             return;
           }
         } else {
-          window.dispatchEvent(new Event('authStateChanged'));
+          window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
         }
       } catch (e) {
         this.log.error('SessionManager: error manejando auth:login', e);
-        window.dispatchEvent(new Event('authStateChanged'));
+        window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
       }
     });
   }
@@ -137,7 +137,7 @@ export class SessionManagerService {
 
   public saveWorkAndLogout(data: SessionExpirationData): void {
     // Dejar que los componentes manejen el guardado escuchando el evento 'saveWorkBeforeLogout'
-    window.dispatchEvent(new CustomEvent('saveWorkBeforeLogout', { detail: { timeout: 30000 } }));
+    window.dispatchEvent(new CustomEvent(OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT, { detail: { timeout: 30000 } }));
 
     // Después de timeout forzamos logout
     setTimeout(() => this.performLogout(data), 30000);
