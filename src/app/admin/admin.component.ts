@@ -10,6 +10,8 @@ import { TemporaryStorageService } from '../core/services/ui/temporary-storage.s
 import { LoggerService } from '../core/services/logger.service';
 import { LoadingService } from '../core/services/ui/loading.service';
 import { ToastService } from '../core/services/ui/toast.service';
+import { TokenStorageService } from '../core/services/auth/token-storage.service';
+import { AuthService } from '../core/services/auth/auth.service';
 
 // ... imports existentes
 
@@ -32,6 +34,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
   public messagesCount: number = 0;
   public commentsCount: number = 0;
 
+  public isAuthed: boolean = false;
+  public ready: boolean = false;
+
   // Propiedades para el componente de recuperación
   showRecoveryNotification = false;
   recoveryData: any[] = [];
@@ -45,7 +50,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
     public loadingService: LoadingService,
     private toastService: ToastService,
     private dashboardApi: DashboardApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private tokenStorage: TokenStorageService,
+    private authService: AuthService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
@@ -66,6 +73,13 @@ export class AdminComponent implements OnInit, AfterViewInit {
   public labelLockAccount = 'Lock Account';
 
   ngOnInit(): void {
+    const ok = this.tokenStorage.isLoggedIn() && this.authService.isTokenValid(30);
+    if (!ok) {
+      this.router.navigate(['/login'], { replaceUrl: true });
+      return;
+    }
+    this.isAuthed = true;
+    this.ready = true;
     this.checkForTemporaryData();
     this.cargaFinalizada = true;
     const locale = (navigator && navigator.language) ? navigator.language : 'es-ES';
@@ -73,7 +87,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.dashboardApi.getContentStats().subscribe(stats => {
       this.projectsCount = Number(stats?.totalEntradas) || 0;
       this.commentsCount = Number(stats?.totalComentarios) || 0;
-      this.messagesCount = this.commentsCount; // mapeo provisional
+      this.messagesCount = this.commentsCount;
       this.cdr.markForCheck();
     });
     this.toastService.toasts$.subscribe(list => {
