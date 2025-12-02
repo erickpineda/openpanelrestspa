@@ -42,14 +42,24 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
 
   loadEtiquetas(): void {
     this.loading = true;
-    const searchPayload = this.searchForm.value;
+    //const searchPayload = this.searchForm.value;
+    const searchRequest = {
+      dataOption: 'AND',
+      searchCriteriaList: [{
+        filterKey: 'nombre',
+        value: '',
+        operation: 'CONTAINS',
+        clazzName: 'Etiqueta'
+      }]
+    };
 
-    this.etiquetasService.buscar(searchPayload, this.currentPage - 1, this.pageSize)
+    this.etiquetasService.buscar(searchRequest, this.currentPage - 1, this.pageSize)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: any) => {
-          this.etiquetas = response.content || response.items || response.elements || response;
-          this.totalItems = response.totalElements || response.total || this.etiquetas.length;
+          const data = response?.data ?? response;
+          this.etiquetas = (data?.elements ?? data?.items ?? data?.content ?? []) as EtiquetaDTO[];
+          this.totalItems = (data?.totalElements ?? data?.total ?? this.etiquetas.length) as number;
           this.loading = false;
         },
         error: (error: any) => {

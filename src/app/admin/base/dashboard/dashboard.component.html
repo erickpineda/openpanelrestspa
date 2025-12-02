@@ -28,7 +28,7 @@
       </div>
     </div>
     <hr>
-    <c-row>
+    <c-row class="g-3">
       <c-col lg="3">
         <app-kpi-card label="Usuarios Activos" [value]="cantidadUsuariosActivos" iconName="cilUser" color="primary"></app-kpi-card>
       </c-col>
@@ -151,7 +151,7 @@
           (retry)="loadTopWidgets()"
         ></app-dashboard-top-panel>
       </c-col>
-      <c-col lg="6">
+      <c-col lg="6" class="mt-3">
         <app-dashboard-top-panel
           title="Top Tags"
           [items]="topTags"
