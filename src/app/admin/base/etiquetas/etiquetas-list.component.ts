@@ -65,8 +65,8 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
             colorHex: e?.colorHex ?? e?.color ?? '#4ECDC4',
             fechaCreacion: e?.fechaCreacion ?? e?.createdAt ?? e?.fechaRegistro
           })) as EtiquetaDTO[] : [];
-          this.etiquetas = mapped.length > this.pageSize ? mapped.slice(0, this.pageSize) : mapped;
-          this.totalItems = (data?.totalElements ?? data?.total ?? this.etiquetas.length) as number;
+          this.etiquetas = mapped;
+          this.totalItems = (data?.totalElements ?? data?.total ?? mapped.length) as number;
           this.loading = false;
         },
         error: (error: any) => {
@@ -97,8 +97,8 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
             colorHex: e?.colorHex ?? e?.color ?? '#4ECDC4',
             fechaCreacion: e?.fechaCreacion ?? e?.createdAt ?? e?.fechaRegistro
           })) as EtiquetaDTO[] : [];
-          this.etiquetas = mapped.length > this.pageSize ? mapped.slice(0, this.pageSize) : mapped;
-          this.totalItems = (data?.totalElements ?? data?.total ?? this.etiquetas.length) as number;
+          this.etiquetas = mapped;
+          this.totalItems = (data?.totalElements ?? data?.total ?? mapped.length) as number;
           this.loading = false;
         },
         error: (error: any) => {

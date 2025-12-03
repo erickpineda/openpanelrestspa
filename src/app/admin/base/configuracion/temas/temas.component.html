@@ -73,8 +73,8 @@
                 <td>{{ t.esquemaColor }}</td>
                 <td>
                   <div class="btn-group">
-                    <button cButton color="secondary" size="sm" (click)="openEdit(t)"><svg cIcon name="cilPencil"></svg></button>
-                    <button cButton color="danger" size="sm" (click)="delete(t)"><svg cIcon name="cilTrash"></svg></button>
+                    <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(t)" [attr.aria-label]="'Editar tema ' + t.nombre"><svg cIcon name="cilPencil"></svg></button>
+                    <button cButton color="danger" size="sm" variant="outline" (click)="delete(t)" [attr.aria-label]="'Eliminar tema ' + t.nombre"><svg cIcon name="cilTrash"></svg></button>
                   </div>
                 </td>
               </tr>

@@ -74,10 +74,11 @@
           <th scope="col">Fecha creación</th>
           <th scope="col">Aprobado</th>
           <th scope="col">Cuarentena</th>
+          <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody *ngFor="let coment of pagedComentarios">
-        <tr (click)="navigate('/admin/control/comentarios/'+coment.idComentario)" style="cursor: pointer">
+        <tr>
           <td scope="row">{{coment.idComentario}}</td>
           <td>{{ truncateContent(coment.contenido) }}</td>
           <td>{{coment.username}}</td>
@@ -85,6 +86,12 @@
           <td>{{coment.fechaCreacionParseada}}</td>
           <td>{{checkTrueOrFalseToString(coment.aprobado)}}</td>
           <td>{{checkTrueOrFalseToString(coment.cuarentena)}}</td>
+          <td>
+            <div class="btn-group">
+              <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(coment)" [attr.aria-label]="'Editar comentario ' + coment.idComentario"><svg cIcon name="cilPencil"></svg></button>
+              <button cButton color="danger" size="sm" variant="outline" (click)="deleteComentario(coment)" [attr.aria-label]="'Eliminar comentario ' + coment.idComentario"><svg cIcon name="cilTrash"></svg></button>
+            </div>
+          </td>
         </tr>
       </tbody>
       <tbody *ngIf="listaComentarios.length === 0" cAlign="middle">
@@ -96,7 +103,7 @@
     <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
       <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
       <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-      <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }}</div>
+      <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
     </div>
 
   </c-card-body>

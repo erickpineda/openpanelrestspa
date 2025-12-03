@@ -24,7 +24,7 @@ export class UsuariosService {
   listar(pageNo?: number, pageSize?: number): Observable<any> {
     let params = new HttpParams();
     if (pageNo != null) params = params.set('pageNo', String(pageNo));
-    if (pageSize != null) params = params.set('size', String(pageSize));
+    if (pageSize != null) params = params.set('pageSize', String(pageSize));
     return this.http.get(this.base, { params });
   }
 
@@ -47,7 +47,7 @@ export class UsuariosService {
   buscar(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
     let params = new HttpParams();
     if (pageNo != null) params = params.set('pageNo', String(pageNo));
-    if (pageSize != null) params = params.set('size', String(pageSize));
+    if (pageSize != null) params = params.set('pageSize', String(pageSize));
     return this.http.post(`${this.base}/buscar`, payload, { params });
   }
 }

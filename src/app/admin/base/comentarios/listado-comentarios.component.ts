@@ -32,6 +32,7 @@ export class ListadoComentariosComponent implements OnInit {
   pageNo = 0;
   totalElements = 0;
   totalPages = 1;
+  numberOfElements = 0;
   filteredComentarios: Comentario[] = [];
   pagedComentarios: Comentario[] = [];
 
@@ -146,6 +147,7 @@ export class ListadoComentariosComponent implements OnInit {
     this.estaVacio = !!data.empty;
     this.totalElements = Number(data.totalElements || this.listaComentarios.length || 0);
     this.totalPages = Number(data.totalPages || 1);
+    this.numberOfElements = Number((data as any).numberOfElements ?? this.listaComentarios.length);
     this.pagedComentarios = this.listaComentarios;
   }
 
@@ -179,5 +181,19 @@ export class ListadoComentariosComponent implements OnInit {
 
   public refrescarPagina(): void {
     window.location.reload();
+  }
+
+  openEdit(coment: Comentario): void {
+    if (!coment?.idComentario) return;
+    this.navigate('/admin/control/comentarios/editar/' + coment.idComentario);
+  }
+
+  deleteComentario(coment: Comentario): void {
+    if (!coment?.idComentario) return;
+    if (!confirm('¿Eliminar comentario #' + coment.idComentario + '?')) return;
+    this.comentarioService.borrar(coment.idComentario!).subscribe({
+      next: () => { this.search(); },
+      error: (err) => { this.log.error('comentarios borrar', err); }
+    });
   }
 }

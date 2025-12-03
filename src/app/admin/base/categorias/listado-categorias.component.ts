@@ -25,6 +25,7 @@ export class ListadoCategoriasComponent implements OnInit {
   totalElements: number = 0;
   totalPages: number = 1;
   pagedCategorias: Categoria[] = [];
+  numberOfElements: number = 0;
 
   constructor(
     private router: Router,
@@ -52,6 +53,7 @@ export class ListadoCategoriasComponent implements OnInit {
             this.pagedCategorias = elementos;
             this.totalElements = Number(data?.totalElements || elementos.length || 0);
             this.totalPages = Number(data?.totalPages || Math.max(1, Math.ceil(this.totalElements / this.pageSize)));
+            this.numberOfElements = Number(data?.numberOfElements ?? elementos.length ?? 0);
           },
           error: (err: any) => {
             if (err?.status === 404) {
@@ -78,6 +80,7 @@ export class ListadoCategoriasComponent implements OnInit {
             this.pagedCategorias = elementos;
             this.totalElements = Number(data?.totalElements || elementos.length || 0);
             this.totalPages = Number(data?.totalPages || Math.max(1, Math.ceil(this.totalElements / this.pageSize)));
+            this.numberOfElements = Number(data?.numberOfElements ?? elementos.length ?? 0);
           },
           error: (err: any) => {
             if (err?.status === 404) {

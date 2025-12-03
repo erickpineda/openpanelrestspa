@@ -19,7 +19,7 @@ export class CategoriaService extends CrudService<Categoria, number> {
   }
 
   buscarSafe(searchRequest: any, pageNo: number, size: number): Observable<PaginaResponse> {
-    const params = { pageNo: pageNo.toString(), size: size.toString() };
+    const params = { pageNo: pageNo.toString(), pageSize: size.toString() };
     const context = new HttpContext();
     return this.safePostData<PaginaResponse>(
       `${this.endpoint}/buscar`,
@@ -30,5 +30,10 @@ export class CategoriaService extends CrudService<Categoria, number> {
       'categorias.buscar',
       context
     );
+  }
+
+  public override listarPagina(pageNo: number, pageSize: number) {
+    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+    return this.get<any>(this.endpoint, params);
   }
 }
