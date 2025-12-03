@@ -16,6 +16,8 @@ export class UsuariosListComponent implements OnInit {
   pageNo = 0;
   pageSize = 10;
   totalElements = 0;
+  showAdvanced = false;
+  basicSearchText = '';
 
   filtroUsuario = '';
   filtroRolId: number | null = null;
@@ -65,6 +67,12 @@ export class UsuariosListComponent implements OnInit {
   reset(): void { this.filtroUsuario = ''; this.filtroRolId = null; this.filtroEmailConfirmado = null; this.pageNo = 0; this.load(); }
   prev(): void { if (this.pageNo > 0) { this.pageNo--; this.load(); } }
   next(): void { const maxPage = this.totalElements ? Math.ceil(this.totalElements / this.pageSize) - 1 : this.pageNo + 1; if (this.pageNo < maxPage) { this.pageNo++; this.load(); } }
+
+  getTotalPages(): number { return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0; }
+
+  onBasicSearchTextChange(text: string): void { this.basicSearchText = text; this.filtroUsuario = text; this.search(); }
+  onPageSizeChange(size: number): void { this.pageSize = size; this.pageNo = 0; this.load(); }
+  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
 
   openEdit(u: UsuarioDTO): void { this.editUser = { ...u }; this.editModalVisible = true; }
   openCreate(): void { this.editUser = { idUsuario: undefined, username: '', nombre: '', apellido: '', email: '', idRol: undefined } as UsuarioDTO; this.editModalVisible = true; }
