@@ -6,21 +6,23 @@
         <svg cIcon name="cilPlus" size="sm" class="me-2"></svg> Nueva Etiqueta
       </button>
     </c-card-header>
-    
   <c-card-body [attr.aria-busy]="loading ? 'true' : null">
-      <app-search-toolbar-basic
-        [total]="totalItems"
-        [page]="currentPage"
-        [pageSize]="pageSize"
-        [sizeOptions]="[5,10,20]"
-        [searchText]="basicSearchText"
-        [disabled]="loading"
-        [totalPages]="getTotalPages()"
-        (pageChange)="onPageChange($event)"
-        (pageSizeChange)="onPageSizeChange($event)"
-        (searchTextChange)="onBasicSearchTextChange($event)"
-        (toggleAdvanced)="toggleAdvanced()"
-      ></app-search-toolbar-basic>
+      <c-row class="align-items-center mb-3 g-2">
+        <c-col xs="12" md="4">
+          <div class="text-muted small">Total {{ totalItems }}</div>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar etiqueta..." style="max-width: 280px;" />
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 120px;">
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+          </select>
+        </c-col>
+      </c-row>
       <form *ngIf="showAdvanced" [formGroup]="searchForm" (ngSubmit)="onSearch()" class="mb-4">
         <div class="row">
           <div class="col-md-4">
@@ -43,8 +45,8 @@
       </form>
 
       <div class="table-responsive" *ngIf="!loading; else loadingTemplate">
-        <table class="table table-hover" role="table" aria-label="Tabla de etiquetas">
-          <thead>
+        <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de etiquetas">
+          <thead cTableColor="dark">
             <tr>
               <th scope="col">Color</th>
               <th scope="col">Nombre</th>
@@ -79,9 +81,9 @@
 
       <c-row class="mt-2">
         <c-col class="d-flex justify-content-end align-items-center gap-2">
-          <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="currentPage<=1">Anterior</button>
-          <button cButton color="light" size="sm" (click)="onNext()" [disabled]="currentPage>=getTotalPages()">Siguiente</button>
-          <div class="text-muted small ms-2">Página {{ currentPage }} | Tamaño {{ pageSize }} | Total {{ totalItems }}</div>
+          <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="pageNo<=0">Anterior</button>
+          <button cButton color="light" size="sm" (click)="onNext()" [disabled]="pageNo>=getTotalPages()-1">Siguiente</button>
+          <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalItems }}</div>
         </c-col>
       </c-row>
 

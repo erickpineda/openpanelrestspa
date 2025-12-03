@@ -3,6 +3,7 @@ import { UsuariosService, UsuarioDTO } from '../../../../core/services/usuarios.
 import { RolesService, RolDTO } from '../../../../core/services/roles.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
+import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
 
 @Component({
   selector: 'app-usuarios-list',
@@ -27,7 +28,7 @@ export class UsuariosListComponent implements OnInit {
   editModalVisible = false;
   editUser: UsuarioDTO | null = null;
 
-  constructor(private usuariosService: UsuariosService, private rolesService: RolesService, private toast: ToastService, private log: LoggerService) {}
+  constructor(private usuariosService: UsuariosService, private rolesService: RolesService, private toast: ToastService, private log: LoggerService, private searchUtil: SearchUtilService) {}
 
   ngOnInit(): void { this.loadRoles(); this.load(); }
 
@@ -45,10 +46,11 @@ export class UsuariosListComponent implements OnInit {
     if (!hasFilters) {
       this.usuariosService.listar(pageNo, this.pageSize).subscribe({ next: handleResponse, error: handleError });
     } else {
-      const payload = { dataOption: 'ALL', searchCriteriaList: [] as any[] };
-      if (this.filtroUsuario) payload.searchCriteriaList.push({ filterKey: 'username', value: this.filtroUsuario, operation: 'CONTAINS', dataOption: 'ALL' });
-      if (this.filtroRolId != null) payload.searchCriteriaList.push({ filterKey: 'idRol', value: String(this.filtroRolId), operation: 'EQUAL', dataOption: 'ALL' });
-      if (this.filtroEmailConfirmado != null) payload.searchCriteriaList.push({ filterKey: 'emailConfirmado', value: String(this.filtroEmailConfirmado), operation: 'EQUAL', dataOption: 'ALL' });
+      const criteria: { filterKey: string; value: any; operation: string }[] = [];
+      if (this.filtroUsuario) criteria.push({ filterKey: 'username', value: this.filtroUsuario, operation: 'CONTAINS' });
+      if (this.filtroRolId != null) criteria.push({ filterKey: 'idRol', value: String(this.filtroRolId), operation: 'EQUAL' });
+      if (this.filtroEmailConfirmado != null) criteria.push({ filterKey: 'emailConfirmado', value: String(this.filtroEmailConfirmado), operation: 'EQUAL' });
+      const payload = this.searchUtil.buildRequest('Usuario', criteria, 'ALL');
       this.usuariosService.buscar(payload, pageNo, this.pageSize).subscribe({ next: handleResponse, error: handleError });
     }
   }

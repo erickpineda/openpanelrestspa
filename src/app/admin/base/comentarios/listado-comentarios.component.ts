@@ -31,6 +31,7 @@ export class ListadoComentariosComponent implements OnInit {
   pageSize = 10;
   pageNo = 0;
   totalElements = 0;
+  totalPages = 1;
   filteredComentarios: Comentario[] = [];
   pagedComentarios: Comentario[] = [];
 
@@ -53,12 +54,7 @@ export class ListadoComentariosComponent implements OnInit {
 
   private initList() {
     try {
-      this.obtenerListaComentarios().then((listaRes: PaginaResponse) => {
-        this.listaComentarios = listaRes.elements;
-        this.estaVacio = listaRes.empty;
-        this.totalElements = this.listaComentarios?.length || 0;
-        this.search();
-      });
+      this.obtenerListaComentarios();
     } catch (error) {
       this.log.error("Error initializing list:", error);
     }
@@ -96,26 +92,26 @@ export class ListadoComentariosComponent implements OnInit {
     });
   }
 
-  private async obtenerListaComentarios(): Promise<PaginaResponse> {
-    return new Promise((resolve, reject) => {
-      this.comentarioService.listarSafe().subscribe({
-        next: (lista: Comentario[]) => {
-          const pResp: PaginaResponse = new PaginaResponse();
-          pResp.elements = Array.isArray(lista) ? lista : [];
-          resolve(pResp);
+  private obtenerListaComentarios(): void {
+    const hasFilters = this.hasActiveFilters();
+    if (!hasFilters) {
+      this.comentarioService.listarPagina(this.pageNo, this.pageSize).subscribe({
+        next: (response: OpenpanelApiResponse<any>) => {
+          const data: PaginaResponse = response?.data || new PaginaResponse();
+          this.setPageData(data);
         },
-        error: (err: any) => {
-          if (err?.status === 404) {
-            this.log.warn("No se encontraron comentarios, asignando lista vacía.");
-            this.listaComentarios = [];
-            resolve(new PaginaResponse()); // o ajusta según el modelo específico
-          } else {
-            reject(err);
-          }
-        }
+        error: (err: any) => this.handlePageError(err)
       });
-    });
-  }  
+    } else {
+      const payload: any = this.buildSearchPayload();
+      this.comentarioService.buscarSafe(payload, this.pageNo, this.pageSize).subscribe({
+        next: (data: PaginaResponse) => {
+          this.setPageData(data);
+        },
+        error: (err: any) => this.handlePageError(err)
+      });
+    }
+  }
 
   public checkTrueOrFalseToString(toCheck: boolean) {
     return toCheck ? 'Si' : 'No';
@@ -128,27 +124,9 @@ export class ListadoComentariosComponent implements OnInit {
   // ===== Toolbar / Búsqueda / Paginación =====
   toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
   onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.search(); }
-  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.updatePage(); }
+  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.obtenerListaComentarios(); }
 
-  search(): void {
-    const term = (this.basicSearchText || '').toLowerCase();
-    const usuario = (this.filtroUsuario || '').toLowerCase();
-    const aprob = this.filtroAprobado;
-    const cuar = this.filtroCuarentena;
-    const base = this.listaComentarios || [];
-    this.filteredComentarios = base.filter(c => {
-      const contenido = (c.contenido || '').toLowerCase();
-      const user = (c.username || '').toLowerCase();
-      const mBasic = !term || contenido.includes(term) || user.includes(term);
-      const mUser = !usuario || user.includes(usuario);
-      const mAprob = aprob === null || c.aprobado === aprob;
-      const mCuar = cuar === null || c.cuarentena === cuar;
-      return mBasic && mUser && mAprob && mCuar;
-    });
-    this.totalElements = this.filteredComentarios.length;
-    this.pageNo = 0;
-    this.updatePage();
-  }
+  search(): void { this.pageNo = 0; this.obtenerListaComentarios(); }
 
   reset(): void {
     this.basicSearchText = '';
@@ -156,17 +134,45 @@ export class ListadoComentariosComponent implements OnInit {
     this.filtroAprobado = null;
     this.filtroCuarentena = null;
     this.pageNo = 0;
-    this.search();
+    this.obtenerListaComentarios();
   }
 
-  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.updatePage(); } }
-  next(): void { if (this.pageNo < this.getTotalPages() - 1) { this.pageNo++; this.updatePage(); } }
-  getTotalPages(): number { return Math.max(1, Math.ceil(this.totalElements / this.pageSize)); }
+  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.obtenerListaComentarios(); } }
+  next(): void { if (this.pageNo < this.totalPages - 1) { this.pageNo++; this.obtenerListaComentarios(); } }
+  getTotalPages(): number { return Math.max(1, this.totalPages); }
 
-  private updatePage(): void {
-    const start = this.pageNo * this.pageSize;
-    const end = start + this.pageSize;
-    this.pagedComentarios = this.filteredComentarios.slice(start, end);
+  private setPageData(data: PaginaResponse): void {
+    this.listaComentarios = Array.isArray(data.elements) ? data.elements : [];
+    this.estaVacio = !!data.empty;
+    this.totalElements = Number(data.totalElements || this.listaComentarios.length || 0);
+    this.totalPages = Number(data.totalPages || 1);
+    this.pagedComentarios = this.listaComentarios;
+  }
+
+  private hasActiveFilters(): boolean {
+    return !!(this.basicSearchText || this.filtroUsuario || this.filtroAprobado !== null || this.filtroCuarentena !== null);
+  }
+
+  private buildSearchPayload(): any {
+    const payload: any = {};
+    if (this.basicSearchText) payload['term'] = this.basicSearchText;
+    if (this.filtroUsuario) payload['username'] = this.filtroUsuario;
+    if (this.filtroAprobado !== null) payload['aprobado'] = this.filtroAprobado;
+    if (this.filtroCuarentena !== null) payload['cuarentena'] = this.filtroCuarentena;
+    return payload;
+  }
+
+  private handlePageError(err: any): void {
+    if (err?.status === 404) {
+      this.log.warn('No se encontraron comentarios, asignando lista vacía.');
+      this.listaComentarios = [];
+      this.estaVacio = true;
+      this.totalElements = 0;
+      this.totalPages = 1;
+      this.pagedComentarios = [];
+    } else {
+      this.log.error('Error al cargar comentarios', err);
+    }
   }
 
   // Métodos antiguos de paginación por números eliminados en favor de Anterior/Siguiente

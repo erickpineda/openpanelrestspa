@@ -3,6 +3,7 @@ import { finalize } from 'rxjs/operators';
 import { Router } from "@angular/router";
 import { Categoria } from "../../../core/models/categoria.model";
 import { CategoriaService } from "../../../core/services/data/categoria.service";
+import { SearchUtilService } from "../../../core/services/utils/search-util.service";
 import { LoggerService } from "../../../core/services/logger.service";
 
 @Component({
@@ -22,13 +23,14 @@ export class ListadoCategoriasComponent implements OnInit {
   pageSize: number = 10;
   pageNo: number = 0;
   totalElements: number = 0;
-  filteredCategorias: Categoria[] = [];
+  totalPages: number = 1;
   pagedCategorias: Categoria[] = [];
 
   constructor(
     private router: Router,
     private categoriaService: CategoriaService,
-    private log: LoggerService
+    private log: LoggerService,
+    private searchUtil: SearchUtilService
   ) {}
 
   ngOnInit(): void {
@@ -38,25 +40,59 @@ export class ListadoCategoriasComponent implements OnInit {
   obtenerListaCategorias(): void {
     this.cargando = true;
     this.errorMsg = null;
-    this.categoriaService.listarSinGlobalLoader()
-      .pipe(finalize(() => { this.cargando = false; }))
-      .subscribe({
-      next: (response: any) => {
-        const categorias: Categoria[] = Array.isArray(response) ? response : [];
-        this.listaCategorias = categorias;
-        this.totalElements = categorias.length;
-        this.search();
-      },
-      error: (err: any) => {
-        if (err?.status === 404) {
-          this.listaCategorias = [];
-          this.errorMsg = 'No se encontraron categorías.';
-        } else {
-          this.errorMsg = 'Error al cargar categorías.';
-          this.log.error('Error al cargar categorías:', err);
-        }
-      }
-    });
+    const hasFilters = !!(this.basicSearchText || this.filtroNombre);
+    if (!hasFilters) {
+      this.categoriaService.listarPagina(this.pageNo, this.pageSize)
+        .pipe(finalize(() => { this.cargando = false; }))
+        .subscribe({
+          next: (response: any) => {
+            const data = response?.data || response;
+            const elementos: Categoria[] = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
+            this.listaCategorias = elementos;
+            this.pagedCategorias = elementos;
+            this.totalElements = Number(data?.totalElements || elementos.length || 0);
+            this.totalPages = Number(data?.totalPages || Math.max(1, Math.ceil(this.totalElements / this.pageSize)));
+          },
+          error: (err: any) => {
+            if (err?.status === 404) {
+              this.listaCategorias = [];
+              this.pagedCategorias = [];
+              this.totalElements = 0;
+              this.totalPages = 1;
+              this.errorMsg = 'No se encontraron categorías.';
+            } else {
+              this.errorMsg = 'Error al cargar categorías.';
+              this.log.error('Error al cargar categorías:', err);
+            }
+          }
+        });
+    } else {
+      const value = this.basicSearchText || this.filtroNombre || '';
+      const payload = this.searchUtil.buildSingle('Categoria', 'nombre', value, 'CONTAINS', 'AND');
+      this.categoriaService.buscarSafe(payload, this.pageNo, this.pageSize)
+        .pipe(finalize(() => { this.cargando = false; }))
+        .subscribe({
+          next: (data: any) => {
+            const elementos: Categoria[] = Array.isArray(data?.elements) ? data.elements : [];
+            this.listaCategorias = elementos;
+            this.pagedCategorias = elementos;
+            this.totalElements = Number(data?.totalElements || elementos.length || 0);
+            this.totalPages = Number(data?.totalPages || Math.max(1, Math.ceil(this.totalElements / this.pageSize)));
+          },
+          error: (err: any) => {
+            if (err?.status === 404) {
+              this.listaCategorias = [];
+              this.pagedCategorias = [];
+              this.totalElements = 0;
+              this.totalPages = 1;
+              this.errorMsg = 'No se encontraron categorías.';
+            } else {
+              this.errorMsg = 'Error al cargar categorías.';
+              this.log.error('Error al cargar categorías:', err);
+            }
+          }
+        });
+    }
   }
 
   refrescar(): void {
@@ -83,38 +119,19 @@ export class ListadoCategoriasComponent implements OnInit {
 
   // ===== Toolbar / Búsqueda / Paginación =====
   toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
-  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.search(); }
-  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.updatePage(); }
+  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.obtenerListaCategorias(); }
+  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.obtenerListaCategorias(); }
 
-  search(): void {
-    const term = (this.basicSearchText || '').toLowerCase();
-    const adv = (this.filtroNombre || '').toLowerCase();
-    const base = this.listaCategorias || [];
-    this.filteredCategorias = base.filter(c => {
-      const nombre = (c.nombre || '').toLowerCase();
-      const matchBasic = !term || nombre.includes(term);
-      const matchAdv = !adv || nombre.includes(adv);
-      return matchBasic && matchAdv;
-    });
-    this.totalElements = this.filteredCategorias.length;
-    this.pageNo = 0;
-    this.updatePage();
-  }
+  search(): void { this.pageNo = 0; this.obtenerListaCategorias(); }
 
   reset(): void {
     this.basicSearchText = '';
     this.filtroNombre = '';
     this.pageNo = 0;
-    this.search();
+    this.obtenerListaCategorias();
   }
 
-  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.updatePage(); } }
-  next(): void { if (this.pageNo < this.getTotalPages() - 1) { this.pageNo++; this.updatePage(); } }
-  getTotalPages(): number { return Math.max(1, Math.ceil(this.totalElements / this.pageSize)); }
-
-  private updatePage(): void {
-    const start = this.pageNo * this.pageSize;
-    const end = start + this.pageSize;
-    this.pagedCategorias = this.filteredCategorias.slice(start, end);
-  }
+  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.obtenerListaCategorias(); } }
+  next(): void { if (this.pageNo < this.getTotalPages() - 1) { this.pageNo++; this.obtenerListaCategorias(); } }
+  getTotalPages(): number { return Math.max(1, this.totalPages); }
 }

@@ -104,8 +104,8 @@ export abstract class CrudService<T, ID> extends BaseService {
     pageNo: number,
     pageSize: number
   ): Observable<OpenpanelApiResponse<any>> {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-    return this.get<any>(this.endpoint, { params });
+    const params = { pageNo: pageNo.toString(), size: pageSize.toString() };
+    return this.get<any>(this.endpoint, params);
   }
 
   obtenerPorId(id: ID): Observable<OpenpanelApiResponse<any>> {

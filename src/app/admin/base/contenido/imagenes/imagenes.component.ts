@@ -12,7 +12,7 @@ export class ImagenesComponent implements OnInit {
   error: string | null = null;
   items: MediaItem[] = [];
   pageNo = 0;
-  pageSize = 12;
+  pageSize = 10;
   totalPages = 0;
   filtroNombre = '';
   filtroMime = '';

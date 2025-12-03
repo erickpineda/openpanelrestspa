@@ -5,6 +5,7 @@ import { EtiquetasService, EtiquetaDTO } from '../../../core/services/etiquetas.
 import { ToastService } from '../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../core/services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SearchUtilService } from '../../../core/services/utils/search-util.service';
 
 @Component({
   selector: 'app-etiquetas-list',
@@ -16,7 +17,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   loading = false;
   totalItems = 0;
   pageSize = 5;
-  currentPage = 1;
+  pageNo = 0;
   showDeleteModal = false;
   etiquetaToDelete: EtiquetaDTO | null = null;
   showAdvanced = false;
@@ -33,7 +34,8 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
     private etiquetasService: EtiquetasService,
     private fb: FormBuilder,
     private toast: ToastService,
-    private log: LoggerService
+    private log: LoggerService,
+    private searchUtil: SearchUtilService
   ) {
     this.searchForm = this.fb.group({
       nombre: [''],
@@ -46,18 +48,43 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
 
   loadEtiquetas(): void {
     this.loading = true;
-    //const searchPayload = this.searchForm.value;
-    const searchRequest = {
-      dataOption: 'AND',
-      searchCriteriaList: [{
-        filterKey: 'nombre',
-        value: this.basicSearchText || '',
-        operation: 'CONTAINS',
-        clazzName: 'Etiqueta'
-      }]
-    };
+    const nombre = (this.searchForm.get('nombre')?.value || '').trim();
+    const descripcion = (this.searchForm.get('descripcion')?.value || '').trim();
+    const hasFilters = !!(this.basicSearchText || nombre || descripcion);
+    if (!hasFilters) {
+      this.etiquetasService.listar(this.pageNo, this.pageSize)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          const data = response?.data ?? response;
+          const raw = (data?.elements ?? data?.items ?? data?.content ?? []) as any[];
+          const mapped = Array.isArray(raw) ? raw.map((e: any) => ({
+            id: e?.id ?? e?.idEtiqueta ?? e?.id_tag ?? e?.idLabel,
+            nombre: e?.nombre ?? e?.name,
+            descripcion: e?.descripcion ?? e?.description,
+            colorHex: e?.colorHex ?? e?.color ?? '#4ECDC4',
+            fechaCreacion: e?.fechaCreacion ?? e?.createdAt ?? e?.fechaRegistro
+          })) as EtiquetaDTO[] : [];
+          this.etiquetas = mapped.length > this.pageSize ? mapped.slice(0, this.pageSize) : mapped;
+          this.totalItems = (data?.totalElements ?? data?.total ?? this.etiquetas.length) as number;
+          this.loading = false;
+        },
+        error: (error: any) => {
+          this.toast.showError('Error cargando etiquetas', 'Etiquetas');
+          this.log.error('etiquetas listar', error);
+          this.loading = false;
+        }
+      });
+      return;
+    }
 
-    this.etiquetasService.buscar(searchRequest, this.currentPage - 1, this.pageSize)
+    const criteria: { filterKey: string; value: any; operation: string }[] = [];
+    if (this.basicSearchText) criteria.push({ filterKey: 'nombre', value: this.basicSearchText, operation: 'CONTAINS' });
+    if (nombre) criteria.push({ filterKey: 'nombre', value: nombre, operation: 'CONTAINS' });
+    if (descripcion) criteria.push({ filterKey: 'descripcion', value: descripcion, operation: 'CONTAINS' });
+    const searchRequest = this.searchUtil.buildRequest('Etiqueta', criteria, 'AND');
+
+    this.etiquetasService.buscar(searchRequest, this.pageNo, this.pageSize)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: any) => {
@@ -82,13 +109,13 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
       });
   }
 
-  onSearch(): void { this.currentPage = 1; this.loadEtiquetas(); }
-  onPageChange(page: number): void { this.currentPage = page; this.loadEtiquetas(); }
+  onSearch(): void { this.pageNo = 0; this.loadEtiquetas(); }
+  onPageChange(page: number): void { this.pageNo = Math.max(0, page); this.loadEtiquetas(); }
 
   onBasicSearchTextChange(text: string): void { this.basicSearchText = text; this.onSearch(); }
-  onPageSizeChange(size: number): void { this.pageSize = size; this.onPageChange(1); }
-  onPrev(): void { if (this.currentPage > 1) { this.onPageChange(this.currentPage - 1); } }
-  onNext(): void { const totalPages = this.getTotalPages(); if (this.currentPage < totalPages) { this.onPageChange(this.currentPage + 1); } }
+  onPageSizeChange(size: number): void { this.pageSize = size; this.onPageChange(0); }
+  onPrev(): void { if (this.pageNo > 0) { this.onPageChange(this.pageNo - 1); } }
+  onNext(): void { const totalPages = this.getTotalPages(); if (this.pageNo < Math.max(0, totalPages - 1)) { this.onPageChange(this.pageNo + 1); } }
   toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
 
   onCreate(): void { this.selectedEtiqueta = null; this.showCreateModal = true; }
@@ -113,12 +140,12 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   cancelDelete(): void { this.showDeleteModal = false; this.etiquetaToDelete = null; }
 
   onModalClose(): void { this.showCreateModal = false; this.showEditModal = false; this.selectedEtiqueta = null; }
-  onModalSave(): void { this.onModalClose(); this.onPageChange(1); }
+  onModalSave(): void { this.onModalClose(); this.onPageChange(0); }
 
   onModalVisibleChange(visible: boolean): void {
     if (!visible) { this.onModalClose(); }
   }
 
-  getPaginationArray(): number[] { const totalPages = this.getTotalPages(); return Array.from({ length: totalPages }, (_, i) => i + 1); }
+  getPaginationArray(): number[] { const totalPages = this.getTotalPages(); return Array.from({ length: totalPages }, (_, i) => i); }
   getTotalPages(): number { return Math.ceil(this.totalItems / this.pageSize); }
 }
