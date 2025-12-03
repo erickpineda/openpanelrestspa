@@ -1,35 +1,70 @@
-<c-card>
-  <c-card-header class="d-flex align-items-center">
-    <c-col [sm]="6">
-      <h6 cCardTitle>Listado de comentarios</h6>
-    </c-col>
-    <c-col [sm]="6">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button cButton color="light" size="sm">
-          <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
-          Imprimir
-        </button>
-        <button cButton color="warning" size="sm">
-          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Pendientes de revisión"></svg>
-          No aprobados
-        </button>
-      </div>
-    </c-col>
-  </c-card-header>
-  <c-card-body>
-
-    <div class="d-flex justify-content-between align-items-end">
-      <h5 cCardTitle>Listado de comentarios</h5>
-      <div class="hstack gap-3">
-        <button cButton color="success" size="sm" routerLink="crear">
-          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nuevo Comentario"></svg>
-          Crear nuevo Comentario
+<c-card aria-live="polite">
+  <c-card-header class="d-flex align-items-center justify-content-between">
+    <span>Comentarios</span>
+    <div class="btn-toolbar gap-2">
+      <div class="btn-group" role="group" aria-label="Acciones">
+        <button cButton color="primary" size="sm" routerLink="crear">
+          <svg cIcon name="cilPlus" class="me-2"></svg>
+          Nuevo
         </button>
       </div>
     </div>
-    <hr>
+  </c-card-header>
+  <c-card-body>
+
+    <c-row class="align-items-center mb-3 g-2">
+      <c-col xs="12" md="4">
+        <div class="text-muted small">Total {{ totalElements }}</div>
+      </c-col>
+      <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+        <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar comentario..." style="max-width: 280px;" />
+        <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+      </c-col>
+      <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+        <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+        </select>
+      </c-col>
+    </c-row>
+
+    <div *ngIf="showAdvanced" class="mb-3">
+      <c-row class="g-3 align-items-end">
+        <c-col xs="12" md="4">
+          <label class="form-label mb-1">Usuario</label>
+          <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" />
+        </c-col>
+        <c-col xs="6" md="4">
+          <label class="form-label mb-1">Aprobado</label>
+          <select cSelect class="form-select-sm" [value]="filtroAprobado === null ? '' : (filtroAprobado ? 'true' : 'false')"
+                  (change)="filtroAprobado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
+            <option value="">Seleccione estado</option>
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+          </select>
+        </c-col>
+        <c-col xs="6" md="4">
+          <label class="form-label mb-1">Cuarentena</label>
+          <select cSelect class="form-select-sm" [value]="filtroCuarentena === null ? '' : (filtroCuarentena ? 'true' : 'false')"
+                  (change)="filtroCuarentena = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
+            <option value="">Seleccione estado</option>
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+          </select>
+        </c-col>
+        <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
+          <button cButton size="sm" color="primary" variant="outline" (click)="search()">
+            <svg cIcon name="cilSearch"></svg> Buscar
+          </button>
+          <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
+            <svg cIcon name="cilReload"></svg> Limpiar
+          </button>
+        </c-col>
+      </c-row>
+    </div>
     
-    <table cTable hover *ngIf="listaComentarios.length >= 0">
+    <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de comentarios" *ngIf="listaComentarios.length >= 0">
       <thead cTableColor="dark">
         <tr>
           <th scope="col">ID</th>
@@ -41,7 +76,7 @@
           <th scope="col">Cuarentena</th>
         </tr>
       </thead>
-      <tbody *ngFor="let coment of listaComentarios">
+      <tbody *ngFor="let coment of pagedComentarios">
         <tr (click)="navigate('/admin/control/comentarios/'+coment.idComentario)" style="cursor: pointer">
           <td scope="row">{{coment.idComentario}}</td>
           <td>{{ truncateContent(coment.contenido) }}</td>
@@ -58,17 +93,11 @@
         </tr>
       </tbody>
     </table>
-    <c-pagination aria-label="Paginación de comentarios" size="sm" *ngIf="listaComentarios.length >= 0">
-      <li cPageItem [active]="page === 1">
-        <a cPageLink (click)="onPageChange(page - 1)" [routerLink]><span aria-hidden="true">&laquo;</span></a>
-      </li>
-      <li cPageItem *ngFor="let p of getPages()" [active]="p === page">
-        <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
-      </li>
-      <li cPageItem [active]="page === numberOfPages">
-        <a cPageLink (click)="onPageChange(page + 1)" [routerLink]><span aria-hidden="true">&raquo;</span></a>
-      </li>
-    </c-pagination>
+    <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
+      <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
+      <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
+      <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }}</div>
+    </div>
 
   </c-card-body>
 </c-card>

@@ -22,10 +22,17 @@ export class ListadoComentariosComponent implements OnInit {
 
   listaComentarios: Comentario[] = [];
 
-  page = 1;
-  pageSize = 5;
-  pageCurrent = 0;
-  pagedComentarios: any[] = [];
+  // Patrón de toolbar/búsqueda/paginación
+  basicSearchText: string = '';
+  showAdvanced: boolean = false;
+  filtroUsuario: string = '';
+  filtroAprobado: boolean | null = null;
+  filtroCuarentena: boolean | null = null;
+  pageSize = 10;
+  pageNo = 0;
+  totalElements = 0;
+  filteredComentarios: Comentario[] = [];
+  pagedComentarios: Comentario[] = [];
 
   estaVacio: boolean = false;
 
@@ -49,9 +56,8 @@ export class ListadoComentariosComponent implements OnInit {
       this.obtenerListaComentarios().then((listaRes: PaginaResponse) => {
         this.listaComentarios = listaRes.elements;
         this.estaVacio = listaRes.empty;
-        if (!this.estaVacio) {
-          this.refreshComentarios();
-        }
+        this.totalElements = this.listaComentarios?.length || 0;
+        this.search();
       });
     } catch (error) {
       this.log.error("Error initializing list:", error);
@@ -92,10 +98,10 @@ export class ListadoComentariosComponent implements OnInit {
 
   private async obtenerListaComentarios(): Promise<PaginaResponse> {
     return new Promise((resolve, reject) => {
-      this.comentarioService.listarPagina(this.pageCurrent, this.pageSize).subscribe({
-        next: (response: OpenpanelApiResponse<any>) => {
-          const pResp: PaginaResponse = (response.data) ? response.data : PaginaResponse;
-          pResp.elements = response.data?.elements;
+      this.comentarioService.listarSafe().subscribe({
+        next: (lista: Comentario[]) => {
+          const pResp: PaginaResponse = new PaginaResponse();
+          pResp.elements = Array.isArray(lista) ? lista : [];
           resolve(pResp);
         },
         error: (err: any) => {
@@ -119,42 +125,51 @@ export class ListadoComentariosComponent implements OnInit {
     return content.length > 20 ? content.substring(0, 20) + '...' : content;
   }
 
-  refreshComentarios() {
-    this.pagedComentarios= this.listaComentarios.slice(
-      (this.page - 1) * this.pageSize,
-      (this.page - 1) * this.pageSize + this.pageSize
-    );
+  // ===== Toolbar / Búsqueda / Paginación =====
+  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
+  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.search(); }
+  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.updatePage(); }
+
+  search(): void {
+    const term = (this.basicSearchText || '').toLowerCase();
+    const usuario = (this.filtroUsuario || '').toLowerCase();
+    const aprob = this.filtroAprobado;
+    const cuar = this.filtroCuarentena;
+    const base = this.listaComentarios || [];
+    this.filteredComentarios = base.filter(c => {
+      const contenido = (c.contenido || '').toLowerCase();
+      const user = (c.username || '').toLowerCase();
+      const mBasic = !term || contenido.includes(term) || user.includes(term);
+      const mUser = !usuario || user.includes(usuario);
+      const mAprob = aprob === null || c.aprobado === aprob;
+      const mCuar = cuar === null || c.cuarentena === cuar;
+      return mBasic && mUser && mAprob && mCuar;
+    });
+    this.totalElements = this.filteredComentarios.length;
+    this.pageNo = 0;
+    this.updatePage();
   }
 
-  onPageChange(page: number) {
-    //if (page < 1 || page > this.numberOfPages) return;
-    
-    if (page < 1) return;
-
-    if (page > this.numberOfPages) {
-      this.pageCurrent = page;
-      this.obtenerListaComentarios().then((listaRes: PaginaResponse) => {
-        this.listaComentarios = listaRes.elements;
-        this.estaVacio = listaRes.empty;
-        if (this.estaVacio) {
-          this.page = this.pageCurrent;
-          return;
-        } else {
-          this.refreshComentarios();
-        }
-      });
-    }
-
-    this.page = page;
+  reset(): void {
+    this.basicSearchText = '';
+    this.filtroUsuario = '';
+    this.filtroAprobado = null;
+    this.filtroCuarentena = null;
+    this.pageNo = 0;
+    this.search();
   }
 
-  get numberOfPages(): number {
-    return this.listaComentarios.length === 0? 1: Math.ceil(this.listaComentarios.length / this.pageSize);
+  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.updatePage(); } }
+  next(): void { if (this.pageNo < this.getTotalPages() - 1) { this.pageNo++; this.updatePage(); } }
+  getTotalPages(): number { return Math.max(1, Math.ceil(this.totalElements / this.pageSize)); }
+
+  private updatePage(): void {
+    const start = this.pageNo * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedComentarios = this.filteredComentarios.slice(start, end);
   }
 
-  getPages(): number[] {
-    return Array.from({ length: this.numberOfPages }, (v, k) => k + 1);
-  }
+  // Métodos antiguos de paginación por números eliminados en favor de Anterior/Siguiente
 
   public refrescarPagina(): void {
     window.location.reload();

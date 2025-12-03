@@ -19,13 +19,17 @@ export class ArchivosComponent implements OnInit {
   fechaDesde = '';
   fechaHasta = '';
 
+  // Patrón de toolbar/búsqueda
+  showAdvanced: boolean = false;
+  basicSearchText: string = '';
+
   constructor(private archivos: ArchivosService) {}
 
   ngOnInit(): void { this.load(); }
 
   load(pageNo = this.pageNo): void {
     this.loading = true; this.error = null;
-    const hasFilters = !!this.filtroNombre;
+    const hasFilters = !!this.filtroNombre || !!this.filtroMime || !!this.fechaDesde || !!this.fechaHasta;
     if (!hasFilters) {
       this.archivos.listarSafe(pageNo, this.pageSize).subscribe({
         next: (list: MediaItem[]) => { this.items = Array.isArray(list) ? list : []; this.totalPages = 0; this.loading = false; },
@@ -41,7 +45,12 @@ export class ArchivosComponent implements OnInit {
   }
 
   search(): void { this.pageNo = 0; this.load(); }
-  reset(): void { this.filtroNombre = ''; this.pageNo = 0; this.load(); }
+  reset(): void { this.filtroNombre = ''; this.filtroMime=''; this.fechaDesde=''; this.fechaHasta=''; this.basicSearchText=''; this.pageNo = 0; this.load(); }
   prev(): void { if (this.pageNo > 0) { this.pageNo--; this.load(); } }
   next(): void { if (this.totalPages ? this.pageNo < this.totalPages - 1 : true) { this.pageNo++; this.load(); } }
+
+  // Handlers toolbar
+  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
+  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.filtroNombre = this.basicSearchText; this.search(); }
+  onPageSizeChange(size: number): void { this.pageSize = Number(size) || this.pageSize; this.pageNo = 0; this.search(); }
 }

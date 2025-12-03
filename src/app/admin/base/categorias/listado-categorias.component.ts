@@ -15,6 +15,16 @@ export class ListadoCategoriasComponent implements OnInit {
   cargando = false;
   errorMsg: string | null = null;
 
+  // Patrón de toolbar/búsqueda/paginación
+  basicSearchText: string = '';
+  showAdvanced: boolean = false;
+  filtroNombre: string = '';
+  pageSize: number = 10;
+  pageNo: number = 0;
+  totalElements: number = 0;
+  filteredCategorias: Categoria[] = [];
+  pagedCategorias: Categoria[] = [];
+
   constructor(
     private router: Router,
     private categoriaService: CategoriaService,
@@ -34,6 +44,8 @@ export class ListadoCategoriasComponent implements OnInit {
       next: (response: any) => {
         const categorias: Categoria[] = Array.isArray(response) ? response : [];
         this.listaCategorias = categorias;
+        this.totalElements = categorias.length;
+        this.search();
       },
       error: (err: any) => {
         if (err?.status === 404) {
@@ -67,5 +79,42 @@ export class ListadoCategoriasComponent implements OnInit {
 
   trackByCategoriaId(index: number, categoria: Categoria): number {
     return categoria.idCategoria;
+  }
+
+  // ===== Toolbar / Búsqueda / Paginación =====
+  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
+  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.search(); }
+  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.updatePage(); }
+
+  search(): void {
+    const term = (this.basicSearchText || '').toLowerCase();
+    const adv = (this.filtroNombre || '').toLowerCase();
+    const base = this.listaCategorias || [];
+    this.filteredCategorias = base.filter(c => {
+      const nombre = (c.nombre || '').toLowerCase();
+      const matchBasic = !term || nombre.includes(term);
+      const matchAdv = !adv || nombre.includes(adv);
+      return matchBasic && matchAdv;
+    });
+    this.totalElements = this.filteredCategorias.length;
+    this.pageNo = 0;
+    this.updatePage();
+  }
+
+  reset(): void {
+    this.basicSearchText = '';
+    this.filtroNombre = '';
+    this.pageNo = 0;
+    this.search();
+  }
+
+  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.updatePage(); } }
+  next(): void { if (this.pageNo < this.getTotalPages() - 1) { this.pageNo++; this.updatePage(); } }
+  getTotalPages(): number { return Math.max(1, Math.ceil(this.totalElements / this.pageSize)); }
+
+  private updatePage(): void {
+    const start = this.pageNo * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedCategorias = this.filteredCategorias.slice(start, end);
   }
 }

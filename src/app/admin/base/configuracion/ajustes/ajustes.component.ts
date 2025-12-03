@@ -18,6 +18,17 @@ export class AjustesComponent implements OnInit {
   editItem: Ajustes | null = null;
   form: FormGroup;
 
+  // Patrón de toolbar/búsqueda/paginación
+  basicSearchText: string = '';
+  showAdvanced: boolean = false;
+  filtroCategoria: string = '';
+  filtroClave: string = '';
+  pageSize: number = 10;
+  pageNo: number = 0;
+  totalElements: number = 0;
+  filteredAjustes: Ajustes[] = [];
+  pagedAjustes: Ajustes[] = [];
+
   constructor(private ajustesService: AjustesService, private fb: FormBuilder, private toast: ToastService, private log: LoggerService) {
     this.form = this.fb.group({
       categoria: ['', [Validators.required, Validators.maxLength(50)]],
@@ -31,7 +42,7 @@ export class AjustesComponent implements OnInit {
   load(): void {
     this.loading = true; this.error = null;
     this.ajustesService.listarAjustesSafe().subscribe({
-      next: (list: Ajustes[]) => { this.ajustes = Array.isArray(list) ? list : []; this.loading = false; },
+      next: (list: Ajustes[]) => { this.ajustes = Array.isArray(list) ? list : []; this.totalElements = this.ajustes.length; this.loading = false; this.search(); },
       error: (err) => { this.error = 'Error cargando ajustes'; this.log.error('ajustes listar', err); this.loading = false; }
     });
   }
@@ -69,5 +80,47 @@ export class AjustesComponent implements OnInit {
       next: () => { this.toast.showSuccess('Ajuste eliminado', 'Ajustes'); this.loading = false; this.load(); },
       error: (err) => { this.toast.showError('Error eliminando', 'Ajustes'); this.log.error('ajustes eliminar', err); this.loading = false; }
     });
+  }
+
+  // ===== Toolbar / Búsqueda / Paginación =====
+  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
+  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.search(); }
+  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.updatePage(); }
+
+  search(): void {
+    const term = (this.basicSearchText || '').toLowerCase();
+    const categoria = (this.filtroCategoria || '').toLowerCase();
+    const clave = (this.filtroClave || '').toLowerCase();
+    const base = this.ajustes || [];
+    this.filteredAjustes = base.filter(a => {
+      const c = (a.categoria || '').toLowerCase();
+      const k = (a.clave || '').toLowerCase();
+      const v = (a.valor || '').toLowerCase();
+      const mBasic = !term || c.includes(term) || k.includes(term) || v.includes(term);
+      const mCat = !categoria || c.includes(categoria);
+      const mClave = !clave || k.includes(clave);
+      return mBasic && mCat && mClave;
+    });
+    this.totalElements = this.filteredAjustes.length;
+    this.pageNo = 0;
+    this.updatePage();
+  }
+
+  reset(): void {
+    this.basicSearchText = '';
+    this.filtroCategoria = '';
+    this.filtroClave = '';
+    this.pageNo = 0;
+    this.search();
+  }
+
+  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.updatePage(); } }
+  next(): void { if (this.pageNo < this.getTotalPages() - 1) { this.pageNo++; this.updatePage(); } }
+  getTotalPages(): number { return Math.max(1, Math.ceil(this.totalElements / this.pageSize)); }
+
+  private updatePage(): void {
+    const start = this.pageNo * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedAjustes = this.filteredAjustes.slice(start, end);
   }
 }

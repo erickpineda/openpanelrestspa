@@ -1,37 +1,90 @@
 <c-container class="container-fluid">
-  <c-card>
-    <c-card-header>
-      Ajustes
+  <c-card aria-live="polite">
+    <c-card-header class="d-flex align-items-center justify-content-between">
+      <span>Ajustes</span>
+      <div class="btn-toolbar gap-2">
+        <div class="btn-group" role="group" aria-label="Acciones">
+          <button cButton color="primary" size="sm" (click)="openNew()">
+            <svg cIcon name="cilPlus" class="me-2"></svg>
+            Nuevo
+          </button>
+        </div>
+      </div>
     </c-card-header>
     <c-card-body [attr.aria-busy]="loading ? 'true' : null">
       <div *ngIf="error" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
         <span>{{ error }}</span>
-      <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
+        <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
       </div>
-    <div *ngIf="loading" class="py-3 text-center"><c-spinner></c-spinner></div>
-    <div *ngIf="!loading">
-      <div class="d-flex justify-content-end mb-2">
-        <button cButton color="primary" size="sm" (click)="openNew()"><svg cIcon name="cilPlus"></svg> Nuevo</button>
+      <div *ngIf="loading" class="py-3 text-center"><c-spinner></c-spinner></div>
+      <div *ngIf="!loading">
+        <c-row class="align-items-center mb-3 g-2">
+          <c-col xs="12" md="4">
+            <div class="text-muted small">Total {{ totalElements }}</div>
+          </c-col>
+          <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+            <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar ajuste..." style="max-width: 280px;" />
+            <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+          </c-col>
+          <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+            <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+            </select>
+          </c-col>
+        </c-row>
+
+        <div *ngIf="showAdvanced" class="mb-3">
+          <c-row class="g-3 align-items-end">
+            <c-col xs="12" md="4">
+              <label class="form-label mb-1">Categoría</label>
+              <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por categoría..." [value]="filtroCategoria" (input)="filtroCategoria=$any($event.target).value" />
+            </c-col>
+            <c-col xs="12" md="4">
+              <label class="form-label mb-1">Clave</label>
+              <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por clave..." [value]="filtroClave" (input)="filtroClave=$any($event.target).value" />
+            </c-col>
+            <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2">
+              <button cButton size="sm" color="primary" variant="outline" (click)="search()">
+                <svg cIcon name="cilSearch"></svg> Buscar
+              </button>
+              <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
+                <svg cIcon name="cilReload"></svg> Limpiar
+              </button>
+            </c-col>
+          </c-row>
+        </div>
+
+        <div class="table-responsive">
+          <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de ajustes">
+            <thead cTableColor="dark">
+              <tr><th>Categoria</th><th>Clave</th><th>Valor</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of pagedAjustes">
+                <td>{{ a.categoria }}</td>
+                <td>{{ a.clave }}</td>
+                <td class="text-truncate">{{ a.valor }}</td>
+                <td>
+                  <div class="btn-group">
+                    <button cButton color="secondary" size="sm" (click)="openEdit(a)"><svg cIcon name="cilPencil"></svg></button>
+                    <button cButton color="danger" size="sm" (click)="delete(a)"><svg cIcon name="cilTrash"></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="pagedAjustes.length === 0"><td colspan="4" class="text-muted text-center">Sin ajustes</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
+          <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
+          <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
+          <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }}</div>
+        </div>
       </div>
-      <table class="table table-hover" role="table">
-        <thead><tr><th>Categoria</th><th>Clave</th><th>Valor</th><th>Acciones</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let a of ajustes">
-            <td>{{ a.categoria }}</td>
-            <td>{{ a.clave }}</td>
-            <td class="text-truncate">{{ a.valor }}</td>
-            <td>
-              <div class="btn-group">
-                <button cButton color="secondary" size="sm" (click)="openEdit(a)"><svg cIcon name="cilPencil"></svg></button>
-                <button cButton color="danger" size="sm" (click)="delete(a)"><svg cIcon name="cilTrash"></svg></button>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="ajustes.length === 0"><td colspan="3" class="text-muted text-center">Sin ajustes</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </c-card-body>
+    </c-card-body>
   </c-card>
 </c-container>
 

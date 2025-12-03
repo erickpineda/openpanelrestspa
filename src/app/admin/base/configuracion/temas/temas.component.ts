@@ -18,6 +18,17 @@ export class TemasComponent implements OnInit {
   editItem: Tema | null = null;
   form: FormGroup;
 
+  // Patrón de toolbar/búsqueda/paginación
+  basicSearchText: string = '';
+  showAdvanced: boolean = false;
+  filtroNombre: string = '';
+  filtroActivo: boolean | null = null;
+  pageSize: number = 10;
+  pageNo: number = 0;
+  totalElements: number = 0;
+  filteredTemas: Tema[] = [];
+  pagedTemas: Tema[] = [];
+
   constructor(private temasService: TemasService, private fb: FormBuilder, private toast: ToastService, private log: LoggerService) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
@@ -31,7 +42,7 @@ export class TemasComponent implements OnInit {
   load(): void {
     this.loading = true; this.error = null;
     this.temasService.listarTemasSafe().subscribe({
-      next: (list: Tema[]) => { this.temas = Array.isArray(list) ? list : []; this.loading = false; },
+      next: (list: Tema[]) => { this.temas = Array.isArray(list) ? list : []; this.totalElements = this.temas.length; this.loading = false; this.search(); },
       error: (err) => { this.error = 'Error cargando temas'; this.log.error('temas listar', err); this.loading = false; }
     });
   }
@@ -77,5 +88,45 @@ export class TemasComponent implements OnInit {
       next: () => { this.toast.showSuccess('Tema eliminado', 'Temas'); this.loading = false; this.load(); },
       error: (err) => { this.toast.showError('Error eliminando', 'Temas'); this.log.error('temas eliminar', err); this.loading = false; }
     });
+  }
+
+  // ===== Toolbar / Búsqueda / Paginación =====
+  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
+  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.search(); }
+  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.updatePage(); }
+
+  search(): void {
+    const term = (this.basicSearchText || '').toLowerCase();
+    const nombre = (this.filtroNombre || '').toLowerCase();
+    const activo = this.filtroActivo;
+    const base = this.temas || [];
+    this.filteredTemas = base.filter(t => {
+      const n = (t.nombre || '').toLowerCase();
+      const mBasic = !term || n.includes(term);
+      const mNombre = !nombre || n.includes(nombre);
+      const mActivo = activo === null || t.activo === activo;
+      return mBasic && mNombre && mActivo;
+    });
+    this.totalElements = this.filteredTemas.length;
+    this.pageNo = 0;
+    this.updatePage();
+  }
+
+  reset(): void {
+    this.basicSearchText = '';
+    this.filtroNombre = '';
+    this.filtroActivo = null;
+    this.pageNo = 0;
+    this.search();
+  }
+
+  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.updatePage(); } }
+  next(): void { if (this.pageNo < this.getTotalPages() - 1) { this.pageNo++; this.updatePage(); } }
+  getTotalPages(): number { return Math.max(1, Math.ceil(this.totalElements / this.pageSize)); }
+
+  private updatePage(): void {
+    const start = this.pageNo * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedTemas = this.filteredTemas.slice(start, end);
   }
 }
