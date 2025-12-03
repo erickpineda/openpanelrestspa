@@ -10,7 +10,5 @@
     <select cSelect [ngModel]="pageSize" (ngModelChange)="pageSizeChange.emit($event)" name="pageSizeSelect" style="max-width: 100px;">
       <option *ngFor="let s of sizeOptions" [value]="s">{{ s }}</option>
     </select>
-    <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="disabled || page<=1">Anterior</button>
-    <button cButton color="light" size="sm" (click)="onNext()" [disabled]="disabled || page>=totalPages">Siguiente</button>
   </c-col>
 </c-row>
