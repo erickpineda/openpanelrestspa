@@ -23,7 +23,7 @@
         </c-col>
         <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
           <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar usuario..." [disabled]="loading" style="max-width: 280px;" />
-          <button cButton color="secondary" variant="outline" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
         </c-col>
         <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
           <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
@@ -66,8 +66,8 @@
         </c-row>
       </div>
       <div class="table-responsive">
-      <table class="table table-sm" role="table">
-        <thead>
+      <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de usuarios">
+        <thead cTableColor="dark">
           <tr><th>Usuario</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Acciones</th></tr>
         </thead>
         <tbody>
@@ -78,8 +78,8 @@
             <td>{{ getRolNombre(u.idRol) }}</td>
             <td>
               <div class="btn-group">
-                <button cButton color="secondary" size="sm" (click)="openEdit(u)"><svg cIcon name="cilPencil"></svg></button>
-                <button cButton color="danger" size="sm" (click)="delete(u)"><svg cIcon name="cilTrash"></svg></button>
+                <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(u)"><svg cIcon name="cilPencil"></svg></button>
+                <button cButton color="danger" size="sm" variant="outline" (click)="delete(u)"><svg cIcon name="cilTrash"></svg></button>
               </div>
             </td>
           </tr>
