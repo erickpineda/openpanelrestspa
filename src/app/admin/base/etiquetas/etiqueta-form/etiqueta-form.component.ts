@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EtiquetasService, EtiquetaDTO } from '../../../../core/services/etiquetas.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
@@ -9,7 +9,7 @@ import { LoggerService } from '../../../../core/services/logger.service';
   templateUrl: './etiqueta-form.component.html',
   styleUrls: ['./etiqueta-form.component.scss']
 })
-export class EtiquetaFormComponent implements OnInit {
+export class EtiquetaFormComponent implements OnInit, OnChanges {
   @Input() etiqueta: EtiquetaDTO | null = null;
   @Input() isEdit = false;
   @Output() save = new EventEmitter<EtiquetaDTO>();
@@ -30,10 +30,16 @@ export class EtiquetaFormComponent implements OnInit {
   ];
 
   constructor(private fb: FormBuilder, private etiquetasService: EtiquetasService, private toast: ToastService, private log: LoggerService) {
-    this.form = this.fb.group({ nombre: ['', [Validators.required, Validators.maxLength(50)]], descripcion: ['', Validators.maxLength(200)], color: ['#4ECDC4', Validators.required] });
+    this.form = this.fb.group({ nombre: ['', [Validators.required, Validators.maxLength(50)]], descripcion: ['', Validators.maxLength(200)], colorHex: ['#4ECDC4', Validators.required] });
   }
 
-  ngOnInit(): void { if (this.isEdit && this.etiqueta) { this.form.patchValue({ nombre: this.etiqueta.nombre, descripcion: this.etiqueta.descripcion, color: this.etiqueta.color || '#4ECDC4' }); } }
+  ngOnInit(): void { if (this.isEdit && this.etiqueta) { this.form.patchValue({ nombre: this.etiqueta.nombre, descripcion: this.etiqueta.descripcion, colorHex: this.etiqueta.colorHex || '#4ECDC4' }); } }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.isEdit && this.etiqueta) {
+      this.form.patchValue({ nombre: this.etiqueta.nombre, descripcion: this.etiqueta.descripcion, colorHex: this.etiqueta.colorHex || '#4ECDC4' });
+    }
+  }
 
   onSubmit(): void {
     if (this.form.valid) {

@@ -84,12 +84,15 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.cargaFinalizada = true;
     const locale = (navigator && navigator.language) ? navigator.language : 'es-ES';
     this.setHeaderLabels(locale);
-    this.dashboardApi.getContentStats().subscribe(stats => {
-      this.projectsCount = Number(stats?.totalEntradas) || 0;
-      this.commentsCount = Number(stats?.totalComentarios) || 0;
-      this.messagesCount = this.commentsCount;
-      this.cdr.markForCheck();
-    });
+    const isDashboardRoute = this.router.url.includes('/admin/base/dashboard');
+    if (isDashboardRoute) {
+      this.dashboardApi.getContentStats().subscribe(stats => {
+        this.projectsCount = Number(stats?.totalEntradas) || 0;
+        this.commentsCount = Number(stats?.totalComentarios) || 0;
+        this.messagesCount = this.commentsCount;
+        this.cdr.markForCheck();
+      });
+    }
     this.toastService.toasts$.subscribe(list => {
       this.notificationsCount = Array.isArray(list) ? list.length : 0;
       this.cdr.markForCheck();

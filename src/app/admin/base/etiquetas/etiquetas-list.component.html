@@ -7,18 +7,21 @@
       </button>
     </c-card-header>
     
-    <c-card-body [attr.aria-busy]="loading ? 'true' : null">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="text-muted small">Total {{ totalItems }}</div>
-        <div class="btn-group" role="group">
-          <select cSelect [value]="pageSize" (change)="pageSize = +$any($event.target).value; onPageChange(1)">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </select>
-        </div>
-      </div>
-      <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="mb-4">
+  <c-card-body [attr.aria-busy]="loading ? 'true' : null">
+      <app-search-toolbar-basic
+        [total]="totalItems"
+        [page]="currentPage"
+        [pageSize]="pageSize"
+        [sizeOptions]="[5,10,20]"
+        [searchText]="basicSearchText"
+        [disabled]="loading"
+        [totalPages]="getTotalPages()"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (searchTextChange)="onBasicSearchTextChange($event)"
+        (toggleAdvanced)="toggleAdvanced()"
+      ></app-search-toolbar-basic>
+      <form *ngIf="showAdvanced" [formGroup]="searchForm" (ngSubmit)="onSearch()" class="mb-4">
         <div class="row">
           <div class="col-md-4">
             <label for="nombre" class="form-label">Nombre</label>
@@ -53,7 +56,7 @@
           <tbody>
             <tr *ngFor="let etiqueta of etiquetas; let i = index" role="row">
               <td>
-                <span class="badge" [style.background-color]="etiqueta.color" [attr.aria-label]="'Color de etiqueta'">&nbsp;&nbsp;&nbsp;</span>
+                <span class="badge" [style.background-color]="etiqueta.colorHex" [attr.aria-label]="'Color de etiqueta'">&nbsp;&nbsp;&nbsp;</span>
               </td>
               <td class="text-truncate" style="max-width: 240px;" [title]="etiqueta.nombre">{{ etiqueta.nombre }}</td>
               <td class="text-truncate" style="max-width: 300px;" [title]="etiqueta.descripcion || ''">{{ etiqueta.descripcion || '-' }}</td>
@@ -74,29 +77,37 @@
         </table>
       </div>
 
-      <nav *ngIf="totalItems > pageSize" aria-label="Paginación de etiquetas">
-        <ul class="pagination justify-content-center">
-          <li class="page-item" [class.disabled]="currentPage === 1">
-            <a class="page-link" (click)="onPageChange(currentPage - 1)" [attr.aria-label]="'Página anterior'"><span aria-hidden="true">&laquo;</span></a>
-          </li>
-          <li class="page-item" *ngFor="let page of getPaginationArray()" [class.active]="page === currentPage">
-            <a class="page-link" (click)="onPageChange(page)" [attr.aria-label]="'Página ' + page">{{ page }}</a>
-          </li>
-          <li class="page-item" [class.disabled]="currentPage >= getTotalPages()">
-            <a class="page-link" (click)="onPageChange(currentPage + 1)" [attr.aria-label]="'Página siguiente'"><span aria-hidden="true">&raquo;</span></a>
-          </li>
-        </ul>
-      </nav>
-    </c-card-body>
+      <c-row class="mt-2">
+        <c-col class="d-flex justify-content-end align-items-center gap-2">
+          <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="currentPage<=1">Anterior</button>
+          <button cButton color="light" size="sm" (click)="onNext()" [disabled]="currentPage>=getTotalPages()">Siguiente</button>
+          <div class="text-muted small ms-2">Página {{ currentPage }} | Tamaño {{ pageSize }} | Total {{ totalItems }}</div>
+        </c-col>
+      </c-row>
+
+  </c-card-body>
   </c-card>
 </c-container>
 
-<c-modal [visible]="showCreateModal || showEditModal" (visibleChange)="(showCreateModal = $event) && (!showCreateModal && (showEditModal = false))" [attr.data-testid]="showCreateModal ? 'crear-etiqueta-modal' : 'editar-etiqueta-modal'">
+<c-modal [visible]="showCreateModal || showEditModal" (visibleChange)="onModalVisibleChange($event)" [attr.data-testid]="showCreateModal ? 'crear-etiqueta-modal' : 'editar-etiqueta-modal'">
   <c-modal-header><h5 cModalTitle>{{ showCreateModal ? 'Crear Nueva Etiqueta' : 'Editar Etiqueta' }}</h5></c-modal-header>
   <c-modal-body>
-    <app-etiqueta-form [etiqueta]="selectedEtiqueta" [isEdit]="showEditModal" (save)="onModalSave()" (cancel)="onModalClose()"></app-etiqueta-form>
+    <app-etiqueta-form *ngIf="showCreateModal || showEditModal" [etiqueta]="selectedEtiqueta" [isEdit]="showEditModal" (save)="onModalSave()" (cancel)="onModalClose()"></app-etiqueta-form>
   </c-modal-body>
   <c-modal-footer><button cButton color="secondary" (click)="onModalClose()">Cerrar</button></c-modal-footer>
+</c-modal>
+
+<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal=$event" alignment="center" [attr.data-testid]="'eliminar-etiqueta-modal'">
+  <c-modal-header>
+    <h5 cModalTitle>Confirmar eliminación</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <p>¿Desea eliminar la etiqueta <strong>{{ etiquetaToDelete?.nombre }}</strong>? Esta acción no se puede deshacer.</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
+    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
+  </c-modal-footer>
 </c-modal>
 
 <ng-template #loadingTemplate>

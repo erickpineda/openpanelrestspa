@@ -7,7 +7,7 @@ export interface EtiquetaDTO {
   id?: number;
   nombre?: string;
   descripcion?: string;
-  color?: string;
+  colorHex?: string;
   creadoPor?: number;
   fechaCreacion?: string;
   modificadoPor?: number;
