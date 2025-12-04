@@ -51,31 +51,29 @@
               <th scope="col">Color</th>
               <th scope="col">Nombre</th>
               <th scope="col">Descripción</th>
-              <th scope="col">Fecha de Creación</th>
               <th scope="col" class="text-center">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let etiqueta of etiquetas; let i = index" role="row">
+            <tr *ngFor="let etiqueta of pagedEtiquetas; let i = index" role="row">
               <td>
                 <span class="badge" [style.background-color]="etiqueta.colorHex" [attr.aria-label]="'Color de etiqueta'">&nbsp;&nbsp;&nbsp;</span>
               </td>
               <td class="text-truncate" style="max-width: 240px;" [title]="etiqueta.nombre">{{ etiqueta.nombre }}</td>
               <td class="text-truncate" style="max-width: 300px;" [title]="etiqueta.descripcion || ''">{{ etiqueta.descripcion || '-' }}</td>
-              <td>{{ etiqueta.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
               <td class="text-center">
                 <div class="btn-group" role="group" aria-label="Acciones">
-                  <button cButton size="sm" color="warning" variant="outline" (click)="onEdit(etiqueta)" [attr.aria-label]="'Editar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-editar-etiqueta-' + etiqueta.id">
+                  <button cButton size="sm" color="warning" variant="outline" (click)="onEdit(etiqueta)" [attr.aria-label]="'Editar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-editar-etiqueta-' + etiqueta.idEtiqueta">
                     <svg cIcon name="cilPencil"></svg>
                   </button>
-                  <button cButton size="sm" color="danger" variant="outline" (click)="onDelete(etiqueta)" [attr.aria-label]="'Eliminar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-eliminar-etiqueta-' + etiqueta.id">
+                  <button cButton size="sm" color="danger" variant="outline" (click)="onDelete(etiqueta)" [attr.aria-label]="'Eliminar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-eliminar-etiqueta-' + etiqueta.idEtiqueta">
                     <svg cIcon name="cilTrash"></svg>
                   </button>
                 </div>
               </td>
             </tr>
-            <tr *ngIf="etiquetas.length === 0">
-              <td colspan="5" class="text-center text-muted">No se encontraron etiquetas</td>
+            <tr *ngIf="pagedEtiquetas.length === 0">
+              <td colspan="4" class="text-center text-muted">No se encontraron etiquetas</td>
             </tr>
           </tbody>
         </table>
@@ -84,7 +82,7 @@
       <c-row class="mt-2">
         <c-col class="d-flex justify-content-end align-items-center gap-2">
           <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="pageNo<=0">Anterior</button>
-          <button cButton color="light" size="sm" (click)="onNext()" [disabled]="pageNo>=getTotalPages()-1">Siguiente</button>
+          <button cButton color="light" size="sm" (click)="onNext()" [disabled]="isNextDisabled()">Siguiente</button>
           <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalItems }}</div>
         </c-col>
       </c-row>

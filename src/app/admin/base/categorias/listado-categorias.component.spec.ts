@@ -12,7 +12,10 @@ describe('ListadoCategoriasComponent spinner finalize', () => {
     await TestBed.configureTestingModule({
       declarations: [ListadoCategoriasComponent],
       providers: [
-        { provide: CategoriaService, useValue: { listarSinGlobalLoader: () => of([]) } },
+        { provide: CategoriaService, useValue: {
+          listarPagina: () => of({ data: { elements: [], totalElements: 0, totalPages: 1 } }),
+          listarSinGlobalLoader: () => of([])
+        } },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -29,9 +32,8 @@ describe('ListadoCategoriasComponent spinner finalize', () => {
 
   it('apaga cargando tras error', () => {
     const svc = TestBed.inject(CategoriaService);
-    spyOn(svc, 'listarSinGlobalLoader').and.returnValue(throwError(() => ({ status: 500 })));
+    spyOn(svc, 'listarPagina').and.returnValue(throwError(() => ({ status: 500 })));
     component.obtenerListaCategorias();
     expect(component.cargando).toBeFalse();
   });
 });
-

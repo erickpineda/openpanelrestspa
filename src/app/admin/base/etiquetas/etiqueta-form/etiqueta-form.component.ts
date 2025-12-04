@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EtiquetasService, EtiquetaDTO } from '../../../../core/services/etiquetas.service';
+import { EtiquetaService } from '../../../../core/services/data/etiqueta.service';
+import { Etiqueta } from '../../../../core/models/etiqueta.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 
@@ -10,9 +11,9 @@ import { LoggerService } from '../../../../core/services/logger.service';
   styleUrls: ['./etiqueta-form.component.scss']
 })
 export class EtiquetaFormComponent implements OnInit, OnChanges {
-  @Input() etiqueta: EtiquetaDTO | null = null;
+  @Input() etiqueta: Etiqueta | null = null;
   @Input() isEdit = false;
-  @Output() save = new EventEmitter<EtiquetaDTO>();
+  @Output() save = new EventEmitter<Etiqueta>();
   @Output() cancel = new EventEmitter<void>();
 
   form: FormGroup;
@@ -29,7 +30,7 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
     { value: '#F8BBD9', label: 'Rosa' }
   ];
 
-  constructor(private fb: FormBuilder, private etiquetasService: EtiquetasService, private toast: ToastService, private log: LoggerService) {
+  constructor(private fb: FormBuilder, private etiquetasService: EtiquetaService, private toast: ToastService, private log: LoggerService) {
     this.form = this.fb.group({ nombre: ['', [Validators.required, Validators.maxLength(50)]], descripcion: ['', Validators.maxLength(200)], colorHex: ['#4ECDC4', Validators.required] });
   }
 
@@ -44,10 +45,10 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
   onSubmit(): void {
     if (this.form.valid) {
       this.loading = true;
-      const etiquetaData: EtiquetaDTO = { ...this.form.value };
-      const operation = this.isEdit && this.etiqueta?.id ? this.etiquetasService.actualizar(this.etiqueta.id, etiquetaData) : this.etiquetasService.crear(etiquetaData);
+      const etiquetaData: Etiqueta = { ...this.form.value } as Etiqueta;
+      const operation = this.isEdit && this.etiqueta?.idEtiqueta ? this.etiquetasService.actualizar(this.etiqueta.idEtiqueta, etiquetaData) : this.etiquetasService.crear(etiquetaData);
       operation.subscribe({
-        next: () => { this.loading = false; this.toast.showSuccess(this.isEdit ? 'Etiqueta actualizada' : 'Etiqueta creada', 'Etiquetas'); this.save.emit({ ...etiquetaData, id: this.etiqueta?.id }); },
+        next: () => { this.loading = false; this.toast.showSuccess(this.isEdit ? 'Etiqueta actualizada' : 'Etiqueta creada', 'Etiquetas'); this.save.emit({ ...etiquetaData, idEtiqueta: this.etiqueta?.idEtiqueta } as Etiqueta); },
         error: (error: any) => { this.toast.showError('Error guardando etiqueta', 'Etiquetas'); this.log.error('etiquetas guardar', error); this.loading = false; }
       });
     }

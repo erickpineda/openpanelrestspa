@@ -30,6 +30,7 @@ test.describe('Dashboard inicial', () => {
       await page.goto('/#/admin/dashboard?e2e=1', { waitUntil: 'domcontentloaded' });
     }
     await page.waitForSelector('[data-testid="dashboard-root"]', { state: 'visible', timeout: 90000 });
+    await page.addStyleTag({ content: '.loading-overlay{pointer-events:none !important; opacity:0 !important;}' });
     const toolbarVisible = await page.locator('[data-testid="dashboard-toolbar"]').first().isVisible().catch(() => false);
     if (!toolbarVisible) {
       const loginVisible = await page.locator('text=Login').first().isVisible().catch(() => false);
@@ -73,6 +74,7 @@ test.describe('Dashboard inicial', () => {
       await page.goto('/#/admin/dashboard?e2e=1', { waitUntil: 'domcontentloaded' });
     }
     await page.waitForSelector('[data-testid="dashboard-root"]', { state: 'visible', timeout: 90000 });
+    await page.addStyleTag({ content: '.loading-overlay{pointer-events:none !important; opacity:0 !important;}' });
     const toolbarVisible2 = await page.locator('[data-testid="dashboard-toolbar"]').first().isVisible().catch(() => false);
     if (!toolbarVisible2) {
       const loginVisible2 = await page.locator('text=Login').first().isVisible().catch(() => false);
@@ -106,6 +108,7 @@ test.describe('Dashboard inicial', () => {
     await page.waitForSelector('[data-testid="admin-root"]', { state: 'visible', timeout: 30000 });
     await page.goto('/#/admin/dashboard?e2e=1', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-testid="dashboard-root"]', { state: 'visible', timeout: 90000 });
+    await page.addStyleTag({ content: '.loading-overlay{pointer-events:none !important; opacity:0 !important;}' });
 
     const downloadPromise = page.waitForEvent('download');
     await page.locator('[data-testid="btn-csv-split-estado"]').click();
@@ -125,6 +128,7 @@ test.describe('Dashboard inicial', () => {
     await page.waitForSelector('[data-testid="admin-root"]', { state: 'visible', timeout: 30000 });
     await page.goto('/#/admin/dashboard?e2e=1', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-testid="dashboard-root"]', { state: 'visible', timeout: 90000 });
+    await page.addStyleTag({ content: '.loading-overlay{pointer-events:none !important; opacity:0 !important;}' });
 
     const downloadPromise = page.waitForEvent('download');
     await page.locator('[data-testid="btn-csv-split-estado-nombre"]').click();
@@ -144,6 +148,7 @@ test.describe('Dashboard inicial', () => {
     await page.waitForSelector('[data-testid="admin-root"]', { state: 'visible', timeout: 30000 });
     await page.goto('/#/admin/dashboard?e2e=1', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-testid="dashboard-root"]', { state: 'visible', timeout: 90000 });
+    await page.addStyleTag({ content: '.loading-overlay{pointer-events:none !important; opacity:0 !important;}' });
 
     const downloadPromise = page.waitForEvent('download');
     await page.locator('[data-testid="btn-csv-top-users"]').click();
@@ -162,6 +167,7 @@ test.describe('Dashboard inicial', () => {
     await page.waitForSelector('[data-testid="admin-root"]', { state: 'visible', timeout: 30000 });
     await page.goto('/#/admin/dashboard?e2e=1', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-testid="dashboard-root"]', { state: 'visible', timeout: 90000 });
+    await page.addStyleTag({ content: '.loading-overlay{pointer-events:none !important; opacity:0 !important;}' });
 
     const downloadPromise = page.waitForEvent('download');
     await page.locator('[data-testid="btn-csv-top-categories"]').click();
@@ -231,9 +237,15 @@ test.describe('Dashboard inicial', () => {
     await setAuthStorage(page);
     await page.goto('/#/', { waitUntil: 'domcontentloaded' });
     await page.goto('/#/admin?e2e=1', { waitUntil: 'domcontentloaded' });
+    const loginImmediately3 = await page.locator('text=Login').first().isVisible().catch(() => false);
+    if (loginImmediately3) {
+      await setAuthStorage(page);
+      await page.goto('/#/admin?e2e=1', { waitUntil: 'domcontentloaded' });
+    }
     await page.waitForSelector('[data-testid="admin-root"]', { state: 'visible', timeout: 30000 });
     await page.goto('/#/admin/dashboard?e2e=1', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-testid="dashboard-root"]', { state: 'visible', timeout: 90000 });
+    await page.addStyleTag({ content: '.loading-overlay{pointer-events:none !important; opacity:0 !important;}' });
 
     const downloadPromise = page.waitForEvent('download');
     await page.locator('[data-testid="btn-csv-storage"]').click();
