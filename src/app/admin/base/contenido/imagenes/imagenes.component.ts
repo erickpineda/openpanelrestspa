@@ -40,6 +40,8 @@ export class ImagenesComponent implements OnInit {
   private pinchActive = false;
   private pinchStartDist = 0;
   private pinchStartZoom = 1;
+  private previewNaturalWidth = 0;
+  private previewNaturalHeight = 0;
 
   // Patrón de toolbar/búsqueda
   showAdvanced: boolean = false;
@@ -82,23 +84,27 @@ export class ImagenesComponent implements OnInit {
   download(item: MediaItem): void {
     if (!item) return;
     const filename = (item.nombre && item.nombre.trim()) ? item.nombre!.trim() : 'imagen';
-    if (item.url) {
-      try {
-        const a = document.createElement('a');
-        a.href = item.url!;
-        a.download = filename;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } catch { window.open(item.url!, '_blank'); }
-      return;
-    }
     if (item.uuid) {
-      this.fileStorage.descargarFichero(item.uuid).subscribe({
-        next: (blob) => { try { saveAs(blob, filename); } catch {} },
+      this.fileStorage.obtenerDatosFichero(item.uuid).subscribe({
+        next: (datos: any) => {
+          try {
+            const b64: string | undefined = datos?.contenido;
+            const mime: string = datos?.tipo || item.mime || 'application/octet-stream';
+            if (!b64) { this.toast.showError('Contenido no disponible', 'Imágenes'); return; }
+            const byteChars = atob(b64);
+            const byteNums = new Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i);
+            const blob = new Blob([new Uint8Array(byteNums)], { type: mime });
+            saveAs(blob, filename);
+          } catch { this.toast.showError('Error procesando descarga', 'Imágenes'); }
+        },
         error: () => { this.toast.showError('Error descargando imagen', 'Imágenes'); }
       });
+      return;
+    }
+    if (item.url) {
+      try { const a = document.createElement('a'); a.href = item.url!; a.download = filename; a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+      catch { window.open(item.url!, '_blank'); }
     }
   }
 
@@ -221,6 +227,7 @@ export class ImagenesComponent implements OnInit {
   zoomPercent(): number { return Math.round(this.previewZoom * 100); }
 
   @ViewChild('previewScroll') previewScroll?: ElementRef<HTMLDivElement>;
+  @ViewChild('previewImg') previewImg?: ElementRef<HTMLImageElement>;
 
   toggleZoom(): void {
     const targetZoom = this.previewZoom < 2 ? 2 : 1;
@@ -253,6 +260,7 @@ export class ImagenesComponent implements OnInit {
     const dy = event.clientY - this.dragStartY;
     el.scrollLeft = this.dragScrollLeft - dx;
     el.scrollTop = this.dragScrollTop - dy;
+    event.preventDefault();
   }
 
   onPreviewMouseUp(): void { this.isDragging = false; }
@@ -312,11 +320,37 @@ export class ImagenesComponent implements OnInit {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
+  onPreviewImageLoad(ev: Event): void {
+    const img = ev.target as HTMLImageElement | null;
+    if (!img) return;
+    this.previewNaturalWidth = img.naturalWidth;
+    this.previewNaturalHeight = img.naturalHeight;
+  }
+
   resetZoom(): void {
     this.previewZoom = 1;
     setTimeout(() => {
       const el = this.previewScroll?.nativeElement;
       if (!el) return;
+      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
+      el.scrollTop = Math.max(0, (el.scrollHeight - el.clientHeight) / 2);
+    }, 0);
+  }
+
+  fitWidth(): void { this.resetZoom(); }
+
+  fitHeight(): void {
+    const el = this.previewScroll?.nativeElement;
+    const imgEl = this.previewImg?.nativeElement;
+    if (!el || !imgEl) { this.resetZoom(); return; }
+    const natW = imgEl.naturalWidth || this.previewNaturalWidth;
+    const natH = imgEl.naturalHeight || this.previewNaturalHeight;
+    if (!natW || !natH) { this.resetZoom(); return; }
+    const contW = el.clientWidth;
+    const contH = el.clientHeight;
+    const targetZoom = (contH / natH) * (natW / contW);
+    this.previewZoom = Math.min(this.maxZoom, Math.max(this.minZoom, targetZoom));
+    setTimeout(() => {
       el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
       el.scrollTop = Math.max(0, (el.scrollHeight - el.clientHeight) / 2);
     }, 0);

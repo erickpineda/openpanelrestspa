@@ -77,23 +77,27 @@ export class ArchivosComponent implements OnInit {
   download(item: MediaItem): void {
     if (!item) return;
     const filename = (item.nombre && item.nombre.trim()) ? item.nombre!.trim() : 'archivo';
-    if (item.url) {
-      try {
-        const a = document.createElement('a');
-        a.href = item.url!;
-        a.download = filename;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } catch { window.open(item.url!, '_blank'); }
-      return;
-    }
     if (item.uuid) {
-      this.fileStorage.descargarFichero(item.uuid).subscribe({
-        next: (blob) => { try { saveAs(blob, filename); } catch {} },
+      this.fileStorage.obtenerDatosFichero(item.uuid).subscribe({
+        next: (datos: any) => {
+          try {
+            const b64: string | undefined = datos?.contenido;
+            const mime: string = datos?.tipo || item.mime || 'application/octet-stream';
+            if (!b64) { this.toast.showError('Contenido no disponible', 'Archivos'); return; }
+            const byteChars = atob(b64);
+            const byteNums = new Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i);
+            const blob = new Blob([new Uint8Array(byteNums)], { type: mime });
+            saveAs(blob, filename);
+          } catch { this.toast.showError('Error procesando descarga', 'Archivos'); }
+        },
         error: () => { this.toast.showError('Error descargando archivo', 'Archivos'); }
       });
+      return;
+    }
+    if (item.url) {
+      try { const a = document.createElement('a'); a.href = item.url!; a.download = filename; a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+      catch { window.open(item.url!, '_blank'); }
     }
   }
 

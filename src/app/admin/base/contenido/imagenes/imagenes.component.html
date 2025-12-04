@@ -97,8 +97,8 @@
         </table>
       </div>
       <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
-        <button cButton color="light" size="sm" (click)="prev" [disabled]="!canPrev">Anterior</button>
-        <button cButton color="light" size="sm" (click)="next" [disabled]="!canNext">Siguiente</button>
+        <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">Anterior</button>
+        <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">Siguiente</button>
         <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }}</div>
       </div>
     </div>
@@ -115,13 +115,21 @@
         <button cButton color="secondary" size="sm" variant="outline" (click)="zoomIn()" [disabled]="!canZoomIn()"><svg cIcon name="cilPlus"></svg></button>
         <c-badge color="secondary" class="ms-2">{{ zoomPercent() }}%</c-badge>
       </div>
+      <div class="btn-group ms-2" role="group" aria-label="Ajuste">
+        <button cButton color="secondary" size="sm" variant="outline" (click)="fitWidth()" [disabled]="!getPreviewUrlForModal()">
+          <svg cIcon name="cilJustifyCenter" class="me-2"></svg> Ajustar ancho
+        </button>
+        <button cButton color="secondary" size="sm" variant="outline" (click)="fitHeight()" [disabled]="!getPreviewUrlForModal()">
+          Ajustar alto
+        </button>
+      </div>
     </div>
   </c-modal-header>
-  <c-modal-body>
-    <div #previewScroll class="text-center" [style.cursor]="getPreviewUrlForModal() ? (isDragging ? 'grabbing' : 'grab') : 'default'" [style.userSelect]="isDragging ? 'none' : null" [style.touchAction]="getPreviewUrlForModal() ? 'none' : 'auto'" style="max-height: 80vh; overflow: auto;" (wheel)="onPreviewWheel($event)" (dblclick)="toggleZoom()" (mousedown)="onPreviewMouseDown($event)" (mousemove)="onPreviewMouseMove($event)" (mouseup)="onPreviewMouseUp()" (mouseleave)="onPreviewMouseLeave()" (touchstart)="onPreviewTouchStart($event)" (touchmove)="onPreviewTouchMove($event)" (touchend)="onPreviewTouchEnd()">
+  <c-modal-body class="preview-body">
+    <div #previewScroll class="text-center" [style.cursor]="getPreviewUrlForModal() ? (isDragging ? 'grabbing' : 'grab') : 'default'" [style.userSelect]="isDragging ? 'none' : null" [style.touchAction]="getPreviewUrlForModal() ? 'none' : 'auto'" style="height: 100%; overflow: auto;" (wheel)="onPreviewWheel($event)" (dblclick)="toggleZoom()" (mousedown)="onPreviewMouseDown($event)" (mousemove)="onPreviewMouseMove($event)" (mouseup)="onPreviewMouseUp()" (mouseleave)="onPreviewMouseLeave()" (touchstart)="onPreviewTouchStart($event)" (touchmove)="onPreviewTouchMove($event)" (touchend)="onPreviewTouchEnd()">
       <ng-container *ngIf="getPreviewUrlForModal() as url">
         <div [style.width]="(previewZoom * 100) + '%'" style="display: inline-block;">
-          <img [src]="url"
+          <img #previewImg [src]="url" (load)="onPreviewImageLoad($event)"
                alt=""
                style="max-width: 100%; height: auto; border-radius: 4px;" />
         </div>
