@@ -64,12 +64,14 @@
               <td class="text-truncate" style="max-width: 300px;" [title]="etiqueta.descripcion || ''">{{ etiqueta.descripcion || '-' }}</td>
               <td>{{ etiqueta.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
               <td class="text-center">
-                <button cButton size="sm" color="warning" variant="outline" class="me-1" (click)="onEdit(etiqueta)" [attr.aria-label]="'Editar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-editar-etiqueta-' + etiqueta.id">
-                  <svg cIcon name="cilPencil"></svg>
-                </button>
-                <button cButton size="sm" color="danger" variant="outline" (click)="onDelete(etiqueta)" [attr.aria-label]="'Eliminar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-eliminar-etiqueta-' + etiqueta.id">
-                  <svg cIcon name="cilTrash"></svg>
-                </button>
+                <div class="btn-group" role="group" aria-label="Acciones">
+                  <button cButton size="sm" color="warning" variant="outline" (click)="onEdit(etiqueta)" [attr.aria-label]="'Editar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-editar-etiqueta-' + etiqueta.id">
+                    <svg cIcon name="cilPencil"></svg>
+                  </button>
+                  <button cButton size="sm" color="danger" variant="outline" (click)="onDelete(etiqueta)" [attr.aria-label]="'Eliminar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-eliminar-etiqueta-' + etiqueta.id">
+                    <svg cIcon name="cilTrash"></svg>
+                  </button>
+                </div>
               </td>
             </tr>
             <tr *ngIf="etiquetas.length === 0">

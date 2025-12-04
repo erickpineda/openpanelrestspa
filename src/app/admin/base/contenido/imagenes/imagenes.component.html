@@ -1,7 +1,16 @@
 <c-container class="container-fluid">
   <c-card aria-live="polite">
-    <c-card-header class="d-flex align-items-center justify-content-between">
+  <c-card-header class="d-flex align-items-center justify-content-between">
       <span>Imágenes</span>
+      <div class="btn-toolbar gap-2">
+        <div class="btn-group" role="group" aria-label="Subida de imágenes">
+          <input type="file" accept="image/*" #imageInput (change)="onFileSelected($event)" [disabled]="uploading" hidden />
+          <button cButton color="primary" size="sm" (click)="openUpload(imageInput)" [disabled]="uploading">
+            <svg cIcon name="cilCloudUpload" class="me-2"></svg>
+            {{ uploading ? 'Subiendo...' : 'Subir' }}
+          </button>
+        </div>
+      </div>
     </c-card-header>
     <c-card-body [attr.aria-busy]="loading ? 'true' : null">
       <c-row class="align-items-center mb-3 g-2">
@@ -60,18 +69,25 @@
       <div class="table-responsive">
         <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de imágenes">
           <thead cTableColor="dark">
-            <tr><th>Vista</th><th>Nombre</th><th>Fecha</th></tr>
+            <tr><th>Vista</th><th>Nombre</th><th>Fecha</th><th>Acciones</th></tr>
           </thead>
           <tbody>
             <tr *ngFor="let m of items">
               <td>
-                <img *ngIf="m.url" [src]="m.url" alt="" style="height: 32px; width: 32px; object-fit: cover;" />
+                <img *ngIf="m.uuid && preview[m.uuid]" [src]="preview[m.uuid]" alt="" style="height: 32px; width: 32px; object-fit: cover;" />
               </td>
               <td class="text-truncate" style="max-width: 240px;" [title]="m.nombre">{{ m.nombre }}</td>
               <td>{{ m.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
+              <td>
+                <div class="btn-group">
+                  <button cButton color="secondary" size="sm" variant="outline" (click)="download(m)" [disabled]="!m.uuid && !m.url" [attr.aria-label]="'Descargar ' + (m.nombre || '')">
+                    <svg cIcon name="cilCloudDownload"></svg>
+                  </button>
+                </div>
+              </td>
             </tr>
             <tr *ngIf="items.length === 0">
-              <td colspan="3" class="text-muted text-center">Sin imágenes</td>
+              <td colspan="4" class="text-muted text-center">Sin imágenes</td>
             </tr>
           </tbody>
         </table>
