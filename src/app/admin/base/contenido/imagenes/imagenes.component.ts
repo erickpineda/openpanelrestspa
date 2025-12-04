@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
 import { MediaItem } from '../../../../core/models/media-item.model';
 import { saveAs } from 'file-saver';
@@ -27,6 +27,19 @@ export class ImagenesComponent implements OnInit {
   fechaDesde = '';
   fechaHasta = '';
   uploading = false;
+  previewModalVisible = false;
+  previewItem: MediaItem | null = null;
+  previewZoom = 1;
+  private readonly minZoom = 0.5;
+  private readonly maxZoom = 4;
+  isDragging = false;
+  private dragStartX = 0;
+  private dragStartY = 0;
+  private dragScrollLeft = 0;
+  private dragScrollTop = 0;
+  private pinchActive = false;
+  private pinchStartDist = 0;
+  private pinchStartZoom = 1;
 
   // Patrón de toolbar/búsqueda
   showAdvanced: boolean = false;
@@ -150,5 +163,162 @@ export class ImagenesComponent implements OnInit {
     const start = pageNo * pageSize;
     const pageItems = list.slice(start, start + pageSize);
     return { pageItems, totalPages };
+  }
+  openPreview(item: MediaItem): void {
+    if (!item) return;
+    this.previewItem = item;
+    this.previewModalVisible = true;
+    this.previewZoom = 1;
+    // Asegurar que la preview esté construida
+    if (item.uuid && !this.preview[item.uuid]) {
+      this.buildPreviews([item]);
+    }
+  }
+
+  closePreview(): void {
+    this.previewModalVisible = false;
+    this.previewItem = null;
+    this.previewZoom = 1;
+  }
+
+  getPreviewUrl(item: MediaItem | null): string | null {
+    const uid = item?.uuid;
+    return uid ? (this.preview[uid] || null) : null;
+  }
+
+  getPreviewUrlForModal(): string | null {
+    return this.getPreviewUrl(this.previewItem);
+  }
+
+  onPreviewWheel(event: WheelEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const delta = event.deltaY;
+    const step = 0.1;
+    const prev = this.previewZoom;
+    let next = prev;
+    if (delta < 0) {
+      next = Math.min(this.maxZoom, prev + step);
+    } else {
+      next = Math.max(this.minZoom, prev - step);
+    }
+    if (next === prev) return;
+    this.previewZoom = next;
+  }
+
+  zoomIn(): void {
+    const step = 0.25;
+    this.previewZoom = Math.min(this.maxZoom, this.previewZoom + step);
+  }
+
+  zoomOut(): void {
+    const step = 0.25;
+    this.previewZoom = Math.max(this.minZoom, this.previewZoom - step);
+  }
+
+  canZoomIn(): boolean { return !!this.getPreviewUrlForModal() && this.previewZoom < this.maxZoom; }
+  canZoomOut(): boolean { return !!this.getPreviewUrlForModal() && this.previewZoom > this.minZoom; }
+  zoomPercent(): number { return Math.round(this.previewZoom * 100); }
+
+  @ViewChild('previewScroll') previewScroll?: ElementRef<HTMLDivElement>;
+
+  toggleZoom(): void {
+    const targetZoom = this.previewZoom < 2 ? 2 : 1;
+    this.previewZoom = targetZoom;
+    setTimeout(() => {
+      const el = this.previewScroll?.nativeElement;
+      if (!el) return;
+      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
+      el.scrollTop = Math.max(0, (el.scrollHeight - el.clientHeight) / 2);
+    }, 0);
+  }
+
+  onPreviewMouseDown(event: MouseEvent): void {
+    if (!this.getPreviewUrlForModal()) return;
+    const el = this.previewScroll?.nativeElement;
+    if (!el) return;
+    this.isDragging = true;
+    this.dragStartX = event.clientX;
+    this.dragStartY = event.clientY;
+    this.dragScrollLeft = el.scrollLeft;
+    this.dragScrollTop = el.scrollTop;
+    event.preventDefault();
+  }
+
+  onPreviewMouseMove(event: MouseEvent): void {
+    if (!this.isDragging) return;
+    const el = this.previewScroll?.nativeElement;
+    if (!el) return;
+    const dx = event.clientX - this.dragStartX;
+    const dy = event.clientY - this.dragStartY;
+    el.scrollLeft = this.dragScrollLeft - dx;
+    el.scrollTop = this.dragScrollTop - dy;
+  }
+
+  onPreviewMouseUp(): void { this.isDragging = false; }
+  onPreviewMouseLeave(): void { this.isDragging = false; }
+
+  onPreviewTouchStart(event: TouchEvent): void {
+    if (!this.getPreviewUrlForModal()) return;
+    const el = this.previewScroll?.nativeElement;
+    if (!el) return;
+    if (event.touches.length === 1) {
+      const t = event.touches[0];
+      this.isDragging = true;
+      this.dragStartX = t.clientX;
+      this.dragStartY = t.clientY;
+      this.dragScrollLeft = el.scrollLeft;
+      this.dragScrollTop = el.scrollTop;
+    } else if (event.touches.length === 2) {
+      const d = this.getTouchDist(event);
+      if (d > 0) {
+        this.pinchActive = true;
+        this.pinchStartDist = d;
+        this.pinchStartZoom = this.previewZoom;
+        this.isDragging = false;
+      }
+    }
+    event.preventDefault();
+  }
+
+  onPreviewTouchMove(event: TouchEvent): void {
+    const el = this.previewScroll?.nativeElement;
+    if (!el) return;
+    if (this.pinchActive && event.touches.length === 2) {
+      const d = this.getTouchDist(event);
+      if (d > 0) {
+        const factor = d / this.pinchStartDist;
+        const next = Math.min(this.maxZoom, Math.max(this.minZoom, this.pinchStartZoom * factor));
+        this.previewZoom = next;
+      }
+    } else if (this.isDragging && event.touches.length === 1) {
+      const t = event.touches[0];
+      const dx = t.clientX - this.dragStartX;
+      const dy = t.clientY - this.dragStartY;
+      el.scrollLeft = this.dragScrollLeft - dx;
+      el.scrollTop = this.dragScrollTop - dy;
+    }
+    event.preventDefault();
+  }
+
+  onPreviewTouchEnd(): void { this.isDragging = false; this.pinchActive = false; }
+
+  private getTouchDist(event: TouchEvent): number {
+    if (event.touches.length < 2) return 0;
+    const a = event.touches[0];
+    const b = event.touches[1];
+    const dx = a.clientX - b.clientX;
+    const dy = a.clientY - b.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  resetZoom(): void {
+    this.previewZoom = 1;
+    setTimeout(() => {
+      const el = this.previewScroll?.nativeElement;
+      if (!el) return;
+      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
+      el.scrollTop = Math.max(0, (el.scrollHeight - el.clientHeight) / 2);
+    }, 0);
   }
 }

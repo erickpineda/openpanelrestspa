@@ -74,7 +74,11 @@
           <tbody>
             <tr *ngFor="let m of items">
               <td>
-                <img *ngIf="m.uuid && preview[m.uuid]" [src]="preview[m.uuid]" alt="" style="height: 32px; width: 32px; object-fit: cover;" />
+                <img *ngIf="m.uuid && preview[m.uuid]"
+                     [src]="preview[m.uuid]"
+                     alt=""
+                     style="height: 32px; width: 32px; object-fit: cover; cursor: pointer;"
+                     (click)="openPreview(m)" />
               </td>
               <td class="text-truncate" style="max-width: 240px;" [title]="m.nombre">{{ m.nombre }}</td>
               <td>{{ m.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
@@ -101,3 +105,36 @@
     </c-card-body>
   </c-card>
 </c-container>
+
+<c-modal [visible]="previewModalVisible" (visibleChange)="previewModalVisible = $event" [size]="'xl'">
+  <c-modal-header>
+    <h5 cModalTitle>{{ previewItem?.nombre || 'Vista previa' }}</h5>
+    <div class="ms-auto btn-toolbar">
+      <div class="btn-group" role="group" aria-label="Zoom">
+        <button cButton color="secondary" size="sm" variant="outline" (click)="zoomOut()" [disabled]="!canZoomOut()"><svg cIcon name="cilMinus"></svg></button>
+        <button cButton color="secondary" size="sm" variant="outline" (click)="zoomIn()" [disabled]="!canZoomIn()"><svg cIcon name="cilPlus"></svg></button>
+        <c-badge color="secondary" class="ms-2">{{ zoomPercent() }}%</c-badge>
+      </div>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div #previewScroll class="text-center" [style.cursor]="getPreviewUrlForModal() ? (isDragging ? 'grabbing' : 'grab') : 'default'" [style.userSelect]="isDragging ? 'none' : null" [style.touchAction]="getPreviewUrlForModal() ? 'none' : 'auto'" style="max-height: 80vh; overflow: auto;" (wheel)="onPreviewWheel($event)" (dblclick)="toggleZoom()" (mousedown)="onPreviewMouseDown($event)" (mousemove)="onPreviewMouseMove($event)" (mouseup)="onPreviewMouseUp()" (mouseleave)="onPreviewMouseLeave()" (touchstart)="onPreviewTouchStart($event)" (touchmove)="onPreviewTouchMove($event)" (touchend)="onPreviewTouchEnd()">
+      <ng-container *ngIf="getPreviewUrlForModal() as url">
+        <div [style.width]="(previewZoom * 100) + '%'" style="display: inline-block;">
+          <img [src]="url"
+               alt=""
+               style="max-width: 100%; height: auto; border-radius: 4px;" />
+        </div>
+      </ng-container>
+    </div>
+    </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="closePreview()">Cerrar</button>
+    <button cButton color="secondary" variant="outline" (click)="resetZoom()" [disabled]="!getPreviewUrlForModal()">
+      <svg cIcon name="cilReload" class="me-2"></svg> Reset
+    </button>
+    <button cButton color="primary" [disabled]="!previewItem" (click)="previewItem && download(previewItem)">
+      <svg cIcon name="cilCloudDownload" class="me-2"></svg> Descargar
+    </button>
+  </c-modal-footer>
+</c-modal>
