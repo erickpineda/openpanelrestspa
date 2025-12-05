@@ -83,11 +83,15 @@
     <!-- Tabla de Entradas con loader local -->
     <div class="tabla-con-loader-wrapper position-relative">
       
-      <ng-template #loadingTemplate>
-        <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando entradas'"></c-spinner><p class="mt-2 text-muted">Cargando entradas...</p></div>
-      </ng-template>
+      <!-- Loader Overlay -->
+      <div *ngIf="cargandoTabla" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+        <div class="text-center">
+          <c-spinner [attr.aria-label]="'Cargando entradas'"></c-spinner>
+          <p class="mt-2 text-muted">Cargando entradas...</p>
+        </div>
+      </div>
 
-      <div *ngIf="!cargandoTabla; else loadingTemplate">
+      <div [class.opacity-50]="cargandoTabla">
       <table responsive hover cAlign="top" cTable class="tabla-con-loader">
         <thead cTableColor="dark">
           <tr>
