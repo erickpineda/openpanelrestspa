@@ -1,22 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { TemasService } from '../../../../core/services/data/temas.service';
 import { Tema } from '../../../../core/models/tema.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-temas',
   templateUrl: './temas.component.html',
   styleUrls: ['./temas.component.scss']
 })
-export class TemasComponent implements OnInit {
+export class TemasComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   temas: Tema[] = [];
   modalVisible = false;
   editItem: Tema | null = null;
   form: FormGroup;
+  private destroy$ = new Subject<void>();
 
   // Patrón de toolbar/búsqueda/paginación
   basicSearchText: string = '';
@@ -29,7 +31,13 @@ export class TemasComponent implements OnInit {
   filteredTemas: Tema[] = [];
   pagedTemas: Tema[] = [];
 
-  constructor(private temasService: TemasService, private fb: FormBuilder, private toast: ToastService, private log: LoggerService) {
+  constructor(
+    private temasService: TemasService, 
+    private fb: FormBuilder, 
+    private toast: ToastService, 
+    private log: LoggerService,
+    private cdr: ChangeDetectorRef
+  ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
       activo: ['false', Validators.required],
@@ -38,13 +46,31 @@ export class TemasComponent implements OnInit {
   }
 
   ngOnInit(): void { this.load(); }
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
   load(): void {
-    this.loading = true; this.error = null;
-    this.temasService.listarTemasSafe().subscribe({
-      next: (list: Tema[]) => { this.temas = Array.isArray(list) ? list : []; this.totalElements = this.temas.length; this.loading = false; this.search(); },
-      error: (err) => { this.error = 'Error cargando temas'; this.log.error('temas listar', err); this.loading = false; }
-    });
+    this.loading = true; 
+    this.error = null;
+    
+    this.temasService.listarTemasSafeSinGlobalLoader()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => { 
+          this.loading = false; 
+          this.cdr.detectChanges(); 
+        })
+      )
+      .subscribe({
+        next: (list: Tema[]) => { 
+          this.temas = Array.isArray(list) ? list : []; 
+          this.totalElements = this.temas.length; 
+          this.search(); 
+        },
+        error: (err) => { 
+          this.error = 'Error cargando temas'; 
+          this.log.error('temas listar', err); 
+        }
+      });
   }
 
   openNew(): void {

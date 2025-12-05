@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
 import { MediaItem } from '../../../../core/models/media-item.model';
 import { saveAs } from 'file-saver';
 import { ToastService } from '../../../../core/services/ui/toast.service';
+import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-archivos',
   templateUrl: './archivos.component.html',
   styleUrls: ['./archivos.component.scss']
 })
-export class ArchivosComponent implements OnInit {
+export class ArchivosComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   items: MediaItem[] = [];
@@ -24,27 +25,47 @@ export class ArchivosComponent implements OnInit {
   fechaDesde = '';
   fechaHasta = '';
   uploading = false;
+  private destroy$ = new Subject<void>();
 
   // Patrón de toolbar/búsqueda
   showAdvanced: boolean = false;
   basicSearchText: string = '';
 
-  constructor(private fileStorage: FileStorageService, private toast: ToastService) {}
+  constructor(
+    private fileStorage: FileStorageService, 
+    private toast: ToastService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void { this.load(); }
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
   load(pageNo = this.pageNo): void {
-    this.loading = true; this.error = null;
+    this.loading = true; 
+    this.error = null;
     this.hasFilters = !!this.filtroNombre || !!this.filtroMime || !!this.fechaDesde || !!this.fechaHasta;
-    this.fileStorage.listarFicheros().subscribe({
-      next: (fs) => {
-        const base = (fs || []).filter(i => i.tipo !== 'image');
-        const filtered = this.applyFilters(base);
-        const { pageItems, totalPages } = this.paginate(filtered, pageNo, this.pageSize);
-        this.items = pageItems; this.totalPages = totalPages; this.updateNavState(); this.loading = false;
-      },
-      error: () => { this.error = 'Error cargando archivos'; this.loading = false; }
-    });
+    
+    this.fileStorage.listarFicherosSinGlobalLoader()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => { 
+          this.loading = false; 
+          this.cdr.detectChanges(); 
+        })
+      )
+      .subscribe({
+        next: (fs) => {
+          const base = (fs || []).filter(i => i.tipo !== 'image');
+          const filtered = this.applyFilters(base);
+          const { pageItems, totalPages } = this.paginate(filtered, pageNo, this.pageSize);
+          this.items = pageItems; 
+          this.totalPages = totalPages; 
+          this.updateNavState(); 
+        },
+        error: () => { 
+          this.error = 'Error cargando archivos'; 
+        }
+      });
   }
 
   search(): void { this.pageNo = 0; this.load(); }

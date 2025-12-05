@@ -1,16 +1,16 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
 import { MediaItem } from '../../../../core/models/media-item.model';
 import { saveAs } from 'file-saver';
 import { ToastService } from '../../../../core/services/ui/toast.service';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-imagenes',
   templateUrl: './imagenes.component.html',
   styleUrls: ['./imagenes.component.scss']
 })
-export class ImagenesComponent implements OnInit {
+export class ImagenesComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   items: MediaItem[] = [];
@@ -47,23 +47,42 @@ export class ImagenesComponent implements OnInit {
   showAdvanced: boolean = false;
   basicSearchText: string = '';
 
-  constructor(private fileStorage: FileStorageService, private toast: ToastService) {}
+  constructor(
+    private fileStorage: FileStorageService, 
+    private toast: ToastService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void { this.load(); }
   ngOnDestroy(): void { this.clearPreviews(); this.destroy$.next(); this.destroy$.complete(); }
 
   load(pageNo = this.pageNo): void {
-    this.loading = true; this.error = null;
+    this.loading = true; 
+    this.error = null;
     this.hasFilters = !!this.filtroNombre || !!this.filtroMime || !!this.fechaDesde || !!this.fechaHasta;
-    this.fileStorage.listarFicheros().subscribe({
-      next: (fs) => {
-        const base = (fs || []).filter(i => i.tipo === 'image');
-        const filtered = this.applyFilters(base);
-        const { pageItems, totalPages } = this.paginate(filtered, pageNo, this.pageSize);
-        this.items = pageItems; this.totalPages = totalPages; this.updateNavState(); this.buildPreviews(pageItems); this.loading = false;
-      },
-      error: () => { this.error = 'Error cargando imágenes'; this.loading = false; }
-    });
+    
+    this.fileStorage.listarFicherosSinGlobalLoader()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => { 
+          this.loading = false; 
+          this.cdr.detectChanges(); 
+        })
+      )
+      .subscribe({
+        next: (fs) => {
+          const base = (fs || []).filter(i => i.tipo === 'image');
+          const filtered = this.applyFilters(base);
+          const { pageItems, totalPages } = this.paginate(filtered, pageNo, this.pageSize);
+          this.items = pageItems; 
+          this.totalPages = totalPages; 
+          this.updateNavState(); 
+          this.buildPreviews(pageItems); 
+        },
+        error: () => { 
+          this.error = 'Error cargando imágenes'; 
+        }
+      });
   }
 
   search(): void { this.pageNo = 0; this.load(); }
@@ -125,7 +144,7 @@ export class ImagenesComponent implements OnInit {
     for (const item of list) {
       if (!item?.uuid) continue;
       if (item?.mime && !String(item.mime).startsWith('image/')) continue;
-      this.fileStorage.obtenerDatosFichero(item.uuid)
+      this.fileStorage.obtenerDatosFicheroSinGlobalLoader(item.uuid)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (datos: any) => {
@@ -139,6 +158,7 @@ export class ImagenesComponent implements OnInit {
               const blob = new Blob([new Uint8Array(byteNums)], { type: mime });
               const url = URL.createObjectURL(blob);
               this.preview[item.uuid!] = url;
+              this.cdr.detectChanges();
             } catch {}
           },
           error: () => {}

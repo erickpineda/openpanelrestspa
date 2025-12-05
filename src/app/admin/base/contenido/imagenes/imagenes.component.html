@@ -64,8 +64,15 @@
         <span>{{ error }}</span>
       <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
       </div>
-    <div *ngIf="loading" class="py-3 text-center"><c-spinner></c-spinner></div>
-    <div *ngIf="!loading">
+
+      <ng-template #loadingTemplate>
+        <div class="text-center my-3" role="status" aria-live="polite">
+          <c-spinner color="primary"></c-spinner>
+          <p class="mt-2">Cargando imágenes...</p>
+        </div>
+      </ng-template>
+
+    <div *ngIf="!loading; else loadingTemplate">
       <div class="table-responsive">
         <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de imágenes">
           <thead cTableColor="dark">

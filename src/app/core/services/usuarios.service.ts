@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { NetworkInterceptor } from '../interceptor/network.interceptor';
 
 export interface UsuarioDTO {
   idUsuario?: number;
@@ -28,6 +29,14 @@ export class UsuariosService {
     return this.http.get(this.base, { params });
   }
 
+  listarSinGlobalLoader(pageNo?: number, pageSize?: number): Observable<any> {
+    let params = new HttpParams();
+    if (pageNo != null) params = params.set('pageNo', String(pageNo));
+    if (pageSize != null) params = params.set('pageSize', String(pageSize));
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.http.get(this.base, { params, context });
+  }
+
   obtenerPorId(id: number): Observable<any> {
     return this.http.get(`${this.base}/obtenerPorId/${id}`);
   }
@@ -49,5 +58,13 @@ export class UsuariosService {
     if (pageNo != null) params = params.set('pageNo', String(pageNo));
     if (pageSize != null) params = params.set('pageSize', String(pageSize));
     return this.http.post(`${this.base}/buscar`, payload, { params });
+  }
+
+  buscarSinGlobalLoader(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
+    let params = new HttpParams();
+    if (pageNo != null) params = params.set('pageNo', String(pageNo));
+    if (pageSize != null) params = params.set('pageSize', String(pageSize));
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.http.post(`${this.base}/buscar`, payload, { params, context });
   }
 }

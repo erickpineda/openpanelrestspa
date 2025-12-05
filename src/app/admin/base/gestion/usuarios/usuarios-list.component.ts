@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { finalize, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { UsuariosService, UsuarioDTO } from '../../../../core/services/usuarios.service';
 import { RolesService, RolDTO } from '../../../../core/services/roles.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
@@ -10,7 +12,7 @@ import { SearchUtilService } from '../../../../core/services/utils/search-util.s
   templateUrl: './usuarios-list.component.html',
   styleUrls: ['./usuarios-list.component.scss']
 })
-export class UsuariosListComponent implements OnInit {
+export class UsuariosListComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   usuarios: UsuarioDTO[] = [];
@@ -28,9 +30,23 @@ export class UsuariosListComponent implements OnInit {
   editModalVisible = false;
   editUser: UsuarioDTO | null = null;
 
-  constructor(private usuariosService: UsuariosService, private rolesService: RolesService, private toast: ToastService, private log: LoggerService, private searchUtil: SearchUtilService) {}
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private usuariosService: UsuariosService, 
+    private rolesService: RolesService, 
+    private toast: ToastService, 
+    private log: LoggerService, 
+    private searchUtil: SearchUtilService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void { this.loadRoles(); this.load(); }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   load(pageNo = this.pageNo): void {
     this.loading = true; this.error = null;
@@ -40,23 +56,29 @@ export class UsuariosListComponent implements OnInit {
       const list = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
       this.usuarios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
-      this.loading = false;
     };
-    const handleError = (err: any) => { this.error = 'Error cargando usuarios'; this.loading = false; this.log.error('usuarios listar', err); };
+    const handleError = (err: any) => { this.error = 'Error cargando usuarios'; this.log.error('usuarios listar', err); };
+    
     if (!hasFilters) {
-      this.usuariosService.listar(pageNo, this.pageSize).subscribe({ next: handleResponse, error: handleError });
+      this.usuariosService.listarSinGlobalLoader(pageNo, this.pageSize)
+        .pipe(takeUntil(this.destroy$), finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+        .subscribe({ next: handleResponse, error: handleError });
     } else {
       const criteria: { filterKey: string; value: any; operation: string }[] = [];
       if (this.filtroUsuario) criteria.push({ filterKey: 'username', value: this.filtroUsuario, operation: 'CONTAINS' });
       if (this.filtroRolId != null) criteria.push({ filterKey: 'idRol', value: String(this.filtroRolId), operation: 'EQUAL' });
       if (this.filtroEmailConfirmado != null) criteria.push({ filterKey: 'emailConfirmado', value: String(this.filtroEmailConfirmado), operation: 'EQUAL' });
       const payload = this.searchUtil.buildRequest('Usuario', criteria, 'ALL');
-      this.usuariosService.buscar(payload, pageNo, this.pageSize).subscribe({ next: handleResponse, error: handleError });
+      this.usuariosService.buscarSinGlobalLoader(payload, pageNo, this.pageSize)
+        .pipe(takeUntil(this.destroy$), finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+        .subscribe({ next: handleResponse, error: handleError });
     }
   }
 
   loadRoles(): void {
-    this.rolesService.listar(0, 50).subscribe({
+    this.rolesService.listar(0, 50)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
       next: (r: any) => {
         const data = r?.data || r;
         this.roles = Array.isArray(data?.content) ? data.content : (Array.isArray(data) ? data : []);

@@ -1,22 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { AjustesService } from '../../../../core/services/data/ajustes.service';
 import { Ajustes } from '../../../../core/models/ajustes.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-ajustes',
   templateUrl: './ajustes.component.html',
   styleUrls: ['./ajustes.component.scss']
 })
-export class AjustesComponent implements OnInit {
+export class AjustesComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   ajustes: Ajustes[] = [];
   modalVisible = false;
   editItem: Ajustes | null = null;
   form: FormGroup;
+  private destroy$ = new Subject<void>();
 
   // Patrón de toolbar/búsqueda/paginación
   basicSearchText: string = '';
@@ -29,7 +31,13 @@ export class AjustesComponent implements OnInit {
   filteredAjustes: Ajustes[] = [];
   pagedAjustes: Ajustes[] = [];
 
-  constructor(private ajustesService: AjustesService, private fb: FormBuilder, private toast: ToastService, private log: LoggerService) {
+  constructor(
+    private ajustesService: AjustesService, 
+    private fb: FormBuilder, 
+    private toast: ToastService, 
+    private log: LoggerService,
+    private cdr: ChangeDetectorRef
+  ) {
     this.form = this.fb.group({
       categoria: ['', [Validators.required, Validators.maxLength(50)]],
       clave: ['', [Validators.required, Validators.maxLength(50)]],
@@ -38,13 +46,31 @@ export class AjustesComponent implements OnInit {
   }
 
   ngOnInit(): void { this.load(); }
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
   load(): void {
-    this.loading = true; this.error = null;
-    this.ajustesService.listarAjustesSafe().subscribe({
-      next: (list: Ajustes[]) => { this.ajustes = Array.isArray(list) ? list : []; this.totalElements = this.ajustes.length; this.loading = false; this.search(); },
-      error: (err) => { this.error = 'Error cargando ajustes'; this.log.error('ajustes listar', err); this.loading = false; }
-    });
+    this.loading = true; 
+    this.error = null;
+    
+    this.ajustesService.listarAjustesSafeSinGlobalLoader()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => { 
+          this.loading = false; 
+          this.cdr.detectChanges(); 
+        })
+      )
+      .subscribe({
+        next: (list: Ajustes[]) => { 
+          this.ajustes = Array.isArray(list) ? list : []; 
+          this.totalElements = this.ajustes.length; 
+          this.search(); 
+        },
+        error: (err) => { 
+          this.error = 'Error cargando ajustes'; 
+          this.log.error('ajustes listar', err); 
+        }
+      });
   }
 
   openNew(): void {

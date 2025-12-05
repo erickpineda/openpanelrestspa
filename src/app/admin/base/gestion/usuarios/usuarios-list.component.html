@@ -15,8 +15,8 @@
       <span>{{ error }}</span>
       <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
     </div>
-    <div *ngIf="loading"><c-spinner></c-spinner></div>
-    <div *ngIf="!loading">
+    <!-- <div *ngIf="loading"><c-spinner></c-spinner></div> -->
+    <div *ngIf="!loading; else loadingTemplate">
       <c-row class="align-items-center mb-3 g-2">
         <c-col xs="12" md="4">
           <div class="text-muted small">Total {{ totalElements }}</div>
@@ -93,6 +93,9 @@
         <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }}</div>
       </div>
     </div>
+    <ng-template #loadingTemplate>
+      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando usuarios'"></c-spinner><p class="mt-2 text-muted">Cargando usuarios...</p></div>
+    </ng-template>
   </c-card-body>
   </c-card>
 
