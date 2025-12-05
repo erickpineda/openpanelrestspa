@@ -21,11 +21,15 @@ import { Router } from '@angular/router';
 })
 export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewInit {
   listaEntradas: Entrada[] = [];
+  allEntradas: Entrada[] = []; // Para fallback client-side
   entradaABorrar: Entrada | null = null;
 
   totalPages: number = 0;
   currentPage: number = 0;
   pageSize: number = 20;
+  totalElements = 0;
+  numberOfElements = 0;
+  estaVacio: boolean = false;
 
   public visible = false;
   private destroy$ = new Subject<void>();
@@ -120,6 +124,20 @@ private readonly boundaryId = 'listado-entradas-main';
     this.busquedaService.triggerBusqueda(text);
   }
 
+  public onPageSizeChange(size: number): void {
+    this.pageSize = Number(size) || 20;
+    this.currentPage = 0;
+    // Forzar recarga
+    if (this.allEntradas.length > 0) {
+       // Si estamos en modo cliente, solo reaplicar paginación
+       // Pero como cambió el pageSize, los totales de páginas cambian.
+       this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
+       this.applyPaging();
+    } else {
+       this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    }
+  }
+
   public aplicarFiltro(filtro: any): void {
     this.campoSeleccionado = filtro.campo;
     this.operacionSeleccionada = filtro.operacion;
@@ -141,21 +159,68 @@ private readonly boundaryId = 'listado-entradas-main';
     this.currentPage = 0;
   }
 
-  private procesarResultadosBusqueda(response: any) {
-    if (response.elements) {
-      this.listaEntradas = response.elements || [];
-      this.totalPages = response.totalPages;
-      this.listaEntradas = this.listaEntradas.map((entrada:Entrada) => ({
-        ...entrada,
-        categoriasConComas: entrada.categorias?.map(e => e.nombre).join(', ') || ''
-      }));
+  private setPageData(data: any): void {
+    const raw = (data?.elements ?? (data as any)?.items ?? (data as any)?.content ?? (Array.isArray(data) ? data : []));
+    let elementos: Entrada[] = Array.isArray(raw) ? raw : [];
+    
+    // Mapear categorías
+    elementos = elementos.map((entrada: Entrada) => ({
+      ...entrada,
+      categoriasConComas: entrada.categorias?.map(e => e.nombre).join(', ') || ''
+    }));
+
+    const hasServerPaging = typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
+
+    if (hasServerPaging) {
+      this.listaEntradas = elementos;
+      this.totalElements = Number(data.totalElements || elementos.length || 0);
+      this.totalPages = Number(data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1);
+      this.numberOfElements = Number(data.numberOfElements ?? elementos.length);
+      this.estaVacio = elementos.length === 0;
+      this.allEntradas = []; // Limpiar caché cliente si es server paging
+
+      // Boundary check
+      if (elementos.length === 0 && this.currentPage > 0 && this.currentPage >= this.totalPages) {
+         this.currentPage = Math.max(0, this.totalPages - 1);
+         this.busquedaService.triggerBusqueda(this.valorBusqueda);
+         return;
+      }
     } else {
-      this.listaEntradas = [];
-      this.currentPage = 0;
-      this.mostrarError('Error en búsqueda: ' + response);
+      // Fallback Client Paging
+      this.allEntradas = elementos;
+      this.totalElements = this.allEntradas.length;
+      this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
+      this.estaVacio = this.totalElements === 0;
+
+      if (this.currentPage >= this.totalPages) {
+        this.currentPage = Math.max(0, this.totalPages - 1);
+      }
+      this.applyPaging();
     }
     this.cdr.markForCheck();
     try { this.cdr.detectChanges(); } catch {}
+  }
+
+  private applyPaging(): void {
+    if (this.allEntradas.length > 0) {
+      const start = this.currentPage * this.pageSize;
+      const end = start + this.pageSize;
+      this.listaEntradas = this.allEntradas.slice(start, end);
+      this.numberOfElements = this.listaEntradas.length;
+    } else {
+      if (this.allEntradas.length === 0 && !this.estaVacio) {
+         // Si allEntradas está vacío pero no es porque no haya resultados, sino porque estamos en server paging, no hacemos nada aquí.
+      } else if (this.allEntradas.length > 0) { // Caso redundante pero por seguridad
+          this.listaEntradas = [];
+          this.numberOfElements = 0;
+      }
+    }
+    this.cdr.markForCheck();
+    try { this.cdr.detectChanges(); } catch {}
+  }
+
+  private procesarResultadosBusqueda(response: any) {
+    this.setPageData(response);
   }
 
   private cargarDefinicionesBuscador(): void {
@@ -221,14 +286,19 @@ private readonly boundaryId = 'listado-entradas-main';
 
   obtenerListaEntradas(page: number): void {
     this.currentPage = page;
-    // Ejecutar la búsqueda inmediatamente a través de BusquedaService para
-    // mantener la misma función de búsqueda registrada y evitar carreras.
-    this.busquedaService.searchNow(this.valorBusqueda, this.currentPage)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => this.procesarResultadosBusqueda(response),
-        error: (error) => this.mostrarError('Error en búsqueda: ' + error)
-      });
+    
+    if (this.allEntradas.length > 0) {
+        // Paginación cliente
+        this.applyPaging();
+    } else {
+        // Paginación servidor
+        this.busquedaService.searchNow(this.valorBusqueda, this.currentPage)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => this.procesarResultadosBusqueda(response),
+            error: (error) => this.mostrarError('Error en búsqueda: ' + error)
+          });
+    }
     this.cdr.markForCheck();
   }
 
