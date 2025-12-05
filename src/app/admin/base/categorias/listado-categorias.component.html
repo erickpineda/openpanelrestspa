@@ -50,19 +50,7 @@
       </c-row>
     </div>
     
-    <div class="tabla-con-loader-wrapper position-relative">
-      <app-op-loader
-        [useGlobal]="false"
-        [active]="cargando"
-        [overlay]="true"
-        [fullScreen]="false"
-        [position]="'center'"
-        [loaderStyle]="'spinner'"
-        [size]="'sm'"
-        [color]="'primary'"
-        [message]="'Cargando categorías...'">
-      </app-op-loader>
-
+    <div *ngIf="!cargando; else categoriasLoading">
       <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de categorías">
       <thead cTableColor="dark">
         <tr>
@@ -102,6 +90,9 @@
       </tbody>
       </table>
     </div>
+    <ng-template #categoriasLoading>
+      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando categorías'"></c-spinner><p class="mt-2 text-muted">Cargando categorías...</p></div>
+    </ng-template>
     <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
       <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
       <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>

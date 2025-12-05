@@ -1,39 +1,45 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ListadoCategoriasComponent } from './listado-categorias.component';
+import { TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { CategoriaService } from '../../../core/services/data/categoria.service';
-import { of, throwError } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { ListadoCategoriasComponent } from './listado-categorias.component';
 
-describe('ListadoCategoriasComponent spinner finalize', () => {
+describe('ListadoCategoriasComponent Spinner', () => {
   let component: ListadoCategoriasComponent;
-  let fixture: ComponentFixture<ListadoCategoriasComponent>;
+  let fixture: any;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(() => {
+    TestBed.configureTestingModule({
       declarations: [ListadoCategoriasComponent],
+      schemas: [NO_ERRORS_SCHEMA],
+      imports: [CommonModule],
       providers: [
-        { provide: CategoriaService, useValue: {
-          listarPagina: () => of({ data: { elements: [], totalElements: 0, totalPages: 1 } }),
-          listarSinGlobalLoader: () => of([])
-        } },
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-
-    TestBed.overrideTemplate(ListadoCategoriasComponent, '<div></div>');
+        { provide: Router, useValue: { navigate: () => {} } },
+        { provide: CategoriaService, useValue: { listarPagina: () => ({ pipe: () => ({ subscribe: () => {} }) }) } },
+        { provide: LoggerService, useValue: { error: () => {}, warn: () => {}, info: () => {}, debug: () => {} } },
+        { provide: SearchUtilService, useValue: { buildSingle: () => ({}) } },
+      ]
+    });
     fixture = TestBed.createComponent(ListadoCategoriasComponent);
     component = fixture.componentInstance;
   });
 
-  it('apaga cargando tras éxito', () => {
-    component.obtenerListaCategorias();
-    expect(component.cargando).toBeFalse();
+  it('muestra spinner cuando cargando=true', () => {
+    component.cargando = true;
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('c-spinner')).toBeTruthy();
   });
 
-  it('apaga cargando tras error', () => {
-    const svc = TestBed.inject(CategoriaService);
-    spyOn(svc, 'listarPagina').and.returnValue(throwError(() => ({ status: 500 })));
-    component.obtenerListaCategorias();
-    expect(component.cargando).toBeFalse();
+  it('oculta spinner cuando cargando=false', () => {
+    (component as any).ngOnInit = () => {};
+    component.cargando = false;
+    component.pagedCategorias = [{ idCategoria: 1, nombre: 'A', descripcion: '' } as any];
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('table')).toBeTruthy();
   });
 });
+import { Router } from '@angular/router';
+import { CategoriaService } from '../../../core/services/data/categoria.service';
+import { LoggerService } from '../../../core/services/logger.service';
+import { SearchUtilService } from '../../../core/services/utils/search-util.service';

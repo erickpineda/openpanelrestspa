@@ -64,7 +64,8 @@
       </c-row>
     </div>
     
-    <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de comentarios" *ngIf="listaComentarios.length >= 0">
+    <div *ngIf="!cargando; else comentariosLoading">
+    <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de comentarios">
       <thead cTableColor="dark">
         <tr>
           <th scope="col">ID</th>
@@ -100,6 +101,10 @@
         </tr>
       </tbody>
     </table>
+    </div>
+    <ng-template #comentariosLoading>
+      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando comentarios'"></c-spinner><p class="mt-2 text-muted">Cargando comentarios...</p></div>
+    </ng-template>
     <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
       <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
       <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>

@@ -1,5 +1,6 @@
 import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
+import { finalize } from 'rxjs/operators';
 import { Router } from "@angular/router";
 import { Comentario } from "../../../core/models/comentario.model";
 import { Entrada } from "../../../core/models/entrada.model";
@@ -37,6 +38,7 @@ export class ListadoComentariosComponent implements OnInit {
   pagedComentarios: Comentario[] = [];
 
   estaVacio: boolean = false;
+  cargando: boolean = false;
 
   constructor(
     private router: Router,
@@ -94,9 +96,12 @@ export class ListadoComentariosComponent implements OnInit {
   }
 
   private obtenerListaComentarios(): void {
+    this.cargando = true;
     const hasFilters = this.hasActiveFilters();
     if (!hasFilters) {
-      this.comentarioService.listarPagina(this.pageNo, this.pageSize).subscribe({
+      this.comentarioService.listarPagina(this.pageNo, this.pageSize)
+        .pipe(finalize(() => { this.cargando = false; }))
+        .subscribe({
         next: (response: OpenpanelApiResponse<any>) => {
           const data: PaginaResponse = response?.data || new PaginaResponse();
           this.setPageData(data);
@@ -105,7 +110,9 @@ export class ListadoComentariosComponent implements OnInit {
       });
     } else {
       const payload: any = this.buildSearchPayload();
-      this.comentarioService.buscarSafe(payload, this.pageNo, this.pageSize).subscribe({
+      this.comentarioService.buscarSafe(payload, this.pageNo, this.pageSize)
+        .pipe(finalize(() => { this.cargando = false; }))
+        .subscribe({
         next: (data: PaginaResponse) => {
           this.setPageData(data);
         },
