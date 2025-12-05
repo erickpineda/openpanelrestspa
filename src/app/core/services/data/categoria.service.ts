@@ -36,4 +36,24 @@ export class CategoriaService extends CrudService<Categoria, number> {
     const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
     return this.get<any>(this.endpoint, params);
   }
+
+  listarPaginaSinGlobalLoader(pageNo: number, pageSize: number): Observable<any> {
+    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.get<any>(this.endpoint, params, undefined, context);
+  }
+
+  buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<PaginaResponse> {
+    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.safePostData<PaginaResponse>(
+      `${this.endpoint}/buscar`,
+      searchRequest,
+      new PaginaResponse(),
+      params,
+      undefined,
+      'categorias.buscar',
+      context
+    );
+  }
 }

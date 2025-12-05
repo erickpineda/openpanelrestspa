@@ -6,15 +6,20 @@ import { ListadoCategoriasComponent } from './listado-categorias.component';
 describe('ListadoCategoriasComponent Spinner', () => {
   let component: ListadoCategoriasComponent;
   let fixture: any;
+  let mockService: any;
 
   beforeEach(() => {
+    mockService = {
+      listarPaginaSinGlobalLoader: jasmine.createSpy('listarPaginaSinGlobalLoader').and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
+      buscarSinGlobalLoader: jasmine.createSpy('buscarSinGlobalLoader').and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
+    };
     TestBed.configureTestingModule({
       declarations: [ListadoCategoriasComponent],
       schemas: [NO_ERRORS_SCHEMA],
       imports: [CommonModule],
       providers: [
         { provide: Router, useValue: { navigate: () => {} } },
-        { provide: CategoriaService, useValue: { listarPagina: () => ({ pipe: () => ({ subscribe: () => {} }) }) } },
+        { provide: CategoriaService, useValue: mockService },
         { provide: LoggerService, useValue: { error: () => {}, warn: () => {}, info: () => {}, debug: () => {} } },
         { provide: SearchUtilService, useValue: { buildSingle: () => ({}) } },
       ]
@@ -32,11 +37,20 @@ describe('ListadoCategoriasComponent Spinner', () => {
 
   it('oculta spinner cuando cargando=false', () => {
     (component as any).ngOnInit = () => {};
+    component.cargando = true;
+    fixture.detectChanges();
     component.cargando = false;
     component.pagedCategorias = [{ idCategoria: 1, nombre: 'A', descripcion: '' } as any];
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('table')).toBeTruthy();
+    expect(el.querySelector('c-spinner')).toBeNull();
+  });
+
+  it('usa listarPaginaSinGlobalLoader en paginación', () => {
+    (component as any).ngOnInit = () => {};
+    component.pageNo = 0; component.pageSize = 5;
+    (component as any).obtenerListaCategorias();
+    expect(mockService.listarPaginaSinGlobalLoader).toHaveBeenCalledWith(0, 5);
   });
 });
 import { Router } from '@angular/router';

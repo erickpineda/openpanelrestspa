@@ -10,7 +10,7 @@
       </div>
     </div>
   </c-card-header>
-  <c-card-body>
+  <c-card-body [attr.aria-busy]="cargando ? 'true' : null">
 
     <c-row class="align-items-center mb-3 g-2">
       <c-col xs="12" md="4">
@@ -64,7 +64,7 @@
       </c-row>
     </div>
     
-    <div *ngIf="!cargando; else comentariosLoading">
+    <div class="table-responsive" *ngIf="!cargando; else comentariosLoading">
     <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de comentarios">
       <thead cTableColor="dark">
         <tr>

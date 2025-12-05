@@ -1,7 +1,8 @@
 import { DatePipe } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
-import { finalize } from 'rxjs/operators';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { finalize, takeUntil } from 'rxjs/operators';
 import { Router } from "@angular/router";
+import { Subject } from 'rxjs';
 import { Comentario } from "../../../core/models/comentario.model";
 import { Entrada } from "../../../core/models/entrada.model";
 import { PaginaResponse } from "../../../core/models/pagina-response.model";
@@ -19,7 +20,7 @@ import { LoggerService } from "../../../core/services/logger.service";
   styleUrls: ['./listado-comentarios.component.scss']
 })
 
-export class ListadoComentariosComponent implements OnInit {
+export class ListadoComentariosComponent implements OnInit, OnDestroy {
 
   listaComentarios: Comentario[] = [];
 
@@ -36,9 +37,11 @@ export class ListadoComentariosComponent implements OnInit {
   numberOfElements = 0;
   filteredComentarios: Comentario[] = [];
   pagedComentarios: Comentario[] = [];
+  allComentarios: Comentario[] = []; // Para paginación cliente
 
   estaVacio: boolean = false;
   cargando: boolean = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private router: Router,
@@ -46,13 +49,19 @@ export class ListadoComentariosComponent implements OnInit {
     private usuarioService: UsuarioService,
     private entradaService: EntradaService,
     private commonFuncService: CommonFunctionalityService,
-    private log: LoggerService
+    private log: LoggerService,
+    private cdr: ChangeDetectorRef
   ) {
     
   }
 
   ngOnInit(): void {
     this.initList();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private initList() {
@@ -99,8 +108,8 @@ export class ListadoComentariosComponent implements OnInit {
     this.cargando = true;
     const hasFilters = this.hasActiveFilters();
     if (!hasFilters) {
-      this.comentarioService.listarPagina(this.pageNo, this.pageSize)
-        .pipe(finalize(() => { this.cargando = false; }))
+      this.comentarioService.listarPaginaSinGlobalLoader(this.pageNo, this.pageSize)
+        .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
         .subscribe({
         next: (response: OpenpanelApiResponse<any>) => {
           const data: PaginaResponse = response?.data || new PaginaResponse();
@@ -110,8 +119,8 @@ export class ListadoComentariosComponent implements OnInit {
       });
     } else {
       const payload: any = this.buildSearchPayload();
-      this.comentarioService.buscarSafe(payload, this.pageNo, this.pageSize)
-        .pipe(finalize(() => { this.cargando = false; }))
+      this.comentarioService.buscarSinGlobalLoader(payload, this.pageNo, this.pageSize)
+        .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
         .subscribe({
         next: (data: PaginaResponse) => {
           this.setPageData(data);
@@ -132,7 +141,12 @@ export class ListadoComentariosComponent implements OnInit {
   // ===== Toolbar / Búsqueda / Paginación =====
   toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
   onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.search(); }
-  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.obtenerListaComentarios(); }
+  
+  onPageSizeChange(size: number): void { 
+    this.pageSize = Number(size) || 10; 
+    this.pageNo = 0; 
+    this.obtenerListaComentarios(); 
+  }
 
   search(): void { this.pageNo = 0; this.obtenerListaComentarios(); }
 
@@ -145,17 +159,76 @@ export class ListadoComentariosComponent implements OnInit {
     this.obtenerListaComentarios();
   }
 
-  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.obtenerListaComentarios(); } }
-  next(): void { if (this.pageNo < this.totalPages - 1) { this.pageNo++; this.obtenerListaComentarios(); } }
+  prev(): void { 
+    if (this.pageNo > 0) { 
+        this.pageNo--; 
+        if (this.allComentarios.length > 0 && this.pagedComentarios.length !== this.totalElements) {
+            this.applyPaging();
+        } else {
+            this.obtenerListaComentarios(); 
+        }
+    } 
+  }
+  
+  next(): void { 
+    if (this.pageNo < this.totalPages - 1) { 
+        this.pageNo++; 
+        if (this.allComentarios.length > 0 && this.pagedComentarios.length !== this.totalElements) {
+            this.applyPaging();
+        } else {
+            this.obtenerListaComentarios(); 
+        }
+    } 
+  }
+  
   getTotalPages(): number { return Math.max(1, this.totalPages); }
 
   private setPageData(data: PaginaResponse): void {
-    this.listaComentarios = Array.isArray(data.elements) ? data.elements : [];
-    this.estaVacio = !!data.empty;
-    this.totalElements = Number(data.totalElements || this.listaComentarios.length || 0);
-    this.totalPages = Number(data.totalPages || 1);
-    this.numberOfElements = Number((data as any).numberOfElements ?? this.listaComentarios.length);
-    this.pagedComentarios = this.listaComentarios;
+    const raw = (data?.elements ?? (Array.isArray(data) ? data : []));
+    const elementos: Comentario[] = Array.isArray(raw) ? raw : [];
+
+    // Detectar si es server paging o lista completa
+    const hasServerPaging = typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
+
+    if (hasServerPaging) {
+        this.listaComentarios = elementos;
+        this.estaVacio = !!data.empty;
+        this.totalElements = Number(data.totalElements || this.listaComentarios.length || 0);
+        this.totalPages = Number(data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1);
+        this.numberOfElements = Number((data as any).numberOfElements ?? this.listaComentarios.length);
+        this.pagedComentarios = this.listaComentarios;
+
+        // Boundary check
+        if (elementos.length === 0 && this.pageNo > 0 && this.pageNo >= this.totalPages) {
+            this.pageNo = Math.max(0, this.totalPages - 1);
+            this.obtenerListaComentarios();
+            return;
+        }
+    } else {
+        // Fallback client paging
+        this.allComentarios = elementos;
+        this.totalElements = this.allComentarios.length;
+        this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
+        this.estaVacio = this.totalElements === 0;
+        
+        if (this.pageNo >= this.totalPages) {
+            this.pageNo = Math.max(0, this.totalPages - 1);
+        }
+        
+        this.applyPaging();
+    }
+    this.cdr.detectChanges();
+  }
+
+  private applyPaging(): void {
+    if (this.allComentarios.length > 0) {
+        const start = this.pageNo * this.pageSize;
+        const end = start + this.pageSize;
+        this.pagedComentarios = this.allComentarios.slice(start, end);
+        this.numberOfElements = this.pagedComentarios.length;
+        this.listaComentarios = this.pagedComentarios;
+    }
+    this.cdr.detectChanges();
   }
 
   private hasActiveFilters(): boolean {
@@ -182,6 +255,7 @@ export class ListadoComentariosComponent implements OnInit {
     } else {
       this.log.error('Error al cargar comentarios', err);
     }
+    this.cdr.detectChanges();
   }
 
   // Métodos antiguos de paginación por números eliminados en favor de Anterior/Siguiente
