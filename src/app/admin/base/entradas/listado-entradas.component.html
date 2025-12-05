@@ -31,6 +31,20 @@
 
     <!-- Buscador -->
     <div class="mb-4">
+      <!-- Búsqueda Básica -->
+      <c-row class="align-items-center mb-3 g-2">
+        <c-col xs="12" md="4">
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar entrada..." style="max-width: 280px;" />
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+        </c-col>
+        <c-col xs="12" md="4">
+        </c-col>
+      </c-row>
+
+      <!-- Buscador Avanzado -->
+      <div *ngIf="showAdvanced">
       <!-- En listado-entradas.component.html -->
       <app-error-boundary 
         context="listado-entradas"
@@ -56,6 +70,7 @@
         <!-- Tu tabla de entradas aquí -->
         
       </app-error-boundary>
+      </div>
     </div>
 
     <!-- Tabla de Entradas con loader local -->

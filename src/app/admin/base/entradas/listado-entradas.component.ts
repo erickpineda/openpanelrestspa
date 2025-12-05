@@ -38,6 +38,10 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   public definiciones: any;
   public cargando: boolean = false;
   public cargandoTabla: boolean = false;
+  
+  // Propiedades para búsqueda básica/avanzada
+  public showAdvanced = false;
+  public basicSearchText = '';
 
   // Para el buscador avanzado genérico
   public cargarCatalogosEntrada = (): Observable<{ [key: string]: string[] }> => {
@@ -97,6 +101,23 @@ private readonly boundaryId = 'listado-entradas-main';
           this.cdr.detectChanges();
         })
       );
+  }
+
+  public toggleAdvanced(): void {
+    this.showAdvanced = !this.showAdvanced;
+  }
+
+  public onBasicSearchTextChange(text: string): void {
+    this.basicSearchText = text;
+    this.campoSeleccionado = 'titulo';
+    
+    // Intentar obtener operación válida para título, por defecto CONTAINS
+    const operaciones = this.definiciones?.operationPermitido?.['titulo'];
+    this.operacionSeleccionada = Array.isArray(operaciones) && operaciones.length > 0 ? operaciones[0] : 'CONTAINS';
+    
+    this.valorBusqueda = text;
+    this.currentPage = 0;
+    this.busquedaService.triggerBusqueda(text);
   }
 
   public aplicarFiltro(filtro: any): void {
