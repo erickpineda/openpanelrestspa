@@ -60,18 +60,12 @@
 
     <!-- Tabla de Entradas con loader local -->
     <div class="tabla-con-loader-wrapper position-relative">
-      <app-op-loader
-        [useGlobal]="false"
-        [active]="cargandoTabla"
-        [overlay]="true"
-        [fullScreen]="false"
-        [position]="'center'"
-        [loaderStyle]="'pulse'"
-        [size]="'sm'"
-        [color]="'primary'"
-        [message]="'Cargando entradas...'">
-      </app-op-loader>
+      
+      <ng-template #loadingTemplate>
+        <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando entradas'"></c-spinner><p class="mt-2 text-muted">Cargando entradas...</p></div>
+      </ng-template>
 
+      <div *ngIf="!cargandoTabla; else loadingTemplate">
       <table responsive hover cAlign="top" cTable class="tabla-con-loader">
         <thead cTableColor="dark">
           <tr>
@@ -133,6 +127,7 @@
         [currentPage]="currentPage"
         (pageChange)="obtenerListaEntradas($event)">
       </app-op-pagination>
+      </div>
     </div>
 
     <!-- Modal de Confirmación -->

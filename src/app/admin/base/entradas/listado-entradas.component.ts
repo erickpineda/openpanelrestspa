@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef, NgZone, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { EntradaCatalogService } from '../../../core/services/data/entrada-catalog.service';
-import { catchError, Subject, takeUntil, throwError } from 'rxjs';
+import { catchError, Subject, takeUntil, throwError, finalize } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
 import { EntradaService } from '../../../core/services/data/entrada.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
@@ -89,7 +89,14 @@ private readonly boundaryId = 'listado-entradas-main';
       }]
     };
     const pageToUse = page !== undefined ? page : this.currentPage;
-    return this.entradaService.buscarSafe(searchRequest, pageToUse, this.pageSize);
+    return this.entradaService.buscarSafe(searchRequest, pageToUse, this.pageSize)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.cargandoTabla = false;
+          this.cdr.detectChanges();
+        })
+      );
   }
 
   public aplicarFiltro(filtro: any): void {
@@ -126,7 +133,6 @@ private readonly boundaryId = 'listado-entradas-main';
       this.currentPage = 0;
       this.mostrarError('Error en búsqueda: ' + response);
     }
-    this.cargandoTabla = false;
     this.cdr.markForCheck();
     try { this.cdr.detectChanges(); } catch {}
   }
@@ -138,6 +144,10 @@ private readonly boundaryId = 'listado-entradas-main';
     this.entradaService.obtenerDefinicionesBuscadorSafe()
       .pipe(
           takeUntil(this.destroy$),
+          finalize(() => {
+            this.cargando = false;
+            this.cdr.detectChanges();
+          }),
           catchError((error) => {
             // Reportar al boundary específico
             this.errorBoundaryService.reportErrorToBoundary(
@@ -151,7 +161,6 @@ private readonly boundaryId = 'listado-entradas-main';
         )
       .subscribe({
         next: (response) => {
-          this.cargando = false;
           if (response) {
             this.definiciones = response;
             this.inicializarCamposBusqueda();
@@ -159,7 +168,6 @@ private readonly boundaryId = 'listado-entradas-main';
           this.cdr.markForCheck();
         },
         error: (error) => {
-          this.cargando = false;
           this.log.error('Error secundario:', error);
           this.cdr.markForCheck();
         }
@@ -239,7 +247,6 @@ private readonly boundaryId = 'listado-entradas-main';
 
   private mostrarError(mensaje: string): void {
     this.toastService.showError(mensaje, 'Error');
-    this.cargandoTabla = false;
     this.cdr.markForCheck();
   }
 
