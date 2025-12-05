@@ -302,6 +302,22 @@ private readonly boundaryId = 'listado-entradas-main';
     this.cdr.markForCheck();
   }
 
+  onPrev(): void {
+    if (this.currentPage > 0) {
+      this.obtenerListaEntradas(this.currentPage - 1);
+    }
+  }
+
+  onNext(): void {
+    if (this.currentPage < Math.max(0, this.totalPages - 1)) {
+      this.obtenerListaEntradas(this.currentPage + 1);
+    }
+  }
+
+  isNextDisabled(): boolean {
+    return this.currentPage >= Math.max(0, this.totalPages - 1);
+  }
+
   checkFechaPublicacion(fechaPublicacion: Date): string {
     return fechaPublicacion
       ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', false)
