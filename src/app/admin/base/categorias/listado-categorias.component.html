@@ -74,7 +74,7 @@
                 <svg cIcon name="cilPencil" size="sm"></svg>
               </button>
               <button cButton color="danger" size="sm" variant="outline"
-                      (click)="borrarCategoria(categ.idCategoria)"
+                      (click)="borrarCategoria(categ)"
                       [attr.aria-label]="'Borrar categoría ' + categ.nombre"
                       [title]="'Borrar categoría ' + categ.nombre">
                 <svg cIcon name="cilTrash" size="sm"></svg>
@@ -100,3 +100,17 @@
     </div>
   </c-card-body>
 </c-card>
+
+<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal=$event" alignment="center" [attr.data-testid]="'eliminar-categoria-modal'">
+  <c-modal-header>
+    <h5 cModalTitle>Confirmar eliminación</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <p>¿Desea eliminar la categoría <strong>{{ categoriaToDelete?.nombre }}</strong>? Esta acción no se puede deshacer.</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
+    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
+  </c-modal-footer>
+</c-modal>
+

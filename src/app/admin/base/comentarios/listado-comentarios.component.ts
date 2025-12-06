@@ -39,6 +39,9 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
   pagedComentarios: Comentario[] = [];
   allComentarios: Comentario[] = []; // Para paginación cliente
 
+  showDeleteModal = false;
+  comentarioToDelete: Comentario | null = null;
+
   estaVacio: boolean = false;
   cargando: boolean = false;
   private destroy$ = new Subject<void>();
@@ -271,10 +274,35 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
 
   deleteComentario(coment: Comentario): void {
     if (!coment?.idComentario) return;
-    if (!confirm('¿Eliminar comentario #' + coment.idComentario + '?')) return;
-    this.comentarioService.borrar(coment.idComentario!).subscribe({
-      next: () => { this.search(); },
-      error: (err) => { this.log.error('comentarios borrar', err); }
-    });
+    this.comentarioToDelete = coment;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+    if (!this.comentarioToDelete?.idComentario) {
+        this.showDeleteModal = false;
+        return;
+    }
+    
+    this.cargando = true;
+    this.comentarioService.borrar(this.comentarioToDelete.idComentario!)
+        .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
+        .subscribe({
+            next: () => {
+                this.showDeleteModal = false;
+                this.comentarioToDelete = null;
+                this.search();
+            },
+            error: (err) => {
+                this.log.error('comentarios borrar', err);
+                this.showDeleteModal = false;
+                this.comentarioToDelete = null;
+            }
+        });
+  }
+
+  cancelDelete(): void {
+      this.showDeleteModal = false;
+      this.comentarioToDelete = null;
   }
 }

@@ -32,6 +32,9 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
   allCategorias: Categoria[] = []; // Para paginación cliente
   numberOfElements: number = 0;
 
+  showDeleteModal = false;
+  categoriaToDelete: Categoria | null = null;
+
   constructor(
     private router: Router,
     private categoriaService: CategoriaService,
@@ -150,10 +153,39 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     this.router.navigate(['/admin/control/categorias/editar', id]);
   }
 
-  borrarCategoria(id: number): void {
-    // Aquí podrías abrir un modal de confirmación y luego llamar al servicio para borrar
-    // this.categoriaService.borrar(id).subscribe(...)
-    alert('Funcionalidad de borrado no implementada');
+  borrarCategoria(categ: Categoria): void {
+    if (!categ?.idCategoria) return;
+    this.categoriaToDelete = categ;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+      if (!this.categoriaToDelete?.idCategoria) {
+          this.showDeleteModal = false;
+          return;
+      }
+      
+      this.cargando = true;
+      this.categoriaService.borrar(this.categoriaToDelete.idCategoria)
+          .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
+          .subscribe({
+              next: () => {
+                  this.showDeleteModal = false;
+                  this.categoriaToDelete = null;
+                  this.obtenerListaCategorias();
+              },
+              error: (err: any) => {
+                  this.log.error('categorias borrar', err);
+                  this.errorMsg = 'Error al borrar la categoría';
+                  this.showDeleteModal = false;
+                  this.categoriaToDelete = null;
+              }
+          });
+  }
+
+  cancelDelete(): void {
+      this.showDeleteModal = false;
+      this.categoriaToDelete = null;
   }
 
   trackByCategoriaId(index: number, categoria: Categoria): number {
