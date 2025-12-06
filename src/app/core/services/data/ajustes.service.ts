@@ -28,15 +28,4 @@ export class AjustesService extends CrudService<Ajustes, number> {
       context
     );
   }
-
-  listarAjustesSafeSinGlobalLoader(): Observable<Ajustes[]> {
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.safeGetList<Ajustes>(
-      this.endpoint,
-      undefined,
-      undefined,
-      'config.ajustes.listar',
-      context
-    );
-  }
 }

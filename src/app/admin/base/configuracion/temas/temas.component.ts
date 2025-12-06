@@ -52,7 +52,7 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.loading = true; 
     this.error = null;
     
-    this.temasService.listarTemasSafeSinGlobalLoader()
+    this.temasService.listarSafeSinGlobalLoader()
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => { 

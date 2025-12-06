@@ -16,23 +16,13 @@ export interface AsociacionEtiquetaDTO {
 })
 export class EtiquetaService extends CrudService<Etiqueta, number> {
   protected endpoint = '/etiquetas';
+  protected override pageSizeParam = 'pageSize';
 
   override listar(pageNo?: number, pageSize?: number): Observable<any> {
     if (pageNo != null && pageSize != null) {
       return this.listarPagina(pageNo, pageSize);
     }
     return super.listar();
-  }
-
-  public override listarPagina(pageNo: number, pageSize: number): Observable<any> {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-    return this.get<any>(this.endpoint, params);
-  }
-
-  listarPaginaSinGlobalLoader(pageNo: number, pageSize: number): Observable<any> {
-    const params = { pageNo: String(pageNo), pageSize: String(pageSize) };
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.get<any>(this.endpoint, params, undefined, context);
   }
 
   override obtenerPorId(id: number): Observable<any> {

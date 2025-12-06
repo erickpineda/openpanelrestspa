@@ -45,7 +45,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     this.error = null;
     this.hasFilters = !!this.filtroNombre || !!this.filtroMime || !!this.fechaDesde || !!this.fechaHasta;
     
-    this.fileStorage.listarFicherosSinGlobalLoader()
+    this.fileStorage.listarFicheros(true)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => { 

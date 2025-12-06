@@ -28,15 +28,4 @@ export class TemasService extends CrudService<Tema, number> {
       context
     );
   }
-
-  listarTemasSafeSinGlobalLoader(): Observable<Tema[]> {
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.safeGetList<Tema>(
-      this.endpoint,
-      undefined,
-      undefined,
-      'config.temas.listar',
-      context
-    );
-  }
 }

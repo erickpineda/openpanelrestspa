@@ -4,13 +4,15 @@ import { Observable } from 'rxjs';
 import { BaseService } from './base.service';
 import { OpenpanelApiResponse } from '../models/openpanel-api-response.model';
 import { TokenStorageService } from '../services/auth/token-storage.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { NetworkInterceptor } from '../interceptor/network.interceptor';
 
 @Injectable({
   providedIn: 'root',
 })
 export abstract class CrudService<T, ID> extends BaseService {
   protected abstract endpoint: string;
+  protected pageSizeParam: string = 'pageSize';
 
   constructor(
     protected override http: HttpClient,
@@ -28,6 +30,20 @@ export abstract class CrudService<T, ID> extends BaseService {
       undefined,
       undefined,
       `${this.endpoint}.listar`
+    );
+  }
+
+  /**
+   * Lista elementos de forma segura sin loader global
+   */
+  listarSafeSinGlobalLoader(): Observable<T[]> {
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.safeGetList<T>(
+      this.endpoint,
+      undefined,
+      undefined,
+      `${this.endpoint}.listar`,
+      context
     );
   }
 
@@ -104,8 +120,17 @@ export abstract class CrudService<T, ID> extends BaseService {
     pageNo: number,
     pageSize: number
   ): Observable<OpenpanelApiResponse<any>> {
-    const params = { pageNo: pageNo.toString(), size: pageSize.toString() };
+    const params = { pageNo: pageNo.toString(), [this.pageSizeParam]: pageSize.toString() };
     return this.get<any>(this.endpoint, params);
+  }
+
+  public listarPaginaSinGlobalLoader(
+    pageNo: number,
+    pageSize: number
+  ): Observable<OpenpanelApiResponse<any>> {
+    const params = { pageNo: pageNo.toString(), [this.pageSizeParam]: pageSize.toString() };
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.get<any>(this.endpoint, params, undefined, context);
   }
 
   obtenerPorId(id: ID): Observable<OpenpanelApiResponse<any>> {

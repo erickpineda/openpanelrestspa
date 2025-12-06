@@ -15,11 +15,7 @@ import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model'
 })
 export class ComentarioService extends CrudService<Comentario, number> {
   protected endpoint = '/comentarios';
-
-  public override listarPagina(pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<any>> {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-    return this.get<any>(this.endpoint, params);
-  }
+  protected override pageSizeParam = 'pageSize';
 
   buscarSafe(searchRequest: any, page: number, size: number): Observable<PaginaResponse> {
     const params = { pageNo: page.toString(), pageSize: size.toString() };
@@ -33,12 +29,6 @@ export class ComentarioService extends CrudService<Comentario, number> {
       'comentarios.buscar',
       context
     );
-  }
-
-  listarPaginaSinGlobalLoader(pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<any>> {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.get<any>(this.endpoint, params, undefined, context);
   }
 
   buscarSinGlobalLoader(searchRequest: any, page: number, size: number): Observable<PaginaResponse> {

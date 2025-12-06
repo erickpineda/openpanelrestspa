@@ -52,7 +52,7 @@ export class AjustesComponent implements OnInit, OnDestroy {
     this.loading = true; 
     this.error = null;
     
-    this.ajustesService.listarAjustesSafeSinGlobalLoader()
+    this.ajustesService.listarSafeSinGlobalLoader()
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => { 

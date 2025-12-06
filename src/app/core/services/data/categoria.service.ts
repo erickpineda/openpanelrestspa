@@ -12,11 +12,7 @@ import { PaginaResponse } from '../../models/pagina-response.model';
 })
 export class CategoriaService extends CrudService<Categoria, number> {
   protected endpoint = '/categorias';
-
-  listarSinGlobalLoader(): Observable<Categoria[]> {
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.safeGetList<Categoria>(this.endpoint, undefined, undefined, 'categorias.listar', context);
-  }
+  protected override pageSizeParam = 'pageSize';
 
   buscarSafe(searchRequest: any, pageNo: number, size: number): Observable<PaginaResponse> {
     const params = { pageNo: pageNo.toString(), pageSize: size.toString() };
@@ -30,17 +26,6 @@ export class CategoriaService extends CrudService<Categoria, number> {
       'categorias.buscar',
       context
     );
-  }
-
-  public override listarPagina(pageNo: number, pageSize: number) {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-    return this.get<any>(this.endpoint, params);
-  }
-
-  listarPaginaSinGlobalLoader(pageNo: number, pageSize: number): Observable<any> {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.get<any>(this.endpoint, params, undefined, context);
   }
 
   buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<PaginaResponse> {

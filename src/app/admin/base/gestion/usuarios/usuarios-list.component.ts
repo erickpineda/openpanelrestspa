@@ -62,7 +62,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     const handleError = (err: any) => { this.error = 'Error cargando usuarios'; this.log.error('usuarios listar', err); };
     
     if (!hasFilters) {
-      this.usuarioService.listarSinGlobalLoader(pageNo, this.pageSize)
+      this.usuarioService.listarPaginaSinGlobalLoader(pageNo, this.pageSize)
         .pipe(takeUntil(this.destroy$), finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
         .subscribe({ next: handleResponse, error: handleError });
     } else {

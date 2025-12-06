@@ -61,7 +61,7 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     this.error = null;
     this.hasFilters = !!this.filtroNombre || !!this.filtroMime || !!this.fechaDesde || !!this.fechaHasta;
     
-    this.fileStorage.listarFicherosSinGlobalLoader()
+    this.fileStorage.listarFicheros(true)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => { 
@@ -144,7 +144,7 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     for (const item of list) {
       if (!item?.uuid) continue;
       if (item?.mime && !String(item.mime).startsWith('image/')) continue;
-      this.fileStorage.obtenerDatosFicheroSinGlobalLoader(item.uuid)
+      this.fileStorage.obtenerDatosFichero(item.uuid, true)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (datos: any) => {

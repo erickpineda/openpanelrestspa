@@ -126,7 +126,7 @@
       </div>
       <div class="mb-3">
         <label class="form-label">Rol</label>
-        <select cSelect [value]="editUser.idRol ?? ''" (change)="editUser && (editUser.idRol = $any($event.target).value ? +$any($event.target).value : 0)" [class.is-invalid]="!editUser.idRol || editUser.idRol <= 0">
+        <select cSelect [value]="editUser.idRol" (change)="editUser && (editUser.idRol = $any($event.target).value ? +$any($event.target).value : 0)" [class.is-invalid]="!editUser.idRol || editUser.idRol <= 0">
           <option value="">Seleccione rol</option>
           <option *ngFor="let r of roles" [value]="r.idRol">{{ r.nombre }}</option>
         </select>

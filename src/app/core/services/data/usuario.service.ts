@@ -14,6 +14,7 @@ import { PaginaResponse } from "../../models/pagina-response.model";
 })
 export class UsuarioService extends CrudService<Usuario, number> {
   protected override endpoint = '/usuarios';
+  protected override pageSizeParam = 'pageSize';
 
   constructor(
     protected override http: HttpClient,
@@ -23,12 +24,6 @@ export class UsuarioService extends CrudService<Usuario, number> {
   }
 
   // ✅ Métodos migrados de UsuariosService
-
-  listarSinGlobalLoader(pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<any>> {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.get<any>(this.endpoint, params, undefined, context);
-  }
 
   buscarSafe(searchRequest: any, pageNo: number, pageSize: number): Observable<PaginaResponse> {
     const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };

@@ -21,31 +21,13 @@ export class FileStorageService {
 
   listMedia(type: 'image' | 'file' = 'image', page?: number, size?: number): Observable<any> {
     let params = new HttpParams().set('type', type);
-    if (page != null) params = params.set('page', String(page));
-    if (size != null) params = params.set('size', String(size));
+    if (page != null) params = params.set('pageNo', String(page));
+    if (size != null) params = params.set('pageSize', String(size));
     return this.http.get(`${this.base}/media`, { params });
   }
 
-  listarFicheros(): Observable<MediaItem[]> {
-    return this.http.get<any>(`${this.base}/fileStorage/ficheros`).pipe(
-      map(resp => {
-        const data = resp?.data ?? resp;
-        const arr = Array.isArray(data) ? data : (Array.isArray(data?.content) ? data.content : []);
-        return arr.map((f: any) => ({
-          uuid: f?.uuidFileStorage,
-          nombre: f?.nombre,
-          tipo: (f?.tipo && String(f.tipo).startsWith('image/')) ? 'image' : 'file',
-          mime: f?.tipo,
-          url: f?.ruta,
-          tamano: f?.size,
-          fechaCreacion: f?.fechaCreacion
-        })) as MediaItem[];
-      })
-    );
-  }
-
-  listarFicherosSinGlobalLoader(): Observable<MediaItem[]> {
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+  listarFicheros(skipLoader: boolean = false): Observable<MediaItem[]> {
+    const context = skipLoader ? new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true) : undefined;
     return this.http.get<any>(`${this.base}/fileStorage/ficheros`, { context }).pipe(
       map(resp => {
         const data = resp?.data ?? resp;
@@ -63,18 +45,13 @@ export class FileStorageService {
     );
   }
 
-  obtenerDatosFichero(uuid: string): Observable<any> {
-    return this.http.get<any>(`${this.base}/fileStorage/ficheros/obtenerDatos/${encodeURIComponent(uuid)}`).pipe(
-      map(resp => resp?.data ?? resp)
-    );
-  }
-
-  obtenerDatosFicheroSinGlobalLoader(uuid: string): Observable<any> {
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+  obtenerDatosFichero(uuid: string, skipLoader: boolean = false): Observable<any> {
+    const context = skipLoader ? new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true) : undefined;
     return this.http.get<any>(`${this.base}/fileStorage/ficheros/obtenerDatos/${encodeURIComponent(uuid)}`, { context }).pipe(
       map(resp => resp?.data ?? resp)
     );
   }
+
 
   descargarFichero(uuid: string, accept?: string): Observable<Blob> {
     let headers = new HttpHeaders({ 'Accept': accept || 'application/octet-stream' });
