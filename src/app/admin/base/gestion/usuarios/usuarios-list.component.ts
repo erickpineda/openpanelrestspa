@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { UsuariosService, UsuarioDTO } from '../../../../core/services/usuarios.service';
+import { UsuarioService } from '../../../../core/services/data/usuario.service';
+import { Usuario } from '../../../../core/models/usuario.model';
 import { RolService } from '../../../../core/services/data/rol.service';
 import { Rol } from '../../../../core/models/rol.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
@@ -16,7 +17,7 @@ import { SearchUtilService } from '../../../../core/services/utils/search-util.s
 export class UsuariosListComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
-  usuarios: UsuarioDTO[] = [];
+  usuarios: Usuario[] = [];
   pageNo = 0;
   pageSize = 10;
   totalElements = 0;
@@ -29,12 +30,12 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   roles: Rol[] = [];
 
   editModalVisible = false;
-  editUser: UsuarioDTO | null = null;
+  editUser: Usuario | null = null;
 
   private destroy$ = new Subject<void>();
 
   constructor(
-    private usuariosService: UsuariosService, 
+    private usuarioService: UsuarioService, 
     private rolService: RolService, 
     private toast: ToastService, 
     private log: LoggerService, 
@@ -61,7 +62,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     const handleError = (err: any) => { this.error = 'Error cargando usuarios'; this.log.error('usuarios listar', err); };
     
     if (!hasFilters) {
-      this.usuariosService.listarSinGlobalLoader(pageNo, this.pageSize)
+      this.usuarioService.listarSinGlobalLoader(pageNo, this.pageSize)
         .pipe(takeUntil(this.destroy$), finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
         .subscribe({ next: handleResponse, error: handleError });
     } else {
@@ -70,7 +71,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       if (this.filtroRolId != null) criteria.push({ filterKey: 'idRol', value: String(this.filtroRolId), operation: 'EQUAL' });
       if (this.filtroEmailConfirmado != null) criteria.push({ filterKey: 'emailConfirmado', value: String(this.filtroEmailConfirmado), operation: 'EQUAL' });
       const payload = this.searchUtil.buildRequest('Usuario', criteria, 'ALL');
-      this.usuariosService.buscarSinGlobalLoader(payload, pageNo, this.pageSize)
+      this.usuarioService.buscarSinGlobalLoader(payload, pageNo, this.pageSize)
         .pipe(takeUntil(this.destroy$), finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
         .subscribe({ next: handleResponse, error: handleError });
     }
@@ -116,17 +117,21 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   onPageSizeChange(size: number): void { this.pageSize = size; this.pageNo = 0; this.load(); }
   toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
 
-  openEdit(u: UsuarioDTO): void { this.editUser = { ...u }; this.editModalVisible = true; }
-  openCreate(): void { this.editUser = { idUsuario: undefined, username: '', nombre: '', apellido: '', email: '', idRol: undefined } as UsuarioDTO; this.editModalVisible = true; }
+  openEdit(u: Usuario): void { this.editUser = { ...u }; this.editModalVisible = true; }
+  openCreate(): void { 
+    this.editUser = new Usuario();
+    // Ensure 0/undefined logic is handled. Usuario defaults to 0.
+    this.editModalVisible = true; 
+  }
   closeEdit(): void { this.editModalVisible = false; this.editUser = null; }
   isEmailValid(e?: string): boolean { if (!e) return false; const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; return re.test(e); }
-  isUserFormValid(): boolean { return !!(this.editUser && this.editUser.username && this.isEmailValid(this.editUser.email) && this.editUser.idRol != null); }
+  isUserFormValid(): boolean { return !!(this.editUser && this.editUser.username && this.isEmailValid(this.editUser.email) && this.editUser.idRol > 0); }
   getUserErrors(): string[] {
     const errs: string[] = [];
     if (!this.editUser) return errs;
     if (!this.editUser.username) errs.push('Usuario requerido');
     if (!this.isEmailValid(this.editUser.email)) errs.push('Email inválido');
-    if (this.editUser.idRol == null) errs.push('Rol requerido');
+    if (!this.editUser.idRol || this.editUser.idRol <= 0) errs.push('Rol requerido');
     return errs;
   }
   getRolNombre(id?: number): string {
@@ -137,8 +142,8 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   saveEdit(): void {
     if (!this.editUser) return;
     this.loading = true;
-    const hasId = !!this.editUser.idUsuario;
-    const op$ = hasId ? this.usuariosService.actualizar(this.editUser.idUsuario!, this.editUser) : this.usuariosService.crear(this.editUser);
+    const hasId = !!this.editUser.idUsuario && this.editUser.idUsuario > 0;
+    const op$ = hasId ? this.usuarioService.actualizar(this.editUser.idUsuario!, this.editUser) : this.usuarioService.crear(this.editUser);
     op$.subscribe({
       next: () => {
         this.toast.showSuccess(hasId ? 'Usuario actualizado' : 'Usuario creado', 'Usuarios');
@@ -152,11 +157,11 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     });
   }
 
-  delete(u: UsuarioDTO): void {
+  delete(u: Usuario): void {
     if (!u.idUsuario) return;
     if (!confirm('¿Eliminar usuario?')) return;
     this.loading = true;
-    this.usuariosService.borrar(u.idUsuario).subscribe({
+    this.usuarioService.borrar(u.idUsuario).subscribe({
       next: () => { this.toast.showSuccess('Usuario eliminado', 'Usuarios'); this.loading = false; this.load(); },
       error: (err: any) => { this.toast.showError('Error eliminando', 'Usuarios'); this.log.error('usuarios borrar', err); this.loading = false; }
     });

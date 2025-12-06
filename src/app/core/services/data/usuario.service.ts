@@ -1,11 +1,13 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
 import { Usuario } from "../../models/usuario.model";
 import { CrudService } from "../../_utils/crud.service";
 import { TokenStorageService } from "../auth/token-storage.service";
 import { catchError, Observable, map, firstValueFrom, of } from "rxjs";
 import { PerfilResponse } from "../../models/perfil-response.model";
 import { OpenpanelApiResponse } from "../../models/openpanel-api-response.model";
+import { NetworkInterceptor } from "../../interceptor/network.interceptor";
+import { PaginaResponse } from "../../models/pagina-response.model";
 
 @Injectable({
   providedIn: "root"
@@ -18,6 +20,34 @@ export class UsuarioService extends CrudService<Usuario, number> {
     protected override tokenStorageService: TokenStorageService
   ) {
     super(http, tokenStorageService);
+  }
+
+  // ✅ Métodos migrados de UsuariosService
+
+  listarSinGlobalLoader(pageNo: number, pageSize: number): Observable<OpenpanelApiResponse<any>> {
+    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.get<any>(this.endpoint, params, undefined, context);
+  }
+
+  buscarSafe(searchRequest: any, pageNo: number, pageSize: number): Observable<PaginaResponse> {
+    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+    const context = new HttpContext();
+    return this.safePostData<PaginaResponse>(
+      `${this.endpoint}/buscar`,
+      searchRequest,
+      new PaginaResponse(),
+      params,
+      undefined,
+      'usuarios.buscar',
+      context
+    );
+  }
+
+  buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<any> {
+    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.post<any>(`${this.endpoint}/buscar`, searchRequest, params, undefined, context);
   }
 
   // ✅ SOLO los métodos esenciales seguros
