@@ -1,41 +1,41 @@
 <c-card>
   <c-card-header>
-
     <div class="d-flex justify-content-between align-items-end">
       <h2 cCardTitle class="h5 mb-3 mb-lg-0">Comentario</h2>
-      <div class="hstack gap-3" *ngIf="this.getComentarioId('idComentario') != 'crear'">
-        <button cButton color="light" size="sm">
+      <div class="hstack gap-3" *ngIf="isEditMode">
+        <!-- Feature not implemented in original TS? -->
+        <!-- <button cButton color="light" size="sm">
           <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear con estos datos"></svg>
           Crear nueva entrada con estos datos
-        </button>
-        <button cButton color="warning" size="sm" (click)="editarComentario()" [disabled]="this.comentarioForm.enabled">
+        </button> -->
+        <button cButton color="warning" size="sm" (click)="handleEditarComentario()" [disabled]="!disabled">
           <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Editar comentario"></svg>
           Editar comentario
         </button>
       </div>
-
     </div>
   </c-card-header>
   <c-card-body>
     <c-container fluid>
-      <form  cForm [formGroup]="comentarioForm" novalidate (ngSubmit)="guardar()" class="needs-validation">
+      <form cForm [formGroup]="form" novalidate (ngSubmit)="guardar()" class="needs-validation">
         <div class="d-flex justify-content-between align-items-end">
 
-          <h2 cCardTitle class="h5 mb-3 mb-lg-0">Crear/Editar Comentario</h2>
+          <h2 cCardTitle class="h5 mb-3 mb-lg-0">{{ isEditMode ? 'Editar Comentario' : 'Crear Comentario' }}</h2>
           <div class="hstack gap-3">
 
-            <button cButton color="danger" size="sm" type="button" (click)="cancelar()" [tabindex]="'0'">
+            <button cButton color="danger" size="sm" type="button" (click)="onCancel()" [tabindex]="'0'">
               <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
               Cancelar
             </button>
 
             <button cButton color="success" size="sm" type="submit" 
-                [disabled]="comentarioForm.pristine || comentarioForm.invalid" [tabindex]="'0'">
+                [disabled]="form.pristine || form.invalid" [tabindex]="'0'">
                 <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
                 Guardar
             </button>
 
-            <button cButton color="info" size="sm" [disabled]="!comentarioForm.valid" (click)="onValidate()" [tabindex]="'0'">
+            <!-- Previa button was in original, kept for consistency -->
+            <button cButton color="info" size="sm" [disabled]="!form.valid" type="button" [tabindex]="'0'">
               <svg cIcon name="cilExternalLink" style="padding-right: 2px" size="sm"
                 title="Previa"></svg>
                 Previa
@@ -119,13 +119,13 @@
                 <h3 cCardTitle class="h6 mb-4">Contenido del comentario sin censura</h3>
                 <textarea aria-label="With textarea" cFormControl formControlName="contenido"
                   required
-                  ngClass="{ 'is-invalid': (submitted || f['contenido'].touched) && f['contenido'].invalid }"></textarea>
+                  [ngClass]="{ 'is-invalid': (submitted || f['contenido'].touched) && f['contenido'].invalid }"></textarea>
               </c-card-body>
             </c-card>
           </c-col>
           <!-- -->
 
-          <!-- Contenido sin censura -->
+          <!-- Contenido sin censura (Wait, label says 'Contenido del comentario censurado') -->
           <c-col lg="12">
             <c-card class="mb-4">
               <c-card-body>
@@ -142,4 +142,3 @@
 
   </c-card-body>
 </c-card>
-

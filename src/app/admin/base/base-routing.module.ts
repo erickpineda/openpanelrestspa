@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
-import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
+import { CrearComentarioComponent } from './comentarios/crear/crear-comentario.component';
+import { EditarComentarioComponent } from './comentarios/editar/editar-comentario.component';
 import { BaseComponent } from './base.component';
 import { CrearCategoriaComponent } from './categorias/crear/crear-categoria.component';
 import { EditarCategoriaComponent } from './categorias/editar/editar-categoria.component';
@@ -28,8 +29,8 @@ const routes: Routes = [
       {
         path: 'comentarios', children: [
           { path: '', component: ListadoComentariosComponent },
-          { path: ':idComentario', component: CrearEditarComentario },
-          { path: 'crear', component: CrearEditarComentario },
+          { path: 'crear', component: CrearComentarioComponent },
+          { path: 'editar/:idComentario', component: EditarComentarioComponent },
         ]
       }
     ]

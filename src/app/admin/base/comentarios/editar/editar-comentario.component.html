@@ -1,0 +1,12 @@
+<app-comentario-form 
+  [comentario]="comentario"
+  [nombreUsuario]="nombreUsuario"
+  [emailUsuario]="emailUsuario"
+  [tituloEntrada]="tituloEntrada"
+  [submitted]="submitted"
+  [disabled]="disabled"
+  [isEditMode]="true"
+  (submitComentario)="onSubmit($event)"
+  (cancel)="onCancel()"
+  (editarComentario)="onEditarComentario()">
+</app-comentario-form>

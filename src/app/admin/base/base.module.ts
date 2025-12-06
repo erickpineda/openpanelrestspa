@@ -8,7 +8,9 @@ import { BaseComponent } from './base.component';
 // Componentes específicos de Base
 // Entradas moved to lazy EntradasModule
 import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
-import { CrearEditarComentario } from './comentarios/crear-editar/crear-editar-comentario.component';
+import { CrearComentarioComponent } from './comentarios/crear/crear-comentario.component';
+import { EditarComentarioComponent } from './comentarios/editar/editar-comentario.component';
+import { ComentarioFormComponent } from './comentarios/comentario-form/comentario-form.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
 import { CrearCategoriaComponent } from './categorias/crear/crear-categoria.component';
 import { EditarCategoriaComponent } from './categorias/editar/editar-categoria.component';
@@ -33,7 +35,9 @@ import { SharedCoreUiModule } from '../../shared/shared-coreui.module';
     BaseComponent,
     // Entradas components declared in EntradasModule (lazy)
     ListadoComentariosComponent,
-    CrearEditarComentario,
+    CrearComentarioComponent,
+    EditarComentarioComponent,
+    ComentarioFormComponent,
     ListadoCategoriasComponent,
     CrearCategoriaComponent,
     EditarCategoriaComponent,
