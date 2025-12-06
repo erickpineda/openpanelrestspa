@@ -24,10 +24,14 @@ export abstract class CrudService<T, ID> extends BaseService {
   /**
    * Lista elementos de forma segura, retornando array vacío en caso de error
    */
-  listarSafe(): Observable<T[]> {
+  listarSafe(pageNo?: number, pageSize?: number): Observable<T[]> {
+    const params: any = {};
+    if (pageNo != null) params.pageNo = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+
     return this.safeGetList<T>(
       this.endpoint,
-      undefined,
+      params,
       undefined,
       `${this.endpoint}.listar`
     );
@@ -36,11 +40,15 @@ export abstract class CrudService<T, ID> extends BaseService {
   /**
    * Lista elementos de forma segura sin loader global
    */
-  listarSafeSinGlobalLoader(): Observable<T[]> {
+  listarSafeSinGlobalLoader(pageNo?: number, pageSize?: number): Observable<T[]> {
+    const params: any = {};
+    if (pageNo != null) params.pageNo = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.safeGetList<T>(
       this.endpoint,
-      undefined,
+      params,
       undefined,
       `${this.endpoint}.listar`,
       context
@@ -112,15 +120,13 @@ export abstract class CrudService<T, ID> extends BaseService {
 
   // ✅ MÉTODOS ORIGINALES (mantener exactamente como están)
 
-  listar(): Observable<OpenpanelApiResponse<any>> {
-    return this.get<any>(this.endpoint);
-  }
-
   public listarPagina(
-    pageNo: number,
-    pageSize: number
+    pageNo?: number,
+    pageSize?: number
   ): Observable<OpenpanelApiResponse<any>> {
-    const params = { pageNo: pageNo.toString(), [this.pageSizeParam]: pageSize.toString() };
+    const params: any = {};
+    if (pageNo != null) params.pageNo = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     return this.get<any>(this.endpoint, params);
   }
 

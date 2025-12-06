@@ -139,3 +139,17 @@
     <button cButton color="primary" [disabled]="!isUserFormValid()" (click)="saveEdit()">Guardar</button>
   </c-modal-footer>
 </c-modal>
+
+<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal = $event" id="deleteUserModal">
+  <c-modal-header>
+    <h5 cModalTitle>Confirmar eliminación</h5>
+  </c-modal-header>
+  <c-modal-body>
+    ¿Estás seguro de que deseas eliminar el usuario <strong>{{ userToDelete?.username }}</strong>?
+    <br>Esta acción no se puede deshacer.
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
+    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
+  </c-modal-footer>
+</c-modal>

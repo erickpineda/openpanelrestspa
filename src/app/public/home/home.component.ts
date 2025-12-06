@@ -43,7 +43,7 @@ export class HomeComponent implements OnInit {
 
   obtenerListaEntradas(): Promise<Entrada[]> {
     return new Promise((resolve, reject) => {
-      this.entradaService.listar()
+      this.entradaService.listarPagina()
         .subscribe({
           next: (response) => {
             const entradas: Entrada[] = Array.isArray(response.data?.elements) ? response.data.elements : [];

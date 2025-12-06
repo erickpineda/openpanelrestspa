@@ -18,11 +18,11 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
   protected endpoint = '/etiquetas';
   protected override pageSizeParam = 'pageSize';
 
-  override listar(pageNo?: number, pageSize?: number): Observable<any> {
+  override listarPagina(pageNo?: number, pageSize?: number): Observable<any> {
     if (pageNo != null && pageSize != null) {
-      return this.listarPagina(pageNo, pageSize);
+      return super.listarPagina(pageNo, pageSize);
     }
-    return super.listar();
+    return super.listarPagina();
   }
 
   override obtenerPorId(id: number): Observable<any> {

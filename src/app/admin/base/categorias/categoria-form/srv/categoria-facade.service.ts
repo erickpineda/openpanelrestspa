@@ -18,7 +18,7 @@ export class CategoriaFacadeService {
   ) {}
 
   obtenerListaCategorias(): Observable<Categoria[]> {
-    return this.categoriaService.listar().pipe(
+    return this.categoriaService.listarPagina().pipe(
       map(resp => Array.isArray(resp.data?.elements) ? resp.data.elements : []),
       catchError(() => of([]))
     );

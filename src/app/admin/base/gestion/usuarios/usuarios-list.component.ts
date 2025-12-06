@@ -32,6 +32,9 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   editModalVisible = false;
   editUser: Usuario | null = null;
 
+  showDeleteModal = false;
+  userToDelete: Usuario | null = null;
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -159,11 +162,38 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   delete(u: Usuario): void {
     if (!u.idUsuario) return;
-    if (!confirm('¿Eliminar usuario?')) return;
+    this.userToDelete = u;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+    if (!this.userToDelete?.idUsuario) {
+      this.showDeleteModal = false;
+      return;
+    }
     this.loading = true;
-    this.usuarioService.borrar(u.idUsuario).subscribe({
-      next: () => { this.toast.showSuccess('Usuario eliminado', 'Usuarios'); this.loading = false; this.load(); },
-      error: (err: any) => { this.toast.showError('Error eliminando', 'Usuarios'); this.log.error('usuarios borrar', err); this.loading = false; }
-    });
+    this.usuarioService.borrar(this.userToDelete.idUsuario)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toast.showSuccess('Usuario eliminado', 'Usuarios');
+          this.loading = false;
+          this.showDeleteModal = false;
+          this.userToDelete = null;
+          this.load();
+        },
+        error: (err: any) => {
+          this.toast.showError('Error eliminando usuario', 'Usuarios');
+          this.log.error('usuarios borrar', err);
+          this.loading = false;
+          this.showDeleteModal = false;
+          this.userToDelete = null;
+        }
+      });
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.userToDelete = null;
   }
 }
