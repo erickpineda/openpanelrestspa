@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { UsuariosService, UsuarioDTO } from '../../../../core/services/usuarios.service';
-import { RolesService, RolDTO } from '../../../../core/services/roles.service';
+import { RolService } from '../../../../core/services/data/rol.service';
+import { Rol } from '../../../../core/models/rol.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
@@ -25,7 +26,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   filtroUsuario = '';
   filtroRolId: number | null = null;
   filtroEmailConfirmado: boolean | null = null;
-  roles: RolDTO[] = [];
+  roles: Rol[] = [];
 
   editModalVisible = false;
   editUser: UsuarioDTO | null = null;
@@ -34,7 +35,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   constructor(
     private usuariosService: UsuariosService, 
-    private rolesService: RolesService, 
+    private rolService: RolService, 
     private toast: ToastService, 
     private log: LoggerService, 
     private searchUtil: SearchUtilService,
@@ -76,12 +77,29 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   }
 
   loadRoles(): void {
-    this.rolesService.listar(0, 50)
+    this.rolService.listarPagina(0, 50)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
       next: (r: any) => {
         const data = r?.data || r;
-        this.roles = Array.isArray(data?.content) ? data.content : (Array.isArray(data) ? data : []);
+        let roles = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data?.content) ? data.content : (Array.isArray(data) ? data : []));
+        
+        // Fix: API returns roles without idRol, so we need to map them manually based on name/index if needed, 
+        // but ideally backend should return IDs. Since we can't change backend now and we know the order/names:
+        // The user provided DB json shows IDs 1..7. Assuming the list is ordered or we map by name.
+        // Let's try to map by name if idRol is missing.
+        // Known roles: PROPIETARIO(1), ADMINISTRADOR(2), MANTENIMIENTO(3), EDITOR(4), DESARROLLADOR(5), AUTOR(6), LECTOR(7)
+        const roleMap: {[key: string]: number} = {
+          'PROPIETARIO': 1, 'ADMINISTRADOR': 2, 'MANTENIMIENTO': 3, 'EDITOR': 4, 
+          'DESARROLLADOR': 5, 'AUTOR': 6, 'LECTOR': 7
+        };
+
+        this.roles = roles.map((rol: any) => {
+          if (!rol.idRol && rol.nombre) {
+            return { ...rol, idRol: roleMap[rol.nombre] || 0 };
+          }
+          return rol;
+        });
       },
       error: () => {}
     });
@@ -113,7 +131,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   }
   getRolNombre(id?: number): string {
     if (id == null) return '';
-    const r = this.roles.find(x => x.id === id);
+    const r = this.roles.find(x => x.idRol == id);
     return r && r.nombre ? r.nombre : String(id);
   }
   saveEdit(): void {

@@ -43,7 +43,7 @@
             <label class="form-label mb-1">Rol</label>
             <select cSelect class="form-select-sm" [value]="filtroRolId ?? ''" (change)="filtroRolId = +$any($event.target).value || null">
               <option value="">Seleccione rol</option>
-              <option *ngFor="let r of roles" [value]="r.id">{{ r.nombre }}</option>
+              <option *ngFor="let r of roles" [value]="r.idRol">{{ r.nombre }}</option>
             </select>
           </c-col>
           <c-col xs="6" md="3">
@@ -128,7 +128,7 @@
         <label class="form-label">Rol</label>
         <select cSelect [value]="editUser.idRol ?? ''" (change)="editUser && (editUser.idRol = $any($event.target).value ? +$any($event.target).value : undefined)" [class.is-invalid]="editUser.idRol == null || editUser.idRol === undefined">
           <option value="">Seleccione rol</option>
-          <option *ngFor="let r of roles" [value]="r.id">{{ r.nombre }}</option>
+          <option *ngFor="let r of roles" [value]="r.idRol">{{ r.nombre }}</option>
         </select>
         <div class="invalid-feedback d-block" *ngIf="editUser.idRol == null || editUser.idRol === undefined">Rol requerido</div>
       </div>

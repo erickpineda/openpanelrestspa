@@ -8,7 +8,6 @@ import { CommonFunctionalityService } from '../../../shared/services/common-func
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 import { ToastService } from '../../../core/services/ui/toast.service';
 import { ErrorBoundaryService } from '../../../core/errors/error-boundary/error-boundary.service';
-import { GlobalErrorHandlerService } from '../../../core/errors/global-error/global-error-handler.service';
 import { ErrorBoundaryComponent } from '../../../shared/components/errors/error-boundary/error-boundary.component';
 import { LoggerService } from '../../../core/services/logger.service';
 import { Router } from '@angular/router';
@@ -20,38 +19,46 @@ import { Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewInit {
+  // #region Properties
+  
+  // Data
   listaEntradas: Entrada[] = [];
-  allEntradas: Entrada[] = []; // Para fallback client-side
-  entradaABorrar: Entrada | null = null;
-
+  allEntradas: Entrada[] = []; // Fallback client-side
+  definiciones: any;
+  
+  // Paging & Stats
   totalPages: number = 0;
   currentPage: number = 0;
   pageSize: number = 20;
   totalElements = 0;
   numberOfElements = 0;
   estaVacio: boolean = false;
-
-  public visible = false;
-  private destroy$ = new Subject<void>();
-
+  
+  // Search & Filters
   campoSeleccionado: string = '';
   operacionSeleccionada: string = '';
   valorBusqueda: string = '';
   dataOptionSeleccionada: string = 'AND';
-
-  public definiciones: any;
-  public cargando: boolean = false;
-  public cargandoTabla: boolean = false;
+  showAdvanced = false;
+  basicSearchText = '';
   
-  // Propiedades para búsqueda básica/avanzada
-  public showAdvanced = false;
-  public basicSearchText = '';
+  // UI State
+  cargando: boolean = false;
+  cargandoTabla: boolean = false;
+  visible = false; // Modal borrado
+  entradaABorrar: Entrada | null = null;
+  
+  // Preview State
+  previewEntrada?: Entrada;
+  previewVisible: boolean = false;
+  @ViewChild('previewCloseBtn') previewCloseBtn?: ElementRef<HTMLButtonElement>;
 
-  // Para el buscador avanzado genérico
-  public cargarCatalogosEntrada = (): Observable<{ [key: string]: string[] }> => {
-    return this.entradaCatalogService.obtenerCatalogosEntrada();
-  };
-private readonly boundaryId = 'listado-entradas-main';
+  // System
+  private destroy$ = new Subject<void>();
+  private readonly boundaryId = 'listado-entradas-main';
+
+  // #endregion
+
   constructor(
     public commonFuncService: CommonFunctionalityService,
     private entradaService: EntradaService,
@@ -64,6 +71,8 @@ private readonly boundaryId = 'listado-entradas-main';
     private cdr: ChangeDetectorRef,
     private zone: NgZone
   ) {}
+
+  // #region Lifecycle Methods
 
   ngOnInit(): void {
     this.cargarDefinicionesBuscador();
@@ -82,6 +91,65 @@ private readonly boundaryId = 'listado-entradas-main';
     this.destroy$.complete();
     this.errorBoundaryService.unregisterBoundary(this.boundaryId);
     this.busquedaService.limpiarBusqueda();
+  }
+  
+  onBoundaryInit(boundary: ErrorBoundaryComponent): void {
+    this.errorBoundaryService.registerBoundary(this.boundaryId, boundary);
+  }
+
+  // #endregion
+
+  // #region Data Loading & Search
+
+  private cargarDefinicionesBuscador(): void {
+    this.cargando = true;
+    this.cdr.markForCheck();
+    
+    this.entradaService.obtenerDefinicionesBuscadorSafe()
+      .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.cargando = false;
+            this.cdr.detectChanges();
+          }),
+          catchError((error) => {
+            this.errorBoundaryService.reportErrorToBoundary(this.boundaryId, error, 'CargarDefinicionesBuscador');
+            return throwError(() => error);
+          })
+        )
+      .subscribe({
+        next: (response) => {
+          if (response) {
+            this.definiciones = response;
+            this.inicializarCamposBusqueda();
+          }
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.log.error('Error secundario:', error);
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  private inicializarCamposBusqueda(): void {
+    const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]) || [];
+    
+    // Ordenar campos: 'titulo' primero, luego el resto alfabéticamente
+    const camposOrdenados = [
+      ...campos.filter(k => k === 'titulo'),
+      ...campos.filter(k => k !== 'titulo').sort((a, b) => a.localeCompare(b))
+    ];
+    
+    this.campoSeleccionado = camposOrdenados[0] || '';
+    const operaciones = this.definiciones.operationPermitido?.[this.campoSeleccionado];
+    this.operacionSeleccionada = Array.isArray(operaciones) ? operaciones[0] : '';
+    this.valorBusqueda = '';
+    this.currentPage = 0;
+    
+    if (this.campoSeleccionado && this.operacionSeleccionada) {
+      this.zone.run(() => setTimeout(() => this.busquedaService.triggerBusqueda(this.valorBusqueda), 0));
+    }
   }
 
   private realizarBusquedaEntradas(term: string, page?: number) {
@@ -107,56 +175,8 @@ private readonly boundaryId = 'listado-entradas-main';
       );
   }
 
-  public toggleAdvanced(): void {
-    this.showAdvanced = !this.showAdvanced;
-  }
-
-  public onBasicSearchTextChange(text: string): void {
-    this.basicSearchText = text;
-    this.campoSeleccionado = 'titulo';
-    
-    // Intentar obtener operación válida para título, por defecto CONTAINS
-    const operaciones = this.definiciones?.operationPermitido?.['titulo'];
-    this.operacionSeleccionada = Array.isArray(operaciones) && operaciones.length > 0 ? operaciones[0] : 'CONTAINS';
-    
-    this.valorBusqueda = text;
-    this.currentPage = 0;
-    this.busquedaService.triggerBusqueda(text);
-  }
-
-  public onPageSizeChange(size: number): void {
-    this.pageSize = Number(size) || 20;
-    this.currentPage = 0;
-    // Forzar recarga
-    if (this.allEntradas.length > 0) {
-       // Si estamos en modo cliente, solo reaplicar paginación
-       // Pero como cambió el pageSize, los totales de páginas cambian.
-       this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
-       this.applyPaging();
-    } else {
-       this.busquedaService.triggerBusqueda(this.valorBusqueda);
-    }
-  }
-
-  public aplicarFiltro(filtro: any): void {
-    this.campoSeleccionado = filtro.campo;
-    this.operacionSeleccionada = filtro.operacion;
-    this.valorBusqueda = filtro.valor;
-    this.currentPage = 0;
-    this.cdr.markForCheck();
-    
-    if (this.campoSeleccionado && this.operacionSeleccionada) {
-      this.busquedaService.triggerBusqueda(this.valorBusqueda);
-    }
-  }
-
-  public onFiltroChanged(filtro: any): void {
-    // Actualizar el estado interno pero no volver a disparar la búsqueda,
-    // ya que el buscador centralizado (BusquedaService) será quien la ejecute.
-    this.campoSeleccionado = filtro.campo;
-    this.operacionSeleccionada = filtro.operacion;
-    this.valorBusqueda = filtro.valor;
-    this.currentPage = 0;
+  private procesarResultadosBusqueda(response: any) {
+    this.setPageData(response);
   }
 
   private setPageData(data: any): void {
@@ -201,6 +221,37 @@ private readonly boundaryId = 'listado-entradas-main';
     try { this.cdr.detectChanges(); } catch {}
   }
 
+  obtenerListaEntradas(page: number): void {
+    this.currentPage = page;
+    
+    if (this.allEntradas.length > 0) {
+        // Paginación cliente
+        this.applyPaging();
+    } else {
+        // Paginación servidor
+        this.busquedaService.searchNow(this.valorBusqueda, this.currentPage)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => this.procesarResultadosBusqueda(response),
+            error: (error) => this.mostrarError('Error en búsqueda: ' + error)
+          });
+    }
+    this.cdr.markForCheck();
+  }
+  
+  refrescarDatos(): void {
+    this.currentPage = 0;
+    this.busquedaService.triggerBusqueda(this.valorBusqueda);
+  }
+
+  public cargarCatalogosEntrada = (): Observable<{ [key: string]: string[] }> => {
+    return this.entradaCatalogService.obtenerCatalogosEntrada();
+  };
+
+  // #endregion
+
+  // #region Pagination
+
   private applyPaging(): void {
     if (this.allEntradas.length > 0) {
       const start = this.currentPage * this.pageSize;
@@ -219,87 +270,17 @@ private readonly boundaryId = 'listado-entradas-main';
     try { this.cdr.detectChanges(); } catch {}
   }
 
-  private procesarResultadosBusqueda(response: any) {
-    this.setPageData(response);
-  }
-
-  private cargarDefinicionesBuscador(): void {
-    this.cargando = true;
-    this.cdr.markForCheck();
-    
-    this.entradaService.obtenerDefinicionesBuscadorSafe()
-      .pipe(
-          takeUntil(this.destroy$),
-          finalize(() => {
-            this.cargando = false;
-            this.cdr.detectChanges();
-          }),
-          catchError((error) => {
-            // Reportar al boundary específico
-            this.errorBoundaryService.reportErrorToBoundary(
-              this.boundaryId, 
-              error,
-              'CargarDefinicionesBuscador'
-            );
-            
-            return throwError(() => error);
-          })
-        )
-      .subscribe({
-        next: (response) => {
-          if (response) {
-            this.definiciones = response;
-            this.inicializarCamposBusqueda();
-          }
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          this.log.error('Error secundario:', error);
-          this.cdr.markForCheck();
-        }
-      });
-  }
-
-   onBoundaryInit(boundary: ErrorBoundaryComponent): void {
-    this.errorBoundaryService.registerBoundary(this.boundaryId, boundary);
-  }
-
-  private inicializarCamposBusqueda(): void {
-    const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]) || [];
-    
-    // Ordenar campos: 'titulo' primero, luego el resto alfabéticamente
-    const camposOrdenados = [
-      ...campos.filter(k => k === 'titulo'),
-      ...campos.filter(k => k !== 'titulo').sort((a, b) => a.localeCompare(b))
-    ];
-    
-    this.campoSeleccionado = camposOrdenados[0] || '';
-    const operaciones = this.definiciones.operationPermitido?.[this.campoSeleccionado];
-    this.operacionSeleccionada = Array.isArray(operaciones) ? operaciones[0] : '';
-    this.valorBusqueda = '';
+  public onPageSizeChange(size: number): void {
+    this.pageSize = Number(size) || 20;
     this.currentPage = 0;
-    
-    if (this.campoSeleccionado && this.operacionSeleccionada) {
-      this.zone.run(() => setTimeout(() => this.busquedaService.triggerBusqueda(this.valorBusqueda), 0));
-    }
-  }
-
-  obtenerListaEntradas(page: number): void {
-    this.currentPage = page;
-    
+    // Forzar recarga
     if (this.allEntradas.length > 0) {
-        // Paginación cliente
-        this.applyPaging();
+       // Si estamos en modo cliente, solo reaplicar paginación
+       this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
+       this.applyPaging();
     } else {
-        // Paginación servidor
-        this.busquedaService.searchNow(this.valorBusqueda, this.currentPage)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: (response) => this.procesarResultadosBusqueda(response),
-            error: (error) => this.mostrarError('Error en búsqueda: ' + error)
-          });
+       this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
-    this.cdr.markForCheck();
   }
 
   onPrev(): void {
@@ -318,11 +299,50 @@ private readonly boundaryId = 'listado-entradas-main';
     return this.currentPage >= Math.max(0, this.totalPages - 1);
   }
 
-  checkFechaPublicacion(fechaPublicacion: Date): string {
-    return fechaPublicacion
-      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', false)
-      : 'No publicada';
+  // #endregion
+
+  // #region Filter & Search Actions
+
+  public toggleAdvanced(): void {
+    this.showAdvanced = !this.showAdvanced;
   }
+
+  public onBasicSearchTextChange(text: string): void {
+    this.basicSearchText = text;
+    this.campoSeleccionado = 'titulo';
+    
+    // Intentar obtener operación válida para título, por defecto CONTAINS
+    const operaciones = this.definiciones?.operationPermitido?.['titulo'];
+    this.operacionSeleccionada = Array.isArray(operaciones) && operaciones.length > 0 ? operaciones[0] : 'CONTAINS';
+    
+    this.valorBusqueda = text;
+    this.currentPage = 0;
+    this.busquedaService.triggerBusqueda(text);
+  }
+
+  public aplicarFiltro(filtro: any): void {
+    this.campoSeleccionado = filtro.campo;
+    this.operacionSeleccionada = filtro.operacion;
+    this.valorBusqueda = filtro.valor;
+    this.currentPage = 0;
+    this.cdr.markForCheck();
+    
+    if (this.campoSeleccionado && this.operacionSeleccionada) {
+      this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    }
+  }
+
+  public onFiltroChanged(filtro: any): void {
+    // Actualizar el estado interno pero no volver a disparar la búsqueda
+    this.campoSeleccionado = filtro.campo;
+    this.operacionSeleccionada = filtro.operacion;
+    this.valorBusqueda = filtro.valor;
+    this.currentPage = 0;
+  }
+
+  // #endregion
+
+  // #region CRUD Actions (Delete)
 
   borrarEntrada(entrada: Entrada): void {
     this.entradaABorrar = entrada;
@@ -352,11 +372,6 @@ private readonly boundaryId = 'listado-entradas-main';
     }
   }
 
-  private mostrarError(mensaje: string): void {
-    this.toastService.showError(mensaje, 'Error');
-    this.cdr.markForCheck();
-  }
-
   toggleModal(): void {
     this.visible = !this.visible;
     if (!this.visible) {
@@ -374,20 +389,14 @@ private readonly boundaryId = 'listado-entradas-main';
     try { this.cdr.detectChanges(); } catch {}
   }
 
-  refrescarDatos(): void {
-    this.currentPage = 0;
-    this.busquedaService.triggerBusqueda(this.valorBusqueda);
-  }
+  // #endregion
 
-  // Preview handling
-  public previewEntrada?: Entrada;
-  public previewVisible: boolean = false;
+  // #region Preview Modal
 
   openPreview(entrada: Entrada): void {
     this.previewEntrada = entrada;
     this.previewVisible = true;
-    // Dar foco al botón de cerrar del modal para accesibilidad (delay corto
-    // para esperar a que el modal se renderice).
+    // Dar foco al botón de cerrar del modal para accesibilidad
     setTimeout(() => {
       try {
         this.previewCloseBtn?.nativeElement?.focus();
@@ -411,23 +420,34 @@ private readonly boundaryId = 'listado-entradas-main';
 
   onEditarDesdePreview(): void {
     if (this.previewEntrada && this.previewEntrada.idEntrada) {
-      // Navegar a la ruta de edición
       this.router.navigate(['/admin/control/entradas/editar', this.previewEntrada.idEntrada]);
       this.closePreview();
     }
   }
 
   onPublicarDesdePreview(entrada: Entrada): void {
-    // Si existe un endpoint para publicar, se llamaría aquí. Por ahora, cerramos la preview
-    // y mostramos un toast informativo.
     this.closePreview();
     this.toastService.showInfo('Solicitud de publicación enviada (acción no implementada).', 'Publicar');
   }
 
-  @ViewChild('previewCloseBtn') previewCloseBtn?: ElementRef<HTMLButtonElement>;
+  // #endregion
 
-  // Método para trackBy en *ngFor (mejora rendimiento)
+  // #region Helpers
+
+  checkFechaPublicacion(fechaPublicacion: Date): string {
+    return fechaPublicacion
+      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', false)
+      : 'No publicada';
+  }
+
   trackByEntradaId(index: number, entrada: Entrada): number {
     return entrada.idEntrada;
   }
+
+  private mostrarError(mensaje: string): void {
+    this.toastService.showError(mensaje, 'Error');
+    this.cdr.markForCheck();
+  }
+
+  // #endregion
 }
