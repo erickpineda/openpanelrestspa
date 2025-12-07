@@ -8,6 +8,7 @@ import { Rol } from '../../../../core/models/rol.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
+import { OPConstants } from '../../../../shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-usuarios-list',
@@ -15,6 +16,8 @@ import { SearchUtilService } from '../../../../core/services/utils/search-util.s
   styleUrls: ['./usuarios-list.component.scss']
 })
 export class UsuariosListComponent implements OnInit, OnDestroy {
+  readonly PROPIETARIO_ROLE_ID = OPConstants.Roles.PROPIETARIO;
+
   loading = false;
   error: string | null = null;
   usuarios: Usuario[] = [];
@@ -94,8 +97,13 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
         // Let's try to map by name if idRol is missing.
         // Known roles: PROPIETARIO(1), ADMINISTRADOR(2), MANTENIMIENTO(3), EDITOR(4), DESARROLLADOR(5), AUTOR(6), LECTOR(7)
         const roleMap: {[key: string]: number} = {
-          'PROPIETARIO': 1, 'ADMINISTRADOR': 2, 'MANTENIMIENTO': 3, 'EDITOR': 4, 
-          'DESARROLLADOR': 5, 'AUTOR': 6, 'LECTOR': 7
+          'PROPIETARIO': OPConstants.Roles.PROPIETARIO, 
+          'ADMINISTRADOR': OPConstants.Roles.ADMINISTRADOR, 
+          'MANTENIMIENTO': OPConstants.Roles.MANTENIMIENTO, 
+          'EDITOR': OPConstants.Roles.EDITOR, 
+          'DESARROLLADOR': OPConstants.Roles.DESARROLLADOR, 
+          'AUTOR': OPConstants.Roles.AUTOR, 
+          'LECTOR': OPConstants.Roles.LECTOR
         };
 
         this.roles = roles.map((rol: any) => {
@@ -162,8 +170,18 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   delete(u: Usuario): void {
     if (!u.idUsuario) return;
+    // Protección para evitar borrar al propietario
+    if (u.idRol === this.PROPIETARIO_ROLE_ID) {
+      this.toast.showWarning('No se puede eliminar al usuario Propietario', 'Acción no permitida');
+      return;
+    }
     this.userToDelete = u;
     this.showDeleteModal = true;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.userToDelete = null;
   }
 
   confirmDelete(): void {
@@ -190,10 +208,5 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
           this.userToDelete = null;
         }
       });
-  }
-
-  cancelDelete(): void {
-    this.showDeleteModal = false;
-    this.userToDelete = null;
   }
 }

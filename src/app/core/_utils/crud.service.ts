@@ -6,13 +6,14 @@ import { OpenpanelApiResponse } from '../models/openpanel-api-response.model';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { NetworkInterceptor } from '../interceptor/network.interceptor';
+import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Injectable({
   providedIn: 'root',
 })
 export abstract class CrudService<T, ID> extends BaseService {
   protected abstract endpoint: string;
-  protected pageSizeParam: string = 'pageSize';
+  protected pageSizeParam: string = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
   constructor(
     protected override http: HttpClient,
@@ -26,7 +27,7 @@ export abstract class CrudService<T, ID> extends BaseService {
    */
   listarSafe(pageNo?: number, pageSize?: number): Observable<T[]> {
     const params: any = {};
-    if (pageNo != null) params.pageNo = String(pageNo);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
 
     return this.safeGetList<T>(
@@ -42,7 +43,7 @@ export abstract class CrudService<T, ID> extends BaseService {
    */
   listarSafeSinGlobalLoader(pageNo?: number, pageSize?: number): Observable<T[]> {
     const params: any = {};
-    if (pageNo != null) params.pageNo = String(pageNo);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
 
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
@@ -125,7 +126,7 @@ export abstract class CrudService<T, ID> extends BaseService {
     pageSize?: number
   ): Observable<OpenpanelApiResponse<any>> {
     const params: any = {};
-    if (pageNo != null) params.pageNo = String(pageNo);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     return this.get<any>(this.endpoint, params);
   }
@@ -134,7 +135,9 @@ export abstract class CrudService<T, ID> extends BaseService {
     pageNo: number,
     pageSize: number
   ): Observable<OpenpanelApiResponse<any>> {
-    const params = { pageNo: pageNo.toString(), [this.pageSizeParam]: pageSize.toString() };
+    const params: any = {};
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.get<any>(this.endpoint, params, undefined, context);
   }

@@ -79,7 +79,7 @@
             <td>
               <div class="btn-group">
                 <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(u)"><svg cIcon name="cilPencil"></svg></button>
-                <button cButton color="danger" size="sm" variant="outline" (click)="delete(u)"><svg cIcon name="cilTrash"></svg></button>
+                <button cButton color="danger" size="sm" variant="outline" (click)="delete(u)" [disabled]="u.idRol === PROPIETARIO_ROLE_ID"><svg cIcon name="cilTrash"></svg></button>
               </div>
             </td>
           </tr>
@@ -126,11 +126,14 @@
       </div>
       <div class="mb-3">
         <label class="form-label">Rol</label>
-        <select cSelect [value]="editUser.idRol" (change)="editUser && (editUser.idRol = $any($event.target).value ? +$any($event.target).value : 0)" [class.is-invalid]="!editUser.idRol || editUser.idRol <= 0">
+        <select cSelect [value]="editUser.idRol" (change)="editUser && (editUser.idRol = $any($event.target).value ? +$any($event.target).value : 0)" [class.is-invalid]="!editUser.idRol || editUser.idRol <= 0" [disabled]="editUser.idRol === PROPIETARIO_ROLE_ID">
           <option value="">Seleccione rol</option>
           <option *ngFor="let r of roles" [value]="r.idRol">{{ r.nombre }}</option>
         </select>
         <div class="invalid-feedback d-block" *ngIf="!editUser.idRol || editUser.idRol <= 0">Rol requerido</div>
+        <div class="text-info small mt-1" *ngIf="editUser.idRol === PROPIETARIO_ROLE_ID">
+          <svg cIcon name="cilLockLocked" size="sm"></svg> El rol de Propietario no se puede modificar.
+        </div>
       </div>
     </div>
   </c-modal-body>

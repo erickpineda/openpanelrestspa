@@ -8,13 +8,14 @@ import { PerfilResponse } from "../../models/perfil-response.model";
 import { OpenpanelApiResponse } from "../../models/openpanel-api-response.model";
 import { NetworkInterceptor } from "../../interceptor/network.interceptor";
 import { PaginaResponse } from "../../models/pagina-response.model";
+import { OPConstants } from "src/app/shared/constants/op-global.constants";
 
 @Injectable({
   providedIn: "root"
 })
 export class UsuarioService extends CrudService<Usuario, number> {
   protected override endpoint = '/usuarios';
-  protected override pageSizeParam = 'pageSize';
+  protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
   constructor(
     protected override http: HttpClient,
@@ -26,7 +27,9 @@ export class UsuarioService extends CrudService<Usuario, number> {
   // ✅ Métodos migrados de UsuariosService
 
   buscarSafe(searchRequest: any, pageNo: number, pageSize: number): Observable<PaginaResponse> {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+    const params: any = {};
+    params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
+    params[this.pageSizeParam] = pageSize.toString();
     const context = new HttpContext();
     return this.safePostData<PaginaResponse>(
       `${this.endpoint}/buscar`,
@@ -40,7 +43,9 @@ export class UsuarioService extends CrudService<Usuario, number> {
   }
 
   buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<any> {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
+    const params: any = {};
+    params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
+    params[this.pageSizeParam] = pageSize.toString();
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.post<any>(`${this.endpoint}/buscar`, searchRequest, params, undefined, context);
   }

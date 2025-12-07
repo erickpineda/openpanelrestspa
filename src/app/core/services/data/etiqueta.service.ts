@@ -4,6 +4,7 @@ import { CrudService } from "../../_utils/crud.service";
 import { Observable } from "rxjs";
 import { HttpContext } from '@angular/common/http';
 import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { OPConstants } from "src/app/shared/constants/op-global.constants";
 
 export interface AsociacionEtiquetaDTO {
   etiquetaId: number;
@@ -16,7 +17,7 @@ export interface AsociacionEtiquetaDTO {
 })
 export class EtiquetaService extends CrudService<Etiqueta, number> {
   protected endpoint = '/etiquetas';
-  protected override pageSizeParam = 'pageSize';
+  protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
   override listarPagina(pageNo?: number, pageSize?: number): Observable<any> {
     if (pageNo != null && pageSize != null) {
@@ -43,15 +44,15 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
 
   buscar(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
     const params: any = {};
-    if (pageNo != null) params.pageNo = String(pageNo);
-    if (pageSize != null) params.pageSize = String(pageSize);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     return this.post<any>(`${this.endpoint}/buscar`, payload, params);
   }
 
   buscarSinGlobalLoader(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
     const params: any = {};
-    if (pageNo != null) params.pageNo = String(pageNo);
-    if (pageSize != null) params.pageSize = String(pageSize);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.post<any>(`${this.endpoint}/buscar`, payload, params, undefined, context);
   }

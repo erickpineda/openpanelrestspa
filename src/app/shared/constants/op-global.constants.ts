@@ -40,8 +40,22 @@ export const OPConstants = {
     SAVE_FORM_DATA: 'saveFormData',
   },
   Sync: {
-    TYPE_LOGIN: 'LOGIN',
-    TYPE_LOGOUT: 'LOGOUT',
-    TYPE_CHANGED: 'CHANGED',
+    TYPE_LOGIN: 'auth:sync:login',
+    TYPE_LOGOUT: 'auth:sync:logout',
+    TYPE_CHANGED: 'auth:sync:changed'
+  },
+  Pagination: {
+    PAGE_NO_PARAM: 'pageNo',
+    PAGE_SIZE_PARAM: 'pageSize',
+    DEFAULT_PAGE_SIZE: 10
+  },
+  Roles: {
+    PROPIETARIO: 1,
+    ADMINISTRADOR: 2,
+    MANTENIMIENTO: 3,
+    EDITOR: 4,
+    DESARROLLADOR: 5,
+    AUTOR: 6,
+    LECTOR: 7
   }
 } as const;
