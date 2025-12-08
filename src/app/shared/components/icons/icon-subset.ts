@@ -55,6 +55,8 @@ import {
   cilExternalLink,
   cilFile,
   cilHome,
+  cilImage,
+  cilImagePlus,
   cilInbox,
   cilIndentDecrease,
   cilIndentIncrease,
@@ -108,6 +110,10 @@ import {
   cilWarning,
   cilX,
   cilContact,
+  cilHistory,
+  cilShieldAlt,
+  cilPaintBucket,
+  cilEqualizer,
 } from '@coreui/icons';
 
 export const iconSubset = {
@@ -168,6 +174,8 @@ export const iconSubset = {
   cilExternalLink,
   cilFile,
   cilHome,
+  cilImage,
+  cilImagePlus,
   cilInbox,
   cilIndentDecrease,
   cilIndentIncrease,
@@ -219,7 +227,11 @@ export const iconSubset = {
   cilUserFollow,
   cilUserUnfollow,
   cilWarning,
-  cilX
+  cilX,
+  cilHistory,
+  cilShieldAlt,
+  cilPaintBucket,
+  cilEqualizer
 };
 
 export enum IconSubset {
@@ -331,5 +343,11 @@ export enum IconSubset {
   cilUserFollow = 'cilUserFollow',
   cilUserUnfollow = 'cilUserUnfollow',
   cilWarning = 'cilWarning',
-  cilX = 'cilX'
+  cilX = 'cilX',
+  cilHistory = 'cilHistory',
+  cilShieldAlt = 'cilShieldAlt',
+  cilPaintBucket = 'cilPaintBucket',
+  cilEqualizer = 'cilEqualizer',
+  cilImage = 'cilImage',
+  cilImagePlus = 'cilImagePlus'
 }

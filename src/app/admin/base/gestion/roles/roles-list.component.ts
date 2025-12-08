@@ -8,7 +8,7 @@ import { Privilegio } from '../../../../core/models/privilegio.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
-import { OPConstants } from 'src/app/shared/constants/op-global.constants';
+import { OPConstants } from '../../../../shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-roles-list',
@@ -105,7 +105,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
   loadPrivilegios(): void {
     // Cargar todos los privilegios disponibles para el selector (usando un tamaño de página grande para traer todos)
-    this.privilegioService.listarSafe(0, 1000)
+    this.privilegioService.listarSafe(0, 50)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (privilegios) => {

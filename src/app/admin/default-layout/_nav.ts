@@ -12,32 +12,37 @@ export const navItems: INavData[] = [
   },
   {
     title: true,
-    name: 'WEB'
+    name: 'Gestión de Contenidos'
   },
   {
     name: 'Entradas',
-    iconComponent: { name: 'cil-pencil' },
     url: '/admin/control/entradas',
+    iconComponent: { name: 'cil-pencil' },
     children: [
       {
         name: 'Listar',
         url: '/admin/control/entradas',
-        icon: 'cil-save',
-        badge: {
-          color: 'warning',
-          text: ''
-        }
+        icon: 'cil-list',
       },
-      // ✅ NUEVO: Enlace al gestor de entradas temporales
       {
         name: 'Entradas Temporales',
         url: '/admin/control/entradas/entradas-temporales',
-        icon: 'cil-save',
+        icon: 'cil-history',
         badge: {
           color: 'warning',
-          text: '!' // Se podría hacer dinámico mostrando el count
+          text: '!'
         }
       },
+      {
+        name: 'Categorías',
+        url: '/admin/control/categorias',
+        icon: 'cil-spreadsheet'
+      },
+      {
+        name: 'Etiquetas',
+        url: '/admin/control/etiquetas',
+        icon: 'cil-tags'
+      }
     ]
   },
   {
@@ -47,10 +52,20 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-library' }
   },
   {
-    name: 'Categorías',
-    url: '/admin/control/categorias',
-    linkProps: { fragment: '' },
-    iconComponent: { name: 'cil-spreadsheet' }
+    name: 'Multimedia',
+    iconComponent: { name: 'cil-image' },
+    children: [
+      {
+        name: 'Imágenes',
+        url: '/admin/control/contenido/imagenes',
+        icon: 'cil-image-plus'
+      },
+      {
+        name: 'Archivos',
+        url: '/admin/control/contenido/archivos',
+        icon: 'cil-file'
+      },
+    ]
   },
   {
     name: 'Comentarios',
@@ -59,70 +74,55 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-comment-square' }
   },
   {
-    name: 'Contenido',
-    title: true
-  },
-  {
-    name: 'Multimedia',
-    iconComponent: { name: 'cil-puzzle' },
-    url: '/admin/control/contenido/imagenes',
-    children: [
-      {
-        name: 'Imágenes',
-        url: '/admin/control/contenido/imagenes'
-      },
-      {
-        name: 'Archivos',
-        url: '/admin/control/contenido/archivos'
-      },
-    ]
-  },
-  {
-    name: 'Etiquetas',
-    url: '/admin/control/etiquetas',
-    iconComponent: { name: 'cil-pin' }
-  },
-  {
     title: true,
-    name: 'Gestión'
+    name: 'Administración'
   },
   {
-    name: 'Usuarios',
-    iconComponent: { name: 'cil-people' },
-    url: '/admin/control/gestion/usuarios',
+    name: 'Control de Acceso',
+    iconComponent: { name: 'cil-shield-alt' },
+    url: '/admin/control/gestion',
     children: [
       {
-        name: 'Listar',
-        url: '/admin/control/gestion/usuarios'
+        name: 'Usuarios',
+        url: '/admin/control/gestion/usuarios',
+        icon: 'cil-people'
       },
       {
-        name: 'Mi Perfil',
-        url: '/admin/control/gestion/miperfil'
-      },
-      {
-        name: 'Cambiar contraseña',
-        url: '/admin/control/gestion/changepassword'
-      },
+        name: 'Roles y Privilegios',
+        url: '/admin/control/gestion/roles',
+        icon: 'cil-lock-locked'
+      }
     ]
   },
   {
-    name: 'Roles',
-    iconComponent: { name: 'cil-lock-locked' },
-    url: '/admin/control/gestion/roles'
-  },
-  {
-    name: 'Configruración',
-    iconComponent: { name: 'cil-cog' },
-    url: '/admin/control/configuracion/temas',
+    name: 'Configuración',
+    iconComponent: { name: 'cil-settings' },
+    url: '/admin/control/configuracion',
     children: [
       {
         name: 'Temas',
-        url: '/admin/control/configuracion/temas'
+        url: '/admin/control/configuracion/temas',
+        icon: 'cil-paint-bucket'
       },
       {
         name: 'Ajustes',
-        url: '/admin/control/configuracion/ajustes'
+        url: '/admin/control/configuracion/ajustes',
+        icon: 'cil-equalizer'
       },
     ]
   },
+  {
+    title: true,
+    name: 'Mi Cuenta'
+  },
+  {
+    name: 'Mi Perfil',
+    url: '/admin/control/gestion/miperfil',
+    iconComponent: { name: 'cil-user' }
+  },
+  {
+    name: 'Cambiar contraseña',
+    url: '/admin/control/gestion/changepassword',
+    iconComponent: { name: 'cil-lock-locked' }
+  }
 ];
