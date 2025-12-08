@@ -106,6 +106,11 @@ export const navItems: INavData[] = [
     ]
   },
   {
+    name: 'Roles',
+    iconComponent: { name: 'cil-lock-locked' },
+    url: '/admin/control/gestion/roles'
+  },
+  {
     name: 'Configruración',
     iconComponent: { name: 'cil-cog' },
     url: '/admin/control/configuracion/temas',
