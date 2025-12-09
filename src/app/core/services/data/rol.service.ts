@@ -68,8 +68,9 @@ export class RolService extends CrudService<Rol, string> {
     );
   }
 
-  actualizarPrivilegios(codigo: string, privilegios: any[]): Observable<any> {
-    return this.put<any>(`${this.endpoint}/actualizarPrivilegios/${codigo}`, privilegios);
+  actualizarPrivilegios(codigo: string, codigosPrivilegios: string[]): Observable<any> {
+    const payload = { codigosPrivilegios };
+    return this.put<any>(`${this.endpoint}/actualizarPrivilegios/${codigo}`, payload);
   }
 
 }

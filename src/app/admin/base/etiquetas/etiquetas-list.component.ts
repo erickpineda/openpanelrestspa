@@ -50,8 +50,14 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void { this.loadEtiquetas(); }
-  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
+  ngOnInit(): void {
+    this.loadEtiquetas();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   loadEtiquetas(): void {
     this.loading = true;
@@ -98,17 +104,52 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
       });
   }
 
-  onSearch(): void { this.pageNo = 0; this.loadEtiquetas(); }
-  onPageChange(page: number): void { this.pageNo = Math.max(0, page); this.loadEtiquetas(); }
+  onSearch(): void {
+    this.pageNo = 0;
+    this.loadEtiquetas();
+  }
 
-  onBasicSearchTextChange(text: string): void { this.basicSearchText = text; this.onSearch(); }
-  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 5; this.onPageChange(0); this.applyPaging(); }
-  onPrev(): void { if (this.pageNo > 0) { this.onPageChange(this.pageNo - 1); } }
-  onNext(): void { if (this.pageNo < Math.max(0, this.getTotalPages() - 1)) { this.onPageChange(this.pageNo + 1); } }
-  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
+  onPageChange(page: number): void {
+    this.pageNo = Math.max(0, page);
+    this.loadEtiquetas();
+  }
 
-  onCreate(): void { this.selectedEtiqueta = null; this.showCreateModal = true; }
-  onEdit(etiqueta: Etiqueta): void { this.selectedEtiqueta = { ...etiqueta }; this.showEditModal = true; }
+  onBasicSearchTextChange(text: string): void {
+    this.basicSearchText = text;
+    this.onSearch();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = Number(size) || 5;
+    this.onPageChange(0);
+    this.applyPaging();
+  }
+
+  onPrev(): void {
+    if (this.pageNo > 0) {
+      this.onPageChange(this.pageNo - 1);
+    }
+  }
+
+  onNext(): void {
+    if (this.pageNo < Math.max(0, this.getTotalPages() - 1)) {
+      this.onPageChange(this.pageNo + 1);
+    }
+  }
+
+  toggleAdvanced(): void {
+    this.showAdvanced = !this.showAdvanced;
+  }
+
+  onCreate(): void {
+    this.selectedEtiqueta = null;
+    this.showCreateModal = true;
+  }
+
+  onEdit(etiqueta: Etiqueta): void {
+    this.selectedEtiqueta = { ...etiqueta };
+    this.showEditModal = true;
+  }
 
   onDelete(etiqueta: Etiqueta): void {
     this.etiquetaToDelete = etiqueta;
@@ -116,28 +157,63 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(): void {
-    if (!this.etiquetaToDelete?.idEtiqueta) { this.showDeleteModal = false; return; }
+    if (!this.etiquetaToDelete?.idEtiqueta) {
+      this.showDeleteModal = false;
+      return;
+    }
     this.loading = true;
     this.etiquetasService.borrar(this.etiquetaToDelete.idEtiqueta!)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.toast.showSuccess('Etiqueta eliminada', 'Etiquetas'); this.loading = false; this.showDeleteModal = false; this.etiquetaToDelete = null; this.loadEtiquetas(); },
-        error: (error: any) => { this.toast.showError('Error eliminando etiqueta', 'Etiquetas'); this.log.error('etiquetas eliminar', error); this.loading = false; this.showDeleteModal = false; this.etiquetaToDelete = null; }
+        next: () => {
+          this.toast.showSuccess('Etiqueta eliminada', 'Etiquetas');
+          this.loading = false;
+          this.showDeleteModal = false;
+          this.etiquetaToDelete = null;
+          this.loadEtiquetas();
+        },
+        error: (error: any) => {
+          this.toast.showError('Error eliminando etiqueta', 'Etiquetas');
+          this.log.error('etiquetas eliminar', error);
+          this.loading = false;
+          this.showDeleteModal = false;
+          this.etiquetaToDelete = null;
+        }
       });
   }
 
-  cancelDelete(): void { this.showDeleteModal = false; this.etiquetaToDelete = null; }
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.etiquetaToDelete = null;
+  }
 
-  onModalClose(): void { this.showCreateModal = false; this.showEditModal = false; this.selectedEtiqueta = null; }
-  onModalSave(): void { this.onModalClose(); this.onPageChange(0); }
+  onModalClose(): void {
+    this.showCreateModal = false;
+    this.showEditModal = false;
+    this.selectedEtiqueta = null;
+  }
+
+  onModalSave(): void {
+    this.onModalClose();
+    this.onPageChange(0);
+  }
 
   onModalVisibleChange(visible: boolean): void {
     if (!visible) { this.onModalClose(); }
   }
 
-  getPaginationArray(): number[] { const totalPages = this.getTotalPages(); return Array.from({ length: totalPages }, (_, i) => i); }
-  getTotalPages(): number { return Math.max(1, Number(this.totalPages || Math.ceil(this.totalItems / this.pageSize) || 1)); }
-  isNextDisabled(): boolean { return this.pageNo >= Math.max(0, this.getTotalPages() - 1); }
+  getPaginationArray(): number[] {
+    const totalPages = this.getTotalPages();
+    return Array.from({ length: totalPages }, (_, i) => i);
+  }
+
+  getTotalPages(): number {
+    return Math.max(1, Number(this.totalPages || Math.ceil(this.totalItems / this.pageSize) || 1));
+  }
+
+  isNextDisabled(): boolean {
+    return this.pageNo >= Math.max(0, this.getTotalPages() - 1);
+  }
 
   private setPageData(data: PaginaResponse): void {
     const raw = (data?.elements ?? (data as any)?.items ?? (data as any)?.content ?? []) as any[];

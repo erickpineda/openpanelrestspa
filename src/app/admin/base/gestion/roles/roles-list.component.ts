@@ -243,18 +243,39 @@ export class RolesListComponent implements OnInit, OnDestroy {
     if (!this.editRol) return;
     if (checked) {
       // Agregar si no existe
-      if (!this.editRol.privilegios.some(p => p.idPrivilegio === privilegio.idPrivilegio)) {
+      if (!this.editRol.privilegios.some(p => p.codigo === privilegio.codigo)) {
         this.editRol.privilegios.push(privilegio);
       }
     } else {
       // Remover
-      this.editRol.privilegios = this.editRol.privilegios.filter(p => p.idPrivilegio !== privilegio.idPrivilegio);
+      this.editRol.privilegios = this.editRol.privilegios.filter(p => p.codigo !== privilegio.codigo);
     }
   }
 
   hasPrivilegio(privilegio: Privilegio): boolean {
     if (!this.editRol || !this.editRol.privilegios) return false;
     return this.editRol.privilegios.some(p => p.idPrivilegio === privilegio.idPrivilegio);
+  }
+
+  areAllPrivilegiosSelected(): boolean {
+    if (!this.editRol || !this.editRol.privilegios || this.privilegios.length === 0) return false;
+    // Comprobar si todos los privilegios disponibles están en la lista de privilegios del rol
+    // Usamos idPrivilegio para comparar
+    const rolPrivilegiosIds = this.editRol.privilegios.map(p => p.idPrivilegio);
+    return this.privilegios.every(p => rolPrivilegiosIds.includes(p.idPrivilegio));
+  }
+
+  toggleAllPrivilegios(checked: boolean): void {
+    if (!this.editRol) return;
+    
+    if (checked) {
+      // Agregar todos los que faltan
+      // Clonamos para evitar referencias cruzadas
+      this.editRol.privilegios = JSON.parse(JSON.stringify(this.privilegios));
+    } else {
+      // Quitar todos
+      this.editRol.privilegios = [];
+    }
   }
 
   saveEdit(): void {
@@ -279,8 +300,9 @@ export class RolesListComponent implements OnInit, OnDestroy {
         // Si el backend devuelve el objeto, lo usamos.
         const rolCode = this.isEditing ? this.editRol!.codigo : (res?.codigo || res?.data?.codigo || this.editRol!.codigo);
         
-        if (privilegios && privilegios.length >= 0) {
-          return this.rolService.actualizarPrivilegios(rolCode, privilegios);
+        if (privilegios && privilegios.length > 0) {
+          const codigos = privilegios.map(p => p.codigo);
+          return this.rolService.actualizarPrivilegios(rolCode, codigos);
         }
         return of(res);
       })

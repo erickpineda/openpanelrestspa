@@ -49,7 +49,10 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void { this.loadRoles(); this.load(); }
+  ngOnInit(): void {
+    this.loadRoles();
+    this.load();
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -57,28 +60,41 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   }
 
   load(pageNo = this.pageNo): void {
-    this.loading = true; this.error = null;
+    this.loading = true;
+    this.error = null;
     const hasFilters = !!(this.filtroUsuario || this.filtroRolId != null || this.filtroEmailConfirmado != null);
+    
     const handleResponse = (r: any) => {
       const data = r?.data || r;
       const list = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
       this.usuarios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
     };
-    const handleError = (err: any) => { this.error = 'Error cargando usuarios'; this.log.error('usuarios listar', err); };
+    
+    const handleError = (err: any) => {
+      this.error = 'Error cargando usuarios';
+      this.log.error('usuarios listar', err);
+    };
     
     if (!hasFilters) {
       this.usuarioService.listarPaginaSinGlobalLoader(pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+        .pipe(takeUntil(this.destroy$), finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }))
         .subscribe({ next: handleResponse, error: handleError });
     } else {
       const criteria: { filterKey: string; value: any; operation: string }[] = [];
       if (this.filtroUsuario) criteria.push({ filterKey: 'username', value: this.filtroUsuario, operation: 'CONTAINS' });
       if (this.filtroRolId != null) criteria.push({ filterKey: 'idRol', value: String(this.filtroRolId), operation: 'EQUAL' });
       if (this.filtroEmailConfirmado != null) criteria.push({ filterKey: 'emailConfirmado', value: String(this.filtroEmailConfirmado), operation: 'EQUAL' });
+      
       const payload = this.searchUtil.buildRequest('Usuario', criteria, 'ALL');
       this.usuarioService.buscarSinGlobalLoader(payload, pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+        .pipe(takeUntil(this.destroy$), finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }))
         .subscribe({ next: handleResponse, error: handleError });
     }
   }
@@ -87,56 +103,110 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     this.rolService.listarPagina(0, 50)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-      next: (r: any) => {
-        const data = r?.data || r;
-        let roles = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data?.content) ? data.content : (Array.isArray(data) ? data : []));
-        
-        // Fix: API returns roles without idRol, so we need to map them manually based on name/index if needed, 
-        // but ideally backend should return IDs. Since we can't change backend now and we know the order/names:
-        // The user provided DB json shows IDs 1..7. Assuming the list is ordered or we map by name.
-        // Let's try to map by name if idRol is missing.
-        // Known roles: PROPIETARIO(1), ADMINISTRADOR(2), MANTENIMIENTO(3), EDITOR(4), DESARROLLADOR(5), AUTOR(6), LECTOR(7)
-        const roleMap: {[key: string]: number} = {
-          'PROPIETARIO': OPConstants.Roles.PROPIETARIO, 
-          'ADMINISTRADOR': OPConstants.Roles.ADMINISTRADOR, 
-          'MANTENIMIENTO': OPConstants.Roles.MANTENIMIENTO, 
-          'EDITOR': OPConstants.Roles.EDITOR, 
-          'DESARROLLADOR': OPConstants.Roles.DESARROLLADOR, 
-          'AUTOR': OPConstants.Roles.AUTOR, 
-          'LECTOR': OPConstants.Roles.LECTOR
-        };
+        next: (r: any) => {
+          const data = r?.data || r;
+          let roles = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data?.content) ? data.content : (Array.isArray(data) ? data : []));
+          
+          // Fix: API returns roles without idRol, so we need to map them manually based on name/index if needed, 
+          // but ideally backend should return IDs. Since we can't change backend now and we know the order/names:
+          // The user provided DB json shows IDs 1..7. Assuming the list is ordered or we map by name.
+          // Let's try to map by name if idRol is missing.
+          // Known roles: PROPIETARIO(1), ADMINISTRADOR(2), MANTENIMIENTO(3), EDITOR(4), DESARROLLADOR(5), AUTOR(6), LECTOR(7)
+          const roleMap: {[key: string]: number} = {
+            'PROPIETARIO': OPConstants.Roles.PROPIETARIO, 
+            'ADMINISTRADOR': OPConstants.Roles.ADMINISTRADOR, 
+            'MANTENIMIENTO': OPConstants.Roles.MANTENIMIENTO, 
+            'EDITOR': OPConstants.Roles.EDITOR, 
+            'DESARROLLADOR': OPConstants.Roles.DESARROLLADOR, 
+            'AUTOR': OPConstants.Roles.AUTOR, 
+            'LECTOR': OPConstants.Roles.LECTOR
+          };
 
-        this.roles = roles.map((rol: any) => {
-          if (!rol.idRol && rol.nombre) {
-            return { ...rol, idRol: roleMap[rol.nombre] || 0 };
-          }
-          return rol;
-        });
-      },
-      error: () => {}
-    });
+          this.roles = roles.map((rol: any) => {
+            if (!rol.idRol && rol.nombre) {
+              return { ...rol, idRol: roleMap[rol.nombre] || 0 };
+            }
+            return rol;
+          });
+        },
+        error: () => {}
+      });
   }
 
-  search(): void { this.pageNo = 0; this.load(); }
-  reset(): void { this.filtroUsuario = ''; this.filtroRolId = null; this.filtroEmailConfirmado = null; this.pageNo = 0; this.load(); }
-  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.load(); } }
-  next(): void { const maxPage = this.totalElements ? Math.ceil(this.totalElements / this.pageSize) - 1 : this.pageNo + 1; if (this.pageNo < maxPage) { this.pageNo++; this.load(); } }
+  search(): void {
+    this.pageNo = 0;
+    this.load();
+  }
 
-  getTotalPages(): number { return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0; }
+  reset(): void {
+    this.filtroUsuario = '';
+    this.filtroRolId = null;
+    this.filtroEmailConfirmado = null;
+    this.pageNo = 0;
+    this.load();
+  }
 
-  onBasicSearchTextChange(text: string): void { this.basicSearchText = text; this.filtroUsuario = text; this.search(); }
-  onPageSizeChange(size: number): void { this.pageSize = size; this.pageNo = 0; this.load(); }
-  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
+  prev(): void {
+    if (this.pageNo > 0) {
+      this.pageNo--;
+      this.load();
+    }
+  }
 
-  openEdit(u: Usuario): void { this.editUser = { ...u }; this.editModalVisible = true; }
+  next(): void {
+    const maxPage = this.totalElements ? Math.ceil(this.totalElements / this.pageSize) - 1 : this.pageNo + 1;
+    if (this.pageNo < maxPage) {
+      this.pageNo++;
+      this.load();
+    }
+  }
+
+  getTotalPages(): number {
+    return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0;
+  }
+
+  onBasicSearchTextChange(text: string): void {
+    this.basicSearchText = text;
+    this.filtroUsuario = text;
+    this.search();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.pageNo = 0;
+    this.load();
+  }
+
+  toggleAdvanced(): void {
+    this.showAdvanced = !this.showAdvanced;
+  }
+
+  openEdit(u: Usuario): void {
+    this.editUser = { ...u };
+    this.editModalVisible = true;
+  }
+
   openCreate(): void { 
     this.editUser = new Usuario();
     // Ensure 0/undefined logic is handled. Usuario defaults to 0.
     this.editModalVisible = true; 
   }
-  closeEdit(): void { this.editModalVisible = false; this.editUser = null; }
-  isEmailValid(e?: string): boolean { if (!e) return false; const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; return re.test(e); }
-  isUserFormValid(): boolean { return !!(this.editUser && this.editUser.username && this.isEmailValid(this.editUser.email) && this.editUser.idRol > 0); }
+
+  closeEdit(): void {
+    this.editModalVisible = false;
+    this.editUser = null;
+  }
+
+  isEmailValid(e?: string): boolean {
+    if (!e) return false;
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(e);
+  }
+
+  isUserFormValid(): boolean {
+    return !!(this.editUser && this.editUser.username && this.isEmailValid(this.editUser.email) && this.editUser.idRol > 0);
+  }
+
   getUserErrors(): string[] {
     const errs: string[] = [];
     if (!this.editUser) return errs;
@@ -145,20 +215,25 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     if (!this.editUser.idRol || this.editUser.idRol <= 0) errs.push('Rol requerido');
     return errs;
   }
+
   getRolNombre(id?: number): string {
     if (id == null) return '';
     const r = this.roles.find(x => x.idRol == id);
     return r && r.nombre ? r.nombre : String(id);
   }
+
   saveEdit(): void {
     if (!this.editUser) return;
     this.loading = true;
     const hasId = !!this.editUser.idUsuario && this.editUser.idUsuario > 0;
     const op$ = hasId ? this.usuarioService.actualizar(this.editUser.idUsuario!, this.editUser) : this.usuarioService.crear(this.editUser);
+    
     op$.subscribe({
       next: () => {
         this.toast.showSuccess(hasId ? 'Usuario actualizado' : 'Usuario creado', 'Usuarios');
-        this.loading = false; this.editModalVisible = false; this.load();
+        this.loading = false;
+        this.editModalVisible = false;
+        this.load();
       },
       error: (err: any) => {
         this.toast.showError(hasId ? 'Error actualizando' : 'Error creando', 'Usuarios');
