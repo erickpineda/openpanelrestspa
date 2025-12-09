@@ -74,6 +74,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
         }
         return item;
       });
+      this.loadPrivilegiosForRoles(this.roles);
       this.totalElements = Number(data?.totalElements || list.length || 0);
     };
 
@@ -101,6 +102,30 @@ export class RolesListComponent implements OnInit, OnDestroy {
         }))
         .subscribe({ next: handleResponse, error: handleError });
     }
+  }
+
+  loadPrivilegiosForRoles(roles: Rol[]): void {
+    roles.forEach(rol => {
+      if (!rol.codigo) return; // Validación extra
+      this.rolService.obtenerPrivilegios(rol.codigo)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response: any) => {
+            // Manejar respuesta paginada o lista directa
+            const data = response?.data || response;
+            const lista = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
+            
+            // Asignar solo si es un array válido
+            if (Array.isArray(lista)) {
+              rol.privilegios = lista;
+            }
+          },
+          error: (err) => {
+            // Silencioso o log debug para no saturar consola
+            // this.log.error(`Error cargando privilegios para rol ${rol.idRol}`, err);
+          }
+        });
+    });
   }
 
   loadPrivilegios(): void {

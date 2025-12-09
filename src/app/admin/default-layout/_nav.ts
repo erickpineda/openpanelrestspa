@@ -53,6 +53,7 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Multimedia',
+    url: '/admin/control/contenido',
     iconComponent: { name: 'cil-image' },
     children: [
       {
