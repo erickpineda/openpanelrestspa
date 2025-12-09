@@ -67,7 +67,7 @@
             <td>
               <div class="btn-group">
                 <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(r)"><svg cIcon name="cilPencil"></svg></button>
-                <button cButton color="danger" size="sm" variant="outline" (click)="delete(r)" [disabled]="r.idRol === PROPIETARIO_ROLE_ID"><svg cIcon name="cilTrash"></svg></button>
+                <button cButton color="danger" size="sm" variant="outline" (click)="delete(r)" [disabled]="r.codigo === PROPIETARIO_ROLE_CODE"><svg cIcon name="cilTrash"></svg></button>
               </div>
             </td>
           </tr>
@@ -89,13 +89,19 @@
 
 <c-modal id="editRolModal" [visible]="editModalVisible" (visibleChange)="editModalVisible = $event" size="lg">
   <c-modal-header class="d-flex justify-content-between align-items-center">
-    <h5 cModalTitle>{{ editRol?.idRol ? 'Editar Rol' : 'Nuevo Rol' }}</h5>
+    <h5 cModalTitle>{{ isEditing ? 'Editar Rol' : 'Nuevo Rol' }}</h5>
   </c-modal-header>
   <c-modal-body>
     <div *ngIf="editRol">
       <div class="mb-3">
+        <label class="form-label">Código</label>
+        <input cFormControl type="text" [value]="editRol.codigo || ''" (input)="onCodigoInput($any($event.target).value)" [disabled]="isEditing" [class.is-invalid]="!editRol.codigo" maxlength="5" placeholder="Máx. 5 caracteres" />
+        <div class="invalid-feedback d-block" *ngIf="!editRol.codigo">Código requerido (máx 5 caracteres)</div>
+        <div class="form-text text-muted" *ngIf="!isEditing">Se autogenerará desde el nombre si se deja vacío o no se modifica manualmente.</div>
+      </div>
+      <div class="mb-3">
         <label class="form-label">Nombre</label>
-        <input cFormControl type="text" [value]="editRol.nombre || ''" (input)="editRol && (editRol.nombre=$any($event.target).value)" [class.is-invalid]="!editRol.nombre" />
+        <input cFormControl type="text" [value]="editRol.nombre || ''" (input)="onNombreInput($any($event.target).value)" [class.is-invalid]="!editRol.nombre" />
         <div class="invalid-feedback d-block" *ngIf="!editRol.nombre">Nombre requerido</div>
       </div>
       <div class="mb-3">

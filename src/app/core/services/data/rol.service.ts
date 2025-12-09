@@ -9,7 +9,7 @@ import { OPConstants } from "../../../shared/constants/op-global.constants";
 @Injectable({
   providedIn: "root"
 })
-export class RolService extends CrudService<Rol, number> {
+export class RolService extends CrudService<Rol, string> {
   protected override endpoint = '/roles';
 
   buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<any> {
@@ -22,6 +22,54 @@ export class RolService extends CrudService<Rol, number> {
 
   obtenerPrivilegios(codigo: string): Observable<any> {
     return this.get<any>(`${this.endpoint}/obtenerPrivilegios/${codigo}`);
+  }
+
+  // Overrides for code-based endpoints
+  override obtenerPorId(id: string): Observable<any> {
+    return this.get<any>(`${this.endpoint}/obtenerPorCodigo/${id}`);
+  }
+
+  override actualizar(id: string, entity: Rol): Observable<any> {
+    return this.put<any>(`${this.endpoint}/actualizarPorCodigo/${id}`, entity);
+  }
+
+  override borrar(id: string): Observable<any> {
+    return this.delete<any>(`${this.endpoint}/borrarPorCodigo/${id}`);
+  }
+
+  // Safe overrides
+  override obtenerPorIdSafe(id: string): Observable<Rol> {
+    return this.safeGetData<Rol>(
+      `${this.endpoint}/obtenerPorCodigo/${id}`,
+      {} as Rol,
+      undefined,
+      undefined,
+      `${this.endpoint}.obtenerPorCodigo`
+    );
+  }
+
+  override actualizarSafe(id: string, entity: Rol): Observable<Rol> {
+    return this.safePutData<Rol>(
+      `${this.endpoint}/actualizarPorCodigo/${id}`,
+      entity,
+      {} as Rol,
+      undefined,
+      undefined,
+      `${this.endpoint}.actualizarPorCodigo`
+    );
+  }
+
+  override eliminarSafe(id: string): Observable<boolean> {
+    return this.safeDeleteOperation(
+      `${this.endpoint}/borrarPorCodigo/${id}`,
+      undefined,
+      undefined,
+      `${this.endpoint}.borrarPorCodigo`
+    );
+  }
+
+  actualizarPrivilegios(codigo: string, privilegios: any[]): Observable<any> {
+    return this.put<any>(`${this.endpoint}/actualizarPrivilegios/${codigo}`, privilegios);
   }
 
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { finalize, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { finalize, takeUntil, switchMap } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
 import { RolService } from '../../../../core/services/data/rol.service';
 import { Rol } from '../../../../core/models/rol.model';
 import { PrivilegioService } from '../../../../core/services/data/privilegio.service';
@@ -16,7 +16,7 @@ import { OPConstants } from '../../../../shared/constants/op-global.constants';
   styleUrls: ['./roles-list.component.scss']
 })
 export class RolesListComponent implements OnInit, OnDestroy {
-  readonly PROPIETARIO_ROLE_ID = OPConstants.Roles.PROPIETARIO;
+  readonly PROPIETARIO_ROLE_CODE = 'PROPIETARIO';
 
   loading = false;
   error: string | null = null;
@@ -33,6 +33,8 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
   editModalVisible = false;
   editRol: Rol | null = null;
+  isEditing = false;
+  manualCodeEntry = false;
 
   showDeleteModal = false;
   rolToDelete: Rol | null = null;
@@ -187,6 +189,8 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
   openCreate(): void {
     this.editRol = new Rol();
+    this.isEditing = false;
+    this.manualCodeEntry = false;
     this.editModalVisible = true;
   }
 
@@ -196,6 +200,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
     if (!this.editRol!.privilegios) {
       this.editRol!.privilegios = [];
     }
+    this.isEditing = true;
     this.editModalVisible = true;
   }
 
@@ -205,7 +210,33 @@ export class RolesListComponent implements OnInit, OnDestroy {
   }
 
   isRolFormValid(): boolean {
-    return !!(this.editRol && this.editRol.nombre && this.editRol.nombre.trim().length > 0);
+    return !!(this.editRol && this.editRol.nombre && this.editRol.nombre.trim().length > 0 && this.editRol.codigo && this.editRol.codigo.trim().length > 0);
+  }
+
+  onNombreInput(value: string): void {
+    if (!this.editRol) return;
+    this.editRol.nombre = value;
+    
+    // Autogenerar código si no estamos editando y el usuario no ha introducido manualmente un código
+    if (!this.isEditing && !this.manualCodeEntry) {
+      this.generateCodeFromNombre(value);
+    }
+  }
+
+  onCodigoInput(value: string): void {
+    if (!this.editRol) return;
+    this.editRol.codigo = value.toUpperCase();
+    // Marcar como entrada manual si el usuario escribe algo (incluso si lo borra, asumimos que quiere control manual)
+    // O si lo borra todo, ¿deberíamos volver a auto? 
+    // Por simplicidad: si el usuario toca el código, es manual.
+    this.manualCodeEntry = true;
+  }
+
+  private generateCodeFromNombre(nombre: string): void {
+    if (!this.editRol) return;
+    // Tomar primeros 5 caracteres, quitar espacios, mayúsculas
+    let code = nombre.replace(/\s/g, '').substring(0, 5).toUpperCase();
+    this.editRol.codigo = code;
   }
 
   togglePrivilegio(privilegio: Privilegio, checked: boolean): void {
@@ -229,49 +260,69 @@ export class RolesListComponent implements OnInit, OnDestroy {
   saveEdit(): void {
     if (!this.editRol) return;
     this.loading = true;
-    const hasId = !!this.editRol.idRol && this.editRol.idRol > 0;
     
-    const op$ = hasId 
-      ? this.rolService.actualizar(this.editRol.idRol, this.editRol)
+    // Guardamos la referencia a los privilegios para enviarlos después
+    const privilegios = [...this.editRol.privilegios];
+    // Opcional: limpiar privilegios del objeto principal si el backend no los acepta
+    // this.editRol.privilegios = []; 
+    
+    const op$ = this.isEditing 
+      ? this.rolService.actualizar(this.editRol.codigo, this.editRol)
       : this.rolService.crear(this.editRol);
 
-    op$.pipe(takeUntil(this.destroy$)).subscribe({
+    op$.pipe(
+      takeUntil(this.destroy$),
+      switchMap((res: any) => {
+        // Si la creación/actualización fue exitosa, actualizamos privilegios
+        // Nota: Si es crear, necesitamos el código del nuevo rol. 
+        // Asumimos que el backend devuelve el objeto creado o usamos el código que enviamos.
+        // Si el backend devuelve el objeto, lo usamos.
+        const rolCode = this.isEditing ? this.editRol!.codigo : (res?.codigo || res?.data?.codigo || this.editRol!.codigo);
+        
+        if (privilegios && privilegios.length >= 0) {
+          return this.rolService.actualizarPrivilegios(rolCode, privilegios);
+        }
+        return of(res);
+      })
+    ).subscribe({
       next: () => {
-        this.toast.showSuccess(hasId ? 'Rol actualizado' : 'Rol creado', 'Roles');
+        this.toast.showSuccess(this.isEditing ? 'Rol actualizado' : 'Rol creado', 'Roles');
         this.loading = false;
         this.editModalVisible = false;
         this.load();
       },
       error: (err: any) => {
-        this.toast.showError(hasId ? 'Error actualizando' : 'Error creando', 'Roles');
-        this.log.error(hasId ? 'roles actualizar' : 'roles crear', err);
+        this.toast.showError(this.isEditing ? 'Error actualizando' : 'Error creando', 'Roles');
+        this.log.error(this.isEditing ? 'roles actualizar' : 'roles crear', err);
         this.loading = false;
       }
     });
   }
 
   delete(rol: Rol): void {
-    if (!rol.idRol) return;
-    if (rol.idRol === this.PROPIETARIO_ROLE_ID) {
+    if (!rol.codigo) return;
+    if (rol.codigo === this.PROPIETARIO_ROLE_CODE) {
       this.toast.showWarning('No se puede eliminar el rol Propietario', 'Acción no permitida');
       return;
     }
     this.rolToDelete = rol;
     this.showDeleteModal = true;
+    this.cdr.detectChanges(); // Forzar detección de cambios
   }
 
   cancelDelete(): void {
     this.showDeleteModal = false;
     this.rolToDelete = null;
+    this.cdr.detectChanges(); // Forzar detección de cambios
   }
 
   confirmDelete(): void {
-    if (!this.rolToDelete?.idRol) {
+    if (!this.rolToDelete?.codigo) {
       this.cancelDelete();
       return;
     }
     this.loading = true;
-    this.rolService.borrar(this.rolToDelete.idRol)
+    this.rolService.borrar(this.rolToDelete.codigo)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

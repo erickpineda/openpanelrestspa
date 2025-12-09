@@ -148,8 +148,13 @@ export class NetworkInterceptor implements HttpInterceptor {
       timestamp: new Date().toISOString()
     };
 
-    // Log del error
-    this.logger.error(`Error HTTP ${error.status} en ${request.method} ${request.url}`, error);
+    // Log del error - Usar warn para errores 4xx (cliente) para no ensuciar la consola con errores esperados
+    const logMessage = `Error HTTP ${error.status} en ${request.method} ${request.url}`;
+    if (error.status >= 400 && error.status < 500) {
+      this.logger.warn(logMessage, error);
+    } else {
+      this.logger.error(logMessage, error);
+    }
 
     // No mostrar notificaciones para peticiones silenciosas
     if (isSilent) return;
