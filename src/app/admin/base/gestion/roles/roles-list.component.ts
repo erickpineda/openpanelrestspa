@@ -287,10 +287,14 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
   areAllPrivilegiosSelected(): boolean {
     if (!this.editRol || !this.editRol.privilegios || this.privilegios.length === 0) return false;
-    // Comprobar si todos los privilegios disponibles están en la lista de privilegios del rol
-    // Usamos idPrivilegio para comparar
     const rolPrivilegiosIds = this.editRol.privilegios.map(p => p.idPrivilegio);
     return this.privilegios.every(p => rolPrivilegiosIds.includes(p.idPrivilegio));
+  }
+
+  areSomePrivilegiosSelected(): boolean {
+    if (!this.editRol || !this.editRol.privilegios || this.privilegios.length === 0) return false;
+    const count = this.editRol.privilegios.length;
+    return count > 0 && count < this.privilegios.length;
   }
 
   toggleAllPrivilegios(checked: boolean): void {
