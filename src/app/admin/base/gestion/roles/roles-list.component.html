@@ -127,7 +127,7 @@
           <div *ngIf="privilegios.length === 0" class="text-muted text-center py-2">No hay privilegios disponibles</div>
           <div class="row">
             <div class="col-md-6" *ngFor="let p of privilegios">
-              <c-form-check class="mb-2">
+              <c-form-check class="mb-2 privilegio-item">
                 <input cFormCheckInput type="checkbox" [id]="'privilegio-'+p.codigo"
                        [checked]="hasPrivilegio(p)"
                        (change)="togglePrivilegio(p, $any($event.target).checked)">

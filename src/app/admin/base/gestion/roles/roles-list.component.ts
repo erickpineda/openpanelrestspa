@@ -267,6 +267,12 @@ export class RolesListComponent implements OnInit, OnDestroy {
     this.editRol.codigo = code;
   }
 
+  /**
+   * Cambia el estado de un privilegio para el rol que se está editando.
+   * Si checked es true, lo añade; si es false, lo elimina.
+   * @param privilegio El privilegio a modificar.
+   * @param checked Estado del checkbox.
+   */
   togglePrivilegio(privilegio: Privilegio, checked: boolean): void {
     if (!this.editRol) return;
     if (checked) {
@@ -280,23 +286,40 @@ export class RolesListComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Comprueba si un privilegio específico está asignado al rol actual.
+   * @param privilegio El privilegio a verificar.
+   * @returns true si está asignado, false en caso contrario.
+   */
   hasPrivilegio(privilegio: Privilegio): boolean {
     if (!this.editRol || !this.editRol.privilegios) return false;
     return this.editRol.privilegios.some(p => p.idPrivilegio === privilegio.idPrivilegio);
   }
 
+  /**
+   * Determina si TODOS los privilegios disponibles están seleccionados.
+   * Se usa para el estado 'checked' del checkbox "Seleccionar todos".
+   */
   areAllPrivilegiosSelected(): boolean {
     if (!this.editRol || !this.editRol.privilegios || this.privilegios.length === 0) return false;
     const rolPrivilegiosIds = this.editRol.privilegios.map(p => p.idPrivilegio);
     return this.privilegios.every(p => rolPrivilegiosIds.includes(p.idPrivilegio));
   }
 
+  /**
+   * Determina si ALGUNOS (pero no todos) privilegios están seleccionados.
+   * Se usa para el estado 'indeterminate' del checkbox "Seleccionar todos".
+   */
   areSomePrivilegiosSelected(): boolean {
     if (!this.editRol || !this.editRol.privilegios || this.privilegios.length === 0) return false;
     const count = this.editRol.privilegios.length;
     return count > 0 && count < this.privilegios.length;
   }
 
+  /**
+   * Selecciona o deselecciona todos los privilegios disponibles.
+   * @param checked true para seleccionar todos, false para deseleccionar todos.
+   */
   toggleAllPrivilegios(checked: boolean): void {
     if (!this.editRol) return;
     
