@@ -2,8 +2,8 @@
   <c-card>
     <c-card-header class="d-flex justify-content-between align-items-center">
       <h5 class="mb-0">Gestión de Etiquetas</h5>
-      <button cButton color="primary" (click)="onCreate()" [attr.aria-label]="'Crear nueva etiqueta'" data-testid="btn-nueva-etiqueta">
-        <svg cIcon name="cilPlus" size="sm" class="me-2"></svg> Nueva Etiqueta
+      <button cButton color="primary" size="sm" (click)="onCreate()" [attr.aria-label]="'Crear nueva etiqueta'" data-testid="btn-nueva-etiqueta">
+        <svg cIcon name="cilPlus" class="me-2"></svg> Nueva Etiqueta
       </button>
     </c-card-header>
   <c-card-body [attr.aria-busy]="loading ? 'true' : null">
@@ -83,7 +83,7 @@
         <c-col class="d-flex justify-content-end align-items-center gap-2">
           <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="pageNo<=0">Anterior</button>
           <button cButton color="light" size="sm" (click)="onNext()" [disabled]="isNextDisabled()">Siguiente</button>
-          <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalItems }}</div>
+          <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalItems }} · Mostrando {{ numberOfElements }}</div>
         </c-col>
       </c-row>
 

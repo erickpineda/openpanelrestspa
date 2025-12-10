@@ -26,6 +26,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
   pageNo = 0;
   pageSize = 10;
   totalElements = 0;
+  numberOfElements = 0;
 
   showAdvanced = false;
   basicSearchText = '';
@@ -77,7 +78,9 @@ export class RolesListComponent implements OnInit, OnDestroy {
         return item;
       });
       this.loadPrivilegiosForRoles(this.roles);
+      console.log(this.roles)
       this.totalElements = Number(data?.totalElements || list.length || 0);
+      this.numberOfElements = list.length;
     };
 
     const handleError = (err: any) => {
@@ -107,27 +110,52 @@ export class RolesListComponent implements OnInit, OnDestroy {
   }
 
   loadPrivilegiosForRoles(roles: Rol[]): void {
-    roles.forEach(rol => {
-      if (!rol.codigo) return; // Validación extra
-      this.rolService.obtenerPrivilegios(rol.codigo)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response: any) => {
-            // Manejar respuesta paginada o lista directa
-            const data = response?.data || response;
-            const lista = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
-            
-            // Asignar solo si es un array válido
-            if (Array.isArray(lista)) {
-              rol.privilegios = lista;
+    const codigos = roles.map(r => r.codigo).filter(c => !!c);
+    
+    if (codigos.length === 0) return;
+
+    // Limpiar privilegios actuales de los roles cargados antes de empezar
+    roles.forEach(r => r.privilegios = []);
+
+    this.fetchPrivilegiosRecursively(codigos, 0, roles);
+  }
+
+  private fetchPrivilegiosRecursively(codigos: string[], pageNo: number, roles: Rol[]): void {
+    const PAGE_SIZE = 50; // Ajustable según necesidad
+
+    this.rolService.obtenerPorCodigos(codigos, pageNo, PAGE_SIZE)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          const data = response?.data || response;
+          const elements = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
+          
+          // Procesar elementos de esta página
+          elements.forEach((item: any) => {
+            // Intentar buscar por ID si existe, sino por nombre como fallback (según código previo que usaba nombre)
+            // Pero idealmente usar ID o Código si está disponible. El usuario mostró un JSON con idRol.
+            const rol = roles.find(r => r.nombre === item.rolNombre);
+            if (rol) {
+              const priv = new Privilegio();
+              priv.idPrivilegio = item.idPrivilegio;
+              priv.nombre = item.privilegioNombre;
+              priv.codigo = item.privilegioCodigo;
+              priv.descripcion = item.privilegioDescripcion;
+              
+              rol.privilegios.push(priv);
             }
-          },
-          error: (err) => {
-            // Silencioso o log debug para no saturar consola
-            // this.log.error(`Error cargando privilegios para rol ${rol.idRol}`, err);
+          });
+
+          // Comprobar si hay más páginas
+          const totalPages = data?.totalPages || 0;
+          if (pageNo < totalPages - 1) {
+            this.fetchPrivilegiosRecursively(codigos, pageNo + 1, roles);
           }
-        });
-    });
+        },
+        error: (err) => {
+           this.log.error(`Error cargando privilegios para roles (página ${pageNo})`, err);
+        }
+      });
   }
 
   loadPrivilegios(): void {

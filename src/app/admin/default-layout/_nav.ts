@@ -89,9 +89,14 @@ export const navItems: INavData[] = [
         icon: 'cil-people'
       },
       {
-        name: 'Roles y Privilegios',
+        name: 'Roles',
         url: '/admin/control/gestion/roles',
         icon: 'cil-lock-locked'
+      },
+      {
+        name: 'Privilegios',
+        url: '/admin/control/gestion/privilegios',
+        icon: 'cil-check-circle'
       }
     ]
   },

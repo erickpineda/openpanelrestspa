@@ -24,6 +24,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   pageNo = 0;
   pageSize = 10;
   totalElements = 0;
+  numberOfElements = 0;
   showAdvanced = false;
   basicSearchText = '';
 
@@ -69,6 +70,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       const list = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
       this.usuarios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
+      this.numberOfElements = list.length;
     };
     
     const handleError = (err: any) => {

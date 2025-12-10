@@ -17,6 +17,8 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   pageNo = 0;
   pageSize = 10;
   totalPages = 0;
+  totalElements = 0;
+  numberOfElements = 0;
   canPrev = false;
   canNext = false;
   private hasFilters = false;
@@ -60,6 +62,8 @@ export class ArchivosComponent implements OnInit, OnDestroy {
           const { pageItems, totalPages } = this.paginate(filtered, pageNo, this.pageSize);
           this.items = pageItems; 
           this.totalPages = totalPages; 
+          this.totalElements = filtered.length;
+          this.numberOfElements = pageItems.length;
           this.updateNavState(); 
         },
         error: () => { 

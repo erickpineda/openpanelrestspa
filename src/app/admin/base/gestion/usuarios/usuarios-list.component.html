@@ -90,7 +90,7 @@
       <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
         <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
         <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-        <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }}</div>
+        <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
       </div>
     </div>
     <ng-template #loadingTemplate>

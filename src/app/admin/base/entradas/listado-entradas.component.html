@@ -159,7 +159,7 @@
         <c-col class="d-flex justify-content-end align-items-center gap-2">
           <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="currentPage<=0">Anterior</button>
           <button cButton color="light" size="sm" (click)="onNext()" [disabled]="isNextDisabled()">Siguiente</button>
-          <div class="text-muted small ms-2">Página {{ currentPage + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }}</div>
+          <div class="text-muted small ms-2">Página {{ currentPage + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
         </c-col>
       </c-row>
       </div>

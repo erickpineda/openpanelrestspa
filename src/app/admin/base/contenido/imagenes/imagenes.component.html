@@ -15,7 +15,7 @@
     <c-card-body [attr.aria-busy]="loading ? 'true' : null">
       <c-row class="align-items-center mb-3 g-2">
         <c-col xs="12" md="4">
-          <div class="text-muted small">Total {{ items.length }}</div>
+          <div class="text-muted small">Total {{ totalElements }}</div>
         </c-col>
         <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
           <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar nombre..." style="max-width: 280px;" />
@@ -106,7 +106,7 @@
       <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
         <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">Anterior</button>
         <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">Siguiente</button>
-        <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }}</div>
+        <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
       </div>
     </div>
     </c-card-body>
