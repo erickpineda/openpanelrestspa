@@ -328,7 +328,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
         // Si el backend devuelve el objeto, lo usamos.
         const rolCode = this.isEditing ? this.editRol!.codigo : (res?.codigo || res?.data?.codigo || this.editRol!.codigo);
         
-        if (privilegios && privilegios.length > 0) {
+        if (privilegios) {
           const codigos = privilegios.map(p => p.codigo);
           return this.rolService.actualizarPrivilegios(rolCode, codigos);
         }
