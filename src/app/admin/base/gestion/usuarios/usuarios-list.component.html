@@ -41,9 +41,9 @@
           </c-col>
           <c-col xs="6" md="3">
             <label class="form-label mb-1">Rol</label>
-            <select cSelect class="form-select-sm" [value]="filtroRolId ?? ''" (change)="filtroRolId = +$any($event.target).value || null">
-              <option value="">Seleccione rol</option>
-              <option *ngFor="let r of roles" [value]="r.idRol">{{ r.nombre }}</option>
+            <select cSelect class="form-select-sm" [(ngModel)]="filtroRolCodigo">
+              <option [ngValue]="null">Seleccione rol</option>
+              <option *ngFor="let r of roles" [value]="r.codigo">{{ r.nombre }}</option>
             </select>
           </c-col>
           <c-col xs="6" md="3">
@@ -75,11 +75,11 @@
             <td class="text-truncate" style="max-width: 200px;" [title]="u.username">{{ u.username }}</td>
             <td>{{ u.nombre }} {{ u.apellido }}</td>
             <td class="text-truncate" style="max-width: 240px;" [title]="u.email">{{ u.email }}</td>
-            <td>{{ getRolNombre(u.idRol) }}</td>
+            <td>{{ u.rolCodigo }}</td>
             <td>
               <div class="btn-group">
                 <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(u)"><svg cIcon name="cilPencil"></svg></button>
-                <button cButton color="danger" size="sm" variant="outline" (click)="delete(u)" [disabled]="u.idRol === PROPIETARIO_ROLE_ID"><svg cIcon name="cilTrash"></svg></button>
+                <button cButton color="danger" size="sm" variant="outline" (click)="delete(u)" [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE"><svg cIcon name="cilTrash"></svg></button>
               </div>
             </td>
           </tr>
@@ -126,12 +126,16 @@
       </div>
       <div class="mb-3">
         <label class="form-label">Rol</label>
-        <select cSelect [value]="editUser.idRol" (change)="editUser && (editUser.idRol = $any($event.target).value ? +$any($event.target).value : 0)" [class.is-invalid]="!editUser.idRol || editUser.idRol <= 0" [disabled]="editUser.idRol === PROPIETARIO_ROLE_ID">
+        <select cSelect [(ngModel)]="editUser.rolCodigo" [class.is-invalid]="!editUser.rolCodigo" [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
           <option value="">Seleccione rol</option>
-          <option *ngFor="let r of roles" [value]="r.idRol">{{ r.nombre }}</option>
+          <ng-container *ngFor="let r of roles">
+            <option [value]="r.codigo" *ngIf="r.codigo !== PROPIETARIO_ROLE_CODE || editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
+              {{ r.nombre }}
+            </option>
+          </ng-container>
         </select>
-        <div class="invalid-feedback d-block" *ngIf="!editUser.idRol || editUser.idRol <= 0">Rol requerido</div>
-        <div class="text-info small mt-1" *ngIf="editUser.idRol === PROPIETARIO_ROLE_ID">
+        <div class="invalid-feedback d-block" *ngIf="!editUser.rolCodigo">Rol requerido</div>
+        <div class="text-info small mt-1" *ngIf="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
           <svg cIcon name="cilLockLocked" size="sm"></svg> El rol de Propietario no se puede modificar.
         </div>
       </div>

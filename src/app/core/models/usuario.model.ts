@@ -5,6 +5,7 @@ import { Rol } from "./rol.model";
 export class Usuario {
   idUsuario: number = 0;
   idRol: number = 0;
+  rolCodigo: string = "";
   username: string = "";
   password: string = "";
   nombre: string = "";
@@ -31,6 +32,7 @@ export class Usuario {
 export interface Usuario {
   idUsuario: number;
   idRol: number;
+  rolCodigo: string;
   username: string;
   password: string;
   nombre: string;

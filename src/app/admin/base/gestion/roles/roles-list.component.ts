@@ -16,7 +16,8 @@ import { OPConstants } from '../../../../shared/constants/op-global.constants';
   styleUrls: ['./roles-list.component.scss']
 })
 export class RolesListComponent implements OnInit, OnDestroy {
-  readonly PROPIETARIO_ROLE_CODE = 'PROPIETARIO';
+  readonly PROPIETARIO_ROLE_CODE = OPConstants.Roles.PROPIETARIO_CODE;
+  readonly ADMIN_ROLE_CODE = OPConstants.Roles.ADMIN_CODE;
 
   loading = false;
   error: string | null = null;
@@ -215,6 +216,11 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
   // CRUD
 
+  isProtectedRole(rol: Rol | null): boolean {
+    if (!rol || !rol.codigo) return false;
+    return rol.codigo === this.PROPIETARIO_ROLE_CODE || rol.codigo === this.ADMIN_ROLE_CODE;
+  }
+
   openCreate(): void {
     this.editRol = new Rol();
     this.isEditing = false;
@@ -228,6 +234,12 @@ export class RolesListComponent implements OnInit, OnDestroy {
     if (!this.editRol!.privilegios) {
       this.editRol!.privilegios = [];
     }
+
+    // RESTRICCION: Propietario siempre debe tener todos los privilegios
+    if (this.editRol!.codigo === this.PROPIETARIO_ROLE_CODE) {
+       this.editRol!.privilegios = JSON.parse(JSON.stringify(this.privilegios));
+    }
+
     this.isEditing = true;
     this.editModalVisible = true;
   }
@@ -275,6 +287,14 @@ export class RolesListComponent implements OnInit, OnDestroy {
    */
   togglePrivilegio(privilegio: Privilegio, checked: boolean): void {
     if (!this.editRol) return;
+
+    // RESTRICCION: Propietario no se le pueden quitar privilegios
+    if (this.editRol.codigo === this.PROPIETARIO_ROLE_CODE && !checked) {
+       // Forzar visualmente a true si angular no lo hace solo, aunque el modelo no cambie
+       // El binding [checked] debería encargarse, pero por si acaso no hacemos nada.
+       return;
+    }
+
     if (checked) {
       // Agregar si no existe
       if (!this.editRol.privilegios.some(p => p.codigo === privilegio.codigo)) {
@@ -323,6 +343,11 @@ export class RolesListComponent implements OnInit, OnDestroy {
   toggleAllPrivilegios(checked: boolean): void {
     if (!this.editRol) return;
     
+    // RESTRICCION: Propietario no se puede deseleccionar todos
+    if (this.editRol.codigo === this.PROPIETARIO_ROLE_CODE && !checked) {
+      return;
+    }
+
     if (checked) {
       // Agregar todos los que faltan
       // Clonamos para evitar referencias cruzadas
@@ -336,6 +361,20 @@ export class RolesListComponent implements OnInit, OnDestroy {
   saveEdit(): void {
     if (!this.editRol) return;
     this.loading = true;
+
+    // RESTRICCION: Propietario siempre debe tener todos los privilegios (incluso los nuevos que no se hayan mostrado)
+     if (this.editRol.codigo === this.PROPIETARIO_ROLE_CODE) {
+        this.editRol.privilegios = JSON.parse(JSON.stringify(this.privilegios));
+     }
+ 
+     // RESTRICCION: Admin debe tener al menos un privilegio (o conjunto esencial)
+     if (this.editRol.codigo === this.ADMIN_ROLE_CODE) {
+        if (!this.editRol.privilegios || this.editRol.privilegios.length === 0) {
+          this.toast.showWarning('El rol de Administrador no puede quedar sin privilegios.', 'Validación');
+          this.loading = false;
+          return;
+        }
+     }
     
     // Guardamos la referencia a los privilegios para enviarlos después
     const privilegios = [...this.editRol.privilegios];
@@ -378,8 +417,8 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
   delete(rol: Rol): void {
     if (!rol.codigo) return;
-    if (rol.codigo === this.PROPIETARIO_ROLE_CODE) {
-      this.toast.showWarning('No se puede eliminar el rol Propietario', 'Acción no permitida');
+    if (rol.codigo === this.PROPIETARIO_ROLE_CODE || rol.codigo === this.ADMIN_ROLE_CODE) {
+      this.toast.showWarning('No se puede eliminar un rol protegido (Propietario o Admin)', 'Acción no permitida');
       return;
     }
     this.rolToDelete = rol;
