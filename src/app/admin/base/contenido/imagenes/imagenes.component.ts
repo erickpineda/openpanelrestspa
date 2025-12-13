@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
 import { MediaItem } from '../../../../core/models/media-item.model';
 import { saveAs } from 'file-saver';
@@ -48,6 +48,9 @@ export class ImagenesComponent implements OnInit, OnDestroy {
   // Patrón de toolbar/búsqueda
   showAdvanced: boolean = false;
   basicSearchText: string = '';
+
+  @Input() mode: 'admin' | 'selector' = 'admin';
+  @Output() selectItem = new EventEmitter<MediaItem>();
 
   constructor(
     private fileStorage: FileStorageService, 
@@ -194,7 +197,7 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     const pageItems = list.slice(start, start + pageSize);
     return { pageItems, totalPages };
   }
-  openPreview(item: MediaItem): void {
+    openPreview(item: MediaItem): void {
     if (!item) return;
     this.previewItem = item;
     this.previewModalVisible = true;
@@ -378,5 +381,24 @@ export class ImagenesComponent implements OnInit, OnDestroy {
       el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
       el.scrollTop = Math.max(0, (el.scrollHeight - el.clientHeight) / 2);
     }, 0);
+  }
+
+  parseFecha(fechaStr: string | undefined | null): Date | null {
+    if (!fechaStr) return null;
+    // Formato esperado: "dd-MM-yyyy HH:mm:ss"
+    const partes = fechaStr.split(' ');
+    if (partes.length !== 2) return null;
+    
+    const [dia, mes, anio] = partes[0].split('-').map(Number);
+    const [hora, min, seg] = partes[1].split(':').map(Number);
+    
+    if (!dia || !mes || !anio) return null;
+    
+    // Mes en Date es 0-indexado
+    return new Date(anio, mes - 1, dia, hora || 0, min || 0, seg || 0);
+  }
+
+  onSelect(item: MediaItem): void {
+    this.selectItem.emit(item);
   }
 }

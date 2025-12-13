@@ -16,6 +16,8 @@ export class Usuario {
   telefono: number = 0;
   emailConfirmado: boolean = false;
   fechaEmailConfirmado: any;
+  habilitado: boolean = false;
+  habilitadoFecha: any;
   website: string = "";
   imagen: string[] = [];
   infouser: string = "";
@@ -43,6 +45,8 @@ export interface Usuario {
   telefono: number;
   emailConfirmado: boolean;
   fechaEmailConfirmado: any;
+  habilitado: boolean;
+  habilitadoFecha: any;
   website: string;
   imagen: string[];
   infouser: string;

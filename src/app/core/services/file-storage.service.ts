@@ -54,7 +54,7 @@ export class FileStorageService {
 
 
   descargarFichero(uuid: string, accept?: string): Observable<Blob> {
-    let headers = new HttpHeaders({ 'Accept': accept || 'application/octet-stream' });
+    let headers = new HttpHeaders({ 'Accept': '*/*' }); // ✅ Aceptar cualquier tipo de respuesta binaria
     const token = this.tokenStorage?.getToken && this.tokenStorage.getToken();
     if (token) headers = headers.set('Authorization', `Bearer ${token}`);
     return this.http.get(`${this.base}/fileStorage/ficheros/descargar/${encodeURIComponent(uuid)}`, { responseType: 'blob', headers });

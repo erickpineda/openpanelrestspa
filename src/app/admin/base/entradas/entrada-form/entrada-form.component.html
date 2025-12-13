@@ -174,11 +174,18 @@
                 <c-card class="mb-4">
                   <c-card-body>
                     <h3 cCardTitle class="h6 card-title">Imagen destacada</h3>
+                    
+                    <!-- Preview de imagen -->
+                    <div class="mb-3 text-center" *ngIf="imagenDestacadaUrl || imagenPreviewUrl">
+                      <img [src]="imagenPreviewUrl || imagenDestacadaUrl" class="img-fluid rounded shadow-sm" style="max-height: 200px; width: auto;" alt="Imagen destacada">
+                    </div>
+
                     <c-input-group>
                       <input aria-describedby="inputGroupFileAddon04" aria-label="Upload" cFormControl
-                        id="selImagenDestacada" type="file" formControlName="imagenDestacada">
+                        id="selImagenDestacada" type="file" (change)="onImagenSeleccionada($event)" accept="image/*" [disabled]="form.disabled">
+                      <button cButton color="info" variant="outline" type="button" (click)="abrirSelectorImagen()" [disabled]="form.disabled"> Librería </button>
                       <button cButton color="secondary" id="inputGroupFileAddon04" type="button" variant="outline"
-                        class="btn btn-outline-secondary"> Quitar </button>
+                        class="btn btn-outline-secondary" (click)="onQuitarImagen()" [disabled]="(!imagenDestacadaUrl && !imagenPreviewUrl) || form.disabled"> Quitar </button>
                     </c-input-group>
                   </c-card-body>
                 </c-card>
@@ -331,3 +338,18 @@
     </c-container>
   </c-card-body>
 </c-card>
+
+<c-modal [visible]="modalSeleccionVisible" (visibleChange)="modalSeleccionVisible = $event" size="xl">
+  <c-modal-header>
+    <h5 cModalTitle>Seleccionar imagen de la librería</h5>
+    <button (click)="cerrarSelectorImagen()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <app-imagenes [mode]="'selector'" (selectItem)="onMediaSelected($event)"></app-imagenes>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="cerrarSelectorImagen()" cButton color="secondary">
+      Cancelar
+    </button>
+  </c-modal-footer>
+</c-modal>

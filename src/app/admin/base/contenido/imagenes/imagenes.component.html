@@ -88,9 +88,12 @@
                      (click)="openPreview(m)" />
               </td>
               <td class="text-truncate" style="max-width: 240px;" [title]="m.nombre">{{ m.nombre }}</td>
-              <td>{{ m.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
+              <td>{{ parseFecha(m.fechaCreacion) | date:'dd-MM-yyyy HH:mm' }}</td>
               <td>
                 <div class="btn-group">
+                  <button *ngIf="mode === 'selector'" cButton color="primary" size="sm" (click)="onSelect(m)">
+                    Seleccionar
+                  </button>
                   <button cButton color="secondary" size="sm" variant="outline" (click)="download(m)" [disabled]="!m.uuid && !m.url" [attr.aria-label]="'Descargar ' + (m.nombre || '')">
                     <svg cIcon name="cilCloudDownload"></svg>
                   </button>

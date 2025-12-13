@@ -82,6 +82,12 @@ export class UsuarioService extends CrudService<Usuario, number> {
     return this.get<PerfilResponse>(`${this.endpoint}/perfil/yo`);
   }
 
+  actualizarParcial(id: number, modificado: Usuario): Observable<OpenpanelApiResponse<any>> {
+    // Content-Type application/json-patch+json is required for JSON Patch (even if body is Usuario model as per backend requirement)
+    const headers = this.setHeaders({ 'Content-Type': 'application/json-patch+json' });
+    return this.patch<any>(`${this.endpoint}/perfil/${id}`, modificado, undefined, headers);
+  }
+
   // ✅ Implementación mínima requerida
   protected createDefaultEntity(): Usuario {
     return {} as Usuario;

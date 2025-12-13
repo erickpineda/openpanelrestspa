@@ -20,8 +20,11 @@ describe('UsuariosListComponent', () => {
   beforeEach(async () => {
     mockUsuarioService = {
       buscarSinGlobalLoader: jasmine.createSpy('buscarSinGlobalLoader').and.returnValue(of({ elements: [], totalElements: 0 })),
-      guardar: jasmine.createSpy('guardar').and.returnValue(of({})),
-      eliminar: jasmine.createSpy('eliminar').and.returnValue(of({}))
+      crear: jasmine.createSpy('crear').and.returnValue(of({})),
+      actualizar: jasmine.createSpy('actualizar').and.returnValue(of({})),
+      actualizarParcial: jasmine.createSpy('actualizarParcial').and.returnValue(of({})),
+      eliminar: jasmine.createSpy('eliminar').and.returnValue(of({})),
+      borrar: jasmine.createSpy('borrar').and.returnValue(of({}))
     };
 
     mockRolService = {
@@ -89,9 +92,26 @@ describe('UsuariosListComponent', () => {
     expect(component.isUserFormValid()).toBeTrue();
   });
   
-  it('should filter by role code', () => {
-    component.filtroRolCodigo = 'ADMIN';
-    component.search();
-    expect(mockUsuarioService.buscarSinGlobalLoader).toHaveBeenCalled();
+  it('should use partial update for existing users', () => {
+    const user = { idUsuario: 1, rolCodigo: 'USER', username: 'test' } as any;
+    component.openEdit(user);
+    
+    // Modify user
+    if (component.editUser) {
+      component.editUser.username = 'test_modified';
+    }
+    
+    component.saveEdit();
+    
+    expect(mockUsuarioService.actualizarParcial).toHaveBeenCalled();
+    expect(mockUsuarioService.actualizar).not.toHaveBeenCalled();
+    expect(mockUsuarioService.crear).not.toHaveBeenCalled();
   });
-});
+  
+  it('should use create for new users', () => {
+    component.openCreate();
+    component.saveEdit();
+    
+    expect(mockUsuarioService.crear).toHaveBeenCalled();
+    expect(mockUsuarioService.actualizarParcial).not.toHaveBeenCalled();
+  });

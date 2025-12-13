@@ -35,6 +35,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   editModalVisible = false;
   editUser: Usuario | null = null;
+  originalUser: Usuario | null = null;
 
   showDeleteModal = false;
   userToDelete: Usuario | null = null;
@@ -164,11 +165,13 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   }
 
   openEdit(u: Usuario): void {
+    this.originalUser = { ...u }; // Keep original for patch comparison
     this.editUser = { ...u };
     this.editModalVisible = true;
   }
 
   openCreate(): void { 
+    this.originalUser = null;
     this.editUser = new Usuario();
     // Ensure 0/undefined logic is handled. Usuario defaults to 0.
     this.editModalVisible = true; 
@@ -177,6 +180,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   closeEdit(): void {
     this.editModalVisible = false;
     this.editUser = null;
+    this.originalUser = null;
   }
 
   isEmailValid(e?: string): boolean {
@@ -202,7 +206,19 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     if (!this.editUser) return;
     this.loading = true;
     const hasId = !!this.editUser.idUsuario && this.editUser.idUsuario > 0;
-    const op$ = hasId ? this.usuarioService.actualizar(this.editUser.idUsuario!, this.editUser) : this.usuarioService.crear(this.editUser);
+    
+    let op$;
+    if (hasId) {
+      // Use partial update with JSON Patch
+      if (this.originalUser) {
+        op$ = this.usuarioService.actualizarParcial(this.editUser.idUsuario!, this.editUser);
+      } else {
+        // Fallback if original is missing (shouldn't happen in edit mode)
+        op$ = this.usuarioService.actualizar(this.editUser.idUsuario!, this.editUser);
+      }
+    } else {
+      op$ = this.usuarioService.crear(this.editUser);
+    }
     
     op$.subscribe({
       next: () => {
