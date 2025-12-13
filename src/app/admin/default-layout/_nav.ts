@@ -20,6 +20,15 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-pencil' },
     children: [
       {
+        name: 'Nueva Entrada',
+        url: '/admin/control/entradas/crear',
+        icon: 'cil-plus',
+        badge: {
+          color: 'success',
+          text: '+'
+        }
+      },
+      {
         name: 'Listar',
         url: '/admin/control/entradas',
         icon: 'cil-list',
@@ -130,5 +139,15 @@ export const navItems: INavData[] = [
     name: 'Cambiar contraseña',
     url: '/admin/control/gestion/changepassword',
     iconComponent: { name: 'cil-lock-locked' }
+  },
+  {
+    title: true,
+    name: 'Enlaces'
+  },
+  {
+    name: 'Ver Sitio Web',
+    url: '/',
+    iconComponent: { name: 'cil-external-link' },
+    attributes: { target: '_blank' }
   }
 ];
