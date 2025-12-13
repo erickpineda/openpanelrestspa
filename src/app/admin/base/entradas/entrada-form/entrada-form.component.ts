@@ -20,6 +20,8 @@ import { OPConstants } from '../../../../shared/constants/op-global.constants';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ViewChild } from '@angular/core';
+import { ImagenesComponent } from '../../contenido/imagenes/imagenes.component';
 
 @Component({
   selector: 'app-entrada-form',
@@ -66,6 +68,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   @Output() cancelar = new EventEmitter<void>();
   @Output() editar = new EventEmitter<void>();
   @Output() preview = new EventEmitter<Entrada>();
+
+  @ViewChild(ImagenesComponent) imagenesComponent?: ImagenesComponent;
 
   public Editor: any = null;
   public editorLoading = false;
@@ -218,6 +222,11 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     this.form.markAsDirty();
     this.cdRef.markForCheck();
     this.toastService.showSuccess('Imagen subida correctamente', 'Éxito');
+    
+    // Refrescar librería si está cargada
+    if (this.imagenesComponent) {
+      this.imagenesComponent.load();
+    }
   }
 
   onQuitarImagen() {
