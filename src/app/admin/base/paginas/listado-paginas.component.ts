@@ -15,7 +15,7 @@ import { Entrada } from '../../../core/models/entrada.model';
 @Component({
   selector: 'app-listado-paginas',
   templateUrl: './listado-paginas.component.html',
-  styleUrls: ['../entradas/listado-entradas.component.scss']
+  styleUrls: ['./listado-paginas.component.scss']
 })
 export class ListadoPaginasComponent implements OnInit, OnDestroy {
   // Data
