@@ -13,12 +13,12 @@ import { LoggerService } from '../../../core/services/logger.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-listado-entradas',
-  templateUrl: './listado-entradas.component.html',
-  styleUrls: ['./listado-entradas.component.scss'],
+  selector: 'app-listado-paginas',
+  templateUrl: './listado-paginas.component.html',
+  styleUrls: ['./listado-paginas.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit {
   // #region Properties
   
   // Data
@@ -55,7 +55,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   // System
   private destroy$ = new Subject<void>();
-  private readonly boundaryId = 'listado-entradas-main';
+  private readonly boundaryId = 'listado-paginas-main';
 
   // #endregion
 
@@ -155,15 +155,31 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   private realizarBusquedaEntradas(term: string, page?: number) {
     this.cargandoTabla = true;
     this.cdr.markForCheck();
-    const searchRequest = {
-      dataOption: this.dataOptionSeleccionada,
-      searchCriteriaList: [{
-        filterKey: this.campoSeleccionado,
-        value: term,
-        operation: this.operacionSeleccionada,
+
+    // Filtro base: TipoEntrada = 'Página'
+    const searchCriteriaList = [
+      {
+        filterKey: 'tipoEntrada.nombre',
+        value: 'Página',
+        operation: 'EQUAL',
         clazzName: 'Entrada'
-      }]
+      }
+    ];
+
+    if (term && this.campoSeleccionado) {
+        searchCriteriaList.push({
+            filterKey: this.campoSeleccionado,
+            value: term,
+            operation: this.operacionSeleccionada,
+            clazzName: 'Entrada'
+        });
+    }
+
+    const searchRequest = {
+      dataOption: 'AND', // Aseguramos AND para que cumpla ambas condiciones si hay búsqueda
+      searchCriteriaList: searchCriteriaList
     };
+    
     const pageToUse = page !== undefined ? page : this.currentPage;
     return this.entradaService.buscarSafe(searchRequest, pageToUse, this.pageSize)
       .pipe(
@@ -359,13 +375,13 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
             this.obtenerListaEntradas(this.currentPage);
             this.entradaABorrar = null;
             this.visible = false;
-            this.toastService.showSuccess('La entrada se ha eliminado correctamente.', 'Entrada eliminada');
+            this.toastService.showSuccess('La página se ha eliminado correctamente.', 'Página eliminada');
             this.cdr.markForCheck();
           },
           error: (error) => {
-            this.log.error('Error al eliminar la entrada:', error);
+            this.log.error('Error al eliminar la página:', error);
             this.visible = false;
-            this.mostrarError('Error al eliminar la entrada: ' + error.message);
+            this.mostrarError('Error al eliminar la página: ' + error.message);
             this.cdr.markForCheck();
           }
         });
@@ -420,7 +436,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   onEditarDesdePreview(): void {
     if (this.previewEntrada && this.previewEntrada.idEntrada) {
-      this.router.navigate(['/admin/control/entradas/editar', this.previewEntrada.idEntrada]);
+      this.router.navigate(['/admin/control/paginas/editar', this.previewEntrada.idEntrada]);
       this.closePreview();
     }
   }
@@ -438,16 +454,6 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     return fechaPublicacion
       ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', false)
       : 'No publicada';
-  }
-
-  getEstadoInfo(entrada: Entrada): { icon: string, color: string, tooltip: string } {
-    if (entrada.publicada) {
-      return { icon: 'cilCheckCircle', color: 'text-success', tooltip: 'Publicada' };
-    }
-    if (entrada.borrador) {
-      return { icon: 'cilFile', color: 'text-warning', tooltip: 'Borrador' };
-    }
-    return { icon: 'cilHistory', color: 'text-warning', tooltip: entrada.estadoEntrada?.nombre || 'Pendiente' };
   }
 
   trackByEntradaId(index: number, entrada: Entrada): number {

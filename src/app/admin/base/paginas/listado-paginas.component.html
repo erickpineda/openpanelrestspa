@@ -1,7 +1,7 @@
 <c-card>
   <c-card-header class="d-flex align-items-center">
     <c-col [sm]="6">
-      <h6 cCardTitle>Listado de entradas</h6>
+      <h6 cCardTitle>Listado de páginas</h6>
     </c-col>
     <c-col [sm]="6">
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -10,7 +10,7 @@
           Imprimir
         </button>
         <button cButton color="warning" size="sm">
-          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Entradas sin revisar"></svg>
+          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Páginas sin revisar"></svg>
           Sin revisar
         </button>
       </div>
@@ -19,11 +19,11 @@
   
   <c-card-body>
     <div class="d-flex justify-content-between align-items-end">
-      <h5 cCardTitle>Listado de entradas</h5>
+      <h5 cCardTitle>Listado de páginas</h5>
       <div class="hstack gap-3">
         <button cButton color="success" size="sm" routerLink="crear">
-          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nueva entrada"></svg>
-          Crear nueva Entrada
+          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nueva página"></svg>
+          Crear nueva Página
         </button>
       </div>
     </div>
@@ -37,7 +37,7 @@
           <div class="text-muted small">Total {{ totalElements }}</div>
         </c-col>
         <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar entrada..." style="max-width: 280px;" />
+          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar página..." style="max-width: 280px;" />
           <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
         </c-col>
         <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
@@ -52,10 +52,9 @@
 
       <!-- Buscador Avanzado -->
       <div *ngIf="showAdvanced">
-      <!-- En listado-entradas.component.html -->
       <app-error-boundary 
-        context="listado-entradas"
-        fallbackMessage="No se pudieron cargar las entradas"
+        context="listado-paginas"
+        fallbackMessage="No se pudieron cargar las páginas"
         fallbackDescription="Verifique su conexión e intente nuevamente."
         [autoRetry]="true">
         
@@ -74,8 +73,6 @@
           (filtroChanged)="onFiltroChanged($event)">
         </app-buscador-avanzado>
         
-        <!-- Tu tabla de entradas aquí -->
-        
       </app-error-boundary>
       </div>
     </div>
@@ -86,69 +83,51 @@
       <!-- Loader Overlay -->
       <div *ngIf="cargandoTabla" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
         <div class="text-center">
-          <c-spinner [attr.aria-label]="'Cargando entradas'"></c-spinner>
-          <p class="mt-2 text-muted">Cargando entradas...</p>
+          <c-spinner [attr.aria-label]="'Cargando páginas'"></c-spinner>
+          <p class="mt-2 text-muted">Cargando páginas...</p>
         </div>
       </div>
 
-      <div [class.opacity-50]="cargandoTabla" class="table-responsive">
-      <table cTable hover class="align-middle mb-0 border tabla-con-loader text-nowrap">
-        <thead cTableColor="light">
+      <div [class.opacity-50]="cargandoTabla">
+      <table responsive hover cAlign="top" cTable class="tabla-con-loader">
+        <thead cTableColor="dark">
           <tr>
-            <th scope="col" style="min-width: 200px;">Título</th>
-            <th scope="col" style="min-width: 100px;">Autor</th>
-            <th scope="col" style="min-width: 100px;">Publicación</th>
-            <th scope="col" style="min-width: 120px;">Categorías</th>
-            <th scope="col" class="text-center" style="min-width: 60px;">Estado</th>
-            <th scope="col" class="text-center" style="min-width: 120px;">Acciones</th>
+            <th scope="col">ID</th>
+            <th scope="col">Título</th>
+            <th scope="col">Autor</th>
+            <th scope="col">Publicación</th>
+            <th scope="col" class="w-10">Categorías</th>
+            <th scope="col" class="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let entrada of listaEntradas; trackBy: trackByEntradaId">
-            <td>
-              <div class="d-flex flex-column">
-                <span class="fw-semibold text-truncate" style="max-width: 250px;" [title]="entrada.titulo">
-                  {{ entrada.titulo }}
-                </span>
-              </div>
-            </td>
-            <td>
-              <div class="d-flex align-items-center">
-                <svg cIcon name="cilUser" size="sm" class="me-2 text-secondary"></svg>
-                {{ entrada.usernameCreador }}
-              </div>
-            </td>
+          <tr *ngFor="let entrada of listaEntradas; trackBy: trackByEntradaId"
+              cAlign="middle" 
+              [cTableColor]="entrada.publicada ? 'success' : 'warning'"
+              class="cursor-pointer">
+            <td scope="row">{{ entrada.idEntrada }}</td>
+            <td>{{ commonFuncService.acortarTexto(entrada.titulo) }}</td>
+            <td>{{ entrada.usernameCreador }}</td>
             <td>{{ checkFechaPublicacion(entrada.fechaPublicacion) }}</td>
+            <td>{{ entrada.categoriasConComas }}</td>
             <td>
-              <span class="d-inline-block text-truncate" style="max-width: 150px;" [title]="entrada.categoriasConComas">
-                {{ entrada.categoriasConComas || 'Sin categoría' }}
-              </span>
-            </td>
-            <td class="text-center">
-              <ng-container *ngIf="getEstadoInfo(entrada) as estado">
-                <div [cTooltip]="estado.tooltip">
-                  <svg cIcon [name]="estado.icon" [class]="estado.color" size="lg"></svg>
-                </div>
-              </ng-container>
-            </td>
-            <td class="text-center">
-              <div class="btn-group" role="group" aria-label="Acciones de entrada">
-                <button cButton color="warning" size="sm" variant="ghost"
-                  [routerLink]="['/admin/control/entradas/editar', entrada.idEntrada]"
-                  [cTooltip]="'Editar entrada'"
-                  [attr.aria-label]="'Editar entrada ' + entrada.titulo">
+              <div class="btn-group" role="group" aria-label="Acciones de página">
+                <button cButton color="warning" size="sm" 
+                  [routerLink]="['/admin/control/paginas/editar', entrada.idEntrada]"
+                  [attr.aria-label]="'Editar página ' + entrada.titulo"
+                  [title]="'Editar página ' + entrada.titulo">
                   <svg cIcon name="cilPen" size="sm"></svg>
                 </button>
-                <button cButton color="danger" size="sm" variant="ghost"
+                <button cButton color="danger" size="sm" 
                   (click)="borrarEntrada(entrada)"
-                  [cTooltip]="'Borrar entrada'"
-                  [attr.aria-label]="'Borrar entrada ' + entrada.titulo">
+                  [attr.aria-label]="'Borrar página ' + entrada.titulo"
+                  [title]="'Borrar página ' + entrada.titulo">
                   <svg cIcon name="cilTrash" size="sm"></svg>
                 </button>
-                <button cButton color="info" size="sm" variant="ghost"
+                <button cButton color="info" size="sm"
                   (click)="openPreview(entrada)"
-                  [cTooltip]="'Vista previa'"
-                  [attr.aria-label]="'Vista previa de ' + entrada.titulo">
+                  [attr.aria-label]="'Vista previa de ' + entrada.titulo"
+                  [title]="'Vista previa de ' + entrada.titulo">
                   <svg cIcon name="cilExternalLink" size="sm"></svg>
                 </button>
               </div>
@@ -156,12 +135,8 @@
           </tr>
           
           <tr *ngIf="listaEntradas.length === 0" cAlign="middle">
-            <td colspan="6" class="text-center py-5">
-              <div class="d-flex flex-column align-items-center justify-content-center">
-                <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
-                <h6 class="text-muted">No se han encontrado entradas</h6>
-                <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
-              </div>
+            <td colspan="6" class="text-center py-4">
+              No se han encontrado registros en el sistema...
             </td>
           </tr>
         </tbody>
@@ -195,7 +170,7 @@
         <button (click)="toggleModal()" cButtonClose aria-label="Cerrar modal"></button>
       </c-modal-header>
       <c-modal-body>
-        <p>¿Está seguro de que desea eliminar la siguiente entrada?</p>
+        <p>¿Está seguro de que desea eliminar la siguiente página?</p>
         <div class="alert alert-warning">
           <strong>ID:</strong> {{ entradaABorrar?.idEntrada }}<br>
           <strong>Título:</strong> {{ entradaABorrar?.titulo }}

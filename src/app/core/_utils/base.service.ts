@@ -3,7 +3,7 @@ import { Injectable  } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpContext } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from '../../../environments/environment.dev.es';
+import { environment } from '../../../environments/environment';
 import { OpenpanelApiResponse, PaginatedResponse } from '../models/openpanel-api-response.model';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 

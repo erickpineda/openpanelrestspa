@@ -14,6 +14,7 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { SharedOPModule } from '../../../shared/shared.module';
 import { SharedCoreUiModule } from '../../../shared/shared-coreui.module';
 import { MediaSharedModule } from '../contenido/media-shared.module';
+import { EntradasSharedModule } from './entradas-shared.module';
 
 @NgModule({
   imports: [
@@ -25,14 +26,13 @@ import { MediaSharedModule } from '../contenido/media-shared.module';
     SharedOPModule,
     CKEditorModule,
     SharedCoreUiModule,
-    MediaSharedModule
+    MediaSharedModule,
+    EntradasSharedModule
   ],
   declarations: [
     ListadoEntradasComponent,
     CrearEntradaComponent,
     EditarEntradaComponent,
-    EntradaFormComponent,
-    PreviaEntradaComponent,
   ]
 })
 export class EntradasModule {}
