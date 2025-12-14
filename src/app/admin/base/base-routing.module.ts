@@ -14,6 +14,7 @@ const routes: Routes = [
   {
     path: '', component: BaseComponent, children: [
       { path: 'entradas', loadChildren: () => import('./entradas/entradas.module').then(m => m.EntradasModule), data: { preload: true, delay: 1000 } },
+      { path: 'paginas', loadChildren: () => import('./paginas/paginas.module').then(m => m.PaginasModule), data: { preload: true, delay: 1000 } },
       // Secciones reubicadas bajo base
       { path: 'configuracion', loadChildren: () => import('./configuracion/configuracion.module').then(m => m.ConfiguracionModule), data: { preload: true, delay: 1200 } },
       { path: 'contenido', loadChildren: () => import('./contenido/contenido.module').then(m => m.ContenidoModule), data: { preload: true, delay: 1400 } },
