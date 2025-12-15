@@ -41,8 +41,14 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.isLoading = true;
     const { username, password } = this.form;
+
+    // Evitar envíos vacíos (pueden ocurrir por conflictos con autofill o doble submit)
+    if (!username || !password) {
+      return;
+    }
+
+    this.isLoading = true;
 
     this.authService.login(username, password).subscribe({
       next: data => {

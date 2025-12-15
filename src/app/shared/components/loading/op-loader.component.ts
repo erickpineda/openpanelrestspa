@@ -29,7 +29,14 @@ export class OpLoaderComponent implements OnInit, OnDestroy, OnChanges {
     | 'info' = 'primary';
 
   @Input() useGlobal: boolean = true;
-  @Input() active: boolean = false;
+  private _active: boolean = false;
+  @Input() set active(val: boolean) {
+    this._active = !!val;
+    if (!this.useGlobal) {
+      this.loading = this._active;
+    }
+  }
+  get active(): boolean { return this._active; }
 
   loading = false;
   errorActive = false;

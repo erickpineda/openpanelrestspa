@@ -24,4 +24,19 @@ export class SearchUtilService {
       { nombre: 'No es nulo', valor: SearchOperation.NOT_NULL }
     ];
   }
+
+  buildRequest(entityName: string | null, criteria: { filterKey: string; value: any; operation: string }[], dataOption: string): any {
+    const list = (criteria || []).map(c => ({
+      filterKey: c.filterKey,
+      value: c.value != null ? String(c.value) : '',
+      operation: c.operation,
+      clazzName: entityName || undefined,
+      dataOption: dataOption
+    }));
+    return { dataOption, searchCriteriaList: list };
+  }
+
+  buildSingle(entityName: string | null, filterKey: string, value: any, operation: string, dataOption: string = 'AND'): any {
+    return this.buildRequest(entityName, [{ filterKey, value, operation }], dataOption);
+  }
 }

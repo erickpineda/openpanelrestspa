@@ -1,0 +1,17 @@
+{
+  "totalUsuarios": 1240,
+  "totalEntradas": 8421,
+  "totalComentarios": 23145,
+  "totalFicheros": 512,
+  "storageBytes": 1234567890,
+  "entradasByEstado": {
+    "PUBLICADA": 7000,
+    "NO PUBLICADA": 0,
+    "GUARDADA": 0,
+    "PENDIENTE_REVISION": 1000,
+    "EN_REVISION": 0,
+    "REVISADA": 0,
+    "PROGRAMADA": 0,
+    "HISTORICA": 421
+  }
+}

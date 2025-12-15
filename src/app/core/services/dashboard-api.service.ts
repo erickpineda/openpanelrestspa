@@ -51,9 +51,11 @@ export class DashboardApiService {
     if (force) {
       this.cache.delete(key);
     }
-    return this.getCached<SummaryDTO>(key, this.ttlSummary, () =>
-      this.http.get<any>(`${this.base}/summary`).pipe(map(r => r && r.data ? r.data as SummaryDTO : r))
-    );
+    return this.getCached<SummaryDTO>(key, this.ttlSummary, () => {
+      let params = new HttpParams();
+      if (force) params = params.set('force', 'true');
+      return this.http.get<any>(`${this.base}/summary`, { params }).pipe(map(r => r && r.data ? r.data as SummaryDTO : r));
+    });
   }
 
   getRecentActivity(page = 0, size = 5): Observable<any> {
@@ -69,7 +71,8 @@ export class DashboardApiService {
     const d = Math.max(1, Math.min(365, dRaw));
     const key = `dashboard:series:activity:days:${d}:gran:${granularity}`;
     if (force) this.cache.delete(key);
-    const params = new HttpParams().set('days', String(d)).set('granularity', granularity);
+    let params = new HttpParams().set('days', String(d)).set('granularity', granularity);
+    if (force) params = params.set('force', 'true');
     return this.getCached<ActivityPointDTO[]>(key, this.ttlSeries, () =>
       this.http.get<any>(`${this.base}/series/activity`, { params }).pipe(
         map(r => (r && r.data ? r.data as ActivityPointDTO[] : r))
@@ -83,7 +86,8 @@ export class DashboardApiService {
     const d = Math.max(1, Math.min(365, dRaw));
     const key = `dashboard:series:entries:split:estado:days:${d}:gran:${granularity}`;
     if (force) this.cache.delete(key);
-    const params = new HttpParams().set('days', String(d)).set('granularity', granularity).set('split', 'estado');
+    let params = new HttpParams().set('days', String(d)).set('granularity', granularity).set('split', 'estado');
+    if (force) params = params.set('force', 'true');
     return this.getCached<any[]>(key, this.ttlSeries, () =>
       this.http.get<any>(`${this.base}/series/entries`, { params }).pipe(
         map(r => (r && r.data ? r.data : r))
@@ -96,7 +100,8 @@ export class DashboardApiService {
     const d = Math.max(1, Math.min(365, dRaw));
     const key = `dashboard:series:entries:split:estadoNombre:days:${d}:gran:${granularity}`;
     if (force) this.cache.delete(key);
-    const params = new HttpParams().set('days', String(d)).set('granularity', granularity).set('split', 'estadoNombre');
+    let params = new HttpParams().set('days', String(d)).set('granularity', granularity).set('split', 'estadoNombre');
+    if (force) params = params.set('force', 'true');
     return this.getCached<any[]>(key, this.ttlSeries, () =>
       this.http.get<any>(`${this.base}/series/entries`, { params }).pipe(
         map(r => (r && r.data ? r.data : r))
@@ -116,6 +121,7 @@ export class DashboardApiService {
       if (type === 'tags') params = params.set('type', 'tags');
       if (startDate) params = params.set('startDate', startDate);
       if (endDate) params = params.set('endDate', endDate);
+      if (force) params = params.set('force', 'true');
       return this.http
         .get<any>(`${this.base}/top`, { params })
         .pipe(map(r => (r && r.data ? r.data as TopItemDTO[] : r)));
@@ -158,4 +164,5 @@ export class DashboardApiService {
       Array.from(this.cache.keys()).forEach(k => { if (k.startsWith('dashboard:top:type:')) this.cache.delete(k); });
     }
   }
+  evictContentStats() { this.cache.delete('dashboard:content-stats'); }
 }

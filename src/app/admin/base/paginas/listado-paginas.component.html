@@ -1,0 +1,224 @@
+<c-card>
+  <c-card-header class="d-flex align-items-center">
+    <c-col [sm]="6">
+      <h6 cCardTitle>Listado de páginas</h6>
+    </c-col>
+    <c-col [sm]="6">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button cButton color="light" size="sm" aria-label="Imprimir listado">
+          <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
+          Imprimir
+        </button>
+        <button cButton color="warning" size="sm">
+          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Páginas sin revisar"></svg>
+          Sin revisar
+        </button>
+      </div>
+    </c-col>
+  </c-card-header>
+  
+  <c-card-body>
+    <div class="d-flex justify-content-between align-items-end">
+      <h5 cCardTitle>Listado de páginas</h5>
+      <div class="hstack gap-3">
+        <button cButton color="success" size="sm" routerLink="crear">
+          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nueva página"></svg>
+          Crear nueva Página
+        </button>
+      </div>
+    </div>
+    <hr>
+
+    <!-- Buscador -->
+    <div class="mb-4">
+      <!-- Búsqueda Básica -->
+      <c-row class="align-items-center mb-3 g-2">
+        <c-col xs="12" md="4">
+          <div class="text-muted small">Total {{ totalElements }}</div>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar página..." style="max-width: 280px;" />
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 120px;">
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+            <option [ngValue]="50">50</option>
+          </select>
+        </c-col>
+      </c-row>
+
+      <!-- Buscador Avanzado -->
+      <div *ngIf="showAdvanced">
+      <app-error-boundary 
+        context="listado-paginas"
+        fallbackMessage="No se pudieron cargar las páginas"
+        fallbackDescription="Verifique su conexión e intente nuevamente."
+        [autoRetry]="true">
+        
+        <app-buscador-avanzado
+          [definiciones]="definiciones"
+          [autoTrigger]="true"
+          [debounceMs]="300"
+          [showButton]="false"
+          [showSearchButton]="true"
+          [showClearButton]="true"
+          [defaultField]="'titulo'"
+          [camposPrioritarios]="['titulo']"
+          [camposCatalogo]="['tipoEntrada.nombre', 'estadoEntrada.nombre', 'categoria.nombre', 'etiqueta.nombre']"
+          [cargarCatalogosFn]="cargarCatalogosEntrada"
+          (filtroSeleccionado)="aplicarFiltro($event)"
+          (filtroChanged)="onFiltroChanged($event)">
+        </app-buscador-avanzado>
+        
+      </app-error-boundary>
+      </div>
+    </div>
+
+    <!-- Tabla de Entradas con loader local -->
+    <div class="tabla-con-loader-wrapper position-relative">
+      
+      <!-- Loader Overlay -->
+      <div *ngIf="cargandoTabla" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+        <div class="text-center">
+          <c-spinner [attr.aria-label]="'Cargando páginas'"></c-spinner>
+          <p class="mt-2 text-muted">Cargando páginas...</p>
+        </div>
+      </div>
+
+    <div [class.opacity-50]="cargandoTabla" class="table-responsive">
+      <table cTable hover class="align-middle mb-0 border tabla-con-loader">
+        <thead cTableColor="light">
+          <tr>
+            <th scope="col" style="min-width: 250px;">Título</th>
+            <th scope="col" style="min-width: 120px;">Autor</th>
+            <th scope="col" style="min-width: 120px;">Publicación</th>
+            <th scope="col" style="min-width: 150px;">Categorías</th>
+            <th scope="col" class="text-center" style="min-width: 80px;">Estado</th>
+            <th scope="col" class="text-center" style="min-width: 140px;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entrada of listaEntradas; trackBy: trackByEntradaId">
+            <td>
+              <span class="fw-semibold text-truncate d-inline-block" style="max-width: 300px;" [title]="entrada.titulo">
+                {{ entrada.titulo }}
+              </span>
+            </td>
+            <td>{{ entrada.usernameCreador }}</td>
+            <td>{{ checkFechaPublicacion(entrada.fechaPublicacion) }}</td>
+            <td>
+              <span class="d-inline-block text-truncate" style="max-width: 200px;" [title]="entrada.categoriasConComas">
+                {{ entrada.categoriasConComas || 'Sin categoría' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <ng-container *ngIf="getEstadoInfo(entrada) as estado">
+                <div [cTooltip]="estado.tooltip">
+                  <svg cIcon [name]="estado.icon" [class]="estado.color" size="lg"></svg>
+                </div>
+              </ng-container>
+            </td>
+            <td class="text-center">
+              <div class="btn-group" role="group" aria-label="Acciones de página">
+                <button cButton color="warning" size="sm" variant="ghost"
+                  [routerLink]="['/admin/control/paginas/editar', entrada.idEntrada]"
+                  [cTooltip]="'Editar página'"
+                  [attr.aria-label]="'Editar página ' + entrada.titulo">
+                  <svg cIcon name="cilPen" size="sm"></svg>
+                </button>
+                <button cButton color="danger" size="sm" variant="ghost"
+                  (click)="borrarEntrada(entrada)"
+                  [cTooltip]="'Borrar página'"
+                  [attr.aria-label]="'Borrar página ' + entrada.titulo">
+                  <svg cIcon name="cilTrash" size="sm"></svg>
+                </button>
+                <button cButton color="info" size="sm" variant="ghost"
+                  (click)="openPreview(entrada)"
+                  [cTooltip]="'Vista previa'"
+                  [attr.aria-label]="'Vista previa de ' + entrada.titulo">
+                  <svg cIcon name="cilExternalLink" size="sm"></svg>
+                </button>
+              </div>
+            </td>          
+          </tr>
+          
+          <tr *ngIf="listaEntradas.length === 0">
+            <td colspan="6" class="text-center py-5">
+              <div class="d-flex flex-column align-items-center justify-content-center">
+                <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                <h6 class="text-muted">No se han encontrado páginas</h6>
+                <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <!-- Paginación -->
+      <app-op-pagination
+        [align]="'center'"
+        *ngIf="listaEntradas.length > 0"
+        [totalPages]="totalPages"
+        [currentPage]="currentPage"
+        (pageChange)="obtenerListaEntradas($event)">
+      </app-op-pagination>
+
+      <!-- Navegación Estilo Etiquetas -->
+      <c-row class="mt-2" *ngIf="listaEntradas.length > 0">
+        <c-col class="d-flex justify-content-end align-items-center gap-2">
+          <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="currentPage<=0">Anterior</button>
+          <button cButton color="light" size="sm" (click)="onNext()" [disabled]="isNextDisabled()">Siguiente</button>
+          <div class="text-muted small ms-2">Página {{ currentPage + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+        </c-col>
+      </c-row>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <c-modal #staticBackdropModal backdrop="static" id="staticBackdropModal" 
+             [visible]="visible" (visibleChange)="onVisibleModalChange($event)">
+      <c-modal-header>
+        <h5 cModalTitle>Confirmar eliminación</h5>
+        <button (click)="toggleModal()" cButtonClose aria-label="Cerrar modal"></button>
+      </c-modal-header>
+      <c-modal-body>
+        <p>¿Está seguro de que desea eliminar la siguiente página?</p>
+        <div class="alert alert-warning">
+          <strong>ID:</strong> {{ entradaABorrar?.idEntrada }}<br>
+          <strong>Título:</strong> {{ entradaABorrar?.titulo }}
+        </div>
+        <p class="text-danger">Esta acción no se puede deshacer.</p>
+      </c-modal-body>
+      <c-modal-footer>
+        <button (click)="toggleModal()" cButton color="secondary">
+          Cancelar
+        </button>
+        <button cButton color="danger" (click)="confirmarBorrado()">
+          Eliminar
+        </button>
+      </c-modal-footer>
+    </c-modal>
+
+    <!-- Modal de Vista Previa de Entrada -->
+    <c-modal id="previewEntradaModal" [visible]="previewVisible" (visibleChange)="onPreviewVisibleChange($event)">
+      <c-modal-header>
+        <h5 cModalTitle>Vista previa</h5>
+        <button #previewCloseBtn (click)="closePreview()" cButtonClose aria-label="Cerrar preview" title="Cerrar vista previa"></button>
+      </c-modal-header>
+      <c-modal-body>
+        <app-previa-entrada
+          [entrada]="previewEntrada"
+          [mostrarBotonesAccion]="true"
+          (cerrar)="closePreview()"
+          (editar)="onEditarDesdePreview()"
+          (publicar)="onPublicarDesdePreview($event)">
+        </app-previa-entrada>
+      </c-modal-body>
+    </c-modal>
+
+  </c-card-body>
+</c-card>

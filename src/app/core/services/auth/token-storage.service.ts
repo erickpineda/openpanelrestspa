@@ -139,9 +139,9 @@ export class TokenStorageService {
       // Limpiar claves de sincronización global
       localStorage.removeItem(SYNC_TOKEN_KEY);
       localStorage.removeItem(SYNC_USER_KEY);
-      localStorage.removeItem('auth-sync');
-      localStorage.removeItem('session-active');
-      localStorage.removeItem('session-timestamp');
+      localStorage.removeItem(OPConstants.Session.AUTH_SYNC_KEY);
+      localStorage.removeItem(OPConstants.Session.SESSION_ACTIVE_KEY);
+      localStorage.removeItem(OPConstants.Session.SESSION_TIMESTAMP_KEY);
     } catch (e) {
       this.log.error('TokenStorageService.signOut error', e);
     }

@@ -114,14 +114,28 @@ export class NetworkInterceptor implements HttpInterceptor {
   }
 
   private addContentType(request: HttpRequest<unknown>): HttpRequest<unknown> {
-    // Agregar Content-Type por defecto para peticiones POST/PUT con body
-    if (['POST', 'PUT', 'PATCH'].includes(request.method) && !request.headers.has('Content-Type')) {
-      return request.clone({
-        setHeaders: {
-          'Content-Type': 'application/json'
-        }
-      });
+    const isApi = request.url.includes('/api/');
+    const isFormData = typeof FormData !== 'undefined' && request.body instanceof FormData;
+
+    let headersToSet: { [name: string]: string } = {};
+
+    if (isApi && !request.headers.has('Accept')) {
+      headersToSet['Accept'] = 'application/json';
     }
+
+    if (
+      isApi &&
+      !isFormData &&
+      !request.headers.has('Content-Type') &&
+      (request.method === 'GET' || request.method === 'DELETE' || request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH')
+    ) {
+      headersToSet['Content-Type'] = 'application/json';
+    }
+
+    if (Object.keys(headersToSet).length > 0) {
+      return request.clone({ setHeaders: headersToSet });
+    }
+
     return request;
   }
 
@@ -134,8 +148,13 @@ export class NetworkInterceptor implements HttpInterceptor {
       timestamp: new Date().toISOString()
     };
 
-    // Log del error
-    this.logger.error(`Error HTTP ${error.status} en ${request.method} ${request.url}`, error);
+    // Log del error - Usar warn para errores 4xx (cliente) para no ensuciar la consola con errores esperados
+    const logMessage = `Error HTTP ${error.status} en ${request.method} ${request.url}`;
+    if (error.status >= 400 && error.status < 500) {
+      this.logger.warn(logMessage, error);
+    } else {
+      this.logger.error(logMessage, error);
+    }
 
     // No mostrar notificaciones para peticiones silenciosas
     if (isSilent) return;

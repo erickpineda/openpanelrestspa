@@ -1,24 +1,25 @@
 import { OPRestApiConstants, OPRestMethods } from './op-restapi.constants';
+import { OPSessionConstants } from './op-session.constants';
+import { OPStorageConstants } from './op-storage.constants';
+import { OPEventsConstants } from './op-events.constants';
+import { OPSyncConstants } from './op-sync.constants';
+import { OPPaginationConstants } from './op-pagination.constants';
+import { OPRolesConstants } from './op-roles.constants';
 
-export const OPConstants: any = {
+/**
+ * OPConstants
+ * 
+ * Agrupador global de constantes de la aplicación.
+ * Las constantes específicas se han extraído a archivos separados (op-*.constants.ts)
+ * para mejorar la mantenibilidad y modularidad.
+ */
+export const OPConstants = {
   API: OPRestApiConstants,
   Methods: OPRestMethods,
-  Session: {
-    // Prefijos y claves de storage
-    POST_LOGIN_PREFIX: 'post-login-redirect-',
-    POST_LOGIN_REDIRECT: 'post-login-redirect',
-    TAB_ID_KEY: 'op-tab-id',
-    TOKEN_KEY: 'auth-token',
-    USER_KEY: 'auth-user',
-    SYNC_TOKEN_KEY: 'sync-auth-token',
-    SYNC_USER_KEY: 'sync-auth-user',
-    // Rutas especiales del flujo de sesión/post-login
-    ROUTE_LOGIN: '/login',
-    ROUTE_SESSION_EXPIRED: '/session-expired',
-    ROUTE_HOME: '/',
-    // Otros identificadores relevantes
-    POST_LOGIN_HANDLED_PREFIX: 'post-login-handled-',
-    // Ventana de protección anti-race (ms)
-    IGNORE_WINDOW_MS: 1000,
-  },
-};
+  Session: OPSessionConstants,
+  Storage: OPStorageConstants,
+  Events: OPEventsConstants,
+  Sync: OPSyncConstants,
+  Pagination: OPPaginationConstants,
+  Roles: OPRolesConstants
+} as const;

@@ -1,0 +1,23 @@
+<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <button cButton color="primary" size="sm" (click)="refresh.emit()">
+    <svg cIcon name="cilChart" style="padding-right: 2px" size="sm" title="Ver Gráfico"></svg>
+    Refrescar Gráficos
+  </button>
+  <button cButton color="secondary" size="sm" (click)="toggleForce.emit()" [active]="forceFromDb" title="Forzar datos desde BD" [attr.aria-pressed]="forceFromDb ? 'true' : 'false'">
+    Forzar BD: {{ forceFromDb ? 'On' : 'Off' }}
+  </button>
+  <button cButton color="info" size="sm" (click)="downloadData.emit()" aria-label="Descargar datos" title="Descargar datos en JSON">
+    <svg cIcon name="cilDataTransferDown" style="padding-right: 2px" size="sm" title="Descargar Datos"></svg>
+    Descargar Datos
+  </button>
+  <button cButton color="secondary" size="sm" (click)="downloadZip.emit()" aria-label="Exportar CSV en ZIP" title="Exportar todos los CSV en ZIP">
+    <svg cIcon name="cilCloudDownload" style="padding-right: 2px" size="sm" title="Exportar ZIP"></svg>
+    Exportar ZIP
+  </button>
+  <div class="d-inline-flex align-items-center ms-2" *ngIf="exportingZip" aria-live="polite" aria-busy="true">
+    <c-spinner size="sm"></c-spinner>
+    <span class="small text-muted ms-2">Generando ZIP...</span>
+  </div>
+  <div class="small text-danger ms-2" *ngIf="exportError">{{ exportError }}</div>
+</div>
+

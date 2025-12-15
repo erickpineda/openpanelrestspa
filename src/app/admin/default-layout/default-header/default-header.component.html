@@ -1,58 +1,59 @@
 <!--<c-header class="mb-4 d-print-none" position="sticky">-->
 <ng-container>
-  <c-container [fluid]="true">
+  <c-container [fluid]="true" [attr.aria-busy]="busy ? 'true' : null">
     <button
       toggle="visible"
       cHeaderToggler
       [cSidebarToggle]="sidebarId"
       class="ps-1"
+      aria-label="Alternar barra lateral"
     >
       <svg cIcon
         name="cilMenu"
         size="lg"
       ></svg>
     </button>
-    <c-header-nav class="d-none d-lg-flex me-auto">
+    <c-header-nav class="d-none d-lg-flex me-auto" role="navigation" aria-label="Navegación principal">
       <c-nav-item>
-        <a cNavLink routerLink="/admin/dashboard" routerLinkActive="active">
-          Escritorio
+        <a cNavLink routerLink="/admin/dashboard" routerLinkActive="active" #rlaDashboard="routerLinkActive" [attr.aria-current]="rlaDashboard.isActive ? 'page' : null" [attr.aria-label]="labelDashboard">
+          {{ labelDashboard }}
         </a>
       </c-nav-item>
       <c-nav-item>
-        <a cNavLink routerLink="/admin/gestion/usuarios" routerLinkActive="active">Usuarios</a>
+        <a cNavLink routerLink="/admin/gestion/usuarios" routerLinkActive="active" #rlaUsers="routerLinkActive" [attr.aria-current]="rlaUsers.isActive ? 'page' : null" [attr.aria-label]="labelUsers">{{ labelUsers }}</a>
       </c-nav-item>
       <c-nav-item>
-        <a cNavLink routerLink="/home" routerLinkActive="active">
-          Ir a inicio
+        <a cNavLink routerLink="/home" routerLinkActive="active" #rlaHome="routerLinkActive" [attr.aria-current]="rlaHome.isActive ? 'page' : null" [attr.aria-label]="labelGoHome">
+          {{ labelGoHome }}
         </a>
       </c-nav-item>
     </c-header-nav>
 
-    <c-header-nav class="d-none d-lg-flex">
+    <c-header-nav class="d-none d-lg-flex" role="navigation" aria-label="Acciones rápidas">
       <c-nav-item>
-        <a routerLink="./" cNavLink>
+        <a routerLink="./" cNavLink aria-label="Notificaciones">
           <svg cIcon name="cilBell" size="lg"></svg>
         </a>
       </c-nav-item>
       <c-nav-item>
-        <a routerLink="./" cNavLink>
+        <a routerLink="./" cNavLink aria-label="Tareas">
           <svg cIcon name="cilList" size="lg"></svg>
         </a>
       </c-nav-item>
       <c-nav-item>
-        <a routerLink="./" cNavLink>
+        <a routerLink="./" cNavLink aria-label="Mensajes">
           <svg cIcon name="cilEnvelopeOpen" size="lg"></svg>
         </a>
       </c-nav-item>
     </c-header-nav>
-    <c-header-nav class="ms-3">
+    <c-header-nav class="ms-3" role="navigation" aria-label="Menú de usuario">
       <ng-container *ngTemplateOutlet="userDropdown"></ng-container>
     </c-header-nav>
 
   </c-container>
   <c-header-divider></c-header-divider>
   <c-container [fluid]="true">
-    <c-breadcrumb class="ms-2">
+    <c-breadcrumb class="ms-2" aria-label="breadcrumb">
       <li class="breadcrumb-item"><a routerLink="/admin">Inicio</a></li>
       <li class="breadcrumb-item active" aria-current="page">Página actual</li>
     </c-breadcrumb>
@@ -68,6 +69,10 @@
       [caret]="false"
       cDropdownToggle
       class="py-0"
+      aria-label="Abrir menú de usuario"
+      aria-haspopup="true"
+      [attr.aria-expanded]="userMenuOpen ? 'true' : 'false'"
+      (click)="userMenuOpen = !userMenuOpen"
     >
       <c-avatar
         cTextColor="primary"
@@ -80,89 +85,72 @@
     </button>
     <ul cDropdownMenu class="pt-0 pr-5 w-auto">
       <li>
-        <h6 cDropdownHeader class="bg-light fw-semibold py-2">Account</h6>
+        <h6 cDropdownHeader class="bg-light fw-semibold py-2">{{ labelAccount }}</h6>
       </li>
       <li>
         <a routerLink="./" cDropdownItem>
           <svg cIcon class="me-2" name="cilBell"></svg>
-          Updates
-          <c-badge class="ms-2 float-end" color="info">
-            42
-          </c-badge>
+          {{ labelUpdates }}
+          <c-badge class="ms-2 float-end" color="info">{{ notificationsCount }}</c-badge>
         </a>
       </li>
       <li>
         <a routerLink="./" cDropdownItem>
           <svg cIcon class="me-2" name="cilEnvelopeOpen"></svg>
-          Messages
-          <c-badge class="ms-2 float-end" color="success">
-            42
-          </c-badge>
+          {{ labelMessages }}
+          <c-badge class="ms-2 float-end" color="success">{{ messagesCount }}</c-badge>
         </a>
       </li>
       <li>
         <a routerLink="./" cDropdownItem>
           <svg cIcon class="me-2" name="cilTask"></svg>
-          Tasks
-          <c-badge class="ms-2 float-end" color="danger">
-            42
-          </c-badge>
+          {{ labelTasks }}
+          <c-badge class="ms-2 float-end" color="danger">{{ tasksCount }}</c-badge>
         </a>
       </li>
       <li>
-        <a routerLink="./" cDropdownItem>
+        <a routerLink="/admin/control/comentarios" cDropdownItem>
           <svg cIcon class="me-2" name='cilCommentSquare'></svg>
           Comments
-          <c-badge class="ms-auto" color="warning">
-            42
-          </c-badge>
+          <c-badge class="ms-auto" color="warning">{{ commentsCount }}</c-badge>
         </a>
       </li>
       <li>
-        <h6 cDropdownHeader class="bg-light fw-semibold py-2">Settings</h6>
+        <h6 cDropdownHeader class="bg-light fw-semibold py-2">{{ labelSettings }}</h6>
       </li>
       <li></li>
       <li>
-        <a routerLink="./" cDropdownItem>
+        <a routerLink="/admin/control/gestion/miperfil" cDropdownItem>
           <svg cIcon class="me-2" name="cilUser"></svg>
-          Profile
+          {{ labelProfile }}
         </a>
       </li>
       <li>
-        <a routerLink="./" cDropdownItem>
+        <a routerLink="/admin/control/configuracion/ajustes" cDropdownItem>
           <svg cIcon class="me-2" name="cilSettings"></svg>
-          Settings
+          {{ labelSettings }}
         </a>
       </li>
       <li>
-        <a routerLink="./" cDropdownItem>
-          <svg cIcon class="me-2" name="cilCreditCard"></svg>
-          Payments
-          <c-badge class="ms-2 float-end" color="secondary">
-            42
-          </c-badge>
-        </a>
+        <!-- Payments item eliminado -->
       </li>
       <li>
-        <a routerLink="./" cDropdownItem>
+        <a routerLink="/admin/control/entradas" cDropdownItem>
           <svg cIcon class="me-2" name="cilFile"></svg>
-          Projects
-          <c-badge class="ms-2 float-end" color="primary">
-            42
-          </c-badge>
+          {{ labelProjects }}
+          <c-badge class="ms-2 float-end" color="primary">{{ projectsCount }}</c-badge>
         </a>
       </li>
       <li>
         <hr cDropdownDivider/>
       </li>
       <li>
-        <a routerLink="./" cDropdownItem>
+        <a routerLink="/login" cDropdownItem>
           <svg cIcon class="me-2" name="cilLockLocked"></svg>
-          Lock Account
+          {{ labelLockAccount }}
         </a>
       </li>
       <li></li>
     </ul>
   </c-dropdown>
 </ng-template>
-

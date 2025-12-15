@@ -1,4 +1,4 @@
-import { ErrorHandler, NgModule } from '@angular/core';
+import { ErrorHandler, NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -7,7 +7,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CoreModule } from './core/core.module';
 import { HttpClientModule } from '@angular/common/http';
 import { CustomPreloadingStrategyService } from './core/preloading/custom-preloading-strategy.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
 import { ModalModule, ToastModule } from '@coreui/angular';
 import { UnsavedWorkDirective } from './core/directives/unsaved-work.directive';
 import { SessionExpiredComponent } from './core/features/session-expired.component';
@@ -35,8 +36,10 @@ import { SharedOPModule } from './shared/shared.module';
   ],
   providers: [
     DatePipe,
-    CustomPreloadingStrategyService
+    CustomPreloadingStrategyService,
+    { provide: LOCALE_ID, useValue: 'es-ES' }
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+registerLocaleData(localeEs);

@@ -31,6 +31,27 @@
 
     <!-- Buscador -->
     <div class="mb-4">
+      <!-- Búsqueda Básica -->
+      <c-row class="align-items-center mb-3 g-2">
+        <c-col xs="12" md="4">
+          <div class="text-muted small">Total {{ totalElements }}</div>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar entrada..." style="max-width: 280px;" />
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 120px;">
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+            <option [ngValue]="50">50</option>
+          </select>
+        </c-col>
+      </c-row>
+
+      <!-- Buscador Avanzado -->
+      <div *ngIf="showAdvanced">
       <!-- En listado-entradas.component.html -->
       <app-error-boundary 
         context="listado-entradas"
@@ -56,61 +77,78 @@
         <!-- Tu tabla de entradas aquí -->
         
       </app-error-boundary>
+      </div>
     </div>
 
     <!-- Tabla de Entradas con loader local -->
     <div class="tabla-con-loader-wrapper position-relative">
-      <app-op-loader
-        [useGlobal]="false"
-        [active]="cargandoTabla"
-        [overlay]="true"
-        [fullScreen]="false"
-        [position]="'center'"
-        [loaderStyle]="'pulse'"
-        [size]="'sm'"
-        [color]="'primary'"
-        [message]="'Cargando entradas...'">
-      </app-op-loader>
+      
+      <!-- Loader Overlay -->
+      <div *ngIf="cargandoTabla" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+        <div class="text-center">
+          <c-spinner [attr.aria-label]="'Cargando entradas'"></c-spinner>
+          <p class="mt-2 text-muted">Cargando entradas...</p>
+        </div>
+      </div>
 
-      <table responsive hover cAlign="top" cTable class="tabla-con-loader">
-        <thead cTableColor="dark">
+      <div [class.opacity-50]="cargandoTabla" class="table-responsive">
+      <table cTable hover class="align-middle mb-0 border tabla-con-loader text-nowrap">
+        <thead cTableColor="light">
           <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Título</th>
-            <th scope="col">Autor</th>
-            <th scope="col">Publicación</th>
-            <th scope="col" class="w-10">Categorías</th>
-            <th scope="col" class="col">Acciones</th>
+            <th scope="col" style="min-width: 200px;">Título</th>
+            <th scope="col" style="min-width: 100px;">Autor</th>
+            <th scope="col" style="min-width: 100px;">Publicación</th>
+            <th scope="col" style="min-width: 120px;">Categorías</th>
+            <th scope="col" class="text-center" style="min-width: 60px;">Estado</th>
+            <th scope="col" class="text-center" style="min-width: 120px;">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let entrada of listaEntradas; trackBy: trackByEntradaId"
-              cAlign="middle" 
-              [cTableColor]="entrada.publicada ? 'success' : 'warning'"
-              class="cursor-pointer">
-            <td scope="row">{{ entrada.idEntrada }}</td>
-            <td>{{ commonFuncService.acortarTexto(entrada.titulo) }}</td>
-            <td>{{ entrada.usernameCreador }}</td>
-            <td>{{ checkFechaPublicacion(entrada.fechaPublicacion) }}</td>
-            <td>{{ entrada.categoriasConComas }}</td>
+          <tr *ngFor="let entrada of listaEntradas; trackBy: trackByEntradaId">
             <td>
+              <div class="d-flex flex-column">
+                <span class="fw-semibold text-truncate" style="max-width: 250px;" [title]="entrada.titulo">
+                  {{ entrada.titulo }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <svg cIcon name="cilUser" size="sm" class="me-2 text-secondary"></svg>
+                {{ entrada.usernameCreador }}
+              </div>
+            </td>
+            <td>{{ checkFechaPublicacion(entrada.fechaPublicacion) }}</td>
+            <td>
+              <span class="d-inline-block text-truncate" style="max-width: 150px;" [title]="entrada.categoriasConComas">
+                {{ entrada.categoriasConComas || 'Sin categoría' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <ng-container *ngIf="getEstadoInfo(entrada) as estado">
+                <div [cTooltip]="estado.tooltip">
+                  <svg cIcon [name]="estado.icon" [class]="estado.color" size="lg"></svg>
+                </div>
+              </ng-container>
+            </td>
+            <td class="text-center">
               <div class="btn-group" role="group" aria-label="Acciones de entrada">
-                <button cButton color="warning" size="sm" 
+                <button cButton color="warning" size="sm" variant="ghost"
                   [routerLink]="['/admin/control/entradas/editar', entrada.idEntrada]"
-                  [attr.aria-label]="'Editar entrada ' + entrada.titulo"
-                  [title]="'Editar entrada ' + entrada.titulo">
+                  [cTooltip]="'Editar entrada'"
+                  [attr.aria-label]="'Editar entrada ' + entrada.titulo">
                   <svg cIcon name="cilPen" size="sm"></svg>
                 </button>
-                <button cButton color="danger" size="sm" 
+                <button cButton color="danger" size="sm" variant="ghost"
                   (click)="borrarEntrada(entrada)"
-                  [attr.aria-label]="'Borrar entrada ' + entrada.titulo"
-                  [title]="'Borrar entrada ' + entrada.titulo">
+                  [cTooltip]="'Borrar entrada'"
+                  [attr.aria-label]="'Borrar entrada ' + entrada.titulo">
                   <svg cIcon name="cilTrash" size="sm"></svg>
                 </button>
-                <button cButton color="info" size="sm"
+                <button cButton color="info" size="sm" variant="ghost"
                   (click)="openPreview(entrada)"
-                  [attr.aria-label]="'Vista previa de ' + entrada.titulo"
-                  [title]="'Vista previa de ' + entrada.titulo">
+                  [cTooltip]="'Vista previa'"
+                  [attr.aria-label]="'Vista previa de ' + entrada.titulo">
                   <svg cIcon name="cilExternalLink" size="sm"></svg>
                 </button>
               </div>
@@ -118,8 +156,12 @@
           </tr>
           
           <tr *ngIf="listaEntradas.length === 0" cAlign="middle">
-            <td colspan="6" class="text-center py-4">
-              No se han encontrado registros en el sistema...
+            <td colspan="6" class="text-center py-5">
+              <div class="d-flex flex-column align-items-center justify-content-center">
+                <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                <h6 class="text-muted">No se han encontrado entradas</h6>
+                <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -133,6 +175,16 @@
         [currentPage]="currentPage"
         (pageChange)="obtenerListaEntradas($event)">
       </app-op-pagination>
+
+      <!-- Navegación Estilo Etiquetas -->
+      <c-row class="mt-2" *ngIf="listaEntradas.length > 0">
+        <c-col class="d-flex justify-content-end align-items-center gap-2">
+          <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="currentPage<=0">Anterior</button>
+          <button cButton color="light" size="sm" (click)="onNext()" [disabled]="isNextDisabled()">Siguiente</button>
+          <div class="text-muted small ms-2">Página {{ currentPage + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+        </c-col>
+      </c-row>
+      </div>
     </div>
 
     <!-- Modal de Confirmación -->

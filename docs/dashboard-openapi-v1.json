@@ -1,0 +1,354 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Openpanel Dashboard API (v1)",
+    "version": "1.0.0",
+    "description": "Contratos para los endpoints del dashboard. Base path: /api/v1. Este archivo es la fuente de la verdad para el API del dashboard. Nota: las respuestas reales están envueltas en el envelope OpenpanelApiResponse { result, data, error }."
+  },
+  "servers": [ { "url": "/api/v1" } ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT bearer token. Añadir header: Authorization: Bearer <token>"
+      }
+    },
+    "schemas": {
+      "ResultApiResponse": {
+        "type": "object",
+        "properties": {
+          "trackingId": { "type": "string" },
+          "timestamp": { "type": "string", "description": "Formato: dd-MM-yyyy HH:mm:ss" },
+          "success": { "type": "boolean" },
+          "message": { "type": "string" }
+        }
+      },
+      "OpenpanelApiResponse": {
+        "type": "object",
+        "properties": {
+          "result": { "$ref": "#/components/schemas/ResultApiResponse" },
+          "data": { "type": "object", "description": "Payload específico del endpoint" },
+          "error": { "type": "object", "description": "Error object (si existe)" }
+        },
+        "required": [ "result" ]
+      },
+      "ActivityPointDTO": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date", "example": "2025-10-22" },
+          "entradas": { "type": "integer", "example": 2 },
+          "comentarios": { "type": "integer", "example": 5 },
+          "usuarios": { "type": "integer", "example": 1 }
+        }
+      },
+      "ActivityHourPointDTO": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date-time", "example": "2025-11-23T08:00:00+01:00", "description": "Fecha/hora con offset (zone Europe/Madrid)" },
+          "entradas": { "type": "integer", "example": 3 },
+          "comentarios": { "type": "integer", "example": 7 },
+          "usuarios": { "type": "integer", "example": 1 }
+        }
+      },
+      "EntriesSplitPointDTO": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "entradasByEstado": {
+            "type": "object",
+            "additionalProperties": { "type": "integer" },
+            "description": "Mapa de estados posibles de la entrada y su cantidad. Ejemplo: { 'PUBLICADA': 71, 'NO PUBLICADA': 4, 'GUARDADA': 0, ... }. Los estados posibles se obtienen de EstadoEntradaEnum."
+          }
+        }
+      },
+      "TopItemDTO": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "count": { "type": "integer" }
+        }
+      },
+      "SummaryDTO": {
+        "type": "object",
+        "properties": {
+          "totalUsuarios": { "type": "integer" },
+          "totalEntradas": { "type": "integer" },
+          "totalComentarios": { "type": "integer" },
+          "totalFicheros": { "type": "integer" },
+          "storageBytes": { "type": "integer" },
+          "ultimasEntradas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "titulo": { "type": "string" },
+                "fechaCreacion": { "type": "string", "format": "date-time" },
+                "idUsuario": { "type": "integer" },
+                "estado": { "type": "string" }
+              }
+            }
+          },
+          "ultimosComentarios": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "contenidoCorto": { "type": "string" },
+                "fechaCreacion": { "type": "string", "format": "date-time" },
+                "idUsuario": { "type": "integer" },
+                "idEntrada": { "type": "integer" }
+              }
+            }
+          },
+          "ultimosUsuarios": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "username": { "type": "string" },
+                "email": { "type": "string" },
+                "fechaRegistro": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        }
+      },
+      "StorageDTO": {
+        "type": "object",
+        "properties": {
+          "totalFicheros": { "type": "integer" },
+          "storageBytes": { "type": "integer" }
+        }
+      },
+      "ContentStatsDTO": {
+        "type": "object",
+        "properties": {
+          "totalUsuarios": { "type": "integer" },
+          "totalEntradas": { "type": "integer" },
+          "totalComentarios": { "type": "integer" },
+          "totalFicheros": { "type": "integer" },
+          "storageBytes": { "type": "integer" },
+          "entradasByEstado": { "type": "object", "additionalProperties": { "type": "integer" } }
+        }
+      }
+    }
+  },
+  "security": [ { "bearerAuth": [] } ],
+  "paths": {
+    "/dashboard/summary": {
+      "get": {
+        "summary": "Resumen del dashboard",
+        "security": [ { "bearerAuth": [] } ],
+        "parameters": [
+          { "name": "force", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Si true, ignora caché y refresca datos (actualiza caché)" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resumen (envuelto en OpenpanelApiResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/OpenpanelApiResponse" },
+                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/SummaryDTO" } } }
+                  ]
+                },
+                "example": {
+                  "result": { "timestamp": "22-11-2025 00:00:00", "trackingId": "abc-123", "success": true, "message": "OK" },
+                  "data": { "$ref": "./examples/summary.json" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/recent-activity": {
+      "get": {
+        "summary": "Actividad reciente (paginada)",
+        "security": [ { "bearerAuth": [] } ],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 0 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 5 }, "description": "Tamaño de página. Default 5 en la API; size <=0 -> normalizado a 5" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resumen paginado (envuelto)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/OpenpanelApiResponse" },
+                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/SummaryDTO" } } }
+                  ]
+                },
+                "example": {
+                  "result": { "timestamp": "22-11-2025 00:00:00", "trackingId": "abc-124", "success": true, "message": "OK" },
+                  "data": { "$ref": "./examples/summary.json" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/series/activity": {
+      "get": {
+        "summary": "Series de actividad por día (o por hora si granularity=hour)",
+        "security": [ { "bearerAuth": [] } ],
+        "parameters": [
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 }, "description": "Días a mostrar. Normalizado: <=0 -> 30; max 365. Si granularity=hour, 'days' se interpreta como horas." },
+          { "name": "granularity", "in": "query", "schema": { "type": "string", "default": "day", "enum": ["hour","day","week","month"] }, "description": "Granularidad de la serie" },
+          { "name": "force", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Si true, ignora caché y refresca datos (actualiza caché)" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de puntos de actividad (envuelta). Si granularity=hour los elementos son ActivityHourPointDTO (date con hora).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/OpenpanelApiResponse" },
+                    { "type": "object", "properties": { "data": { "type": "array", "items": { "anyOf": [ { "$ref": "#/components/schemas/ActivityPointDTO" }, { "$ref": "#/components/schemas/ActivityHourPointDTO" } ] } } } }
+                  ]
+                },
+                "example": {
+                  "result": { "timestamp": "22-11-2025 00:00:00", "trackingId": "abc-125", "success": true, "message": "OK" },
+                  "data": { "$ref": "./examples/series.json" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/series/entries": {
+      "get": {
+        "summary": "Series de entradas (split por estado, agrupado por fecha)",
+        "security": [ { "bearerAuth": [] } ],
+        "parameters": [
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 }, "description": "Días a mostrar. Normalizado: <=0 -> 30; max 365" },
+          { "name": "split", "in": "query", "schema": { "type": "string", "default": "estado", "enum": ["estado","estadoNombre"] }, "description": "Parámetro legacy/alternativo: estado o estadoNombre; si no soportado devuelve 400" },
+          { "name": "granularity", "in": "query", "schema": { "type": "string", "default": "day", "enum": ["hour","day","week","month"] } },
+          { "name": "force", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Si true, ignora caché y refresca datos (actualiza caché)" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array de puntos split por estado agrupado por fecha (envuelto)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/OpenpanelApiResponse" },
+                    { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/EntriesSplitPointDTO" } } } }
+                  ]
+                },
+                "example": {
+                  "result": { "timestamp": "26-11-2025 00:00:00", "trackingId": "abc-126", "success": true, "message": "OK" },
+                  "data": [
+                    { "date": "2025-11-24", "entradasByEstado": { "PUBLICADA": 10, "NO PUBLICADA": 2, "GUARDADA": 0, "PENDIENTE_REVISION": 1, "EN_REVISION": 0, "REVISADA": 0, "PROGRAMADA": 0, "HISTORICA": 0 } },
+                    { "date": "2025-11-25", "entradasByEstado": { "PUBLICADA": 8, "NO PUBLICADA": 1, "GUARDADA": 0, "PENDIENTE_REVISION": 0, "EN_REVISION": 0, "REVISADA": 0, "PROGRAMADA": 0, "HISTORICA": 0 } }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "description": "Parámetro split no soportado" }
+        },
+        "x-notes": [
+          "A partir de 2025-11-26, la serie temporal de split por estado en /dashboard/series/entries se agrupa por FECHA_EDICION, no por FECHA_PUBLICACION. Esto permite reflejar los cambios de estado realizados en cada día, aunque la entrada no esté publicada."
+        ]
+      }
+    },
+    "/dashboard/top": {
+      "get": {
+        "summary": "Top-N por tipo",
+        "security": [ { "bearerAuth": [] } ],
+        "parameters": [
+          { "name": "type", "in": "query", "required": false, "schema": { "type": "string", "enum": ["users","categories"], "default": "users" }, "description": "Tipo (users|categories). Default 'users'" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 }, "description": "Número máximo de elementos. La API normaliza: limit <=0 -> 10; limit >200 -> 200" },
+          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" }, "description": "Fecha inicio (opcional)" },
+          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" }, "description": "Fecha fin (opcional)" },
+          { "name": "force", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Si true, ignora caché y refresca datos (actualiza caché)" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista Top (envuelta)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/OpenpanelApiResponse" },
+                    { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/TopItemDTO" } } } }
+                  ]
+                },
+                "example": {
+                  "result": { "timestamp": "22-11-2025 00:00:00", "trackingId": "abc-127", "success": true, "message": "OK" },
+                  "data": { "$ref": "./examples/top-users.json" }
+                }
+              }
+            }
+          },
+          "400": { "description": "Tipo no soportado" }
+        }
+      }
+    },
+    "/dashboard/storage": {
+      "get": {
+        "summary": "Estadísticas de almacenamiento",
+        "security": [ { "bearerAuth": [] } ],
+        "responses": {
+          "200": {
+            "description": "Storage info (envuelta)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/OpenpanelApiResponse" },
+                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/StorageDTO" } } }
+                  ]
+                },
+                "example": {
+                  "result": { "timestamp": "22-11-2025 00:00:00", "trackingId": "abc-128", "success": true, "message": "OK" },
+                  "data": { "$ref": "./examples/storage.json" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Error obteniendo storage" }
+        }
+      }
+    },
+    "/dashboard/content-stats": {
+      "get": {
+        "summary": "Estadísticas de contenido",
+        "security": [ { "bearerAuth": [] } ],
+        "responses": {
+          "200": {
+            "description": "Content stats (envuelta)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/OpenpanelApiResponse" },
+                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/ContentStatsDTO" } } }
+                  ]
+                },
+                "example": {
+                  "result": { "timestamp": "22-11-2025 00:00:00", "trackingId": "abc-129", "success": true, "message": "OK" },
+                  "data": { "$ref": "./examples/content-stats.json" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Error obteniendo content-stats" }
+        }
+      }
+    }
+  }
+}

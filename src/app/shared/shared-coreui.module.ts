@@ -23,6 +23,7 @@ import {
   UtilitiesModule,
   WidgetModule,
   TemplateIdDirective,
+  TooltipModule,
 } from '@coreui/angular';
 
 @NgModule({
@@ -52,6 +53,7 @@ import {
     GridModule,
     AlertModule,
     TemplateIdDirective,
+    TooltipModule,
   ],
   exports: [
     CommonModule,
@@ -79,6 +81,7 @@ import {
     GridModule,
     AlertModule,
     TemplateIdDirective,
+    TooltipModule,
   ],
 })
 export class SharedCoreUiModule {}

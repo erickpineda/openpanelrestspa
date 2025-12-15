@@ -1,0 +1,172 @@
+<c-card aria-live="polite">
+  <c-card-header class="d-flex align-items-center justify-content-between">
+    <span>Usuarios</span>
+    <div class="btn-toolbar gap-2">
+      <div class="btn-group" role="group" aria-label="Acciones">
+        <button cButton color="primary" size="sm" (click)="openCreate()">
+          <svg cIcon name="cilPlus" class="me-2"></svg>
+          Nuevo
+        </button>
+      </div>
+    </div>
+  </c-card-header>
+  <c-card-body [attr.aria-busy]="loading ? 'true' : null">
+    <div *ngIf="error" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
+      <span>{{ error }}</span>
+      <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
+    </div>
+    <!-- <div *ngIf="loading"><c-spinner></c-spinner></div> -->
+    <div *ngIf="!loading; else loadingTemplate">
+      <c-row class="align-items-center mb-3 g-2">
+        <c-col xs="12" md="4">
+          <div class="text-muted small">Total {{ totalElements }}</div>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar usuario..." [disabled]="loading" style="max-width: 280px;" />
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </select>
+        </c-col>
+      </c-row>
+      <div *ngIf="showAdvanced" class="mb-3">
+        <c-row class="g-3 align-items-end">
+          <c-col xs="12" md="4">
+            <label class="form-label mb-1">Usuario</label>
+            <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" />
+          </c-col>
+          <c-col xs="6" md="3">
+            <label class="form-label mb-1">Rol</label>
+            <select cSelect class="form-select-sm" [(ngModel)]="filtroRolCodigo">
+              <option [ngValue]="null">Seleccione rol</option>
+              <option *ngFor="let r of roles" [value]="r.codigo">{{ r.nombre }}</option>
+            </select>
+          </c-col>
+          <c-col xs="6" md="3">
+            <label class="form-label mb-1">Email confirmado</label>
+            <select cSelect class="form-select-sm" [value]="filtroEmailConfirmado === null ? '' : (filtroEmailConfirmado ? 'true' : 'false')"
+                    (change)="filtroEmailConfirmado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
+              <option value="">Seleccione estado</option>
+              <option value="true">Sí</option>
+              <option value="false">No</option>
+            </select>
+          </c-col>
+          <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
+            <button cButton size="sm" color="primary" variant="outline" (click)="search()">
+              <svg cIcon name="cilSearch"></svg> Buscar
+            </button>
+            <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
+              <svg cIcon name="cilReload"></svg> Limpiar
+            </button>
+          </c-col>
+        </c-row>
+      </div>
+      <div class="table-responsive">
+      <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de usuarios">
+        <thead cTableColor="dark">
+          <tr><th>Usuario</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of usuarios">
+            <td class="text-truncate" style="max-width: 200px;" [title]="u.username">{{ u.username }}</td>
+            <td>{{ u.nombre }} {{ u.apellido }}</td>
+            <td class="text-truncate" style="max-width: 240px;" [title]="u.email">{{ u.email }}</td>
+            <td>{{ u.rolCodigo }}</td>
+            <td>
+              <div class="btn-group">
+                <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(u)"><svg cIcon name="cilPencil"></svg></button>
+                <button cButton color="danger" size="sm" variant="outline" (click)="delete(u)" [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE"><svg cIcon name="cilTrash"></svg></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <div *ngIf="usuarios.length === 0" class="text-muted">Sin usuarios</div>
+      <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
+        <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
+        <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
+        <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+      </div>
+    </div>
+    <ng-template #loadingTemplate>
+      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando usuarios'"></c-spinner><p class="mt-2 text-muted">Cargando usuarios...</p></div>
+    </ng-template>
+  </c-card-body>
+  </c-card>
+
+<c-modal id="editUserModal" [visible]="editModalVisible" (visibleChange)="editModalVisible = $event">
+  <c-modal-header class="d-flex justify-content-between align-items-center">
+    <h5 cModalTitle>{{ editUser?.idUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}</h5>
+    <c-badge color="danger" *ngIf="getUserErrors().length">{{ getUserErrors().length }}</c-badge>
+  </c-modal-header>
+  <c-modal-body>
+    <div *ngIf="editUser">
+      <div class="mb-3">
+        <label class="form-label">Usuario</label>
+        <input cFormControl type="text" [value]="editUser.username || ''" (input)="editUser && (editUser.username=$any($event.target).value)" [class.is-invalid]="!editUser.username" [disabled]="!!editUser.idUsuario" />
+        <div class="invalid-feedback d-block" *ngIf="!editUser.username">Usuario requerido</div>
+        <div class="text-muted small mt-1" *ngIf="!!editUser.idUsuario">El nombre de usuario no se puede modificar aquí.</div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input cFormControl type="text" [value]="editUser.nombre || ''" (input)="editUser && (editUser.nombre=$any($event.target).value)" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Apellido</label>
+        <input cFormControl type="text" [value]="editUser.apellido || ''" (input)="editUser && (editUser.apellido=$any($event.target).value)" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input cFormControl type="email" [value]="editUser.email || ''" (input)="editUser && (editUser.email=$any($event.target).value)" [class.is-invalid]="!isEmailValid(editUser.email)" />
+        <div class="invalid-feedback d-block" *ngIf="!isEmailValid(editUser.email)">Email inválido</div>
+      </div>
+      <div class="mb-3">
+        <c-form-check>
+          <input cFormCheckInput type="checkbox" id="userEnabled" [checked]="editUser.habilitado" (change)="editUser && (editUser.habilitado = $any($event.target).checked)" [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE" />
+          <label cFormCheckLabel for="userEnabled">Habilitar Usuario</label>
+        </c-form-check>
+        <div class="text-info small mt-1" *ngIf="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
+          <svg cIcon name="cilLockLocked" size="sm"></svg>El rol de Propietario no se puede deshabilitar.
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Rol</label>
+        <select cSelect [(ngModel)]="editUser.rolCodigo" [class.is-invalid]="!editUser.rolCodigo" [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
+          <option value="">Seleccione rol</option>
+          <ng-container *ngFor="let r of roles">
+            <option [value]="r.codigo" *ngIf="r.codigo !== PROPIETARIO_ROLE_CODE || editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
+              {{ r.nombre }}
+            </option>
+          </ng-container>
+        </select>
+        <div class="invalid-feedback d-block" *ngIf="!editUser.rolCodigo">Rol requerido</div>
+        <div class="text-info small mt-1" *ngIf="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
+          <svg cIcon name="cilLockLocked" size="sm"></svg> El rol de Propietario no se puede modificar.
+        </div>
+      </div>
+    </div>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="closeEdit()">Cerrar</button>
+    <button cButton color="primary" [disabled]="!isUserFormValid()" (click)="saveEdit()">Guardar</button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal = $event" id="deleteUserModal">
+  <c-modal-header>
+    <h5 cModalTitle>Confirmar eliminación</h5>
+  </c-modal-header>
+  <c-modal-body>
+    ¿Estás seguro de que deseas eliminar el usuario <strong>{{ userToDelete?.username }}</strong>?
+    <br>Esta acción no se puede deshacer.
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
+    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
+  </c-modal-footer>
+</c-modal>

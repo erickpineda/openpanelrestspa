@@ -3,7 +3,7 @@ import { Injectable  } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpContext } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from '../../../environments/environment.dev.es';
+import { environment } from '../../../environments/environment';
 import { OpenpanelApiResponse, PaginatedResponse } from '../models/openpanel-api-response.model';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 
@@ -35,7 +35,7 @@ export class BaseService {
         if (Array.isArray(value)) {
           value.forEach(v => headers = headers.append(key, v));
         } else {
-          headers = headers.append(key, value);
+          headers = headers.set(key, value);
         }
       });
     }
@@ -66,6 +66,12 @@ export class BaseService {
     const finalHeaders = headers || this.setHeaders();
     const options = { params: this.getParams(params), headers: finalHeaders, context };
     return this.http.delete<OpenpanelApiResponse<T>>(`${this.host}${this.uri}${url}`, options);
+  }
+
+  protected patch<T>(url: string, body: any, params?: any, headers?: HttpHeaders, context?: HttpContext): Observable<OpenpanelApiResponse<T>> {
+    const finalHeaders = headers || this.setHeaders();
+    const options = { params: this.getParams(params), headers: finalHeaders, context };
+    return this.http.patch<OpenpanelApiResponse<T>>(`${this.host}${this.uri}${url}`, body, options);
   }
 
 /**

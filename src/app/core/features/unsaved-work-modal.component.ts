@@ -5,6 +5,7 @@ import { SessionManagerService, SessionExpirationData } from '../../core/service
 import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
 import { TemporaryStorageService } from '../../core/services/ui/temporary-storage.service';
 import { LoggerService } from '../services/logger.service';
+import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-unsaved-work-modal',
@@ -46,13 +47,13 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
       })
     );
 
-    window.addEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
+    window.addEventListener(OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT, this.handleSaveWork.bind(this));
     this.log.info('✅ UnsavedWorkModalComponent: Inicializado correctamente');
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    window.removeEventListener('saveWorkBeforeLogout', this.handleSaveWork.bind(this));
+    window.removeEventListener(OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT, this.handleSaveWork.bind(this));
   }
 
   private showModal(): void {
@@ -72,7 +73,7 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
     this.saveInProgress = true;
     
     // Disparar evento para que los componentes guarden
-    const saveEvent = new CustomEvent('saveUnsavedWork');
+    const saveEvent = new CustomEvent(OPConstants.Events.SAVE_UNSAVED_WORK);
     window.dispatchEvent(saveEvent);
     
     // Esperar un poco para que se complete el guardado temporal

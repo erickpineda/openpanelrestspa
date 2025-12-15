@@ -2,8 +2,6 @@ import { VERSION } from '@angular/core';
 
 // op-rest-api.constants.ts
 export const OPRestApiConstants: any = {
-  HOST: 'http://localhost:8080',
-  BASE_URL: '/api/v1',
   VERSION: '1.0.0',
 };
 

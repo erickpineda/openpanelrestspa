@@ -1,0 +1,14 @@
+<c-row class="align-items-center mb-3 g-2">
+  <c-col xs="12" md="4">
+    <div class="text-muted small">Total {{ total }}</div>
+  </c-col>
+  <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+    <input cFormControl type="text" [value]="searchText" (input)="searchTextChange.emit($any($event.target).value)" placeholder="Buscar..." [disabled]="disabled" style="max-width: 280px;" />
+    <button cButton color="secondary" variant="outline" size="sm" (click)="toggleAdvanced.emit()" [disabled]="disabled">Avanzado</button>
+  </c-col>
+  <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+    <select cSelect [ngModel]="pageSize" (ngModelChange)="pageSizeChange.emit($event)" name="pageSizeSelect" style="max-width: 100px;">
+      <option *ngFor="let s of sizeOptions" [value]="s">{{ s }}</option>
+    </select>
+  </c-col>
+</c-row>

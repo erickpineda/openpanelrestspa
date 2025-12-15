@@ -1,74 +1,148 @@
-<c-card>
-  <c-card-header class="d-flex align-items-center">
-    <c-col [sm]="6">
-      <h6 cCardTitle>Listado de comentarios</h6>
-    </c-col>
-    <c-col [sm]="6">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button cButton color="light" size="sm">
-          <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
-          Imprimir
-        </button>
-        <button cButton color="warning" size="sm">
-          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Pendientes de revisión"></svg>
-          No aprobados
-        </button>
-      </div>
-    </c-col>
-  </c-card-header>
-  <c-card-body>
-
-    <div class="d-flex justify-content-between align-items-end">
-      <h5 cCardTitle>Listado de comentarios</h5>
-      <div class="hstack gap-3">
-        <button cButton color="success" size="sm" routerLink="crear">
-          <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear nuevo Comentario"></svg>
-          Crear nuevo Comentario
+<c-card aria-live="polite">
+  <c-card-header class="d-flex align-items-center justify-content-between">
+    <span>Comentarios</span>
+    <div class="btn-toolbar gap-2">
+      <div class="btn-group" role="group" aria-label="Acciones">
+        <button cButton color="primary" size="sm" routerLink="crear">
+          <svg cIcon name="cilPlus" class="me-2"></svg>
+          Nuevo
         </button>
       </div>
     </div>
-    <hr>
+  </c-card-header>
+  <c-card-body [attr.aria-busy]="cargando ? 'true' : null">
+
+    <c-row class="align-items-center mb-3 g-2">
+      <c-col xs="12" md="4">
+        <div class="text-muted small">Total {{ totalElements }}</div>
+      </c-col>
+      <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+        <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar comentario..." style="max-width: 280px;" />
+        <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+      </c-col>
+      <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+        <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+        </select>
+      </c-col>
+    </c-row>
+
+    <div *ngIf="showAdvanced" class="mb-3">
+      <c-row class="g-3 align-items-end">
+        <c-col xs="12" md="4">
+          <label class="form-label mb-1">Usuario</label>
+          <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" />
+        </c-col>
+        <c-col xs="6" md="4">
+          <label class="form-label mb-1">Aprobado</label>
+          <select cSelect class="form-select-sm" [value]="filtroAprobado === null ? '' : (filtroAprobado ? 'true' : 'false')"
+                  (change)="filtroAprobado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
+            <option value="">Seleccione estado</option>
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+          </select>
+        </c-col>
+        <c-col xs="6" md="4">
+          <label class="form-label mb-1">Cuarentena</label>
+          <select cSelect class="form-select-sm" [value]="filtroCuarentena === null ? '' : (filtroCuarentena ? 'true' : 'false')"
+                  (change)="filtroCuarentena = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
+            <option value="">Seleccione estado</option>
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+          </select>
+        </c-col>
+        <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
+          <button cButton size="sm" color="primary" variant="outline" (click)="search()">
+            <svg cIcon name="cilSearch"></svg> Buscar
+          </button>
+          <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
+            <svg cIcon name="cilReload"></svg> Limpiar
+          </button>
+        </c-col>
+      </c-row>
+    </div>
     
-    <table cTable hover *ngIf="listaComentarios.length >= 0">
-      <thead cTableColor="dark">
+    <div class="table-responsive" *ngIf="!cargando; else comentariosLoading">
+    <table cTable hover class="align-middle mb-0 border text-nowrap" role="table" aria-label="Tabla de comentarios">
+      <thead cTableColor="light">
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Contenido</th>
-          <th scope="col">Usuario</th>
-          <th scope="col">Entrada</th>
-          <th scope="col">Fecha creación</th>
-          <th scope="col">Aprobado</th>
-          <th scope="col">Cuarentena</th>
+          <th scope="col" style="min-width: 250px;">Contenido</th>
+          <th scope="col" style="min-width: 120px;">Usuario</th>
+          <th scope="col" style="min-width: 150px;">Entrada</th>
+          <th scope="col" style="min-width: 120px;">Fecha creación</th>
+          <th scope="col" class="text-center" style="min-width: 80px;">Estado</th>
+          <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
         </tr>
       </thead>
-      <tbody *ngFor="let coment of listaComentarios">
-        <tr (click)="navigate('/admin/control/comentarios/'+coment.idComentario)" style="cursor: pointer">
-          <td scope="row">{{coment.idComentario}}</td>
-          <td>{{ truncateContent(coment.contenido) }}</td>
+      <tbody>
+        <tr *ngFor="let coment of pagedComentarios">
+          <td>
+            <span class="d-inline-block text-truncate" style="max-width: 250px;" [title]="coment.contenido">
+              {{ coment.contenido }}
+            </span>
+          </td>
           <td>{{coment.username}}</td>
-          <td>{{coment.tituloEntrada}}</td>
+          <td>
+            <span class="d-inline-block text-truncate" style="max-width: 150px;" [title]="coment.tituloEntrada">
+              {{coment.tituloEntrada}}
+            </span>
+          </td>
           <td>{{coment.fechaCreacionParseada}}</td>
-          <td>{{checkTrueOrFalseToString(coment.aprobado)}}</td>
-          <td>{{checkTrueOrFalseToString(coment.cuarentena)}}</td>
+          <td class="text-center">
+            <ng-container *ngIf="coment.aprobado; else noAprobado">
+               <svg cIcon name="cilCheckCircle" class="text-success" size="lg" cTooltip="Aprobado"></svg>
+            </ng-container>
+            <ng-template #noAprobado>
+              <ng-container *ngIf="coment.cuarentena; else pendiente">
+                <svg cIcon name="cilWarning" class="text-danger" size="lg" cTooltip="En cuarentena"></svg>
+              </ng-container>
+            </ng-template>
+            <ng-template #pendiente>
+              <svg cIcon name="cilHistory" class="text-warning" size="lg" cTooltip="Pendiente de moderación"></svg>
+            </ng-template>
+          </td>
+          <td class="text-center">
+            <div class="btn-group">
+              <button cButton color="warning" size="sm" variant="ghost" (click)="openEdit(coment)" [cTooltip]="'Editar comentario'" [attr.aria-label]="'Editar comentario ' + coment.idComentario"><svg cIcon name="cilPencil" size="sm"></svg></button>
+              <button cButton color="danger" size="sm" variant="ghost" (click)="deleteComentario(coment)" [cTooltip]="'Eliminar comentario'" [attr.aria-label]="'Eliminar comentario ' + coment.idComentario"><svg cIcon name="cilTrash" size="sm"></svg></button>
+            </div>
+          </td>
         </tr>
-      </tbody>
-      <tbody *ngIf="listaComentarios.length === 0" cAlign="middle">
-        <tr style="cursor: pointer">
-          <td colSpan="7">No se han encontrado registros en el sistema...</td>
+        <tr *ngIf="listaComentarios.length === 0">
+          <td colspan="6" class="text-center py-5">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+              <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+              <h6 class="text-muted">No se han encontrado comentarios</h6>
+              <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
-    <c-pagination aria-label="Paginación de comentarios" size="sm" *ngIf="listaComentarios.length >= 0">
-      <li cPageItem [active]="page === 1">
-        <a cPageLink (click)="onPageChange(page - 1)" [routerLink]><span aria-hidden="true">&laquo;</span></a>
-      </li>
-      <li cPageItem *ngFor="let p of getPages()" [active]="p === page">
-        <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
-      </li>
-      <li cPageItem [active]="page === numberOfPages">
-        <a cPageLink (click)="onPageChange(page + 1)" [routerLink]><span aria-hidden="true">&raquo;</span></a>
-      </li>
-    </c-pagination>
+    </div>
+    <ng-template #comentariosLoading>
+      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando comentarios'"></c-spinner><p class="mt-2 text-muted">Cargando comentarios...</p></div>
+    </ng-template>
+    <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
+      <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
+      <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
+      <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+    </div>
 
   </c-card-body>
 </c-card>
+
+<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal=$event" alignment="center" [attr.data-testid]="'eliminar-comentario-modal'">
+  <c-modal-header>
+    <h5 cModalTitle>Confirmar eliminación</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <p>¿Desea eliminar el comentario <strong>#{{ comentarioToDelete?.idComentario }}</strong>? Esta acción no se puede deshacer.</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
+    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
+  </c-modal-footer>
+</c-modal>

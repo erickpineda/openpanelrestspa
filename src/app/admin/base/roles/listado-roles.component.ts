@@ -40,9 +40,9 @@ export class ListadoRolesComponent implements OnInit {
     this.cargarRoles(page - 1);
   }
 
-  eliminarRol(id: number): void {
+  eliminarRol(codigo: string): void {
     if (confirm('¿Está seguro de eliminar este rol?')) {
-      this.rolService.borrar(id).subscribe({
+      this.rolService.borrar(codigo).subscribe({
         next: () => this.cargarRoles(),
         error: (error: any) => this.log.error('Error eliminando rol:', error)
       });

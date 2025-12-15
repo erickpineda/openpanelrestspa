@@ -18,8 +18,8 @@ export class KpiCardComponent {
     const key = (this.label || '').toLowerCase();
     if (key.includes('usuario')) return 'cilUser';
     if (key.includes('entrada')) return 'cilNotes';
-    if (key.includes('publicada')) return 'cilCheckCircle';
     if (key.includes('no publicada') || key.includes('no publicadas')) return 'cilXCircle';
+    if (key.includes('publicada')) return 'cilCheckCircle';
     return 'cilSpeedometer';
   }
 
@@ -28,8 +28,8 @@ export class KpiCardComponent {
     const key = (this.label || '').toLowerCase();
     if (key.includes('usuario')) return 'primary';
     if (key.includes('entrada')) return 'info';
-    if (key.includes('publicada')) return 'success';
     if (key.includes('no publicada') || key.includes('no publicadas')) return 'warning';
+    if (key.includes('publicada')) return 'success';
     return undefined;
   }
 }

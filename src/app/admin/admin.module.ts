@@ -8,7 +8,6 @@ import {
   DefaultFooterComponent,
   DefaultHeaderComponent,
 } from './default-layout';
-import { UserComponent } from './perfil/user.component';
 
 // Módulos externos
 import { NgScrollbarModule } from 'ngx-scrollbar';
@@ -25,7 +24,7 @@ const APP_CONTAINERS = [
 ];
 
 @NgModule({
-  declarations: [...APP_CONTAINERS, UserComponent],
+  declarations: [...APP_CONTAINERS],
   imports: [
     CommonModule,
     AdminRoutingModule,

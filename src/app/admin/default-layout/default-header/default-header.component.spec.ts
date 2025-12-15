@@ -10,7 +10,7 @@ import {
   NavModule, SidebarModule
 } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
-import { iconSubset } from '../../../icons/icon-subset';
+import { iconSubset } from '../../../shared/components/icons/icon-subset';
 import { DefaultHeaderComponent } from './default-header.component';
 import { RouterTestingModule } from '@angular/router/testing';
 
@@ -34,10 +34,63 @@ describe('DefaultHeaderComponent', () => {
 
     fixture = TestBed.createComponent(DefaultHeaderComponent);
     component = fixture.componentInstance;
+    component.busy = false;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should render aria labels on navigation containers', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    const navs = el.querySelectorAll('c-header-nav');
+    expect(navs.length).toBeGreaterThan(0);
+    const hasMainNav = Array.from(navs).some(n => n.getAttribute('aria-label') === 'Navegación principal');
+    const hasQuickActions = Array.from(navs).some(n => n.getAttribute('aria-label') === 'Acciones rápidas');
+    const hasUserMenu = Array.from(navs).some(n => n.getAttribute('aria-label') === 'Menú de usuario');
+    expect(hasMainNav && hasQuickActions && hasUserMenu).toBeTrue();
+  });
+
+  it('should show dynamic badge counts from component state', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    const badges = el.querySelectorAll('c-badge');
+    const texts = Array.from(badges).map(b => (b.textContent || '').trim());
+    expect(texts).toContain(String(component.notificationsCount));
+    expect(texts).toContain(String(component.messagesCount));
+    expect(texts).toContain(String(component.tasksCount));
+    expect(texts).toContain(String(component.commentsCount));
+  });
+
+  it('updates badge counts when userCounts input changes', () => {
+    component.userCounts = { notifications: 3, tasks: 7, messages: 9, comments: 11 };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const badges = el.querySelectorAll('c-badge');
+    const texts = Array.from(badges).map(b => (b.textContent || '').trim());
+    expect(texts).toContain('3');
+    expect(texts).toContain('7');
+    expect(texts).toContain('9');
+    expect(texts).toContain('11');
+  });
+
+  it('shows projectsCount in Projects badge', () => {
+    component.projectsCount = 123;
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const link = el.querySelector('a[routerLink="/admin/control/entradas"]');
+    expect(link).toBeTruthy();
+    const badge = link!.querySelector('c-badge');
+    expect((badge?.textContent || '').trim()).toBe('123');
+  });
+
+  it('should toggle aria-expanded on user menu toggle button', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    const btn = el.querySelector('button[cDropdownToggle]') as HTMLButtonElement;
+    expect(btn).toBeTruthy();
+    expect(btn.getAttribute('aria-expanded')).toBe('false');
+    btn.click();
+    fixture.detectChanges();
+    expect(btn.getAttribute('aria-expanded')).toBe('true');
   });
 });

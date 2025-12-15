@@ -1,0 +1,65 @@
+<c-card>
+  <c-card-header>
+    <c-row class="align-items-center g-2">
+      <c-col lg="6">
+        <h6 class="mb-0">Estadísticas de Contenido</h6>
+      </c-col>
+      <c-col lg="6">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <button cButton color="secondary" size="sm" (click)="downloadContentCsv.emit()" title="Descargar métricas de contenido en CSV" [attr.aria-label]="'Descargar métricas de contenido en CSV'" data-testid="btn-csv-content-stats">CSV</button>
+          <button cButton color="secondary" size="sm" (click)="downloadEstadosCsv.emit()" title="Descargar estados en CSV" [attr.aria-label]="'Descargar estados en CSV'" data-testid="btn-csv-content-stats-estados">CSV estados</button>
+        </div>
+      </c-col>
+    </c-row>
+  </c-card-header>
+  <c-card-body>
+    <div *ngIf="errorContentStats" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert" aria-live="assertive">
+      <span>{{ errorContentStats }}</span>
+      <button cButton color="danger" size="sm" class="retry-btn-content" (click)="retry.emit()">Reintentar</button>
+    </div>
+    <div *ngIf="loadingContentStats" class="mb-2"><c-spinner></c-spinner></div>
+    <c-row>
+      <c-col lg="3">
+        <app-kpi-card label="Usuarios" [value]="contentStats?.totalUsuarios || 0" [color]="kpiUsuariosTotalColor" iconName="cilUser"></app-kpi-card>
+      </c-col>
+      <c-col lg="3">
+        <app-kpi-card label="Entradas" [value]="contentStats?.totalEntradas || 0" [color]="kpiEntradasTotalColor" iconName="cilNotes"></app-kpi-card>
+      </c-col>
+      <c-col lg="3">
+        <app-kpi-card label="Comentarios" [value]="contentStats?.totalComentarios || 0" [color]="kpiComentariosTotalColor" iconName="cilCommentSquare"></app-kpi-card>
+      </c-col>
+      <c-col lg="3">
+        <app-kpi-card label="Ficheros" [value]="contentStats?.totalFicheros || 0" [color]="kpiFicherosTotalColor" iconName="cilFile"></app-kpi-card>
+      </c-col>
+    </c-row>
+    <div class="mt-3">
+      <h6 class="text-muted">Entradas por estado</h6>
+      <c-row>
+        <c-col lg="6">
+          <app-dashboard-chart *ngIf="contentStatsChartData" [data]="contentStatsChartData" type="doughnut"></app-dashboard-chart>
+          <div *ngIf="!contentStatsChartData" class="text-muted small">Sin datos</div>
+        </c-col>
+      </c-row>
+      <div class="mt-3">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Estado</th>
+              <th class="text-end">Total</th>
+              <th class="text-end">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of contentEstadoRows">
+              <td>{{ row.estado }}</td>
+              <td class="text-end"><c-badge color="secondary">{{ row.total }}</c-badge></td>
+              <td class="text-end"><c-badge color="light" class="text-dark">{{ row.porcentaje }}%</c-badge></td>
+            </tr>
+            <tr *ngIf="!contentEstadoRows || contentEstadoRows.length===0"><td colspan="3" class="text-muted">Sin datos</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </c-card-body>
+</c-card>
+

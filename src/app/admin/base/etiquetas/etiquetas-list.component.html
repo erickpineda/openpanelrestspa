@@ -1,0 +1,117 @@
+<c-container class="container-fluid" data-testid="etiquetas-list">
+  <c-card>
+    <c-card-header class="d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Gestión de Etiquetas</h5>
+      <button cButton color="primary" size="sm" (click)="onCreate()" [attr.aria-label]="'Crear nueva etiqueta'" data-testid="btn-nueva-etiqueta">
+        <svg cIcon name="cilPlus" class="me-2"></svg> Nueva Etiqueta
+      </button>
+    </c-card-header>
+  <c-card-body [attr.aria-busy]="loading ? 'true' : null">
+      <c-row class="align-items-center mb-3 g-2">
+        <c-col xs="12" md="4">
+          <div class="text-muted small">Total {{ totalItems }}</div>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar etiqueta..." style="max-width: 280px;" />
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 120px;">
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+          </select>
+        </c-col>
+      </c-row>
+      <form *ngIf="showAdvanced" [formGroup]="searchForm" (ngSubmit)="onSearch()" class="mb-4">
+        <div class="row">
+          <div class="col-md-4">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" id="nombre" cFormControl formControlName="nombre" placeholder="Buscar por nombre..." [attr.aria-label]="'Buscar etiqueta por nombre'">
+          </div>
+          <div class="col-md-4">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <input type="text" id="descripcion" cFormControl formControlName="descripcion" placeholder="Buscar por descripción..." [attr.aria-label]="'Buscar etiqueta por descripción'">
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" cButton color="primary" variant="outline" class="me-2" [attr.aria-label]="'Buscar etiquetas'" data-testid="btn-buscar">
+              <svg cIcon name="cilSearch"></svg> Buscar
+            </button>
+            <button type="button" cButton color="secondary" variant="outline" (click)="searchForm.reset(); onSearch()" [attr.aria-label]="'Limpiar filtros de búsqueda'" data-testid="btn-limpiar">
+              <svg cIcon name="cilReload"></svg> Limpiar
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="table-responsive" *ngIf="!loading; else loadingTemplate">
+        <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de etiquetas">
+          <thead cTableColor="dark">
+            <tr>
+              <th scope="col">Color</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Descripción</th>
+              <th scope="col" class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let etiqueta of pagedEtiquetas; let i = index" role="row">
+              <td>
+                <span class="badge" [style.background-color]="etiqueta.colorHex" [attr.aria-label]="'Color de etiqueta'">&nbsp;&nbsp;&nbsp;</span>
+              </td>
+              <td class="text-truncate" style="max-width: 240px;" [title]="etiqueta.nombre">{{ etiqueta.nombre }}</td>
+              <td class="text-truncate" style="max-width: 300px;" [title]="etiqueta.descripcion || ''">{{ etiqueta.descripcion || '-' }}</td>
+              <td class="text-center">
+                <div class="btn-group" role="group" aria-label="Acciones">
+                  <button cButton size="sm" color="warning" variant="outline" (click)="onEdit(etiqueta)" [attr.aria-label]="'Editar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-editar-etiqueta-' + etiqueta.idEtiqueta">
+                    <svg cIcon name="cilPencil"></svg>
+                  </button>
+                  <button cButton size="sm" color="danger" variant="outline" (click)="onDelete(etiqueta)" [attr.aria-label]="'Eliminar etiqueta ' + etiqueta.nombre" role="button" [attr.data-testid]="'btn-eliminar-etiqueta-' + etiqueta.idEtiqueta">
+                    <svg cIcon name="cilTrash"></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="pagedEtiquetas.length === 0">
+              <td colspan="4" class="text-center text-muted">No se encontraron etiquetas</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <c-row class="mt-2">
+        <c-col class="d-flex justify-content-end align-items-center gap-2">
+          <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="pageNo<=0">Anterior</button>
+          <button cButton color="light" size="sm" (click)="onNext()" [disabled]="isNextDisabled()">Siguiente</button>
+          <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalItems }} · Mostrando {{ numberOfElements }}</div>
+        </c-col>
+      </c-row>
+
+  </c-card-body>
+  </c-card>
+</c-container>
+
+<c-modal [visible]="showCreateModal || showEditModal" (visibleChange)="onModalVisibleChange($event)" [attr.data-testid]="showCreateModal ? 'crear-etiqueta-modal' : 'editar-etiqueta-modal'">
+  <c-modal-header><h5 cModalTitle>{{ showCreateModal ? 'Crear Nueva Etiqueta' : 'Editar Etiqueta' }}</h5></c-modal-header>
+  <c-modal-body>
+    <app-etiqueta-form *ngIf="showCreateModal || showEditModal" [etiqueta]="selectedEtiqueta" [isEdit]="showEditModal" (save)="onModalSave()" (cancel)="onModalClose()"></app-etiqueta-form>
+  </c-modal-body>
+  <c-modal-footer><button cButton color="secondary" (click)="onModalClose()">Cerrar</button></c-modal-footer>
+</c-modal>
+
+<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal=$event" alignment="center" [attr.data-testid]="'eliminar-etiqueta-modal'">
+  <c-modal-header>
+    <h5 cModalTitle>Confirmar eliminación</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <p>¿Desea eliminar la etiqueta <strong>{{ etiquetaToDelete?.nombre }}</strong>? Esta acción no se puede deshacer.</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
+    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
+  </c-modal-footer>
+</c-modal>
+
+<ng-template #loadingTemplate>
+  <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando etiquetas'"></c-spinner><p class="mt-2 text-muted">Cargando etiquetas...</p></div>
+</ng-template>

@@ -4,13 +4,16 @@ import { Observable } from 'rxjs';
 import { BaseService } from './base.service';
 import { OpenpanelApiResponse } from '../models/openpanel-api-response.model';
 import { TokenStorageService } from '../services/auth/token-storage.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { NetworkInterceptor } from '../interceptor/network.interceptor';
+import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Injectable({
   providedIn: 'root',
 })
 export abstract class CrudService<T, ID> extends BaseService {
   protected abstract endpoint: string;
+  protected pageSizeParam: string = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
   constructor(
     protected override http: HttpClient,
@@ -22,12 +25,34 @@ export abstract class CrudService<T, ID> extends BaseService {
   /**
    * Lista elementos de forma segura, retornando array vacío en caso de error
    */
-  listarSafe(): Observable<T[]> {
+  listarSafe(pageNo?: number, pageSize?: number): Observable<T[]> {
+    const params: any = {};
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+
     return this.safeGetList<T>(
       this.endpoint,
-      undefined,
+      params,
       undefined,
       `${this.endpoint}.listar`
+    );
+  }
+
+  /**
+   * Lista elementos de forma segura sin loader global
+   */
+  listarSafeSinGlobalLoader(pageNo?: number, pageSize?: number): Observable<T[]> {
+    const params: any = {};
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.safeGetList<T>(
+      this.endpoint,
+      params,
+      undefined,
+      `${this.endpoint}.listar`,
+      context
     );
   }
 
@@ -96,16 +121,25 @@ export abstract class CrudService<T, ID> extends BaseService {
 
   // ✅ MÉTODOS ORIGINALES (mantener exactamente como están)
 
-  listar(): Observable<OpenpanelApiResponse<any>> {
-    return this.get<any>(this.endpoint);
+  public listarPagina(
+    pageNo?: number,
+    pageSize?: number
+  ): Observable<OpenpanelApiResponse<any>> {
+    const params: any = {};
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+    return this.get<any>(this.endpoint, params);
   }
 
-  public listarPagina(
+  public listarPaginaSinGlobalLoader(
     pageNo: number,
     pageSize: number
   ): Observable<OpenpanelApiResponse<any>> {
-    const params = { pageNo: pageNo.toString(), pageSize: pageSize.toString() };
-    return this.get<any>(this.endpoint, { params });
+    const params: any = {};
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.get<any>(this.endpoint, params, undefined, context);
   }
 
   obtenerPorId(id: ID): Observable<OpenpanelApiResponse<any>> {

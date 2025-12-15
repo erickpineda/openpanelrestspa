@@ -1,0 +1,19 @@
+.card { min-height: 240px; }
+
+/* Estilo para items de privilegios */
+.privilegio-item {
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  
+  &:hover {
+    background-color: rgba(var(--cui-primary-rgb), 0.05);
+    transform: translateX(2px);
+  }
+
+  /* Ajustar label para que ocupe todo el espacio clickeable si es necesario */
+  label {
+    cursor: pointer;
+    width: 100%;
+  }
+}
