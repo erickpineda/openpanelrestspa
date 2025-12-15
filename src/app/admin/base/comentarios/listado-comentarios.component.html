@@ -65,39 +65,59 @@
     </div>
     
     <div class="table-responsive" *ngIf="!cargando; else comentariosLoading">
-    <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de comentarios">
-      <thead cTableColor="dark">
+    <table cTable hover class="align-middle mb-0 border text-nowrap" role="table" aria-label="Tabla de comentarios">
+      <thead cTableColor="light">
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Contenido</th>
-          <th scope="col">Usuario</th>
-          <th scope="col">Entrada</th>
-          <th scope="col">Fecha creación</th>
-          <th scope="col">Aprobado</th>
-          <th scope="col">Cuarentena</th>
-          <th scope="col">Acciones</th>
+          <th scope="col" style="min-width: 250px;">Contenido</th>
+          <th scope="col" style="min-width: 120px;">Usuario</th>
+          <th scope="col" style="min-width: 150px;">Entrada</th>
+          <th scope="col" style="min-width: 120px;">Fecha creación</th>
+          <th scope="col" class="text-center" style="min-width: 80px;">Estado</th>
+          <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
         </tr>
       </thead>
-      <tbody *ngFor="let coment of pagedComentarios">
-        <tr>
-          <td scope="row">{{coment.idComentario}}</td>
-          <td>{{ truncateContent(coment.contenido) }}</td>
-          <td>{{coment.username}}</td>
-          <td>{{coment.tituloEntrada}}</td>
-          <td>{{coment.fechaCreacionParseada}}</td>
-          <td>{{checkTrueOrFalseToString(coment.aprobado)}}</td>
-          <td>{{checkTrueOrFalseToString(coment.cuarentena)}}</td>
+      <tbody>
+        <tr *ngFor="let coment of pagedComentarios">
           <td>
+            <span class="d-inline-block text-truncate" style="max-width: 250px;" [title]="coment.contenido">
+              {{ coment.contenido }}
+            </span>
+          </td>
+          <td>{{coment.username}}</td>
+          <td>
+            <span class="d-inline-block text-truncate" style="max-width: 150px;" [title]="coment.tituloEntrada">
+              {{coment.tituloEntrada}}
+            </span>
+          </td>
+          <td>{{coment.fechaCreacionParseada}}</td>
+          <td class="text-center">
+            <ng-container *ngIf="coment.aprobado; else noAprobado">
+               <svg cIcon name="cilCheckCircle" class="text-success" size="lg" cTooltip="Aprobado"></svg>
+            </ng-container>
+            <ng-template #noAprobado>
+              <ng-container *ngIf="coment.cuarentena; else pendiente">
+                <svg cIcon name="cilWarning" class="text-danger" size="lg" cTooltip="En cuarentena"></svg>
+              </ng-container>
+            </ng-template>
+            <ng-template #pendiente>
+              <svg cIcon name="cilHistory" class="text-warning" size="lg" cTooltip="Pendiente de moderación"></svg>
+            </ng-template>
+          </td>
+          <td class="text-center">
             <div class="btn-group">
-              <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(coment)" [attr.aria-label]="'Editar comentario ' + coment.idComentario"><svg cIcon name="cilPencil"></svg></button>
-              <button cButton color="danger" size="sm" variant="outline" (click)="deleteComentario(coment)" [attr.aria-label]="'Eliminar comentario ' + coment.idComentario"><svg cIcon name="cilTrash"></svg></button>
+              <button cButton color="warning" size="sm" variant="ghost" (click)="openEdit(coment)" [cTooltip]="'Editar comentario'" [attr.aria-label]="'Editar comentario ' + coment.idComentario"><svg cIcon name="cilPencil" size="sm"></svg></button>
+              <button cButton color="danger" size="sm" variant="ghost" (click)="deleteComentario(coment)" [cTooltip]="'Eliminar comentario'" [attr.aria-label]="'Eliminar comentario ' + coment.idComentario"><svg cIcon name="cilTrash" size="sm"></svg></button>
             </div>
           </td>
         </tr>
-      </tbody>
-      <tbody *ngIf="listaComentarios.length === 0" cAlign="middle">
-        <tr style="cursor: pointer">
-          <td colSpan="7">No se han encontrado registros en el sistema...</td>
+        <tr *ngIf="listaComentarios.length === 0">
+          <td colspan="6" class="text-center py-5">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+              <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+              <h6 class="text-muted">No se han encontrado comentarios</h6>
+              <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>

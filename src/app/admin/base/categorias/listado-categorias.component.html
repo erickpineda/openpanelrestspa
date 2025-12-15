@@ -51,40 +51,52 @@
     </div>
     
     <div class="table-responsive" *ngIf="!cargando; else categoriasLoading">
-      <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de categorías">
-      <thead cTableColor="dark">
+      <table cTable hover class="align-middle mb-0 border text-nowrap" role="table" aria-label="Tabla de categorías">
+      <thead cTableColor="light">
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Descripción</th>
-          <th scope="col" class="col">Acciones</th>
+          <th scope="col" style="min-width: 200px;">Nombre</th>
+          <th scope="col" style="min-width: 250px;">Descripción</th>
+          <th scope="col" class="text-center" style="min-width: 120px;">Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let categ of pagedCategorias; trackBy: trackByCategoriaId">
-          <td scope="row">{{categ.idCategoria}}</td>
-          <td>{{categ.nombre}}</td>
-          <td>{{categ.descripcion}}</td>
           <td>
+            <div class="d-flex flex-column">
+              <span class="fw-semibold text-truncate" style="max-width: 250px;" [title]="categ.nombre">
+                {{ categ.nombre }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <span class="d-inline-block text-truncate" style="max-width: 300px;" [title]="categ.descripcion">
+              {{ categ.descripcion || 'Sin descripción' }}
+            </span>
+          </td>
+          <td class="text-center">
             <div class="btn-group" role="group" aria-label="Acciones de categoría">
-              <button cButton color="warning" size="sm" variant="outline"
+              <button cButton color="warning" size="sm" variant="ghost"
                       (click)="editarCategoria(categ.idCategoria)"
-                      [attr.aria-label]="'Editar categoría ' + categ.nombre"
-                      [title]="'Editar categoría ' + categ.nombre">
+                      [cTooltip]="'Editar categoría'"
+                      [attr.aria-label]="'Editar categoría ' + categ.nombre">
                 <svg cIcon name="cilPencil" size="sm"></svg>
               </button>
-              <button cButton color="danger" size="sm" variant="outline"
+              <button cButton color="danger" size="sm" variant="ghost"
                       (click)="borrarCategoria(categ)"
-                      [attr.aria-label]="'Borrar categoría ' + categ.nombre"
-                      [title]="'Borrar categoría ' + categ.nombre">
+                      [cTooltip]="'Borrar categoría'"
+                      [attr.aria-label]="'Borrar categoría ' + categ.nombre">
                 <svg cIcon name="cilTrash" size="sm"></svg>
               </button>
             </div>
           </td>
         </tr>
         <tr *ngIf="pagedCategorias.length === 0">
-          <td colspan="4" class="text-center py-4">
-            {{ errorMsg || 'No se han encontrado registros en el sistema...' }}
+          <td colspan="3" class="text-center py-5">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+              <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+              <h6 class="text-muted">No se han encontrado categorías</h6>
+              <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+            </div>
           </td>
         </tr>
       </tbody>

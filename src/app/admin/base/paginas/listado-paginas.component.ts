@@ -456,6 +456,16 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
       : 'No publicada';
   }
 
+  getEstadoInfo(entrada: Entrada): { icon: string, color: string, tooltip: string } {
+    if (entrada.publicada) {
+      return { icon: 'cilCheckCircle', color: 'text-success', tooltip: 'Publicada' };
+    }
+    if (entrada.borrador) {
+      return { icon: 'cilEye', color: 'text-warning', tooltip: 'Borrador' };
+    }
+    return { icon: 'cilHistory', color: 'text-warning', tooltip: entrada.estadoEntrada?.nombre || 'Pendiente' };
+  }
+
   trackByEntradaId(index: number, entrada: Entrada): number {
     return entrada.idEntrada;
   }

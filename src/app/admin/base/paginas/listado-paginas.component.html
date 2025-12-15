@@ -88,59 +88,75 @@
         </div>
       </div>
 
-      <div [class.opacity-50]="cargandoTabla">
-      <table responsive hover cAlign="top" cTable class="tabla-con-loader">
-        <thead cTableColor="dark">
+    <div [class.opacity-50]="cargandoTabla" class="table-responsive">
+      <table cTable hover class="align-middle mb-0 border tabla-con-loader">
+        <thead cTableColor="light">
           <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Título</th>
-            <th scope="col">Autor</th>
-            <th scope="col">Publicación</th>
-            <th scope="col" class="w-10">Categorías</th>
-            <th scope="col" class="col">Acciones</th>
+            <th scope="col" style="min-width: 250px;">Título</th>
+            <th scope="col" style="min-width: 120px;">Autor</th>
+            <th scope="col" style="min-width: 120px;">Publicación</th>
+            <th scope="col" style="min-width: 150px;">Categorías</th>
+            <th scope="col" class="text-center" style="min-width: 80px;">Estado</th>
+            <th scope="col" class="text-center" style="min-width: 140px;">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let entrada of listaEntradas; trackBy: trackByEntradaId"
-              cAlign="middle" 
-              [cTableColor]="entrada.publicada ? 'success' : 'warning'"
-              class="cursor-pointer">
-            <td scope="row">{{ entrada.idEntrada }}</td>
-            <td>{{ commonFuncService.acortarTexto(entrada.titulo) }}</td>
+          <tr *ngFor="let entrada of listaEntradas; trackBy: trackByEntradaId">
+            <td>
+              <span class="fw-semibold text-truncate d-inline-block" style="max-width: 300px;" [title]="entrada.titulo">
+                {{ entrada.titulo }}
+              </span>
+            </td>
             <td>{{ entrada.usernameCreador }}</td>
             <td>{{ checkFechaPublicacion(entrada.fechaPublicacion) }}</td>
-            <td>{{ entrada.categoriasConComas }}</td>
             <td>
+              <span class="d-inline-block text-truncate" style="max-width: 200px;" [title]="entrada.categoriasConComas">
+                {{ entrada.categoriasConComas || 'Sin categoría' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <ng-container *ngIf="getEstadoInfo(entrada) as estado">
+                <div [cTooltip]="estado.tooltip">
+                  <svg cIcon [name]="estado.icon" [class]="estado.color" size="lg"></svg>
+                </div>
+              </ng-container>
+            </td>
+            <td class="text-center">
               <div class="btn-group" role="group" aria-label="Acciones de página">
-                <button cButton color="warning" size="sm" 
+                <button cButton color="warning" size="sm" variant="ghost"
                   [routerLink]="['/admin/control/paginas/editar', entrada.idEntrada]"
-                  [attr.aria-label]="'Editar página ' + entrada.titulo"
-                  [title]="'Editar página ' + entrada.titulo">
+                  [cTooltip]="'Editar página'"
+                  [attr.aria-label]="'Editar página ' + entrada.titulo">
                   <svg cIcon name="cilPen" size="sm"></svg>
                 </button>
-                <button cButton color="danger" size="sm" 
+                <button cButton color="danger" size="sm" variant="ghost"
                   (click)="borrarEntrada(entrada)"
-                  [attr.aria-label]="'Borrar página ' + entrada.titulo"
-                  [title]="'Borrar página ' + entrada.titulo">
+                  [cTooltip]="'Borrar página'"
+                  [attr.aria-label]="'Borrar página ' + entrada.titulo">
                   <svg cIcon name="cilTrash" size="sm"></svg>
                 </button>
-                <button cButton color="info" size="sm"
+                <button cButton color="info" size="sm" variant="ghost"
                   (click)="openPreview(entrada)"
-                  [attr.aria-label]="'Vista previa de ' + entrada.titulo"
-                  [title]="'Vista previa de ' + entrada.titulo">
+                  [cTooltip]="'Vista previa'"
+                  [attr.aria-label]="'Vista previa de ' + entrada.titulo">
                   <svg cIcon name="cilExternalLink" size="sm"></svg>
                 </button>
               </div>
             </td>          
           </tr>
           
-          <tr *ngIf="listaEntradas.length === 0" cAlign="middle">
-            <td colspan="6" class="text-center py-4">
-              No se han encontrado registros en el sistema...
+          <tr *ngIf="listaEntradas.length === 0">
+            <td colspan="6" class="text-center py-5">
+              <div class="d-flex flex-column align-items-center justify-content-center">
+                <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                <h6 class="text-muted">No se han encontrado páginas</h6>
+                <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
+
 
       <!-- Paginación -->
       <app-op-pagination

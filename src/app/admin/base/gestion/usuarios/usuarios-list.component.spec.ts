@@ -88,7 +88,7 @@ describe('UsuariosListComponent', () => {
     
     expect(component.isUserFormValid()).toBeFalse(); // Missing rolCodigo
 
-    component.editUser.rolCodigo = 'ADMIN';
+    component.editUser!.rolCodigo = 'ADMIN';
     expect(component.isUserFormValid()).toBeTrue();
   });
   
@@ -115,3 +115,4 @@ describe('UsuariosListComponent', () => {
     expect(mockUsuarioService.crear).toHaveBeenCalled();
     expect(mockUsuarioService.actualizarParcial).not.toHaveBeenCalled();
   });
+});
