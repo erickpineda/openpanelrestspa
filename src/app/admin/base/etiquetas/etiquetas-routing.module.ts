@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { EtiquetasListComponent } from './etiquetas-list.component';
+import { EtiquetasListComponent } from './listado-etiquetas.component';
 
 const routes: Routes = [
   { path: '', component: EtiquetasListComponent }

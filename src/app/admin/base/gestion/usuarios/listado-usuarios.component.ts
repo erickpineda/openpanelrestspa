@@ -12,8 +12,8 @@ import { OPConstants } from '../../../../shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-usuarios-list',
-  templateUrl: './usuarios-list.component.html',
-  styleUrls: ['./usuarios-list.component.scss']
+  templateUrl: './listado-usuarios.component.html',
+  styleUrls: ['./listado-usuarios.component.scss']
 })
 export class UsuariosListComponent implements OnInit, OnDestroy {
   readonly PROPIETARIO_ROLE_CODE = OPConstants.Roles.PROPIETARIO;

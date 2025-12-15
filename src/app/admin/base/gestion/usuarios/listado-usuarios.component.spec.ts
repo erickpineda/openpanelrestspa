@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UsuariosListComponent } from './usuarios-list.component';
+import { UsuariosListComponent } from './listado-usuarios.component';
 import { UsuarioService } from '../../../../core/services/data/usuario.service';
 import { RolService } from '../../../../core/services/data/rol.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';

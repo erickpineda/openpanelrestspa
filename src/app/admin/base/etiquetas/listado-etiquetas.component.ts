@@ -11,8 +11,8 @@ import { SearchUtilService } from '../../../core/services/utils/search-util.serv
 
 @Component({
   selector: 'app-etiquetas-list',
-  templateUrl: './etiquetas-list.component.html',
-  styleUrls: ['./etiquetas-list.component.scss']
+  templateUrl: './listado-etiquetas.component.html',
+  styleUrls: ['./listado-etiquetas.component.scss']
 })
 export class EtiquetasListComponent implements OnInit, OnDestroy {
   etiquetas: Etiqueta[] = [];

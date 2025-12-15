@@ -9,8 +9,8 @@ import { SearchUtilService } from '../../../../core/services/utils/search-util.s
 
 @Component({
   selector: 'app-privilegios-list',
-  templateUrl: './privilegios-list.component.html',
-  styleUrls: ['./privilegios-list.component.scss']
+  templateUrl: './listado-privilegios.component.html',
+  styleUrls: ['./listado-privilegios.component.scss']
 })
 export class PrivilegiosListComponent implements OnInit, OnDestroy {
   loading = false;

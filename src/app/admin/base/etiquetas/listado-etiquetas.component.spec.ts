@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { EtiquetasListComponent } from './etiquetas-list.component';
+import { EtiquetasListComponent } from './listado-etiquetas.component';
 import { FormBuilder } from '@angular/forms';
 import { of } from 'rxjs';
 import { EtiquetaService } from '../../../core/services/data/etiqueta.service';
