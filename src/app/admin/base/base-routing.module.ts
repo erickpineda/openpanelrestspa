@@ -20,6 +20,7 @@ const routes: Routes = [
       { path: 'contenido', loadChildren: () => import('./contenido/contenido.module').then(m => m.ContenidoModule), data: { preload: true, delay: 1400 } },
       { path: 'gestion', loadChildren: () => import('./gestion/gestion.module').then(m => m.GestionModule), data: { preload: true, delay: 1600 } },
       { path: 'etiquetas', loadChildren: () => import('./etiquetas/etiquetas.module').then(m => m.EtiquetasModule), data: { preload: true, delay: 1800 } },
+      { path: 'perfil', loadChildren: () => import('./perfil/perfil.module').then(m => m.PerfilModule) },
       {
         path: 'categorias', children: [
           { path: '', component: ListadoCategoriasComponent },

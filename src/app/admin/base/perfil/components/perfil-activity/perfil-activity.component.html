@@ -1,0 +1,15 @@
+<div class="activity-list">
+  <div *ngFor="let activity of activities" class="d-flex align-items-center border-bottom py-3">
+    <div class="me-3">
+       <div class="bg-light rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+          <svg cIcon name="cil-history" class="text-primary"></svg>
+       </div>
+    </div>
+    <div>
+      <h6 class="mb-1">{{ activity.action }}</h6>
+      <small class="text-muted">
+        {{ activity.date | date:'medium' }} &bull; IP: {{ activity.ip }} &bull; {{ activity.device }}
+      </small>
+    </div>
+  </div>
+</div>

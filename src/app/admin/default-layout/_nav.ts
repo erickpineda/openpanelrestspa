@@ -88,6 +88,11 @@ export const navItems: INavData[] = [
     name: 'Administración'
   },
   {
+    name: 'Mi Perfil',
+    url: '/admin/control/perfil',
+    iconComponent: { name: 'cil-user' }
+  },
+  {
     name: 'Control de Acceso',
     iconComponent: { name: 'cil-shield-alt' },
     url: '/admin/control/gestion',

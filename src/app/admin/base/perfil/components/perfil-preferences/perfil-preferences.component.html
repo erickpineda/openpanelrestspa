@@ -1,0 +1,28 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="mb-3">
+    <label cLabel for="theme">Tema</label>
+    <select cSelect id="theme" formControlName="theme">
+      <option value="light">Claro</option>
+      <option value="dark">Oscuro</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label cLabel for="language">Idioma</label>
+    <select cSelect id="language" formControlName="language">
+      <option value="es">Español</option>
+      <option value="en">Inglés</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <c-form-check>
+      <input cFormCheckInput type="checkbox" id="notifications" formControlName="notifications" />
+      <label cFormCheckLabel for="notifications">Recibir notificaciones por correo</label>
+    </c-form-check>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button cButton color="primary" type="submit">Guardar Preferencias</button>
+  </div>
+</form>

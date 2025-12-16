@@ -31,7 +31,9 @@ import {
   cilBookmark,
   cilCalculator,
   cilCalendar,
+  cilCamera,
   cilChart,
+
   cilChartPie,
   cilCheck,
   cilCheckCircle,
@@ -110,6 +112,7 @@ import {
   cilWarning,
   cilX,
   cilContact,
+
   cilHistory,
   cilShieldAlt,
   cilPaintBucket,
@@ -228,8 +231,10 @@ export const iconSubset = {
   cilUserUnfollow,
   cilWarning,
   cilX,
+  cilCamera,
   cilHistory,
   cilShieldAlt,
+
   cilPaintBucket,
   cilEqualizer
 };
@@ -267,6 +272,7 @@ export enum IconSubset {
   cilBookmark = 'cilBookmark',
   cilCalculator = 'cilCalculator',
   cilCalendar = 'cilCalendar',
+  cilCamera = 'cilCamera',
   cilChart = 'cilChart',
   cilChartPie = 'cilChartPie',
   cilDevices = 'cilDevices',
