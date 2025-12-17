@@ -74,9 +74,14 @@
 
     <div *ngIf="!loading; else loadingTemplate">
       <div class="table-responsive">
-        <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de imágenes">
-          <thead cTableColor="dark">
-            <tr><th>Vista</th><th>Nombre</th><th>Fecha</th><th>Acciones</th></tr>
+        <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de imágenes">
+          <thead cTableColor="light">
+            <tr>
+              <th scope="col" class="text-start">Vista</th>
+              <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
+              <th scope="col" class="text-center">Fecha</th>
+              <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
+            </tr>
           </thead>
           <tbody>
             <tr *ngFor="let m of items">
@@ -87,9 +92,9 @@
                      style="height: 32px; width: 32px; object-fit: cover; cursor: pointer;"
                      (click)="openPreview(m)" />
               </td>
-              <td class="text-truncate" style="max-width: 240px;" [title]="m.nombre">{{ m.nombre }}</td>
-              <td>{{ parseFecha(m.fechaCreacion) | date:'dd-MM-yyyy HH:mm' }}</td>
-              <td>
+              <td class="text-truncate text-start" style="max-width: 240px;" [title]="m.nombre">{{ m.nombre }}</td>
+              <td class="text-center">{{ parseFecha(m.fechaCreacion) | date:'dd-MM-yyyy HH:mm' }}</td>
+              <td class="text-center">
                 <div class="btn-group">
                   <button *ngIf="mode === 'selector'" cButton color="primary" size="sm" (click)="onSelect(m)">
                     Seleccionar

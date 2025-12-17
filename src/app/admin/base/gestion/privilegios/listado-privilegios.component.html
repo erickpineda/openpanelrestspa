@@ -52,16 +52,21 @@
       </div>
 
       <div class="table-responsive">
-      <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de privilegios">
-        <thead cTableColor="dark">
-          <tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr>
+      <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de privilegios">
+        <thead cTableColor="light">
+          <tr>
+            <th scope="col" class="text-start">Código</th>
+            <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
+            <th scope="col" class="text-start" style="min-width: 250px;">Descripción</th>
+            <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
+          </tr>
         </thead>
         <tbody>
           <tr *ngFor="let p of privilegios">
             <td>{{ p.codigo }}</td>
             <td>{{ p.nombre }}</td>
             <td>{{ p.descripcion }}</td>
-            <td>
+            <td class="text-center">
               <div class="btn-group">
                 <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(p)"><svg cIcon name="cilPencil"></svg></button>
                 <button cButton color="danger" size="sm" variant="outline" (click)="delete(p)"><svg cIcon name="cilTrash"></svg></button>

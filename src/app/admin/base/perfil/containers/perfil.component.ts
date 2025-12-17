@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { UsuarioService } from '../../../../core/services/data/usuario.service';
 import { Usuario } from '../../../../core/models/usuario.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { PerfilResponse } from '../../../../core/models/perfil-response.model';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
+import { finalize, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-perfil',
@@ -18,7 +19,8 @@ export class PerfilComponent implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private toastService: ToastService,
-    private fileStorageService: FileStorageService
+    private fileStorageService: FileStorageService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -27,32 +29,50 @@ export class PerfilComponent implements OnInit {
 
   cargarPerfil() {
     this.loading = true;
-    this.usuarioService.obtenerDatosSesionActualSafe().subscribe({
-      next: (res: PerfilResponse) => {
-        this.usuario = res;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.toastService.showError('Error al cargar perfil', 'Error');
-        this.loading = false;
-      }
-    });
+    this.cdr.markForCheck();
+    this.usuarioService.obtenerDatosSesionActualSafe()
+      .pipe(
+        take(1),
+        finalize(() => { 
+          this.loading = false; 
+          this.cdr.markForCheck(); 
+          try { this.cdr.detectChanges(); } catch {} 
+        })
+      )
+      .subscribe({
+        next: (res: PerfilResponse) => {
+          this.usuario = res;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.toastService.showError('Error al cargar perfil', 'Error');
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   onSave(usuarioModificado: Partial<Usuario>) {
      if (!this.usuario) return;
      this.loading = true;
+     this.cdr.markForCheck();
      // Cast to Usuario or compatible type if needed
-     this.usuarioService.actualizarParcial(this.usuario.idUsuario, usuarioModificado as Usuario).subscribe({
+     this.usuarioService.actualizarParcial(this.usuario.idUsuario, usuarioModificado as Usuario)
+      .pipe(finalize(() => { 
+        this.loading = false; 
+        this.cdr.markForCheck(); 
+        try { this.cdr.detectChanges(); } catch {} 
+      }))
+      .subscribe({
         next: () => {
-             this.toastService.showSuccess('Perfil actualizado', 'Éxito');
-             this.cargarPerfil();
+          this.toastService.showSuccess('Perfil actualizado', 'Éxito');
+          this.cargarPerfil();
+          this.cdr.markForCheck();
         },
         error: () => {
-             this.toastService.showError('Error al actualizar', 'Error');
-             this.loading = false;
+          this.toastService.showError('Error al actualizar', 'Error');
+          this.cdr.markForCheck();
         }
-     });
+      });
   }
 
   triggerFileInput(fileInput: HTMLElement) {
@@ -77,10 +97,12 @@ export class PerfilComponent implements OnInit {
              // Pero idealmente actualizamos el usuario con la nueva imagen
            }
            this.uploading = false;
+           this.cdr.markForCheck();
         },
         error: () => {
           this.toastService.showError('Error al subir imagen', 'Error');
           this.uploading = false;
+          this.cdr.markForCheck();
         }
       });
     }

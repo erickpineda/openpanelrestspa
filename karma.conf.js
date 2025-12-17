@@ -1,8 +1,16 @@
 // Karma configuration file, see link for more information
-// https://karma-runner.github.io/1.0/config/configuration-file.html
+// karma-runner.github.io
+const path = require('path');
 
 module.exports = function (config) {
-  try { process.env.CHROME_BIN = require('puppeteer').executablePath(); } catch {}
+  try { 
+    // Intenta usar puppeteer si está disponible, si no, usa el Chrome del sistema.
+    process.env.CHROME_BIN = require('puppeteer').executablePath(); 
+  } catch (e) {
+    // Manejo de error si puppeteer no está instalado
+    console.warn('Puppeteer no encontrado, usando Chrome instalado localmente.');
+  }
+  
   config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
@@ -16,22 +24,22 @@ module.exports = function (config) {
     ],
     client: {
       jasmine: {
-        // you can add configuration options for Jasmine here
-        // the possible options are listed at https://jasmine.github.io/api/edge/Configuration.html
-        // for example, you can disable the random execution with `random: false`
-        // or set a specific seed with `seed: 4321`
+        // Puedes añadir opciones de Jasmine aquí si lo necesitas
+        // random: false, // Desactiva la ejecución aleatoria de tests
       },
-      clearContext: false // leave Jasmine Spec Runner output visible in browser
+      clearContext: false, // Deja la salida de Jasmine Spec Runner visible en el navegador
+      captureConsole: false // Esto evita que los WARN y LOG saturen la comunicación
     },
     jasmineHtmlReporter: {
-      suppressAll: true // removes the duplicated traces
+      suppressAll: true // Elimina trazas duplicadas
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/openpanelspa'),
+      dir: path.join(__dirname, './coverage/openpanelspa'),
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' }
+        { type: 'text-summary' },
+        { type: 'lcovonly' } // Útil para herramientas de CI como SonarQube
       ],
       check: {
         global: {
@@ -48,13 +56,41 @@ module.exports = function (config) {
         }
       }
     },
-    reporters: ['progress', 'kjhtml'],
+    reporters: ['progress', 'kjhtml', 'coverage'], // Añadido 'coverage' aquí para que reporte
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: true,
-    browsers: ['ChromeHeadless'],
-    singleRun: false,
-    restartOnFileChange: true
+    
+    // --- Configuración de Ejecución para CI ---
+    autoWatch: false,
+    singleRun: true, // Ejecuta todos los tests una vez y termina el proceso
+    restartOnFileChange: false, // Deshabilita la recarga automática
+    
+    // --- Configuración de Navegadores y Timeouts Optimizada ---
+    // Usamos el launcher personalizado para mayor estabilidad
+    browsers: ['ChromeHeadlessNoSandbox'], 
+    
+    // Timeouts optimizados para CI. Detecta fallos más rápido (60s) en vez de 90s.
+    browserNoActivityTimeout: 60000, 
+    browserDisconnectTimeout: 10000,
+    browserDisconnectTolerance: 0, // No reintentar la conexión si falla
+    captureTimeout: 120000,
+
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox', // CRÍTICO para entornos Linux/Docker/CI
+          '--disable-gpu',
+          '--disable-dev-shm-usage', // CRÍTICO para problemas de memoria en CI
+          '--no-proxy-server',
+          '--disable-background-timer-throttling', // Evita que Chrome reduzca su prioridad en CI
+          '--js-flags="--max-old-space-size=4096"' // Aumenta el límite de RAM de JS (4GB)
+        ]
+      }
+    },
+    
+    // Limita la concurrencia a 1 para evitar que el navegador se sature en máquinas con pocos recursos
+    concurrency: 1 
   });
 };

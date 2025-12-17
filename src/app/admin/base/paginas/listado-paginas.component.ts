@@ -461,7 +461,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
       return { icon: 'cilCheckCircle', color: 'text-success', tooltip: 'Publicada' };
     }
     if (entrada.borrador) {
-      return { icon: 'cilEye', color: 'text-warning', tooltip: 'Borrador' };
+      return { icon: 'cilFile', color: 'text-warning', tooltip: 'Borrador' };
     }
     return { icon: 'cilHistory', color: 'text-warning', tooltip: entrada.estadoEntrada?.nombre || 'Pendiente' };
   }

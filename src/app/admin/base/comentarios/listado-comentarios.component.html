@@ -83,24 +83,30 @@
               {{ coment.contenido }}
             </span>
           </td>
-          <td>{{coment.username}}</td>
+          <td>{{coment.idUsuario}}</td>
           <td>
             <span class="d-inline-block text-truncate" style="max-width: 150px;" [title]="coment.tituloEntrada">
-              {{coment.tituloEntrada}}
+              {{coment.idEntrada}}
             </span>
           </td>
-          <td>{{coment.fechaCreacionParseada}}</td>
+          <td>{{coment.fechaCreacion}}</td>
           <td class="text-center">
             <ng-container *ngIf="coment.aprobado; else noAprobado">
-               <svg cIcon name="cilCheckCircle" class="text-success" size="lg" cTooltip="Aprobado"></svg>
+               <span [cTooltip]="'Aprobado'" aria-label="Aprobado">
+                 <svg cIcon name="cilCheckCircle" class="text-success" size="lg"></svg>
+               </span>
             </ng-container>
             <ng-template #noAprobado>
               <ng-container *ngIf="coment.cuarentena; else pendiente">
-                <svg cIcon name="cilWarning" class="text-danger" size="lg" cTooltip="En cuarentena"></svg>
+                <span [cTooltip]="'En cuarentena'" aria-label="En cuarentena">
+                  <svg cIcon name="cilWarning" class="text-danger" size="lg"></svg>
+                </span>
               </ng-container>
             </ng-template>
             <ng-template #pendiente>
-              <svg cIcon name="cilHistory" class="text-warning" size="lg" cTooltip="Pendiente de moderación"></svg>
+              <span [cTooltip]="'Pendiente de moderación'" aria-label="Pendiente de moderación">
+                <svg cIcon name="cilHistory" class="text-warning" size="lg"></svg>
+              </span>
             </ng-template>
           </td>
           <td class="text-center">

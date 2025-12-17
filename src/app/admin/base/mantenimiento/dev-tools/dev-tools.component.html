@@ -1,0 +1,17 @@
+<c-row>
+  <c-col xs="12">
+    <c-card>
+      <c-card-header>
+        <strong>Herramientas de Desarrollo</strong>
+      </c-card-header>
+      <c-card-body>
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let f of features">
+            <span>{{ f.name }}</span>
+            <button cButton color="dark" (click)="toggle(f)">{{ f.enabled ? 'Desactivar' : 'Activar' }}</button>
+          </li>
+        </ul>
+      </c-card-body>
+    </c-card>
+  </c-col>
+</c-row>

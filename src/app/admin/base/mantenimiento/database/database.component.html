@@ -1,0 +1,19 @@
+<c-row>
+  <c-col xs="12">
+    <c-card>
+      <c-card-header>
+        <strong>Base de Datos</strong>
+      </c-card-header>
+      <c-card-body>
+        <p>Estado actual: <span class="badge bg-success">{{ status }}</span></p>
+        <div class="actions">
+          <button cButton color="primary" [disabled]="optimizeRunning" (click)="runOptimize()">Optimizar</button>
+          <button cButton color="secondary" [disabled]="backupRunning" (click)="runBackup()">Backup</button>
+        </div>
+        <div class="mt-2">
+          <c-spinner *ngIf="optimizeRunning || backupRunning" color="primary" size="sm"></c-spinner>
+        </div>
+      </c-card-body>
+    </c-card>
+  </c-col>
+</c-row>

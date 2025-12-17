@@ -52,19 +52,25 @@
       </div>
 
       <div class="table-responsive">
-      <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de roles">
-        <thead cTableColor="dark">
-          <tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Privilegios</th><th>Acciones</th></tr>
+      <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de roles">
+        <thead cTableColor="light">
+          <tr>
+            <th scope="col" class="text-start">Código</th>
+            <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
+            <th scope="col" class="text-start" style="min-width: 250px;">Descripción</th>
+            <th scope="col" class="text-center">Privilegios</th>
+            <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
+          </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let r of roles">
+          <tr *ngFor="let r of roles" [class.table-row-disabled]="r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE">
             <td>{{ r.codigo }}</td>
             <td>{{ r.nombre }}</td>
             <td>{{ r.descripcion }}</td>
             <td>
               <c-badge color="info" shape="rounded-pill">{{ r.privilegios ? r.privilegios.length : 0 }}</c-badge>
             </td>
-            <td>
+            <td class="text-center">
               <div class="btn-group">
                 <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(r)"><svg cIcon name="cilPencil"></svg></button>
                 <button cButton color="danger" size="sm" variant="outline" (click)="delete(r)" [disabled]="r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE"><svg cIcon name="cilTrash"></svg></button>

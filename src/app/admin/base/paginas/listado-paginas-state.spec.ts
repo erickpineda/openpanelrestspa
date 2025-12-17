@@ -55,7 +55,7 @@ describe('ListadoPaginasComponent', () => {
     } as Entrada;
 
     const state = component.getEstadoInfo(entrada);
-    expect(state.icon).toBe('cilEye');
+    expect(state.icon).toBe('cilFile');
     expect(state.color).toBe('text-warning');
     expect(state.tooltip).toBe('Borrador');
   });

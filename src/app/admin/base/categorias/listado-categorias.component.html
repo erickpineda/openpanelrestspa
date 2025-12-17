@@ -51,12 +51,12 @@
     </div>
     
     <div class="table-responsive" *ngIf="!cargando; else categoriasLoading">
-      <table cTable hover class="align-middle mb-0 border text-nowrap" role="table" aria-label="Tabla de categorías">
+      <table cTable hover striped class="align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de categorías">
       <thead cTableColor="light">
         <tr>
-          <th scope="col" style="min-width: 200px;">Nombre</th>
-          <th scope="col" style="min-width: 250px;">Descripción</th>
-          <th scope="col" class="text-center" style="min-width: 120px;">Acciones</th>
+          <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
+          <th scope="col" class="text-start" style="min-width: 250px;">Descripción</th>
+          <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
         </tr>
       </thead>
       <tbody>

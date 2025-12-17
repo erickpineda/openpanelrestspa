@@ -143,3 +143,40 @@ header.masthead .site-heading .h1 {
 .app-default-header .c-container {
   overflow-x: hidden;
 }
+
+.table-responsive {
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+.op-table {
+  td,
+  th {
+    vertical-align: middle;
+  }
+  thead th {
+    background-color: var(--cui-table-hover-bg, #f8f9fa);
+    font-weight: 600;
+    border-top: none;
+  }
+  tbody tr:hover {
+    background-color: var(--cui-table-hover-bg, rgba(0,0,0,0.075));
+  }
+  tbody tr.table-row-selected {
+    background-color: rgba(var(--cui-primary-rgb, 13,110,253), 0.1);
+  }
+  tbody tr.table-row-disabled {
+    background-color: var(--cui-secondary-bg, #f8f9fa);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}

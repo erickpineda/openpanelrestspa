@@ -1,0 +1,30 @@
+<c-row>
+  <c-col xs="12">
+    <c-card>
+      <c-card-header>
+        <strong>Logs del Sistema</strong>
+      </c-card-header>
+      <c-card-body>
+        <div class="toolbar">
+          <input class="form-control" placeholder="Filtrar por texto" [(ngModel)]="filter" />
+          <button cButton color="primary" (click)="search()">Buscar</button>
+          <button cButton color="secondary" variant="outline" (click)="clear()">Limpiar</button>
+          <button cButton color="info" variant="outline" (click)="sample()">Generar ejemplos</button>
+        </div>
+        <div *ngIf="loading">
+          <c-spinner color="primary" size="sm"></c-spinner>
+        </div>
+        <div *ngIf="!loading && filtered.length === 0" class="empty">
+          No hay logs disponibles
+        </div>
+        <ul class="list-group" *ngIf="!loading && filtered.length > 0">
+          <li class="list-group-item" *ngFor="let e of filtered">
+            <span class="badge bg-info me-2">{{ e.level }}</span>
+            <span class="text-muted me-2">{{ e.timestamp }}</span>
+            <span>{{ e.message }}</span>
+          </li>
+        </ul>
+      </c-card-body>
+    </c-card>
+  </c-col>
+</c-row>

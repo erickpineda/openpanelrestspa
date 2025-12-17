@@ -28,7 +28,8 @@ describe('UsuariosListComponent', () => {
     };
 
     mockRolService = {
-      obtenerTodos: jasmine.createSpy('obtenerTodos').and.returnValue(of([]))
+      obtenerTodos: jasmine.createSpy('obtenerTodos').and.returnValue(of([])),
+      listarPagina: jasmine.createSpy('listarPagina').and.returnValue(of({ elements: [], totalElements: 0 }))
     };
 
     mockToastService = {

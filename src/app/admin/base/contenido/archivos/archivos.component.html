@@ -72,26 +72,35 @@
           </c-col>
         </c-row>
       </div>
-      <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de archivos">
-        <thead><tr><th>Nombre</th><th>Tamaño</th><th>Fecha</th><th>Acciones</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let f of items">
-            <td class="text-truncate" style="max-width: 240px;" [title]="f.nombre">{{ f.nombre }}</td>
-            <td>{{ f.tamano | number }}</td>
-            <td>{{ f.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
-            <td>
-              <div class="btn-group">
-                <button cButton color="secondary" size="sm" variant="outline" (click)="download(f)" [disabled]="!f.uuid && !f.url" [attr.aria-label]="'Descargar ' + (f.nombre || '')">
-                  <svg cIcon name="cilCloudDownload"></svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="items.length === 0">
-            <td colspan="4" class="text-muted text-center">Sin archivos</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de archivos">
+          <thead cTableColor="light">
+            <tr>
+              <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
+              <th scope="col" class="text-end">Tamaño</th>
+              <th scope="col" class="text-center">Fecha</th>
+              <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of items">
+              <td class="text-truncate text-start" style="max-width: 240px;" [title]="f.nombre">{{ f.nombre }}</td>
+              <td class="text-end">{{ f.tamano | number }}</td>
+              <td class="text-center">{{ f.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
+              <td class="text-center">
+                <div class="btn-group">
+                  <button cButton color="secondary" size="sm" variant="outline" (click)="download(f)" [disabled]="!f.uuid && !f.url" [attr.aria-label]="'Descargar ' + (f.nombre || '')">
+                    <svg cIcon name="cilCloudDownload"></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="items.length === 0">
+              <td colspan="4" class="text-muted text-center">Sin archivos</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
         <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">Anterior</button>
         <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">Siguiente</button>

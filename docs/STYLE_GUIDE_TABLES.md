@@ -45,7 +45,7 @@ Utilizar iconos y colores semánticos para indicar el estado de un registro. Evi
   - Icono: `cilCheckCircle`
   - Color: `text-success`
 - **Borrador/Oculto**:
-  - Icono: `cilEye` (o `cilFile` si es borrador de archivo)
+  - Icono: `cilFile` (o `cilFile` si es borrador de archivo)
   - Color: `text-warning`
 - **Pendiente/En Revisión**:
   - Icono: `cilHistory`

@@ -7,6 +7,7 @@ import { INavData } from '@coreui/angular';
 export class SidebarStateService {
   private readonly STORAGE_KEY = 'sidebar_expanded_items';
   private expandedItems: Set<string> = new Set();
+  private loadedFromStorage = false;
 
   constructor() {
     this.loadState();
@@ -24,6 +25,7 @@ export class SidebarStateService {
         console.warn('Error loading sidebar state', e);
       }
     }
+    this.loadedFromStorage = !!stored;
   }
 
   private saveState(): void {
@@ -40,13 +42,16 @@ export class SidebarStateService {
   }
 
   public updateNavItems(items: INavData[], currentUrl: string): void {
-    // 1. Identificar items activos por URL y asegurar que estén en expandedItems
     this.ensureActiveItemsExpanded(items, currentUrl);
 
-    // 2. Aplicar el estado 'open' a los items basado en expandedItems
+    if (!this.loadedFromStorage && this.expandedItems.size === 0) {
+      this.expandAllGroups(items);
+      this.saveState();
+    }
+
+    this.expandTaxonomiaPattern(items, currentUrl);
+    this.expandRolesPermisosPattern(items, currentUrl);
     this.applyStateToItems(items);
-    
-    // Guardar el estado actualizado (por si la URL forzó nuevas aperturas)
     this.saveState();
   }
 
@@ -55,7 +60,7 @@ export class SidebarStateService {
 
     for (const item of items) {
       // Verificar si este item es el activo o tiene un hijo activo
-      const isItemActive = this.isRouteActive(item.url, currentUrl);
+      const isItemActive = this.isRouteActive(typeof item.url === 'string' ? item.url : undefined, currentUrl);
       let childActive = false;
 
       if (item.children && item.children.length > 0) {
@@ -65,6 +70,7 @@ export class SidebarStateService {
       if (isItemActive || childActive) {
         if (item.children && item.children.length > 0 && item.name) {
            this.expandedItems.add(item.name);
+           this.expandChildGroups(item);
         }
         hasActiveChild = true;
       }
@@ -76,16 +82,11 @@ export class SidebarStateService {
   private applyStateToItems(items: INavData[]): void {
     for (const item of items) {
       if (item.children && item.children.length > 0) {
-        // Si está en el set, lo marcamos como abierto
         if (item.name && this.expandedItems.has(item.name)) {
-          item.open = true;
+          (item as any).open = true;
         } else {
-          // Si no está en el set, aseguramos que esté cerrado (opcional, depende del comportamiento deseado)
-          // Si queremos persistencia estricta, debemos cerrar lo que no esté guardado.
-          // Pero si CoreUI ya lo tiene abierto por alguna razón interna, esto lo forzará.
-          item.open = false;
+          (item as any).open = false;
         }
-        // Recursión
         this.applyStateToItems(item.children);
       }
     }
@@ -93,10 +94,72 @@ export class SidebarStateService {
 
   private isRouteActive(itemUrl: string | undefined, currentUrl: string): boolean {
     if (!itemUrl) return false;
-    // Comparación simple, puede mejorarse con Router.isActive si se inyecta, 
-    // pero string match suele ser suficiente para menús jerárquicos.
-    // Ojo con query params y fragmentos.
     const urlTree = currentUrl.split('?')[0].split('#')[0];
     return urlTree === itemUrl || urlTree.startsWith(itemUrl + '/');
+  }
+
+  private expandAllGroups(items: INavData[]): void {
+    for (const item of items) {
+      if (item.children && item.children.length > 0 && item.name) {
+        this.expandedItems.add(item.name);
+        this.expandAllGroups(item.children);
+      }
+    }
+  }
+
+  private expandChildGroups(item: INavData): void {
+    if (!item.children || item.children.length === 0) return;
+    for (const child of item.children) {
+      if (child.children && child.children.length > 0 && child.name) {
+        this.expandedItems.add(child.name);
+        this.expandChildGroups(child);
+      }
+    }
+  }
+
+  private expandTaxonomiaPattern(items: INavData[], currentUrl: string): void {
+    const isEntradasContext =
+      currentUrl.startsWith('/admin/control/entradas') ||
+      currentUrl.startsWith('/admin/control/taxonomia') ||
+      currentUrl.startsWith('/admin/control/etiquetas') ||
+      currentUrl.startsWith('/admin/control/categorias');
+
+    if (!isEntradasContext) return;
+
+    const stack: INavData[] = [...items];
+    while (stack.length) {
+      const item = stack.pop()!;
+      if (item.name === 'Entradas' && item.children && item.children.length > 0) {
+        this.expandedItems.add(item.name);
+        for (const child of item.children) {
+          if (child.name === 'Taxonomía') {
+            this.expandedItems.add(child.name);
+          }
+        }
+      }
+      if (item.children && item.children.length > 0) {
+        stack.push(...item.children);
+      }
+    }
+  }
+
+  private expandRolesPermisosPattern(items: INavData[], currentUrl: string): void {
+    const isRolesContext =
+      currentUrl.startsWith('/admin/control/gestion/roles') ||
+      currentUrl.startsWith('/admin/control/gestion/privilegios');
+
+    if (!isRolesContext) return;
+
+    const stack: INavData[] = [...items];
+    while (stack.length) {
+      const item = stack.pop()!;
+      if (item.name === 'Roles y Permisos' && item.children && item.children.length > 0) {
+        this.expandedItems.add(item.name);
+        return;
+      }
+      if (item.children && item.children.length > 0) {
+        stack.push(...item.children);
+      }
+    }
   }
 }

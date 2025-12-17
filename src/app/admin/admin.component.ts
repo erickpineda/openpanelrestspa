@@ -12,6 +12,7 @@ import { LoadingService } from '../core/services/ui/loading.service';
 import { ToastService } from '../core/services/ui/toast.service';
 import { TokenStorageService } from '../core/services/auth/token-storage.service';
 import { AuthService } from '../core/services/auth/auth.service';
+import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
 
 // ... imports existentes
 
@@ -52,7 +53,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
     private dashboardApi: DashboardApiService,
     private cdr: ChangeDetectorRef,
     private tokenStorage: TokenStorageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private sidebarState: SidebarStateService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
@@ -99,6 +101,13 @@ export class AdminComponent implements OnInit, AfterViewInit {
     });
     this.tasksCount = this.temporaryEntriesCount;
     this.cdr.markForCheck();
+
+    // Actualizar estado de sidebar en inicio y en cambios de ruta
+    this.sidebarState.updateNavItems(this.navItems, this.router.url);
+    this.router.events.subscribe(() => {
+      this.sidebarState.updateNavItems(this.navItems, this.router.url);
+      this.cdr.markForCheck();
+    });
   }
 
   ngAfterViewInit(): void {

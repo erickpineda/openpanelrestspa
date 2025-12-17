@@ -69,16 +69,21 @@
         </div>
 
         <div class="table-responsive">
-          <table responsive hover cAlign="top" cTable class="table table-sm" role="table" aria-label="Tabla de temas">
-            <thead cTableColor="dark">
-              <tr><th>Nombre</th><th>Activo</th><th>Esquema</th><th>Acciones</th></tr>
+          <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de temas">
+            <thead cTableColor="light">
+              <tr>
+                <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
+                <th scope="col" class="text-center">Activo</th>
+                <th scope="col" class="text-start" style="min-width: 200px;">Esquema</th>
+                <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
+              </tr>
             </thead>
             <tbody>
               <tr *ngFor="let t of pagedTemas">
                 <td>{{ t.nombre }}</td>
                 <td>{{ t.activo ? 'Sí' : 'No' }}</td>
                 <td>{{ t.esquemaColor }}</td>
-                <td>
+                <td class="text-center">
                   <div class="btn-group">
                     <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(t)" [attr.aria-label]="'Editar tema ' + t.nombre"><svg cIcon name="cilPencil"></svg></button>
                     <button cButton color="danger" size="sm" variant="outline" (click)="delete(t)" [attr.aria-label]="'Eliminar tema ' + t.nombre"><svg cIcon name="cilTrash"></svg></button>

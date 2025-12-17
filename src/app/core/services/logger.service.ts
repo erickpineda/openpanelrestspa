@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.dev.es';
+import { LoggerBufferService } from './logger-buffer.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ export class LoggerService {
   // Niveles de log
   private levels = ['debug', 'info', 'warn', 'error'] as const;
   private minLevel: typeof this.levels[number] = this.isProduction ? 'warn' : 'debug';
+  constructor(private buffer: LoggerBufferService) {}
 
   private shouldLog(level: typeof this.levels[number]): boolean {
     const levelIndex = this.levels.indexOf(level);
@@ -37,6 +39,7 @@ export class LoggerService {
         console.error(prefix, message, ...args);
         break;
     }
+    try { this.buffer.record(level, message, args); } catch {}
 
     // En producción, enviar errores a servicio de tracking
     if (this.isProduction && level === 'error') {

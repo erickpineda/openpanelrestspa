@@ -24,7 +24,7 @@
     >
     </c-sidebar-brand>
     <ng-scrollbar pointerEventsMethod="scrollbar">
-      <c-sidebar-nav [navItems]="navItems"></c-sidebar-nav>
+      <c-sidebar-nav [navItems]="navItems" [dropdownMode]="'none'"></c-sidebar-nav>
     </ng-scrollbar>
     <c-sidebar-toggler
       *ngIf="!sidebar.narrow"
