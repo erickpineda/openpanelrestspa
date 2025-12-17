@@ -1,0 +1,176 @@
+# Migración a Angular 21 y CoreUI (última versión)
+
+## 1. Requisitos previos
+- Versión actual:
+  - Angular 16 (`package.json:24–33`)
+  - CoreUI Angular `~4.5.28` (`package.json:39,44`), CoreUI CSS `^4.2.6` (`package.json:42`)
+  - CoreUI ChartJS `~4.5.28` (`package.json:40`), `@coreui/chartjs ^3.1.2` (`package.json:41`)
+  - CoreUI Icons Angular `~4.5.28` (`package.json:44`)
+- Lenguaje y runtime:
+  - TypeScript `~4.9.5` (`package.json:79`)
+  - RxJS `~7.8.1` (`package.json:55`)
+  - Zone.js `~0.13.1` cargado en `src/polyfills.ts:48`
+  - Node engines `>=16.4.0` (`package.json:81–84`)
+- Configuración de build y pruebas:
+  - Builder `@angular-devkit/build-angular:browser` (`angular.json:25`)
+  - `polyfills` apuntando a `src/polyfills.ts` (`angular.json:30`)
+  - Test runner Karma (`angular.json:106–123`)
+  - E2E con Playwright (`package.json:20`)
+- Dependencias y paquetes relacionados:
+  - CKEditor Angular (`@ckeditor/ckeditor5-angular ^9.1.0`) y build classic (^44.3.0)
+  - jQuery `^3.6.1` y otras CommonJS permitidas en `angular.json:45–52`
+  - CoreUI módulos usados en `AppModule`: `ToastModule`, `ModalModule` (`src/app/app.module.ts:12,31–33`)
+- Patrón de bootstrap:
+  - `platformBrowserDynamic().bootstrapModule(AppModule)` (`src/main.ts:11`)
+- HTTP:
+  - `HttpClientModule` importado en `AppModule` (`src/app/app.module.ts:16`)
+  - Interceptores en `CoreModule` con orden explícito (`src/app/core/core.module.ts:33–63`)
+- TypeScript config:
+  - `tsconfig.json` con `strictTemplates: true`, `target/module ES2022`, `useDefineForClassFields: false` (`c:\dev\git\openpanelrestspa\tsconfig.json:22–25,41–46`)
+  - `tsconfig.app.json` incluye `src/main.ts` y `src/polyfills.ts` (`c:\dev\git\openpanelrestspa\tsconfig.app.json:9–11`)
+  - `tsconfig.spec.json` usa `jasmine` y Karma (`c:\dev\git\openpanelrestspa\tsconfig.spec.json:6–13`)
+- Otras dependencias potencialmente sensibles:
+  - `ngx-scrollbar ^13.0.3` (alinear compatibilidad con Angular 21)
+  - `loader-utils 3.2.1`, `serve ^14.0.1` (auditar uso real y remover si no se usan)
+
+## 2. Plan de migración Angular 21
+- Pasos detallados:
+  - Actualizar Node a una versión soportada por Angular 21 (`^20.19.0` o superior). Referencia: Version compatibility • Angular (https://angular.dev/reference/versions).
+  - Actualizar TypeScript a `^5.9.x`, `tslib` a `^2.6.x`, y `@types/node` (sugerido `^20.x`).
+  - Actualizar Angular local:
+    - Ruta incremental recomendada: 16→17→18→19→20→21 con `ng update` en cada salto, corrigiendo warnings y fallos.
+    - Ruta directa alternativa: `ng update @angular/cli@21 @angular/core@21` si se prefiere rapidez, con mayor riesgo.
+  - Ajustar `angular.json` según migraciones: builders modernos (esbuild), `dev-server`, `extract-i18n`.
+  - Evaluar mantener Zone o migrar a zoneless:
+    - Corto plazo: mantener Zone (añadir `provideZoneChangeDetection()` si la migración lo solicita).
+    - Medio plazo: migración progresiva a zoneless y señales.
+- Breaking changes a considerar:
+  - Zoneless por defecto en apps nuevas; apps existentes pueden seguir usando Zone si se provee explícitamente. Resumen de v21: Ninja Squad (https://blog.ninja-squad.com/2025/11/20/what-is-new-angular-21.0).
+  - `HttpClient` provisto por defecto en el inyector raíz; puede retirarse `HttpClientModule` del `AppModule` si no se requiere configuración especial.
+  - Migración de control flow (`@if`, `@for`, `@switch`), y recomendación de bindings `class.*`/`style.*` frente a `NgClass`/`NgStyle`.
+  - `typeCheckHostBindings` habilitado por defecto; posibles nuevos errores de tipo en plantillas.
+  - `SimpleChanges<T>` genérico para `ngOnChanges`, con tipos más estrictos.
+  - Test runner por defecto pasa de Karma a Vitest en proyectos nuevos; considerar migración.
+- Actualización de dependencias compatibles:
+  - RxJS: conservar `7.8.x` (compatible con v21).
+  - Zone.js: si se mantiene CD clásico, subir a `^0.16.x` (alineado con ecosistema actual).
+  - `@angular-devkit/build-angular` y CLI: aceptar versiones sugeridas por `ng update`.
+  - Angular ESLint y herramientas de linting: actualizar a línea 21.
+- Modificaciones necesarias en el código:
+  - `AppModule`: retirar `HttpClientModule` si no hay configuración de `provideHttpClient(...)` personalizada (`src/app/app.module.ts:16`).
+  - Interceptores: validar que el orden se conserva (`TimeoutInterceptor` → `AuthInterceptor` → `NetworkInterceptor` → `ErrorInterceptor`) (`src/app/core/core.module.ts:45–63`).
+  - `polyfills.ts`: mantener `import 'zone.js'` si se conserva Zone; eliminarlo en zoneless y ajustar detección de cambios.
+  - Plantillas: sustituir `NgClass`/`NgStyle` por bindings equivalentes; considerar aplicar migraciones automáticas disponibles en v21.
+  - Tests:
+    - Migrar de `HttpClientTestingModule` a `provideHttpClientTesting()` en nuevas pruebas donde proceda.
+    - Considerar migración total a Vitest; si se mantiene Karma temporalmente, conservar builder de Karma en `angular.json`.
+  - Arquitectura opcional (a medio plazo):
+    - Evaluar migración progresiva a Standalone y `bootstrapApplication` (sustituir `platformBrowserDynamic` en `src/main.ts:11`), manteniendo `AppRoutingModule` hasta migrar a `provideRouter`.
+  - `language-service`: mover `@angular/language-service` a `devDependencies` (actualmente está en `dependencies`, `package.json:30`).
+- Configuraciones de compilación y despliegue:
+  - Revisar `budgets` tras la migración (`angular.json:56–66`).
+  - Revisar `allowedCommonJsDependencies` y reducir CommonJS (lodash, CKEditor, jQuery) si el builder advierte.
+  - Alinear soportes de navegador y polyfills con Baseline de Angular 21.
+  - Validar builds `development` y `production`, y revisar warnings/dx del CLI.
+  - Builders:
+    - Migrar referencias de `@angular-devkit/build-angular:*` a `@angular/build:*` cuando `ng update` lo proponga (nuevo paquete de builders en Angular 21).
+  - TypeScript:
+    - Confirmar `target/module` recomendados por CLI, `useDefineForClassFields` acorde, y `strictTemplates` activo (ya configurado en `tsconfig.json:41–46`).
+
+## 3. Migración a CoreUI
+- Versión objetivo:
+  - `@coreui/angular 5.6.x` y paquetes asociados para Angular 21 (releases oficiales: https://github.com/coreui/coreui-angular/releases, entradas 5.6.0–5.6.2).
+  - `@coreui/icons-angular 5.6.x`, `@coreui/angular-chartjs 5.6.x`, `@coreui/coreui` 5.x (CSS/SCSS).
+- Cambios en componentes y estilos:
+  - Migración interna de `NgClass`/`NgStyle` a bindings `class.*`/`style.*` en librería; revisar usos propios para coherencia.
+  - Señales en componentes CoreUI (ej. `modal`, `sidebar`): confirmar API y efectos en integración.
+  - Modales/backdrop: se han corregido comportamientos en zoneless en v5.5.x; validar en nuestra app.
+  - Revisión de imports: `ToastModule`, `ModalModule` deben seguir disponibles; confirmar API estable.
+- Actualización de temas y personalizaciones:
+  - `angular.json:39` importa `coreui.min.css`; con v5, se recomienda SCSS: `@import "@coreui/coreui/scss/coreui";` en `src/styles.scss`.
+  - Verificar overrides SCSS propios y variables de tema; alinear con Bootstrap 5.x y CoreUI 5.x.
+  - Iconos: actualizar a `@coreui/icons-angular 5.6.x` y confirmar nombres/paths.
+  - Chart.js: `@coreui/angular-chartjs 5.6.x` (wrapper para Chart.js v4); revisar `@coreui/chartjs` si se mantiene.
+- Compatibilidad con Angular 21:
+  - CoreUI 5.6 anuncia soporte para Angular 21 y TS 5.9 (npm page y releases). Ver: https://coreui.io/angular/docs/.
+  - En zoneless, validar componentes que dependían de Zone; CoreUI ha aplicado fixes y migraciones en 5.5.x/5.6.x.
+-. Auditoría adicional de dependencias relacionadas con CoreUI:
+  - `@coreui/coreui ^4.2.6` (CSS) → actualizar a 5.x para plena compatibilidad con CoreUI Angular 5.6.x.
+  - `@coreui/chartjs ^3.1.2` → revisar compatibilidad con Chart.js v4 y wrapper Angular 5.6.x.
+
+## 4. Cronograma estimado
+- Fase 0 — Preparación (0.5–1 día)
+  - Rama de migración, auditoría de dependencias, limpieza de warnings.
+  - Punto de verificación: build y tests pasan en v16.
+- Fase 1 — Entorno y dependencias base (0.5 día)
+  - Node/TypeScript/tslib/`@types/node`.
+  - Punto de verificación: build con TS 5.9 sigue pasando.
+- Fase 2 — Angular 16→21 (2–3 días)
+  - Actualizaciones con `ng update` (incremental o directa), resolución de breaking changes.
+  - Punto de verificación: build prod y dev sin errores; E2E básicos pasan.
+- Fase 3 — Tests (1–2 días)
+  - Migración a Vitest o estabilización con Karma temporal; actualización de pruebas HTTP.
+  - Punto de verificación: suite unitaria estable y rápida.
+- Fase 4 — CoreUI 5.6.x (1–2 días)
+  - Actualización de paquetes, ajustes de estilos/temas, verificación visual.
+  - Punto de verificación: revisión UI de pantallas clave y componentes CoreUI.
+- Fase 5 — QA y despliegue (1–2 días)
+  - Pruebas de regresión visual, performance budgets, smoke tests en entorno de staging.
+  - Punto de verificación: reporte de QA y go/no-go para producción.
+ - Fase 6 — Limpieza (0.5 día)
+   - Remover dependencias obsoletas (Karma/Jasmine/Puppeteer/jQuery si procede), CommonJS innecesarias y actualizar scripts en `package.json`.
+
+## 5. Pruebas requeridas
+- Pruebas unitarias:
+  - Interceptores (`Auth`, `Network`, `Error`, `Timeout`) con orden y comportamiento (`src/app/core/core.module.ts:45–63`).
+  - Servicios HTTP (`auth.service`, `dashboard-api.service`, `usuario.service`) validando parámetros y rutas; ejemplo existente: `dashboard-api.service.spec.ts`.
+  - Manejador global de errores (`global-error-handler.service.ts`) para `HttpErrorResponse` y validaciones del backend (`src/app/core/errors/global-error/global-error-handler.service.ts:269–304`).
+- Pruebas de integración:
+  - Flujo de sesión y expiración (`SessionExpiredComponent`, `UnsavedWorkDirective`) (`src/app/app.module.ts:12–21`).
+  - Preloading de rutas (`CustomPreloadingStrategyService`) y navegación con estados de carga.
+- Pruebas de regresión visual:
+  - Playwright con screenshots de páginas clave: dashboard, perfil (`src/app/admin/base/perfil/containers/perfil.component.html:3`), listas y modales.
+  - Validar temas y componentes CoreUI (toasts, modales, sidebar).
+- Validación de funcionalidad:
+  - Rendimiento: respetar `budgets` (`angular.json:56–66`) y revisar paquetes CommonJS.
+  - Comprobación zoneless/Zone según decisión: estabilidad de detección de cambios.
+ - Pruebas de compatibilidad de librerías:
+   - `ngx-scrollbar` y CKEditor contra Angular 21/TS 5.9; actualizar versiones y pruebas de integración.
+   - `@coreui/angular-chartjs` y Chart.js v4 en gráficas actuales.
+
+## 6. Documentación adicional
+- Guía de referencia para cambios importantes:
+  - Compatibilidad Angular 21 (Node/TS/RxJS): https://angular.dev/reference/versions
+  - Novedades Angular 21 y migraciones (`NgClass`/`NgStyle`, control flow, zoneless): https://blog.ninja-squad.com/2025/11/20/what-is-new-angular-21.0
+  - CoreUI para Angular (docs y requisitos): https://coreui.io/angular/docs/ y releases: https://github.com/coreui/coreui-angular/releases
+- Problemas conocidos y soluciones:
+  - Warnings por CommonJS (lodash, CKEditor, jQuery): sustituir por ESM donde sea viable; mantener lista en `angular.json:45–52` temporalmente.
+  - CKEditor compatibilidad: actualizar `@ckeditor/ckeditor5-angular` a versión compatible con TS 5.9/Angular 21; validar builds.
+  - Karma→Vitest: el schematic de migración ayuda, pero configuraciones personalizadas pueden requerir ajustes manuales.
+  - Zoneless: evitar mezclar patrones sin control; introducir señales gradualmente, revisar `ChangeDetectorRef`.
+  - Builders nuevos:
+    - `@angular/build` sustituye a `@angular-devkit/build-angular` en Angular 21; aceptar migraciones del CLI y validar `angular.json`.
+  - Linting:
+    - Actualizar `angular-eslint` a línea 21 y revisar reglas nuevas en plantillas (bindings `class.*`/`style.*`).
+- Recomendaciones post-migración:
+  - Adoptar señales en nuevas funcionalidades y formularios (`@angular/forms/signals`) donde aporte.
+  - Reducir uso de jQuery y librerías CommonJS; migrar a alternativas ESM.
+  - Mantener `provideZoneChangeDetection()` solo si es necesario; planificar transición a zoneless.
+  - Actualizar pipeline CI/CD (Node LTS 20/22), bloquear versiones y definir lints de Angular 21.
+  - Arquitectura:
+    - Planificar migración progresiva a Standalone y `bootstrapApplication` para simplificar `AppModule` y reducir dependencias del sistema de módulos.
+
+---
+
+## Apéndice: ubicaciones clave del proyecto
+- `package.json` (`c:\dev\git\openpanelrestspa\package.json`)
+- `angular.json` (`c:\dev\git\openpanelrestspa\angular.json`)
+- `src/main.ts` (`c:\dev\git\openpanelrestspa\src\main.ts:11`)
+- `src/polyfills.ts` (`c:\dev\git\openpanelrestspa\src\polyfills.ts:48`)
+- `AppModule` (`c:\dev\git\openpanelrestspa\src\app\app.module.ts:1–44`)
+- `CoreModule` (`c:\dev\git\openpanelrestspa\src\app\core\core.module.ts:1–69`)
+- `DashboardApiService tests` (`c:\dev\git\openpanelrestspa\src\app\core\services\dashboard-api.service.spec.ts`)
+ - `tsconfig.json` (`c:\dev\git\openpanelrestspa\tsconfig.json`)
+ - `tsconfig.app.json` (`c:\dev\git\openpanelrestspa\tsconfig.app.json`)
+ - `tsconfig.spec.json` (`c:\dev\git\openpanelrestspa\tsconfig.spec.json`)
+
