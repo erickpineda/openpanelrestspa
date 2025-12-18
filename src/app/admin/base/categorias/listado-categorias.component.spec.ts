@@ -35,14 +35,24 @@ describe('ListadoCategoriasComponent Spinner', () => {
     expect(el.querySelector('c-spinner')).toBeTruthy();
   });
 
-  it('oculta spinner cuando cargando=false', () => {
-    (component as any).ngOnInit = () => {};
-    component.cargando = true;
-    fixture.detectChanges();
+  it('oculta spinner cuando cargando=false', async () => {
+    // Evitar que obtenerListaCategorias se ejecute y ponga cargando=true
+    spyOn(component, 'obtenerListaCategorias');
+    
+    // Configurar estado inicial
     component.cargando = false;
     component.pagedCategorias = [{ idCategoria: 1, nombre: 'A', descripcion: '' } as any];
+    
+    // IMPORTANTE: Primero detectChanges() para que Angular procese los bindings
     fixture.detectChanges();
+    await fixture.whenStable();
+    
     const el: HTMLElement = fixture.nativeElement;
+    
+    // Verificar que el componente realmente tiene cargando en false
+    expect(component.cargando).toBeFalse();
+
+    // Verificar que el spinner NO está presente
     expect(el.querySelector('c-spinner')).toBeNull();
   });
 

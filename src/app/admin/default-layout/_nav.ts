@@ -11,14 +11,16 @@ export const navItems: INavItemEnhanced[] = [
     badge: {
       color: 'info',
       text: 'Principal'
-    }
+    },
+    attributes: { id: 'nav-dashboard' }
   },
 
   // Content Management Section
   {
     title: true,
     name: 'Gestión de Contenido',
-    priority: 90
+    priority: 90,
+    attributes: { id: 'nav-title-content' }
   },
   {
     name: 'Entradas',
@@ -26,6 +28,7 @@ export const navItems: INavItemEnhanced[] = [
     iconComponent: { name: 'cil-pencil' },
     priority: 85,
     requiredRoles: [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
+    attributes: { id: 'nav-entries' },
     children: [
       {
         name: 'Nueva Entrada',
@@ -92,7 +95,8 @@ export const navItems: INavItemEnhanced[] = [
     iconComponent: { name: 'cil-library' },
     priority: 75,
     requiredRoles: [UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
-    linkProps: { fragment: 'someAnchor' }
+    linkProps: { fragment: 'someAnchor' },
+    attributes: { id: 'nav-pages' }
   },
   {
     name: 'Multimedia',
@@ -100,6 +104,7 @@ export const navItems: INavItemEnhanced[] = [
     iconComponent: { name: 'cil-image' },
     priority: 70,
     requiredRoles: [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
+    attributes: { id: 'nav-media' },
     children: [
       {
         name: 'Imágenes',
@@ -132,7 +137,8 @@ export const navItems: INavItemEnhanced[] = [
     badge: {
       color: 'danger',
       text: 'Pendientes'
-    }
+    },
+    attributes: { id: 'nav-comments' }
   },
 
   // User Administration Section
@@ -140,7 +146,8 @@ export const navItems: INavItemEnhanced[] = [
     title: true,
     name: 'Administración de Usuarios',
     priority: 60,
-    requiredRoles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO]
+    requiredRoles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO],
+    attributes: { id: 'nav-title-users' }
   },
   {
     name: 'Usuarios',
@@ -156,7 +163,8 @@ export const navItems: INavItemEnhanced[] = [
     badge: {
       color: 'info',
       text: 'Nuevos'
-    }
+    },
+    attributes: { id: 'nav-users' }
   },
   {
     name: 'Roles y Permisos',
@@ -164,6 +172,7 @@ export const navItems: INavItemEnhanced[] = [
     iconComponent: { name: 'cil-shield-alt' },
     priority: 50,
     requiredRoles: [UserRole.PROPIETARIO],
+    attributes: { id: 'nav-roles' },
     children: [
       {
         name: 'Roles',

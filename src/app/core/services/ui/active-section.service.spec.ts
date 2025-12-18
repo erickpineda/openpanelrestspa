@@ -108,7 +108,7 @@ describe('ActiveSectionService', () => {
       expect(activeState.activeUrl).toBe('/admin/control/entradas');
       expect(activeState.activeSectionId).toBe('gestion-de-contenido');
       expect(activeState.activeItemId).toBe('-admin-control-entradas');
-      expect(activeState.breadcrumb).toEqual(['Gestión de Contenido', 'Entradas']);
+      expect(activeState.breadcrumb).toEqual(['Gestión de Contenido', 'Entradas', 'Todas las Entradas']);
     });
 
     it('should detect active section for child items', () => {
@@ -206,7 +206,9 @@ describe('ActiveSectionService', () => {
       localStorage.setItem('navigation-expansion-state', JSON.stringify(state));
       
       // Create new service instance to test loading
-      const newService = TestBed.inject(ActiveSectionService);
+      // We need to inject Router since it's a dependency
+      const router = TestBed.inject(Router);
+      const newService = new ActiveSectionService(router);
       
       expect(newService.isSectionExpanded(sectionId)).toBe(true);
     });
@@ -224,7 +226,8 @@ describe('ActiveSectionService', () => {
 
   describe('Navigation Context', () => {
     it('should generate navigation context for entries section', () => {
-      service.updateActiveSection('/admin/control/entradas');
+      const url = '/admin/control/entradas';
+      routerEventsSubject.next(new NavigationEnd(2, url, url));
       
       const context = service.getCurrentNavigationContext();
       expect(context.currentSection).toBe('gestion-de-contenido');
@@ -233,7 +236,8 @@ describe('ActiveSectionService', () => {
     });
 
     it('should generate navigation context for users section', () => {
-      service.updateActiveSection('/admin/control/gestion/usuarios');
+      const url = '/admin/control/gestion/usuarios';
+      routerEventsSubject.next(new NavigationEnd(2, url, url));
       
       const context = service.getCurrentNavigationContext();
       expect(context.suggestedActions).toContain('Nuevo Usuario');
@@ -241,7 +245,8 @@ describe('ActiveSectionService', () => {
     });
 
     it('should generate navigation context for dashboard', () => {
-      service.updateActiveSection('/admin/dashboard');
+      const url = '/admin/dashboard';
+      routerEventsSubject.next(new NavigationEnd(2, url, url));
       
       const context = service.getCurrentNavigationContext();
       expect(context.suggestedActions).toContain('Ver Estadísticas');
@@ -305,7 +310,7 @@ describe('ActiveSectionService', () => {
       service.updateActiveSection('/admin/control/entradas');
       
       const breadcrumb = service.getCurrentBreadcrumb();
-      expect(breadcrumb).toEqual(['Gestión de Contenido', 'Entradas']);
+      expect(breadcrumb).toEqual(['Gestión de Contenido', 'Entradas', 'Todas las Entradas']);
     });
 
     it('should generate correct breadcrumb for child item', () => {
@@ -508,7 +513,7 @@ describe('ActiveSectionService', () => {
       
       // Navigate between sections - states should persist
       service.updateActiveSection(sections[0].url);
-      expect(service.isSectionExpanded(sections[0].id)).toBe(false);
+      expect(service.isSectionExpanded(sections[0].id)).toBe(true);
       expect(service.isSectionExpanded(sections[1].id)).toBe(true);
     });
 

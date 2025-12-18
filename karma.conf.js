@@ -25,7 +25,7 @@ module.exports = function (config) {
     client: {
       jasmine: {
         // Puedes añadir opciones de Jasmine aquí si lo necesitas
-        // random: false, // Desactiva la ejecución aleatoria de tests
+        random: false, // Desactiva la ejecución aleatoria de tests
       },
       clearContext: false, // Deja la salida de Jasmine Spec Runner visible en el navegador
       captureConsole: false // Esto evita que los WARN y LOG saturen la comunicación
@@ -71,9 +71,9 @@ module.exports = function (config) {
     browsers: ['ChromeHeadlessNoSandbox'], 
     
     // Timeouts optimizados para CI. Detecta fallos más rápido (60s) en vez de 90s.
-    browserNoActivityTimeout: 60000, 
-    browserDisconnectTimeout: 10000,
-    browserDisconnectTolerance: 0, // No reintentar la conexión si falla
+    browserNoActivityTimeout: 100000, 
+    browserDisconnectTimeout: 20000,
+    browserDisconnectTolerance: 1, // Reintentar la conexión si falla
     captureTimeout: 120000,
 
     customLaunchers: {

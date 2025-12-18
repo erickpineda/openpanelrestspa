@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { NavigationService } from './navigation.service';
 import { SidebarStateService } from './sidebar-state.service';
 import { ActiveSectionService } from './active-section.service';
@@ -419,7 +420,9 @@ describe('NavigationService', () => {
 
       service.loadNavigationConfig(testConfig);
 
-      service.getNavigationItems(UserRole.ADMINISTRADOR).subscribe(items => {
+      service.getNavigationItems(UserRole.ADMINISTRADOR)
+        .pipe(take(1))
+        .subscribe(items => {
         // Encontrar los índices de las secciones
         const highIndex = items.findIndex(item => item.name === 'Alta Prioridad');
         const mediumIndex = items.findIndex(item => item.name === 'Media Prioridad');
