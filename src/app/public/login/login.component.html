@@ -4,52 +4,70 @@
       <c-col md="4">
         <c-card class="p-4">
           <c-card-body>
-            <form cForm *ngIf="!isLoggedIn" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
-              <h1>Login</h1>
-              <p class="text-medium-emphasis">Inicia sesión con tu cuenta</p>
-              <c-input-group class="mb-3">
-                <span cInputGroupText>
-                  <svg [cIcon]="icons.cilUser" name="cilUser"></svg>
-                </span>
-                <input id="username" autoComplete="username" cFormControl placeholder="Introduzca nombre de usuario"
-                  name="username" [(ngModel)]="form.username" required #username="ngModel"/>
-              </c-input-group>
-              <c-alert color="danger" fade *ngIf="username.errors && f.submitted">El nombre de usuario es obligatorio</c-alert>
-              <c-input-group class="mb-4">
-                <span cInputGroupText>
-                  <svg [cIcon]="icons.cilLockLocked"></svg>
-                </span>
-                <input id="password" autoComplete="current-password" cFormControl placeholder="Introduzca la contraseña"
-                  type="password" name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"/>
-              </c-input-group>
-              <c-alert color="danger" fade *ngIf="password.errors && f.submitted">
-                <span *ngIf="password.errors['required']">La contraseña es obligatoria</span>
-                <span *ngIf="password.errors['minlength']">La contraseña debe tener 6 caracteres como mínimo</span>
-              </c-alert>
-              <c-row>
-                <c-col xs="6">
-                  <button *ngIf="!isLoading" class="btn btn-primary" type="submit">
-                    Login
-                  </button>
-                  <button *ngIf="isLoading" class="btn btn-primary" type="button" disabled>
-                    Iniciando...
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  </button>
-                </c-col>
-                <c-col class="text-right" xs="6">
-                  <button cButton class="px-0" color="link" type="button">¿Has olvidado la contraseña?</button>
-                </c-col>
-              </c-row>
-              <c-row>
-                <c-alert color="danger" fade *ngIf="isLoginFailed">Error: {{ errorMessage }}</c-alert>
-              </c-row>
-            </form>
-            <c-row>
-              <c-alert color="success" *ngIf="isLoggedIn">El rol del usuario es {{ roles }}.</c-alert>
-            </c-row>
-          </c-card-body>
-        </c-card>
-      </c-col>
-    </c-row>
-  </c-container>
-</div>
+            @if (!isLoggedIn) {
+              <form cForm name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+                <h1>Login</h1>
+                <p class="text-medium-emphasis">Inicia sesión con tu cuenta</p>
+                <c-input-group class="mb-3">
+                  <span cInputGroupText>
+                    <svg [cIcon]="icons.cilUser" name="cilUser"></svg>
+                  </span>
+                  <input id="username" autoComplete="username" cFormControl placeholder="Introduzca nombre de usuario"
+                    name="username" [(ngModel)]="form.username" required #username="ngModel"/>
+                  </c-input-group>
+                  @if (username.errors && f.submitted) {
+                    <c-alert color="danger" fade>El nombre de usuario es obligatorio</c-alert>
+                  }
+                  <c-input-group class="mb-4">
+                    <span cInputGroupText>
+                      <svg [cIcon]="icons.cilLockLocked"></svg>
+                    </span>
+                    <input id="password" autoComplete="current-password" cFormControl placeholder="Introduzca la contraseña"
+                      type="password" name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"/>
+                    </c-input-group>
+                    @if (password.errors && f.submitted) {
+                      <c-alert color="danger" fade>
+                        @if (password.errors['required']) {
+                          <span>La contraseña es obligatoria</span>
+                        }
+                        @if (password.errors['minlength']) {
+                          <span>La contraseña debe tener 6 caracteres como mínimo</span>
+                        }
+                      </c-alert>
+                    }
+                    <c-row>
+                      <c-col xs="6">
+                        @if (!isLoading) {
+                          <button class="btn btn-primary" type="submit">
+                            Login
+                          </button>
+                        }
+                        @if (isLoading) {
+                          <button class="btn btn-primary" type="button" disabled>
+                            Iniciando...
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          </button>
+                        }
+                      </c-col>
+                      <c-col class="text-right" xs="6">
+                        <button cButton class="px-0" color="link" type="button">¿Has olvidado la contraseña?</button>
+                      </c-col>
+                    </c-row>
+                    <c-row>
+                      @if (isLoginFailed) {
+                        <c-alert color="danger" fade>Error: {{ errorMessage }}</c-alert>
+                      }
+                    </c-row>
+                  </form>
+                }
+                <c-row>
+                  @if (isLoggedIn) {
+                    <c-alert color="success">El rol del usuario es {{ roles }}.</c-alert>
+                  }
+                </c-row>
+              </c-card-body>
+            </c-card>
+          </c-col>
+        </c-row>
+      </c-container>
+    </div>

@@ -8,7 +8,9 @@
   </c-col>
   <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
     <select cSelect [ngModel]="pageSize" (ngModelChange)="pageSizeChange.emit($event)" name="pageSizeSelect" style="max-width: 100px;">
-      <option *ngFor="let s of sizeOptions" [value]="s">{{ s }}</option>
+      @for (s of sizeOptions; track s) {
+        <option [value]="s">{{ s }}</option>
+      }
     </select>
   </c-col>
 </c-row>

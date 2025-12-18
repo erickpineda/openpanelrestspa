@@ -5,69 +5,82 @@
     </c-card-header>
     <c-card-body>
 
-      <div *ngIf="!noHayEntradas">
-        <h5 cCardTitle>No hay entradas</h5>
-        <p cCardText>
-          Este blog no tiene entradas, contacta con los vagos del Blog para que publiquen algo..
-        </p>
-        <button cButton href="#about" color="primary" (click)="refrescarPagina()">Refrescar</button>
-      </div>
-
-      <div *ngIf="cargaFinalizada">
-        <div class="large-entry mb-4" *ngIf="pagedEntradas.length > 0">
-          <c-card>
-            <img src="../../../../assets/img/brand/coreui-base.svg" class="card-img-top">
-            <c-card-body>
-              <h5 cCardTitle>{{ pagedEntradas[0]?.titulo }}</h5>
-              <p cCardText>{{ pagedEntradas[0]?.resumen }}</p>
-              <button cButton color="primary">Continuar leyendo...</button>
-            </c-card-body>
-            <c-card-footer>
-              <small class="text-medium-emphasis">
-                Fecha publicación: {{ pagedEntradas[0]?.fechaPublicacion ? pagedEntradas[0]?.fechaPublicacion : 'No Publicada' }}
-              </small>
-              <div *ngFor="let categoria of pagedEntradas[0]?.categorias">
-                <small class="text-medium-emphasis">Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small>
-              </div>
-            </c-card-footer>
-          </c-card>
+      @if (!noHayEntradas) {
+        <div>
+          <h5 cCardTitle>No hay entradas</h5>
+          <p cCardText>
+            Este blog no tiene entradas, contacta con los vagos del Blog para que publiquen algo..
+          </p>
+          <button cButton href="#about" color="primary" (click)="refrescarPagina()">Refrescar</button>
         </div>
+      }
 
-        <c-row>
-          <ng-container *ngFor="let entrada of pagedEntradas.slice(1)">
-            <c-col [md]="4" class="mb-4">
+      @if (cargaFinalizada) {
+        <div>
+          @if (pagedEntradas.length > 0) {
+            <div class="large-entry mb-4">
               <c-card>
                 <img src="../../../../assets/img/brand/coreui-base.svg" class="card-img-top">
                 <c-card-body>
-                  <h5 cCardTitle>{{ entrada.titulo }}</h5>
-                  <p cCardText>{{ entrada.resumen }}</p>
+                  <h5 cCardTitle>{{ pagedEntradas[0]?.titulo }}</h5>
+                  <p cCardText>{{ pagedEntradas[0]?.resumen }}</p>
                   <button cButton color="primary">Continuar leyendo...</button>
                 </c-card-body>
                 <c-card-footer>
                   <small class="text-medium-emphasis">
-                    Fecha publicación: {{ entrada.fechaPublicacion ? entrada.fechaPublicacion : 'No Publicada' }}
+                    Fecha publicación: {{ pagedEntradas[0]?.fechaPublicacion ? pagedEntradas[0]?.fechaPublicacion : 'No Publicada' }}
                   </small>
-                  <div *ngFor="let categoria of entrada.categorias">
-                    <small class="text-medium-emphasis">Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small>
-                  </div>
+                  @for (categoria of pagedEntradas[0]?.categorias; track categoria) {
+                    <div>
+                      <small class="text-medium-emphasis">Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small>
+                    </div>
+                  }
                 </c-card-footer>
               </c-card>
-            </c-col>
-          </ng-container>
-        </c-row>
-      </div>
+            </div>
+          }
+          <c-row>
+            @for (entrada of pagedEntradas.slice(1); track entrada) {
+              <c-col [md]="4" class="mb-4">
+                <c-card>
+                  <img src="../../../../assets/img/brand/coreui-base.svg" class="card-img-top">
+                  <c-card-body>
+                    <h5 cCardTitle>{{ entrada.titulo }}</h5>
+                    <p cCardText>{{ entrada.resumen }}</p>
+                    <button cButton color="primary">Continuar leyendo...</button>
+                  </c-card-body>
+                  <c-card-footer>
+                    <small class="text-medium-emphasis">
+                      Fecha publicación: {{ entrada.fechaPublicacion ? entrada.fechaPublicacion : 'No Publicada' }}
+                    </small>
+                    @for (categoria of entrada.categorias; track categoria) {
+                      <div>
+                        <small class="text-medium-emphasis">Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small>
+                      </div>
+                    }
+                  </c-card-footer>
+                </c-card>
+              </c-col>
+            }
+          </c-row>
+        </div>
+      }
 
-      <c-pagination aria-label="Paginación de entradas" size="sm" *ngIf="entradas.length > 0">
-        <li cPageItem [active]="page === 1">
-          <a cPageLink (click)="onPageChange(page - 1)" [routerLink]><span aria-hidden="true">&laquo;</span></a>
-        </li>
-        <li cPageItem *ngFor="let p of getPages()" [active]="p === page">
-          <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
-        </li>
-        <li cPageItem [active]="page === numberOfPages">
-          <a cPageLink (click)="onPageChange(page + 1)" [routerLink]><span aria-hidden="true">&raquo;</span></a>
-        </li>
-      </c-pagination>
+      @if (entradas.length > 0) {
+        <c-pagination aria-label="Paginación de entradas" size="sm">
+          <li cPageItem [active]="page === 1">
+            <a cPageLink (click)="onPageChange(page - 1)" [routerLink]><span aria-hidden="true">&laquo;</span></a>
+          </li>
+          @for (p of getPages(); track p) {
+            <li cPageItem [active]="p === page">
+              <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
+            </li>
+          }
+          <li cPageItem [active]="page === numberOfPages">
+            <a cPageLink (click)="onPageChange(page + 1)" [routerLink]><span aria-hidden="true">&raquo;</span></a>
+          </li>
+        </c-pagination>
+      }
     </c-card-body>
     <c-card-footer class="text-medium-emphasis">
       2 days ago

@@ -15,32 +15,38 @@
     <div class="btn-group" role="group" aria-label="Descargas">
       <button cButton color="secondary" size="sm" (click)="downloadCsv.emit()" title="Descargar serie en CSV" aria-label="Descargar serie en CSV" data-testid="btn-csv-series">CSV</button>
     </div>
-    <div class="btn-group" role="group" aria-label="Herramientas" *ngIf="showMetricsTools">
-      <button cButton color="light" size="sm" (click)="toggleMetrics.emit()" [attr.aria-expanded]="metricsExpanded ? 'true' : 'false'" aria-controls="metrics-panel" title="Mostrar/Ocultar métricas" aria-label="Mostrar/ocultar métricas">
-        Métricas
-        <svg cIcon [name]="metricsExpanded ? 'cilChevronTop' : 'cilChevronBottom'" size="sm" class="ms-1"></svg>
-      </button>
-      <button cButton color="light" size="sm" (click)="copyPerf.emit()" title="Copiar métricas" aria-label="Copiar métricas">Copiar</button>
-    </div>
+    @if (showMetricsTools) {
+      <div class="btn-group" role="group" aria-label="Herramientas">
+        <button cButton color="light" size="sm" (click)="toggleMetrics.emit()" [attr.aria-expanded]="metricsExpanded ? 'true' : 'false'" aria-controls="metrics-panel" title="Mostrar/Ocultar métricas" aria-label="Mostrar/ocultar métricas">
+          Métricas
+          <svg cIcon [name]="metricsExpanded ? 'cilChevronTop' : 'cilChevronBottom'" size="sm" class="ms-1"></svg>
+        </button>
+        <button cButton color="light" size="sm" (click)="copyPerf.emit()" title="Copiar métricas" aria-label="Copiar métricas">Copiar</button>
+      </div>
+    }
   </div>
 </div>
-<div *ngIf="showMetricsTools" class="mt-2 metrics-panel" [class.expanded]="metricsExpanded" [class.collapsed]="!metricsExpanded" id="metrics-panel" role="region" aria-label="Métricas de rendimiento" [attr.aria-hidden]="!metricsExpanded ? 'true' : null" aria-live="polite">
-  <div class="small text-muted">Rendimiento (dev) — Actualizado: {{ perfUpdatedAt | date:'HH:mm:ss' }}</div>
-  <ul class="list-unstyled small mb-2">
-    <li>Summary: {{ perf['summary'] || 0 }} ms</li>
-    <li>Series: {{ perf['series'] || 0 }} ms</li>
-    <li>Top Usuarios: {{ perf['topUsers'] || 0 }} ms</li>
-    <li>Top Categorías: {{ perf['topCategories'] || 0 }} ms</li>
-    <li>Top Tags: {{ perf['topTags'] || 0 }} ms</li>
-    <li>Storage: {{ perf['storage'] || 0 }} ms</li>
-    <li>Contenido: {{ perf['contentStats'] || 0 }} ms</li>
-    <li>Reciente: {{ perf['recent'] || 0 }} ms</li>
-  </ul>
-</div>
-<div *ngIf="loadingSeries" class="mb-2" aria-live="polite" aria-busy="true"><c-spinner></c-spinner></div>
+@if (showMetricsTools) {
+  <div class="mt-2 metrics-panel" [class.expanded]="metricsExpanded" [class.collapsed]="!metricsExpanded" id="metrics-panel" role="region" aria-label="Métricas de rendimiento" [attr.aria-hidden]="!metricsExpanded ? 'true' : null" aria-live="polite">
+    <div class="small text-muted">Rendimiento (dev) — Actualizado: {{ perfUpdatedAt | date:'HH:mm:ss' }}</div>
+    <ul class="list-unstyled small mb-2">
+      <li>Summary: {{ perf['summary'] || 0 }} ms</li>
+      <li>Series: {{ perf['series'] || 0 }} ms</li>
+      <li>Top Usuarios: {{ perf['topUsers'] || 0 }} ms</li>
+      <li>Top Categorías: {{ perf['topCategories'] || 0 }} ms</li>
+      <li>Top Tags: {{ perf['topTags'] || 0 }} ms</li>
+      <li>Storage: {{ perf['storage'] || 0 }} ms</li>
+      <li>Contenido: {{ perf['contentStats'] || 0 }} ms</li>
+      <li>Reciente: {{ perf['recent'] || 0 }} ms</li>
+    </ul>
+  </div>
+}
+@if (loadingSeries) {
+  <div class="mb-2" aria-live="polite" aria-busy="true"><c-spinner></c-spinner></div>
+}
 <div class="chart-container mb-3" [attr.aria-busy]="loadingSeries ? 'true' : null">
   <app-dashboard-chart [data]="data" type="line"></app-dashboard-chart>
-  </div>
+</div>
 <c-row>
   <c-col lg="4">
     <c-widget-stat-b value="{{ sumEntradasSerie }}" title="Últimas Entradas" [color]="kpiUltimasEntradasColor"></c-widget-stat-b>

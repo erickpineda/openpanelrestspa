@@ -3,15 +3,22 @@
     <div class="d-flex justify-content-between align-items-center w-100">
       <div>
         <h3 class="h5 mb-0">{{ tituloMostrar || 'Sin título' }}</h3>
-        <small *ngIf="categoriasMostrar?.length" class="text-muted">
-          Categorías:
-          <span *ngFor="let c of categoriasMostrar; let last = last">
-            {{ c.nombre || c }}<span *ngIf="!last">, </span>
-          </span>
+        @if (categoriasMostrar?.length) {
+          <small class="text-muted">
+            Categorías:
+            @for (c of categoriasMostrar; track c; let last = $last) {
+              <span>
+                {{ c.nombre || c }}@if (!last) {
+                <span>, </span>
+              }
+            </span>
+          }
         </small>
-      </div>
+      }
+    </div>
 
-      <div class="d-flex gap-2" *ngIf="mostrarBotonesAccion">
+    @if (mostrarBotonesAccion) {
+      <div class="d-flex gap-2">
         <button cButton color="warning" size="sm" (click)="onEditar()">
           <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Editar entrada"></svg>
           Editar
@@ -25,10 +32,11 @@
           Publicar
         </button>
       </div>
-    </div>
-  </c-card-header>
+    }
+  </div>
+</c-card-header>
 
-  <c-card-body>
-    <div class="preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
-  </c-card-body>
+<c-card-body>
+  <div class="preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
+</c-card-body>
 </c-card>

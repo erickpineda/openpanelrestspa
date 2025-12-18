@@ -2,9 +2,10 @@
   <c-card-header>
     <div class="d-flex justify-content-between align-items-end">
       <h2 cCardTitle class="h5 mb-3 mb-lg-0">Comentario</h2>
-      <div class="hstack gap-3" *ngIf="isEditMode">
-        <!-- Feature not implemented in original TS? -->
-        <!-- <button cButton color="light" size="sm">
+      @if (isEditMode) {
+        <div class="hstack gap-3">
+          <!-- Feature not implemented in original TS? -->
+          <!-- <button cButton color="light" size="sm">
           <svg cIcon name="cilPencil" style="padding-right: 2px" size="sm" title="Crear con estos datos"></svg>
           Crear nueva entrada con estos datos
         </button> -->
@@ -13,37 +14,38 @@
           Editar comentario
         </button>
       </div>
-    </div>
-  </c-card-header>
-  <c-card-body>
-    <c-container fluid>
-      <form cForm [formGroup]="form" novalidate (ngSubmit)="guardar()" class="needs-validation">
-        <div class="d-flex justify-content-between align-items-end">
+    }
+  </div>
+</c-card-header>
+<c-card-body>
+  <c-container fluid>
+    <form cForm [formGroup]="form" novalidate (ngSubmit)="guardar()" class="needs-validation">
+      <div class="d-flex justify-content-between align-items-end">
 
-          <h2 cCardTitle class="h5 mb-3 mb-lg-0">{{ isEditMode ? 'Editar Comentario' : 'Crear Comentario' }}</h2>
-          <div class="hstack gap-3">
+        <h2 cCardTitle class="h5 mb-3 mb-lg-0">{{ isEditMode ? 'Editar Comentario' : 'Crear Comentario' }}</h2>
+        <div class="hstack gap-3">
 
-            <button cButton color="danger" size="sm" type="button" (click)="onCancel()" [tabindex]="'0'">
-              <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
-              Cancelar
-            </button>
+          <button cButton color="danger" size="sm" type="button" (click)="onCancel()" [tabindex]="'0'">
+            <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
+            Cancelar
+          </button>
 
-            <button cButton color="success" size="sm" type="submit" 
-                [disabled]="form.pristine || form.invalid" [tabindex]="'0'">
-                <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
-                Guardar
-            </button>
+          <button cButton color="success" size="sm" type="submit"
+            [disabled]="form.pristine || form.invalid" [tabindex]="'0'">
+            <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
+            Guardar
+          </button>
 
-            <!-- Previa button was in original, kept for consistency -->
-            <button cButton color="info" size="sm" [disabled]="!form.valid" type="button" [tabindex]="'0'">
-              <svg cIcon name="cilExternalLink" style="padding-right: 2px" size="sm"
-                title="Previa"></svg>
-                Previa
-            </button>
+          <!-- Previa button was in original, kept for consistency -->
+          <button cButton color="info" size="sm" [disabled]="!form.valid" type="button" [tabindex]="'0'">
+            <svg cIcon name="cilExternalLink" style="padding-right: 2px" size="sm"
+            title="Previa"></svg>
+            Previa
+          </button>
 
-          </div>
         </div>
-        <hr>
+      </div>
+      <hr>
         <c-row>
           <!-- Información básica -->
           <c-col lg="8">
@@ -84,29 +86,29 @@
           <c-col lg="4">
             <c-card class="mb-4">
               <c-card-body>
-                    <ul cListGroup class="mx-n2 list-group list-group-flush">
-                      <li cListGroupItem 
-                        class="px-0 d-flex justify-content-between align-items-start list-group-item" aria-current="false">
-                        <div class="ms-2 me-auto">
-                          <h6 class="mb-0">Aprobado</h6>
-                          <small>Comentario que ha sido aprobado</small>
-                        </div>
-                        <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['aprobado'].value" formControlName="aprobado">
+                <ul cListGroup class="mx-n2 list-group list-group-flush">
+                  <li cListGroupItem
+                    class="px-0 d-flex justify-content-between align-items-start list-group-item" aria-current="false">
+                    <div class="ms-2 me-auto">
+                      <h6 class="mb-0">Aprobado</h6>
+                      <small>Comentario que ha sido aprobado</small>
+                    </div>
+                    <c-form-check [switch]="true">
+                      <input cFormCheckInput type="checkbox" [checked]="f['aprobado'].value" formControlName="aprobado">
 
-                        </c-form-check>
-                      </li>
-                      <li cListGroupItem 
-                        class="px-0 d-flex justify-content-between align-items-start list-group-item" aria-current="false">
-                        <div class="ms-2 me-auto">
-                          <h6 class="mb-0">Cuarentena</h6>
-                          <small>Comentario que está en cuarentena</small>
-                        </div>
-                        <c-form-check [switch]="true">
-                          <input cFormCheckInput type="checkbox" [checked]="f['cuarentena'].value" formControlName="cuarentena">
-                        </c-form-check>
-                      </li>
-                    </ul>
+                    </c-form-check>
+                  </li>
+                  <li cListGroupItem
+                    class="px-0 d-flex justify-content-between align-items-start list-group-item" aria-current="false">
+                    <div class="ms-2 me-auto">
+                      <h6 class="mb-0">Cuarentena</h6>
+                      <small>Comentario que está en cuarentena</small>
+                    </div>
+                    <c-form-check [switch]="true">
+                      <input cFormCheckInput type="checkbox" [checked]="f['cuarentena'].value" formControlName="cuarentena">
+                    </c-form-check>
+                  </li>
+                </ul>
 
               </c-card-body>
             </c-card>
@@ -119,7 +121,7 @@
                 <h3 cCardTitle class="h6 mb-4">Contenido del comentario sin censura</h3>
                 <textarea aria-label="With textarea" cFormControl formControlName="contenido"
                   required
-                  [ngClass]="{ 'is-invalid': (submitted || f['contenido'].touched) && f['contenido'].invalid }"></textarea>
+                [ngClass]="{ 'is-invalid': (submitted || f['contenido'].touched) && f['contenido'].invalid }"></textarea>
               </c-card-body>
             </c-card>
           </c-col>
@@ -135,7 +137,7 @@
             </c-card>
           </c-col>
           <!-- -->
-          
+
         </c-row>
       </form>
     </c-container>

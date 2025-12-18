@@ -268,7 +268,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   }
 
    private checkNavigationState(): void {
-    const navigation = this.router.getCurrentNavigation();
+    const navigation = this.router.currentNavigation();
     const state = navigation?.extras?.state as any;
     
     if (state?.temporaryEntry && state?.recoverData) {

@@ -18,28 +18,38 @@
     </c-row>
   </c-card-header>
   <c-card-body>
-    <div *ngIf="errorRecent" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert" aria-live="assertive">
-      <span>{{ errorRecent }}</span>
-      <button cButton color="danger" size="sm" class="retry-btn-recent" (click)="retry.emit()">Reintentar</button>
-    </div>
+    @if (errorRecent) {
+      <div class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert" aria-live="assertive">
+        <span>{{ errorRecent }}</span>
+        <button cButton color="danger" size="sm" class="retry-btn-recent" (click)="retry.emit()">Reintentar</button>
+      </div>
+    }
     <div class="d-flex justify-content-between align-items-center mb-2">
       <div class="small text-muted">Últimos items</div>
       <app-op-pagination [totalPages]="recentTotalPages" [currentPage]="recentPage" [align]="'end'" (pageChange)="pageChange.emit($event)"></app-op-pagination>
     </div>
-    <div *ngIf="loadingRecent" class="mb-2"><c-spinner></c-spinner></div>
+    @if (loadingRecent) {
+      <div class="mb-2"><c-spinner></c-spinner></div>
+    }
     <ul class="list-group list-group-flush">
-      <li class="list-group-item" *ngFor="let e of recentItems">
-        <div class="d-flex justify-content-between">
-          <div>
-            <strong>{{ e?.titulo || e?.contenidoCorto || e?.username || e?.name || 'Item' }}</strong>
-            <div class="small text-muted">{{ e?.fechaCreacion || e?.fechaRegistro || e?.date }}</div>
+      @for (e of recentItems; track e) {
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong>{{ e?.titulo || e?.contenidoCorto || e?.username || e?.name || 'Item' }}</strong>
+              <div class="small text-muted">{{ e?.fechaCreacion || e?.fechaRegistro || e?.date }}</div>
+            </div>
+            <div class="text-end">
+              @if (e?.estado) {
+                <c-badge color="secondary">{{ e?.estado }}</c-badge>
+              }
+            </div>
           </div>
-          <div class="text-end">
-            <c-badge color="secondary" *ngIf="e?.estado">{{ e?.estado }}</c-badge>
-          </div>
-        </div>
-      </li>
-      <li *ngIf="!recentItems || recentItems.length === 0" class="list-group-item text-muted">No hay actividad reciente</li>
+        </li>
+      }
+      @if (!recentItems || recentItems.length === 0) {
+        <li class="list-group-item text-muted">No hay actividad reciente</li>
+      }
     </ul>
   </c-card-body>
 </c-card>

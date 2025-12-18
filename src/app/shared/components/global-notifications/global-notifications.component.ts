@@ -5,20 +5,22 @@ import { NotificationService, NotificationOptions } from '../../../core/services
     selector: 'app-global-notifications',
     template: `
     <c-toaster placement="top-end" position="fixed">
-      <c-toast *ngFor="let notification of notifications" 
-               [autohide]="true" 
-               [delay]="notification.duration || 5000"
-               [color]="getToastColor(notification.type)"
-               (visibleChange)="removeNotification(notification)">
-        <c-toast-header>
-          <strong class="me-auto">{{ notification.title }}</strong>
-        </c-toast-header>
-        <c-toast-body>
-          {{ notification.message }}
-        </c-toast-body>
-      </c-toast>
+      @for (notification of notifications; track notification) {
+        <c-toast
+          [autohide]="true"
+          [delay]="notification.duration || 5000"
+          [color]="getToastColor(notification.type)"
+          (visibleChange)="removeNotification(notification)">
+          <c-toast-header>
+            <strong class="me-auto">{{ notification.title }}</strong>
+          </c-toast-header>
+          <c-toast-body>
+            {{ notification.message }}
+          </c-toast-body>
+        </c-toast>
+      }
     </c-toaster>
-  `,
+    `,
     standalone: false
 })
 export class GlobalNotificationsComponent implements OnInit {

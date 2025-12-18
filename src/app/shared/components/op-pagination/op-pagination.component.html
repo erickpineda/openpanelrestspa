@@ -4,11 +4,13 @@
       <span aria-hidden="true">&laquo;</span>
     </a>
   </li>
-  <li cPageItem [active]="pageNumber === currentPage" *ngFor="let pageNumber of paginasVisibles">
-    <a cPageLink (click)="pageChange.emit(pageNumber)">
-      {{ pageNumber + 1 }}
-    </a>
-  </li>
+  @for (pageNumber of paginasVisibles; track pageNumber) {
+    <li cPageItem [active]="pageNumber === currentPage">
+      <a cPageLink (click)="pageChange.emit(pageNumber)">
+        {{ pageNumber + 1 }}
+      </a>
+    </li>
+  }
   <li cPageItem [disabled]="currentPage >= totalPages - 1">
     <a cPageLink (click)="cambiarPagina(1)" aria-label="Siguiente">
       <span aria-hidden="true">&raquo;</span>

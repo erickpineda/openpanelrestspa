@@ -3,4 +3,6 @@
     <svg cIcon [name]="resolvedIcon" size="lg"></svg>
   </ng-template>
 </c-widget-stat-f>
-<small *ngIf="subtitle" class="text-muted d-block mt-1">{{ subtitle }}</small>
+@if (subtitle) {
+  <small class="text-muted d-block mt-1">{{ subtitle }}</small>
+}

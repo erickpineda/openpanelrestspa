@@ -28,7 +28,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Si la navegación actual trae sessionData (fallback)
-    const navigation = this.router.getCurrentNavigation();
+    const navigation = this.router.currentNavigation();
     this.sessionData =
       navigation?.extras?.state?.['sessionData'] ||
       (window.history && (window.history.state as any)?.sessionData) ||

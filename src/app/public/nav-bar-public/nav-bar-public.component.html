@@ -1,18 +1,20 @@
 <!-- nav-bar-public.component.html -->
 <c-header [ngClass]="{'navbar-fixed': true, 'navbar-shrink': isShrink}">
   <c-container fluid>
-    <c-header-brand 
-      (click)="navigateToRoute('/home')" 
-      style="cursor: pointer;" 
+    <c-header-brand
+      (click)="navigateToRoute('/home')"
+      style="cursor: pointer;"
       class="brand-large">
       Openpanel
     </c-header-brand>
     <c-header-nav class="ms-auto">
       <!-- Enlace Admin -->
-      <c-nav-item *ngIf="isLoggedIn">
-        <a cNavLink (click)="navigateToRoute('/admin')" style="cursor: pointer;">Admin</a>
-      </c-nav-item>
-      
+      @if (isLoggedIn) {
+        <c-nav-item>
+          <a cNavLink (click)="navigateToRoute('/admin')" style="cursor: pointer;">Admin</a>
+        </c-nav-item>
+      }
+
       <!-- Secciones de la página principal -->
       <c-nav-item>
         <a cNavLink id="home" (click)="navigateToRoute('/home')" style="cursor: pointer;">Inicio</a>
@@ -23,23 +25,31 @@
       <c-nav-item>
         <a cNavLink id="contact" (click)="navigateToRoute('/contact')" style="cursor: pointer;">Contacto</a>
       </c-nav-item>
-      
+
       <!-- Login/Logout -->
-      <c-nav-item *ngIf="!isLoggedIn">
-        <a cNavLink (click)="navigateToRoute('/login')" style="cursor: pointer;">Login</a>
-      </c-nav-item>
-      <c-nav-item *ngIf="isLoggedIn">
-        <a cNavLink 
-           (click)="logout()" 
-           style="cursor: pointer;"
-           [class.disabled]="isLoadingLogout">
-          <span *ngIf="!isLoadingLogout">LogOut</span>
-          <span *ngIf="isLoadingLogout">
-            Cerrando...
-            <span class="spinner-border spinner-border-sm" role="status"></span>
-          </span>
-        </a>
-      </c-nav-item>
+      @if (!isLoggedIn) {
+        <c-nav-item>
+          <a cNavLink (click)="navigateToRoute('/login')" style="cursor: pointer;">Login</a>
+        </c-nav-item>
+      }
+      @if (isLoggedIn) {
+        <c-nav-item>
+          <a cNavLink
+            (click)="logout()"
+            style="cursor: pointer;"
+            [class.disabled]="isLoadingLogout">
+            @if (!isLoadingLogout) {
+              <span>LogOut</span>
+            }
+            @if (isLoadingLogout) {
+              <span>
+                Cerrando...
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+              </span>
+            }
+          </a>
+        </c-nav-item>
+      }
     </c-header-nav>
   </c-container>
 </c-header>

@@ -14,10 +14,14 @@
     <svg cIcon name="cilCloudDownload" style="padding-right: 2px" size="sm" title="Exportar ZIP"></svg>
     Exportar ZIP
   </button>
-  <div class="d-inline-flex align-items-center ms-2" *ngIf="exportingZip" aria-live="polite" aria-busy="true">
-    <c-spinner size="sm"></c-spinner>
-    <span class="small text-muted ms-2">Generando ZIP...</span>
-  </div>
-  <div class="small text-danger ms-2" *ngIf="exportError">{{ exportError }}</div>
+  @if (exportingZip) {
+    <div class="d-inline-flex align-items-center ms-2" aria-live="polite" aria-busy="true">
+      <c-spinner size="sm"></c-spinner>
+      <span class="small text-muted ms-2">Generando ZIP...</span>
+    </div>
+  }
+  @if (exportError) {
+    <div class="small text-danger ms-2">{{ exportError }}</div>
+  }
 </div>
 

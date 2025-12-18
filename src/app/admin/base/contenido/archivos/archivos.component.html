@@ -1,6 +1,6 @@
 <c-container class="container-fluid">
   <c-card aria-live="polite">
-  <c-card-header class="d-flex align-items-center justify-content-between">
+    <c-card-header class="d-flex align-items-center justify-content-between">
       <span>Archivos</span>
       <div class="btn-toolbar gap-2">
         <div class="btn-group" role="group" aria-label="Subida de archivos">
@@ -13,100 +13,108 @@
       </div>
     </c-card-header>
     <c-card-body [attr.aria-busy]="loading ? 'true' : null">
-      <div *ngIf="error" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
-        <span>{{ error }}</span>
-      <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
-      </div>
+      @if (error) {
+        <div class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
+          <span>{{ error }}</span>
+          <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
+        </div>
+      }
 
-      <ng-template #loadingTemplate>
+
+      @if (!loading) {
+        <div>
+          <c-row class="align-items-center mb-3 g-2">
+            <c-col xs="12" md="4">
+              <div class="text-muted small">Total {{ totalElements }}</div>
+            </c-col>
+            <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+              <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar nombre..." style="max-width: 280px;" />
+              <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+            </c-col>
+            <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+              <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
+                <option [ngValue]="5">5</option>
+                <option [ngValue]="10">10</option>
+                <option [ngValue]="20">20</option>
+              </select>
+            </c-col>
+          </c-row>
+          @if (showAdvanced) {
+            <div class="mb-3">
+              <c-row class="g-3 align-items-end">
+                <c-col xs="12" md="4">
+                  <label class="form-label mb-1">Tipo MIME</label>
+                  <select cSelect class="form-select-sm" [(ngModel)]="filtroMime">
+                    <option value="">Todos</option>
+                    <option value="application/pdf">application/pdf</option>
+                    <option value="application/zip">application/zip</option>
+                    <option value="text/plain">text/plain</option>
+                  </select>
+                </c-col>
+                <c-col xs="6" md="4">
+                  <label class="form-label mb-1">Desde</label>
+                  <input cFormControl class="form-control-sm" type="date" [(ngModel)]="fechaDesde" />
+                </c-col>
+                <c-col xs="6" md="4">
+                  <label class="form-label mb-1">Hasta</label>
+                  <input cFormControl class="form-control-sm" type="date" [(ngModel)]="fechaHasta" />
+                </c-col>
+                <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
+                  <button cButton size="sm" color="primary" variant="outline" (click)="search()">
+                    <svg cIcon name="cilSearch"></svg> Buscar
+                  </button>
+                  <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
+                    <svg cIcon name="cilReload"></svg> Limpiar
+                  </button>
+                </c-col>
+              </c-row>
+            </div>
+          }
+          <div class="table-responsive">
+            <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de archivos">
+              <thead cTableColor="light">
+                <tr>
+                  <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
+                  <th scope="col" class="text-end">Tamaño</th>
+                  <th scope="col" class="text-center">Fecha</th>
+                  <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (f of items; track f) {
+                  <tr>
+                    <td class="text-truncate text-start" style="max-width: 240px;" [title]="f.nombre">{{ f.nombre }}</td>
+                    <td class="text-end">{{ f.tamano | number }}</td>
+                    <td class="text-center">{{ f.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
+                    <td class="text-center">
+                      <div class="btn-group">
+                        <button cButton color="secondary" size="sm" variant="outline" (click)="download(f)" [disabled]="!f.uuid && !f.url" [attr.aria-label]="'Descargar ' + (f.nombre || '')">
+                          <svg cIcon name="cilCloudDownload"></svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+                @if (items.length === 0) {
+                  <tr>
+                    <td colspan="4" class="text-muted text-center">Sin archivos</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
+            <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">Anterior</button>
+            <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">Siguiente</button>
+            <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+          </div>
+        </div>
+      } @else {
         <div class="text-center my-3" role="status" aria-live="polite">
           <c-spinner color="primary"></c-spinner>
           <p class="mt-2">Cargando archivos...</p>
         </div>
-      </ng-template>
-
-    <div *ngIf="!loading; else loadingTemplate">
-      <c-row class="align-items-center mb-3 g-2">
-        <c-col xs="12" md="4">
-          <div class="text-muted small">Total {{ totalElements }}</div>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar nombre..." style="max-width: 280px;" />
-          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
-            <option [ngValue]="5">5</option>
-            <option [ngValue]="10">10</option>
-            <option [ngValue]="20">20</option>
-          </select>
-        </c-col>
-      </c-row>
-
-      <div *ngIf="showAdvanced" class="mb-3">
-        <c-row class="g-3 align-items-end">
-          <c-col xs="12" md="4">
-            <label class="form-label mb-1">Tipo MIME</label>
-            <select cSelect class="form-select-sm" [(ngModel)]="filtroMime">
-              <option value="">Todos</option>
-              <option value="application/pdf">application/pdf</option>
-              <option value="application/zip">application/zip</option>
-              <option value="text/plain">text/plain</option>
-            </select>
-          </c-col>
-          <c-col xs="6" md="4">
-            <label class="form-label mb-1">Desde</label>
-            <input cFormControl class="form-control-sm" type="date" [(ngModel)]="fechaDesde" />
-          </c-col>
-          <c-col xs="6" md="4">
-            <label class="form-label mb-1">Hasta</label>
-            <input cFormControl class="form-control-sm" type="date" [(ngModel)]="fechaHasta" />
-          </c-col>
-          <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
-            <button cButton size="sm" color="primary" variant="outline" (click)="search()">
-              <svg cIcon name="cilSearch"></svg> Buscar
-            </button>
-            <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
-              <svg cIcon name="cilReload"></svg> Limpiar
-            </button>
-          </c-col>
-        </c-row>
-      </div>
-      <div class="table-responsive">
-        <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de archivos">
-          <thead cTableColor="light">
-            <tr>
-              <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
-              <th scope="col" class="text-end">Tamaño</th>
-              <th scope="col" class="text-center">Fecha</th>
-              <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let f of items">
-              <td class="text-truncate text-start" style="max-width: 240px;" [title]="f.nombre">{{ f.nombre }}</td>
-              <td class="text-end">{{ f.tamano | number }}</td>
-              <td class="text-center">{{ f.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
-              <td class="text-center">
-                <div class="btn-group">
-                  <button cButton color="secondary" size="sm" variant="outline" (click)="download(f)" [disabled]="!f.uuid && !f.url" [attr.aria-label]="'Descargar ' + (f.nombre || '')">
-                    <svg cIcon name="cilCloudDownload"></svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr *ngIf="items.length === 0">
-              <td colspan="4" class="text-muted text-center">Sin archivos</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
-        <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">Anterior</button>
-        <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">Siguiente</button>
-        <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
-      </div>
-    </div>
+      }
     </c-card-body>
   </c-card>
 </c-container>

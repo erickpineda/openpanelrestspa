@@ -6,31 +6,39 @@
       </c-col>
       <c-col xs="12" md="6">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <ng-container *ngIf="showPeriodControls">
+          @if (showPeriodControls) {
             <input cFormControl type="number" min="1" max="200" [ngModel]="topLimit" (ngModelChange)="changeTopLimit.emit($event)" style="max-width:90px;" />
             <div class="btn-group" role="group" aria-label="Periodo">
               <button cButton color="secondary" size="sm" [disabled]="topPeriodDays===7" (click)="changePeriod.emit(7)">7d</button>
               <button cButton color="secondary" size="sm" [disabled]="topPeriodDays===30" (click)="changePeriod.emit(30)">30d</button>
               <button cButton color="secondary" size="sm" [disabled]="topPeriodDays===90" (click)="changePeriod.emit(90)">90d</button>
             </div>
-          </ng-container>
+          }
           <button cButton color="secondary" size="sm" (click)="downloadCsv.emit()" title="Descargar {{ title }} en CSV" [attr.aria-label]="'Descargar ' + title + ' en CSV'" [attr.data-testid]="csvDataTestId || null">CSV</button>
         </div>
       </c-col>
     </c-row>
   </c-card-header>
   <c-card-body>
-    <div *ngIf="error" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert" aria-live="assertive">
-      <span>{{ error }}</span>
-      <button cButton color="danger" size="sm" [ngClass]="retryBtnClass" (click)="retry.emit()">Reintentar</button>
-    </div>
-    <div *ngIf="loading" class="mb-2"><c-spinner></c-spinner></div>
+    @if (error) {
+      <div class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert" aria-live="assertive">
+        <span>{{ error }}</span>
+        <button cButton color="danger" size="sm" [ngClass]="retryBtnClass" (click)="retry.emit()">Reintentar</button>
+      </div>
+    }
+    @if (loading) {
+      <div class="mb-2"><c-spinner></c-spinner></div>
+    }
     <ul class="list-group list-group-flush">
-      <li class="list-group-item d-flex justify-content-between" *ngFor="let it of items">
-        <span>{{ it.name }}</span>
-        <c-badge [color]="badgeColor">{{ it.count }}</c-badge>
-      </li>
-      <li *ngIf="!items || items.length === 0" class="list-group-item text-muted">Sin datos</li>
+      @for (it of items; track it) {
+        <li class="list-group-item d-flex justify-content-between">
+          <span>{{ it.name }}</span>
+          <c-badge [color]="badgeColor">{{ it.count }}</c-badge>
+        </li>
+      }
+      @if (!items || items.length === 0) {
+        <li class="list-group-item text-muted">Sin datos</li>
+      }
     </ul>
   </c-card-body>
 </c-card>

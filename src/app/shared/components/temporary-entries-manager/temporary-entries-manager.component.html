@@ -12,44 +12,52 @@
     </div>
   </c-card-header>
   <c-card-body>
-    <div *ngIf="entries.length === 0" class="text-center py-4">
-      <p>No hay entradas temporales guardadas.</p>
-    </div>
+    @if (entries.length === 0) {
+      <div class="text-center py-4">
+        <p>No hay entradas temporales guardadas.</p>
+      </div>
+    }
 
-    <c-row *ngIf="entries.length > 0">
-      <c-col lg="6" *ngFor="let entry of entries">
-        <c-card class="mb-3">
-          <c-card-body>
-            <h5 class="card-title">{{ entry.title || 'Sin título' }}</h5>
-            <p class="card-text text-muted small">
-              {{ entry.description || 'Entrada sin descripción' }}
-            </p>
-            <p class="card-text">
-              <small class="text-muted">
-                Guardado: {{ entry.timestamp | date:'medium' }}
-              </small>
-            </p>
-            <div class="btn-group">
-              <button cButton color="success" size="sm" (click)="recoverEntry(entry)">
-                <i class="cil-download me-1"></i> Recuperar
-              </button>
-              <button cButton color="secondary" size="sm" (click)="viewEntry(entry)">
-                <i class="cil-file me-1"></i> Ver
-              </button>
-              <button cButton color="danger" size="sm" (click)="deleteEntry(entry.id)">
-                <i class="cil-trash me-1"></i> Eliminar
-              </button>
-            </div>
-          </c-card-body>
-        </c-card>
-      </c-col>
-    </c-row>
+    @if (entries.length > 0) {
+      <c-row>
+        @for (entry of entries; track entry) {
+          <c-col lg="6">
+            <c-card class="mb-3">
+              <c-card-body>
+                <h5 class="card-title">{{ entry.title || 'Sin título' }}</h5>
+                <p class="card-text text-muted small">
+                  {{ entry.description || 'Entrada sin descripción' }}
+                </p>
+                <p class="card-text">
+                  <small class="text-muted">
+                    Guardado: {{ entry.timestamp | date:'medium' }}
+                  </small>
+                </p>
+                <div class="btn-group">
+                  <button cButton color="success" size="sm" (click)="recoverEntry(entry)">
+                    <i class="cil-download me-1"></i> Recuperar
+                  </button>
+                  <button cButton color="secondary" size="sm" (click)="viewEntry(entry)">
+                    <i class="cil-file me-1"></i> Ver
+                  </button>
+                  <button cButton color="danger" size="sm" (click)="deleteEntry(entry.id)">
+                    <i class="cil-trash me-1"></i> Eliminar
+                  </button>
+                </div>
+              </c-card-body>
+            </c-card>
+          </c-col>
+        }
+      </c-row>
+    }
 
-    <div *ngIf="entries.length > 0" class="text-center mt-3">
-      <button cButton color="outline-danger" (click)="clearAll()">
-        <i class="cil-broom me-1"></i> Limpiar Todas
-      </button>
-    </div>
+    @if (entries.length > 0) {
+      <div class="text-center mt-3">
+        <button cButton color="outline-danger" (click)="clearAll()">
+          <i class="cil-broom me-1"></i> Limpiar Todas
+        </button>
+      </div>
+    }
   </c-card-body>
 </c-card>
 
@@ -59,13 +67,15 @@
     <h5 cModalTitle>Vista Previa: {{ selectedEntry?.title }}</h5>
   </c-modal-header>
   <c-modal-body>
-    <div *ngIf="selectedEntry">
-      <p><strong>Título:</strong> {{ selectedEntry.formData.titulo || 'Sin título' }}</p>
-      <p><strong>Subtítulo:</strong> {{ selectedEntry.formData.subtitulo || 'Sin subtítulo' }}</p>
-      <p><strong>Resumen:</strong> {{ selectedEntry.formData.resumen || 'Sin resumen' }}</p>
-      <p><strong>Contenido:</strong></p>
-      <div class="border p-2 bg-light" [innerHTML]="selectedEntry.formData.contenido || 'Sin contenido'"></div>
-    </div>
+    @if (selectedEntry) {
+      <div>
+        <p><strong>Título:</strong> {{ selectedEntry.formData.titulo || 'Sin título' }}</p>
+        <p><strong>Subtítulo:</strong> {{ selectedEntry.formData.subtitulo || 'Sin subtítulo' }}</p>
+        <p><strong>Resumen:</strong> {{ selectedEntry.formData.resumen || 'Sin resumen' }}</p>
+        <p><strong>Contenido:</strong></p>
+        <div class="border p-2 bg-light" [innerHTML]="selectedEntry.formData.contenido || 'Sin contenido'"></div>
+      </div>
+    }
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="viewModalVisible = false">Cerrar</button>

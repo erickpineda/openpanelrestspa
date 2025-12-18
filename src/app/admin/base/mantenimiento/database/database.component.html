@@ -11,7 +11,9 @@
           <button cButton color="secondary" [disabled]="backupRunning" (click)="runBackup()">Backup</button>
         </div>
         <div class="mt-2">
-          <c-spinner *ngIf="optimizeRunning || backupRunning" color="primary" size="sm"></c-spinner>
+          @if (optimizeRunning || backupRunning) {
+            <c-spinner color="primary" size="sm"></c-spinner>
+          }
         </div>
       </c-card-body>
     </c-card>

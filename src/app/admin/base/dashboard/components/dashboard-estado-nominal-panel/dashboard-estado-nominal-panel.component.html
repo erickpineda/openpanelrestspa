@@ -17,14 +17,20 @@
     </c-row>
   </c-card-header>
   <c-card-body>
-    <div *ngIf="errorSplitEstadoNombre" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert" aria-live="assertive">
-      <span>{{ errorSplitEstadoNombre }}</span>
-      <button cButton color="danger" size="sm" class="retry-btn-split-nominal" (click)="retry.emit()">Reintentar</button>
-    </div>
-    <div class="chart-container mb-2" *ngIf="seriesEntriesSplitEstadoNombreData">
-      <app-dashboard-chart [data]="seriesEntriesSplitEstadoNombreData" [type]="estadoNominalChartType" [options]="estadoNominalChartOptions"></app-dashboard-chart>
-    </div>
-    <div *ngIf="!seriesEntriesSplitEstadoNombreData" class="text-muted small">Sin datos</div>
+    @if (errorSplitEstadoNombre) {
+      <div class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert" aria-live="assertive">
+        <span>{{ errorSplitEstadoNombre }}</span>
+        <button cButton color="danger" size="sm" class="retry-btn-split-nominal" (click)="retry.emit()">Reintentar</button>
+      </div>
+    }
+    @if (seriesEntriesSplitEstadoNombreData) {
+      <div class="chart-container mb-2">
+        <app-dashboard-chart [data]="seriesEntriesSplitEstadoNombreData" [type]="estadoNominalChartType" [options]="estadoNominalChartOptions"></app-dashboard-chart>
+      </div>
+    }
+    @if (!seriesEntriesSplitEstadoNombreData) {
+      <div class="text-muted small">Sin datos</div>
+    }
   </c-card-body>
 </c-card>
 

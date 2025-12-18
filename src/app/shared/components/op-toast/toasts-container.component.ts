@@ -7,25 +7,32 @@ import { ToastMessage } from '../../../core/models/toast.model';   // ajusta rut
     selector: 'app-toasts-container',
     template: `
   <c-toaster placement="top-end" class="p-3" position="fixed">
-    <c-toast *ngFor="let toast of toasts$ | async"
-             [visible]="true"
-             [autohide]="toast.autohide ?? true"
-             [delay]="toast.delay"
-             (visibleChange)="onVisibleChange($event, toast)"
-             (mouseenter)="onMouseEnter(toast)"
-             (mouseleave)="onMouseLeave(toast)"
-             #toast="cToast">
-      <c-toast-header [ngClass]="headerClass(toast)" [closeButton]="false">
-        <strong class="me-auto">{{ toast.title || 'Notificación' }}</strong>
-        <small class="text-muted" *ngIf="toast.delay">{{ dateAsString(toast.createdAt) }}</small>
-        <button type="button" class="btn-close" aria-label="Close"
-                (click)="$event.stopPropagation(); onClose(toast)"></button>
-      </c-toast-header>
-      <c-toast-body>
-        <div *ngIf="toast.html; else plain" [innerHTML]="toast.body"></div>
-        <ng-template #plain>{{ toast.body }}</ng-template>
-      </c-toast-body>
-    </c-toast>
+    @for (toast of toasts$ | async; track toast) {
+      <c-toast
+        [visible]="true"
+        [autohide]="toast.autohide ?? true"
+        [delay]="toast.delay"
+        (visibleChange)="onVisibleChange($event, toast)"
+        (mouseenter)="onMouseEnter(toast)"
+        (mouseleave)="onMouseLeave(toast)"
+        #toast="cToast">
+        <c-toast-header [ngClass]="headerClass(toast)" [closeButton]="false">
+          <strong class="me-auto">{{ toast.title || 'Notificación' }}</strong>
+          @if (toast.delay) {
+            <small class="text-muted">{{ dateAsString(toast.createdAt) }}</small>
+          }
+          <button type="button" class="btn-close" aria-label="Close"
+          (click)="$event.stopPropagation(); onClose(toast)"></button>
+        </c-toast-header>
+        <c-toast-body>
+          @if (toast.html) {
+            <div [innerHTML]="toast.body"></div>
+          } @else {
+            {{ toast.body }}
+          }
+        </c-toast-body>
+      </c-toast>
+    }
   </c-toaster>
   `,
     changeDetection: ChangeDetectionStrategy.OnPush,

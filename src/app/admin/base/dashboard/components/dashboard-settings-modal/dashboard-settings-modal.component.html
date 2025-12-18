@@ -31,28 +31,30 @@
       </c-col>
       <c-col lg="12">
         <hr>
-        <div class="small text-muted mb-2">Rango exacto para Top (opcional)</div>
-      </c-col>
-      <c-col lg="6">
-        <label class="form-label" for="topStartDate">Fecha inicio</label>
-        <input id="topStartDate" cFormControl type="date" [(ngModel)]="settings.topStartDate" aria-describedby="topRangeHelp" />
-      </c-col>
-      <c-col lg="6">
-        <label class="form-label" for="topEndDate">Fecha fin</label>
-        <input id="topEndDate" cFormControl type="date" [(ngModel)]="settings.topEndDate" aria-describedby="topRangeHelp" />
-      </c-col>
-      <c-col lg="12">
-        <div id="topRangeHelp" class="form-text">Si se establece rango, se usará en los Top en lugar del periodo.</div>
-      </c-col>
-      <c-col lg="12" *ngIf="clearFeedback" aria-live="polite">
-        <div class="alert alert-info py-1 px-2 mb-0">{{ clearFeedback }}</div>
-      </c-col>
-    </c-row>
-  </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" (click)="onClose()">Cancelar</button>
-    <button cButton color="warning" class="settings-clear-btn" (click)="onReset()" title="Restablecer campos a valores iniciales" [attr.aria-label]="'Limpiar campos'">Limpiar</button>
-    <button cButton color="primary" (click)="onApply()">Aplicar</button>
-  </c-modal-footer>
-</c-modal>
+          <div class="small text-muted mb-2">Rango exacto para Top (opcional)</div>
+        </c-col>
+        <c-col lg="6">
+          <label class="form-label" for="topStartDate">Fecha inicio</label>
+          <input id="topStartDate" cFormControl type="date" [(ngModel)]="settings.topStartDate" aria-describedby="topRangeHelp" />
+        </c-col>
+        <c-col lg="6">
+          <label class="form-label" for="topEndDate">Fecha fin</label>
+          <input id="topEndDate" cFormControl type="date" [(ngModel)]="settings.topEndDate" aria-describedby="topRangeHelp" />
+        </c-col>
+        <c-col lg="12">
+          <div id="topRangeHelp" class="form-text">Si se establece rango, se usará en los Top en lugar del periodo.</div>
+        </c-col>
+        @if (clearFeedback) {
+          <c-col lg="12" aria-live="polite">
+            <div class="alert alert-info py-1 px-2 mb-0">{{ clearFeedback }}</div>
+          </c-col>
+        }
+      </c-row>
+    </c-modal-body>
+    <c-modal-footer>
+      <button cButton color="secondary" (click)="onClose()">Cancelar</button>
+      <button cButton color="warning" class="settings-clear-btn" (click)="onReset()" title="Restablecer campos a valores iniciales" [attr.aria-label]="'Limpiar campos'">Limpiar</button>
+      <button cButton color="primary" (click)="onApply()">Aplicar</button>
+    </c-modal-footer>
+  </c-modal>
 

@@ -11,19 +11,27 @@
           <button cButton color="secondary" variant="outline" (click)="clear()">Limpiar</button>
           <button cButton color="info" variant="outline" (click)="sample()">Generar ejemplos</button>
         </div>
-        <div *ngIf="loading">
-          <c-spinner color="primary" size="sm"></c-spinner>
-        </div>
-        <div *ngIf="!loading && filtered.length === 0" class="empty">
-          No hay logs disponibles
-        </div>
-        <ul class="list-group" *ngIf="!loading && filtered.length > 0">
-          <li class="list-group-item" *ngFor="let e of filtered">
-            <span class="badge bg-info me-2">{{ e.level }}</span>
-            <span class="text-muted me-2">{{ e.timestamp }}</span>
-            <span>{{ e.message }}</span>
-          </li>
-        </ul>
+        @if (loading) {
+          <div>
+            <c-spinner color="primary" size="sm"></c-spinner>
+          </div>
+        }
+        @if (!loading && filtered.length === 0) {
+          <div class="empty">
+            No hay logs disponibles
+          </div>
+        }
+        @if (!loading && filtered.length > 0) {
+          <ul class="list-group">
+            @for (e of filtered; track e) {
+              <li class="list-group-item">
+                <span class="badge bg-info me-2">{{ e.level }}</span>
+                <span class="text-muted me-2">{{ e.timestamp }}</span>
+                <span>{{ e.message }}</span>
+              </li>
+            }
+          </ul>
+        }
       </c-card-body>
     </c-card>
   </c-col>

@@ -1,64 +1,71 @@
-<div *ngIf="loading || (useGlobal && errorActive)" [class]="getCombinedClasses()">
-  
-  <!-- Variante 1: Spinner Clásico (por defecto) -->
-  <div *ngIf="loaderStyle === 'spinner'" class="loader-content spinner-loader">
-    <div class="spinner-container">
-      <c-spinner variant="grow" [size]="'sm'"></c-spinner>
-      <c-spinner variant="grow" [size]="'sm'"></c-spinner>
-      <c-spinner variant="grow" [size]="'sm'"></c-spinner>
-    </div>
-    <p class="loader-message">{{ message }}</p>
-  </div>
-
-  <!-- Variante 2: Dots Bouncing -->
-  <div *ngIf="loaderStyle === 'dots'" class="loader-content dots-loader">
-    <div class="dots-container">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
-    <p class="loader-message">{{ message }}</p>
-  </div>
-
-  <!-- Variante 3: Pulse -->
-  <div *ngIf="loaderStyle === 'pulse'" class="loader-content pulse-loader">
-    <div class="pulse-container">
-      <div class="pulse-circle"></div>
-    </div>
-    <p class="loader-message">{{ message }}</p>
-  </div>
-
-  <!-- Variante 4: Progress Bar -->
-  <div *ngIf="loaderStyle === 'progress'" class="loader-content progress-loader">
-    <div class="progress-container">
-      <div class="progress-bar">
-        <div class="progress-fill"></div>
+@if (loading || (useGlobal && errorActive)) {
+  <div [class]="getCombinedClasses()">
+    <!-- Variante 1: Spinner Clásico (por defecto) -->
+    @if (loaderStyle === 'spinner') {
+      <div class="loader-content spinner-loader">
+        <div class="spinner-container">
+          <c-spinner variant="grow" [size]="'sm'"></c-spinner>
+          <c-spinner variant="grow" [size]="'sm'"></c-spinner>
+          <c-spinner variant="grow" [size]="'sm'"></c-spinner>
+        </div>
+        <p class="loader-message">{{ message }}</p>
       </div>
-    </div>
-    <p class="loader-message">{{ message }}</p>
-  </div>
-
-  <!-- Variante 5: Modern -->
-  <div *ngIf="loaderStyle === 'modern'" class="loader-content modern-loader">
-    <div class="modern-container">
-      <div class="modern-spinner">
-        <div class="ring"></div>
-        <div class="ring"></div>
-        <div class="ring"></div>
+    }
+    <!-- Variante 2: Dots Bouncing -->
+    @if (loaderStyle === 'dots') {
+      <div class="loader-content dots-loader">
+        <div class="dots-container">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <p class="loader-message">{{ message }}</p>
       </div>
-    </div>
-    <p class="loader-message">{{ message }}</p>
+    }
+    <!-- Variante 3: Pulse -->
+    @if (loaderStyle === 'pulse') {
+      <div class="loader-content pulse-loader">
+        <div class="pulse-container">
+          <div class="pulse-circle"></div>
+        </div>
+        <p class="loader-message">{{ message }}</p>
+      </div>
+    }
+    <!-- Variante 4: Progress Bar -->
+    @if (loaderStyle === 'progress') {
+      <div class="loader-content progress-loader">
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+        <p class="loader-message">{{ message }}</p>
+      </div>
+    }
+    <!-- Variante 5: Modern -->
+    @if (loaderStyle === 'modern') {
+      <div class="loader-content modern-loader">
+        <div class="modern-container">
+          <div class="modern-spinner">
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+          </div>
+        </div>
+        <p class="loader-message">{{ message }}</p>
+      </div>
+    }
+    <!-- Estado de error -->
+    @if (errorActive) {
+      <div class="loader-content">
+        <div class="mb-2">
+          <c-alert color="danger">{{ errorMessage || 'Error de conexión. El servidor no responde.' }}</c-alert>
+        </div>
+        <div class="d-flex justify-content-center gap-2">
+          <button cButton color="primary" (click)="onRetry()">Reintentar</button>
+          <button cButton color="secondary" variant="outline" (click)="onCloseError()">Cerrar</button>
+        </div>
+      </div>
+    }
   </div>
-
-  <!-- Estado de error -->
-  <div *ngIf="errorActive" class="loader-content">
-    <div class="mb-2">
-      <c-alert color="danger">{{ errorMessage || 'Error de conexión. El servidor no responde.' }}</c-alert>
-    </div>
-    <div class="d-flex justify-content-center gap-2">
-      <button cButton color="primary" (click)="onRetry()">Reintentar</button>
-      <button cButton color="secondary" variant="outline" (click)="onCloseError()">Cerrar</button>
-    </div>
-  </div>
-
-</div>
+}
