@@ -88,10 +88,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "openpanelspa:build:production"
+              "buildTarget": "openpanelspa:build:production"
             },
             "development": {
-              "browserTarget": "openpanelspa:build:development"
+              "buildTarget": "openpanelspa:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -99,7 +99,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "openpanelspa:build"
+            "buildTarget": "openpanelspa:build"
           }
         },
         "test": {
