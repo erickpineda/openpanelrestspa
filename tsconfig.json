@@ -25,10 +25,6 @@
     "useDefineForClassFields": false,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "lib": [
-      "ES2022",
-      "dom"
-    ],
     "esModuleInterop": true,
     "types": [
       "ckeditor__ckeditor5-core",
