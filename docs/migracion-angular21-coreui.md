@@ -94,14 +94,33 @@
 - Compatibilidad con Angular 21:
   - CoreUI 5.6 anuncia soporte para Angular 21 y TS 5.9 (npm page y releases). Ver: https://coreui.io/angular/docs/.
   - En zoneless, validar componentes que dependían de Zone; CoreUI ha aplicado fixes y migraciones en 5.5.x/5.6.x.
--. Auditoría adicional de dependencias relacionadas con CoreUI:
+- Auditoría adicional de dependencias relacionadas con CoreUI:
   - `@coreui/coreui ^4.2.6` (CSS) → actualizar a 5.x para plena compatibilidad con CoreUI Angular 5.6.x.
   - `@coreui/chartjs ^3.1.2` → revisar compatibilidad con Chart.js v4 y wrapper Angular 5.6.x.
+
+## 3.1. Migración de CKEditor
+- Versión objetivo:
+  - `@ckeditor/ckeditor5-angular ^11` (soporta Angular 19+ y requiere CKEditor 5 ≥ 47). Referencias: npm y GitHub oficiales.
+  - Build: `@ckeditor/ckeditor5-build-classic ^47.x` (alinear todas las dependencias `@ckeditor/ckeditor5-*` al mismo mayor).
+- Paquetes a actualizar/alinear:
+  - `@ckeditor/ckeditor5-build-classic` → `^47.x`.
+  - `@ckeditor/ckeditor5-utils`, `@ckeditor/ckeditor5-watchdog`, `@ckeditor/ckeditor5-ckbox` → `^47.x` o versiones compatibles con el build elegido.
+  - Eliminar `@types/ckeditor` (corresponde a CKEditor 4 y no aplica en CKEditor 5).
+- Integración:
+  - Mantener integración por build (Classic) o evaluar `loadCKEditorCloud` para CDN si simplifica bundling y tipados.
+  - CKEditor 5 trae tipos nativos; si faltan tipos de plugins, añadir `devDependencies` `ckeditor5` y `ckeditor5-premium-features`.
+- Pruebas y compatibilidad:
+  - Probar inicialización del editor, carga de plugins usados (incluido CKBox si aplica) y eventos (`ready`, `change`).
+  - Verificar estilos del editor con nuestro tema SCSS y CoreUI 5.x.
 
 ## 4. Cronograma estimado
 - Fase 0 — Preparación (0.5–1 día)
   - Rama de migración, auditoría de dependencias, limpieza de warnings.
-  - Punto de verificación: build y tests pasan en v16.
+  - **Auditoría inicial (Estado actual):**
+    - Vulnerabilidades: `npm audit` detecta problemas en `esbuild`, `webpack-dev-server` y cadena de `ckeditor5`. Solución: actualización de Angular CLI a v21 y CKEditor a v44.x/v11.x resolverá la mayoría.
+    - Dependencias no usadas: `jquery` (remover), `@types/ckeditor` (obsoleto en v5), `sass` (innecesario explícitamente).
+    - Tipos faltantes: `@types/ckeditor__ckeditor5-core`, `@types/ckeditor__ckeditor5-utils`.
+  - Punto de verificación: build y tests pasan en v16 sin errores de auditoría crítica.
 - Fase 1 — Entorno y dependencias base (0.5 día)
   - Node/TypeScript/tslib/`@types/node`.
   - Punto de verificación: build con TS 5.9 sigue pasando.
@@ -114,11 +133,226 @@
 - Fase 4 — CoreUI 5.6.x (1–2 días)
   - Actualización de paquetes, ajustes de estilos/temas, verificación visual.
   - Punto de verificación: revisión UI de pantallas clave y componentes CoreUI.
+- Fase 4.1 — CKEditor (0.5–1 día)
+  - Actualizar wrapper Angular, build y plugins; remover `@types/ckeditor`.
+  - Punto de verificación: editor funcionando con nuestros plugins y estilos; pruebas pasan.
 - Fase 5 — QA y despliegue (1–2 días)
   - Pruebas de regresión visual, performance budgets, smoke tests en entorno de staging.
   - Punto de verificación: reporte de QA y go/no-go para producción.
- - Fase 6 — Limpieza (0.5 día)
-   - Remover dependencias obsoletas (Karma/Jasmine/Puppeteer/jQuery si procede), CommonJS innecesarias y actualizar scripts en `package.json`.
+- Fase 6 — Limpieza (0.5 día)
+  - Remover dependencias obsoletas (Karma/Jasmine/Puppeteer/jQuery), CommonJS innecesarias y actualizar scripts en `package.json`.
+
+### 4.0. Estrategia y ruta crítica de migración
+Orden recomendado de ataque para minimizar bloqueos y maximizar estabilidad progresiva:
+
+1. **Core & Shared (Cimientos):**
+   - Migrar `CoreModule` (interceptores, servicios) y `SharedOPModule`/`SharedCoreUiModule` primero.
+   - Si estos fallan, nada funciona. Verificar `HttpClient` y componentes UI base (alertas, badges, spinners).
+
+2. **Layout Admin & Navegación:**
+   - Adaptar `AdminModule`, Sidebar (`ngx-scrollbar`), Header y Footer.
+   - Objetivo: Tener un esqueleto navegable aunque el contenido falle.
+
+3. **Dashboard (Solo lectura):**
+   - Migrar `DashboardComponent` y gráficos. Es la "home" y valida la carga de datos masiva sin formularios complejos.
+
+4. **Módulos CRUD Simples (Gestión/Config):**
+   - `Gestión` (Usuarios/Roles), `Configuración` (Ajustes), `Categorías`, `Etiquetas`.
+   - Validan formularios reactivos básicos, modales y tablas sin editores ricos.
+
+5. **Módulos Complejos (Entradas/Páginas):**
+   - Al final, atacar `Entradas` y `Páginas`.
+   - Dependen de todo lo anterior + CKEditor 5 (la parte más riesgosa).
+
+### 4.1. Mapa detallado: Entradas y Dashboard
+- Entradas (`src/app/admin/base/entradas`):
+  - Componentes clave:
+    - `listado-entradas.component.ts` (`src/app/admin/base/entradas/listado-entradas.component.ts:1–30`)
+    - `crear-entrada.component.ts` (`src/app/admin/base/entradas/crear/crear-entrada.component.ts:1–20`)
+    - `editar-entrada.component.ts` (`src/app/admin/base/entradas/editar/editar-entrada.component.ts:1–12`)
+    - `entrada-form.component.ts` (`src/app/admin/base/entradas/entrada-form/entrada-form.component.ts:1–30`)
+    - `entrada-form.component.html` (`src/app/admin/base/entradas/entrada-form/entrada-form.component.html:146–162`)
+    - `preview-entrada.component.ts` (`src/app/admin/base/entradas/previa/preview-entrada.component.ts:1–8`)
+  - Servicios y utilidades:
+    - `entrada-facade.service.ts` (`src/app/admin/base/entradas/entrada-form/srv/entrada-facade.service.ts:1–20`)
+    - `validation-entrada-forms.service.ts` (`src/app/admin/base/entradas/entrada-form/srv/validation-entrada-forms.service.ts:1–8`)
+    - Servicios de datos relacionados: `EntradaService`, `CategoriaService` (`src/app/core/services/data/*.service.ts`)
+  - Impacto de migración:
+    - CKEditor 5: actualizar wrapper a `@ckeditor/ckeditor5-angular ^11` y build `^47.x`; validar carga dinámica del build en `loadEditorBuild()` (`src/app/admin/base/entradas/entrada-form/entrada-form.component.ts:246–260`).
+    - CoreUI 5.6: validar modales (`<c-modal>`) y feedback de formularios en plantillas; sustituir `NgClass` por `class.*` donde aplique en vistas.
+    - Angular 21: revisar `ChangeDetectionStrategy.OnPush` + eventos CKEditor; si zoneless, confirmar llamadas a `ChangeDetectorRef.detectChanges()` y evitar dependencias de Zone.
+    - Tests: actualizar specs NG0100 y pruebas de formularios para `provideHttpClientTesting()` si se migra a test API moderna.
+
+- Dashboard (`src/app/admin/base/dashboard`):
+  - Componentes clave:
+    - `dashboard.component.ts` (carga y orquestación de datos, exportaciones) (`src/app/admin/base/dashboard/dashboard.component.ts:148–170, 288–317`)
+    - Paneles: `dashboard-series-panel`, `dashboard-estado-nominal-panel`, `dashboard-estado-split-panel`, `dashboard-top-panel`, `dashboard-recent-panel`, `dashboard-content-panel` (en `src/app/admin/base/dashboard/components/*`)
+    - Barra de herramientas: `dashboard-toolbar.component.ts` (`src/app/admin/base/dashboard/components/dashboard-toolbar/dashboard-toolbar.component.ts:1–14`)
+  - Servicios:
+    - `DashboardFacadeService` (`src/app/admin/base/dashboard/srv/dashboard-facade.service.ts:1–20, 44–66`)
+    - `DashboardApiService` (`src/app/core/services/dashboard-api.service.ts:1–20, 49–67, 112–129`)
+  - Impacto de migración:
+    - Chart.js: actualizar a `@coreui/angular-chartjs 5.6.x` y validar opciones/registro con Chart.js v4; revisar `DashboardChartComponent` (`src/app/shared/components/dashboard-chart/dashboard-chart.component.ts:1–13`).
+    - Angular 21: revisar suscripciones y `ChangeDetectorRef`; si zoneless, asegurar actualizaciones explícitas en flujos asíncronos críticos.
+    - CoreUI 5.6: cards, grids, badges; revisar iconos `@coreui/icons-angular 5.6.x`.
+    - HTTP: `DashboardApiService` aprovecha `HttpClient` por defecto; evaluar retiro de `HttpClientModule` del `AppModule`.
+
+Notas transversales:
+- Layout Admin: `NgScrollbarModule` en `AdminModule` (`src/app/admin/admin.module.ts:1–20`); actualizar `ngx-scrollbar` a versión compatible.
+- Shared CoreUI: `shared-coreui.module.ts` consolida imports CoreUI (`src/app/shared/shared-coreui.module.ts:1–30`); migrar a CoreUI 5.6 y revisar APIs.
+
+### 4.2. Mapa detallado: Páginas
+- Páginas (`src/app/admin/base/paginas`):
+  - Componentes clave:
+    - `listado-paginas.component.ts` (`src/app/admin/base/paginas/listado-paginas.component.ts:1–30, 194–240, 271–287, 339–349, 425–447`)
+    - `listado-paginas.component.html` (`src/app/admin/base/paginas/listado-paginas.component.html:1–40, 106–140, 171–207`)
+    - `crear-pagina.component.ts` (`src/app/admin/base/paginas/crear/crear-pagina.component.ts:13–27, 82–98`)
+    - `crear-pagina.component.html` (`src/app/admin/base/paginas/crear/crear-pagina.component.html:1–21`)
+    - `editar-pagina.component.ts` (`src/app/admin/base/paginas/editar/editar-pagina.component.ts:12–29, 91–106`)
+  - Módulo:
+    - `PaginasModule` (`src/app/admin/base/paginas/paginas.module.ts:1–24`)
+  - Impacto de migración:
+    - CKEditor 5: reutiliza `EntradaFormComponent` y `PreviaEntradaComponent` desde `EntradasSharedModule`; aplicar mismos cambios que en Entradas.
+    - CoreUI 5.6: tablas, botones y modales (`<c-modal id="previewPaginaModal">`) en vistas de listado y edición.
+    - Angular 21: lógica de paginación, `ChangeDetectorRef` y `NgZone` similares a Entradas; revisar posibles NG0100 en previews y modales.
+
+### 4.3. Mapa detallado: Comentarios
+- Comentarios (`src/app/admin/base/comentarios`):
+  - Componentes clave:
+    - `listado-comentarios.component.ts` (`src/app/admin/base/comentarios/listado-comentarios.component.ts:1–47, 110–134, 275–308`)
+    - `listado-comentarios.component.html` (`src/app/admin/base/comentarios/listado-comentarios.component.html:1–31, 57–89, 115–144`)
+    - `crear-comentario.component.ts` (`src/app/admin/base/comentarios/crear/crear-comentario.component.ts:1–25`)
+    - `editar-comentario.component.ts` (`src/app/admin/base/comentarios/editar/editar-comentario.component.ts:1–36, 38–59, 86–101`)
+    - `comentario-form.component.ts` (`src/app/admin/base/comentarios/comentario-form/comentario-form.component.ts:1–24, 44–72`)
+  - Impacto de migración:
+    - CoreUI 5.6: listas, tablas, modales de confirmación (`<c-modal [visible]=...>`), paginación manual y toolbars de búsqueda.
+    - Angular 21: uso intensivo de `ChangeDetectorRef.detectChanges()` tras peticiones; revisar comportamiento en zoneless.
+    - HTTP: `ComentarioService`, `EntradaService`, `UsuarioService` en `src/app/core/services/data/*.service.ts` deben alinearse con HttpClient actualizado.
+
+### 4.4. Mapa detallado: Categorías y Etiquetas
+- Categorías (`src/app/admin/base/categorias`):
+  - Componentes:
+    - `listado-categorias.component.ts` (`src/app/admin/base/categorias/listado-categorias.component.ts:1–36, 144–160`)
+    - `listado-categorias.component.html` (`src/app/admin/base/categorias/listado-categorias.component.html:1–27, 59–91`)
+    - `categoria-form.component.ts` (`src/app/admin/base/categorias/categoria-form/categoria-form.component.ts:1–25`)
+    - `categoria-form.component.html` (`src/app/admin/base/categorias/categoria-form/categoria-form.component.html:78–92`)
+  - Impacto:
+    - CoreUI 5.6: tablas, badges (`<c-badge>`), modales de borrado.
+    - Angular 21: patrones de búsqueda/paginación similares a Comentarios; revisar tipado de formularios y validators.
+    - HTTP: `CategoriaService` (`src/app/core/services/data/categoria.service.ts:1–10`) usa `CrudService`/`HttpContext` con `NetworkInterceptor`.
+
+- Etiquetas (`src/app/admin/base/etiquetas`):
+  - Componentes:
+    - `listado-etiquetas.component.ts` (`src/app/admin/base/etiquetas/listado-etiquetas.component.ts:1–37, 144–199`)
+    - `listado-etiquetas.component.html` (`src/app/admin/base/etiquetas/listado-etiquetas.component.html:1–32, 45–76`)
+    - `etiqueta-form.component.ts` (`src/app/admin/base/etiquetas/etiqueta-form/etiqueta-form.component.ts:1–31`)
+  - Módulo:
+    - `EtiquetasModule` (`src/app/admin/base/etiquetas/etiquetas.module.ts:1–14`)
+  - Impacto:
+    - CoreUI 5.6: cards, tablas, badges de color y modales.
+    - Angular 21: formularios reactivos y validaciones; revisar `FormBuilder` y types con TS 5.9.
+    - HTTP: `EtiquetaService` y `SearchUtilService` para filtros avanzados (`src/app/core/services/utils/search-util.service.ts:1–24`).
+
+### 4.5. Mapa detallado: Gestión (usuarios, roles, privilegios)
+- Gestión (`src/app/admin/base/gestion`):
+  - Módulo:
+    - `GestionModule` y routing (`src/app/admin/base/gestion/gestion.module.ts:1–15`, `gestion-routing.module.ts:1–22`)
+  - Usuarios:
+    - `listado-usuarios.component.ts` (`src/app/admin/base/gestion/usuarios/listado-usuarios.component.ts:1–12, 45–57`)
+    - Impacto: tablas de usuarios, filtros, asignación de roles (`RolService`, `UsuarioService`), mensajes CoreUI.
+  - Roles:
+    - `listado-roles.component.ts` (`src/app/admin/base/gestion/roles/listado-roles.component.ts:1–44, 231–245, 319–359, 361–392`)
+    - `listado-roles.component.html` (`src/app/admin/base/gestion/roles/listado-roles.component.html:109–132`)
+    - Impacto: modales complejos, checkboxes de “todos los privilegios”, reglas de negocio (roles protegidos PROPIETARIO/ADMIN).
+  - Privilegios:
+    - `listado-privilegios.component.ts` (`src/app/admin/base/gestion/privilegios/listado-privilegios.component.ts:1–37`)
+    - `listado-privilegios.component.html` (`src/app/admin/base/gestion/privilegios/listado-privilegios.component.html:1–27`)
+    - Impacto: CRUD completo con búsqueda avanzada, paginación y modales.
+  - Impacto de migración (común):
+    - CoreUI 5.6: tablas densas, toolbars, modales y toasts.
+    - Angular 21: `ChangeDetectorRef`, observables de servicios con `takeUntil`; revisar tipados y posible migración a señales a medio plazo.
+    - HTTP: `UsuarioService`, `RolService`, `PrivilegioService` dependen de `CrudService` y `NetworkInterceptor`.
+
+### 4.6. Mapa detallado: Perfil
+- Perfil (`src/app/admin/base/perfil`):
+  - Módulo:
+    - `PerfilModule` (`src/app/admin/base/perfil/perfil.module.ts:1–24`)
+  - Componentes:
+    - `PerfilComponent` contenedor (`src/app/admin/base/perfil/containers/perfil.component.ts`)
+    - `PerfilFormComponent` (`src/app/admin/base/perfil/components/perfil-form/perfil-form.component.ts:1–24`)
+    - `PerfilPreferencesComponent`, `PerfilActivityComponent` (`src/app/admin/base/perfil/components/*`)
+  - Impacto:
+    - CoreUI 5.6: tabs (`TabsModule`), cards y formularios.
+    - Angular 21: formularios reactivos, eventos de guardado, posibles validaciones asíncronas.
+    - HTTP: `UsuarioService` para datos de perfil.
+
+### 4.7. Mapa detallado: Configuración (Ajustes, Temas)
+- Configuración (`src/app/admin/base/configuracion`):
+  - Módulo:
+    - `ConfiguracionModule` (`src/app/admin/base/configuracion/configuracion.module.ts:1–13`)
+  - Ajustes:
+    - `AjustesComponent` (`src/app/admin/base/configuracion/ajustes/ajustes.component.ts:1–34, 48–74, 76–99, 111–133`)
+    - `ajustes.component.html` (`src/app/admin/base/configuracion/ajustes/ajustes.component.html:1–32`)
+  - Temas:
+    - `TemasComponent` (`src/app/admin/base/configuracion/temas/temas.component.ts:1–34, 119–122`)
+    - `temas.component.html` (`src/app/admin/base/configuracion/temas/temas.component.html`)
+  - Impacto:
+    - CoreUI 5.6: tablas/listas de ajustes, modales de edición.
+    - Angular 21: formularios reactivos, pipes de filtro y paginación manual.
+    - HTTP: `AjustesService`, `TemasService` y su integración con backend.
+
+### 4.8. Mapa detallado: Contenido (archivos, imágenes)
+- Contenido (`src/app/admin/base/contenido`):
+  - Módulo:
+    - `ContenidoModule` (`src/app/admin/base/contenido/contenido.module.ts:1–19`)
+    - `MediaSharedModule` (`src/app/admin/base/contenido/media-shared.module.ts`)
+  - Archivos:
+    - `ArchivosComponent` (`src/app/admin/base/contenido/archivos/archivos.component.ts:1–34, 75–78`)
+    - `archivos.component.html` (`src/app/admin/base/contenido/archivos/archivos.component.html:59–87`)
+  - Imágenes:
+    - `ImagenesComponent` (`src/app/admin/base/contenido/imagenes/imagenes.component.ts:1–7, ...`)
+    - Usado como selector en `EntradaFormComponent` (`src/app/admin/base/entradas/entrada-form/entrada-form.component.ts:24–25`) y modales.
+  - Impacto:
+    - CoreUI 5.6: tablas, toolbars, filtrado por fechas y modales.
+    - Angular 21: manejo de `ChangeDetectorRef`, `Subject`/`takeUntil`, subida de ficheros (probar con HttpClient actualizado).
+    - HTTP: `FileStorageService` (`src/app/core/services/file-storage.service.ts`) ajustado a Angular 21 y `NetworkInterceptor`.
+
+### 4.9. Mapa detallado: Mantenimiento
+- Mantenimiento (`src/app/admin/base/mantenimiento`):
+  - Módulo:
+    - `MantenimientoModule` (`src/app/admin/base/mantenimiento/mantenimiento.module.ts:1–19`)
+    - Routing (`mantenimiento-routing.module.ts:1–18`)
+  - Logs:
+    - `LogsComponent` (`src/app/admin/base/mantenimiento/logs/logs.component.ts:1–53`)
+  - Database:
+    - `DatabaseComponent` (`src/app/admin/base/mantenimiento/database/database.component.ts:1–15`)
+  - Dev Tools:
+    - `DevToolsComponent` (`src/app/admin/base/mantenimiento/dev-tools/dev-tools.component.ts:1–16`)
+  - Impacto:
+    - CoreUI 5.6: cards, listas y botones de acciones.
+    - Angular 21: timers (`setInterval` en logs), suscripciones y limpieza adecuada en zoneless.
+
+### 4.10. Mapa detallado: Layout Admin, Core y App
+- Layout Admin:
+  - `AdminModule` (`src/app/admin/admin.module.ts:1–42`), `AdminRoutingModule` (`src/app/admin/admin-routing.module.ts:1–30`)
+  - Componentes: `AdminComponent`, `DefaultHeaderComponent`, `DefaultFooterComponent`, sidebar y navegación (`src/app/admin/default-layout/*`, `src/app/admin/admin.component.html:1–40`)
+  - Impacto:
+    - CoreUI 5.6: header, footer, sidebar, breadcrumbs, toasts globales.
+    - `NgScrollbarModule` + `ngx-scrollbar` para sidebar; actualizar versión y probar en Angular 21.
+
+- Core (`src/app/core`):
+  - `CoreModule` (`src/app/core/core.module.ts:1–40`): interceptores (`TimeoutInterceptor` → `AuthInterceptor` → `NetworkInterceptor` → `ErrorInterceptor`).
+  - Servicios clave: `AuthService`, `TokenStorageService`, `LoadingService`, `TemporaryStorageService`, `SessionManagerService`, `UnsavedWorkService`, `SearchUtilService`, servicios de datos (`EntradaService`, `UsuarioService`, `CategoriaService`, `RolService`, etc.).
+  - Errores y logging: `GlobalErrorHandlerService` (`src/app/core/errors/global-error/global-error-handler.service.ts`), `ErrorBoundaryService`, `LoggerService`.
+  - Impacto:
+    - Angular 21: revisar providers, uso de `HttpClient`, y posibles nuevas APIs (`provideHttpClient`).
+    - Compatibilidad con zoneless: interceptores no deben depender de Zone.
+
+- App y routing:
+  - `AppModule` (`src/app/app.module.ts:1–40`), `AppRoutingModule` (`src/app/app-routing.module.ts:1–25`), `main.ts` (`src/main.ts:1–13`), `polyfills.ts` (`src/polyfills.ts:1–36`), `app.config.ts` (`src/app/app.config.ts:1–24`).
+  - Impacto:
+    - Migración opcional a Standalone (`bootstrapApplication`) y `provideRouter` a medio plazo.
+    - Revisión de `HttpClientModule` (retirar si se usa `provideHttpClient`) y `BrowserAnimationsModule`.
 
 ## 5. Pruebas requeridas
 - Pruebas unitarias:
@@ -137,6 +371,9 @@
  - Pruebas de compatibilidad de librerías:
    - `ngx-scrollbar` y CKEditor contra Angular 21/TS 5.9; actualizar versiones y pruebas de integración.
    - `@coreui/angular-chartjs` y Chart.js v4 en gráficas actuales.
+ - Pruebas específicas CKEditor:
+   - Inicialización en contenedores, eventos `ready` y `change`, y watchdog.
+   - Carga de plugins utilizados (CKBox/premium) y validación de tipos en TS.
 
 ## 6. Documentación adicional
 - Guía de referencia para cambios importantes:

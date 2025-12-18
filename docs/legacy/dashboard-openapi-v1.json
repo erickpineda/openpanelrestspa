@@ -1,9 +1,0 @@
-{
-  "openapi": "3.0.1",
-  "info": {
-    "title": "Openpanel Dashboard API (v1)",
-    "version": "1.0.0",
-    "description": "Copia histórica archivada de docs/openapi/dashboard-openapi-v1.json"
-  },
-  "note": "Este archivo ha sido movido a docs/legacy. Usar docs/dashboard-openapi-v1.json como canónico."
-}
