@@ -24,10 +24,11 @@ import { ViewChild } from '@angular/core';
 import { ImagenesComponent } from '../../contenido/imagenes/imagenes.component';
 
 @Component({
-  selector: 'app-entrada-form',
-  templateUrl: './entrada-form.component.html',
-  styleUrls: ['./entrada-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-entrada-form',
+    templateUrl: './entrada-form.component.html',
+    styleUrls: ['./entrada-form.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class EntradaFormComponent implements OnInit, OnChanges {
   @Input() editorConfig: any = {

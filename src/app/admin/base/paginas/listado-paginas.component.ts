@@ -13,10 +13,11 @@ import { LoggerService } from '../../../core/services/logger.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-listado-paginas',
-  templateUrl: './listado-paginas.component.html',
-  styleUrls: ['./listado-paginas.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-listado-paginas',
+    templateUrl: './listado-paginas.component.html',
+    styleUrls: ['./listado-paginas.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit {
   // #region Properties

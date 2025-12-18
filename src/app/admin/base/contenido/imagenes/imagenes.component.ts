@@ -6,9 +6,10 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-imagenes',
-  templateUrl: './imagenes.component.html',
-  styleUrls: ['./imagenes.component.scss']
+    selector: 'app-imagenes',
+    templateUrl: './imagenes.component.html',
+    styleUrls: ['./imagenes.component.scss'],
+    standalone: false
 })
 export class ImagenesComponent implements OnInit, OnDestroy {
   loading = false;

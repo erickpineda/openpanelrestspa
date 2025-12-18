@@ -6,9 +6,10 @@ import { CommonFunctionalityService } from '../../../../shared/services/common-f
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-  selector: 'app-editar-categoria',
-  templateUrl: './editar-categoria.component.html',
-  styleUrls: ['./editar-categoria.component.scss']
+    selector: 'app-editar-categoria',
+    templateUrl: './editar-categoria.component.html',
+    styleUrls: ['./editar-categoria.component.scss'],
+    standalone: false
 })
 export class EditarCategoriaComponent implements OnInit {
   categoria?: Categoria;

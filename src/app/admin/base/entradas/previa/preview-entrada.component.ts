@@ -5,10 +5,11 @@ import { Entrada } from '../../../../core/models/entrada.model';
 import { Categoria } from '../../../../core/models/categoria.model';
 
 @Component({
-  selector: 'app-previa-entrada',
-  templateUrl: './preview-entrada.component.html',
-  styleUrls: ['./preview-entrada.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-previa-entrada',
+    templateUrl: './preview-entrada.component.html',
+    styleUrls: ['./preview-entrada.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class PreviaEntradaComponent implements OnChanges {
   @Input() form?: UntypedFormGroup;

@@ -8,9 +8,10 @@ import { LoggerService } from '../services/logger.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Component({
-  selector: 'app-unsaved-work-modal',
-  templateUrl: './unsaved-work-modal.component.html',
-  styleUrls: ['./unsaved-work-modal.component.scss']
+    selector: 'app-unsaved-work-modal',
+    templateUrl: './unsaved-work-modal.component.html',
+    styleUrls: ['./unsaved-work-modal.component.scss'],
+    standalone: false
 })
 export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();

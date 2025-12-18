@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-search-toolbar-basic',
-  templateUrl: './search-toolbar-basic.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-search-toolbar-basic',
+    templateUrl: './search-toolbar-basic.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SearchToolbarBasicComponent {
   @Input() total = 0;

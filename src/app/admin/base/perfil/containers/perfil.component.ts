@@ -7,9 +7,10 @@ import { FileStorageService } from '../../../../core/services/file-storage.servi
 import { finalize, take } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-perfil',
-  templateUrl: './perfil.component.html',
-  styleUrls: ['./perfil.component.scss']
+    selector: 'app-perfil',
+    templateUrl: './perfil.component.html',
+    styleUrls: ['./perfil.component.scss'],
+    standalone: false
 })
 export class PerfilComponent implements OnInit {
   usuario: PerfilResponse | null = null;

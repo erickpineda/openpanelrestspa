@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard-content-panel',
-  templateUrl: './dashboard-content-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-dashboard-content-panel',
+    templateUrl: './dashboard-content-panel.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DashboardContentPanelComponent {
   @Input() loadingContentStats: boolean = false;

@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { LoadingService } from '../../core/services/ui/loading.service';
 
 @Component({
-  selector: 'app-base',
-  templateUrl: './base.component.html'
+    selector: 'app-base',
+    templateUrl: './base.component.html',
+    standalone: false
 })
 export class BaseComponent implements OnInit {
 

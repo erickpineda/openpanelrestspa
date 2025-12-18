@@ -7,9 +7,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-temas',
-  templateUrl: './temas.component.html',
-  styleUrls: ['./temas.component.scss']
+    selector: 'app-temas',
+    templateUrl: './temas.component.html',
+    styleUrls: ['./temas.component.scss'],
+    standalone: false
 })
 export class TemasComponent implements OnInit, OnDestroy {
   loading = false;

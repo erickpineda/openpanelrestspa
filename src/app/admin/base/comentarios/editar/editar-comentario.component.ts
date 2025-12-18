@@ -11,9 +11,10 @@ import { LoggerService } from '../../../../core/services/logger.service';
 import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-response.model';
 
 @Component({
-  selector: 'app-editar-comentario',
-  templateUrl: './editar-comentario.component.html',
-  styleUrls: ['./editar-comentario.component.scss']
+    selector: 'app-editar-comentario',
+    templateUrl: './editar-comentario.component.html',
+    styleUrls: ['./editar-comentario.component.scss'],
+    standalone: false
 })
 export class EditarComentarioComponent implements OnInit {
   comentario?: Comentario;

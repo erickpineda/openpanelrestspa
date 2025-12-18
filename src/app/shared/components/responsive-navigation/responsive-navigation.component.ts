@@ -6,10 +6,11 @@ import { NavigationService } from '../../../core/services/ui/navigation.service'
 import { INavItemEnhanced, UserRole } from '../../types/navigation.types';
 
 @Component({
-  selector: 'app-responsive-navigation',
-  templateUrl: './responsive-navigation.component.html',
-  styleUrls: ['./responsive-navigation.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-responsive-navigation',
+    templateUrl: './responsive-navigation.component.html',
+    styleUrls: ['./responsive-navigation.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
   @Input() userRole: UserRole = UserRole.LECTOR;

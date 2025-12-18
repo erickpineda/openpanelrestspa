@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-perfil-activity',
-  templateUrl: './perfil-activity.component.html',
-  styleUrls: ['./perfil-activity.component.scss']
+    selector: 'app-perfil-activity',
+    templateUrl: './perfil-activity.component.html',
+    styleUrls: ['./perfil-activity.component.scss'],
+    standalone: false
 })
 export class PerfilActivityComponent implements OnInit {
   @Input() usuarioId: number = 0;

@@ -7,9 +7,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-ajustes',
-  templateUrl: './ajustes.component.html',
-  styleUrls: ['./ajustes.component.scss']
+    selector: 'app-ajustes',
+    templateUrl: './ajustes.component.html',
+    styleUrls: ['./ajustes.component.scss'],
+    standalone: false
 })
 export class AjustesComponent implements OnInit, OnDestroy {
   loading = false;

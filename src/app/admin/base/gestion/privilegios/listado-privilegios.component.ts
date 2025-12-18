@@ -8,9 +8,10 @@ import { LoggerService } from '../../../../core/services/logger.service';
 import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
 
 @Component({
-  selector: 'app-privilegios-list',
-  templateUrl: './listado-privilegios.component.html',
-  styleUrls: ['./listado-privilegios.component.scss']
+    selector: 'app-privilegios-list',
+    templateUrl: './listado-privilegios.component.html',
+    styleUrls: ['./listado-privilegios.component.scss'],
+    standalone: false
 })
 export class PrivilegiosListComponent implements OnInit, OnDestroy {
   loading = false;

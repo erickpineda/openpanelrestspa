@@ -3,9 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PerfilResponse } from '../../../../../core/models/perfil-response.model';
 
 @Component({
-  selector: 'app-perfil-form',
-  templateUrl: './perfil-form.component.html',
-  styleUrls: ['./perfil-form.component.scss']
+    selector: 'app-perfil-form',
+    templateUrl: './perfil-form.component.html',
+    styleUrls: ['./perfil-form.component.scss'],
+    standalone: false
 })
 export class PerfilFormComponent implements OnInit {
   @Input() usuario: PerfilResponse | null = null;

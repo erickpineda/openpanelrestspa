@@ -13,10 +13,11 @@ import { LoggerService } from '../../../core/services/logger.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-listado-entradas',
-  templateUrl: './listado-entradas.component.html',
-  styleUrls: ['./listado-entradas.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-listado-entradas',
+    templateUrl: './listado-entradas.component.html',
+    styleUrls: ['./listado-entradas.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewInit {
   // #region Properties

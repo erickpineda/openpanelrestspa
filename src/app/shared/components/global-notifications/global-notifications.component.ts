@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { NotificationService, NotificationOptions } from '../../../core/services/ui/notification.service';
 
 @Component({
-  selector: 'app-global-notifications',
-  template: `
+    selector: 'app-global-notifications',
+    template: `
     <c-toaster placement="top-end" position="fixed">
       <c-toast *ngFor="let notification of notifications" 
                [autohide]="true" 
@@ -18,7 +18,8 @@ import { NotificationService, NotificationOptions } from '../../../core/services
         </c-toast-body>
       </c-toast>
     </c-toaster>
-  `
+  `,
+    standalone: false
 })
 export class GlobalNotificationsComponent implements OnInit {
   notifications: NotificationOptions[] = [];

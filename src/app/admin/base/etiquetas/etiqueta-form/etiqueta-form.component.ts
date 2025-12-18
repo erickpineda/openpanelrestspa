@@ -6,9 +6,10 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 
 @Component({
-  selector: 'app-etiqueta-form',
-  templateUrl: './etiqueta-form.component.html',
-  styleUrls: ['./etiqueta-form.component.scss']
+    selector: 'app-etiqueta-form',
+    templateUrl: './etiqueta-form.component.html',
+    styleUrls: ['./etiqueta-form.component.scss'],
+    standalone: false
 })
 export class EtiquetaFormComponent implements OnInit, OnChanges {
   @Input() etiqueta: Etiqueta | null = null;

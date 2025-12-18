@@ -6,9 +6,10 @@ import { CategoriaFacadeService } from '../categoria-form/srv/categoria-facade.s
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-  selector: 'app-crear-categoria',
-  templateUrl: './crear-categoria.component.html',
-  styleUrls: ['./crear-categoria.component.scss']
+    selector: 'app-crear-categoria',
+    templateUrl: './crear-categoria.component.html',
+    styleUrls: ['./crear-categoria.component.scss'],
+    standalone: false
 })
 export class CrearCategoriaComponent implements OnInit {
   listaCategorias: Categoria[] = [];

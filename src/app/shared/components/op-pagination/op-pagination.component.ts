@@ -1,9 +1,10 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
-  selector: 'app-op-pagination',
-  templateUrl: './op-pagination.component.html',
-  styleUrls: ['./op-pagination.component.scss']
+    selector: 'app-op-pagination',
+    templateUrl: './op-pagination.component.html',
+    styleUrls: ['./op-pagination.component.scss'],
+    standalone: false
 })
 export class OpPaginationComponent implements OnChanges {
   @Input() totalPages: number = 0;

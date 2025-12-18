@@ -1,10 +1,11 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  selector: 'app-kpi-card',
-  templateUrl: './kpi-card.component.html',
-  styleUrls: ['./kpi-card.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-kpi-card',
+    templateUrl: './kpi-card.component.html',
+    styleUrls: ['./kpi-card.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KpiCardComponent {
   @Input() label: string = '';

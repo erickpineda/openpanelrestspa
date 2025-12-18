@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-global-error',
-  template: `
+    selector: 'app-global-error',
+    template: `
       <div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
         <div class="text-center">
           <h1 class="display-1 text-danger">😵</h1>
@@ -20,7 +20,8 @@ import { ActivatedRoute } from '@angular/router';
           </div>
         </div>
       </div>
-    `
+    `,
+    standalone: false
 })
 export class GlobalErrorComponent {
   errorCode: string = '500';

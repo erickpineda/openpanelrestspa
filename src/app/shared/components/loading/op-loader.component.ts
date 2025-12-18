@@ -7,10 +7,11 @@ export type LoaderStyle = 'spinner' | 'dots' | 'pulse' | 'progress' | 'modern';
 export type LoaderPosition = 'center' | 'top' | 'fullscreen';
 
 @Component({
-  selector: 'app-op-loader',
-  templateUrl: './op-loader.component.html',
-  styleUrls: ['./op-loader.component.scss'],
-  exportAs: 'opLoader'
+    selector: 'app-op-loader',
+    templateUrl: './op-loader.component.html',
+    styleUrls: ['./op-loader.component.scss'],
+    exportAs: 'opLoader',
+    standalone: false
 })
 export class OpLoaderComponent implements OnInit, OnDestroy, OnChanges {
   @Input() message = 'Cargando...';

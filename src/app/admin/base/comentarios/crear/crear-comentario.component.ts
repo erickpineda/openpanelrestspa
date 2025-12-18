@@ -7,9 +7,10 @@ import { CommonFunctionalityService } from '../../../../shared/services/common-f
 import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-response.model';
 
 @Component({
-  selector: 'app-crear-comentario',
-  templateUrl: './crear-comentario.component.html',
-  styleUrls: ['./crear-comentario.component.scss']
+    selector: 'app-crear-comentario',
+    templateUrl: './crear-comentario.component.html',
+    styleUrls: ['./crear-comentario.component.scss'],
+    standalone: false
 })
 export class CrearComentarioComponent {
   comentario: Comentario = new Comentario();

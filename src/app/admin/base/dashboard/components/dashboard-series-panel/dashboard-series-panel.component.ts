@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard-series-panel',
-  templateUrl: './dashboard-series-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-dashboard-series-panel',
+    templateUrl: './dashboard-series-panel.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DashboardSeriesPanelComponent {
   @Input() seriesDays: number = 30;

@@ -3,9 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Comentario } from '../../../../core/models/comentario.model';
 
 @Component({
-  selector: 'app-comentario-form',
-  templateUrl: './comentario-form.component.html',
-  styleUrls: ['./comentario-form.component.scss']
+    selector: 'app-comentario-form',
+    templateUrl: './comentario-form.component.html',
+    styleUrls: ['./comentario-form.component.scss'],
+    standalone: false
 })
 export class ComentarioFormComponent implements OnChanges {
   @Input() comentario?: Comentario;

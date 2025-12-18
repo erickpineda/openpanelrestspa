@@ -6,9 +6,10 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-archivos',
-  templateUrl: './archivos.component.html',
-  styleUrls: ['./archivos.component.scss']
+    selector: 'app-archivos',
+    templateUrl: './archivos.component.html',
+    styleUrls: ['./archivos.component.scss'],
+    standalone: false
 })
 export class ArchivosComponent implements OnInit, OnDestroy {
   loading = false;

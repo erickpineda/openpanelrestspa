@@ -8,9 +8,10 @@ import { LoggerService } from '../../core/services/logger.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Component({
-  selector: 'app-nav-bar-public',
-  templateUrl: './nav-bar-public.component.html',
-  styleUrls: ['./nav-bar-public.component.scss']
+    selector: 'app-nav-bar-public',
+    templateUrl: './nav-bar-public.component.html',
+    styleUrls: ['./nav-bar-public.component.scss'],
+    standalone: false
 })
 export class NavBarPublicComponent implements OnInit {
 

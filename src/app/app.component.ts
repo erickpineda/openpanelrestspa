@@ -8,9 +8,10 @@ import { RouteTrackerService } from './core/services/auth/route-tracker.service'
 import { OPConstants } from './shared/constants/op-global.constants';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    standalone: false
 })
 export class AppComponent implements OnInit {
   title = 'openpanelspa';

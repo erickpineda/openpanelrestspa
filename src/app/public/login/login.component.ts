@@ -8,10 +8,11 @@ import { PostLoginRedirectService } from '../../core/services/auth/post-login-re
 import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
 
 @Component({
-  selector: 'app-login',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+    selector: 'app-login',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.css'],
+    standalone: false
 })
 export class LoginComponent implements OnInit {
   icons = { cilUser, cilLockLocked };

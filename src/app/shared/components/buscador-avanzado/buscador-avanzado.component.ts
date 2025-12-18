@@ -82,10 +82,10 @@ import { getBuscadorDefinicionesAmigables, BuscadorDefinicionesAdaptadas, Buscad
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 
 @Component({
-  selector: 'app-buscador-avanzado',
-  templateUrl: './buscador-avanzado.component.html',
-  styleUrls: ['./buscador-avanzado.component.scss'],
-  
+    selector: 'app-buscador-avanzado',
+    templateUrl: './buscador-avanzado.component.html',
+    styleUrls: ['./buscador-avanzado.component.scss'],
+    standalone: false
 })
 
 export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {

@@ -15,9 +15,10 @@ import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-respons
 import { LoggerService } from "../../../core/services/logger.service";
 
 @Component({
-  selector: 'app-listado-comentarios',
-  templateUrl: './listado-comentarios.component.html',
-  styleUrls: ['./listado-comentarios.component.scss']
+    selector: 'app-listado-comentarios',
+    templateUrl: './listado-comentarios.component.html',
+    styleUrls: ['./listado-comentarios.component.scss'],
+    standalone: false
 })
 
 export class ListadoComentariosComponent implements OnInit, OnDestroy {

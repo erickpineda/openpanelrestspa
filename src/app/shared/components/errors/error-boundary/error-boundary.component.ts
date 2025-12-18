@@ -4,8 +4,8 @@ import { AppError, GlobalErrorHandlerService } from '../../../../core/errors/glo
 import { LoggerService } from '../../../../core/services/logger.service';
 
 @Component({
-  selector: 'app-error-boundary',
-  template: `
+    selector: 'app-error-boundary',
+    template: `
     <ng-container *ngIf="!hasError; else errorTemplate">
       <ng-content></ng-content>
     </ng-container>
@@ -42,7 +42,7 @@ import { LoggerService } from '../../../../core/services/logger.service';
       </c-alert>
     </ng-template>
   `,
-  styles: [`
+    styles: [`
     .error-boundary {
       border-left: 4px solid #ffc107;
       background: #fff3cd;
@@ -58,7 +58,8 @@ import { LoggerService } from '../../../../core/services/logger.service';
         margin-top: 0.2rem;
       }
     }
-  `]
+  `],
+    standalone: false
 })
 export class ErrorBoundaryComponent {
   @Input() fallbackMessage: string = 'Algo salió mal en este componente';

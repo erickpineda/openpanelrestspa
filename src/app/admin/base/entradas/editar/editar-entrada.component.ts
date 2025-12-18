@@ -11,9 +11,10 @@ import { Categoria } from '../../../../core/models/categoria.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-  selector: 'app-editar-entrada',
-  templateUrl: './editar-entrada.component.html',
-  styleUrls: ['./editar-entrada.component.scss'],
+    selector: 'app-editar-entrada',
+    templateUrl: './editar-entrada.component.html',
+    styleUrls: ['./editar-entrada.component.scss'],
+    standalone: false
 })
 export class EditarEntradaComponent implements OnInit {
   entradaForm!: UntypedFormGroup;

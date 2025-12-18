@@ -11,9 +11,10 @@ import { SearchUtilService } from '../../../../core/services/utils/search-util.s
 import { OPConstants } from '../../../../shared/constants/op-global.constants';
 
 @Component({
-  selector: 'app-roles-list',
-  templateUrl: './listado-roles.component.html',
-  styleUrls: ['./listado-roles.component.scss']
+    selector: 'app-roles-list',
+    templateUrl: './listado-roles.component.html',
+    styleUrls: ['./listado-roles.component.scss'],
+    standalone: false
 })
 export class RolesListComponent implements OnInit, OnDestroy {
   readonly PROPIETARIO_ROLE_CODE = OPConstants.Roles.PROPIETARIO_CODE;

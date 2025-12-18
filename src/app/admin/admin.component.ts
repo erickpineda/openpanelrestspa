@@ -17,10 +17,11 @@ import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
 // ... imports existentes
 
 @Component({
-  selector: 'app-admin',
-  templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-admin',
+    templateUrl: './admin.component.html',
+    styleUrls: ['./admin.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class AdminComponent implements OnInit, AfterViewInit {
   // ✅ NUEVO: Propiedades para controlar la notificación

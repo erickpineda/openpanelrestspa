@@ -3,9 +3,10 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { PerfilResponse } from '../../../../../core/models/perfil-response.model';
 
 @Component({
-  selector: 'app-perfil-preferences',
-  templateUrl: './perfil-preferences.component.html',
-  styleUrls: ['./perfil-preferences.component.scss']
+    selector: 'app-perfil-preferences',
+    templateUrl: './perfil-preferences.component.html',
+    styleUrls: ['./perfil-preferences.component.scss'],
+    standalone: false
 })
 export class PerfilPreferencesComponent implements OnInit {
   @Input() usuario: PerfilResponse | null = null;

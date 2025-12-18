@@ -3,9 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Categoria } from '../../../../core/models/categoria.model';
 
 @Component({
-  selector: 'app-categoria-form',
-  styleUrls: ['./categoria-form.component.scss'],
-  templateUrl: './categoria-form.component.html',
+    selector: 'app-categoria-form',
+    styleUrls: ['./categoria-form.component.scss'],
+    templateUrl: './categoria-form.component.html',
+    standalone: false
 })
 export class CategoriaFormComponent implements OnChanges {
   @Input() categoria?: Categoria;

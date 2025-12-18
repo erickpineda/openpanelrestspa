@@ -7,9 +7,10 @@ import { RouteTrackerService } from '../../core/services/auth/route-tracker.serv
 import { PostLoginRedirectService } from '../services/auth/post-login-redirect.service';
 
 @Component({
-  selector: 'app-session-expired-modal',
-  templateUrl: './session-expired.component.html',
-  styleUrls: ['./session-expired.component.scss']
+    selector: 'app-session-expired-modal',
+    templateUrl: './session-expired.component.html',
+    styleUrls: ['./session-expired.component.scss'],
+    standalone: false
 })
 export class SessionExpiredComponent implements OnInit, OnDestroy {
   private subs = new Subscription();

@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard-recent-panel',
-  templateUrl: './dashboard-recent-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-dashboard-recent-panel',
+    templateUrl: './dashboard-recent-panel.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DashboardRecentPanelComponent {
   @Input() recentItems: any[] = [];

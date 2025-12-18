@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard-settings-modal',
-  templateUrl: './dashboard-settings-modal.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-dashboard-settings-modal',
+    templateUrl: './dashboard-settings-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DashboardSettingsModalComponent {
   @Input() visible: boolean = false;

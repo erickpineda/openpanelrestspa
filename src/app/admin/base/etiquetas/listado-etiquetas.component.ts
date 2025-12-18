@@ -10,9 +10,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SearchUtilService } from '../../../core/services/utils/search-util.service';
 
 @Component({
-  selector: 'app-etiquetas-list',
-  templateUrl: './listado-etiquetas.component.html',
-  styleUrls: ['./listado-etiquetas.component.scss']
+    selector: 'app-etiquetas-list',
+    templateUrl: './listado-etiquetas.component.html',
+    styleUrls: ['./listado-etiquetas.component.scss'],
+    standalone: false
 })
 export class EtiquetasListComponent implements OnInit, OnDestroy {
   etiquetas: Etiqueta[] = [];

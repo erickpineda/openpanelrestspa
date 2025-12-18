@@ -16,9 +16,10 @@ import { AuthSyncService } from '../../../core/services/auth/auth-sync.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+    selector: 'app-dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.scss'],
+    standalone: false
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   errorSummary: string | null = null;

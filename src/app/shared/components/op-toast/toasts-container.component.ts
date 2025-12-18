@@ -4,8 +4,8 @@ import { ToastService } from '../../../core/services/ui/toast.service'; // ajust
 import { ToastMessage } from '../../../core/models/toast.model';   // ajusta ruta
 
 @Component({
-  selector: 'app-toasts-container',
-  template: `
+    selector: 'app-toasts-container',
+    template: `
   <c-toaster placement="top-end" class="p-3" position="fixed">
     <c-toast *ngFor="let toast of toasts$ | async"
              [visible]="true"
@@ -28,7 +28,8 @@ import { ToastMessage } from '../../../core/models/toast.model';   // ajusta rut
     </c-toast>
   </c-toaster>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ToastsContainerComponent {
   public toasts$: Observable<ToastMessage[]>;

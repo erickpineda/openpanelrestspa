@@ -5,9 +5,10 @@ import { TemporaryEntry, TemporaryStorageService } from '../../../core/services/
 import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
-  selector: 'app-temporary-entries-manager',
-  templateUrl: './temporary-entries-manager.component.html',
-  styleUrls: ['./temporary-entries-manager.component.scss']
+    selector: 'app-temporary-entries-manager',
+    templateUrl: './temporary-entries-manager.component.html',
+    styleUrls: ['./temporary-entries-manager.component.scss'],
+    standalone: false
 })
 export class TemporaryEntriesManagerComponent implements OnInit {
   entries: TemporaryEntry[] = [];

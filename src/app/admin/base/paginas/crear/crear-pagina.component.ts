@@ -11,9 +11,10 @@ import { LoggerService } from '../../../../core/services/logger.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-  selector: 'app-crear-pagina',
-  templateUrl: './crear-pagina.component.html',
-  styleUrls: ['./crear-pagina.component.scss'],
+    selector: 'app-crear-pagina',
+    templateUrl: './crear-pagina.component.html',
+    styleUrls: ['./crear-pagina.component.scss'],
+    standalone: false
 })
 export class CrearPaginaComponent implements OnInit {
   entradaForm : UntypedFormGroup;

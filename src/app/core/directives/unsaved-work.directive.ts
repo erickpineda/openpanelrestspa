@@ -4,7 +4,8 @@ import { LoggerService } from '../services/logger.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Directive({
-  selector: '[appUnsavedWork]'
+    selector: '[appUnsavedWork]',
+    standalone: false
 })
 export class UnsavedWorkDirective implements OnInit, OnDestroy {
   @Input() appUnsavedWork: string = '';

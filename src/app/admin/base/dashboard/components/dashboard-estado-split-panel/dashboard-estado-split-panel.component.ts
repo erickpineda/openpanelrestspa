@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard-estado-split-panel',
-  templateUrl: './dashboard-estado-split-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-dashboard-estado-split-panel',
+    templateUrl: './dashboard-estado-split-panel.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DashboardEstadoSplitPanelComponent {
   @Input() loadingSplitEstado: boolean = false;

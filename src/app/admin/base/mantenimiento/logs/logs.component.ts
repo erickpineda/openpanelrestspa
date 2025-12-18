@@ -4,9 +4,10 @@ import { LoggerBufferService, LogEntry } from '../../../../core/services/logger-
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-mantenimiento-logs',
-  templateUrl: './logs.component.html',
-  styleUrls: ['./logs.component.scss']
+    selector: 'app-mantenimiento-logs',
+    templateUrl: './logs.component.html',
+    styleUrls: ['./logs.component.scss'],
+    standalone: false
 })
 export class LogsComponent implements OnInit, OnDestroy {
   loading = false;

@@ -9,9 +9,10 @@ import { LoggerService } from "../../../core/services/logger.service";
 import { PaginaResponse } from "../../../core/models/pagina-response.model";
 
 @Component({
-  selector: 'app-listado-categorias',
-  templateUrl: './listado-categorias.component.html',
-  styleUrls: ['./listado-categorias.component.scss']
+    selector: 'app-listado-categorias',
+    templateUrl: './listado-categorias.component.html',
+    styleUrls: ['./listado-categorias.component.scss'],
+    standalone: false
 })
 export class ListadoCategoriasComponent implements OnInit, OnDestroy {
   listaCategorias: Categoria[] = [];

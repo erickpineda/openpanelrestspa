@@ -10,9 +10,10 @@ import { Categoria } from '../../../../core/models/categoria.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-  selector: 'app-editar-pagina',
-  templateUrl: './editar-pagina.component.html',
-  styleUrls: ['./editar-pagina.component.scss'],
+    selector: 'app-editar-pagina',
+    templateUrl: './editar-pagina.component.html',
+    styleUrls: ['./editar-pagina.component.scss'],
+    standalone: false
 })
 export class EditarPaginaComponent implements OnInit {
   entradaForm!: UntypedFormGroup;
