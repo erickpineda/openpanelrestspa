@@ -64,8 +64,9 @@
   - Actualización de entorno base.
 - **Fase 2 — Angular Core:** (Completado)
   - Migración del framework y CLI.
-- **Fase 3 — Tests:** (Pendiente)
-  - Ejecución y corrección de tests unitarios y E2E.
+- **Fase 3 — Tests:** (Completado)
+  - Ejecución y corrección de tests unitarios críticos.
+  - Estabilización del entorno de pruebas (Karma/ChromeHeadless).
 - **Fase 4 — UI Libs (CoreUI, CKEditor):** (Completado)
   - Actualización de librerías de interfaz.
   - CKEditor actualizado a v11.x (wrapper) y v44.x (build).
