@@ -1,12 +1,6 @@
 // core/interceptor/error.interceptor.ts - VERSIÓN CORREGIDA
 import { Injectable } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-  HttpErrorResponse
-} from '@angular/common/http';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { GlobalErrorHandlerService } from '../errors/global-error/global-error-handler.service';

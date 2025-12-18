@@ -1,8 +1,6 @@
 // src/app/core/interceptors/auth.interceptor.ts
 import { Injectable } from '@angular/core';
-import {
-  HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse
-} from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable, EMPTY, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TokenStorageService } from '../services/auth/token-storage.service';

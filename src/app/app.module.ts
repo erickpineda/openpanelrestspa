@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CoreModule } from './core/core.module';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CustomPreloadingStrategyService } from './core/preloading/custom-preloading-strategy.service';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
@@ -16,30 +16,24 @@ import { UnsavedWorkModalComponent } from './core/features/unsaved-work-modal.co
 import { GlobalNotificationsComponent } from './shared/components/global-notifications/global-notifications.component';
 import { SharedOPModule } from './shared/shared.module';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    SessionExpiredComponent,
-    UnsavedWorkModalComponent,
-    UnsavedWorkDirective,
-    GlobalNotificationsComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    CoreModule, // ✅ Solo servicios globales
-    SharedOPModule, // ✅ Componentes compartidos
-    ToastModule,
-    ModalModule
-  ],
-  providers: [
-    DatePipe,
-    CustomPreloadingStrategyService,
-    { provide: LOCALE_ID, useValue: 'es-ES' }
-  ],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        SessionExpiredComponent,
+        UnsavedWorkModalComponent,
+        UnsavedWorkDirective,
+        GlobalNotificationsComponent
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        CoreModule, // ✅ Solo servicios globales
+        SharedOPModule, // ✅ Componentes compartidos
+        ToastModule,
+        ModalModule], providers: [
+        DatePipe,
+        CustomPreloadingStrategyService,
+        { provide: LOCALE_ID, useValue: 'es-ES' },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule { }
 registerLocaleData(localeEs);
