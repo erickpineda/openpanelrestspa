@@ -30,7 +30,7 @@
       <div class="mb-2"><c-spinner></c-spinner></div>
     }
     <ul class="list-group list-group-flush">
-      @for (it of items; track it) {
+      @for (it of items; track it.name) {
         <li class="list-group-item d-flex justify-content-between">
           <span>{{ it.name }}</span>
           <c-badge [color]="badgeColor">{{ it.count }}</c-badge>

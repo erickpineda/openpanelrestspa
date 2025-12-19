@@ -71,7 +71,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (a of pagedAjustes; track a) {
+                @for (a of pagedAjustes; track trackByAjuste($index, a)) {
                   <tr>
                     <td>{{ a.categoria }}</td>
                     <td>{{ a.clave }}</td>

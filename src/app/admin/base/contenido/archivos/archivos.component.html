@@ -81,7 +81,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (f of items; track f) {
+                @for (f of items; track trackByMediaItem($index, f)) {
                   <tr>
                     <td class="text-truncate text-start" style="max-width: 240px;" [title]="f.nombre">{{ f.nombre }}</td>
                     <td class="text-end">{{ f.tamano | number }}</td>

@@ -420,7 +420,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     
     if (this.form.valid) {
       this.log.info('💾 Intentando guardar entrada...');
-      this.submitForm.emit(this.form.value as Entrada);
+      const clean = this.sanitizeHtmlFields(this.form.value);
+      this.submitForm.emit(clean as Entrada);
       
       // ✅ MODIFICADO: Limpiar entrada temporal específica al guardar exitosamente
       if (this.currentTemporaryEntryId) {
@@ -451,6 +452,39 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   control(path: string) {
     return this.form ? this.form.get(path) : null;
+  }
+
+  private sanitizeHtmlFields(val: any): any {
+    const sanitize = (html: string | null | undefined) => {
+      if (!html || typeof html !== 'string') return html;
+      const tpl = document.createElement('template');
+      tpl.innerHTML = html;
+      const walker = document.createTreeWalker(tpl.content, NodeFilter.SHOW_ELEMENT, null);
+      const toRemove: Element[] = [];
+      while (walker.nextNode()) {
+        const el = walker.currentNode as Element;
+        if (el.tagName.toLowerCase() === 'script' || el.tagName.toLowerCase() === 'iframe') {
+          toRemove.push(el);
+          continue;
+        }
+        for (const attr of Array.from(el.attributes)) {
+          const n = attr.name.toLowerCase();
+          const v = attr.value;
+          if (n.startsWith('on')) el.removeAttribute(attr.name);
+          if (n === 'src' || n === 'href') {
+            const lower = (v || '').toLowerCase().trim();
+            if (lower.startsWith('javascript:') || lower.startsWith('data:text/html')) el.removeAttribute(attr.name);
+          }
+        }
+      }
+      toRemove.forEach(e => e.remove());
+      return tpl.innerHTML;
+    };
+    return {
+      ...val,
+      contenido: sanitize(val?.contenido),
+      resumen: sanitize(val?.resumen)
+    };
   }
 
   // ===== SISTEMA DE CATEGORÍAS UNIFICADO =====

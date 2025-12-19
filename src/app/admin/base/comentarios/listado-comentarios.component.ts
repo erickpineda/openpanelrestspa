@@ -306,4 +306,8 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
       this.showDeleteModal = false;
       this.comentarioToDelete = null;
   }
+
+  trackByComentario(index: number, c: Comentario): number {
+    return c?.idComentario ?? index;
+  }
 }

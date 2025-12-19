@@ -17,7 +17,7 @@
   <div class="mb-3">
     <label for="descripcion" class="form-label">Descripción</label>
     <textarea id="descripcion" cFormControl formControlName="descripcion" [class.is-invalid]="form.get('descripcion')?.invalid && form.get('descripcion')?.touched" [attr.aria-label]="'Ingrese una descripción opcional para la etiqueta'" rows="3" placeholder="Ingrese una descripción opcional para la etiqueta" maxlength="200" data-testid="input-descripcion"></textarea>
-    <div class="form-text" data-testid="contador-descripcion">{{ form.get('descripcion')?.value?.length || 0 }}/200 caracteres</div>
+    <div class="form-text" data-testid="contador-descripcion">{{ (form.get('descripcion')?.value ?? '').length }}/200 caracteres</div>
     @if (form.get('descripcion')?.invalid && form.get('descripcion')?.touched) {
       <div id="descripcion-error" class="invalid-feedback">La descripción no puede exceder 200 caracteres</div>
     }
@@ -26,7 +26,7 @@
   <div class="mb-4">
     <label class="form-label">Color <span class="text-danger">*</span></label>
     <div class="d-flex flex-wrap gap-2">
-      @for (colorOption of colores; track colorOption) {
+      @for (colorOption of colores; track colorOption.value) {
         <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" [id]="'color-' + colorOption.value" formControlName="colorHex" [value]="colorOption.value" [checked]="form.get('colorHex')?.value === colorOption.value" [attr.data-testid]="'color-' + colorOption.value">
           <label class="form-check-label d-flex align-items-center" [for]="'color-' + colorOption.value">

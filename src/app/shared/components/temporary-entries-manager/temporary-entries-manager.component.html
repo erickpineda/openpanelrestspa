@@ -20,7 +20,7 @@
 
     @if (entries.length > 0) {
       <c-row>
-        @for (entry of entries; track entry) {
+        @for (entry of entries; track entry.id) {
           <c-col lg="6">
             <c-card class="mb-3">
               <c-card-body>

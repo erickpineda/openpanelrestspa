@@ -2,14 +2,14 @@
   <c-row class="g-2 align-items-end flex-column flex-md-row">
     <c-col xs="12" md="3">
       <select cSelect cFormControl [(ngModel)]="campoSeleccionado" (change)="actualizarOperacionesDisponibles()">
-        @for (c of camposDisponibles; track c) {
+        @for (c of camposDisponibles; track c.valor) {
           <option [value]="c.valor">{{ c.nombre }}</option>
         }
       </select>
     </c-col>
     <c-col xs="12" md="3">
       <select cSelect cFormControl [(ngModel)]="operacionSeleccionada">
-        @for (o of operacionesDisponibles; track o) {
+        @for (o of operacionesDisponibles; track o.valor) {
           <option [value]="o.valor">{{ o.nombre }}</option>
         }
       </select>

@@ -23,7 +23,7 @@
         }
         @if (!loading && filtered.length > 0) {
           <ul class="list-group">
-            @for (e of filtered; track e) {
+            @for (e of filtered; track trackByLogEntry($index, e)) {
               <li class="list-group-item">
                 <span class="badge bg-info me-2">{{ e.level }}</span>
                 <span class="text-muted me-2">{{ e.timestamp }}</span>

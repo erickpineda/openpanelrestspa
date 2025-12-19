@@ -145,4 +145,8 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     const pageItems = list.slice(start, start + pageSize);
     return { pageItems, totalPages };
   }
+
+  trackByMediaItem(index: number, item: MediaItem): string {
+    return item?.uuid || item?.url || `${item?.nombre || ''}-${item?.fechaCreacion || ''}`;
+  }
 }

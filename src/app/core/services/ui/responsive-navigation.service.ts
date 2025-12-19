@@ -30,6 +30,7 @@ export interface CriticalFunction {
   providedIn: 'root'
 })
 export class ResponsiveNavigationService {
+  private readonly STORAGE_KEY = 'op.sidebar.collapsed';
   private readonly DEFAULT_BREAKPOINTS: ResponsiveBreakpoints = {
     mobile: 768,
     tablet: 1024,
@@ -45,7 +46,7 @@ export class ResponsiveNavigationService {
   ];
 
   private breakpoints: ResponsiveBreakpoints = this.DEFAULT_BREAKPOINTS;
-  private sidebarCollapsedSubject = new BehaviorSubject<boolean>(false);
+  private sidebarCollapsedSubject = new BehaviorSubject<boolean>(this.readCollapsedFromStorage());
   private responsiveStateSubject = new BehaviorSubject<ResponsiveState>(this.getInitialState());
 
   public responsiveState$: Observable<ResponsiveState> = this.responsiveStateSubject.asObservable();
@@ -135,6 +136,7 @@ export class ResponsiveNavigationService {
    */
   public collapseSidebar(): void {
     this.sidebarCollapsedSubject.next(true);
+    this.writeCollapsedToStorage(true);
     this.updateResponsiveState();
   }
 
@@ -143,6 +145,7 @@ export class ResponsiveNavigationService {
    */
   public expandSidebar(): void {
     this.sidebarCollapsedSubject.next(false);
+    this.writeCollapsedToStorage(false);
     this.updateResponsiveState();
   }
 
@@ -152,6 +155,7 @@ export class ResponsiveNavigationService {
   public toggleSidebar(): void {
     const currentState = this.sidebarCollapsedSubject.value;
     this.sidebarCollapsedSubject.next(!currentState);
+    this.writeCollapsedToStorage(!currentState);
     this.updateResponsiveState();
   }
 
@@ -161,6 +165,26 @@ export class ResponsiveNavigationService {
   private updateResponsiveState(): void {
     const newState = this.calculateResponsiveState();
     this.responsiveStateSubject.next(newState);
+  }
+
+  private readCollapsedFromStorage(): boolean {
+    try {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(this.STORAGE_KEY) : null;
+      if (raw === null) return false;
+      return raw === 'true';
+    } catch {
+      return false;
+    }
+  }
+
+  private writeCollapsedToStorage(collapsed: boolean): void {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(this.STORAGE_KEY, collapsed ? 'true' : 'false');
+      }
+    } catch {
+      // ignore storage errors
+    }
   }
 
   /**

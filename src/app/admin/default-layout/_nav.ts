@@ -10,7 +10,7 @@ export const navItems: INavItemEnhanced[] = [
     requiredRoles: [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO],
     badge: {
       color: 'info',
-      text: 'Principal'
+      text: '+'
     },
     attributes: { id: 'nav-dashboard' }
   },
@@ -61,7 +61,7 @@ export const navItems: INavItemEnhanced[] = [
         },
         badge: {
           color: 'warning',
-          text: 'Pendientes'
+          text: 'Pend'
         }
       },
       {
@@ -136,7 +136,7 @@ export const navItems: INavItemEnhanced[] = [
     },
     badge: {
       color: 'danger',
-      text: 'Pendientes'
+      text: 'Pend'
     },
     attributes: { id: 'nav-comments' }
   },
@@ -144,7 +144,7 @@ export const navItems: INavItemEnhanced[] = [
   // User Administration Section
   {
     title: true,
-    name: 'Administración de Usuarios',
+    name: 'Admin. de Usuarios',
     priority: 60,
     requiredRoles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO],
     attributes: { id: 'nav-title-users' }
@@ -162,7 +162,7 @@ export const navItems: INavItemEnhanced[] = [
     },
     badge: {
       color: 'info',
-      text: 'Nuevos'
+      text: '+'
     },
     attributes: { id: 'nav-users' }
   },
@@ -191,10 +191,43 @@ export const navItems: INavItemEnhanced[] = [
     ]
   },
 
+  // User Account Section
+  {
+    title: true,
+    name: 'Mi Cuenta',
+    priority: 20
+  },
+  {
+    name: 'Mi Perfil',
+    url: '/admin/control/perfil',
+    iconComponent: { name: 'cil-user' },
+    priority: 15,
+    requiredRoles: [UserRole.LECTOR, UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO],
+    badge: {
+      color: 'info',
+      text: 'Yo'
+    },
+    contextualActions: [
+      {
+        name: 'Editar Perfil',
+        icon: 'cil-pencil',
+        action: () => console.log('Editar perfil'),
+        tooltip: 'Editar información del perfil'
+      }
+    ]
+  },
+  {
+    name: 'Cambiar Contraseña',
+    url: '/admin/control/gestion/changepassword',
+    iconComponent: { name: 'cil-lock-locked' },
+    priority: 10,
+    requiredRoles: [UserRole.LECTOR, UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO]
+  },
+
   // System Configuration Section
   {
     title: true,
-    name: 'Configuración del Sistema',
+    name: 'Config. del Sistema',
     priority: 40
   },
   {
@@ -219,39 +252,6 @@ export const navItems: INavItemEnhanced[] = [
     requiredRoles: [UserRole.DESARROLLADOR, UserRole.PROPIETARIO]
   },
 
-  // User Account Section
-  {
-    title: true,
-    name: 'Mi Cuenta',
-    priority: 20
-  },
-  {
-    name: 'Mi Perfil',
-    url: '/admin/control/perfil',
-    iconComponent: { name: 'cil-user' },
-    priority: 15,
-    requiredRoles: [UserRole.LECTOR, UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO],
-    badge: {
-      color: 'info',
-      text: 'Perfil'
-    },
-    contextualActions: [
-      {
-        name: 'Editar Perfil',
-        icon: 'cil-pencil',
-        action: () => console.log('Editar perfil'),
-        tooltip: 'Editar información del perfil'
-      }
-    ]
-  },
-  {
-    name: 'Cambiar Contraseña',
-    url: '/admin/control/gestion/changepassword',
-    iconComponent: { name: 'cil-lock-locked' },
-    priority: 10,
-    requiredRoles: [UserRole.LECTOR, UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO]
-  },
-
   // Maintenance Section (for specific roles only)
   {
     title: true,
@@ -272,7 +272,7 @@ export const navItems: INavItemEnhanced[] = [
     },
     badge: {
       color: 'warning',
-      text: 'Alertas'
+      text: '*'
     }
   },
   {
@@ -283,7 +283,7 @@ export const navItems: INavItemEnhanced[] = [
     requiredRoles: [UserRole.DESARROLLADOR, UserRole.PROPIETARIO]
   },
   {
-    name: 'Herramientas de Desarrollo',
+    name: 'Herram. de Desarrollo',
     url: '/admin/control/mantenimiento/dev-tools',
     iconComponent: { name: 'cil-code' },
     priority: 2,

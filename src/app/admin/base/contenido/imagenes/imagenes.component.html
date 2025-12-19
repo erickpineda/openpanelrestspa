@@ -83,7 +83,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (m of items; track m) {
+                @for (m of items; track trackByMediaItem($index, m)) {
                   <tr>
                     <td>
                       @if (m.uuid && preview[m.uuid]) {

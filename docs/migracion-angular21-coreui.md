@@ -292,6 +292,14 @@ Notas transversales:
   - Flujo de sesión y expiración (`SessionExpiredComponent`, `UnsavedWorkDirective`) (`src/app/app.module.ts:12–21`).
   - Preloading de rutas (`CustomPreloadingStrategyService`) y navegación con estados de carga.
 - Pruebas de regresión visual:
+
+## 6. Seguridad y rendimiento post-migración
+- NPM: Resuelto conflicto de `@coreui/angular-chartjs@5.6.2` con `@coreui/chartjs`. Actualizado `@coreui/chartjs` a `^4.1.0` en `package.json` para cumplir peer dependency.
+- Auditoría: `npm audit` detectó 61 vulnerabilidades de baja severidad (principalmente CKEditor 5). No hay vulnerabilidades críticas/altas.
+- Mitigación CKEditor:
+  - Sanitización de campos `contenido` y `resumen` al guardar entradas (`src/app/admin/base/entradas/entrada-form/entrada-form.component.ts:418–434` y `src/app/admin/base/entradas/entrada-form/entrada-form.component.ts:456–478`).
+  - Mantener carga dinámica del build para mejorar rendimiento (`src/app/admin/base/entradas/entrada-form/entrada-form.component.ts:248–261`).
+- Karma/ChromeHeadless: Configuración optimizada con `ChromeHeadlessNoSandbox` y timeouts para estabilidad en CI (`karma.conf.js:79–91`).
   - Playwright con screenshots de páginas clave: dashboard, perfil (`src/app/admin/base/perfil/containers/perfil.component.html:3`), listas y modales.
   - Validar temas y componentes CoreUI (toasts, modales, sidebar).
 - Validación de funcionalidad:

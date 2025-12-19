@@ -14,4 +14,8 @@ export class DevToolsComponent {
   ];
 
   toggle(feature: any): void { feature.enabled = !feature.enabled; }
+
+  trackByFeature(index: number, f: any): string {
+    return f?.name ?? index.toString();
+  }
 }

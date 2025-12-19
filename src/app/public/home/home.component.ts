@@ -90,4 +90,12 @@ export class HomeComponent implements OnInit {
   public refrescarPagina(): void {
     window.location.reload();
   }
+
+  trackByCategoria(index: number, c: Categoria): number | string {
+    return c?.idCategoria ?? c?.nombre ?? index;
+  }
+
+  trackByEntrada(index: number, e: Entrada): number {
+    return e?.idEntrada ?? index;
+  }
 }

@@ -65,7 +65,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (p of privilegios; track p) {
+              @for (p of privilegios; track trackByPrivilegio($index, p)) {
                 <tr>
                   <td>{{ p.codigo }}</td>
                   <td>{{ p.nombre }}</td>

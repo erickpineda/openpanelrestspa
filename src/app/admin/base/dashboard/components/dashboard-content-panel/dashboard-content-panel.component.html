@@ -58,7 +58,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (row of contentEstadoRows; track row) {
+            @for (row of contentEstadoRows; track row.estado) {
               <tr>
                 <td>{{ row.estado }}</td>
                 <td class="text-end"><c-badge color="secondary">{{ row.total }}</c-badge></td>
@@ -74,4 +74,3 @@
     </div>
   </c-card-body>
 </c-card>
-

@@ -47,7 +47,7 @@
                 <label class="form-label mb-1">Rol</label>
                 <select cSelect class="form-select-sm" [(ngModel)]="filtroRolCodigo">
                   <option [ngValue]="null">Seleccione rol</option>
-                  @for (r of roles; track r) {
+                  @for (r of roles; track trackByRol($index, r)) {
                     <option [value]="r.codigo">{{ r.nombre }}</option>
                   }
                 </select>
@@ -84,7 +84,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (u of usuarios; track u) {
+              @for (u of usuarios; track trackByUsuario($index, u)) {
                 <tr [class.table-row-disabled]="!u.habilitado">
                   <td class="text-truncate" style="max-width: 200px;" [title]="u.username">{{ u.username }}</td>
                   <td>{{ u.nombre }} {{ u.apellido }}</td>
@@ -166,7 +166,7 @@
           <label class="form-label">Rol</label>
           <select cSelect [(ngModel)]="editUser.rolCodigo" [class.is-invalid]="!editUser.rolCodigo" [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
             <option value="">Seleccione rol</option>
-            @for (r of roles; track r) {
+            @for (r of roles; track trackByRol($index, r)) {
               @if (r.codigo !== PROPIETARIO_ROLE_CODE || editUser.rolCodigo === PROPIETARIO_ROLE_CODE) {
                 <option [value]="r.codigo">
                   {{ r.nombre }}

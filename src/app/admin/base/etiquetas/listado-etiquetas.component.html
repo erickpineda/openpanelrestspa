@@ -58,7 +58,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (etiqueta of pagedEtiquetas; track etiqueta; let i = $index) {
+              @for (etiqueta of pagedEtiquetas; track trackByEtiqueta($index, etiqueta); let i = $index) {
                 <tr role="row">
                   <td>
                     <span class="badge" [style.background-color]="etiqueta.colorHex" [attr.aria-label]="'Color de etiqueta'">&nbsp;&nbsp;&nbsp;</span>
@@ -123,4 +123,3 @@
     <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
   </c-modal-footer>
 </c-modal>
-

@@ -277,4 +277,12 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
         }
       });
   }
+
+  trackByUsuario(index: number, u: Usuario): number | string {
+    return u?.idUsuario ?? u?.username ?? index;
+  }
+
+  trackByRol(index: number, r: Rol): number | string {
+    return r?.idRol ?? r?.codigo ?? index;
+  }
 }

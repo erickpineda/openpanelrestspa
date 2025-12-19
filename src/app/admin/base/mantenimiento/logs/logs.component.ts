@@ -51,4 +51,8 @@ export class LogsComponent implements OnInit, OnDestroy {
     this.filtered = this.entries.filter(e => 
       e.message.toLowerCase().includes(f) || e.level.toLowerCase().includes(f));
   }
+
+  trackByLogEntry(index: number, e: LogEntry): string {
+    return `${e?.timestamp || ''}-${e?.level || ''}-${e?.message?.substring(0,50) || ''}`;
+  }
 }

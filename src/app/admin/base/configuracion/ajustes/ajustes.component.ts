@@ -150,4 +150,8 @@ export class AjustesComponent implements OnInit, OnDestroy {
     const end = start + this.pageSize;
     this.pagedAjustes = this.filteredAjustes.slice(start, end);
   }
+
+  trackByAjuste(index: number, a: Ajustes): number | string {
+    return a?.id ?? `${a?.categoria || ''}-${a?.clave || ''}`;
+  }
 }

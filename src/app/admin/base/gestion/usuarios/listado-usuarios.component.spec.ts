@@ -20,6 +20,7 @@ describe('UsuariosListComponent', () => {
   beforeEach(async () => {
     mockUsuarioService = {
       buscarSinGlobalLoader: jasmine.createSpy('buscarSinGlobalLoader').and.returnValue(of({ elements: [], totalElements: 0 })),
+      listarPaginaSinGlobalLoader: jasmine.createSpy('listarPaginaSinGlobalLoader').and.returnValue(of({ data: { elements: [], totalElements: 0 } })),
       crear: jasmine.createSpy('crear').and.returnValue(of({})),
       actualizar: jasmine.createSpy('actualizar').and.returnValue(of({})),
       actualizarParcial: jasmine.createSpy('actualizarParcial').and.returnValue(of({})),
@@ -46,7 +47,7 @@ describe('UsuariosListComponent', () => {
         { provide: RolService, useValue: mockRolService },
         { provide: ToastService, useValue: mockToastService },
         { provide: LoggerService, useValue: { log: () => {}, error: () => {} } },
-        { provide: SearchUtilService, useValue: { buildCriteria: () => [] } }
+        { provide: SearchUtilService, useValue: { buildCriteria: () => [], buildRequest: () => ({}) } }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     })

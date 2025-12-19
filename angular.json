@@ -110,6 +110,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "hmr": false
+          },
           "configurations": {
             "production": {
               "buildTarget": "openpanelspa:build:production"

@@ -76,7 +76,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (t of pagedTemas; track t) {
+                @for (t of pagedTemas; track t.nombre) {
                   <tr>
                     <td>{{ t.nombre }}</td>
                     <td>{{ t.activo ? 'Sí' : 'No' }}</td>

@@ -6,32 +6,40 @@
     id="sidebar"
     colorScheme="dark"
     visible
+    [unfoldable]="sidebarNarrow"
     >
-    <c-sidebar-brand routerLink="./">
-      <img
-        class="sidebar-brand-full"
-        src="assets/img/brand/coreui-angular.svg"
-        alt="CoreUI Logo"
-        height="46"
-        width="200"
-      />
-      <img
-        class="sidebar-brand-narrow"
-        src="assets/img/brand/coreui-signet-white.svg"
-        alt="CoreUI Logo"
-        height="46"
-        width="46"
-      />
-    </c-sidebar-brand>
-    <ng-scrollbar pointerEventsMethod="scrollbar">
+    
+    <c-sidebar-header class="border-bottom">
+      <c-sidebar-brand [routerLink]="[]">
+        <img
+          class="sidebar-brand-full"
+          src="assets/img/brand/coreui-angular.svg"
+          alt="CoreUI Logo"
+          height="46"
+        />
+        <img
+          class="sidebar-brand-narrow"
+          src="assets/img/brand/coreui-signet-white.svg"
+          alt="CoreUI Logo"
+          height="46"
+        />
+      </c-sidebar-brand>
+    </c-sidebar-header>
+    
+    <ng-scrollbar pointerEventsMethod="scrollbar" visibility="hover">
       <c-sidebar-nav [navItems]="navItems" [dropdownMode]="'none'"></c-sidebar-nav>
     </ng-scrollbar>
-    @if (!sidebar.narrow) {
-      <c-sidebar-toggler
-        toggle="unfoldable"
-        cSidebarToggle="sidebar"
-      ></c-sidebar-toggler>
-    }
+    <c-sidebar-footer
+      class="border-top d-flex align-items-center justify-content-center"
+      [attr.aria-label]="sidebarNarrow ? 'Expandir sidebar' : 'Compactar sidebar'"
+    >
+      <button
+        type="button"
+        class="sidebar-toggler"
+        (click)="toggleSidebarNarrow()"
+        aria-label="Toggle sidebar fold"
+      ></button>
+    </c-sidebar-footer>
   </c-sidebar>
   <div class="wrapper d-flex flex-column min-vh-100 bg-light dark:bg-transparent" data-testid="admin-root">
     @if (showGlobalRecoveryNotification) {
@@ -83,4 +91,3 @@
     <app-op-loader></app-op-loader>
   </div>
 }
-

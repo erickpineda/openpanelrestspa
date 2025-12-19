@@ -30,7 +30,7 @@
                   <small class="text-medium-emphasis">
                     Fecha publicación: {{ pagedEntradas[0]?.fechaPublicacion ? pagedEntradas[0]?.fechaPublicacion : 'No Publicada' }}
                   </small>
-                  @for (categoria of pagedEntradas[0]?.categorias; track categoria) {
+                  @for (categoria of pagedEntradas[0]?.categorias; track trackByCategoria($index, categoria)) {
                     <div>
                       <small class="text-medium-emphasis">Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small>
                     </div>
@@ -40,7 +40,7 @@
             </div>
           }
           <c-row>
-            @for (entrada of pagedEntradas.slice(1); track entrada) {
+            @for (entrada of pagedEntradas.slice(1); track trackByEntrada($index, entrada)) {
               <c-col [md]="4" class="mb-4">
                 <c-card>
                   <img src="../../../../assets/img/brand/coreui-base.svg" class="card-img-top">
@@ -53,7 +53,7 @@
                     <small class="text-medium-emphasis">
                       Fecha publicación: {{ entrada.fechaPublicacion ? entrada.fechaPublicacion : 'No Publicada' }}
                     </small>
-                    @for (categoria of entrada.categorias; track categoria) {
+                        @for (categoria of entrada.categorias; track trackByCategoria($index, categoria)) {
                       <div>
                         <small class="text-medium-emphasis">Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small>
                       </div>

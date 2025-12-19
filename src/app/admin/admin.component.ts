@@ -38,6 +38,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   public isAuthed: boolean = false;
   public ready: boolean = false;
+  public sidebarNarrow: boolean = false;
 
   // Propiedades para el componente de recuperación
   showRecoveryNotification = false;
@@ -103,6 +104,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.tasksCount = this.temporaryEntriesCount;
     this.cdr.markForCheck();
 
+    // Estado inicial del sidebar (persistencia)
+    this.sidebarNarrow = this.readSidebarNarrowFromStorage();
+    this.cdr.markForCheck();
+
     // Actualizar estado de sidebar en inicio y en cambios de ruta
     this.sidebarState.updateNavItems(this.navItems, this.router.url);
     this.router.events.subscribe(() => {
@@ -165,5 +170,26 @@ export class AdminComponent implements OnInit, AfterViewInit {
     // eliminado: etiqueta de pagos
     this.labelProjects = 'Proyectos';
     this.labelLockAccount = 'Bloquear cuenta';
+  }
+
+  private readSidebarNarrowFromStorage(): boolean {
+    try {
+      const raw = localStorage.getItem('sidebar_narrow');
+      return raw === 'true';
+    } catch {
+      return false;
+    }
+  }
+
+  private writeSidebarNarrowToStorage(value: boolean): void {
+    try {
+      localStorage.setItem('sidebar_narrow', value ? 'true' : 'false');
+    } catch {}
+  }
+
+  public toggleSidebarNarrow(): void {
+    this.sidebarNarrow = !this.sidebarNarrow;
+    this.writeSidebarNarrowToStorage(this.sidebarNarrow);
+    this.cdr.markForCheck();
   }
 }

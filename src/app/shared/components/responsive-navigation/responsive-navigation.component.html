@@ -78,7 +78,7 @@
                   <c-badge
                     [color]="item.badge.color"
                     class="ms-auto nav-badge"
-                    [ngClass]="['badge-' + (item.badge?.color || 'info'), {'zero-count': item.badge?.text === '0'}]">
+                    [ngClass]="getBadgeClasses(item.badge)">
                     {{ item.badge.text }}
                   </c-badge>
                 }
@@ -138,7 +138,7 @@
         <c-nav-group
           class="critical-functions-bar">
           <c-nav-title>Acceso Rápido</c-nav-title>
-          @for (func of criticalFunctions.slice(0, 4); track func) {
+          @for (func of criticalFunctions.slice(0, 4); track func.url) {
             <c-nav-item>
               <c-nav-link [routerLink]="func.url"
                 class="critical-function-btn"
@@ -152,5 +152,17 @@
         </c-nav-group>
       }
     </c-sidebar-nav>
+    <!-- Bottom toggle control -->
+    <div class="sidebar-bottom-toggle"
+      role="button"
+      tabindex="0"
+      [attr.aria-label]="state.sidebarCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'"
+      [attr.aria-pressed]="!state.sidebarCollapsed"
+      (click)="toggleSidebar()"
+      (keydown)="onBottomToggleKeydown($event)">
+      <svg cIcon
+        [name]="state.sidebarCollapsed ? 'cilArrowRight' : 'cilArrowLeft'"
+        class="bottom-toggle-icon"></svg>
+    </div>
   </div>
 }

@@ -20,4 +20,9 @@ export class PerfilActivityComponent implements OnInit {
       { action: 'Cierre de sesión', date: new Date(Date.now() - 172800000), ip: '10.0.0.5', device: 'Safari on iPhone' }
     ];
   }
+
+  trackByActivity(index: number, activity: any): string {
+    const time = activity?.date instanceof Date ? activity.date.getTime() : new Date(activity?.date).getTime();
+    return `${activity?.action || ''}-${time}-${activity?.ip || ''}-${activity?.device || ''}`;
+  }
 }

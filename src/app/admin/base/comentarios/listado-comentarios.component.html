@@ -80,7 +80,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (coment of pagedComentarios; track coment) {
+            @for (coment of pagedComentarios; track trackByComentario($index, coment)) {
               <tr>
                 <td>
                   <span class="d-inline-block text-truncate" style="max-width: 250px;" [title]="coment.contenido">

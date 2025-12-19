@@ -32,7 +32,7 @@
       <div class="mb-2"><c-spinner></c-spinner></div>
     }
     <ul class="list-group list-group-flush">
-      @for (e of recentItems; track e) {
+      @for (e of recentItems; track (e.id ?? e.idEntrada ?? e.username ?? e.name ?? $index)) {
         <li class="list-group-item">
           <div class="d-flex justify-content-between">
             <div>
@@ -53,4 +53,3 @@
     </ul>
   </c-card-body>
 </c-card>
-

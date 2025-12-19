@@ -266,4 +266,8 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
   }
+
+  trackByEtiqueta(index: number, e: Etiqueta): number | string {
+    return e?.idEtiqueta ?? e?.nombre ?? index;
+  }
 }

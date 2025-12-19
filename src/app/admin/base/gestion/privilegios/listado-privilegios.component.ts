@@ -238,4 +238,8 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
         }
       });
   }
+
+  trackByPrivilegio(index: number, p: Privilegio): number | string {
+    return p?.idPrivilegio ?? p?.codigo ?? index;
+  }
 }

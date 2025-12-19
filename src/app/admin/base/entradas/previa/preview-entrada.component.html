@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-center w-100">
       <div>
         <h3 class="h5 mb-0">{{ tituloMostrar || 'Sin título' }}</h3>
-        @if (categoriasMostrar?.length) {
+        @if (categoriasMostrar.length) {
           <small class="text-muted">
             Categorías:
             @for (c of categoriasMostrar; track c; let last = $last) {

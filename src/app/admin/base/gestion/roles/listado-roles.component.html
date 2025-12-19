@@ -66,7 +66,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (r of roles; track r) {
+              @for (r of roles; track trackByRol($index, r)) {
                 <tr [class.table-row-disabled]="r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE">
                   <td>{{ r.codigo }}</td>
                   <td>{{ r.nombre }}</td>
@@ -150,7 +150,7 @@
                 <div class="text-muted text-center py-2">No hay privilegios disponibles</div>
               }
               <div class="row">
-                @for (p of privilegios; track p) {
+                @for (p of privilegios; track trackByPrivilegio($index, p)) {
                   <div class="col-md-6">
                     <c-form-check class="mb-2 privilegio-item">
                       <input cFormCheckInput type="checkbox" [id]="'privilegio-'+p.codigo"

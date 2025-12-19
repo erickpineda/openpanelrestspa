@@ -1,8 +1,8 @@
 <div class="activity-list">
-  @for (activity of activities; track activity) {
+  @for (activity of activities; track trackByActivity($index, activity)) {
     <div class="d-flex align-items-center border-bottom py-3">
       <div class="me-3">
-        <div class="bg-light rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+        <div class="bg-light rounded-circle p-2 d-flex align-items-center justify-content-center activity-icon">
           <svg cIcon name="cil-history" class="text-primary"></svg>
         </div>
       </div>

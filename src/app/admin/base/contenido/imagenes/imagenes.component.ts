@@ -402,4 +402,8 @@ export class ImagenesComponent implements OnInit, OnDestroy {
   onSelect(item: MediaItem): void {
     this.selectItem.emit(item);
   }
+
+  trackByMediaItem(index: number, item: MediaItem): string {
+    return item?.uuid || item?.url || `${item?.nombre || ''}-${item?.fechaCreacion || ''}`;
+  }
 }

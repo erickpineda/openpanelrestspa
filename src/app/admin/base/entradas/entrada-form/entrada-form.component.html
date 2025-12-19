@@ -112,11 +112,11 @@
                       <c-col lg="12">
                         <div>
                           <label cCol cLabel="col">Estado</label>
-                          @if (estadosEntr?.length) {
+                          @if (estadosEntr.length) {
                             <select cSelect cFormControl formControlName="estadoEntrada"
                               [ngClass]="{ 'is-invalid': (submitted || control('estadoEntrada')?.touched) && control('estadoEntrada')?.invalid, 'is-valid': control('estadoEntrada')?.valid && (submitted || control('estadoEntrada')?.touched) }">
                               <option [ngValue]="null" disabled>Selecciona un estado</option>
-                              @for (ee of estadosEntr; track ee) {
+                              @for (ee of estadosEntr; track ee.nombre) {
                                 <option [ngValue]="ee">{{ ee.nombre }}</option>
                               }
                             </select>
@@ -139,11 +139,11 @@
                       <c-col lg="12">
                         <div>
                           <label cCol cLabel="col">Tipo entrada</label>
-                          @if (tiposEntr?.length) {
+                          @if (tiposEntr.length) {
                             <select cSelect cFormControl formControlName="tipoEntrada"
                               [ngClass]="{ 'is-invalid': (submitted || control('tipoEntrada')?.touched) && control('tipoEntrada')?.invalid, 'is-valid': control('tipoEntrada')?.valid && (submitted || control('tipoEntrada')?.touched) }">
                               <option [ngValue]="null" disabled>Selecciona un tipo</option>
-                              @for (te of tiposEntr; track te) {
+                              @for (te of tiposEntr; track te.nombre) {
                                 <option [ngValue]="te">{{ te.nombre }}</option>
                               }
                             </select>
@@ -283,7 +283,7 @@
                               <!-- Grid de categorías -->
                               @if (categorias.length > 0) {
                                 <div class="categorias-grid">
-                                  @for (categoria of categorias; track categoria) {
+                                  @for (categoria of categorias; track categoria.idCategoria) {
                                     <c-form-check class="categoria-item">
                                       <input
                                         cFormCheckInput
