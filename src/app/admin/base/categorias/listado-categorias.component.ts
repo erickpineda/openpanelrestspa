@@ -89,6 +89,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
 
     if (hasServerPaging) {
       this.listaCategorias = elementos;
+      this.allCategorias = [];
       this.totalElements = Number(data?.totalElements || elementos.length || 0);
       this.totalPages = Number(data?.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1);
       this.numberOfElements = Number(data?.numberOfElements ?? elementos.length);
@@ -217,26 +218,26 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
 
   prev(): void { 
     if (this.pageNo > 0) { 
-        this.pageNo--; 
-        // Si tenemos allCategorias, paginamos local
-        if (this.allCategorias.length > 0 && this.pagedCategorias.length !== this.totalElements) {
-            this.applyPaging();
-        } else {
-            this.obtenerListaCategorias(); 
-        }
+        this.onPageChange(this.pageNo - 1);
     } 
   }
   
   next(): void { 
     if (this.pageNo < this.getTotalPages() - 1) { 
-        this.pageNo++; 
-        // Si tenemos allCategorias, paginamos local
-        if (this.allCategorias.length > 0 && this.pagedCategorias.length !== this.totalElements) {
-            this.applyPaging();
-        } else {
-            this.obtenerListaCategorias(); 
-        }
+        this.onPageChange(this.pageNo + 1);
     } 
+  }
+
+  onPageChange(page: number): void {
+    const totalPages = this.getTotalPages();
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    if (safePage === this.pageNo) return;
+    this.pageNo = safePage;
+    if (this.allCategorias.length > 0) {
+      this.applyPaging();
+      return;
+    }
+    this.obtenerListaCategorias();
   }
   
   getTotalPages(): number { return Math.max(1, this.totalPages); }

@@ -165,24 +165,26 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
 
   prev(): void { 
     if (this.pageNo > 0) { 
-        this.pageNo--; 
-        if (this.allComentarios.length > 0 && this.pagedComentarios.length !== this.totalElements) {
-            this.applyPaging();
-        } else {
-            this.obtenerListaComentarios(); 
-        }
+        this.onPageChange(this.pageNo - 1);
     } 
   }
   
   next(): void { 
     if (this.pageNo < this.totalPages - 1) { 
-        this.pageNo++; 
-        if (this.allComentarios.length > 0 && this.pagedComentarios.length !== this.totalElements) {
-            this.applyPaging();
-        } else {
-            this.obtenerListaComentarios(); 
-        }
+        this.onPageChange(this.pageNo + 1);
     } 
+  }
+
+  onPageChange(page: number): void {
+    const totalPages = this.getTotalPages();
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    if (safePage === this.pageNo) return;
+    this.pageNo = safePage;
+    if (this.allComentarios.length > 0) {
+      this.applyPaging();
+      return;
+    }
+    this.obtenerListaComentarios();
   }
   
   getTotalPages(): number { return Math.max(1, this.totalPages); }
@@ -196,6 +198,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
 
     if (hasServerPaging) {
         this.listaComentarios = elementos;
+        this.allComentarios = [];
         this.estaVacio = !!data.empty;
         this.totalElements = Number(data.totalElements || this.listaComentarios.length || 0);
         this.totalPages = Number(data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1);

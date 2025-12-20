@@ -19,94 +19,126 @@
         </div>
       }
 
+      <div>
+        <c-row class="align-items-center mb-3 g-2">
+          <c-col xs="12" md="4">
+            <div class="text-muted small">Total {{ totalElements }}</div>
+          </c-col>
+          <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+            <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar tema..." style="max-width: 280px;" [disabled]="loading" />
+            <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
+          </c-col>
+          <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+            <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;" [disabled]="loading">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+            </select>
+          </c-col>
+        </c-row>
 
-      @if (!loading) {
-        <div>
-          <c-row class="align-items-center mb-3 g-2">
-            <c-col xs="12" md="4">
-              <div class="text-muted small">Total {{ totalElements }}</div>
-            </c-col>
-            <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-              <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar tema..." style="max-width: 280px;" />
-              <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
-            </c-col>
-            <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-              <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="20">20</option>
-              </select>
-            </c-col>
-          </c-row>
-          @if (showAdvanced) {
-            <div class="mb-3">
-              <c-row class="g-3 align-items-end">
-                <c-col xs="12" md="6">
-                  <label class="form-label mb-1">Nombre</label>
-                  <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por nombre..." [value]="filtroNombre" (input)="filtroNombre=$any($event.target).value" />
-                </c-col>
-                <c-col xs="12" md="6">
-                  <label class="form-label mb-1">Activo</label>
-                  <select cSelect class="form-select-sm" [value]="filtroActivo === null ? '' : (filtroActivo ? 'true' : 'false')"
-                    (change)="filtroActivo = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
-                    <option value="">Seleccione estado</option>
-                    <option value="true">Sí</option>
-                    <option value="false">No</option>
-                  </select>
-                </c-col>
-                <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
-                  <button cButton size="sm" color="primary" variant="outline" (click)="search()">
-                    <svg cIcon name="cilSearch"></svg> Buscar
-                  </button>
-                  <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
-                    <svg cIcon name="cilReload"></svg> Limpiar
-                  </button>
-                </c-col>
-              </c-row>
+        @if (showAdvanced) {
+          <div class="mb-3">
+            <c-row class="g-3 align-items-end">
+              <c-col xs="12" md="6">
+                <label class="form-label mb-1">Nombre</label>
+                <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por nombre..." [value]="filtroNombre" (input)="filtroNombre=$any($event.target).value" [disabled]="loading" />
+              </c-col>
+              <c-col xs="12" md="6">
+                <label class="form-label mb-1">Activo</label>
+                <select cSelect class="form-select-sm" [value]="filtroActivo === null ? '' : (filtroActivo ? 'true' : 'false')"
+                  (change)="filtroActivo = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')" [disabled]="loading">
+                  <option value="">Seleccione estado</option>
+                  <option value="true">Sí</option>
+                  <option value="false">No</option>
+                </select>
+              </c-col>
+              <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
+                <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="loading">
+                  <svg cIcon name="cilSearch"></svg> Buscar
+                </button>
+                <button cButton size="sm" color="secondary" variant="outline" (click)="reset()" [disabled]="loading">
+                  <svg cIcon name="cilReload"></svg> Limpiar
+                </button>
+              </c-col>
+            </c-row>
+          </div>
+        }
+
+        <div class="tabla-con-loader-wrapper position-relative">
+          @if (loading) {
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+              <div class="text-center">
+                <c-spinner [attr.aria-label]="'Cargando temas'"></c-spinner>
+                <p class="mt-2 text-muted">Cargando temas...</p>
+              </div>
             </div>
           }
-          <div class="table-responsive">
-            <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de temas">
+
+          <div [class.opacity-50]="loading" class="table-responsive">
+            <table responsive cAlign="top" cTable hover class="align-middle mb-0 border tabla-con-loader" role="table" aria-label="Tabla de temas">
               <thead cTableColor="light">
                 <tr>
-                  <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
-                  <th scope="col" class="text-center">Activo</th>
-                  <th scope="col" class="text-start" style="min-width: 200px;">Esquema</th>
+                  <th scope="col" style="min-width: 200px;">Nombre</th>
+                  <th scope="col" class="text-center" style="min-width: 90px;">Activo</th>
+                  <th scope="col" style="min-width: 200px;">Esquema</th>
                   <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 @for (t of pagedTemas; track t.nombre) {
                   <tr>
-                    <td>{{ t.nombre }}</td>
-                    <td>{{ t.activo ? 'Sí' : 'No' }}</td>
-                    <td>{{ t.esquemaColor }}</td>
+                    <td>
+                      <span class="fw-semibold text-truncate d-inline-block" style="max-width: 320px;" [title]="t.nombre">{{ t.nombre }}</span>
+                    </td>
+                    <td class="text-center">{{ t.activo ? 'Sí' : 'No' }}</td>
+                    <td>
+                      <span class="d-inline-block text-truncate" style="max-width: 320px;" [title]="t.esquemaColor">{{ t.esquemaColor }}</span>
+                    </td>
                     <td class="text-center">
-                      <div class="btn-group">
-                        <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(t)" [attr.aria-label]="'Editar tema ' + t.nombre"><svg cIcon name="cilPencil"></svg></button>
-                        <button cButton color="danger" size="sm" variant="outline" (click)="delete(t)" [attr.aria-label]="'Eliminar tema ' + t.nombre"><svg cIcon name="cilTrash"></svg></button>
+                      <div class="btn-group" role="group" aria-label="Acciones de tema">
+                        <button cButton color="warning" size="sm" variant="ghost" (click)="openEdit(t)" [attr.aria-label]="'Editar tema ' + t.nombre"><svg cIcon name="cilPencil" size="sm"></svg></button>
+                        <button cButton color="danger" size="sm" variant="ghost" (click)="delete(t)" [attr.aria-label]="'Eliminar tema ' + t.nombre"><svg cIcon name="cilTrash" size="sm"></svg></button>
                       </div>
                     </td>
                   </tr>
                 }
+
                 @if (pagedTemas.length === 0) {
-                  <tr><td colspan="4" class="text-muted text-center">Sin temas</td></tr>
+                  <tr>
+                    <td colspan="4" class="text-center py-5">
+                      <div class="d-flex flex-column align-items-center justify-content-center">
+                        <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                        <h6 class="text-muted">No se han encontrado temas</h6>
+                        <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+                      </div>
+                    </td>
+                  </tr>
                 }
               </tbody>
             </table>
-          </div>
-          <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
-            <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
-            <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-            <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }}</div>
+
+            @if (pagedTemas.length > 0) {
+              <app-op-pagination
+                [align]="'center'"
+                [totalPages]="getTotalPages()"
+                [currentPage]="pageNo"
+                (pageChange)="onPageChange($event)">
+              </app-op-pagination>
+            }
+
+            @if (pagedTemas.length > 0) {
+              <c-row class="mt-2">
+                <c-col class="d-flex justify-content-end align-items-center gap-2">
+                  <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
+                  <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
+                  <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }}</div>
+                </c-col>
+              </c-row>
+            }
           </div>
         </div>
-      } @else {
-        <div class="text-center my-3" role="status" aria-live="polite">
-          <c-spinner color="primary"></c-spinner>
-          <p class="mt-2">Cargando temas...</p>
-        </div>
-      }
+      </div>
     </c-card-body>
   </c-card>
 </c-container>

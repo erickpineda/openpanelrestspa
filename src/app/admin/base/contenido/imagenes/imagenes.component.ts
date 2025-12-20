@@ -98,6 +98,13 @@ export class ImagenesComponent implements OnInit, OnDestroy {
   prev(): void { if (this.canPrev) { this.pageNo--; this.load(); } }
   next(): void { if (this.canNext) { this.pageNo++; this.load(); } }
 
+  onPageChange(page: number): void {
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, this.totalPages - 1)));
+    if (safePage === this.pageNo) return;
+    this.pageNo = safePage;
+    this.load();
+  }
+
   // Handlers toolbar
   toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
   onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.filtroNombre = this.basicSearchText; this.search(); }

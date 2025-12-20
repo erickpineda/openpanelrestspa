@@ -18,50 +18,60 @@
       </div>
     }
 
-    @if (!loading) {
-      <div>
-        <c-row class="align-items-center mb-3 g-2">
-          <c-col xs="12" md="4">
-            <div class="text-muted small">Total {{ totalElements }}</div>
-          </c-col>
-          <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-            <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar rol..." [disabled]="loading" style="max-width: 280px;" />
-            <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
-          </c-col>
-          <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-            <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-            </select>
-          </c-col>
-        </c-row>
-        @if (showAdvanced) {
-          <div class="mb-3">
-            <c-row class="g-3 align-items-end">
-              <c-col xs="12" md="4">
-                <label class="form-label mb-1">Nombre</label>
-                <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por nombre..." [value]="filtroNombre" (input)="filtroNombre=$any($event.target).value" />
-              </c-col>
-              <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
-                <button cButton size="sm" color="primary" variant="outline" (click)="search()">
-                  <svg cIcon name="cilSearch"></svg> Buscar
-                </button>
-                <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
-                  <svg cIcon name="cilReload"></svg> Limpiar
-                </button>
-              </c-col>
-            </c-row>
+    <div>
+      <c-row class="align-items-center mb-3 g-2">
+        <c-col xs="12" md="4">
+          <div class="text-muted small">Total {{ totalElements }}</div>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar rol..." [disabled]="loading" style="max-width: 280px;" />
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;" [disabled]="loading">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </select>
+        </c-col>
+      </c-row>
+      @if (showAdvanced) {
+        <div class="mb-3">
+          <c-row class="g-3 align-items-end">
+            <c-col xs="12" md="4">
+              <label class="form-label mb-1">Nombre</label>
+              <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por nombre..." [value]="filtroNombre" (input)="filtroNombre=$any($event.target).value" [disabled]="loading" />
+            </c-col>
+            <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
+              <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="loading">
+                <svg cIcon name="cilSearch"></svg> Buscar
+              </button>
+              <button cButton size="sm" color="secondary" variant="outline" (click)="reset()" [disabled]="loading">
+                <svg cIcon name="cilReload"></svg> Limpiar
+              </button>
+            </c-col>
+          </c-row>
+        </div>
+      }
+
+      <div class="tabla-con-loader-wrapper position-relative">
+        @if (loading) {
+          <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+            <div class="text-center">
+              <c-spinner [attr.aria-label]="'Cargando roles'"></c-spinner>
+              <p class="mt-2 text-muted">Cargando roles...</p>
+            </div>
           </div>
         }
-        <div class="table-responsive">
-          <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de roles">
+
+        <div [class.opacity-50]="loading" class="table-responsive">
+          <table responsive cAlign="top" cTable hover class="align-middle mb-0 border tabla-con-loader" role="table" aria-label="Tabla de roles">
             <thead cTableColor="light">
               <tr>
-                <th scope="col" class="text-start">Código</th>
-                <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
-                <th scope="col" class="text-start" style="min-width: 250px;">Descripción</th>
-                <th scope="col" class="text-center">Privilegios</th>
+                <th scope="col" style="min-width: 120px;">Código</th>
+                <th scope="col" style="min-width: 200px;">Nombre</th>
+                <th scope="col" style="min-width: 250px;">Descripción</th>
+                <th scope="col" class="text-center" style="min-width: 110px;">Privilegios</th>
                 <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
               </tr>
             </thead>
@@ -69,34 +79,63 @@
               @for (r of roles; track trackByRol($index, r)) {
                 <tr [class.table-row-disabled]="r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE">
                   <td>{{ r.codigo }}</td>
-                  <td>{{ r.nombre }}</td>
-                  <td>{{ r.descripcion }}</td>
                   <td>
+                    <span class="fw-semibold text-truncate d-inline-block" style="max-width: 260px;" [title]="r.nombre">{{ r.nombre }}</span>
+                  </td>
+                  <td>
+                    <span class="d-inline-block text-truncate" style="max-width: 320px;" [title]="r.descripcion">{{ r.descripcion }}</span>
+                  </td>
+                  <td class="text-center">
                     <c-badge color="info" shape="rounded-pill">{{ r.privilegios ? r.privilegios.length : 0 }}</c-badge>
                   </td>
                   <td class="text-center">
-                    <div class="btn-group">
-                      <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(r)"><svg cIcon name="cilPencil"></svg></button>
-                      <button cButton color="danger" size="sm" variant="outline" (click)="delete(r)" [disabled]="r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE"><svg cIcon name="cilTrash"></svg></button>
+                    <div class="btn-group" role="group" aria-label="Acciones de rol">
+                      <button cButton color="warning" size="sm" variant="ghost" (click)="openEdit(r)" [attr.aria-label]="'Editar rol ' + r.nombre">
+                        <svg cIcon name="cilPencil" size="sm"></svg>
+                      </button>
+                      <button cButton color="danger" size="sm" variant="ghost" (click)="delete(r)" [disabled]="r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE" [attr.aria-label]="'Eliminar rol ' + r.nombre">
+                        <svg cIcon name="cilTrash" size="sm"></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+
+              @if (roles.length === 0) {
+                <tr>
+                  <td colspan="5" class="text-center py-5">
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                      <h6 class="text-muted">No se han encontrado roles</h6>
+                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                     </div>
                   </td>
                 </tr>
               }
             </tbody>
           </table>
-        </div>
-        @if (roles.length === 0) {
-          <div class="text-muted">Sin roles</div>
-        }
-        <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
-          <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
-          <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-          <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+
+          @if (roles.length > 0) {
+            <app-op-pagination
+              [align]="'center'"
+              [totalPages]="getTotalPages()"
+              [currentPage]="pageNo"
+              (pageChange)="onPageChange($event)">
+            </app-op-pagination>
+          }
+
+          @if (roles.length > 0) {
+            <c-row class="mt-2">
+              <c-col class="d-flex justify-content-end align-items-center gap-2">
+                <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
+                <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
+                <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+              </c-col>
+            </c-row>
+          }
         </div>
       </div>
-    } @else {
-      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando roles'"></c-spinner><p class="mt-2 text-muted">Cargando roles...</p></div>
-    }
+    </div>
   </c-card-body>
 </c-card>
 

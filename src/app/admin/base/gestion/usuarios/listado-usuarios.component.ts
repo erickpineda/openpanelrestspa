@@ -145,6 +145,14 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     }
   }
 
+  onPageChange(page: number): void {
+    const totalPages = this.getTotalPages();
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    if (safePage === this.pageNo) return;
+    this.pageNo = safePage;
+    this.load();
+  }
+
   getTotalPages(): number {
     return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0;
   }

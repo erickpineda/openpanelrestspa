@@ -31,27 +31,16 @@ export const navItems: INavItemEnhanced[] = [
     attributes: { id: 'nav-entries' },
     children: [
       {
-        name: 'Nueva Entrada',
-        url: '/admin/control/entradas/crear',
-        icon: 'cil-plus',
-        priority: 100,
-        requiredRoles: [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
-        badge: {
-          color: 'success',
-          text: '+'
-        }
-      },
-      {
         name: 'Todas las Entradas',
         url: '/admin/control/entradas',
-        icon: 'cil-list',
+        iconComponent: { name: 'cil-list' },
         priority: 90,
         requiredRoles: [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO]
       },
       {
         name: 'Borradores',
         url: '/admin/control/entradas/entradas-temporales',
-        icon: 'cil-history',
+        iconComponent: { name: 'cil-history' },
         priority: 80,
         requiredRoles: [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
         dynamicBadge: {
@@ -67,21 +56,21 @@ export const navItems: INavItemEnhanced[] = [
       {
         name: 'Taxonomía',
         url: '/admin/control/taxonomia',
-        icon: 'cil-tags',
+        iconComponent: { name: 'cil-asterisk' },
         priority: 70,
         requiredRoles: [UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
         children: [
           {
             name: 'Categorías',
             url: '/admin/control/categorias',
-            icon: 'cil-spreadsheet',
+            iconComponent: { name: 'cil-spreadsheet' },
             priority: 100,
             requiredRoles: [UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO]
           },
           {
             name: 'Etiquetas',
             url: '/admin/control/etiquetas',
-            icon: 'cil-tags',
+            iconComponent: { name: 'cil-tags' },
             priority: 90,
             requiredRoles: [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO]
           }
@@ -109,14 +98,14 @@ export const navItems: INavItemEnhanced[] = [
       {
         name: 'Imágenes',
         url: '/admin/control/contenido/imagenes',
-        icon: 'cil-image-plus',
+        iconComponent: { name: 'cil-image-plus' },
         priority: 100,
         requiredRoles: [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO]
       },
       {
         name: 'Archivos',
         url: '/admin/control/contenido/archivos',
-        icon: 'cil-file',
+        iconComponent: { name: 'cil-file' },
         priority: 90,
         requiredRoles: [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO]
       }
@@ -177,14 +166,14 @@ export const navItems: INavItemEnhanced[] = [
       {
         name: 'Roles',
         url: '/admin/control/gestion/roles',
-        icon: 'cil-lock-locked',
+        iconComponent: { name: 'cil-lock-locked' },
         priority: 100,
         requiredRoles: [UserRole.PROPIETARIO]
       },
       {
         name: 'Privilegios',
         url: '/admin/control/gestion/privilegios',
-        icon: 'cil-check-circle',
+        iconComponent: { name: 'cil-check-circle' },
         priority: 90,
         requiredRoles: [UserRole.PROPIETARIO]
       }

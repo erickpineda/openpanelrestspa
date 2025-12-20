@@ -71,10 +71,10 @@ module.exports = function (config) {
     browsers: ['ChromeHeadlessNoSandbox'], 
     
     // Timeouts optimizados para CI. Detecta fallos más rápido (60s) en vez de 90s.
-    browserNoActivityTimeout: 100000, 
-    browserDisconnectTimeout: 20000,
-    browserDisconnectTolerance: 1, // Reintentar la conexión si falla
-    captureTimeout: 120000,
+    browserNoActivityTimeout: 300000, 
+    browserDisconnectTimeout: 60000,
+    browserDisconnectTolerance: 2, // Reintentar la conexión si falla
+    captureTimeout: 300000,
 
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
@@ -85,6 +85,8 @@ module.exports = function (config) {
           '--disable-dev-shm-usage', // CRÍTICO para problemas de memoria en CI
           '--no-proxy-server',
           '--disable-background-timer-throttling', // Evita que Chrome reduzca su prioridad en CI
+          '--disable-backgrounding-occluded-windows',
+          '--disable-renderer-backgrounding',
           '--js-flags="--max-old-space-size=4096"' // Aumenta el límite de RAM de JS (4GB)
         ]
       }

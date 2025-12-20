@@ -17,102 +17,142 @@
         <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
       </div>
     }
-    <!-- <div *ngIf="loading"><c-spinner></c-spinner></div> -->
-    @if (!loading) {
-      <div>
-        <c-row class="align-items-center mb-3 g-2">
-          <c-col xs="12" md="4">
-            <div class="text-muted small">Total {{ totalElements }}</div>
-          </c-col>
-          <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-            <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar usuario..." [disabled]="loading" style="max-width: 280px;" />
-            <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
-          </c-col>
-          <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-            <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-            </select>
-          </c-col>
-        </c-row>
-        @if (showAdvanced) {
-          <div class="mb-3">
-            <c-row class="g-3 align-items-end">
-              <c-col xs="12" md="4">
-                <label class="form-label mb-1">Usuario</label>
-                <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" />
-              </c-col>
-              <c-col xs="6" md="3">
-                <label class="form-label mb-1">Rol</label>
-                <select cSelect class="form-select-sm" [(ngModel)]="filtroRolCodigo">
-                  <option [ngValue]="null">Seleccione rol</option>
-                  @for (r of roles; track trackByRol($index, r)) {
-                    <option [value]="r.codigo">{{ r.nombre }}</option>
-                  }
-                </select>
-              </c-col>
-              <c-col xs="6" md="3">
-                <label class="form-label mb-1">Email confirmado</label>
-                <select cSelect class="form-select-sm" [value]="filtroEmailConfirmado === null ? '' : (filtroEmailConfirmado ? 'true' : 'false')"
-                  (change)="filtroEmailConfirmado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
-                  <option value="">Seleccione estado</option>
-                  <option value="true">Sí</option>
-                  <option value="false">No</option>
-                </select>
-              </c-col>
-              <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
-                <button cButton size="sm" color="primary" variant="outline" (click)="search()">
-                  <svg cIcon name="cilSearch"></svg> Buscar
-                </button>
-                <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
-                  <svg cIcon name="cilReload"></svg> Limpiar
-                </button>
-              </c-col>
-            </c-row>
+    <div>
+      <c-row class="align-items-center mb-3 g-2">
+        <c-col xs="12" md="4">
+          <div class="text-muted small">Total {{ totalElements }}</div>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
+          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar usuario..." [disabled]="loading" style="max-width: 280px;" />
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
+        </c-col>
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;" [disabled]="loading">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </select>
+        </c-col>
+      </c-row>
+      @if (showAdvanced) {
+        <div class="mb-3">
+          <c-row class="g-3 align-items-end">
+            <c-col xs="12" md="4">
+              <label class="form-label mb-1">Usuario</label>
+              <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" [disabled]="loading" />
+            </c-col>
+            <c-col xs="6" md="3">
+              <label class="form-label mb-1">Rol</label>
+              <select cSelect class="form-select-sm" [(ngModel)]="filtroRolCodigo" [disabled]="loading">
+                <option [ngValue]="null">Seleccione rol</option>
+                @for (r of roles; track trackByRol($index, r)) {
+                  <option [value]="r.codigo">{{ r.nombre }}</option>
+                }
+              </select>
+            </c-col>
+            <c-col xs="6" md="3">
+              <label class="form-label mb-1">Email confirmado</label>
+              <select cSelect class="form-select-sm" [value]="filtroEmailConfirmado === null ? '' : (filtroEmailConfirmado ? 'true' : 'false')"
+                (change)="filtroEmailConfirmado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')" [disabled]="loading">
+                <option value="">Seleccione estado</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+              </select>
+            </c-col>
+            <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
+              <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="loading">
+                <svg cIcon name="cilSearch"></svg> Buscar
+              </button>
+              <button cButton size="sm" color="secondary" variant="outline" (click)="reset()" [disabled]="loading">
+                <svg cIcon name="cilReload"></svg> Limpiar
+              </button>
+            </c-col>
+          </c-row>
+        </div>
+      }
+
+      <div class="tabla-con-loader-wrapper position-relative">
+        @if (loading) {
+          <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+            <div class="text-center">
+              <c-spinner [attr.aria-label]="'Cargando usuarios'"></c-spinner>
+              <p class="mt-2 text-muted">Cargando usuarios...</p>
+            </div>
           </div>
         }
-        <div class="table-responsive">
-          <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de usuarios">
+
+        <div [class.opacity-50]="loading" class="table-responsive">
+          <table responsive cAlign="top" cTable hover class="align-middle mb-0 border tabla-con-loader" role="table" aria-label="Tabla de usuarios">
             <thead cTableColor="light">
               <tr>
-                <th scope="col" class="text-start" style="min-width: 200px;">Usuario</th>
-                <th scope="col" class="text-start">Nombre</th>
-                <th scope="col" class="text-start" style="min-width: 250px;">Email</th>
-                <th scope="col" class="text-start">Rol</th>
+                <th scope="col" style="min-width: 200px;">Usuario</th>
+                <th scope="col" style="min-width: 160px;">Nombre</th>
+                <th scope="col" style="min-width: 250px;">Email</th>
+                <th scope="col" style="min-width: 120px;">Rol</th>
                 <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
               </tr>
             </thead>
             <tbody>
               @for (u of usuarios; track trackByUsuario($index, u)) {
                 <tr [class.table-row-disabled]="!u.habilitado">
-                  <td class="text-truncate" style="max-width: 200px;" [title]="u.username">{{ u.username }}</td>
-                  <td>{{ u.nombre }} {{ u.apellido }}</td>
-                  <td class="text-truncate text-start" style="max-width: 240px;" [title]="u.email">{{ u.email }}</td>
+                  <td>
+                    <span class="fw-semibold text-truncate d-inline-block" style="max-width: 220px;" [title]="u.username">{{ u.username }}</span>
+                  </td>
+                  <td>
+                    <span class="d-inline-block text-truncate" style="max-width: 220px;" [title]="(u.nombre + ' ' + u.apellido).trim()">{{ u.nombre }} {{ u.apellido }}</span>
+                  </td>
+                  <td>
+                    <span class="d-inline-block text-truncate" style="max-width: 260px;" [title]="u.email">{{ u.email }}</span>
+                  </td>
                   <td>{{ u.rolCodigo }}</td>
                   <td class="text-center">
-                    <div class="btn-group">
-                      <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(u)"><svg cIcon name="cilPencil"></svg></button>
-                      <button cButton color="danger" size="sm" variant="outline" (click)="delete(u)" [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE"><svg cIcon name="cilTrash"></svg></button>
+                    <div class="btn-group" role="group" aria-label="Acciones de usuario">
+                      <button cButton color="warning" size="sm" variant="ghost" (click)="openEdit(u)" [attr.aria-label]="'Editar usuario ' + u.username">
+                        <svg cIcon name="cilPencil" size="sm"></svg>
+                      </button>
+                      <button cButton color="danger" size="sm" variant="ghost" (click)="delete(u)" [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE" [attr.aria-label]="'Eliminar usuario ' + u.username">
+                        <svg cIcon name="cilTrash" size="sm"></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+
+              @if (usuarios.length === 0) {
+                <tr>
+                  <td colspan="5" class="text-center py-5">
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                      <h6 class="text-muted">No se han encontrado usuarios</h6>
+                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                     </div>
                   </td>
                 </tr>
               }
             </tbody>
           </table>
-        </div>
-        @if (usuarios.length === 0) {
-          <div class="text-muted">Sin usuarios</div>
-        }
-        <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
-          <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
-          <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-          <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+
+          @if (usuarios.length > 0) {
+            <app-op-pagination
+              [align]="'center'"
+              [totalPages]="getTotalPages()"
+              [currentPage]="pageNo"
+              (pageChange)="onPageChange($event)">
+            </app-op-pagination>
+          }
+
+          @if (usuarios.length > 0) {
+            <c-row class="mt-2">
+              <c-col class="d-flex justify-content-end align-items-center gap-2">
+                <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
+                <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
+                <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+              </c-col>
+            </c-row>
+          }
         </div>
       </div>
-    } @else {
-      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando usuarios'"></c-spinner><p class="mt-2 text-muted">Cargando usuarios...</p></div>
-    }
+    </div>
   </c-card-body>
 </c-card>
 

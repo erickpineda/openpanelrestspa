@@ -17,11 +17,11 @@
         <div class="text-muted small">Total {{ totalElements }}</div>
       </c-col>
       <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-        <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar comentario..." style="max-width: 280px;" />
-        <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
+        <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar comentario..." style="max-width: 280px;" [disabled]="cargando" />
+        <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="cargando">Avanzado</button>
       </c-col>
       <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-        <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
+        <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;" [disabled]="cargando">
           <option value="5">5</option>
           <option value="10">10</option>
           <option value="20">20</option>
@@ -34,12 +34,12 @@
         <c-row class="g-3 align-items-end">
           <c-col xs="12" md="4">
             <label class="form-label mb-1">Usuario</label>
-            <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" />
+            <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" [disabled]="cargando" />
           </c-col>
           <c-col xs="6" md="4">
             <label class="form-label mb-1">Aprobado</label>
             <select cSelect class="form-select-sm" [value]="filtroAprobado === null ? '' : (filtroAprobado ? 'true' : 'false')"
-              (change)="filtroAprobado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
+              (change)="filtroAprobado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')" [disabled]="cargando">
               <option value="">Seleccione estado</option>
               <option value="true">Sí</option>
               <option value="false">No</option>
@@ -48,17 +48,17 @@
           <c-col xs="6" md="4">
             <label class="form-label mb-1">Cuarentena</label>
             <select cSelect class="form-select-sm" [value]="filtroCuarentena === null ? '' : (filtroCuarentena ? 'true' : 'false')"
-              (change)="filtroCuarentena = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
+              (change)="filtroCuarentena = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')" [disabled]="cargando">
               <option value="">Seleccione estado</option>
               <option value="true">Sí</option>
               <option value="false">No</option>
             </select>
           </c-col>
           <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
-            <button cButton size="sm" color="primary" variant="outline" (click)="search()">
+            <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="cargando">
               <svg cIcon name="cilSearch"></svg> Buscar
             </button>
-            <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
+            <button cButton size="sm" color="secondary" variant="outline" (click)="reset()" [disabled]="cargando">
               <svg cIcon name="cilReload"></svg> Limpiar
             </button>
           </c-col>
@@ -66,9 +66,18 @@
       </div>
     }
 
-    @if (!cargando) {
-      <div class="table-responsive">
-        <table cTable hover class="align-middle mb-0 border text-nowrap" role="table" aria-label="Tabla de comentarios">
+    <div class="tabla-con-loader-wrapper position-relative">
+      @if (cargando) {
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+          <div class="text-center">
+            <c-spinner [attr.aria-label]="'Cargando comentarios'"></c-spinner>
+            <p class="mt-2 text-muted">Cargando comentarios...</p>
+          </div>
+        </div>
+      }
+
+      <div [class.opacity-50]="cargando" class="table-responsive">
+        <table responsive cAlign="top" cTable hover class="align-middle mb-0 border tabla-con-loader text-nowrap" role="table" aria-label="Tabla de comentarios">
           <thead cTableColor="light">
             <tr>
               <th scope="col" style="min-width: 250px;">Contenido</th>
@@ -119,7 +128,7 @@
                 </td>
               </tr>
             }
-            @if (listaComentarios.length === 0) {
+            @if (pagedComentarios.length === 0) {
               <tr>
                 <td colspan="6" class="text-center py-5">
                   <div class="d-flex flex-column align-items-center justify-content-center">
@@ -132,14 +141,26 @@
             }
           </tbody>
         </table>
+
+        @if (pagedComentarios.length > 0) {
+          <app-op-pagination
+            [align]="'center'"
+            [totalPages]="getTotalPages()"
+            [currentPage]="pageNo"
+            (pageChange)="onPageChange($event)">
+          </app-op-pagination>
+        }
+
+        @if (pagedComentarios.length > 0) {
+          <c-row class="mt-2">
+            <c-col class="d-flex justify-content-end align-items-center gap-2">
+              <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
+              <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
+              <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+            </c-col>
+          </c-row>
+        }
       </div>
-    } @else {
-      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando comentarios'"></c-spinner><p class="mt-2 text-muted">Cargando comentarios...</p></div>
-    }
-    <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
-      <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
-      <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-      <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
     </div>
 
   </c-card-body>

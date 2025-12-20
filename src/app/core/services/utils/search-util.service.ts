@@ -31,7 +31,7 @@ export class SearchUtilService {
       value: c.value != null ? String(c.value) : '',
       operation: c.operation,
       clazzName: entityName || undefined,
-      dataOption: dataOption
+      //dataOption: dataOption
     }));
     return { dataOption, searchCriteriaList: list };
   }

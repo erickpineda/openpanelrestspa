@@ -80,7 +80,6 @@ export class RolesListComponent implements OnInit, OnDestroy {
         return item;
       });
       this.loadPrivilegiosForRoles(this.roles);
-      console.log(this.roles)
       this.totalElements = Number(data?.totalElements || list.length || 0);
       this.numberOfElements = list.length;
     };
@@ -213,6 +212,15 @@ export class RolesListComponent implements OnInit, OnDestroy {
     const maxPage = this.totalElements ? Math.ceil(this.totalElements / this.pageSize) - 1 : this.pageNo + 1;
     if (this.pageNo < maxPage) { this.pageNo++; this.load(); } 
   }
+
+  onPageChange(page: number): void {
+    const totalPages = this.getTotalPages();
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    if (safePage === this.pageNo) return;
+    this.pageNo = safePage;
+    this.load();
+  }
+
   getTotalPages(): number { return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0; }
 
   // CRUD

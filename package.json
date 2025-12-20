@@ -15,8 +15,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:firefox": "ng test --watch=false --browsers=Firefox",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
-    "test:coverage": "ng test --watch=false --code-coverage --browsers=ChromeHeadless",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox",
+    "test:coverage": "ng test --watch=false --code-coverage --browsers=ChromeHeadlessNoSandbox",
     "e2e": "playwright test"
   },
   "private": true,
