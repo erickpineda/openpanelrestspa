@@ -1,16 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { NotificationService, NotificationOptions } from '../../../core/services/ui/notification.service';
+import {
+  NotificationService,
+  NotificationOptions,
+} from '../../../core/services/ui/notification.service';
 
 @Component({
-    selector: 'app-global-notifications',
-    template: `
+  selector: 'app-global-notifications',
+  template: `
     <c-toaster placement="top-end" position="fixed">
       @for (notification of notifications; track notification) {
         <c-toast
           [autohide]="true"
           [delay]="notification.duration || 5000"
           [color]="getToastColor(notification.type)"
-          (visibleChange)="removeNotification(notification)">
+          (visibleChange)="removeNotification(notification)"
+        >
           <c-toast-header>
             <strong class="me-auto">{{ notification.title }}</strong>
           </c-toast-header>
@@ -20,8 +24,8 @@ import { NotificationService, NotificationOptions } from '../../../core/services
         </c-toast>
       }
     </c-toaster>
-    `,
-    standalone: false
+  `,
+  standalone: false,
 })
 export class GlobalNotificationsComponent implements OnInit {
   notifications: NotificationOptions[] = [];
@@ -29,7 +33,7 @@ export class GlobalNotificationsComponent implements OnInit {
   constructor(private notificationService: NotificationService) {}
 
   ngOnInit(): void {
-    this.notificationService.notification$.subscribe(notification => {
+    this.notificationService.notification$.subscribe((notification) => {
       this.notifications.push(notification);
     });
   }
@@ -39,12 +43,12 @@ export class GlobalNotificationsComponent implements OnInit {
       success: 'success',
       error: 'danger',
       warning: 'warning',
-      info: 'info'
+      info: 'info',
     };
     return colors[type] || 'info';
   }
 
   removeNotification(notification: NotificationOptions): void {
-    this.notifications = this.notifications.filter(n => n !== notification);
+    this.notifications = this.notifications.filter((n) => n !== notification);
   }
 }

@@ -11,11 +11,11 @@ const routes: Routes = [
   { path: '', component: ListadoEntradasComponent },
   { path: 'crear', component: CrearEntradaComponent },
   { path: 'editar/:idEntrada', component: EditarEntradaComponent },
-  { path: 'entradas-temporales', component: TemporaryEntriesManagerComponent }
+  { path: 'entradas-temporales', component: TemporaryEntriesManagerComponent },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class EntradasRoutingModule {}

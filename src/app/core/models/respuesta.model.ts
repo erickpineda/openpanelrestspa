@@ -1,11 +1,9 @@
 export class RespuestaResp {
-  respuesta: string = "";
+  respuesta: string = '';
 
-  constructor() {
-
-  }
+  constructor() {}
 }
 
 export interface RespuestaModelResp {
-  respuesta: string ;
+  respuesta: string;
 }

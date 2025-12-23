@@ -6,11 +6,11 @@ import { ArchivosComponent } from './archivos/archivos.component';
 const routes: Routes = [
   { path: 'imagenes', component: ImagenesComponent },
   { path: 'archivos', component: ArchivosComponent },
-  { path: '', redirectTo: 'imagenes', pathMatch: 'full' }
+  { path: '', redirectTo: 'imagenes', pathMatch: 'full' },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class ContenidoRoutingModule { }
+export class ContenidoRoutingModule {}

@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-    selector: 'app-confirmation-modal',
-    templateUrl: './confirmation-modal.component.html',
-    standalone: false
+  selector: 'app-confirmation-modal',
+  templateUrl: './confirmation-modal.component.html',
+  standalone: false,
 })
 export class ConfirmationModalComponent {
   @Input() visible = false;
@@ -12,7 +12,7 @@ export class ConfirmationModalComponent {
   @Input() confirmText = 'Confirmar';
   @Input() cancelText = 'Cancelar';
   @Input() type: 'info' | 'warning' | 'danger' = 'info';
-  
+
   @Output() confirm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
@@ -35,7 +35,7 @@ export class ConfirmationModalComponent {
     const colors = {
       info: 'primary',
       warning: 'warning',
-      danger: 'danger'
+      danger: 'danger',
     };
     return colors[this.type];
   }

@@ -1,5 +1,5 @@
 // Import optimized navigation styles
-@import '../../../../assets/css/navigation-optimized';
+@use '../../../../assets/css/navigation-optimized';
 
 // Variables mejoradas
 $mobile-breakpoint: 768px;
@@ -58,7 +58,7 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 .responsive-navigation-container {
   position: relative;
   height: 100%;
-  
+
   &.mobile-layout {
     .navigation-menu {
       position: fixed;
@@ -146,7 +146,7 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
   &.mobile {
     @include touch-target;
-    
+
     .toggle-text {
       display: none;
     }
@@ -191,7 +191,8 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     font-size: 20px;
   }
 
-  &:hover, &:focus-visible {
+  &:hover,
+  &:focus-visible {
     outline: none;
     border-color: rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.12);
@@ -361,12 +362,30 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     min-width: 18px;
     text-align: center;
 
-    &.badge-primary { background: var(--cui-primary, #007bff); color: white; }
-    &.badge-secondary { background: var(--cui-secondary, #6c757d); color: white; }
-    &.badge-success { background: var(--cui-success, #28a745); color: white; }
-    &.badge-warning { background: var(--cui-warning, #ffc107); color: #212529; }
-    &.badge-danger { background: var(--cui-danger, #dc3545); color: white; }
-    &.badge-info { background: var(--cui-info, #17a2b8); color: white; }
+    &.badge-primary {
+      background: var(--cui-primary, #007bff);
+      color: white;
+    }
+    &.badge-secondary {
+      background: var(--cui-secondary, #6c757d);
+      color: white;
+    }
+    &.badge-success {
+      background: var(--cui-success, #28a745);
+      color: white;
+    }
+    &.badge-warning {
+      background: var(--cui-warning, #ffc107);
+      color: #212529;
+    }
+    &.badge-danger {
+      background: var(--cui-danger, #dc3545);
+      color: white;
+    }
+    &.badge-info {
+      background: var(--cui-info, #17a2b8);
+      color: white;
+    }
   }
 
   .dynamic-badge {
@@ -437,12 +456,30 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
         border-radius: 8px;
         line-height: 1.2;
 
-        &.badge-primary { background: var(--cui-primary, #007bff); color: white; }
-        &.badge-secondary { background: var(--cui-secondary, #6c757d); color: white; }
-        &.badge-success { background: var(--cui-success, #28a745); color: white; }
-        &.badge-warning { background: var(--cui-warning, #ffc107); color: #212529; }
-        &.badge-danger { background: var(--cui-danger, #dc3545); color: white; }
-        &.badge-info { background: var(--cui-info, #17a2b8); color: white; }
+        &.badge-primary {
+          background: var(--cui-primary, #007bff);
+          color: white;
+        }
+        &.badge-secondary {
+          background: var(--cui-secondary, #6c757d);
+          color: white;
+        }
+        &.badge-success {
+          background: var(--cui-success, #28a745);
+          color: white;
+        }
+        &.badge-warning {
+          background: var(--cui-warning, #ffc107);
+          color: #212529;
+        }
+        &.badge-danger {
+          background: var(--cui-danger, #dc3545);
+          color: white;
+        }
+        &.badge-info {
+          background: var(--cui-info, #17a2b8);
+          color: white;
+        }
       }
     }
   }
@@ -503,7 +540,7 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 // Responsive Breakpoints
-@media (max-width: $mobile-breakpoint - 1px) {
+@media (max-width: ($mobile-breakpoint - 1px)) {
   .responsive-navigation-container {
     &:not(.mobile-layout) {
       .navigation-menu {
@@ -523,7 +560,7 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 
-@media (min-width: $mobile-breakpoint) and (max-width: $tablet-breakpoint - 1px) {
+@media (min-width: $mobile-breakpoint) and (max-width: ($tablet-breakpoint - 1px)) {
   .responsive-navigation-container {
     &.tablet-layout {
       .nav-link,
@@ -561,7 +598,10 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
       color: var(--cui-sidebar-nav-link-color-dark, #e2e8f0);
 
       &:hover {
-        background: var(--cui-sidebar-nav-link-hover-bg-dark, rgba(255, 255, 255, 0.1));
+        background: var(
+          --cui-sidebar-nav-link-hover-bg-dark,
+          rgba(255, 255, 255, 0.1)
+        );
         color: var(--cui-sidebar-nav-link-hover-color-dark, #f7fafc);
       }
     }
@@ -574,7 +614,10 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
       color: var(--cui-sidebar-nav-link-color-dark, #e2e8f0);
 
       &:hover {
-        background: var(--cui-sidebar-nav-link-hover-bg-dark, rgba(255, 255, 255, 0.1));
+        background: var(
+          --cui-sidebar-nav-link-hover-bg-dark,
+          rgba(255, 255, 255, 0.1)
+        );
         color: var(--cui-sidebar-nav-link-hover-color-dark, #f7fafc);
       }
     }

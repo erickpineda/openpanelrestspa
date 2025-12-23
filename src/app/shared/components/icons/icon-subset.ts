@@ -34,7 +34,6 @@ import {
   cilCalendar,
   cilCamera,
   cilChart,
-
   cilChartPie,
   cilCheck,
   cilCheckCircle,
@@ -46,7 +45,6 @@ import {
   cilClone,
   cilCode,
   cilCommentSquare,
-  
   cilCursor,
   cilDataTransferDown,
   cilDataTransferUp,
@@ -113,7 +111,6 @@ import {
   cilWarning,
   cilX,
   cilContact,
-
   cilHistory,
   cilShieldAlt,
   cilPaintBucket,
@@ -168,7 +165,7 @@ export const iconSubset = {
   cilCode,
   cilCommentSquare,
   cilContact,
-  
+
   cilCursor,
   cilDataTransferDown,
   cilDataTransferUp,
@@ -240,7 +237,7 @@ export const iconSubset = {
 
   cilPaintBucket,
   cilEqualizer,
-  cilStorage
+  cilStorage,
 };
 
 export enum IconSubset {
@@ -281,7 +278,7 @@ export enum IconSubset {
   cilChart = 'cilChart',
   cilChartPie = 'cilChartPie',
   cilDevices = 'cilDevices',
-  cilCheck='cilCheck',
+  cilCheck = 'cilCheck',
   cilCheckCircle = 'cilCheckCircle',
   cilXCircle = 'cilXCircle',
   cilChevronLeft = 'cilChevronLeft',
@@ -292,7 +289,7 @@ export enum IconSubset {
   cilCode = 'cilCode',
   cilCommentSquare = 'cilCommentSquare',
   cilContact = 'cilContact',
-  
+
   cilCursor = 'cilCursor',
   cilDataTransferDown = 'cilDataTransferDown',
   cilDataTransferUp = 'cilDataTransferUp',
@@ -361,5 +358,5 @@ export enum IconSubset {
   cilEqualizer = 'cilEqualizer',
   cilImage = 'cilImage',
   cilImagePlus = 'cilImagePlus',
-  cilStorage = 'cilStorage'
+  cilStorage = 'cilStorage',
 }

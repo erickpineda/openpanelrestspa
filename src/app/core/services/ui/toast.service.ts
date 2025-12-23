@@ -4,12 +4,12 @@ import { ToastMessage } from '../../models/toast.model';
 
 type TimerRecord = {
   timeoutId?: any;
-  startAt?: number;      // timestamp cuando arrancó el timer
-  remaining?: number;    // ms restantes para autohide
+  startAt?: number; // timestamp cuando arrancó el timer
+  remaining?: number; // ms restantes para autohide
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ToastService implements OnDestroy {
   private _toasts$ = new BehaviorSubject<ToastMessage[]>([]);
@@ -77,7 +77,7 @@ export class ToastService implements OnDestroy {
       const delay = t.delay ?? this.defaultDelay;
       const record: TimerRecord = {
         startAt: this.now(),
-        remaining: delay
+        remaining: delay,
       };
       record.timeoutId = setTimeout(() => this.removeById(t.id), delay);
       this.timers.set(t.id, record);
@@ -94,13 +94,18 @@ export class ToastService implements OnDestroy {
       autohide: toast.autohide ?? true,
       delay: toast.delay ?? this.defaultDelay,
       createdAt: this.now(),
-      html: toast.html ?? false
+      html: toast.html ?? false,
     };
 
     if (this.preventExactDuplicates) {
       const exists = this._toasts$
         .getValue()
-        .find(t => (t.body === full.body) && (t.title === full.title) && (t.color === full.color));
+        .find(
+          (t) =>
+            t.body === full.body &&
+            t.title === full.title &&
+            t.color === full.color,
+        );
       if (exists) {
         if (exists.autohide) {
           // refrescar timer
@@ -132,7 +137,7 @@ export class ToastService implements OnDestroy {
 
   removeById(id: string) {
     const current = this._toasts$.getValue();
-    const next = current.filter(t => t.id !== id);
+    const next = current.filter((t) => t.id !== id);
     this.clearTimerRecord(id);
     this.setToasts(next);
   }
@@ -142,7 +147,7 @@ export class ToastService implements OnDestroy {
     this.clearTimerRecord(id);
     const record: TimerRecord = {
       startAt: this.now(),
-      remaining: delay
+      remaining: delay,
     };
     record.timeoutId = setTimeout(() => this.removeById(id), delay);
     this.timers.set(id, record);
@@ -162,7 +167,10 @@ export class ToastService implements OnDestroy {
 
     // calcular tiempo transcurrido
     const elapsed = this.now() - (rec.startAt ?? this.now());
-    const remaining = Math.max(0, (rec.remaining ?? this.defaultDelay) - elapsed);
+    const remaining = Math.max(
+      0,
+      (rec.remaining ?? this.defaultDelay) - elapsed,
+    );
 
     // limpiar timeout y actualizar registro
     clearTimeout(rec.timeoutId);
@@ -191,9 +199,11 @@ export class ToastService implements OnDestroy {
   // --------- FIN PAUSA / REANUDAR ---------
 
   removeOldest(count = 1) {
-    const current = this._toasts$.getValue().sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+    const current = this._toasts$
+      .getValue()
+      .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
     const toRemove = current.slice(0, count);
-    toRemove.forEach(t => this.removeById(t.id));
+    toRemove.forEach((t) => this.removeById(t.id));
   }
 
   clear() {

@@ -1,14 +1,25 @@
-import { Injectable, ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
+import {
+  Injectable,
+  ElementRef,
+  Renderer2,
+  RendererFactory2,
+} from '@angular/core';
 import { Observable, Subject, timer } from 'rxjs';
 
 /**
  * Tipos de animaciones disponibles
  */
-export type NavigationAnimationType = 
-  | 'slide-in-left' | 'slide-out-left'
-  | 'fade-in-up' | 'fade-in-down'
-  | 'scale-in' | 'scale-out'
-  | 'bounce-in' | 'pulse' | 'shake' | 'glow'
+export type NavigationAnimationType =
+  | 'slide-in-left'
+  | 'slide-out-left'
+  | 'fade-in-up'
+  | 'fade-in-down'
+  | 'scale-in'
+  | 'scale-out'
+  | 'bounce-in'
+  | 'pulse'
+  | 'shake'
+  | 'glow'
   | 'shimmer';
 
 /**
@@ -18,7 +29,13 @@ export interface AnimationConfig {
   type: NavigationAnimationType;
   duration?: number;
   delay?: number;
-  easing?: 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'bounce' | 'elastic';
+  easing?:
+    | 'ease'
+    | 'ease-in'
+    | 'ease-out'
+    | 'ease-in-out'
+    | 'bounce'
+    | 'elastic';
   infinite?: boolean;
 }
 
@@ -35,10 +52,9 @@ export interface AnimationEvent {
  * Servicio para gestionar animaciones de navegación de forma programática
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NavigationAnimationService {
-  
   private renderer: Renderer2;
   private animationEvents = new Subject<AnimationEvent>();
   private activeAnimations = new Map<HTMLElement, string>();
@@ -70,18 +86,21 @@ export class NavigationAnimationService {
       // Aplicar clases
       this.renderer.addClass(element, 'nav-animate');
       this.renderer.addClass(element, config.type);
-      
+
       if (timingClass) {
         this.renderer.addClass(element, timingClass);
       }
-      
+
       if (easingClass) {
         this.renderer.addClass(element, easingClass);
       }
 
       // Configurar variables CSS personalizadas
       if (config.duration) {
-        element.style.setProperty('--nav-transition-duration', `${config.duration}ms`);
+        element.style.setProperty(
+          '--nav-transition-duration',
+          `${config.duration}ms`,
+        );
       }
 
       // Registrar animación activa
@@ -91,7 +110,7 @@ export class NavigationAnimationService {
       this.animationEvents.next({
         element,
         type: config.type,
-        phase: 'start'
+        phase: 'start',
       });
 
       // Manejar delay si existe
@@ -104,12 +123,12 @@ export class NavigationAnimationService {
           if (!config.infinite) {
             this.clearAnimation(element);
           }
-          
+
           // Emitir evento de fin
           this.animationEvents.next({
             element,
             type: config.type,
-            phase: 'end'
+            phase: 'end',
           });
 
           element.removeEventListener('animationend', animationEndHandler);
@@ -131,7 +150,9 @@ export class NavigationAnimationService {
   /**
    * Anima múltiples elementos en secuencia
    */
-  animateSequence(animations: { element: HTMLElement; config: AnimationConfig }[]): Promise<void> {
+  animateSequence(
+    animations: { element: HTMLElement; config: AnimationConfig }[],
+  ): Promise<void> {
     return animations.reduce((promise, { element, config }) => {
       return promise.then(() => this.animate(element, config));
     }, Promise.resolve());
@@ -140,8 +161,12 @@ export class NavigationAnimationService {
   /**
    * Anima múltiples elementos en paralelo
    */
-  animateParallel(animations: { element: HTMLElement; config: AnimationConfig }[]): Promise<void[]> {
-    const promises = animations.map(({ element, config }) => this.animate(element, config));
+  animateParallel(
+    animations: { element: HTMLElement; config: AnimationConfig }[],
+  ): Promise<void[]> {
+    const promises = animations.map(({ element, config }) =>
+      this.animate(element, config),
+    );
     return Promise.all(promises);
   }
 
@@ -149,16 +174,16 @@ export class NavigationAnimationService {
    * Anima elementos con stagger (escalonado)
    */
   animateStagger(
-    elements: HTMLElement[], 
-    config: AnimationConfig, 
-    staggerDelay: number = 100
+    elements: HTMLElement[],
+    config: AnimationConfig,
+    staggerDelay: number = 100,
   ): Promise<void[]> {
     const animations = elements.map((element, index) => ({
       element,
       config: {
         ...config,
-        delay: (config.delay || 0) + (index * staggerDelay)
-      }
+        delay: (config.delay || 0) + index * staggerDelay,
+      },
     }));
 
     return this.animateParallel(animations);
@@ -170,14 +195,31 @@ export class NavigationAnimationService {
   clearAnimation(element: HTMLElement): void {
     // Remover clases de animación
     const animationClasses = [
-      'nav-animate', 'slide-in-left', 'slide-out-left',
-      'fade-in-up', 'fade-in-down', 'scale-in', 'scale-out',
-      'bounce-in', 'pulse', 'shake', 'glow', 'shimmer',
-      'nav-timing', 'fast', 'slow', 'instant',
-      'nav-easing', 'ease-in', 'ease-out', 'ease-in-out', 'bounce', 'elastic'
+      'nav-animate',
+      'slide-in-left',
+      'slide-out-left',
+      'fade-in-up',
+      'fade-in-down',
+      'scale-in',
+      'scale-out',
+      'bounce-in',
+      'pulse',
+      'shake',
+      'glow',
+      'shimmer',
+      'nav-timing',
+      'fast',
+      'slow',
+      'instant',
+      'nav-easing',
+      'ease-in',
+      'ease-out',
+      'ease-in-out',
+      'bounce',
+      'elastic',
     ];
 
-    animationClasses.forEach(className => {
+    animationClasses.forEach((className) => {
       this.renderer.removeClass(element, className);
     });
 
@@ -214,7 +256,9 @@ export class NavigationAnimationService {
    * Obtiene el tipo de animación activa de un elemento
    */
   getActiveAnimationType(element: HTMLElement): NavigationAnimationType | null {
-    return this.activeAnimations.get(element) as NavigationAnimationType || null;
+    return (
+      (this.activeAnimations.get(element) as NavigationAnimationType) || null
+    );
   }
 
   /**
@@ -236,7 +280,7 @@ export class NavigationAnimationService {
       type: 'fade-in-up',
       duration: 400,
       delay,
-      easing: 'ease-out'
+      easing: 'ease-out',
     });
   }
 
@@ -247,7 +291,7 @@ export class NavigationAnimationService {
     return this.animate(element, {
       type: 'fade-in-down',
       duration: 300,
-      easing: 'ease-in'
+      easing: 'ease-in',
     });
   }
 
@@ -258,7 +302,7 @@ export class NavigationAnimationService {
     return this.animate(element, {
       type: 'bounce-in',
       duration: 600,
-      easing: 'bounce'
+      easing: 'bounce',
     });
   }
 
@@ -269,7 +313,7 @@ export class NavigationAnimationService {
     return this.animate(element, {
       type: 'pulse',
       duration: 1000,
-      infinite: true
+      infinite: true,
     });
   }
 
@@ -280,7 +324,7 @@ export class NavigationAnimationService {
     return this.animate(element, {
       type: 'slide-in-left',
       duration: 300,
-      easing: 'ease-out'
+      easing: 'ease-out',
     });
   }
 
@@ -291,7 +335,7 @@ export class NavigationAnimationService {
     return this.animate(element, {
       type: 'slide-out-left',
       duration: 300,
-      easing: 'ease-in'
+      easing: 'ease-in',
     });
   }
 
@@ -302,7 +346,7 @@ export class NavigationAnimationService {
     return this.animate(element, {
       type: 'shimmer',
       duration: 1500,
-      infinite: true
+      infinite: true,
     });
   }
 
@@ -312,7 +356,7 @@ export class NavigationAnimationService {
   animateError(element: HTMLElement): Promise<void> {
     return this.animate(element, {
       type: 'shake',
-      duration: 500
+      duration: 500,
     });
   }
 
@@ -322,7 +366,7 @@ export class NavigationAnimationService {
   animateSuccess(element: HTMLElement): Promise<void> {
     return this.animate(element, {
       type: 'glow',
-      duration: 1000
+      duration: 1000,
     });
   }
 
@@ -333,11 +377,11 @@ export class NavigationAnimationService {
    */
   private getTimingClass(duration?: number): string | null {
     if (!duration) return null;
-    
+
     if (duration <= 150) return 'fast';
     if (duration >= 600) return 'slow';
     if (duration === 0) return 'instant';
-    
+
     return null;
   }
 
@@ -346,13 +390,13 @@ export class NavigationAnimationService {
    */
   private getEasingClass(easing?: string): string | null {
     if (!easing || easing === 'ease') return null;
-    
+
     const easingMap: { [key: string]: string } = {
       'ease-in': 'ease-in',
       'ease-out': 'ease-out',
       'ease-in-out': 'ease-in-out',
-      'bounce': 'bounce',
-      'elastic': 'elastic'
+      bounce: 'bounce',
+      elastic: 'elastic',
     };
 
     return easingMap[easing] || null;

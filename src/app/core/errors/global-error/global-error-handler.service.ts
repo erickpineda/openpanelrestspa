@@ -34,7 +34,7 @@ export interface BackendErrorResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GlobalErrorHandlerService implements ErrorHandler {
   private errorCount = 0;
@@ -43,7 +43,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
   constructor(
     private injector: Injector,
     private ngZone: NgZone,
-    private log: LoggerService
+    private log: LoggerService,
   ) {
     // ✅ Capturar errores de promesas no manejadas
     this.setupUnhandledPromiseRejectionHandler();
@@ -52,14 +52,14 @@ export class GlobalErrorHandlerService implements ErrorHandler {
   handleError(error: any): void {
     this.ngZone.run(() => {
       this.errorCount++;
-      
+
       if (this.errorCount > this.maxErrors) {
         this.log.error('🛑 Demasiados errores, evitando notificaciones');
         return;
       }
 
       this.log.info('🔥 [GLOBAL HANDLER] Error recibido:', error);
-      
+
       const appError = this.normalizeError(error);
       this.processError(appError);
     });
@@ -68,7 +68,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
   private normalizeError(error: any): AppError {
     const isBackendError = this.isBackendErrorResponse(error);
     const isHttpError = error instanceof HttpErrorResponse;
-    
+
     this.log.info('🔍 [NORMALIZE] isBackendError:', isBackendError);
     this.log.info('🔍 [NORMALIZE] isHttpError:', isHttpError);
     this.log.info('🔍 [NORMALIZE] error structure:', error);
@@ -82,7 +82,9 @@ export class GlobalErrorHandlerService implements ErrorHandler {
       severity: this.determineSeverity(error),
       category: isBackendError ? 'validation' : this.categorizeError(error),
       originalError: error,
-      validationErrors: isBackendError ? this.extractValidationErrors(error) : undefined
+      validationErrors: isBackendError
+        ? this.extractValidationErrors(error)
+        : undefined,
     };
   }
 
@@ -91,9 +93,12 @@ export class GlobalErrorHandlerService implements ErrorHandler {
     if (typeof window !== 'undefined' && window.addEventListener) {
       window.addEventListener('unhandledrejection', (event) => {
         event.preventDefault();
-        
-        this.log.info('🔍 [PROMISE] Unhandled rejection capturado:', event.reason);
-        
+
+        this.log.info(
+          '🔍 [PROMISE] Unhandled rejection capturado:',
+          event.reason,
+        );
+
         // Convertir el rechazo de promesa a un error manejable
         const promiseError = this.normalizePromiseRejection(event.reason);
         this.handleError(promiseError);
@@ -114,12 +119,14 @@ export class GlobalErrorHandlerService implements ErrorHandler {
         error: rejection,
         status: rejection.status || 0,
         statusText: rejection.statusText || 'Promise Rejection',
-        url: rejection.url
+        url: rejection.url,
       });
     }
 
     // Para otros tipos de rechazos
-    return new Error(`Unhandled Promise rejection: ${rejection?.message || rejection}`);
+    return new Error(
+      `Unhandled Promise rejection: ${rejection?.message || rejection}`,
+    );
   }
 
   private processError(error: AppError): void {
@@ -147,7 +154,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
 
   private showUserNotification(error: AppError): void {
     const toastService = this.injector.get(ToastService);
-    
+
     if (error.severity === 'low' && !this.isDevelopment()) {
       return;
     }
@@ -173,24 +180,35 @@ export class GlobalErrorHandlerService implements ErrorHandler {
     }
   }
 
-  private showValidationErrors(error: AppError, toastService: ToastService): void {
+  private showValidationErrors(
+    error: AppError,
+    toastService: ToastService,
+  ): void {
     if (error.validationErrors && error.validationErrors.length > 0) {
       if (error.validationErrors.length === 1) {
         // Un solo error - mostrar directamente
-        const cleanMessage = this.cleanValidationMessage(error.validationErrors[0]);
+        const cleanMessage = this.cleanValidationMessage(
+          error.validationErrors[0],
+        );
         toastService.showError(cleanMessage, 'Error de Validación');
       } else {
         // Múltiples errores
-        const mainError = this.cleanValidationMessage(error.validationErrors[0]);
+        const mainError = this.cleanValidationMessage(
+          error.validationErrors[0],
+        );
         const additionalCount = error.validationErrors.length - 1;
-        const message = additionalCount > 0 
-          ? `${mainError} (+${additionalCount} error${additionalCount > 1 ? 'es' : ''} más)`
-          : mainError;
-        
+        const message =
+          additionalCount > 0
+            ? `${mainError} (+${additionalCount} error${additionalCount > 1 ? 'es' : ''} más)`
+            : mainError;
+
         toastService.showError(message, 'Errores de Validación');
-        
+
         if (this.isDevelopment()) {
-          this.log.warn('📋 Todos los errores de validación:', error.validationErrors);
+          this.log.warn(
+            '📋 Todos los errores de validación:',
+            error.validationErrors,
+          );
         }
       }
     }
@@ -203,33 +221,36 @@ export class GlobalErrorHandlerService implements ErrorHandler {
 
   private handleCriticalError(error: AppError): void {
     const router = this.injector.get(Router);
-    
+
     if (!router.url.includes('/error')) {
       router.navigate(['/error', 'critical'], {
-        state: { error: this.sanitizeErrorForRouting(error) }
+        state: { error: this.sanitizeErrorForRouting(error) },
       });
     }
   }
 
   private getUserFriendlyMessage(error: any): string {
     this.log.info('🔍 [USER MESSAGE] Tipo de error:', typeof error);
-    this.log.info('🔍 [USER MESSAGE] error instanceof HttpErrorResponse:', error instanceof HttpErrorResponse);
-    
+    this.log.info(
+      '🔍 [USER MESSAGE] error instanceof HttpErrorResponse:',
+      error instanceof HttpErrorResponse,
+    );
+
     if (error instanceof HttpErrorResponse) {
       return this.getHttpErrorMessage(error);
     }
-    
+
     if (error?.message?.includes('Network Error')) {
       return 'Error de red. Verifique su conexión a internet.';
     }
-    
+
     return 'Ha ocurrido un error inesperado. Por favor, intente nuevamente.';
   }
 
   private getHttpErrorMessage(error: HttpErrorResponse): string {
     this.log.info('🔍 [HTTP ERROR] Status:', error.status);
     this.log.info('🔍 [HTTP ERROR] Error body:', error.error);
-    
+
     // ✅ PRIMERO verificar si es error de validación de nuestro backend
     if (this.isBackendErrorResponse(error)) {
       this.log.info('🔍 [HTTP ERROR] Es error de validación del backend');
@@ -266,16 +287,18 @@ export class GlobalErrorHandlerService implements ErrorHandler {
     }
   }
 
-  private isBackendErrorResponse(error: any): error is HttpErrorResponse & { error: BackendErrorResponse } {
+  private isBackendErrorResponse(
+    error: any,
+  ): error is HttpErrorResponse & { error: BackendErrorResponse } {
     if (!error || !error.error) {
       return false;
     }
-    
-    const hasValidStructure = 
-      error.error.result && 
+
+    const hasValidStructure =
+      error.error.result &&
       error.error.error &&
       Array.isArray(error.error.error.details);
-    
+
     this.log.info('🔍 [BACKEND CHECK] Estructura válida:', hasValidStructure);
     return hasValidStructure;
   }
@@ -297,9 +320,9 @@ export class GlobalErrorHandlerService implements ErrorHandler {
       if (error.status === 404 || error.status === 403) return 'medium';
       return 'low';
     }
-    
+
     if (error?.ngDebugContext) return 'critical';
-    
+
     return 'medium';
   }
 

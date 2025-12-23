@@ -8,16 +8,12 @@ import { DatabaseComponent } from './database/database.component';
 import { DevToolsComponent } from './dev-tools/dev-tools.component';
 
 @NgModule({
-  declarations: [
-    LogsComponent,
-    DatabaseComponent,
-    DevToolsComponent
-  ],
+  declarations: [LogsComponent, DatabaseComponent, DevToolsComponent],
   imports: [
     CommonModule,
     FormsModule,
     SharedOPModule,
-    MantenimientoRoutingModule
-  ]
+    MantenimientoRoutingModule,
+  ],
 })
 export class MantenimientoModule {}

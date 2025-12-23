@@ -1,29 +1,29 @@
-import { Categoria } from "./categoria.model";
-import { EstadoEntrada } from "./estado-entrada.model";
-import { Etiqueta } from "./etiqueta.model";
-import { TipoEntrada } from "./tipo-entrada.model";
-import { Usuario } from "./usuario.model";
+import { Categoria } from './categoria.model';
+import { EstadoEntrada } from './estado-entrada.model';
+import { Etiqueta } from './etiqueta.model';
+import { TipoEntrada } from './tipo-entrada.model';
+import { Usuario } from './usuario.model';
 
 export class Entrada {
   idEntrada: number = 0;
   idUsuario: number = 0;
   idUsuarioEditado: number = 0;
-  titulo: string = "";
-  subtitulo: string = "";
-  contenido: string = "";
-  notas: string = "";
-  tipoEntrada: TipoEntrada = new TipoEntrada;
-  resumen: string = "";
+  titulo: string = '';
+  subtitulo: string = '';
+  contenido: string = '';
+  notas: string = '';
+  tipoEntrada: TipoEntrada = new TipoEntrada();
+  resumen: string = '';
   fechaPublicacion: Date = new Date();
   fechaEdicion: Date = new Date();
   borrador: boolean = false;
   publicada: boolean = false;
-  password: string = "";
+  password: string = '';
   privado: boolean = false;
   estadoEntrada: EstadoEntrada = new EstadoEntrada();
   fechaPublicacionProgramada: Date = new Date();
   permitirComentario: boolean = true;
-  imagenDestacada: string = "";
+  imagenDestacada: string = '';
   votos: number = 0;
   cantidadComentarios: number = 0;
   categorias: Categoria[] = [];
@@ -31,13 +31,10 @@ export class Entrada {
 
   // Fuera del backend
   categoriasConComas: string = '';
-  usernameCreador: string = "";
-  usernameModificador: string = "";
+  usernameCreador: string = '';
+  usernameModificador: string = '';
 
-  constructor() {
-
-  }
-
+  constructor() {}
 }
 
 export interface Entrada {
@@ -62,7 +59,7 @@ export interface Entrada {
   imagenDestacada: string;
   votos: number;
   cantidadComentarios: number;
-  
+
   categorias: Categoria[];
   etiquetas: Etiqueta[];
 
@@ -70,7 +67,6 @@ export interface Entrada {
   categoriasConComas: string;
   usernameCreador: string;
   usernameModificador: string;
-
 }
 
 export interface EntradaFormData {
@@ -80,4 +76,3 @@ export interface EntradaFormData {
   categorias: Categoria[];
   estadoEntrada: EstadoEntrada;
 }
-

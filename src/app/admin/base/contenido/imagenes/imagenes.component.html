@@ -4,8 +4,21 @@
       <span>Imágenes</span>
       <div class="btn-toolbar gap-2">
         <div class="btn-group" role="group" aria-label="Subida de imágenes">
-          <input type="file" accept="image/*" #imageInput (change)="onFileSelected($event)" [disabled]="uploading" hidden />
-          <button cButton color="primary" size="sm" (click)="openUpload(imageInput)" [disabled]="uploading">
+          <input
+            type="file"
+            accept="image/*"
+            #imageInput
+            (change)="onFileSelected($event)"
+            [disabled]="uploading"
+            hidden
+          />
+          <button
+            cButton
+            color="primary"
+            size="sm"
+            (click)="openUpload(imageInput)"
+            [disabled]="uploading"
+          >
             <svg cIcon name="cilCloudUpload" class="me-2"></svg>
             {{ uploading ? 'Subiendo...' : 'Subir' }}
           </button>
@@ -18,11 +31,39 @@
           <div class="text-muted small">Total {{ totalElements }}</div>
         </c-col>
         <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar nombre..." style="max-width: 280px;" [disabled]="loading" />
-          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
+          <input
+            cFormControl
+            type="text"
+            [value]="basicSearchText"
+            (input)="onBasicSearchTextChange($any($event.target).value)"
+            placeholder="Buscar nombre..."
+            style="max-width: 280px"
+            [disabled]="loading"
+          />
+          <button
+            cButton
+            color="secondary"
+            variant="ghost"
+            size="sm"
+            (click)="toggleAdvanced()"
+            [disabled]="loading"
+          >
+            Avanzado
+          </button>
         </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;" [disabled]="loading">
+        <c-col
+          xs="12"
+          md="4"
+          class="d-flex justify-content-md-end gap-2 align-items-center"
+        >
+          <select
+            cSelect
+            [ngModel]="pageSize"
+            (ngModelChange)="onPageSizeChange($event)"
+            name="pageSizeSelect"
+            style="max-width: 100px"
+            [disabled]="loading"
+          >
             <option [ngValue]="5">5</option>
             <option [ngValue]="10">10</option>
             <option [ngValue]="20">20</option>
@@ -35,7 +76,12 @@
           <c-row class="g-3 align-items-end">
             <c-col xs="12" md="4">
               <label class="form-label mb-1">Tipo MIME</label>
-              <select cSelect class="form-select-sm" [(ngModel)]="filtroMime" [disabled]="loading">
+              <select
+                cSelect
+                class="form-select-sm"
+                [(ngModel)]="filtroMime"
+                [disabled]="loading"
+              >
                 <option value="">Todos</option>
                 <option value="image/jpeg">image/jpeg</option>
                 <option value="image/png">image/png</option>
@@ -45,17 +91,43 @@
             </c-col>
             <c-col xs="6" md="4">
               <label class="form-label mb-1">Desde</label>
-              <input cFormControl class="form-control-sm" type="date" [(ngModel)]="fechaDesde" [disabled]="loading" />
+              <input
+                cFormControl
+                class="form-control-sm"
+                type="date"
+                [(ngModel)]="fechaDesde"
+                [disabled]="loading"
+              />
             </c-col>
             <c-col xs="6" md="4">
               <label class="form-label mb-1">Hasta</label>
-              <input cFormControl class="form-control-sm" type="date" [(ngModel)]="fechaHasta" [disabled]="loading" />
+              <input
+                cFormControl
+                class="form-control-sm"
+                type="date"
+                [(ngModel)]="fechaHasta"
+                [disabled]="loading"
+              />
             </c-col>
             <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
-              <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="loading">
+              <button
+                cButton
+                size="sm"
+                color="primary"
+                variant="outline"
+                (click)="search()"
+                [disabled]="loading"
+              >
                 <svg cIcon name="cilSearch"></svg> Buscar
               </button>
-              <button cButton size="sm" color="secondary" variant="outline" (click)="reset()" [disabled]="loading">
+              <button
+                cButton
+                size="sm"
+                color="secondary"
+                variant="outline"
+                (click)="reset()"
+                [disabled]="loading"
+              >
                 <svg cIcon name="cilReload"></svg> Limpiar
               </button>
             </c-col>
@@ -63,15 +135,27 @@
         </div>
       }
       @if (error) {
-        <div class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
+        <div
+          class="alert alert-danger d-flex align-items-center justify-content-between my-2"
+          role="alert"
+        >
           <span>{{ error }}</span>
-          <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
+          <button cButton color="danger" size="sm" (click)="load()">
+            Reintentar
+          </button>
         </div>
       }
 
       <div class="tabla-con-loader-wrapper position-relative">
         @if (loading) {
-          <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+          <div
+            class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+            style="
+              z-index: 10;
+              background-color: rgba(255, 255, 255, 0.8);
+              min-height: 200px;
+            "
+          >
             <div class="text-center">
               <c-spinner [attr.aria-label]="'Cargando imágenes'"></c-spinner>
               <p class="mt-2 text-muted">Cargando imágenes...</p>
@@ -80,13 +164,25 @@
         }
 
         <div [class.opacity-50]="loading" class="table-responsive">
-          <table responsive cAlign="top" cTable hover class="align-middle mb-0 border tabla-con-loader" role="table" aria-label="Tabla de imágenes">
+          <table
+            responsive
+            cAlign="top"
+            cTable
+            hover
+            class="align-middle mb-0 border tabla-con-loader"
+            role="table"
+            aria-label="Tabla de imágenes"
+          >
             <thead cTableColor="light">
               <tr>
-                <th scope="col" style="min-width: 80px;">Vista</th>
-                <th scope="col" style="min-width: 200px;">Nombre</th>
-                <th scope="col" class="text-center" style="min-width: 160px;">Fecha</th>
-                <th scope="col" class="text-center" style="min-width: 110px;">Acciones</th>
+                <th scope="col" style="min-width: 80px">Vista</th>
+                <th scope="col" style="min-width: 200px">Nombre</th>
+                <th scope="col" class="text-center" style="min-width: 160px">
+                  Fecha
+                </th>
+                <th scope="col" class="text-center" style="min-width: 110px">
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -97,22 +193,52 @@
                       <img
                         [src]="preview[m.uuid]"
                         alt=""
-                        style="height: 32px; width: 32px; object-fit: cover; cursor: pointer;"
-                        (click)="openPreview(m)" />
+                        style="
+                          height: 32px;
+                          width: 32px;
+                          object-fit: cover;
+                          cursor: pointer;
+                        "
+                        (click)="openPreview(m)"
+                      />
                     }
                   </td>
                   <td>
-                    <span class="fw-semibold text-truncate d-inline-block" style="max-width: 260px;" [title]="m.nombre">{{ m.nombre }}</span>
+                    <span
+                      class="fw-semibold text-truncate d-inline-block"
+                      style="max-width: 260px"
+                      [title]="m.nombre"
+                      >{{ m.nombre }}</span
+                    >
                   </td>
-                  <td class="text-center">{{ parseFecha(m.fechaCreacion) | date:'dd-MM-yyyy HH:mm' }}</td>
                   <td class="text-center">
-                    <div class="btn-group" role="group" aria-label="Acciones de imagen">
+                    {{ parseFecha(m.fechaCreacion) | date: 'dd-MM-yyyy HH:mm' }}
+                  </td>
+                  <td class="text-center">
+                    <div
+                      class="btn-group"
+                      role="group"
+                      aria-label="Acciones de imagen"
+                    >
                       @if (mode === 'selector') {
-                        <button cButton color="primary" size="sm" (click)="onSelect(m)">
+                        <button
+                          cButton
+                          color="primary"
+                          size="sm"
+                          (click)="onSelect(m)"
+                        >
                           Seleccionar
                         </button>
                       }
-                      <button cButton color="secondary" size="sm" variant="ghost" (click)="download(m)" [disabled]="!m.uuid && !m.url" [attr.aria-label]="'Descargar ' + (m.nombre || '')">
+                      <button
+                        cButton
+                        color="secondary"
+                        size="sm"
+                        variant="ghost"
+                        (click)="download(m)"
+                        [disabled]="!m.uuid && !m.url"
+                        [attr.aria-label]="'Descargar ' + (m.nombre || '')"
+                      >
                         <svg cIcon name="cilCloudDownload" size="sm"></svg>
                       </button>
                     </div>
@@ -123,10 +249,19 @@
               @if (items.length === 0) {
                 <tr>
                   <td colspan="4" class="text-center py-5">
-                    <div class="d-flex flex-column align-items-center justify-content-center">
-                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                    <div
+                      class="d-flex flex-column align-items-center justify-content-center"
+                    >
+                      <svg
+                        cIcon
+                        name="cilSearch"
+                        size="3xl"
+                        class="text-muted mb-3"
+                      ></svg>
                       <h6 class="text-muted">No se han encontrado imágenes</h6>
-                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+                      <p class="text-muted small">
+                        Intenta ajustar los filtros de búsqueda
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -139,16 +274,38 @@
               [align]="'center'"
               [totalPages]="totalPages"
               [currentPage]="pageNo"
-              (pageChange)="onPageChange($event)">
+              (pageChange)="onPageChange($event)"
+            >
             </app-op-pagination>
           }
 
           @if (totalElements > 0) {
             <c-row class="mt-2">
-              <c-col class="d-flex justify-content-end align-items-center gap-2">
-                <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">Anterior</button>
-                <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">Siguiente</button>
-                <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+              <c-col
+                class="d-flex justify-content-end align-items-center gap-2"
+              >
+                <button
+                  cButton
+                  color="light"
+                  size="sm"
+                  (click)="prev()"
+                  [disabled]="!canPrev"
+                >
+                  Anterior
+                </button>
+                <button
+                  cButton
+                  color="light"
+                  size="sm"
+                  (click)="next()"
+                  [disabled]="!canNext"
+                >
+                  Siguiente
+                </button>
+                <div class="text-muted small ms-2">
+                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
+                  {{ totalElements }} · Mostrando {{ numberOfElements }}
+                </div>
               </c-col>
             </c-row>
           }
@@ -158,43 +315,115 @@
   </c-card>
 </c-container>
 
-<c-modal [visible]="previewModalVisible" (visibleChange)="previewModalVisible = $event" [size]="'xl'">
+<c-modal
+  [visible]="previewModalVisible"
+  (visibleChange)="previewModalVisible = $event"
+  [size]="'xl'"
+>
   <c-modal-header>
     <h5 cModalTitle>{{ previewItem?.nombre || 'Vista previa' }}</h5>
     <div class="ms-auto btn-toolbar">
       <div class="btn-group" role="group" aria-label="Zoom">
-        <button cButton color="secondary" size="sm" variant="outline" (click)="zoomOut()" [disabled]="!canZoomOut()"><svg cIcon name="cilMinus"></svg></button>
-        <button cButton color="secondary" size="sm" variant="outline" (click)="zoomIn()" [disabled]="!canZoomIn()"><svg cIcon name="cilPlus"></svg></button>
+        <button
+          cButton
+          color="secondary"
+          size="sm"
+          variant="outline"
+          (click)="zoomOut()"
+          [disabled]="!canZoomOut()"
+        >
+          <svg cIcon name="cilMinus"></svg>
+        </button>
+        <button
+          cButton
+          color="secondary"
+          size="sm"
+          variant="outline"
+          (click)="zoomIn()"
+          [disabled]="!canZoomIn()"
+        >
+          <svg cIcon name="cilPlus"></svg>
+        </button>
         <c-badge color="secondary" class="ms-2">{{ zoomPercent() }}%</c-badge>
       </div>
       <div class="btn-group ms-2" role="group" aria-label="Ajuste">
-        <button cButton color="secondary" size="sm" variant="outline" (click)="fitWidth()" [disabled]="!getPreviewUrlForModal()">
+        <button
+          cButton
+          color="secondary"
+          size="sm"
+          variant="outline"
+          (click)="fitWidth()"
+          [disabled]="!getPreviewUrlForModal()"
+        >
           <svg cIcon name="cilJustifyCenter" class="me-2"></svg> Ajustar ancho
         </button>
-        <button cButton color="secondary" size="sm" variant="outline" (click)="fitHeight()" [disabled]="!getPreviewUrlForModal()">
+        <button
+          cButton
+          color="secondary"
+          size="sm"
+          variant="outline"
+          (click)="fitHeight()"
+          [disabled]="!getPreviewUrlForModal()"
+        >
           Ajustar alto
         </button>
       </div>
     </div>
   </c-modal-header>
   <c-modal-body class="preview-body">
-    <div #previewScroll class="text-center" [style.cursor]="getPreviewUrlForModal() ? (isDragging ? 'grabbing' : 'grab') : 'default'" [style.userSelect]="isDragging ? 'none' : null" [style.touchAction]="getPreviewUrlForModal() ? 'none' : 'auto'" style="height: 100%; overflow: auto;" (wheel)="onPreviewWheel($event)" (dblclick)="toggleZoom()" (mousedown)="onPreviewMouseDown($event)" (mousemove)="onPreviewMouseMove($event)" (mouseup)="onPreviewMouseUp()" (mouseleave)="onPreviewMouseLeave()" (touchstart)="onPreviewTouchStart($event)" (touchmove)="onPreviewTouchMove($event)" (touchend)="onPreviewTouchEnd()">
+    <div
+      #previewScroll
+      class="text-center"
+      [style.cursor]="
+        getPreviewUrlForModal() ? (isDragging ? 'grabbing' : 'grab') : 'default'
+      "
+      [style.userSelect]="isDragging ? 'none' : null"
+      [style.touchAction]="getPreviewUrlForModal() ? 'none' : 'auto'"
+      style="height: 100%; overflow: auto"
+      (wheel)="onPreviewWheel($event)"
+      (dblclick)="toggleZoom()"
+      (mousedown)="onPreviewMouseDown($event)"
+      (mousemove)="onPreviewMouseMove($event)"
+      (mouseup)="onPreviewMouseUp()"
+      (mouseleave)="onPreviewMouseLeave()"
+      (touchstart)="onPreviewTouchStart($event)"
+      (touchmove)="onPreviewTouchMove($event)"
+      (touchend)="onPreviewTouchEnd()"
+    >
       @if (getPreviewUrlForModal(); as url) {
-        <div [style.width]="(previewZoom * 100) + '%'" style="display: inline-block;">
-          <img #previewImg [src]="url" (load)="onPreviewImageLoad($event)"
+        <div
+          [style.width]="previewZoom * 100 + '%'"
+          style="display: inline-block"
+        >
+          <img
+            #previewImg
+            [src]="url"
+            (load)="onPreviewImageLoad($event)"
             alt=""
-            style="max-width: 100%; height: auto; border-radius: 4px;" />
-          </div>
-        }
-      </div>
-    </c-modal-body>
-    <c-modal-footer>
-      <button cButton color="secondary" (click)="closePreview()">Cerrar</button>
-      <button cButton color="secondary" variant="outline" (click)="resetZoom()" [disabled]="!getPreviewUrlForModal()">
-        <svg cIcon name="cilReload" class="me-2"></svg> Reset
-      </button>
-      <button cButton color="primary" [disabled]="!previewItem" (click)="previewItem && download(previewItem)">
-        <svg cIcon name="cilCloudDownload" class="me-2"></svg> Descargar
-      </button>
-    </c-modal-footer>
-  </c-modal>
+            style="max-width: 100%; height: auto; border-radius: 4px"
+          />
+        </div>
+      }
+    </div>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="closePreview()">Cerrar</button>
+    <button
+      cButton
+      color="secondary"
+      variant="outline"
+      (click)="resetZoom()"
+      [disabled]="!getPreviewUrlForModal()"
+    >
+      <svg cIcon name="cilReload" class="me-2"></svg> Reset
+    </button>
+    <button
+      cButton
+      color="primary"
+      [disabled]="!previewItem"
+      (click)="previewItem && download(previewItem)"
+    >
+      <svg cIcon name="cilCloudDownload" class="me-2"></svg> Descargar
+    </button>
+  </c-modal-footer>
+</c-modal>

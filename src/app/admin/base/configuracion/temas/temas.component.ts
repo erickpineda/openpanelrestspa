@@ -7,10 +7,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
-    selector: 'app-temas',
-    templateUrl: './temas.component.html',
-    styleUrls: ['./temas.component.scss'],
-    standalone: false
+  selector: 'app-temas',
+  templateUrl: './temas.component.html',
+  styleUrls: ['./temas.component.scss'],
+  standalone: false,
 })
 export class TemasComponent implements OnInit, OnDestroy {
   loading = false;
@@ -33,44 +33,50 @@ export class TemasComponent implements OnInit, OnDestroy {
   pagedTemas: Tema[] = [];
 
   constructor(
-    private temasService: TemasService, 
-    private fb: FormBuilder, 
-    private toast: ToastService, 
+    private temasService: TemasService,
+    private fb: FormBuilder,
+    private toast: ToastService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
       activo: ['false', Validators.required],
-      esquemaColor: ['', Validators.maxLength(50)]
+      esquemaColor: ['', Validators.maxLength(50)],
     });
   }
 
-  ngOnInit(): void { this.load(); }
-  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
+  ngOnInit(): void {
+    this.load();
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   load(): void {
-    this.loading = true; 
+    this.loading = true;
     this.error = null;
-    
-    this.temasService.listarSafeSinGlobalLoader()
+
+    this.temasService
+      .listarSafeSinGlobalLoader()
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => { 
-          this.loading = false; 
-          this.cdr.detectChanges(); 
-        })
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
       )
       .subscribe({
-        next: (list: Tema[]) => { 
-          this.temas = Array.isArray(list) ? list : []; 
-          this.totalElements = this.temas.length; 
-          this.search(); 
+        next: (list: Tema[]) => {
+          this.temas = Array.isArray(list) ? list : [];
+          this.totalElements = this.temas.length;
+          this.search();
         },
-        error: (err) => { 
-          this.error = 'Error cargando temas'; 
-          this.log.error('temas listar', err); 
-        }
+        error: (err) => {
+          this.error = 'Error cargando temas';
+          this.log.error('temas listar', err);
+        },
       });
   }
 
@@ -85,12 +91,15 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.form.reset({
       nombre: item.nombre || '',
       activo: String(item.activo ? 'true' : 'false'),
-      esquemaColor: item.esquemaColor || ''
+      esquemaColor: item.esquemaColor || '',
     });
     this.modalVisible = true;
   }
 
-  closeModal(): void { this.modalVisible = false; this.editItem = null; }
+  closeModal(): void {
+    this.modalVisible = false;
+    this.editItem = null;
+  }
 
   save(): void {
     if (this.form.invalid) return;
@@ -98,12 +107,23 @@ export class TemasComponent implements OnInit, OnDestroy {
     const payload: Tema = {
       nombre: this.form.value.nombre,
       activo: this.form.value.activo === 'true',
-      esquemaColor: this.form.value.esquemaColor
+      esquemaColor: this.form.value.esquemaColor,
     };
-    const op = this.editItem?.id ? this.temasService.actualizarSafe(this.editItem.id, payload) : this.temasService.crearSafe(payload);
+    const op = this.editItem?.id
+      ? this.temasService.actualizarSafe(this.editItem.id, payload)
+      : this.temasService.crearSafe(payload);
     op.subscribe({
-      next: () => { this.toast.showSuccess('Tema guardado', 'Temas'); this.loading = false; this.modalVisible = false; this.load(); },
-      error: (err) => { this.toast.showError('Error guardando', 'Temas'); this.log.error('temas guardar', err); this.loading = false; }
+      next: () => {
+        this.toast.showSuccess('Tema guardado', 'Temas');
+        this.loading = false;
+        this.modalVisible = false;
+        this.load();
+      },
+      error: (err) => {
+        this.toast.showError('Error guardando', 'Temas');
+        this.log.error('temas guardar', err);
+        this.loading = false;
+      },
     });
   }
 
@@ -112,22 +132,40 @@ export class TemasComponent implements OnInit, OnDestroy {
     if (!confirm('¿Eliminar tema?')) return;
     this.loading = true;
     this.temasService.eliminarSafe(item.id).subscribe({
-      next: () => { this.toast.showSuccess('Tema eliminado', 'Temas'); this.loading = false; this.load(); },
-      error: (err) => { this.toast.showError('Error eliminando', 'Temas'); this.log.error('temas eliminar', err); this.loading = false; }
+      next: () => {
+        this.toast.showSuccess('Tema eliminado', 'Temas');
+        this.loading = false;
+        this.load();
+      },
+      error: (err) => {
+        this.toast.showError('Error eliminando', 'Temas');
+        this.log.error('temas eliminar', err);
+        this.loading = false;
+      },
     });
   }
 
   // ===== Toolbar / Búsqueda / Paginación =====
-  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
-  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.search(); }
-  onPageSizeChange(size: number): void { this.pageSize = Number(size) || 10; this.pageNo = 0; this.updatePage(); }
+  toggleAdvanced(): void {
+    this.showAdvanced = !this.showAdvanced;
+  }
+  onBasicSearchTextChange(text: string): void {
+    this.basicSearchText = text || '';
+    this.pageNo = 0;
+    this.search();
+  }
+  onPageSizeChange(size: number): void {
+    this.pageSize = Number(size) || 10;
+    this.pageNo = 0;
+    this.updatePage();
+  }
 
   search(): void {
     const term = (this.basicSearchText || '').toLowerCase();
     const nombre = (this.filtroNombre || '').toLowerCase();
     const activo = this.filtroActivo;
     const base = this.temas || [];
-    this.filteredTemas = base.filter(t => {
+    this.filteredTemas = base.filter((t) => {
       const n = (t.nombre || '').toLowerCase();
       const mBasic = !term || n.includes(term);
       const mNombre = !nombre || n.includes(nombre);
@@ -147,18 +185,33 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.search();
   }
 
-  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.updatePage(); } }
-  next(): void { if (this.pageNo < this.getTotalPages() - 1) { this.pageNo++; this.updatePage(); } }
+  prev(): void {
+    if (this.pageNo > 0) {
+      this.pageNo--;
+      this.updatePage();
+    }
+  }
+  next(): void {
+    if (this.pageNo < this.getTotalPages() - 1) {
+      this.pageNo++;
+      this.updatePage();
+    }
+  }
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    const safePage = Math.max(
+      0,
+      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
+    );
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.updatePage();
   }
 
-  getTotalPages(): number { return Math.max(1, Math.ceil(this.totalElements / this.pageSize)); }
+  getTotalPages(): number {
+    return Math.max(1, Math.ceil(this.totalElements / this.pageSize));
+  }
 
   private updatePage(): void {
     const start = this.pageNo * this.pageSize;

@@ -3,23 +3,29 @@ import { environment } from '../../../environments/environment.dev.es';
 import { LoggerBufferService } from './logger-buffer.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoggerService {
   private isProduction = environment.mock;
 
   // Niveles de log
   private levels = ['debug', 'info', 'warn', 'error'] as const;
-  private minLevel: typeof this.levels[number] = this.isProduction ? 'warn' : 'debug';
+  private minLevel: (typeof this.levels)[number] = this.isProduction
+    ? 'warn'
+    : 'debug';
   constructor(private buffer: LoggerBufferService) {}
 
-  private shouldLog(level: typeof this.levels[number]): boolean {
+  private shouldLog(level: (typeof this.levels)[number]): boolean {
     const levelIndex = this.levels.indexOf(level);
     const minLevelIndex = this.levels.indexOf(this.minLevel);
     return levelIndex >= minLevelIndex;
   }
 
-  log(level: typeof this.levels[number], message: string, ...args: any[]): void {
+  log(
+    level: (typeof this.levels)[number],
+    message: string,
+    ...args: any[]
+  ): void {
     if (!this.shouldLog(level)) return;
 
     const timestamp = new Date().toISOString();
@@ -39,7 +45,9 @@ export class LoggerService {
         console.error(prefix, message, ...args);
         break;
     }
-    try { this.buffer.record(level, message, args); } catch {}
+    try {
+      this.buffer.record(level, message, args);
+    } catch {}
 
     // En producción, enviar errores a servicio de tracking
     if (this.isProduction && level === 'error') {

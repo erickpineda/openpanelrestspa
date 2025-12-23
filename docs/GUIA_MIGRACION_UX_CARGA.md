@@ -3,6 +3,7 @@
 Esta guía documenta los pasos necesarios para unificar la experiencia de carga (spinner interno, sin bloqueo global) y la implementación del buscador avanzado en los listados del sistema.
 
 ## 1. Objetivos
+
 - Eliminar el cargador global (pantalla completa) durante operaciones de paginación, filtrado y ordenación.
 - Implementar un spinner local centrado en el área de contenido (tabla).
 - Asegurar transiciones suaves y manejo correcto de errores.
@@ -13,6 +14,7 @@ Esta guía documenta los pasos necesarios para unificar la experiencia de carga 
 Para evitar que el interceptor global muestre el spinner de pantalla completa, se deben crear métodos específicos que pasen el contexto `SKIP_GLOBAL_LOADER`.
 
 ### Pasos:
+
 1.  Importar `HttpContext` y la constante del interceptor.
 2.  Crear métodos alternativos (ej. `listar...SinGlobalLoader` o `buscar...Safe`).
 
@@ -35,6 +37,7 @@ listarPaginaSinGlobalLoader(page: number, size: number): Observable<any> {
 El componente debe gestionar manualmente el estado de carga local y forzar la detección de cambios debido a la naturaleza asíncrona y estrategias de detección (OnPush).
 
 ### Requisitos:
+
 - `ChangeDetectorRef` para actualizar la vista.
 - `Subject` para limpiar suscripciones (`takeUntil`).
 - Variable de estado `cargando` o `cargandoTabla`.
@@ -49,7 +52,10 @@ export class MiListadoComponent implements OnInit, OnDestroy {
   cargandoTabla = false;
   private destroy$ = new Subject<void>();
 
-  constructor(private cdr: ChangeDetectorRef, private service: MiService) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private service: MiService,
+  ) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -60,13 +66,14 @@ export class MiListadoComponent implements OnInit, OnDestroy {
     this.cargandoTabla = true;
     this.cdr.markForCheck(); // Marcar para verificación
 
-    this.service.listarPaginaSinGlobalLoader(this.page, this.size)
+    this.service
+      .listarPaginaSinGlobalLoader(this.page, this.size)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
           this.cargandoTabla = false;
           this.cdr.detectChanges(); // Forzar actualización al finalizar (éxito o error)
-        })
+        }),
       )
       .subscribe({
         next: (data) => {
@@ -76,7 +83,7 @@ export class MiListadoComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error(err);
           this.cdr.detectChanges();
-        }
+        },
       });
   }
 }
@@ -102,7 +109,7 @@ Reemplazar el uso de `app-op-loader` (si bloquea toda la sección) por un templa
   <table cTable>
     <!-- Contenido de la tabla -->
   </table>
-  
+
   <!-- Paginación -->
   <app-op-pagination ...></app-op-pagination>
 </div>
@@ -136,21 +143,14 @@ onBasicSearchTextChange(text: string): void {
   <!-- Fila de Búsqueda Básica -->
   <c-row class="align-items-center mb-3 g-2">
     <c-col xs="12" md="4">
-       <!-- Espacio para contadores o vacío -->
+      <!-- Espacio para contadores o vacío -->
     </c-col>
     <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-      <input cFormControl 
-             type="text" 
-             [value]="basicSearchText" 
-             (input)="onBasicSearchTextChange($any($event.target).value)" 
-             placeholder="Buscar..." 
-             style="max-width: 280px;" />
-      <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">
-        Avanzado
-      </button>
+      <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar..." style="max-width: 280px;" />
+      <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">Avanzado</button>
     </c-col>
     <c-col xs="12" md="4">
-       <!-- Espacio para selector de tamaño de página o vacío -->
+      <!-- Espacio para selector de tamaño de página o vacío -->
     </c-col>
   </c-row>
 

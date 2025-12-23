@@ -1,34 +1,32 @@
-import { Comentario } from "./comentario.model";
-import { Entrada } from "./entrada.model";
-import { Rol } from "./rol.model";
+import { Comentario } from './comentario.model';
+import { Entrada } from './entrada.model';
+import { Rol } from './rol.model';
 
 export class Usuario {
   idUsuario: number = 0;
   idRol: number = 0;
-  rolCodigo: string = "";
-  username: string = "";
-  password: string = "";
-  nombre: string = "";
-  apellido: string = "";
+  rolCodigo: string = '';
+  username: string = '';
+  password: string = '';
+  nombre: string = '';
+  apellido: string = '';
   fechaNacimiento: any;
-  email: string = "";
-  genero: string = "";
+  email: string = '';
+  genero: string = '';
   telefono: number = 0;
   emailConfirmado: boolean = false;
   fechaEmailConfirmado: any;
   habilitado: boolean = false;
   habilitadoFecha: any;
-  website: string = "";
+  website: string = '';
   imagen: string[] = [];
-  infouser: string = "";
+  infouser: string = '';
   tokenExpirationDate: any;
-  verifyToken: string = "";
+  verifyToken: string = '';
   //refreshToken
   //deviceMetadata
 
-  constructor() {
-
-  }
+  constructor() {}
 }
 
 export interface Usuario {

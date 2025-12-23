@@ -11,17 +11,44 @@
     </div>
   </c-card-header>
   <c-card-body [attr.aria-busy]="cargando ? 'true' : null">
-
     <c-row class="align-items-center mb-3 g-2">
       <c-col xs="12" md="4">
         <div class="text-muted small">Total {{ totalElements }}</div>
       </c-col>
       <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-        <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar comentario..." style="max-width: 280px;" [disabled]="cargando" />
-        <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="cargando">Avanzado</button>
+        <input
+          cFormControl
+          type="text"
+          [value]="basicSearchText"
+          (input)="onBasicSearchTextChange($any($event.target).value)"
+          placeholder="Buscar comentario..."
+          style="max-width: 280px"
+          [disabled]="cargando"
+        />
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          size="sm"
+          (click)="toggleAdvanced()"
+          [disabled]="cargando"
+        >
+          Avanzado
+        </button>
       </c-col>
-      <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-        <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;" [disabled]="cargando">
+      <c-col
+        xs="12"
+        md="4"
+        class="d-flex justify-content-md-end gap-2 align-items-center"
+      >
+        <select
+          cSelect
+          [ngModel]="pageSize"
+          (ngModelChange)="onPageSizeChange($event)"
+          name="pageSizeSelect"
+          style="max-width: 100px"
+          [disabled]="cargando"
+        >
           <option value="5">5</option>
           <option value="10">10</option>
           <option value="20">20</option>
@@ -34,12 +61,32 @@
         <c-row class="g-3 align-items-end">
           <c-col xs="12" md="4">
             <label class="form-label mb-1">Usuario</label>
-            <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" [disabled]="cargando" />
+            <input
+              cFormControl
+              class="form-control-sm"
+              type="text"
+              placeholder="Buscar por usuario..."
+              [value]="filtroUsuario"
+              (input)="filtroUsuario = $any($event.target).value"
+              [disabled]="cargando"
+            />
           </c-col>
           <c-col xs="6" md="4">
             <label class="form-label mb-1">Aprobado</label>
-            <select cSelect class="form-select-sm" [value]="filtroAprobado === null ? '' : (filtroAprobado ? 'true' : 'false')"
-              (change)="filtroAprobado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')" [disabled]="cargando">
+            <select
+              cSelect
+              class="form-select-sm"
+              [value]="
+                filtroAprobado === null ? '' : filtroAprobado ? 'true' : 'false'
+              "
+              (change)="
+                filtroAprobado =
+                  $any($event.target).value === ''
+                    ? null
+                    : $any($event.target).value === 'true'
+              "
+              [disabled]="cargando"
+            >
               <option value="">Seleccione estado</option>
               <option value="true">Sí</option>
               <option value="false">No</option>
@@ -47,18 +94,48 @@
           </c-col>
           <c-col xs="6" md="4">
             <label class="form-label mb-1">Cuarentena</label>
-            <select cSelect class="form-select-sm" [value]="filtroCuarentena === null ? '' : (filtroCuarentena ? 'true' : 'false')"
-              (change)="filtroCuarentena = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')" [disabled]="cargando">
+            <select
+              cSelect
+              class="form-select-sm"
+              [value]="
+                filtroCuarentena === null
+                  ? ''
+                  : filtroCuarentena
+                    ? 'true'
+                    : 'false'
+              "
+              (change)="
+                filtroCuarentena =
+                  $any($event.target).value === ''
+                    ? null
+                    : $any($event.target).value === 'true'
+              "
+              [disabled]="cargando"
+            >
               <option value="">Seleccione estado</option>
               <option value="true">Sí</option>
               <option value="false">No</option>
             </select>
           </c-col>
           <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
-            <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="cargando">
+            <button
+              cButton
+              size="sm"
+              color="primary"
+              variant="outline"
+              (click)="search()"
+              [disabled]="cargando"
+            >
               <svg cIcon name="cilSearch"></svg> Buscar
             </button>
-            <button cButton size="sm" color="secondary" variant="outline" (click)="reset()" [disabled]="cargando">
+            <button
+              cButton
+              size="sm"
+              color="secondary"
+              variant="outline"
+              (click)="reset()"
+              [disabled]="cargando"
+            >
               <svg cIcon name="cilReload"></svg> Limpiar
             </button>
           </c-col>
@@ -68,7 +145,14 @@
 
     <div class="tabla-con-loader-wrapper position-relative">
       @if (cargando) {
-        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+        <div
+          class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+          style="
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.8);
+            min-height: 200px;
+          "
+        >
           <div class="text-center">
             <c-spinner [attr.aria-label]="'Cargando comentarios'"></c-spinner>
             <p class="mt-2 text-muted">Cargando comentarios...</p>
@@ -77,53 +161,121 @@
       }
 
       <div [class.opacity-50]="cargando" class="table-responsive">
-        <table responsive cAlign="top" cTable hover class="align-middle mb-0 border tabla-con-loader text-nowrap" role="table" aria-label="Tabla de comentarios">
+        <table
+          responsive
+          cAlign="top"
+          cTable
+          hover
+          class="align-middle mb-0 border tabla-con-loader text-nowrap"
+          role="table"
+          aria-label="Tabla de comentarios"
+        >
           <thead cTableColor="light">
             <tr>
-              <th scope="col" style="min-width: 250px;">Contenido</th>
-              <th scope="col" style="min-width: 120px;">Usuario</th>
-              <th scope="col" style="min-width: 150px;">Entrada</th>
-              <th scope="col" style="min-width: 120px;">Fecha creación</th>
-              <th scope="col" class="text-center" style="min-width: 80px;">Estado</th>
-              <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
+              <th scope="col" style="min-width: 250px">Contenido</th>
+              <th scope="col" style="min-width: 120px">Usuario</th>
+              <th scope="col" style="min-width: 150px">Entrada</th>
+              <th scope="col" style="min-width: 120px">Fecha creación</th>
+              <th scope="col" class="text-center" style="min-width: 80px">
+                Estado
+              </th>
+              <th scope="col" class="text-center" style="min-width: 100px">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
-            @for (coment of pagedComentarios; track trackByComentario($index, coment)) {
+            @for (
+              coment of pagedComentarios;
+              track trackByComentario($index, coment)
+            ) {
               <tr>
                 <td>
-                  <span class="d-inline-block text-truncate" style="max-width: 250px;" [title]="coment.contenido">
+                  <span
+                    class="d-inline-block text-truncate"
+                    style="max-width: 250px"
+                    [title]="coment.contenido"
+                  >
                     {{ coment.contenido }}
                   </span>
                 </td>
-                <td>{{coment.idUsuario}}</td>
+                <td>{{ coment.idUsuario }}</td>
                 <td>
-                  <span class="d-inline-block text-truncate" style="max-width: 150px;" [title]="coment.tituloEntrada">
-                    {{coment.idEntrada}}
+                  <span
+                    class="d-inline-block text-truncate"
+                    style="max-width: 150px"
+                    [title]="coment.tituloEntrada"
+                  >
+                    {{ coment.idEntrada }}
                   </span>
                 </td>
-                <td>{{coment.fechaCreacion}}</td>
+                <td>{{ coment.fechaCreacion }}</td>
                 <td class="text-center">
                   @if (coment.aprobado) {
                     <span [cTooltip]="'Aprobado'" aria-label="Aprobado">
-                      <svg cIcon name="cilCheckCircle" class="text-success" size="lg"></svg>
+                      <svg
+                        cIcon
+                        name="cilCheckCircle"
+                        class="text-success"
+                        size="lg"
+                      ></svg>
                     </span>
                   } @else {
                     @if (coment.cuarentena) {
-                      <span [cTooltip]="'En cuarentena'" aria-label="En cuarentena">
-                        <svg cIcon name="cilWarning" class="text-danger" size="lg"></svg>
+                      <span
+                        [cTooltip]="'En cuarentena'"
+                        aria-label="En cuarentena"
+                      >
+                        <svg
+                          cIcon
+                          name="cilWarning"
+                          class="text-danger"
+                          size="lg"
+                        ></svg>
                       </span>
                     } @else {
-                      <span [cTooltip]="'Pendiente de moderación'" aria-label="Pendiente de moderación">
-                        <svg cIcon name="cilHistory" class="text-warning" size="lg"></svg>
+                      <span
+                        [cTooltip]="'Pendiente de moderación'"
+                        aria-label="Pendiente de moderación"
+                      >
+                        <svg
+                          cIcon
+                          name="cilHistory"
+                          class="text-warning"
+                          size="lg"
+                        ></svg>
                       </span>
                     }
                   }
                 </td>
                 <td class="text-center">
                   <div class="btn-group">
-                    <button cButton color="warning" size="sm" variant="ghost" (click)="openEdit(coment)" [cTooltip]="'Editar comentario'" [attr.aria-label]="'Editar comentario ' + coment.idComentario"><svg cIcon name="cilPencil" size="sm"></svg></button>
-                    <button cButton color="danger" size="sm" variant="ghost" (click)="deleteComentario(coment)" [cTooltip]="'Eliminar comentario'" [attr.aria-label]="'Eliminar comentario ' + coment.idComentario"><svg cIcon name="cilTrash" size="sm"></svg></button>
+                    <button
+                      cButton
+                      color="warning"
+                      size="sm"
+                      variant="ghost"
+                      (click)="openEdit(coment)"
+                      [cTooltip]="'Editar comentario'"
+                      [attr.aria-label]="
+                        'Editar comentario ' + coment.idComentario
+                      "
+                    >
+                      <svg cIcon name="cilPencil" size="sm"></svg>
+                    </button>
+                    <button
+                      cButton
+                      color="danger"
+                      size="sm"
+                      variant="ghost"
+                      (click)="deleteComentario(coment)"
+                      [cTooltip]="'Eliminar comentario'"
+                      [attr.aria-label]="
+                        'Eliminar comentario ' + coment.idComentario
+                      "
+                    >
+                      <svg cIcon name="cilTrash" size="sm"></svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -131,10 +283,19 @@
             @if (pagedComentarios.length === 0) {
               <tr>
                 <td colspan="6" class="text-center py-5">
-                  <div class="d-flex flex-column align-items-center justify-content-center">
-                    <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                  <div
+                    class="d-flex flex-column align-items-center justify-content-center"
+                  >
+                    <svg
+                      cIcon
+                      name="cilSearch"
+                      size="3xl"
+                      class="text-muted mb-3"
+                    ></svg>
                     <h6 class="text-muted">No se han encontrado comentarios</h6>
-                    <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+                    <p class="text-muted small">
+                      Intenta ajustar los filtros de búsqueda
+                    </p>
                   </div>
                 </td>
               </tr>
@@ -147,31 +308,59 @@
             [align]="'center'"
             [totalPages]="getTotalPages()"
             [currentPage]="pageNo"
-            (pageChange)="onPageChange($event)">
+            (pageChange)="onPageChange($event)"
+          >
           </app-op-pagination>
         }
 
         @if (pagedComentarios.length > 0) {
           <c-row class="mt-2">
             <c-col class="d-flex justify-content-end align-items-center gap-2">
-              <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
-              <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-              <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+              <button
+                cButton
+                color="light"
+                size="sm"
+                (click)="prev()"
+                [disabled]="pageNo <= 0"
+              >
+                Anterior
+              </button>
+              <button
+                cButton
+                color="light"
+                size="sm"
+                (click)="next()"
+                [disabled]="pageNo >= getTotalPages() - 1"
+              >
+                Siguiente
+              </button>
+              <div class="text-muted small ms-2">
+                Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
+                {{ totalElements }} · Mostrando {{ numberOfElements }}
+              </div>
             </c-col>
           </c-row>
         }
       </div>
     </div>
-
   </c-card-body>
 </c-card>
 
-<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal=$event" alignment="center" [attr.data-testid]="'eliminar-comentario-modal'">
+<c-modal
+  [visible]="showDeleteModal"
+  (visibleChange)="showDeleteModal = $event"
+  alignment="center"
+  [attr.data-testid]="'eliminar-comentario-modal'"
+>
   <c-modal-header>
     <h5 cModalTitle>Confirmar eliminación</h5>
   </c-modal-header>
   <c-modal-body>
-    <p>¿Desea eliminar el comentario <strong>#{{ comentarioToDelete?.idComentario }}</strong>? Esta acción no se puede deshacer.</p>
+    <p>
+      ¿Desea eliminar el comentario
+      <strong>#{{ comentarioToDelete?.idComentario }}</strong
+      >? Esta acción no se puede deshacer.
+    </p>
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>

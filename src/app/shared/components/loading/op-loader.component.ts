@@ -1,4 +1,11 @@
-import { Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { LoadingService } from '../../../core/services/ui/loading.service';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -7,11 +14,11 @@ export type LoaderStyle = 'spinner' | 'dots' | 'pulse' | 'progress' | 'modern';
 export type LoaderPosition = 'center' | 'top' | 'fullscreen';
 
 @Component({
-    selector: 'app-op-loader',
-    templateUrl: './op-loader.component.html',
-    styleUrls: ['./op-loader.component.scss'],
-    exportAs: 'opLoader',
-    standalone: false
+  selector: 'app-op-loader',
+  templateUrl: './op-loader.component.html',
+  styleUrls: ['./op-loader.component.scss'],
+  exportAs: 'opLoader',
+  standalone: false,
 })
 export class OpLoaderComponent implements OnInit, OnDestroy, OnChanges {
   @Input() message = 'Cargando...';
@@ -37,7 +44,9 @@ export class OpLoaderComponent implements OnInit, OnDestroy, OnChanges {
       this.loading = this._active;
     }
   }
-  get active(): boolean { return this._active; }
+  get active(): boolean {
+    return this._active;
+  }
 
   loading = false;
   errorActive = false;

@@ -18,12 +18,12 @@ import { CrearPaginaComponent } from './crear/crear-pagina.component';
     PaginasRoutingModule,
     SharedOPModule,
     SharedCoreUiModule,
-    EntradasSharedModule
+    EntradasSharedModule,
   ],
   declarations: [
     ListadoPaginasComponent,
     CrearPaginaComponent,
-    EditarPaginaComponent
-  ]
+    EditarPaginaComponent,
+  ],
 })
 export class PaginasModule {}

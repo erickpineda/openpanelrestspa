@@ -9,34 +9,35 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* You can add global styles to this file, and also import other style files */
 // If you want to override variables do it here
-@use "./assets/css/variables" as *;
-
- 
+@use './assets/css/variables' as *;
 
 // Import styles with default layout.
 /*@use "@coreui/coreui/scss/coreui" with ($enable-ltr: true, $enable-rtl: true);*/
-@use "../node_modules/@coreui/coreui/scss/coreui" with ($enable-ltr: true, $enable-rtl: true);
+@use '../node_modules/@coreui/coreui/scss/coreui' with (
+  $enable-ltr: true,
+  $enable-rtl: true
+);
 
 // Import Chart.js custom tooltips styles
 /*@use "@coreui/chartjs/scss/coreui-chartjs" as *;*/
-@use "../node_modules/@coreui/chartjs/scss/coreui-chartjs" as *;
+@use '../node_modules/@coreui/chartjs/scss/coreui-chartjs' as *;
 
 // perfect scrollbar theming for use with [perfectScrollbar] directive
 //@import 'perfect-scrollbar/css/perfect-scrollbar.css';
 
-@use "./assets/css/layout";
+@use './assets/css/layout';
 
 // Some temp fixes
-@use "./assets/css/fixes";
+@use './assets/css/fixes';
 
 // Prism.js (deshabilitado; requiere variables no utilizadas)
 // @use "./assets/css/examples";
 
 // If you want to add something do it here
-@use "./assets/css/custom";
+@use './assets/css/custom';
 
 // Optimized navigation styles
-@use "./assets/css/navigation-optimized";
+@use './assets/css/navigation-optimized';
 
 // Navigation animations
-@use "./assets/css/navigation-animations";
+@use './assets/css/navigation-animations';

@@ -12,13 +12,13 @@ import { LoggerService } from '../../../../core/services/logger.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-    selector: 'app-crear-entrada',
-    templateUrl: './crear-entrada.component.html',
-    styleUrls: ['./crear-entrada.component.scss'],
-    standalone: false
+  selector: 'app-crear-entrada',
+  templateUrl: './crear-entrada.component.html',
+  styleUrls: ['./crear-entrada.component.scss'],
+  standalone: false,
 })
 export class CrearEntradaComponent implements OnInit {
-  entradaForm : UntypedFormGroup;
+  entradaForm: UntypedFormGroup;
   tiposEntr: TipoEntrada[] = [];
   estadosEntr: EstadoEntrada[] = [];
   categorias: Categoria[] = [];
@@ -33,7 +33,7 @@ export class CrearEntradaComponent implements OnInit {
     private facade: EntradaFacadeService,
     private router: Router,
     private toastService: ToastService,
-    private log: LoggerService
+    private log: LoggerService,
   ) {
     this.entradaForm = this.vf.buildForm();
   }
@@ -49,25 +49,31 @@ export class CrearEntradaComponent implements OnInit {
   async onGuardar(ent: any) {
     this.submitted = true;
     if (this.entradaForm.invalid) return;
-    
+
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuario = usuario?.idUsuario ?? null;
-    
+
     this.facade.crearEntrada(ent).subscribe({
       next: () => {
-        this.toastService.showInfo('Se ha creado la entrada correctamente', 'Entrada creada');
+        this.toastService.showInfo(
+          'Se ha creado la entrada correctamente',
+          'Entrada creada',
+        );
         // ✅ Solo navegar si es exitoso
         this.router.navigateByUrl('/admin/control/entradas');
       },
       error: (error) => {
         // ❌ Error - mostrar mensaje y mantener en formulario
         this.log.error('Error creando entrada:', error);
-      }
+      },
     });
   }
 
   onPreviewEmit(payload: Partial<Entrada>) {
-    this.entradaParaPrevia = { ...(this.entradaParaPrevia || {}), ...(payload as Entrada) } as Entrada;
+    this.entradaParaPrevia = {
+      ...(this.entradaParaPrevia || {}),
+      ...(payload as Entrada),
+    } as Entrada;
     this.modalPreviaVisible = true;
   }
 

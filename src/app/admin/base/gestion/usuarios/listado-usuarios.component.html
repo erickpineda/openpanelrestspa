@@ -12,9 +12,14 @@
   </c-card-header>
   <c-card-body [attr.aria-busy]="loading ? 'true' : null">
     @if (error) {
-      <div class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
+      <div
+        class="alert alert-danger d-flex align-items-center justify-content-between my-2"
+        role="alert"
+      >
         <span>{{ error }}</span>
-        <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
+        <button cButton color="danger" size="sm" (click)="load()">
+          Reintentar
+        </button>
       </div>
     }
     <div>
@@ -23,11 +28,39 @@
           <div class="text-muted small">Total {{ totalElements }}</div>
         </c-col>
         <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar usuario..." [disabled]="loading" style="max-width: 280px;" />
-          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
+          <input
+            cFormControl
+            type="text"
+            [value]="basicSearchText"
+            (input)="onBasicSearchTextChange($any($event.target).value)"
+            placeholder="Buscar usuario..."
+            [disabled]="loading"
+            style="max-width: 280px"
+          />
+          <button
+            cButton
+            color="secondary"
+            variant="ghost"
+            size="sm"
+            (click)="toggleAdvanced()"
+            [disabled]="loading"
+          >
+            Avanzado
+          </button>
         </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;" [disabled]="loading">
+        <c-col
+          xs="12"
+          md="4"
+          class="d-flex justify-content-md-end gap-2 align-items-center"
+        >
+          <select
+            cSelect
+            [ngModel]="pageSize"
+            (ngModelChange)="onPageSizeChange($event)"
+            name="pageSizeSelect"
+            style="max-width: 100px"
+            [disabled]="loading"
+          >
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="20">20</option>
@@ -39,11 +72,24 @@
           <c-row class="g-3 align-items-end">
             <c-col xs="12" md="4">
               <label class="form-label mb-1">Usuario</label>
-              <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" [disabled]="loading" />
+              <input
+                cFormControl
+                class="form-control-sm"
+                type="text"
+                placeholder="Buscar por usuario..."
+                [value]="filtroUsuario"
+                (input)="filtroUsuario = $any($event.target).value"
+                [disabled]="loading"
+              />
             </c-col>
             <c-col xs="6" md="3">
               <label class="form-label mb-1">Rol</label>
-              <select cSelect class="form-select-sm" [(ngModel)]="filtroRolCodigo" [disabled]="loading">
+              <select
+                cSelect
+                class="form-select-sm"
+                [(ngModel)]="filtroRolCodigo"
+                [disabled]="loading"
+              >
                 <option [ngValue]="null">Seleccione rol</option>
                 @for (r of roles; track trackByRol($index, r)) {
                   <option [value]="r.codigo">{{ r.nombre }}</option>
@@ -52,18 +98,48 @@
             </c-col>
             <c-col xs="6" md="3">
               <label class="form-label mb-1">Email confirmado</label>
-              <select cSelect class="form-select-sm" [value]="filtroEmailConfirmado === null ? '' : (filtroEmailConfirmado ? 'true' : 'false')"
-                (change)="filtroEmailConfirmado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')" [disabled]="loading">
+              <select
+                cSelect
+                class="form-select-sm"
+                [value]="
+                  filtroEmailConfirmado === null
+                    ? ''
+                    : filtroEmailConfirmado
+                      ? 'true'
+                      : 'false'
+                "
+                (change)="
+                  filtroEmailConfirmado =
+                    $any($event.target).value === ''
+                      ? null
+                      : $any($event.target).value === 'true'
+                "
+                [disabled]="loading"
+              >
                 <option value="">Seleccione estado</option>
                 <option value="true">Sí</option>
                 <option value="false">No</option>
               </select>
             </c-col>
             <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
-              <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="loading">
+              <button
+                cButton
+                size="sm"
+                color="primary"
+                variant="outline"
+                (click)="search()"
+                [disabled]="loading"
+              >
                 <svg cIcon name="cilSearch"></svg> Buscar
               </button>
-              <button cButton size="sm" color="secondary" variant="outline" (click)="reset()" [disabled]="loading">
+              <button
+                cButton
+                size="sm"
+                color="secondary"
+                variant="outline"
+                (click)="reset()"
+                [disabled]="loading"
+              >
                 <svg cIcon name="cilReload"></svg> Limpiar
               </button>
             </c-col>
@@ -73,7 +149,14 @@
 
       <div class="tabla-con-loader-wrapper position-relative">
         @if (loading) {
-          <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+          <div
+            class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+            style="
+              z-index: 10;
+              background-color: rgba(255, 255, 255, 0.8);
+              min-height: 200px;
+            "
+          >
             <div class="text-center">
               <c-spinner [attr.aria-label]="'Cargando usuarios'"></c-spinner>
               <p class="mt-2 text-muted">Cargando usuarios...</p>
@@ -82,35 +165,82 @@
         }
 
         <div [class.opacity-50]="loading" class="table-responsive">
-          <table responsive cAlign="top" cTable hover class="align-middle mb-0 border tabla-con-loader" role="table" aria-label="Tabla de usuarios">
+          <table
+            responsive
+            cAlign="top"
+            cTable
+            hover
+            class="align-middle mb-0 border tabla-con-loader"
+            role="table"
+            aria-label="Tabla de usuarios"
+          >
             <thead cTableColor="light">
               <tr>
-                <th scope="col" style="min-width: 200px;">Usuario</th>
-                <th scope="col" style="min-width: 160px;">Nombre</th>
-                <th scope="col" style="min-width: 250px;">Email</th>
-                <th scope="col" style="min-width: 120px;">Rol</th>
-                <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
+                <th scope="col" style="min-width: 200px">Usuario</th>
+                <th scope="col" style="min-width: 160px">Nombre</th>
+                <th scope="col" style="min-width: 250px">Email</th>
+                <th scope="col" style="min-width: 120px">Rol</th>
+                <th scope="col" class="text-center" style="min-width: 100px">
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody>
               @for (u of usuarios; track trackByUsuario($index, u)) {
                 <tr [class.table-row-disabled]="!u.habilitado">
                   <td>
-                    <span class="fw-semibold text-truncate d-inline-block" style="max-width: 220px;" [title]="u.username">{{ u.username }}</span>
+                    <span
+                      class="fw-semibold text-truncate d-inline-block"
+                      style="max-width: 220px"
+                      [title]="u.username"
+                      >{{ u.username }}</span
+                    >
                   </td>
                   <td>
-                    <span class="d-inline-block text-truncate" style="max-width: 220px;" [title]="(u.nombre + ' ' + u.apellido).trim()">{{ u.nombre }} {{ u.apellido }}</span>
+                    <span
+                      class="d-inline-block text-truncate"
+                      style="max-width: 220px"
+                      [title]="(u.nombre + ' ' + u.apellido).trim()"
+                      >{{ u.nombre }} {{ u.apellido }}</span
+                    >
                   </td>
                   <td>
-                    <span class="d-inline-block text-truncate" style="max-width: 260px;" [title]="u.email">{{ u.email }}</span>
+                    <span
+                      class="d-inline-block text-truncate"
+                      style="max-width: 260px"
+                      [title]="u.email"
+                      >{{ u.email }}</span
+                    >
                   </td>
                   <td>{{ u.rolCodigo }}</td>
                   <td class="text-center">
-                    <div class="btn-group" role="group" aria-label="Acciones de usuario">
-                      <button cButton color="warning" size="sm" variant="ghost" (click)="openEdit(u)" [attr.aria-label]="'Editar usuario ' + u.username">
+                    <div
+                      class="btn-group"
+                      role="group"
+                      aria-label="Acciones de usuario"
+                    >
+                      <button
+                        cButton
+                        color="warning"
+                        size="sm"
+                        variant="ghost"
+                        (click)="openEdit(u)"
+                        [attr.aria-label]="'Editar usuario ' + u.username"
+                      >
                         <svg cIcon name="cilPencil" size="sm"></svg>
                       </button>
-                      <button cButton color="danger" size="sm" variant="ghost" (click)="delete(u)" [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE" [attr.aria-label]="'Eliminar usuario ' + u.username">
+                      <button
+                        cButton
+                        color="danger"
+                        size="sm"
+                        variant="ghost"
+                        (click)="delete(u)"
+                        [disabled]="
+                          PROPIETARIO_ROLE_CODE &&
+                          u.rolCodigo === PROPIETARIO_ROLE_CODE
+                        "
+                        [attr.aria-label]="'Eliminar usuario ' + u.username"
+                      >
                         <svg cIcon name="cilTrash" size="sm"></svg>
                       </button>
                     </div>
@@ -121,10 +251,19 @@
               @if (usuarios.length === 0) {
                 <tr>
                   <td colspan="5" class="text-center py-5">
-                    <div class="d-flex flex-column align-items-center justify-content-center">
-                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                    <div
+                      class="d-flex flex-column align-items-center justify-content-center"
+                    >
+                      <svg
+                        cIcon
+                        name="cilSearch"
+                        size="3xl"
+                        class="text-muted mb-3"
+                      ></svg>
                       <h6 class="text-muted">No se han encontrado usuarios</h6>
-                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+                      <p class="text-muted small">
+                        Intenta ajustar los filtros de búsqueda
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -137,16 +276,38 @@
               [align]="'center'"
               [totalPages]="getTotalPages()"
               [currentPage]="pageNo"
-              (pageChange)="onPageChange($event)">
+              (pageChange)="onPageChange($event)"
+            >
             </app-op-pagination>
           }
 
           @if (usuarios.length > 0) {
             <c-row class="mt-2">
-              <c-col class="d-flex justify-content-end align-items-center gap-2">
-                <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
-                <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-                <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+              <c-col
+                class="d-flex justify-content-end align-items-center gap-2"
+              >
+                <button
+                  cButton
+                  color="light"
+                  size="sm"
+                  (click)="prev()"
+                  [disabled]="pageNo <= 0"
+                >
+                  Anterior
+                </button>
+                <button
+                  cButton
+                  color="light"
+                  size="sm"
+                  (click)="next()"
+                  [disabled]="pageNo >= getTotalPages() - 1"
+                >
+                  Siguiente
+                </button>
+                <div class="text-muted small ms-2">
+                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
+                  {{ totalElements }} · Mostrando {{ numberOfElements }}
+                </div>
               </c-col>
             </c-row>
           }
@@ -156,9 +317,15 @@
   </c-card-body>
 </c-card>
 
-<c-modal id="editUserModal" [visible]="editModalVisible" (visibleChange)="editModalVisible = $event">
+<c-modal
+  id="editUserModal"
+  [visible]="editModalVisible"
+  (visibleChange)="editModalVisible = $event"
+>
   <c-modal-header class="d-flex justify-content-between align-items-center">
-    <h5 cModalTitle>{{ editUser?.idUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}</h5>
+    <h5 cModalTitle>
+      {{ editUser?.idUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}
+    </h5>
     @if (getUserErrors().length) {
       <c-badge color="danger">{{ getUserErrors().length }}</c-badge>
     }
@@ -168,46 +335,102 @@
       <div>
         <div class="mb-3">
           <label class="form-label">Usuario</label>
-          <input cFormControl type="text" [value]="editUser.username || ''" (input)="editUser && (editUser.username=$any($event.target).value)" [class.is-invalid]="!editUser.username" [disabled]="!!editUser.idUsuario" />
+          <input
+            cFormControl
+            type="text"
+            [value]="editUser.username || ''"
+            (input)="
+              editUser && (editUser.username = $any($event.target).value)
+            "
+            [class.is-invalid]="!editUser.username"
+            [disabled]="!!editUser.idUsuario"
+          />
           @if (!editUser.username) {
             <div class="invalid-feedback d-block">Usuario requerido</div>
           }
           @if (!!editUser.idUsuario) {
-            <div class="text-muted small mt-1">El nombre de usuario no se puede modificar aquí.</div>
+            <div class="text-muted small mt-1">
+              El nombre de usuario no se puede modificar aquí.
+            </div>
           }
         </div>
         <div class="mb-3">
           <label class="form-label">Nombre</label>
-          <input cFormControl type="text" [value]="editUser.nombre || ''" (input)="editUser && (editUser.nombre=$any($event.target).value)" />
+          <input
+            cFormControl
+            type="text"
+            [value]="editUser.nombre || ''"
+            (input)="editUser && (editUser.nombre = $any($event.target).value)"
+          />
         </div>
         <div class="mb-3">
           <label class="form-label">Apellido</label>
-          <input cFormControl type="text" [value]="editUser.apellido || ''" (input)="editUser && (editUser.apellido=$any($event.target).value)" />
+          <input
+            cFormControl
+            type="text"
+            [value]="editUser.apellido || ''"
+            (input)="
+              editUser && (editUser.apellido = $any($event.target).value)
+            "
+          />
         </div>
         <div class="mb-3">
           <label class="form-label">Email</label>
-          <input cFormControl type="email" [value]="editUser.email || ''" (input)="editUser && (editUser.email=$any($event.target).value)" [class.is-invalid]="!isEmailValid(editUser.email)" />
+          <input
+            cFormControl
+            type="email"
+            [value]="editUser.email || ''"
+            (input)="editUser && (editUser.email = $any($event.target).value)"
+            [class.is-invalid]="!isEmailValid(editUser.email)"
+          />
           @if (!isEmailValid(editUser.email)) {
             <div class="invalid-feedback d-block">Email inválido</div>
           }
         </div>
         <div class="mb-3">
           <c-form-check>
-            <input cFormCheckInput type="checkbox" id="userEnabled" [checked]="editUser.habilitado" (change)="editUser && (editUser.habilitado = $any($event.target).checked)" [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE" />
+            <input
+              cFormCheckInput
+              type="checkbox"
+              id="userEnabled"
+              [checked]="editUser.habilitado"
+              (change)="
+                editUser && (editUser.habilitado = $any($event.target).checked)
+              "
+              [disabled]="
+                PROPIETARIO_ROLE_CODE &&
+                editUser.rolCodigo === PROPIETARIO_ROLE_CODE
+              "
+            />
             <label cFormCheckLabel for="userEnabled">Habilitar Usuario</label>
           </c-form-check>
-          @if (PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE) {
+          @if (
+            PROPIETARIO_ROLE_CODE &&
+            editUser.rolCodigo === PROPIETARIO_ROLE_CODE
+          ) {
             <div class="text-info small mt-1">
-              <svg cIcon name="cilLockLocked" size="sm"></svg>El rol de Propietario no se puede deshabilitar.
+              <svg cIcon name="cilLockLocked" size="sm"></svg>El rol de
+              Propietario no se puede deshabilitar.
             </div>
           }
         </div>
         <div class="mb-3">
           <label class="form-label">Rol</label>
-          <select cSelect [(ngModel)]="editUser.rolCodigo" [class.is-invalid]="!editUser.rolCodigo" [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
+          <select
+            cSelect
+            [(ngModel)]="editUser.rolCodigo"
+            [class.is-invalid]="!editUser.rolCodigo"
+            [disabled]="
+              PROPIETARIO_ROLE_CODE &&
+              editUser.rolCodigo === PROPIETARIO_ROLE_CODE
+            "
+          >
             <option value="">Seleccione rol</option>
             @for (r of roles; track trackByRol($index, r)) {
-              @if (r.codigo !== PROPIETARIO_ROLE_CODE || editUser.rolCodigo === PROPIETARIO_ROLE_CODE) {
+              @if (
+                r.codigo !== PROPIETARIO_ROLE_CODE ||
+                editUser.rolCodigo === PROPIETARIO_ROLE_CODE
+              ) {
                 <option [value]="r.codigo">
                   {{ r.nombre }}
                 </option>
@@ -217,9 +440,13 @@
           @if (!editUser.rolCodigo) {
             <div class="invalid-feedback d-block">Rol requerido</div>
           }
-          @if (PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE) {
+          @if (
+            PROPIETARIO_ROLE_CODE &&
+            editUser.rolCodigo === PROPIETARIO_ROLE_CODE
+          ) {
             <div class="text-info small mt-1">
-              <svg cIcon name="cilLockLocked" size="sm"></svg> El rol de Propietario no se puede modificar.
+              <svg cIcon name="cilLockLocked" size="sm"></svg> El rol de
+              Propietario no se puede modificar.
             </div>
           }
         </div>
@@ -228,20 +455,32 @@
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="closeEdit()">Cerrar</button>
-    <button cButton color="primary" [disabled]="!isUserFormValid()" (click)="saveEdit()">Guardar</button>
+    <button
+      cButton
+      color="primary"
+      [disabled]="!isUserFormValid()"
+      (click)="saveEdit()"
+    >
+      Guardar
+    </button>
   </c-modal-footer>
 </c-modal>
 
-<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal = $event" id="deleteUserModal">
+<c-modal
+  [visible]="showDeleteModal"
+  (visibleChange)="showDeleteModal = $event"
+  id="deleteUserModal"
+>
   <c-modal-header>
     <h5 cModalTitle>Confirmar eliminación</h5>
   </c-modal-header>
   <c-modal-body>
-    ¿Estás seguro de que deseas eliminar el usuario <strong>{{ userToDelete?.username }}</strong>?
-    <br>Esta acción no se puede deshacer.
-    </c-modal-body>
-    <c-modal-footer>
-      <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
-      <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
-    </c-modal-footer>
-  </c-modal>
+    ¿Estás seguro de que deseas eliminar el usuario
+    <strong>{{ userToDelete?.username }}</strong
+    >? <br />Esta acción no se puede deshacer.
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
+    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
+  </c-modal-footer>
+</c-modal>

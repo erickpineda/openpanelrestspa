@@ -6,10 +6,18 @@
       </c-card-header>
       <c-card-body>
         <div class="toolbar">
-          <input class="form-control" placeholder="Filtrar por texto" [(ngModel)]="filter" />
+          <input
+            class="form-control"
+            placeholder="Filtrar por texto"
+            [(ngModel)]="filter"
+          />
           <button cButton color="primary" (click)="search()">Buscar</button>
-          <button cButton color="secondary" variant="outline" (click)="clear()">Limpiar</button>
-          <button cButton color="info" variant="outline" (click)="sample()">Generar ejemplos</button>
+          <button cButton color="secondary" variant="outline" (click)="clear()">
+            Limpiar
+          </button>
+          <button cButton color="info" variant="outline" (click)="sample()">
+            Generar ejemplos
+          </button>
         </div>
         @if (loading) {
           <div>
@@ -17,9 +25,7 @@
           </div>
         }
         @if (!loading && filtered.length === 0) {
-          <div class="empty">
-            No hay logs disponibles
-          </div>
+          <div class="empty">No hay logs disponibles</div>
         }
         @if (!loading && filtered.length > 0) {
           <ul class="list-group">

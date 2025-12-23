@@ -31,9 +31,7 @@ Para celdas con contenido variable que podría romper el diseño, usar truncado 
 
 ```html
 <td>
-  <span class="d-inline-block text-truncate" style="max-width: 250px;" [title]="item.textoCompleto">
-    {{ item.textoCompleto }}
-  </span>
+  <span class="d-inline-block text-truncate" style="max-width: 250px;" [title]="item.textoCompleto"> {{ item.textoCompleto }} </span>
 </td>
 ```
 
@@ -78,7 +76,7 @@ Para mejorar la estética en Windows/Linux, se aplica un estilo personalizado a 
     height: 8px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
   }
 }

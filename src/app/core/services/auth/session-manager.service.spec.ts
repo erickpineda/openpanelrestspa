@@ -1,0 +1,138 @@
+import { SessionManagerService } from './session-manager.service';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
+import { RouteTrackerService } from './route-tracker.service';
+
+describe('SessionManagerService', () => {
+  it('handleLogoutFromSync fuerza logout inmediato si no hay cambios sin guardar', () => {
+    const tokenStorage = jasmine.createSpyObj('TokenStorageService', [
+      'signOut',
+    ]);
+    const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', [
+      'hasUnsavedWork',
+    ]);
+    unsavedWorkService.hasUnsavedWork.and.returnValue(false);
+    const router = jasmine.createSpyObj('Router', ['navigate']);
+    const log = jasmine.createSpyObj('LoggerService', ['info', 'error']);
+    const postLoginRedirect = jasmine.createSpyObj('PostLoginRedirectService', [
+      'saveLastValidRoute',
+      'getAndClearRedirectForTab',
+      'normalizeRoute',
+      'markPostLoginHandled',
+    ]);
+
+    spyOn(window, 'addEventListener').and.callFake(() => {});
+    spyOn(document, 'querySelectorAll').and.returnValue({ length: 0 } as any);
+    spyOn(RouteTrackerService, 'getLastValidUrl').and.returnValue('/admin/x');
+
+    const service = new SessionManagerService(
+      tokenStorage as any,
+      unsavedWorkService as any,
+      router as any,
+      log as any,
+      postLoginRedirect as any,
+    );
+
+    service.handleLogoutFromSync({ timestamp: 123 });
+
+    expect(postLoginRedirect.saveLastValidRoute).toHaveBeenCalledWith(
+      '/admin/x',
+    );
+    expect(tokenStorage.signOut).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(
+      [OPConstants.Session.ROUTE_SESSION_EXPIRED],
+      { state: { sessionData: jasmine.any(Object) } },
+    );
+  });
+
+  it('emite evento si hay trabajo sin guardar y allowSave=true', (done) => {
+    const tokenStorage = jasmine.createSpyObj('TokenStorageService', [
+      'signOut',
+    ]);
+    const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', [
+      'hasUnsavedWork',
+    ]);
+    unsavedWorkService.hasUnsavedWork.and.returnValue(true);
+    const router = jasmine.createSpyObj('Router', ['navigate']);
+    const log = jasmine.createSpyObj('LoggerService', ['info', 'error']);
+    const postLoginRedirect = jasmine.createSpyObj('PostLoginRedirectService', [
+      'saveLastValidRoute',
+      'getAndClearRedirectForTab',
+      'normalizeRoute',
+      'markPostLoginHandled',
+    ]);
+
+    spyOn(window, 'addEventListener').and.callFake(() => {});
+    spyOn(document, 'querySelectorAll').and.returnValue({ length: 0 } as any);
+
+    const service = new SessionManagerService(
+      tokenStorage as any,
+      unsavedWorkService as any,
+      router as any,
+      log as any,
+      postLoginRedirect as any,
+    );
+
+    service.sessionExpired$.subscribe((payload) => {
+      expect(payload.type).toBe('LOGOUT');
+      expect(tokenStorage.signOut).not.toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
+      done();
+    });
+
+    service.handleLogoutFromSync({ timestamp: 456 });
+  });
+
+  it('saveWorkAndLogout emite evento y fuerza logout tras timeout', () => {
+    jasmine.clock().install();
+
+    const tokenStorage = jasmine.createSpyObj('TokenStorageService', [
+      'signOut',
+    ]);
+    const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', [
+      'hasUnsavedWork',
+    ]);
+    unsavedWorkService.hasUnsavedWork.and.returnValue(false);
+    const router = jasmine.createSpyObj('Router', ['navigate']);
+    const log = jasmine.createSpyObj('LoggerService', ['info', 'error']);
+    const postLoginRedirect = jasmine.createSpyObj('PostLoginRedirectService', [
+      'saveLastValidRoute',
+      'getAndClearRedirectForTab',
+      'normalizeRoute',
+      'markPostLoginHandled',
+    ]);
+
+    const addEventListenerSpy = spyOn(window, 'addEventListener').and.callFake(
+      () => {},
+    );
+    expect(addEventListenerSpy).toBeDefined();
+
+    const dispatchSpy = spyOn(window, 'dispatchEvent').and.callThrough();
+    spyOn(document, 'querySelectorAll').and.returnValue({ length: 0 } as any);
+
+    const service = new SessionManagerService(
+      tokenStorage as any,
+      unsavedWorkService as any,
+      router as any,
+      log as any,
+      postLoginRedirect as any,
+    );
+
+    spyOn(service, 'performLogout');
+    service.saveWorkAndLogout({
+      type: 'SESSION_EXPIRED',
+      message: 'x',
+      allowSave: true,
+      timestamp: 1,
+    });
+
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        type: OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
+      }),
+    );
+    jasmine.clock().tick(30000);
+    expect(service.performLogout).toHaveBeenCalled();
+
+    jasmine.clock().uninstall();
+  });
+});

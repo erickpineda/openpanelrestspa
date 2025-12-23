@@ -23,6 +23,6 @@
       "reAttach": true,
       "preLaunchTask": "npm: start",
       "url": "http://localhost:4200/"
-  }
+    }
   ]
 }

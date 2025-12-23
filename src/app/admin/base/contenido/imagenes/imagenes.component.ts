@@ -1,4 +1,14 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ElementRef,
+  ViewChild,
+  ChangeDetectorRef,
+  Input,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
 import { MediaItem } from '../../../../core/models/media-item.model';
 import { saveAs } from 'file-saver';
@@ -6,10 +16,10 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
-    selector: 'app-imagenes',
-    templateUrl: './imagenes.component.html',
-    styleUrls: ['./imagenes.component.scss'],
-    standalone: false
+  selector: 'app-imagenes',
+  templateUrl: './imagenes.component.html',
+  styleUrls: ['./imagenes.component.scss'],
+  standalone: false,
 })
 export class ImagenesComponent implements OnInit, OnDestroy {
   loading = false;
@@ -54,61 +64,110 @@ export class ImagenesComponent implements OnInit, OnDestroy {
   @Output() selectItem = new EventEmitter<MediaItem>();
 
   constructor(
-    private fileStorage: FileStorageService, 
+    private fileStorage: FileStorageService,
     private toast: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
-  ngOnInit(): void { this.load(); }
-  ngOnDestroy(): void { this.clearPreviews(); this.destroy$.next(); this.destroy$.complete(); }
+  ngOnInit(): void {
+    this.load();
+  }
+  ngOnDestroy(): void {
+    this.clearPreviews();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   load(pageNo = this.pageNo): void {
-    this.loading = true; 
+    this.loading = true;
     this.error = null;
-    this.hasFilters = !!this.filtroNombre || !!this.filtroMime || !!this.fechaDesde || !!this.fechaHasta;
-    
-    this.fileStorage.listarFicheros(true)
+    this.hasFilters =
+      !!this.filtroNombre ||
+      !!this.filtroMime ||
+      !!this.fechaDesde ||
+      !!this.fechaHasta;
+
+    this.fileStorage
+      .listarFicheros(true)
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => { 
-          this.loading = false; 
-          this.cdr.detectChanges(); 
-        })
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
       )
       .subscribe({
         next: (fs) => {
-          const base = (fs || []).filter(i => i.tipo === 'image');
+          const base = (fs || []).filter((i) => i.tipo === 'image');
           const filtered = this.applyFilters(base);
-          const { pageItems, totalPages } = this.paginate(filtered, pageNo, this.pageSize);
-          this.items = pageItems; 
-          this.totalPages = totalPages; 
+          const { pageItems, totalPages } = this.paginate(
+            filtered,
+            pageNo,
+            this.pageSize,
+          );
+          this.items = pageItems;
+          this.totalPages = totalPages;
           this.totalElements = filtered.length;
           this.numberOfElements = pageItems.length;
-          this.updateNavState(); 
-          this.buildPreviews(pageItems); 
+          this.updateNavState();
+          this.buildPreviews(pageItems);
         },
-        error: () => { 
-          this.error = 'Error cargando imágenes'; 
-        }
+        error: () => {
+          this.error = 'Error cargando imágenes';
+        },
       });
   }
 
-  search(): void { this.pageNo = 0; this.load(); }
-  reset(): void { this.filtroNombre = ''; this.filtroMime=''; this.fechaDesde=''; this.fechaHasta=''; this.basicSearchText=''; this.pageNo = 0; this.load(); }
-  prev(): void { if (this.canPrev) { this.pageNo--; this.load(); } }
-  next(): void { if (this.canNext) { this.pageNo++; this.load(); } }
+  search(): void {
+    this.pageNo = 0;
+    this.load();
+  }
+  reset(): void {
+    this.filtroNombre = '';
+    this.filtroMime = '';
+    this.fechaDesde = '';
+    this.fechaHasta = '';
+    this.basicSearchText = '';
+    this.pageNo = 0;
+    this.load();
+  }
+  prev(): void {
+    if (this.canPrev) {
+      this.pageNo--;
+      this.load();
+    }
+  }
+  next(): void {
+    if (this.canNext) {
+      this.pageNo++;
+      this.load();
+    }
+  }
 
   onPageChange(page: number): void {
-    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, this.totalPages - 1)));
+    const safePage = Math.max(
+      0,
+      Math.min(Number(page) || 0, Math.max(0, this.totalPages - 1)),
+    );
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.load();
   }
 
   // Handlers toolbar
-  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
-  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.filtroNombre = this.basicSearchText; this.search(); }
-  onPageSizeChange(size: number): void { this.pageSize = Number(size) || this.pageSize; this.pageNo = 0; this.search(); }
+  toggleAdvanced(): void {
+    this.showAdvanced = !this.showAdvanced;
+  }
+  onBasicSearchTextChange(text: string): void {
+    this.basicSearchText = text || '';
+    this.filtroNombre = this.basicSearchText;
+    this.search();
+  }
+  onPageSizeChange(size: number): void {
+    this.pageSize = Number(size) || this.pageSize;
+    this.pageNo = 0;
+    this.search();
+  }
 
   private updateNavState(): void {
     this.canPrev = this.pageNo > 0;
@@ -117,40 +176,71 @@ export class ImagenesComponent implements OnInit, OnDestroy {
 
   download(item: MediaItem): void {
     if (!item) return;
-    const filename = (item.nombre && item.nombre.trim()) ? item.nombre!.trim() : 'imagen';
+    const filename =
+      item.nombre && item.nombre.trim() ? item.nombre!.trim() : 'imagen';
     if (item.uuid) {
       this.fileStorage.obtenerDatosFichero(item.uuid).subscribe({
         next: (datos: any) => {
           try {
             const b64: string | undefined = datos?.contenido;
-            const mime: string = datos?.tipo || item.mime || 'application/octet-stream';
-            if (!b64) { this.toast.showError('Contenido no disponible', 'Imágenes'); return; }
+            const mime: string =
+              datos?.tipo || item.mime || 'application/octet-stream';
+            if (!b64) {
+              this.toast.showError('Contenido no disponible', 'Imágenes');
+              return;
+            }
             const byteChars = atob(b64);
             const byteNums = new Array(byteChars.length);
-            for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i);
+            for (let i = 0; i < byteChars.length; i++)
+              byteNums[i] = byteChars.charCodeAt(i);
             const blob = new Blob([new Uint8Array(byteNums)], { type: mime });
             saveAs(blob, filename);
-          } catch { this.toast.showError('Error procesando descarga', 'Imágenes'); }
+          } catch {
+            this.toast.showError('Error procesando descarga', 'Imágenes');
+          }
         },
-        error: () => { this.toast.showError('Error descargando imagen', 'Imágenes'); }
+        error: () => {
+          this.toast.showError('Error descargando imagen', 'Imágenes');
+        },
       });
       return;
     }
     if (item.url) {
-      try { const a = document.createElement('a'); a.href = item.url!; a.download = filename; a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
-      catch { window.open(item.url!, '_blank'); }
+      try {
+        const a = document.createElement('a');
+        a.href = item.url!;
+        a.download = filename;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch {
+        window.open(item.url!, '_blank');
+      }
     }
   }
 
-  openUpload(input: HTMLInputElement): void { if (this.uploading) return; input.value = ''; input.click(); }
+  openUpload(input: HTMLInputElement): void {
+    if (this.uploading) return;
+    input.value = '';
+    input.click();
+  }
   onFileSelected(ev: Event): void {
     const input = ev.target as HTMLInputElement;
     if (!input?.files || input.files.length === 0) return;
     const file = input.files[0];
     this.uploading = true;
     this.fileStorage.uploadFile(file).subscribe({
-      next: () => { this.uploading = false; this.toast.showSuccess('Imagen subida', 'Imágenes'); this.pageNo = 0; this.load(); },
-      error: () => { this.uploading = false; this.toast.showError('Error subiendo imagen', 'Imágenes'); }
+      next: () => {
+        this.uploading = false;
+        this.toast.showSuccess('Imagen subida', 'Imágenes');
+        this.pageNo = 0;
+        this.load();
+      },
+      error: () => {
+        this.uploading = false;
+        this.toast.showError('Error subiendo imagen', 'Imágenes');
+      },
     });
   }
 
@@ -159,53 +249,78 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     for (const item of list) {
       if (!item?.uuid) continue;
       if (item?.mime && !String(item.mime).startsWith('image/')) continue;
-      this.fileStorage.obtenerDatosFichero(item.uuid, true)
+      this.fileStorage
+        .obtenerDatosFichero(item.uuid, true)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (datos: any) => {
             try {
               const b64: string | undefined = datos?.contenido;
-              const mime: string = datos?.tipo || item.mime || 'application/octet-stream';
+              const mime: string =
+                datos?.tipo || item.mime || 'application/octet-stream';
               if (!b64) return;
               const byteChars = atob(b64);
               const byteNums = new Array(byteChars.length);
-              for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i);
+              for (let i = 0; i < byteChars.length; i++)
+                byteNums[i] = byteChars.charCodeAt(i);
               const blob = new Blob([new Uint8Array(byteNums)], { type: mime });
               const url = URL.createObjectURL(blob);
               this.preview[item.uuid!] = url;
               this.cdr.detectChanges();
             } catch {}
           },
-          error: () => {}
+          error: () => {},
         });
     }
   }
 
   private clearPreviews(): void {
     try {
-      Object.values(this.preview).forEach(url => { try { URL.revokeObjectURL(url); } catch {} });
+      Object.values(this.preview).forEach((url) => {
+        try {
+          URL.revokeObjectURL(url);
+        } catch {}
+      });
     } catch {}
     this.preview = {};
   }
 
   private applyFilters(list: MediaItem[]): MediaItem[] {
     let res = list;
-    if (this.filtroNombre) res = res.filter(i => (i.nombre || '').toLowerCase().includes(this.filtroNombre.toLowerCase()));
-    if (this.filtroMime) res = res.filter(i => (i.mime || '').toLowerCase().includes(this.filtroMime.toLowerCase()));
+    if (this.filtroNombre)
+      res = res.filter((i) =>
+        (i.nombre || '')
+          .toLowerCase()
+          .includes(this.filtroNombre.toLowerCase()),
+      );
+    if (this.filtroMime)
+      res = res.filter((i) =>
+        (i.mime || '').toLowerCase().includes(this.filtroMime.toLowerCase()),
+      );
     const d = this.fechaDesde ? new Date(this.fechaDesde) : null;
     const h = this.fechaHasta ? new Date(this.fechaHasta) : null;
-    if (d) res = res.filter(i => i.fechaCreacion ? new Date(i.fechaCreacion) >= d : true);
-    if (h) res = res.filter(i => i.fechaCreacion ? new Date(i.fechaCreacion) <= h : true);
+    if (d)
+      res = res.filter((i) =>
+        i.fechaCreacion ? new Date(i.fechaCreacion) >= d : true,
+      );
+    if (h)
+      res = res.filter((i) =>
+        i.fechaCreacion ? new Date(i.fechaCreacion) <= h : true,
+      );
     return res;
   }
 
-  private paginate(list: MediaItem[], pageNo: number, pageSize: number): { pageItems: MediaItem[]; totalPages: number } {
+  private paginate(
+    list: MediaItem[],
+    pageNo: number,
+    pageSize: number,
+  ): { pageItems: MediaItem[]; totalPages: number } {
     const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
     const start = pageNo * pageSize;
     const pageItems = list.slice(start, start + pageSize);
     return { pageItems, totalPages };
   }
-    openPreview(item: MediaItem): void {
+  openPreview(item: MediaItem): void {
     if (!item) return;
     this.previewItem = item;
     this.previewModalVisible = true;
@@ -224,7 +339,7 @@ export class ImagenesComponent implements OnInit, OnDestroy {
 
   getPreviewUrl(item: MediaItem | null): string | null {
     const uid = item?.uuid;
-    return uid ? (this.preview[uid] || null) : null;
+    return uid ? this.preview[uid] || null : null;
   }
 
   getPreviewUrlForModal(): string | null {
@@ -257,9 +372,15 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     this.previewZoom = Math.max(this.minZoom, this.previewZoom - step);
   }
 
-  canZoomIn(): boolean { return !!this.getPreviewUrlForModal() && this.previewZoom < this.maxZoom; }
-  canZoomOut(): boolean { return !!this.getPreviewUrlForModal() && this.previewZoom > this.minZoom; }
-  zoomPercent(): number { return Math.round(this.previewZoom * 100); }
+  canZoomIn(): boolean {
+    return !!this.getPreviewUrlForModal() && this.previewZoom < this.maxZoom;
+  }
+  canZoomOut(): boolean {
+    return !!this.getPreviewUrlForModal() && this.previewZoom > this.minZoom;
+  }
+  zoomPercent(): number {
+    return Math.round(this.previewZoom * 100);
+  }
 
   @ViewChild('previewScroll') previewScroll?: ElementRef<HTMLDivElement>;
   @ViewChild('previewImg') previewImg?: ElementRef<HTMLImageElement>;
@@ -298,8 +419,12 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     event.preventDefault();
   }
 
-  onPreviewMouseUp(): void { this.isDragging = false; }
-  onPreviewMouseLeave(): void { this.isDragging = false; }
+  onPreviewMouseUp(): void {
+    this.isDragging = false;
+  }
+  onPreviewMouseLeave(): void {
+    this.isDragging = false;
+  }
 
   onPreviewTouchStart(event: TouchEvent): void {
     if (!this.getPreviewUrlForModal()) return;
@@ -331,7 +456,10 @@ export class ImagenesComponent implements OnInit, OnDestroy {
       const d = this.getTouchDist(event);
       if (d > 0) {
         const factor = d / this.pinchStartDist;
-        const next = Math.min(this.maxZoom, Math.max(this.minZoom, this.pinchStartZoom * factor));
+        const next = Math.min(
+          this.maxZoom,
+          Math.max(this.minZoom, this.pinchStartZoom * factor),
+        );
         this.previewZoom = next;
       }
     } else if (this.isDragging && event.touches.length === 1) {
@@ -344,7 +472,10 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     event.preventDefault();
   }
 
-  onPreviewTouchEnd(): void { this.isDragging = false; this.pinchActive = false; }
+  onPreviewTouchEnd(): void {
+    this.isDragging = false;
+    this.pinchActive = false;
+  }
 
   private getTouchDist(event: TouchEvent): number {
     if (event.touches.length < 2) return 0;
@@ -372,19 +503,30 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  fitWidth(): void { this.resetZoom(); }
+  fitWidth(): void {
+    this.resetZoom();
+  }
 
   fitHeight(): void {
     const el = this.previewScroll?.nativeElement;
     const imgEl = this.previewImg?.nativeElement;
-    if (!el || !imgEl) { this.resetZoom(); return; }
+    if (!el || !imgEl) {
+      this.resetZoom();
+      return;
+    }
     const natW = imgEl.naturalWidth || this.previewNaturalWidth;
     const natH = imgEl.naturalHeight || this.previewNaturalHeight;
-    if (!natW || !natH) { this.resetZoom(); return; }
+    if (!natW || !natH) {
+      this.resetZoom();
+      return;
+    }
     const contW = el.clientWidth;
     const contH = el.clientHeight;
     const targetZoom = (contH / natH) * (natW / contW);
-    this.previewZoom = Math.min(this.maxZoom, Math.max(this.minZoom, targetZoom));
+    this.previewZoom = Math.min(
+      this.maxZoom,
+      Math.max(this.minZoom, targetZoom),
+    );
     setTimeout(() => {
       el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
       el.scrollTop = Math.max(0, (el.scrollHeight - el.clientHeight) / 2);
@@ -396,12 +538,12 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     // Formato esperado: "dd-MM-yyyy HH:mm:ss"
     const partes = fechaStr.split(' ');
     if (partes.length !== 2) return null;
-    
+
     const [dia, mes, anio] = partes[0].split('-').map(Number);
     const [hora, min, seg] = partes[1].split(':').map(Number);
-    
+
     if (!dia || !mes || !anio) return null;
-    
+
     // Mes en Date es 0-indexado
     return new Date(anio, mes - 1, dia, hora || 0, min || 0, seg || 0);
   }
@@ -411,6 +553,10 @@ export class ImagenesComponent implements OnInit, OnDestroy {
   }
 
   trackByMediaItem(index: number, item: MediaItem): string {
-    return item?.uuid || item?.url || `${item?.nombre || ''}-${item?.fechaCreacion || ''}`;
+    return (
+      item?.uuid ||
+      item?.url ||
+      `${item?.nombre || ''}-${item?.fechaCreacion || ''}`
+    );
   }
 }

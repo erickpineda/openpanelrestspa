@@ -1,10 +1,16 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 
 @Component({
-    selector: 'app-dashboard-toolbar',
-    templateUrl: './dashboard-toolbar.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-dashboard-toolbar',
+  templateUrl: './dashboard-toolbar.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardToolbarComponent {
   @Input() forceFromDb: boolean = false;
@@ -16,4 +22,3 @@ export class DashboardToolbarComponent {
   @Output() downloadData = new EventEmitter<void>();
   @Output() downloadZip = new EventEmitter<void>();
 }
-

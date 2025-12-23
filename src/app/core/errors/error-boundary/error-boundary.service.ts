@@ -29,7 +29,7 @@ import { Injectable, Injector } from '@angular/core';
 import { ErrorBoundaryComponent } from '../../../shared/components/errors/error-boundary/error-boundary.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ErrorBoundaryService {
   private boundaries = new Map<string, ErrorBoundaryComponent>();
@@ -42,7 +42,11 @@ export class ErrorBoundaryService {
     this.boundaries.delete(id);
   }
 
-  reportErrorToBoundary(boundaryId: string, error: any, componentName: string = ''): void {
+  reportErrorToBoundary(
+    boundaryId: string,
+    error: any,
+    componentName: string = '',
+  ): void {
     const boundary = this.boundaries.get(boundaryId);
     if (boundary) {
       boundary.captureError(error, componentName);

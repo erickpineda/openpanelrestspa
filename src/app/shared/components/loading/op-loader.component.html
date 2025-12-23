@@ -59,11 +59,22 @@
     @if (errorActive) {
       <div class="loader-content">
         <div class="mb-2">
-          <c-alert color="danger">{{ errorMessage || 'Error de conexión. El servidor no responde.' }}</c-alert>
+          <c-alert color="danger">{{
+            errorMessage || 'Error de conexión. El servidor no responde.'
+          }}</c-alert>
         </div>
         <div class="d-flex justify-content-center gap-2">
-          <button cButton color="primary" (click)="onRetry()">Reintentar</button>
-          <button cButton color="secondary" variant="outline" (click)="onCloseError()">Cerrar</button>
+          <button cButton color="primary" (click)="onRetry()">
+            Reintentar
+          </button>
+          <button
+            cButton
+            color="secondary"
+            variant="outline"
+            (click)="onCloseError()"
+          >
+            Cerrar
+          </button>
         </div>
       </div>
     }

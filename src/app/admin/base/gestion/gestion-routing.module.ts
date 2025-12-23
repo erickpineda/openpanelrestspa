@@ -12,11 +12,11 @@ const routes: Routes = [
   { path: 'privilegios', component: PrivilegiosListComponent },
   { path: 'miperfil', component: MiPerfilComponent },
   { path: 'changepassword', component: ChangePasswordComponent },
-  { path: '', redirectTo: 'usuarios', pathMatch: 'full' }
+  { path: '', redirectTo: 'usuarios', pathMatch: 'full' },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class GestionRoutingModule {}

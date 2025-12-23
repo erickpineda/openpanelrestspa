@@ -1,4 +1,10 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { IconSetService } from '@coreui/icons-angular';
@@ -17,11 +23,11 @@ import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
 // ... imports existentes
 
 @Component({
-    selector: 'app-admin',
-    templateUrl: './admin.component.html',
-    styleUrls: ['./admin.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-admin',
+  templateUrl: './admin.component.html',
+  styleUrls: ['./admin.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AdminComponent implements OnInit, AfterViewInit {
   // ✅ NUEVO: Propiedades para controlar la notificación
@@ -56,7 +62,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private tokenStorage: TokenStorageService,
     private authService: AuthService,
-    private sidebarState: SidebarStateService
+    private sidebarState: SidebarStateService,
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
@@ -77,7 +83,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
   public labelLockAccount = 'Lock Account';
 
   ngOnInit(): void {
-    const ok = this.tokenStorage.isLoggedIn() && this.authService.isTokenValid(30);
+    const ok =
+      this.tokenStorage.isLoggedIn() && this.authService.isTokenValid(30);
     if (!ok) {
       this.router.navigate(['/login'], { replaceUrl: true });
       return;
@@ -86,18 +93,19 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.ready = true;
     this.checkForTemporaryData();
     this.cargaFinalizada = true;
-    const locale = (navigator && navigator.language) ? navigator.language : 'es-ES';
+    const locale =
+      navigator && navigator.language ? navigator.language : 'es-ES';
     this.setHeaderLabels(locale);
     const isDashboardRoute = this.router.url.includes('/admin/base/dashboard');
     if (isDashboardRoute) {
-      this.dashboardApi.getContentStats().subscribe(stats => {
+      this.dashboardApi.getContentStats().subscribe((stats) => {
         this.projectsCount = Number(stats?.totalEntradas) || 0;
         this.commentsCount = Number(stats?.totalComentarios) || 0;
         this.messagesCount = this.commentsCount;
         this.cdr.markForCheck();
       });
     }
-    this.toastService.toasts$.subscribe(list => {
+    this.toastService.toasts$.subscribe((list) => {
       this.notificationsCount = Array.isArray(list) ? list.length : 0;
       this.cdr.markForCheck();
     });
@@ -125,10 +133,13 @@ export class AdminComponent implements OnInit, AfterViewInit {
   private checkForTemporaryData(): void {
     const temporaryEntries = this.temporaryStorage.getAllTemporaryEntries();
     this.temporaryEntriesCount = temporaryEntries.length;
-    
+
     if (this.temporaryEntriesCount > 0) {
-      this.log.info('📥 Datos temporales encontrados en admin:', temporaryEntries);
-      
+      this.log.info(
+        '📥 Datos temporales encontrados en admin:',
+        temporaryEntries,
+      );
+
       // ✅ MODIFICADO: Siempre mostrar notificación múltiple, incluso con una sola entrada
       this.showGlobalRecoveryNotification = true;
     }

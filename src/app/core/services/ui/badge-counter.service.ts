@@ -1,9 +1,24 @@
-import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, timer, combineLatest, of, throwError } from 'rxjs';
-import { map, switchMap, catchError, startWith, retry, retryWhen, delay, take } from 'rxjs/operators';
-import { 
-  IBadgeCounterService 
-} from '../../../shared/types/navigation.types';
+import { Injectable, OnDestroy } from '@angular/core';
+import {
+  Observable,
+  BehaviorSubject,
+  Subscription,
+  timer,
+  combineLatest,
+  of,
+  throwError,
+} from 'rxjs';
+import {
+  map,
+  switchMap,
+  catchError,
+  startWith,
+  retry,
+  retryWhen,
+  delay,
+  take,
+} from 'rxjs/operators';
+import { IBadgeCounterService } from '../../../shared/types/navigation.types';
 import { NavigationConstants } from '../../../shared/constants/navigation.constants';
 
 // Importar servicios de datos existentes
@@ -19,7 +34,7 @@ export enum BadgeCounterErrorCodes {
   INVALID_COUNTER_ID = 'BADGE_002',
   NETWORK_ERROR = 'BADGE_003',
   PERMISSION_DENIED = 'BADGE_004',
-  CONFIGURATION_ERROR = 'BADGE_005'
+  CONFIGURATION_ERROR = 'BADGE_005',
 }
 
 /**
@@ -37,24 +52,25 @@ export interface CounterFallbackConfig {
  * con manejo robusto de errores y fallbacks
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class BadgeCounterService implements IBadgeCounterService {
-  
-  private readonly countersSubject = new BehaviorSubject<Map<string, number>>(new Map());
-  private refreshTimers: Map<string, Observable<number>> = new Map();
+export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
+  private readonly countersSubject = new BehaviorSubject<Map<string, number>>(
+    new Map(),
+  );
+  private refreshTimers: Map<string, Subscription> = new Map();
   private errorCounts: Map<string, number> = new Map();
   private fallbackConfig: CounterFallbackConfig = {
     defaultValue: 0,
     maxRetries: 3,
     retryDelayMs: 2000,
-    enableLogging: true
+    enableLogging: true,
   };
 
   constructor(
     private comentarioService: ComentarioService,
     private entradaService: EntradaService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
   ) {
     // Inicializar contadores solo si no estamos en un entorno de pruebas
     if (typeof jasmine === 'undefined') {
@@ -69,24 +85,33 @@ export class BadgeCounterService implements IBadgeCounterService {
     return this.comentarioService.listarSafe().pipe(
       map((comentarios: any[]) => {
         if (!Array.isArray(comentarios)) {
-          this.logError('unmoderated-comments', BadgeCounterErrorCodes.INVALID_COUNTER_ID, 
-            'Invalid response format for comments');
+          this.logError(
+            'unmoderated-comments',
+            BadgeCounterErrorCodes.INVALID_COUNTER_ID,
+            'Invalid response format for comments',
+          );
           return this.fallbackConfig.defaultValue;
         }
-        
+
         // Filtrar comentarios que requieren moderación
-        return comentarios.filter((comentario: any) => 
-          comentario.estado === 'PENDIENTE' || comentario.estado === 'REPORTADO'
+        return comentarios.filter(
+          (comentario: any) =>
+            comentario.estado === 'PENDIENTE' ||
+            comentario.estado === 'REPORTADO',
         ).length;
       }),
       retry({
         count: this.fallbackConfig.maxRetries,
-        delay: this.fallbackConfig.retryDelayMs
+        delay: this.fallbackConfig.retryDelayMs,
       }),
-      catchError(error => {
-        this.logError('unmoderated-comments', BadgeCounterErrorCodes.SERVICE_UNAVAILABLE, error);
+      catchError((error) => {
+        this.logError(
+          'unmoderated-comments',
+          BadgeCounterErrorCodes.SERVICE_UNAVAILABLE,
+          error,
+        );
         return of(this.getFallbackValue('unmoderated-comments'));
-      })
+      }),
     );
   }
 
@@ -97,24 +122,32 @@ export class BadgeCounterService implements IBadgeCounterService {
     return this.entradaService.listarSafe().pipe(
       map((entradas: any[]) => {
         if (!Array.isArray(entradas)) {
-          this.logError('draft-entries', BadgeCounterErrorCodes.INVALID_COUNTER_ID, 
-            'Invalid response format for entries');
+          this.logError(
+            'draft-entries',
+            BadgeCounterErrorCodes.INVALID_COUNTER_ID,
+            'Invalid response format for entries',
+          );
           return this.fallbackConfig.defaultValue;
         }
-        
+
         // Filtrar entradas en estado borrador
-        return entradas.filter((entrada: any) => 
-          entrada.estado === 'BORRADOR' || entrada.estado === 'TEMPORAL'
+        return entradas.filter(
+          (entrada: any) =>
+            entrada.estado === 'BORRADOR' || entrada.estado === 'TEMPORAL',
         ).length;
       }),
       retry({
         count: this.fallbackConfig.maxRetries,
-        delay: this.fallbackConfig.retryDelayMs
+        delay: this.fallbackConfig.retryDelayMs,
       }),
-      catchError(error => {
-        this.logError('draft-entries', BadgeCounterErrorCodes.SERVICE_UNAVAILABLE, error);
+      catchError((error) => {
+        this.logError(
+          'draft-entries',
+          BadgeCounterErrorCodes.SERVICE_UNAVAILABLE,
+          error,
+        );
         return of(this.getFallbackValue('draft-entries'));
-      })
+      }),
     );
   }
 
@@ -125,24 +158,32 @@ export class BadgeCounterService implements IBadgeCounterService {
     return this.usuarioService.listarSafe().pipe(
       map((usuarios: any[]) => {
         if (!Array.isArray(usuarios)) {
-          this.logError('pending-users', BadgeCounterErrorCodes.INVALID_COUNTER_ID, 
-            'Invalid response format for users');
+          this.logError(
+            'pending-users',
+            BadgeCounterErrorCodes.INVALID_COUNTER_ID,
+            'Invalid response format for users',
+          );
           return this.fallbackConfig.defaultValue;
         }
-        
+
         // Filtrar usuarios pendientes de activación
-        return usuarios.filter((usuario: any) => 
-          usuario.estado === 'PENDIENTE' || usuario.estado === 'INACTIVO'
+        return usuarios.filter(
+          (usuario: any) =>
+            usuario.estado === 'PENDIENTE' || usuario.estado === 'INACTIVO',
         ).length;
       }),
       retry({
         count: this.fallbackConfig.maxRetries,
-        delay: this.fallbackConfig.retryDelayMs
+        delay: this.fallbackConfig.retryDelayMs,
       }),
-      catchError(error => {
-        this.logError('pending-users', BadgeCounterErrorCodes.SERVICE_UNAVAILABLE, error);
+      catchError((error) => {
+        this.logError(
+          'pending-users',
+          BadgeCounterErrorCodes.SERVICE_UNAVAILABLE,
+          error,
+        );
         return of(this.getFallbackValue('pending-users'));
-      })
+      }),
     );
   }
 
@@ -154,32 +195,39 @@ export class BadgeCounterService implements IBadgeCounterService {
     return combineLatest([
       this.getUnmoderatedCommentsCount(),
       this.getDraftEntriesCount(),
-      this.getPendingUsersCount()
+      this.getPendingUsersCount(),
     ]).pipe(
       map(([comments, drafts, users]) => {
         // Validar que todos los valores sean números válidos
-        const validComments = typeof comments === 'number' && !isNaN(comments) ? comments : 0;
-        const validDrafts = typeof drafts === 'number' && !isNaN(drafts) ? drafts : 0;
-        const validUsers = typeof users === 'number' && !isNaN(users) ? users : 0;
-        
+        const validComments =
+          typeof comments === 'number' && !isNaN(comments) ? comments : 0;
+        const validDrafts =
+          typeof drafts === 'number' && !isNaN(drafts) ? drafts : 0;
+        const validUsers =
+          typeof users === 'number' && !isNaN(users) ? users : 0;
+
         // Calcular alertas críticas del sistema
         let alerts = 0;
-        
+
         // Comentarios críticos (más de 10 sin moderar)
         if (validComments > 10) alerts++;
-        
+
         // Borradores antiguos (más de 20)
         if (validDrafts > 20) alerts++;
-        
+
         // Usuarios pendientes críticos (más de 5)
         if (validUsers > 5) alerts++;
-        
+
         return alerts;
       }),
-      catchError(error => {
-        this.logError('system-alerts', BadgeCounterErrorCodes.SERVICE_UNAVAILABLE, error);
+      catchError((error) => {
+        this.logError(
+          'system-alerts',
+          BadgeCounterErrorCodes.SERVICE_UNAVAILABLE,
+          error,
+        );
         return of(this.getFallbackValue('system-alerts'));
-      })
+      }),
     );
   }
 
@@ -187,7 +235,10 @@ export class BadgeCounterService implements IBadgeCounterService {
    * Refresca todos los contadores manualmente
    */
   refreshAllCounters(): void {
-    this.updateCounter('unmoderated-comments', this.getUnmoderatedCommentsCount());
+    this.updateCounter(
+      'unmoderated-comments',
+      this.getUnmoderatedCommentsCount(),
+    );
     this.updateCounter('draft-entries', this.getDraftEntriesCount());
     this.updateCounter('pending-users', this.getPendingUsersCount());
     this.updateCounter('system-alerts', this.getSystemAlertsCount());
@@ -197,9 +248,9 @@ export class BadgeCounterService implements IBadgeCounterService {
    * Obtiene un contador específico por ID
    */
   getCounterById(counterId: string): Observable<number> {
-    return this.countersSubject.asObservable().pipe(
-      map(counters => counters.get(counterId) || 0)
-    );
+    return this.countersSubject
+      .asObservable()
+      .pipe(map((counters) => counters.get(counterId) || 0));
   }
 
   /**
@@ -213,29 +264,40 @@ export class BadgeCounterService implements IBadgeCounterService {
    * Configura un contador con actualización automática
    */
   setupAutoRefreshCounter(
-    counterId: string, 
-    counterObservable: Observable<number>, 
-    intervalMs: number = NavigationConstants.REFRESH_INTERVALS.NORMAL
+    counterId: string,
+    counterObservable: Observable<number>,
+    intervalMs: number = NavigationConstants.REFRESH_INTERVALS.NORMAL,
   ): void {
-    // Crear timer para actualización automática
-    const refreshTimer = timer(0, intervalMs).pipe(
-      switchMap(() => counterObservable),
-      startWith(0)
-    );
+    this.stopAutoRefresh(counterId);
 
-    this.refreshTimers.set(counterId, refreshTimer);
-    
-    // Suscribirse y actualizar el contador
-    refreshTimer.subscribe(count => {
-      this.setCounterValue(counterId, count);
-    });
+    const subscription = timer(0, intervalMs)
+      .pipe(
+        switchMap(() => counterObservable),
+        startWith(0),
+      )
+      .subscribe((count) => {
+        this.setCounterValue(counterId, count);
+      });
+
+    this.refreshTimers.set(counterId, subscription);
   }
 
   /**
    * Detiene la actualización automática de un contador
    */
   stopAutoRefresh(counterId: string): void {
+    const existing = this.refreshTimers.get(counterId);
+    if (existing) {
+      existing.unsubscribe();
+    }
     this.refreshTimers.delete(counterId);
+  }
+
+  ngOnDestroy(): void {
+    for (const subscription of this.refreshTimers.values()) {
+      subscription.unsubscribe();
+    }
+    this.refreshTimers.clear();
   }
 
   /**
@@ -280,49 +342,60 @@ export class BadgeCounterService implements IBadgeCounterService {
     this.setupAutoRefreshCounter(
       'unmoderated-comments',
       this.getUnmoderatedCommentsCount(),
-      NavigationConstants.REFRESH_INTERVALS.NORMAL
+      NavigationConstants.REFRESH_INTERVALS.NORMAL,
     );
 
     this.setupAutoRefreshCounter(
       'draft-entries',
       this.getDraftEntriesCount(),
-      NavigationConstants.REFRESH_INTERVALS.SLOW
+      NavigationConstants.REFRESH_INTERVALS.SLOW,
     );
 
     this.setupAutoRefreshCounter(
       'pending-users',
       this.getPendingUsersCount(),
-      NavigationConstants.REFRESH_INTERVALS.SLOW
+      NavigationConstants.REFRESH_INTERVALS.SLOW,
     );
 
     this.setupAutoRefreshCounter(
       'system-alerts',
       this.getSystemAlertsCount(),
-      NavigationConstants.REFRESH_INTERVALS.FAST
+      NavigationConstants.REFRESH_INTERVALS.FAST,
     );
   }
 
   /**
    * Actualiza un contador específico con manejo de errores
    */
-  private updateCounter(counterId: string, counterObservable: Observable<number>): void {
+  private updateCounter(
+    counterId: string,
+    counterObservable: Observable<number>,
+  ): void {
     counterObservable.subscribe({
-      next: count => {
+      next: (count) => {
         this.setCounterValue(counterId, count);
         // Resetear contador de errores en caso de éxito
         this.errorCounts.delete(counterId);
       },
-      error: error => {
-        this.logError(counterId, BadgeCounterErrorCodes.SERVICE_UNAVAILABLE, error);
+      error: (error) => {
+        this.logError(
+          counterId,
+          BadgeCounterErrorCodes.SERVICE_UNAVAILABLE,
+          error,
+        );
         this.setCounterValue(counterId, this.getFallbackValue(counterId));
-      }
+      },
     });
   }
 
   /**
    * Registra errores del servicio de contadores
    */
-  private logError(counterId: string, errorCode: BadgeCounterErrorCodes, error: any): void {
+  private logError(
+    counterId: string,
+    errorCode: BadgeCounterErrorCodes,
+    error: any,
+  ): void {
     if (!this.fallbackConfig.enableLogging) return;
 
     // Incrementar contador de errores
@@ -334,16 +407,18 @@ export class BadgeCounterService implements IBadgeCounterService {
       counterId,
       errorCode,
       errorCount: currentErrors + 1,
-      error: error?.message || error
+      error: error?.message || error,
     };
 
     console.error('[BadgeCounterService] Error:', errorInfo);
 
     // Emitir evento personalizado para sistemas de logging externos
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('badge-counter-error', { 
-        detail: errorInfo 
-      }));
+      window.dispatchEvent(
+        new CustomEvent('badge-counter-error', {
+          detail: errorInfo,
+        }),
+      );
     }
   }
 
@@ -356,7 +431,7 @@ export class BadgeCounterService implements IBadgeCounterService {
       'unmoderated-comments': 0,
       'draft-entries': 0,
       'pending-users': 0,
-      'system-alerts': 0
+      'system-alerts': 0,
     };
 
     return fallbackValues[counterId] ?? this.fallbackConfig.defaultValue;
@@ -394,15 +469,22 @@ export class BadgeCounterService implements IBadgeCounterService {
   /**
    * Obtiene el estado de salud del servicio
    */
-  public getServiceHealthStatus(): { healthy: boolean; errors: number; counters: number } {
-    const totalErrors = Array.from(this.errorCounts.values()).reduce((sum, count) => sum + count, 0);
+  public getServiceHealthStatus(): {
+    healthy: boolean;
+    errors: number;
+    counters: number;
+  } {
+    const totalErrors = Array.from(this.errorCounts.values()).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
     const totalCounters = this.countersSubject.value.size;
     const errorCounters = this.errorCounts.size;
 
     return {
       healthy: errorCounters === 0,
       errors: totalErrors,
-      counters: totalCounters
+      counters: totalCounters,
     };
   }
 }

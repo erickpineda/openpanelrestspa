@@ -5,7 +5,8 @@ import { OPConstants } from '../../../shared/constants/op-global.constants';
 @Injectable({ providedIn: 'root' })
 export class PostLoginRedirectService {
   private readonly REDIRECT_PREFIX = OPConstants.Session.POST_LOGIN_PREFIX;
-  private readonly HANDLED_PREFIX = OPConstants.Session.POST_LOGIN_HANDLED_PREFIX;
+  private readonly HANDLED_PREFIX =
+    OPConstants.Session.POST_LOGIN_HANDLED_PREFIX;
   private readonly IGNORE_WINDOW_MS = OPConstants.Session.IGNORE_WINDOW_MS;
 
   constructor(private tokenStorage: TokenStorageService) {}
@@ -13,20 +14,31 @@ export class PostLoginRedirectService {
   // Guarda la ruta válida actual para la pestaña
   saveLastValidRoute(url: string): void {
     const key = this.getTabKey();
-    try { window.sessionStorage.setItem(key, url); } catch {}
-    try { localStorage.setItem(key, url); } catch {}
+    try {
+      window.sessionStorage.setItem(key, url);
+    } catch {}
+    try {
+      localStorage.setItem(key, url);
+    } catch {}
   }
 
   // Recupera y limpia la ruta guardada para la pestaña (o null)
   getAndClearRedirectForTab(): string | null {
     const key = this.getTabKey();
     let redirect: string | null = null;
-    try { redirect = window.sessionStorage.getItem(key); } catch {}
+    try {
+      redirect = window.sessionStorage.getItem(key);
+    } catch {}
     if (!redirect) {
-      try { redirect = localStorage.getItem(key) ?? null; } catch {}
+      try {
+        redirect = localStorage.getItem(key) ?? null;
+      } catch {}
     }
     if (!redirect) {
-      try { redirect = localStorage.getItem(OPConstants.Session.POST_LOGIN_REDIRECT) ?? null; } catch {}
+      try {
+        redirect =
+          localStorage.getItem(OPConstants.Session.POST_LOGIN_REDIRECT) ?? null;
+      } catch {}
     }
     // Fallback: buscar cualquier clave post-login-redirect- en sessionStorage
     if (!redirect) {
@@ -44,8 +56,12 @@ export class PostLoginRedirectService {
       } catch {}
     }
     // Limpiar claves tras uso
-    try { window.sessionStorage.removeItem(key); } catch {}
-    try { localStorage.removeItem(OPConstants.Session.POST_LOGIN_REDIRECT); } catch {}
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch {}
+    try {
+      localStorage.removeItem(OPConstants.Session.POST_LOGIN_REDIRECT);
+    } catch {}
     return redirect;
   }
 
@@ -53,7 +69,10 @@ export class PostLoginRedirectService {
   markPostLoginHandled(): void {
     const key = this.getTabKey();
     try {
-      window.sessionStorage.setItem(this.HANDLED_PREFIX + key, Date.now().toString());
+      window.sessionStorage.setItem(
+        this.HANDLED_PREFIX + key,
+        Date.now().toString(),
+      );
     } catch {}
   }
 

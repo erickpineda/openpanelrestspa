@@ -1,17 +1,20 @@
 // unsaved-work-modal.component.ts
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { SessionManagerService, SessionExpirationData } from '../../core/services/auth/session-manager.service';
+import {
+  SessionManagerService,
+  SessionExpirationData,
+} from '../../core/services/auth/session-manager.service';
 import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
 import { TemporaryStorageService } from '../../core/services/ui/temporary-storage.service';
 import { LoggerService } from '../services/logger.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Component({
-    selector: 'app-unsaved-work-modal',
-    templateUrl: './unsaved-work-modal.component.html',
-    styleUrls: ['./unsaved-work-modal.component.scss'],
-    standalone: false
+  selector: 'app-unsaved-work-modal',
+  templateUrl: './unsaved-work-modal.component.html',
+  styleUrls: ['./unsaved-work-modal.component.scss'],
+  standalone: false,
 })
 export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
@@ -24,19 +27,20 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
     private sessionManager: SessionManagerService,
     private unsavedWorkService: UnsavedWorkService,
     private temporaryStorage: TemporaryStorageService,
-    private log: LoggerService
+    private log: LoggerService,
   ) {}
 
   ngOnInit(): void {
     this.log.info('🔄 UnsavedWorkModalComponent: Inicializando...');
-    
+
     this.subscription.add(
-      this.sessionManager.sessionExpired$.subscribe(data => {
+      this.sessionManager.sessionExpired$.subscribe((data) => {
         this.log.info('📡 UnsavedWorkModalComponent: Evento recibido:', data);
-        
-        const isLogoutWithSave = data.type === 'LOGOUT' && data.allowSave === true;
+
+        const isLogoutWithSave =
+          data.type === 'LOGOUT' && data.allowSave === true;
         this.log.info('🔍 Es logout con allowSave:', isLogoutWithSave);
-        
+
         if (isLogoutWithSave) {
           this.log.info('✅ Mostrando modal porque es LOGOUT con allowSave');
           this.sessionData = data;
@@ -45,16 +49,22 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
           this.log.info('❌ No se muestra modal, redirigiendo...');
           this.sessionManager.performLogout(data);
         }
-      })
+      }),
     );
 
-    window.addEventListener(OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT, this.handleSaveWork.bind(this));
+    window.addEventListener(
+      OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
+      this.handleSaveWork.bind(this),
+    );
     this.log.info('✅ UnsavedWorkModalComponent: Inicializado correctamente');
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    window.removeEventListener(OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT, this.handleSaveWork.bind(this));
+    window.removeEventListener(
+      OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
+      this.handleSaveWork.bind(this),
+    );
   }
 
   private showModal(): void {
@@ -72,18 +82,18 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
 
   startSaveProcess(): void {
     this.saveInProgress = true;
-    
+
     // Disparar evento para que los componentes guarden
     const saveEvent = new CustomEvent(OPConstants.Events.SAVE_UNSAVED_WORK);
     window.dispatchEvent(saveEvent);
-    
+
     // Esperar un poco para que se complete el guardado temporal
     setTimeout(() => {
       this.saveInProgress = false;
       this.saveCompleted = true;
-      
+
       this.log.info('✅ Guardado temporal completado');
-      
+
       setTimeout(() => {
         this.hideModal();
         if (this.sessionData) {
@@ -100,7 +110,7 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   logoutWithoutSaving(): void {
     // Limpiar datos temporales si el usuario elige no guardar
     this.temporaryStorage.clearAllTemporaryEntries();
-    
+
     this.hideModal();
     if (this.sessionData) {
       this.sessionManager.performLogout(this.sessionData);

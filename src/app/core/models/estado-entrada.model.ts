@@ -1,11 +1,9 @@
 export class EstadoEntrada {
   idEstadoEntrada: number = 0;
-  nombre: string = "";
-  descripcion: string = "";
-  
-  constructor() {
+  nombre: string = '';
+  descripcion: string = '';
 
-  }
+  constructor() {}
 }
 
 export interface EstadoEntrada {

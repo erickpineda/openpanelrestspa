@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { INavData } from '@coreui/angular';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SidebarStateService {
   private readonly STORAGE_KEY = 'sidebar_expanded_items';
@@ -29,7 +29,10 @@ export class SidebarStateService {
   }
 
   private saveState(): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(Array.from(this.expandedItems)));
+    localStorage.setItem(
+      this.STORAGE_KEY,
+      JSON.stringify(Array.from(this.expandedItems)),
+    );
   }
 
   public toggleItem(name: string, isOpen: boolean): void {
@@ -55,12 +58,18 @@ export class SidebarStateService {
     this.saveState();
   }
 
-  private ensureActiveItemsExpanded(items: INavData[], currentUrl: string): boolean {
+  private ensureActiveItemsExpanded(
+    items: INavData[],
+    currentUrl: string,
+  ): boolean {
     let hasActiveChild = false;
 
     for (const item of items) {
       // Verificar si este item es el activo o tiene un hijo activo
-      const isItemActive = this.isRouteActive(typeof item.url === 'string' ? item.url : undefined, currentUrl);
+      const isItemActive = this.isRouteActive(
+        typeof item.url === 'string' ? item.url : undefined,
+        currentUrl,
+      );
       let childActive = false;
 
       if (item.children && item.children.length > 0) {
@@ -69,8 +78,8 @@ export class SidebarStateService {
 
       if (isItemActive || childActive) {
         if (item.children && item.children.length > 0 && item.name) {
-           this.expandedItems.add(item.name);
-           this.expandChildGroups(item);
+          this.expandedItems.add(item.name);
+          this.expandChildGroups(item);
         }
         hasActiveChild = true;
       }
@@ -92,7 +101,10 @@ export class SidebarStateService {
     }
   }
 
-  private isRouteActive(itemUrl: string | undefined, currentUrl: string): boolean {
+  private isRouteActive(
+    itemUrl: string | undefined,
+    currentUrl: string,
+  ): boolean {
     if (!itemUrl) return false;
     const urlTree = currentUrl.split('?')[0].split('#')[0];
     return urlTree === itemUrl || urlTree.startsWith(itemUrl + '/');
@@ -129,7 +141,11 @@ export class SidebarStateService {
     const stack: INavData[] = [...items];
     while (stack.length) {
       const item = stack.pop()!;
-      if (item.name === 'Entradas' && item.children && item.children.length > 0) {
+      if (
+        item.name === 'Entradas' &&
+        item.children &&
+        item.children.length > 0
+      ) {
         this.expandedItems.add(item.name);
         for (const child of item.children) {
           if (child.name === 'Taxonomía') {
@@ -143,7 +159,10 @@ export class SidebarStateService {
     }
   }
 
-  private expandRolesPermisosPattern(items: INavData[], currentUrl: string): void {
+  private expandRolesPermisosPattern(
+    items: INavData[],
+    currentUrl: string,
+  ): void {
     const isRolesContext =
       currentUrl.startsWith('/admin/control/gestion/roles') ||
       currentUrl.startsWith('/admin/control/gestion/privilegios');
@@ -153,7 +172,11 @@ export class SidebarStateService {
     const stack: INavData[] = [...items];
     while (stack.length) {
       const item = stack.pop()!;
-      if (item.name === 'Roles y Permisos' && item.children && item.children.length > 0) {
+      if (
+        item.name === 'Roles y Permisos' &&
+        item.children &&
+        item.children.length > 0
+      ) {
         this.expandedItems.add(item.name);
         return;
       }

@@ -100,13 +100,21 @@
 }
 
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
-  10%, 30%, 50%, 70%, 90% {
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translateX(-2px);
   }
-  20%, 40%, 60%, 80% {
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translateX(2px);
   }
 }
@@ -170,43 +178,43 @@
   &.slide-in-left {
     animation: slideInFromLeft 0.4s var(--nav-transition-easing);
   }
-  
+
   &.slide-out-left {
     animation: slideOutToLeft 0.4s var(--nav-transition-easing);
   }
-  
+
   &.fade-in-up {
     animation: fadeInUp 0.5s var(--nav-transition-easing);
   }
-  
+
   &.fade-in-down {
     animation: fadeInDown 0.5s var(--nav-transition-easing);
   }
-  
+
   &.scale-in {
     animation: scaleIn 0.3s var(--nav-transition-easing);
   }
-  
+
   &.scale-out {
     animation: scaleOut 0.3s var(--nav-transition-easing);
   }
-  
+
   &.bounce-in {
     animation: bounceIn 0.6s var(--nav-transition-easing);
   }
-  
+
   &.pulse {
     animation: pulse 1s infinite;
   }
-  
+
   &.shake {
     animation: shake 0.5s;
   }
-  
+
   &.glow {
     animation: glow 2s infinite;
   }
-  
+
   &.shimmer {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200px 100%;
@@ -219,7 +227,7 @@
   .nav-link {
     position: relative;
     overflow: hidden;
-    
+
     // Efecto de ondas al hacer clic
     &::before {
       content: '';
@@ -231,14 +239,16 @@
       background: rgba(0, 123, 255, 0.3);
       border-radius: 50%;
       transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
+      transition:
+        width 0.6s,
+        height 0.6s;
     }
-    
+
     &:active::before {
       width: 300px;
       height: 300px;
     }
-    
+
     // Efecto de brillo en hover
     &::after {
       content: '';
@@ -247,22 +257,27 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
       transform: translateX(-100%);
       transition: transform 0.6s;
     }
-    
+
     &:hover::after {
       transform: translateX(100%);
     }
-    
+
     // Transformaciones en hover
     &:hover {
       .nav-icon {
         transform: scale(1.1) rotate(5deg);
         transition: transform 0.3s var(--nav-transition-easing);
       }
-      
+
       .nav-text {
         transform: translateX(4px);
         transition: transform 0.3s var(--nav-transition-easing);
@@ -277,23 +292,23 @@
     &.new-badge {
       animation: bounceIn 0.6s var(--nav-transition-easing);
     }
-    
+
     &.updating {
       animation: pulse 1s infinite;
     }
-    
+
     &.error {
       animation: shake 0.5s;
     }
-    
+
     &.success {
       animation: glow 1s;
     }
-    
+
     &.count-up {
       animation: scaleIn 0.3s var(--nav-transition-easing);
     }
-    
+
     &.count-down {
       animation: scaleOut 0.3s var(--nav-transition-easing);
     }
@@ -308,13 +323,13 @@
         animation: slideDown 0.4s var(--nav-transition-easing);
       }
     }
-    
+
     &.collapsing {
       .nav-section-content {
         animation: slideUp 0.4s var(--nav-transition-easing);
       }
     }
-    
+
     &.highlight {
       animation: glow 1s;
     }
@@ -328,7 +343,7 @@
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
-      
+
       .nav-text,
       .nav-icon {
         background: #e0e0e0;
@@ -337,10 +352,10 @@
       }
     }
   }
-  
+
   .nav-chunk.loading {
     position: relative;
-    
+
     &::after {
       content: '';
       position: absolute;
@@ -348,7 +363,12 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
       animation: shimmer 1.5s infinite;
     }
   }
@@ -360,15 +380,15 @@
     &.entering {
       animation: fadeInUp 0.4s var(--nav-transition-easing);
     }
-    
+
     &.leaving {
       animation: fadeInDown 0.4s var(--nav-transition-easing) reverse;
     }
-    
+
     &.active-entering {
       animation: scaleIn 0.3s var(--nav-transition-easing);
     }
-    
+
     &.active-leaving {
       animation: scaleOut 0.3s var(--nav-transition-easing);
     }
@@ -382,17 +402,17 @@
       &.mobile-entering {
         animation: slideInFromLeft 0.3s var(--nav-transition-easing);
       }
-      
+
       &.mobile-leaving {
         animation: slideOutToLeft 0.3s var(--nav-transition-easing);
       }
     }
-    
+
     .critical-functions-bar {
       &.entering {
         animation: fadeInUp 0.4s var(--nav-transition-easing);
       }
-      
+
       .critical-function {
         &:active {
           animation: pulse 0.2s;
@@ -400,7 +420,7 @@
       }
     }
   }
-  
+
   @media (min-width: 768px) {
     .optimized-navigation {
       &.collapsing {
@@ -409,7 +429,7 @@
           animation: fadeInDown 0.3s var(--nav-transition-easing) reverse;
         }
       }
-      
+
       &.expanding {
         .nav-text,
         .nav-badge {
@@ -431,13 +451,13 @@
     animation: none !important;
     transition: none !important;
   }
-  
+
   .nav-hover-effects .nav-link {
     &::before,
     &::after {
       display: none;
     }
-    
+
     &:hover {
       .nav-icon,
       .nav-text {
@@ -455,7 +475,7 @@
       border: 2px solid currentColor;
     }
   }
-  
+
   .nav-hover-effects .nav-link {
     &::after {
       display: none;
@@ -468,11 +488,11 @@
   &.fast {
     --nav-transition-duration: 0.15s;
   }
-  
+
   &.slow {
     --nav-transition-duration: 0.6s;
   }
-  
+
   &.instant {
     --nav-transition-duration: 0s;
   }
@@ -483,19 +503,19 @@
   &.ease-in {
     --nav-transition-easing: ease-in;
   }
-  
+
   &.ease-out {
     --nav-transition-easing: ease-out;
   }
-  
+
   &.ease-in-out {
     --nav-transition-easing: ease-in-out;
   }
-  
+
   &.bounce {
     --nav-transition-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
-  
+
   &.elastic {
     --nav-transition-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }

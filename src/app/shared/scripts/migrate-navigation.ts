@@ -27,7 +27,6 @@ interface MigrationResult {
  * Main migration class that handles the conversion process
  */
 export class NavigationMigrationScript {
-  
   /**
    * Migrates a legacy navigation configuration file
    * @param legacyNavPath - Path to the legacy navigation file
@@ -35,13 +34,13 @@ export class NavigationMigrationScript {
    * @returns Migration result
    */
   static async migrateNavigationFile(
-    legacyNavPath: string, 
-    options: MigrationOptions = {}
+    legacyNavPath: string,
+    options: MigrationOptions = {},
   ): Promise<MigrationResult> {
     try {
       // Load legacy navigation configuration
       const legacyNav = await this.loadLegacyNavigation(legacyNavPath);
-      
+
       // Create backup if requested
       let backupPath: string | undefined;
       if (options.backupOriginal) {
@@ -66,14 +65,13 @@ export class NavigationMigrationScript {
         success: true,
         migratedItems,
         validationResult,
-        backupPath
+        backupPath,
       };
-
     } catch (error) {
       return {
         success: false,
         migratedItems: [],
-        errors: [error instanceof Error ? error.message : String(error)]
+        errors: [error instanceof Error ? error.message : String(error)],
       };
     }
   }
@@ -83,14 +81,16 @@ export class NavigationMigrationScript {
    * @param filePath - Path to the legacy navigation file
    * @returns Legacy navigation items
    */
-  private static async loadLegacyNavigation(filePath: string): Promise<INavData[]> {
+  private static async loadLegacyNavigation(
+    filePath: string,
+  ): Promise<INavData[]> {
     // In a real implementation, this would read from the file system
     // For now, we'll return a sample legacy configuration
     return [
       {
         name: 'Dashboard',
         url: '/admin/dashboard',
-        iconComponent: { name: 'cil-speedometer' }
+        iconComponent: { name: 'cil-speedometer' },
       },
       {
         name: 'Entradas',
@@ -99,24 +99,24 @@ export class NavigationMigrationScript {
         children: [
           {
             name: 'Nueva Entrada',
-            url: '/admin/entradas/crear'
+            url: '/admin/entradas/crear',
           },
           {
             name: 'Todas las Entradas',
-            url: '/admin/entradas'
-          }
-        ]
+            url: '/admin/entradas',
+          },
+        ],
       },
       {
         name: 'Usuarios',
         url: '/admin/usuarios',
-        iconComponent: { name: 'cil-people' }
+        iconComponent: { name: 'cil-people' },
       },
       {
         name: 'Mi Perfil',
         url: '/admin/perfil',
-        iconComponent: { name: 'cil-user' }
-      }
+        iconComponent: { name: 'cil-user' },
+      },
     ];
   }
 
@@ -128,10 +128,10 @@ export class NavigationMigrationScript {
   private static async createBackup(originalPath: string): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const backupPath = `${originalPath}.backup.${timestamp}`;
-    
+
     // In a real implementation, this would copy the file
     console.log(`Backup created at: ${backupPath}`);
-    
+
     return backupPath;
   }
 
@@ -142,12 +142,13 @@ export class NavigationMigrationScript {
    * @returns Migrated navigation items
    */
   private static performMigration(
-    legacyItems: INavData[], 
-    options: MigrationOptions
+    legacyItems: INavData[],
+    options: MigrationOptions,
   ): INavItemEnhanced[] {
-    
     // Convert legacy items to enhanced format
-    const migratedItems = legacyItems.map(item => this.migrateSingleItem(item));
+    const migratedItems = legacyItems.map((item) =>
+      this.migrateSingleItem(item),
+    );
 
     // Apply route mappings
     const mappedItems = this.applyRouteMappings(migratedItems);
@@ -170,13 +171,13 @@ export class NavigationMigrationScript {
     const enhancedItem: INavItemEnhanced = {
       ...legacyItem,
       priority: this.inferPriority(legacyItem),
-      requiredRoles: this.inferRequiredRoles(legacyItem)
+      requiredRoles: this.inferRequiredRoles(legacyItem),
     };
 
     // Migrate children if they exist
     if (legacyItem.children && legacyItem.children.length > 0) {
-      enhancedItem.children = legacyItem.children.map(child => 
-        this.migrateSingleItem(child)
+      enhancedItem.children = legacyItem.children.map((child) =>
+        this.migrateSingleItem(child),
       );
     }
 
@@ -194,12 +195,14 @@ export class NavigationMigrationScript {
    * @param items - Navigation items to update
    * @returns Items with updated URLs
    */
-  private static applyRouteMappings(items: INavItemEnhanced[]): INavItemEnhanced[] {
+  private static applyRouteMappings(
+    items: INavItemEnhanced[],
+  ): INavItemEnhanced[] {
     const routeMap = this.getRouteMapping();
 
-    return items.map(item => {
+    return items.map((item) => {
       const updatedItem = { ...item };
-      
+
       if (item.url && routeMap.has(item.url)) {
         updatedItem.url = routeMap.get(item.url);
         console.log(`Mapped route: ${item.url} -> ${updatedItem.url}`);
@@ -271,11 +274,24 @@ export class NavigationMigrationScript {
     const url = item.url || '';
 
     if (url.includes('dashboard')) {
-      return [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO];
+      return [
+        UserRole.AUTOR,
+        UserRole.EDITOR,
+        UserRole.ADMINISTRADOR,
+        UserRole.DESARROLLADOR,
+        UserRole.MANTENIMIENTO,
+        UserRole.PROPIETARIO,
+      ];
     }
 
     if (url.includes('entradas')) {
-      return [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
+      return [
+        UserRole.AUTOR,
+        UserRole.EDITOR,
+        UserRole.ADMINISTRADOR,
+        UserRole.DESARROLLADOR,
+        UserRole.PROPIETARIO,
+      ];
     }
 
     if (url.includes('usuarios') && !url.includes('perfil')) {
@@ -283,10 +299,24 @@ export class NavigationMigrationScript {
     }
 
     if (url.includes('perfil')) {
-      return [UserRole.LECTOR, UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO];
+      return [
+        UserRole.LECTOR,
+        UserRole.AUTOR,
+        UserRole.EDITOR,
+        UserRole.ADMINISTRADOR,
+        UserRole.DESARROLLADOR,
+        UserRole.MANTENIMIENTO,
+        UserRole.PROPIETARIO,
+      ];
     }
 
-    return [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
+    return [
+      UserRole.AUTOR,
+      UserRole.EDITOR,
+      UserRole.ADMINISTRADOR,
+      UserRole.DESARROLLADOR,
+      UserRole.PROPIETARIO,
+    ];
   }
 
   /**
@@ -301,23 +331,26 @@ export class NavigationMigrationScript {
       item.dynamicBadge = {
         service: 'BadgeCounterService',
         method: 'getUnmoderatedCommentsCount',
-        refreshInterval: 15000
+        refreshInterval: 15000,
       };
       item.badge = {
         color: 'danger',
-        text: 'Pendientes'
+        text: 'Pendientes',
       };
     }
 
-    if (url.includes('entradas-temporales') || name.toLowerCase().includes('borrador')) {
+    if (
+      url.includes('entradas-temporales') ||
+      name.toLowerCase().includes('borrador')
+    ) {
       item.dynamicBadge = {
         service: 'BadgeCounterService',
         method: 'getDraftEntriesCount',
-        refreshInterval: 30000
+        refreshInterval: 30000,
       };
       item.badge = {
         color: 'warning',
-        text: 'Pendientes'
+        text: 'Pendientes',
       };
     }
   }
@@ -332,14 +365,14 @@ export class NavigationMigrationScript {
     if (url.includes('mantenimiento') || url.includes('dev-tools')) {
       item.responsiveConfig = {
         hideOnMobile: true,
-        collapseThreshold: 768
+        collapseThreshold: 768,
       };
     }
 
     if (item.children && item.children.length > 0) {
       item.responsiveConfig = {
         hideOnMobile: false,
-        collapseThreshold: 1024
+        collapseThreshold: 1024,
       };
     }
   }
@@ -349,7 +382,10 @@ export class NavigationMigrationScript {
    * @param items - Migrated navigation items
    * @returns Validation result
    */
-  private static validateMigratedStructure(items: INavItemEnhanced[]): { isValid: boolean; issues: string[] } {
+  private static validateMigratedStructure(items: INavItemEnhanced[]): {
+    isValid: boolean;
+    issues: string[];
+  } {
     const issues: string[] = [];
 
     // Check for duplicate URLs
@@ -364,7 +400,7 @@ export class NavigationMigrationScript {
 
     return {
       isValid: issues.length === 0,
-      issues
+      issues,
     };
   }
 
@@ -374,7 +410,11 @@ export class NavigationMigrationScript {
    * @param urls - Set to track URLs
    * @param issues - Array to collect issues
    */
-  private static collectUrls(items: INavItemEnhanced[], urls: Set<string>, issues: string[]): void {
+  private static collectUrls(
+    items: INavItemEnhanced[],
+    urls: Set<string>,
+    issues: string[],
+  ): void {
     for (const item of items) {
       if (item.url) {
         if (urls.has(item.url)) {
@@ -395,14 +435,19 @@ export class NavigationMigrationScript {
    * @param items - Navigation items
    * @param issues - Array to collect issues
    */
-  private static validateRequiredProperties(items: INavItemEnhanced[], issues: string[]): void {
+  private static validateRequiredProperties(
+    items: INavItemEnhanced[],
+    issues: string[],
+  ): void {
     for (const item of items) {
       if (!item.name) {
         issues.push('Navigation item missing name property');
       }
 
       if (!item.title && !item.url) {
-        issues.push(`Navigation item "${item.name}" must have either title or url property`);
+        issues.push(
+          `Navigation item "${item.name}" must have either title or url property`,
+        );
       }
 
       if (item.children) {
@@ -417,13 +462,19 @@ export class NavigationMigrationScript {
    * @param issues - Array to collect issues
    * @param currentDepth - Current depth level
    */
-  private static validateHierarchyDepth(items: INavItemEnhanced[], issues: string[], currentDepth: number): void {
+  private static validateHierarchyDepth(
+    items: INavItemEnhanced[],
+    issues: string[],
+    currentDepth: number,
+  ): void {
     const maxDepth = 2;
 
     for (const item of items) {
       if (item.children && item.children.length > 0) {
         if (currentDepth >= maxDepth) {
-          issues.push(`Navigation hierarchy exceeds maximum depth of ${maxDepth} levels at item: ${item.name}`);
+          issues.push(
+            `Navigation hierarchy exceeds maximum depth of ${maxDepth} levels at item: ${item.name}`,
+          );
         } else {
           this.validateHierarchyDepth(item.children, issues, currentDepth + 1);
         }
@@ -436,9 +487,12 @@ export class NavigationMigrationScript {
    * @param items - Migrated navigation items
    * @param outputPath - Path to save the migrated configuration
    */
-  private static async saveMigratedNavigation(items: INavItemEnhanced[], outputPath: string): Promise<void> {
+  private static async saveMigratedNavigation(
+    items: INavItemEnhanced[],
+    outputPath: string,
+  ): Promise<void> {
     const output = this.generateNavigationFile(items);
-    
+
     // In a real implementation, this would write to the file system
     console.log(`Migrated navigation saved to: ${outputPath}`);
     console.log('Generated content preview:');
@@ -467,7 +521,6 @@ export const navItems: INavItemEnhanced[] = `;
  * CLI interface for running the migration script
  */
 export class MigrationCLI {
-  
   /**
    * Runs the migration with command line arguments
    * @param args - Command line arguments
@@ -477,26 +530,33 @@ export class MigrationCLI {
       preserveCustomConfig: args.includes('--preserve-custom'),
       validateOutput: args.includes('--validate'),
       backupOriginal: args.includes('--backup'),
-      outputPath: this.getArgValue(args, '--output')
+      outputPath: this.getArgValue(args, '--output'),
     };
 
-    const inputPath = this.getArgValue(args, '--input') || 'src/app/admin/default-layout/_nav.ts';
+    const inputPath =
+      this.getArgValue(args, '--input') ||
+      'src/app/admin/default-layout/_nav.ts';
 
     console.log('Starting navigation migration...');
     console.log(`Input: ${inputPath}`);
     console.log(`Options:`, options);
 
-    const result = await NavigationMigrationScript.migrateNavigationFile(inputPath, options);
+    const result = await NavigationMigrationScript.migrateNavigationFile(
+      inputPath,
+      options,
+    );
 
     if (result.success) {
       console.log('✅ Migration completed successfully!');
-      
+
       if (result.validationResult) {
         if (result.validationResult.isValid) {
           console.log('✅ Validation passed');
         } else {
           console.log('⚠️  Validation issues found:');
-          result.validationResult.issues.forEach(issue => console.log(`  - ${issue}`));
+          result.validationResult.issues.forEach((issue) =>
+            console.log(`  - ${issue}`),
+          );
         }
       }
 
@@ -504,11 +564,12 @@ export class MigrationCLI {
         console.log(`📁 Backup created: ${result.backupPath}`);
       }
 
-      console.log(`📊 Migrated ${result.migratedItems.length} navigation items`);
-      
+      console.log(
+        `📊 Migrated ${result.migratedItems.length} navigation items`,
+      );
     } else {
       console.log('❌ Migration failed:');
-      result.errors?.forEach(error => console.log(`  - ${error}`));
+      result.errors?.forEach((error) => console.log(`  - ${error}`));
     }
   }
 
@@ -518,9 +579,14 @@ export class MigrationCLI {
    * @param argName - Argument name to find
    * @returns Argument value or undefined
    */
-  private static getArgValue(args: string[], argName: string): string | undefined {
+  private static getArgValue(
+    args: string[],
+    argName: string,
+  ): string | undefined {
     const index = args.indexOf(argName);
-    return index !== -1 && index + 1 < args.length ? args[index + 1] : undefined;
+    return index !== -1 && index + 1 < args.length
+      ? args[index + 1]
+      : undefined;
   }
 }
 

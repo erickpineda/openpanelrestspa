@@ -12,7 +12,7 @@ export enum UserRole {
   DESARROLLADOR = 'DESAR',
   AUTOR = 'AUTOR',
   LECTOR = 'LECTO',
-  ANONYMOUS = 'ANONY'
+  ANONYMOUS = 'ANONY',
 }
 
 /**
@@ -139,7 +139,10 @@ export interface INavigationService {
   toggleSection(sectionId: string): void;
   getActiveSection(): string;
   setContextualActions(itemId: string, actions: IContextualAction[]): void;
-  filterByPermissions(items: INavItemEnhanced[], userRole: UserRole): INavItemEnhanced[];
+  filterByPermissions(
+    items: INavItemEnhanced[],
+    userRole: UserRole,
+  ): INavItemEnhanced[];
 }
 
 /**
@@ -161,7 +164,7 @@ export enum NavigationErrorCodes {
   PERMISSION_DENIED = 'NAV_002',
   COUNTER_SERVICE_UNAVAILABLE = 'NAV_003',
   CONFIGURATION_INVALID = 'NAV_004',
-  RESPONSIVE_ADAPTATION_FAILED = 'NAV_005'
+  RESPONSIVE_ADAPTATION_FAILED = 'NAV_005',
 }
 
 /**
@@ -190,7 +193,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: true,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: true,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   newEntry: {
     [UserRole.PROPIETARIO]: true,
@@ -199,7 +202,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: true,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: true,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   manageEntries: {
     [UserRole.PROPIETARIO]: true,
@@ -208,7 +211,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: true,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: true, // Solo sus propias entradas
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   categories: {
     [UserRole.PROPIETARIO]: true,
@@ -217,7 +220,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: true,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: false,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   tags: {
     [UserRole.PROPIETARIO]: true,
@@ -226,7 +229,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: true,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: true,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   pages: {
     [UserRole.PROPIETARIO]: true,
@@ -235,7 +238,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: true,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: false,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   multimedia: {
     [UserRole.PROPIETARIO]: true,
@@ -244,7 +247,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: true,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: true,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   comments: {
     [UserRole.PROPIETARIO]: true,
@@ -253,7 +256,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: true,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: false,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   users: {
     [UserRole.PROPIETARIO]: true,
@@ -262,7 +265,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: false,
     [UserRole.DESARROLLADOR]: false,
     [UserRole.AUTOR]: false,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   rolesPermissions: {
     [UserRole.PROPIETARIO]: true,
@@ -271,7 +274,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: false,
     [UserRole.DESARROLLADOR]: false,
     [UserRole.AUTOR]: false,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   configuration: {
     [UserRole.PROPIETARIO]: true,
@@ -280,7 +283,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: false,
     [UserRole.DESARROLLADOR]: true, // Solo herramientas de desarrollo y apariencia
     [UserRole.AUTOR]: false,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   maintenance: {
     [UserRole.PROPIETARIO]: true,
@@ -289,7 +292,7 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: false,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: false,
-    [UserRole.LECTOR]: false
+    [UserRole.LECTOR]: false,
   },
   profile: {
     [UserRole.PROPIETARIO]: true,
@@ -298,6 +301,6 @@ export const DEFAULT_PERMISSION_MATRIX: RolePermissionMatrix = {
     [UserRole.EDITOR]: true,
     [UserRole.DESARROLLADOR]: true,
     [UserRole.AUTOR]: true,
-    [UserRole.LECTOR]: true
-  }
+    [UserRole.LECTOR]: true,
+  },
 };

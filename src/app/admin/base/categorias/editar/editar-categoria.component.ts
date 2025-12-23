@@ -6,10 +6,10 @@ import { CommonFunctionalityService } from '../../../../shared/services/common-f
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-    selector: 'app-editar-categoria',
-    templateUrl: './editar-categoria.component.html',
-    styleUrls: ['./editar-categoria.component.scss'],
-    standalone: false
+  selector: 'app-editar-categoria',
+  templateUrl: './editar-categoria.component.html',
+  styleUrls: ['./editar-categoria.component.scss'],
+  standalone: false,
 })
 export class EditarCategoriaComponent implements OnInit {
   categoria?: Categoria;
@@ -22,31 +22,39 @@ export class EditarCategoriaComponent implements OnInit {
     private facade: CategoriaFacadeService,
     private router: Router,
     private commonFuncService: CommonFunctionalityService,
-    private toastService: ToastService
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.params['idCategoria']);
-    this.facade.obtenerCategoriaPorId(id).subscribe(cat => {
+    this.facade.obtenerCategoriaPorId(id).subscribe((cat) => {
       this.categoria = cat || undefined;
       this.formDisabled = true;
     });
-    this.facade.obtenerListaCategorias().subscribe(cats => this.listaCategorias = cats);
+    this.facade
+      .obtenerListaCategorias()
+      .subscribe((cats) => (this.listaCategorias = cats));
   }
 
   editar(cat: Categoria) {
     if (!cat.idCategoria) return;
     this.facade.actualizarCategoria(cat.idCategoria, cat).subscribe({
       next: () => {
-        this.toastService.showSuccess('La categoría se ha modificado correctamente.', 'Categoría modificada');
-        this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
+        this.toastService.showSuccess(
+          'La categoría se ha modificado correctamente.',
+          'Categoría modificada',
+        );
+        this.commonFuncService.reloadComponent(
+          false,
+          '/admin/control/categorias',
+        );
       },
       error: (err) => {
         console.error('Error al actualizar la categoría:', err);
         // Emitir evento de error al componente hijo
         const form = document.querySelector('app-categoria-form') as any;
         form?.onError.emit();
-      }
+      },
     });
   }
 

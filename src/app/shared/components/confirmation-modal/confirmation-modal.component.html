@@ -1,4 +1,8 @@
-<c-modal [visible]="visible" (visibleChange)="onClose()" class="confirmation-modal">
+<c-modal
+  [visible]="visible"
+  (visibleChange)="onClose()"
+  class="confirmation-modal"
+>
   <c-modal-header>
     <h5 cModalTitle [class]="'text-' + getHeaderColor()">
       @if (type === 'warning') {
@@ -24,7 +28,8 @@
       cButton
       [color]="getHeaderColor()"
       (click)="onConfirm()"
-      class="ms-2">
+      class="ms-2"
+    >
       {{ confirmText }}
     </button>
   </c-modal-footer>

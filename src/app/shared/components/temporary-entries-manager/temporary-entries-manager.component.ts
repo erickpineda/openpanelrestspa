@@ -1,14 +1,17 @@
 // temporary-entries-manager.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { TemporaryEntry, TemporaryStorageService } from '../../../core/services/ui/temporary-storage.service';
+import {
+  TemporaryEntry,
+  TemporaryStorageService,
+} from '../../../core/services/ui/temporary-storage.service';
 import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
-    selector: 'app-temporary-entries-manager',
-    templateUrl: './temporary-entries-manager.component.html',
-    styleUrls: ['./temporary-entries-manager.component.scss'],
-    standalone: false
+  selector: 'app-temporary-entries-manager',
+  templateUrl: './temporary-entries-manager.component.html',
+  styleUrls: ['./temporary-entries-manager.component.scss'],
+  standalone: false,
 })
 export class TemporaryEntriesManagerComponent implements OnInit {
   entries: TemporaryEntry[] = [];
@@ -18,7 +21,7 @@ export class TemporaryEntriesManagerComponent implements OnInit {
   constructor(
     private temporaryStorage: TemporaryStorageService,
     private router: Router,
-    private log: LoggerService
+    private log: LoggerService,
   ) {}
 
   ngOnInit(): void {
@@ -31,13 +34,13 @@ export class TemporaryEntriesManagerComponent implements OnInit {
 
   recoverEntry(entry: TemporaryEntry): void {
     this.log.info('📥 Recuperando entrada:', entry);
-    
+
     // ✅ CORREGIDO: Navegar al formulario de creación con los datos
     this.router.navigate(['/admin/control/entradas/crear'], {
-      state: { 
+      state: {
         temporaryEntry: entry,
-        recoverData: true 
-      }
+        recoverData: true,
+      },
     });
   }
 
@@ -54,14 +57,20 @@ export class TemporaryEntriesManagerComponent implements OnInit {
   }
 
   deleteEntry(id: string): void {
-    if (confirm('¿Estás seguro de que quieres eliminar esta entrada temporal?')) {
+    if (
+      confirm('¿Estás seguro de que quieres eliminar esta entrada temporal?')
+    ) {
       this.temporaryStorage.removeTemporaryEntry(id);
       this.loadEntries();
     }
   }
 
   clearAll(): void {
-    if (confirm('¿Estás seguro de que quieres eliminar TODAS las entradas temporales?')) {
+    if (
+      confirm(
+        '¿Estás seguro de que quieres eliminar TODAS las entradas temporales?',
+      )
+    ) {
       this.temporaryStorage.clearTemporaryEntriesByType('entrada');
       this.loadEntries();
     }

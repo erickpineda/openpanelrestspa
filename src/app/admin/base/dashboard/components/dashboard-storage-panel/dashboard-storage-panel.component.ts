@@ -1,10 +1,16 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 
 @Component({
-    selector: 'app-dashboard-storage-panel',
-    templateUrl: './dashboard-storage-panel.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-dashboard-storage-panel',
+  templateUrl: './dashboard-storage-panel.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardStoragePanelComponent {
   @Input() loadingStorage: boolean = false;

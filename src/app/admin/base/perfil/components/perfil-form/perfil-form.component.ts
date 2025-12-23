@@ -3,10 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PerfilResponse } from '../../../../../core/models/perfil-response.model';
 
 @Component({
-    selector: 'app-perfil-form',
-    templateUrl: './perfil-form.component.html',
-    styleUrls: ['./perfil-form.component.scss'],
-    standalone: false
+  selector: 'app-perfil-form',
+  templateUrl: './perfil-form.component.html',
+  styleUrls: ['./perfil-form.component.scss'],
+  standalone: false,
 })
 export class PerfilFormComponent implements OnInit {
   @Input() usuario: PerfilResponse | null = null;
@@ -19,8 +19,8 @@ export class PerfilFormComponent implements OnInit {
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      telefono: ['', [Validators.pattern('^[0-9]+$')]], 
-      website: ['']
+      telefono: ['', [Validators.pattern('^[0-9]+$')]],
+      website: [''],
     });
   }
 
@@ -31,7 +31,7 @@ export class PerfilFormComponent implements OnInit {
         apellido: this.usuario.apellido,
         email: this.usuario.email,
         telefono: this.usuario.telefono,
-        website: this.usuario.website
+        website: this.usuario.website,
       });
     }
   }
@@ -40,7 +40,7 @@ export class PerfilFormComponent implements OnInit {
     if (this.form.valid) {
       this.save.emit(this.form.value);
     } else {
-        this.form.markAllAsTouched();
+      this.form.markAllAsTouched();
     }
   }
 }

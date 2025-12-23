@@ -9,11 +9,17 @@
   (editar)="onEditar()"
   (submitForm)="onGuardar($event)"
   (preview)="onPreviewEmit($event)"
-  (cancelar)="onCancelar()">
+  (cancelar)="onCancelar()"
+>
 </app-entrada-form>
 
 <!-- Modal Previa -->
-<c-modal id="previewPaginaModal" [visible]="modalPreviaVisible" (visibleChange)="modalPreviaVisible=$event" size="xl">
+<c-modal
+  id="previewPaginaModal"
+  [visible]="modalPreviaVisible"
+  (visibleChange)="modalPreviaVisible = $event"
+  size="xl"
+>
   <c-modal-header>
     <h5 cModalTitle>Vista previa de la Página</h5>
     <button (click)="onCerrarPreview()" cButtonClose></button>
@@ -23,7 +29,8 @@
       [entrada]="entradaParaPrevia"
       [mostrarBotonesAccion]="true"
       (cerrar)="onCerrarPreview()"
-      (editar)="onEditarDesdePreview()">
+      (editar)="onEditarDesdePreview()"
+    >
     </app-previa-entrada>
   </c-modal-body>
 </c-modal>

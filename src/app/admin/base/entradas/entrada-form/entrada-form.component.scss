@@ -76,7 +76,7 @@
       background-color: #e9f7ef;
       border-color: #198754;
       opacity: 0.8;
-      
+
       input.form-check-input:checked + .form-check-label {
         color: #0f5132 !important;
       }
@@ -95,11 +95,11 @@
 }
 
 /* Checkbox deshabilitado - MEJORADO */
-input[type="checkbox"]:disabled {
+input[type='checkbox']:disabled {
   background-color: #e9ecef;
   border-color: #adb5bd;
   cursor: not-allowed;
-  
+
   &:checked {
     background-color: #6c757d;
     border-color: #6c757d;
@@ -107,7 +107,7 @@ input[type="checkbox"]:disabled {
 }
 
 /* Indeterminate state */
-input[type="checkbox"]:indeterminate {
+input[type='checkbox']:indeterminate {
   background-color: #ffc107;
   border-color: #ffc107;
 }

@@ -6,10 +6,10 @@ import { LoadingService } from '../../core/services/ui/loading.service';
 import { LoggerService } from '../../core/services/logger.service';
 
 @Component({
-    selector: 'app-home',
-    templateUrl: './home.component.html',
-    styleUrls: ['./home.component.css'],
-    standalone: false
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css'],
+  standalone: false,
 })
 export class HomeComponent implements OnInit {
   cargaFinalizada: boolean = false;
@@ -24,52 +24,56 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private entradaService: EntradaService,
-    private log: LoggerService
+    private log: LoggerService,
   ) {}
 
   ngOnInit(): void {
     this.obtenerListaEntradas()
       .then((listaRes: Entrada[]) => {
         listaRes.forEach((entradaRes) => {
-          entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
+          entradaRes.categoriasConComas = entradaRes.categorias
+            .map((e) => e.nombre)
+            .join(', ');
         });
         this.refreshEntradas(); // Refrescar las entradas después de obtener la lista
       })
       .catch((error) => {
         this.log.error('Error al obtener lista de entradas:', error.message);
-        this.errorMsg = 'No se pudieron cargar las entradas, intenta nuevamente más tarde.';
+        this.errorMsg =
+          'No se pudieron cargar las entradas, intenta nuevamente más tarde.';
         this.log.error(this.errorMsg);
       });
   }
 
   obtenerListaEntradas(): Promise<Entrada[]> {
     return new Promise((resolve, reject) => {
-      this.entradaService.listarPagina()
-        .subscribe({
-          next: (response) => {
-            const entradas: Entrada[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
-            if (entradas.length < 1) {
-              this.noHayEntradas = false;
-            } else {
-              this.entradas = entradas;
-              this.categorias = this.entradas.flatMap(e => e.categorias);
-              this.cargaFinalizada = true;
-            }
-            resolve(this.entradas);
-          },
-          error: (error) => {
+      this.entradaService.listarPagina().subscribe({
+        next: (response) => {
+          const entradas: Entrada[] = Array.isArray(response.data?.elements)
+            ? response.data.elements
+            : [];
+          if (entradas.length < 1) {
             this.noHayEntradas = false;
+          } else {
+            this.entradas = entradas;
+            this.categorias = this.entradas.flatMap((e) => e.categorias);
             this.cargaFinalizada = true;
-            reject(error);
           }
-        });
+          resolve(this.entradas);
+        },
+        error: (error) => {
+          this.noHayEntradas = false;
+          this.cargaFinalizada = true;
+          reject(error);
+        },
+      });
     });
   }
 
   refreshEntradas() {
     this.pagedEntradas = this.entradas.slice(
       (this.page - 1) * this.pageSize,
-      (this.page - 1) * this.pageSize + this.pageSize
+      (this.page - 1) * this.pageSize + this.pageSize,
     );
   }
 

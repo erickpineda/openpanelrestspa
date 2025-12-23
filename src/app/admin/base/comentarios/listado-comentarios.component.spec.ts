@@ -16,8 +16,12 @@ describe('ListadoComentariosComponent Spinner', () => {
 
   beforeEach(() => {
     mockService = {
-      listarPaginaSinGlobalLoader: jasmine.createSpy('listarPaginaSinGlobalLoader').and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
-      buscarSinGlobalLoader: jasmine.createSpy('buscarSinGlobalLoader').and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
+      listarPaginaSinGlobalLoader: jasmine
+        .createSpy('listarPaginaSinGlobalLoader')
+        .and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
+      buscarSinGlobalLoader: jasmine
+        .createSpy('buscarSinGlobalLoader')
+        .and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
     };
     TestBed.configureTestingModule({
       declarations: [ListadoComentariosComponent],
@@ -28,12 +32,24 @@ describe('ListadoComentariosComponent Spinner', () => {
         { provide: ComentarioService, useValue: mockService },
         { provide: UsuarioService, useValue: {} },
         { provide: EntradaService, useValue: {} },
-        { provide: CommonFunctionalityService, useValue: { truncateText: (s: string, n: number) => s } },
-        { provide: LoggerService, useValue: { error: () => {}, warn: () => {}, info: () => {}, debug: () => {} } },
-      ]
+        {
+          provide: CommonFunctionalityService,
+          useValue: { truncateText: (s: string, n: number) => s },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            error: () => {},
+            warn: () => {},
+            info: () => {},
+            debug: () => {},
+          },
+        },
+      ],
     });
     fixture = TestBed.createComponent(ListadoComentariosComponent);
     component = fixture.componentInstance;
+    (component as any).initList = () => {};
   });
 
   it('muestra spinner cuando cargando=true', () => {
@@ -44,9 +60,6 @@ describe('ListadoComentariosComponent Spinner', () => {
   });
 
   it('oculta spinner cuando cargando=false', () => {
-    (component as any).ngOnInit = () => {};
-    component.cargando = true;
-    fixture.detectChanges();
     component.cargando = false;
     component.pagedComentarios = [{ idComentario: 1, contenido: 'X' } as any];
     fixture.detectChanges();
@@ -55,8 +68,8 @@ describe('ListadoComentariosComponent Spinner', () => {
   });
 
   it('usa listarPaginaSinGlobalLoader en paginación', () => {
-    (component as any).ngOnInit = () => {};
-    component.pageNo = 0; component.pageSize = 5;
+    component.pageNo = 0;
+    component.pageSize = 5;
     (component as any).obtenerListaComentarios();
     expect(mockService.listarPaginaSinGlobalLoader).toHaveBeenCalledWith(0, 5);
   });

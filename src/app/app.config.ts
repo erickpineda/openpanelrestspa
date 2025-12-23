@@ -8,17 +8,17 @@ export const APP_CONFIG = {
       entradas: '/entradas',
       usuarios: '/usuarios',
       categorias: '/categorias',
-      comentarios: '/comentarios'
-    }
+      comentarios: '/comentarios',
+    },
   },
   features: {
     enableTemporaryStorage: true,
     enableAutoSave: false,
-    maxFileUploadSize: 5 * 1024 * 1024 // 5MB
+    maxFileUploadSize: 5 * 1024 * 1024, // 5MB
   },
   ui: {
     defaultPageSize: 10,
     maxPageSize: 100,
-    debounceTime: 300
-  }
+    debounceTime: 300,
+  },
 } as const;

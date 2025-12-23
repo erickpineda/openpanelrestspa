@@ -9,11 +9,13 @@ import { ChangePasswordComponent } from './password/change-password.component';
 import { SharedOPModule } from '../../../shared/shared.module';
 
 @NgModule({
-  declarations: [UsuariosListComponent, RolesListComponent, PrivilegiosListComponent, MiPerfilComponent, ChangePasswordComponent],
-  imports: [
-    CommonModule,
-    GestionRoutingModule, 
-    SharedOPModule,
-  ]
+  declarations: [
+    UsuariosListComponent,
+    RolesListComponent,
+    PrivilegiosListComponent,
+    MiPerfilComponent,
+    ChangePasswordComponent,
+  ],
+  imports: [CommonModule, GestionRoutingModule, SharedOPModule],
 })
 export class GestionModule {}

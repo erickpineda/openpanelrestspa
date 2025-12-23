@@ -12,13 +12,13 @@ export interface TemporaryEntry {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TemporaryStorageService {
   private readonly STORAGE_KEY = 'temporary-entries';
   private readonly NOTIFICATION_SHOWN_KEY = 'recovery-notification-shown';
 
-  constructor(private log: LoggerService) { }
+  constructor(private log: LoggerService) {}
 
   // ✅ NUEVO: Generar ID único
   private generateId(): string {
@@ -28,15 +28,15 @@ export class TemporaryStorageService {
   // ✅ MODIFICADO: Ahora acepta un objeto completo de entrada temporal
   saveTemporaryEntry(entry: Omit<TemporaryEntry, 'id'>): string {
     const entries = this.getTemporaryEntries();
-    
+
     const newEntry: TemporaryEntry = {
       ...entry,
-      id: this.generateId()
+      id: this.generateId(),
     };
 
     entries[newEntry.id] = newEntry;
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
-    
+
     this.log.info('💾 Entrada temporal guardada:', newEntry.id, newEntry.title);
     return newEntry.id;
   }
@@ -49,7 +49,9 @@ export class TemporaryStorageService {
   // ✅ NUEVO: Obtener entradas por tipo
   getTemporaryEntriesByType(formType: string): TemporaryEntry[] {
     const entries = this.getTemporaryEntries();
-    return Object.values(entries).filter(entry => entry.formType === formType);
+    return Object.values(entries).filter(
+      (entry) => entry.formType === formType,
+    );
   }
 
   getAllTemporaryEntries(): TemporaryEntry[] {
@@ -72,7 +74,7 @@ export class TemporaryStorageService {
   // ✅ NUEVO: Limpiar entradas por tipo
   clearTemporaryEntriesByType(formType: string): void {
     const entries = this.getTemporaryEntries();
-    Object.keys(entries).forEach(id => {
+    Object.keys(entries).forEach((id) => {
       if (entries[id].formType === formType) {
         delete entries[id];
       }

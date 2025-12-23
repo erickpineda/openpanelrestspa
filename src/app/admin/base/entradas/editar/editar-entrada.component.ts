@@ -3,7 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntradaFacadeService } from '../entrada-form/srv/entrada-facade.service';
 import { ValidationEntradaFormsService } from '../entrada-form/srv/validation-entrada-forms.service';
-import { UntypedFormArray, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import {
+  UntypedFormArray,
+  UntypedFormControl,
+  UntypedFormGroup,
+} from '@angular/forms';
 import { Entrada } from '../../../../core/models/entrada.model';
 import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
 import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
@@ -11,10 +15,10 @@ import { Categoria } from '../../../../core/models/categoria.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-    selector: 'app-editar-entrada',
-    templateUrl: './editar-entrada.component.html',
-    styleUrls: ['./editar-entrada.component.scss'],
-    standalone: false
+  selector: 'app-editar-entrada',
+  templateUrl: './editar-entrada.component.html',
+  styleUrls: ['./editar-entrada.component.scss'],
+  standalone: false,
 })
 export class EditarEntradaComponent implements OnInit {
   entradaForm!: UntypedFormGroup;
@@ -35,10 +39,8 @@ export class EditarEntradaComponent implements OnInit {
     private vf: ValidationEntradaFormsService,
     private facade: EntradaFacadeService,
     private router: Router,
-    private toastService: ToastService
-  ) {
-    
-  }
+    private toastService: ToastService,
+  ) {}
 
   async ngOnInit() {
     this.entradaForm = this.vf.buildForm(this.entrada);
@@ -53,25 +55,27 @@ export class EditarEntradaComponent implements OnInit {
     this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: Entrada) => {
       if (!ent) return;
       this.entrada = ent;
-      
+
       // Busca los objetos reales por referencia
       const estadoCorrecto = this.estadosEntr.find(
-        e => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada
+        (e) => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada,
       );
       const tipoCorrecto = this.tiposEntr.find(
-        t => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada
+        (t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada,
       );
 
       this.entradaForm.patchValue({
         ...ent,
         estadoEntrada: estadoCorrecto ?? null,
-        tipoEntrada: tipoCorrecto ?? null
+        tipoEntrada: tipoCorrecto ?? null,
       });
 
       // Rellenar categorías igual que antes
       const arr = this.entradaForm.get('categorias') as UntypedFormArray;
       if (ent.categorias && Array.isArray(ent.categorias)) {
-        ent.categorias.forEach((cat: any) => arr.push(new UntypedFormControl(cat)));
+        ent.categorias.forEach((cat: any) =>
+          arr.push(new UntypedFormControl(cat)),
+        );
       }
 
       // Por defecto en modo lectura
@@ -99,13 +103,19 @@ export class EditarEntradaComponent implements OnInit {
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuarioEditado = usuario?.idUsuario ?? null;
     this.facade.actualizarEntrada(this.idEntrada, ent).subscribe(() => {
-      this.toastService.showSuccess('La entrada se ha actualizado correctamente.', 'Entrada actualizada');
+      this.toastService.showSuccess(
+        'La entrada se ha actualizado correctamente.',
+        'Entrada actualizada',
+      );
       this.router.navigateByUrl('/admin/control/entradas');
     });
   }
 
   onPreviewEmit(payload: Partial<Entrada>) {
-    this.entradaParaPrevia = { ...(this.entradaParaPrevia || {}), ...(payload as Entrada) } as Entrada;
+    this.entradaParaPrevia = {
+      ...(this.entradaParaPrevia || {}),
+      ...(payload as Entrada),
+    } as Entrada;
     this.modalPreviaVisible = true;
   }
 

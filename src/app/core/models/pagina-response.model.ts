@@ -7,9 +7,7 @@ export class PaginaResponse {
   hasMore: boolean = false;
   elements: any;
 
-  constructor() {
-
-  }
+  constructor() {}
 }
 
 export interface PaginaResponse {

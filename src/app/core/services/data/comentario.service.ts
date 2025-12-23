@@ -18,7 +18,11 @@ export class ComentarioService extends CrudService<Comentario, number> {
   protected endpoint = '/comentarios';
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
-  buscarSafe(searchRequest: any, page: number, size: number): Observable<PaginaResponse> {
+  buscarSafe(
+    searchRequest: any,
+    page: number,
+    size: number,
+  ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = page.toString();
     params[this.pageSizeParam] = size.toString();
@@ -30,15 +34,22 @@ export class ComentarioService extends CrudService<Comentario, number> {
       params,
       undefined,
       'comentarios.buscar',
-      context
+      context,
     );
   }
 
-  buscarSinGlobalLoader(searchRequest: any, page: number, size: number): Observable<PaginaResponse> {
+  buscarSinGlobalLoader(
+    searchRequest: any,
+    page: number,
+    size: number,
+  ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = page.toString();
     params[this.pageSizeParam] = size.toString();
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(
+      NetworkInterceptor.SKIP_GLOBAL_LOADER,
+      true,
+    );
     return this.safePostData<PaginaResponse>(
       `${this.endpoint}/buscar`,
       searchRequest,
@@ -46,7 +57,7 @@ export class ComentarioService extends CrudService<Comentario, number> {
       params,
       undefined,
       'comentarios.buscar',
-      context
+      context,
     );
   }
 }

@@ -44,12 +44,12 @@ import { ErrorBoundaryService } from './errors/error-boundary/error-boundary.ser
     // Interceptors en orden de ejecución
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: TimeoutInterceptor,   // 1º: Timeouts específicos
+      useClass: TimeoutInterceptor, // 1º: Timeouts específicos
       multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,     // 2º: Autenticación
+      useClass: AuthInterceptor, // 2º: Autenticación
       multi: true,
     },
     {
@@ -59,7 +59,7 @@ import { ErrorBoundaryService } from './errors/error-boundary/error-boundary.ser
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: ErrorInterceptor,  // 4º: Manejo global de errores
+      useClass: ErrorInterceptor, // 4º: Manejo global de errores
       multi: true,
     },
   ],

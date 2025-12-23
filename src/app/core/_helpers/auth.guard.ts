@@ -1,8 +1,15 @@
 // auth.guard.ts
 import { Injectable } from '@angular/core';
 import {
-  CanActivate, CanActivateChild, CanLoad, CanMatch,
-  Router, ActivatedRouteSnapshot, Route, UrlSegment, UrlTree
+  CanActivate,
+  CanActivateChild,
+  CanLoad,
+  CanMatch,
+  Router,
+  ActivatedRouteSnapshot,
+  Route,
+  UrlSegment,
+  UrlTree,
 } from '@angular/router';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { environment } from '../../../environments/environment';
@@ -11,10 +18,11 @@ import { LoggerService } from '../services/logger.service';
 import { AuthService } from '../services/auth/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMatch {
-
+export class AuthGuard
+  implements CanActivate, CanActivateChild, CanLoad, CanMatch
+{
   // margen en segundos para considerar "a punto de expirar"
   private readonly EXPIRY_MARGIN_SECONDS = 30;
 
@@ -23,13 +31,19 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     private authSync: AuthSyncService,
     private router: Router,
     private log: LoggerService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   // Common check reused by the three guards
   private checkAuth(): boolean {
-    if (environment && (environment as any).mock) { return true; }
-    try { if ((window as any).__E2E_BYPASS_AUTH__ === true) { return true; } } catch {}
+    if (environment && (environment as any).mock) {
+      return true;
+    }
+    try {
+      if ((window as any).__E2E_BYPASS_AUTH__ === true) {
+        return true;
+      }
+    } catch {}
     // sincronizar estado entre pestañas
     this.authSync.initializeAuthState();
 
@@ -45,7 +59,9 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     }
 
     if (!this.authService.isTokenValid(this.EXPIRY_MARGIN_SECONDS)) {
-      this.log.info('🔐 AuthGuard - Token caducado o a punto de caducar -> redirigiendo (sin emitir logout)');
+      this.log.info(
+        '🔐 AuthGuard - Token caducado o a punto de caducar -> redirigiendo (sin emitir logout)',
+      );
       return false;
     }
 
@@ -54,8 +70,13 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
 
   canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree {
     try {
-      const qp = typeof window !== 'undefined' ? new URL(window.location.href).searchParams.get('e2e') : null;
-      if (qp === '1') { return true; }
+      const qp =
+        typeof window !== 'undefined'
+          ? new URL(window.location.href).searchParams.get('e2e')
+          : null;
+      if (qp === '1') {
+        return true;
+      }
     } catch {}
     if (!this.checkAuth()) {
       return this.router.parseUrl('/login');
@@ -65,9 +86,14 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     const requiredRoles = route.data['roles'] as Array<string> | undefined;
     if (requiredRoles && requiredRoles.length > 0) {
       const user = this.tokenStorage.getUser();
-      const hasRole = Array.isArray(user?.roles) && user.roles.some((role: string) => requiredRoles.includes(role));
+      const hasRole =
+        Array.isArray(user?.roles) &&
+        user.roles.some((role: string) => requiredRoles.includes(role));
       if (!hasRole) {
-        this.log.info('🔐 AuthGuard - Usuario no tiene los roles requeridos:', requiredRoles);
+        this.log.info(
+          '🔐 AuthGuard - Usuario no tiene los roles requeridos:',
+          requiredRoles,
+        );
         return this.router.parseUrl('/login');
       }
     }

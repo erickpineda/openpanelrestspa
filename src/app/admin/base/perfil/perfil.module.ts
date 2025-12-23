@@ -16,7 +16,7 @@ import { SharedCoreUiModule } from '../../../shared/shared-coreui.module';
     PerfilComponent,
     PerfilFormComponent,
     PerfilPreferencesComponent,
-    PerfilActivityComponent
+    PerfilActivityComponent,
   ],
   imports: [
     CommonModule,
@@ -25,7 +25,7 @@ import { SharedCoreUiModule } from '../../../shared/shared-coreui.module';
     TabsModule,
     PerfilRoutingModule,
     SharedOPModule,
-    SharedCoreUiModule
-  ]
+    SharedCoreUiModule,
+  ],
 })
-export class PerfilModule { }
+export class PerfilModule {}

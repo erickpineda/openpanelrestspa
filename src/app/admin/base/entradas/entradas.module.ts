@@ -27,12 +27,12 @@ import { EntradasSharedModule } from './entradas-shared.module';
     CKEditorModule,
     SharedCoreUiModule,
     MediaSharedModule,
-    EntradasSharedModule
+    EntradasSharedModule,
   ],
   declarations: [
     ListadoEntradasComponent,
     CrearEntradaComponent,
     EditarEntradaComponent,
-  ]
+  ],
 })
 export class EntradasModule {}

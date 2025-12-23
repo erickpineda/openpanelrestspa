@@ -6,7 +6,17 @@
       </c-col>
       <c-col xs="12" md="6">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <button cButton color="secondary" size="sm" (click)="downloadCsv.emit()" title="Descargar almacenamiento en CSV" [attr.aria-label]="'Descargar almacenamiento en CSV'" data-testid="btn-csv-storage">CSV</button>
+          <button
+            cButton
+            color="secondary"
+            size="sm"
+            (click)="downloadCsv.emit()"
+            title="Descargar almacenamiento en CSV"
+            [attr.aria-label]="'Descargar almacenamiento en CSV'"
+            data-testid="btn-csv-storage"
+          >
+            CSV
+          </button>
         </div>
       </c-col>
     </c-row>
@@ -15,7 +25,16 @@
     @if (loadingStorage) {
       <div class="mb-2"><c-spinner></c-spinner></div>
     }
-    <div class="mb-2 small text-muted">Ficheros: {{ storage?.totalFiles || 0 }}</div>
-    <div class="mb-2 small text-muted">Bytes: {{ formatBytesFn ? formatBytesFn(storage?.storageBytes) : (storage?.storageBytes | number) }}</div>
+    <div class="mb-2 small text-muted">
+      Ficheros: {{ storage?.totalFiles || 0 }}
+    </div>
+    <div class="mb-2 small text-muted">
+      Bytes:
+      {{
+        formatBytesFn
+          ? formatBytesFn(storage?.storageBytes)
+          : (storage?.storageBytes | number)
+      }}
+    </div>
   </c-card-body>
 </c-card>

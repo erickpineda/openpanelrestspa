@@ -4,7 +4,14 @@ import { TokenStorageService } from './token-storage.service';
 import { LoggerService } from '../logger.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
 
-type SyncEvent = { type: typeof OPConstants.Sync.TYPE_LOGIN | typeof OPConstants.Sync.TYPE_LOGOUT | typeof OPConstants.Sync.TYPE_CHANGED; timestamp: number; [k: string]: any };
+type SyncEvent = {
+  type:
+    | typeof OPConstants.Sync.TYPE_LOGIN
+    | typeof OPConstants.Sync.TYPE_LOGOUT
+    | typeof OPConstants.Sync.TYPE_CHANGED;
+  timestamp: number;
+  [k: string]: any;
+};
 
 @Injectable({ providedIn: 'root' })
 export class AuthSyncService {
@@ -15,7 +22,7 @@ export class AuthSyncService {
 
   constructor(
     private tokenStorage: TokenStorageService,
-    private log: LoggerService
+    private log: LoggerService,
   ) {
     this.setup();
   }
@@ -53,11 +60,19 @@ export class AuthSyncService {
     // Cuando la pestaña vuelve a ser visible, sincronizamos (compatibilidad)
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
-        this.log.info('AuthSyncService: pestaña visible -> sincronizando token local');
+        this.log.info(
+          'AuthSyncService: pestaña visible -> sincronizando token local',
+        );
         const synced = this.tokenStorage.syncFromLocalStorage();
         if (synced) {
-          window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
-          window.dispatchEvent(new CustomEvent(OPConstants.Events.AUTH_CHANGED, { detail: { source: 'visibility' } }));
+          window.dispatchEvent(
+            new Event(OPConstants.Events.AUTH_STATE_CHANGED),
+          );
+          window.dispatchEvent(
+            new CustomEvent(OPConstants.Events.AUTH_CHANGED, {
+              detail: { source: 'visibility' },
+            }),
+          );
         }
       }
     });
@@ -73,8 +88,15 @@ export class AuthSyncService {
       const synced = this.tokenStorage.syncFromLocalStorage();
       // Emitir evento legado para los componentes que lo esperan
       window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
-      window.dispatchEvent(new CustomEvent(OPConstants.Events.AUTH_CHANGED, { detail: { synced } }));
-      this.log.info('AuthSyncService: initializeAuthState finished, synced=', synced);
+      window.dispatchEvent(
+        new CustomEvent(OPConstants.Events.AUTH_CHANGED, {
+          detail: { synced },
+        }),
+      );
+      this.log.info(
+        'AuthSyncService: initializeAuthState finished, synced=',
+        synced,
+      );
     } catch (e) {
       this.log.error('AuthSyncService: error en initializeAuthState', e);
     }
@@ -86,11 +108,13 @@ export class AuthSyncService {
       type: OPConstants.Sync.TYPE_LOGIN,
       timestamp: Date.now(),
       originTabId: this.tokenStorage.getOrCreateTabId(),
-      ...extra
+      ...extra,
     };
     this.broadcast(payload);
     this.tokenStorage.syncFromLocalStorage();
-    window.dispatchEvent(new CustomEvent(OPConstants.Events.AUTH_LOGIN, { detail: payload }));
+    window.dispatchEvent(
+      new CustomEvent(OPConstants.Events.AUTH_LOGIN, { detail: payload }),
+    );
     window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
   }
 
@@ -99,10 +123,12 @@ export class AuthSyncService {
       type: OPConstants.Sync.TYPE_LOGOUT,
       timestamp: Date.now(),
       originTabId: this.tokenStorage.getOrCreateTabId(),
-      ...extra
+      ...extra,
     };
     this.broadcast(payload);
-    window.dispatchEvent(new CustomEvent(OPConstants.Events.AUTH_LOGOUT, { detail: payload }));
+    window.dispatchEvent(
+      new CustomEvent(OPConstants.Events.AUTH_LOGOUT, { detail: payload }),
+    );
     window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
   }
 
@@ -111,10 +137,12 @@ export class AuthSyncService {
       type: OPConstants.Sync.TYPE_CHANGED,
       timestamp: Date.now(),
       originTabId: this.tokenStorage.getOrCreateTabId(),
-      ...extra
+      ...extra,
     };
     this.broadcast(payload);
-    window.dispatchEvent(new CustomEvent(OPConstants.Events.AUTH_CHANGED, { detail: payload }));
+    window.dispatchEvent(
+      new CustomEvent(OPConstants.Events.AUTH_CHANGED, { detail: payload }),
+    );
     window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
   }
 
@@ -123,12 +151,18 @@ export class AuthSyncService {
       // 1) localStorage -> disparará storage event en otras pestañas
       localStorage.setItem(this.AUTH_SYNC_KEY, JSON.stringify(payload));
       setTimeout(() => {
-        try { localStorage.removeItem(this.AUTH_SYNC_KEY); } catch {}
+        try {
+          localStorage.removeItem(this.AUTH_SYNC_KEY);
+        } catch {}
       }, this.cleanupTimeoutMs);
 
       // 2) BroadcastChannel (si está disponible)
       if (this.bc) {
-        try { this.bc.postMessage(payload); } catch (e) { this.log.error('AuthSync: bc.postMessage falló', e); }
+        try {
+          this.bc.postMessage(payload);
+        } catch (e) {
+          this.log.error('AuthSync: bc.postMessage falló', e);
+        }
       }
 
       this.log.info('AuthSyncService: broadcast enviado', payload);
@@ -142,19 +176,25 @@ export class AuthSyncService {
     // si viene LOGIN, sincronizamos token local->session y avisamos
     if (data.type === OPConstants.Sync.TYPE_LOGIN) {
       this.tokenStorage.syncFromLocalStorage();
-      window.dispatchEvent(new CustomEvent(OPConstants.Events.AUTH_LOGIN, { detail: data }));
+      window.dispatchEvent(
+        new CustomEvent(OPConstants.Events.AUTH_LOGIN, { detail: data }),
+      );
       window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
       return;
     }
 
     if (data.type === OPConstants.Sync.TYPE_LOGOUT) {
-      window.dispatchEvent(new CustomEvent(OPConstants.Events.AUTH_LOGOUT, { detail: data }));
+      window.dispatchEvent(
+        new CustomEvent(OPConstants.Events.AUTH_LOGOUT, { detail: data }),
+      );
       window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
       return;
     }
 
     // CHANGED u otros
-    window.dispatchEvent(new CustomEvent(OPConstants.Events.AUTH_CHANGED, { detail: data }));
+    window.dispatchEvent(
+      new CustomEvent(OPConstants.Events.AUTH_CHANGED, { detail: data }),
+    );
     window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
   }
 }

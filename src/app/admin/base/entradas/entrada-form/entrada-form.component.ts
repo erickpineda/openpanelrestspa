@@ -24,11 +24,11 @@ import { ViewChild } from '@angular/core';
 import { ImagenesComponent } from '../../contenido/imagenes/imagenes.component';
 
 @Component({
-    selector: 'app-entrada-form',
-    templateUrl: './entrada-form.component.html',
-    styleUrls: ['./entrada-form.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-entrada-form',
+  templateUrl: './entrada-form.component.html',
+  styleUrls: ['./entrada-form.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class EntradaFormComponent implements OnInit, OnChanges {
   @Input() editorConfig: any = {
@@ -97,33 +97,32 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     private log: LoggerService,
     private fileStorage: FileStorageService,
     private toastService: ToastService,
-    private sanitizer: DomSanitizer
-  ) { }
+    private sanitizer: DomSanitizer,
+  ) {}
 
   ngOnInit(): void {
-  window.addEventListener(
-    OPConstants.Events.SAVE_UNSAVED_WORK,
-    this.saveBeforeLogout.bind(this)
-  );
+    window.addEventListener(
+      OPConstants.Events.SAVE_UNSAVED_WORK,
+      this.saveBeforeLogout.bind(this),
+    );
 
-  // Verificar navegación con recuperación
-  this.checkNavigationState();
+    // Verificar navegación con recuperación
+    this.checkNavigationState();
 
-  // Verificar datos temporales solo si no venimos de recuperación
-  if (!this.estaEditando && !this.isRecoveringFromNavigation) {
-    this.checkForTemporaryData();
+    // Verificar datos temporales solo si no venimos de recuperación
+    if (!this.estaEditando && !this.isRecoveringFromNavigation) {
+      this.checkForTemporaryData();
+    }
+
+    // Cargar CKEditor dinámicamente
+    this.loadEditorBuild();
+
+    // Cargar preview segura si ya existe imagen destacada
+    const currentImg = this.imagenDestacadaUrl;
+    if (currentImg) {
+      this.checkAndLoadSecureImage(currentImg);
+    }
   }
-
-  // Cargar CKEditor dinámicamente
-  this.loadEditorBuild();
-
-  // Cargar preview segura si ya existe imagen destacada
-  const currentImg = this.imagenDestacadaUrl;
-  if (currentImg) {
-    this.checkAndLoadSecureImage(currentImg);
-  }
-}
-
 
   // Helper para cargar imagen segura si es un endpoint protegido
   private checkAndLoadSecureImage(url: string): void {
@@ -143,7 +142,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
         this.imagenPreviewUrl = URL.createObjectURL(blob);
         this.cdRef.markForCheck();
       },
-      error: (err) => console.error('Error cargando preview segura', err)
+      error: (err) => console.error('Error cargando preview segura', err),
     });
   }
 
@@ -161,46 +160,58 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       reader.readAsDataURL(file);
 
       this.log.info('Subiendo imagen destacada...', file.name);
-      
+
       this.fileStorage.uploadFile(file).subscribe({
         next: (response: any) => {
           // Intentar obtener URL directamente
           let url = response?.data?.ruta || response?.ruta || response?.url;
-          
+
           if (url) {
             this.handleUploadSuccess(url);
             return;
-          } 
-          
+          }
+
           // Si no hay URL directa, buscar UUID en el mensaje (caso trackingId)
           // Comprobar response.message Y response.result.message
           const message = response.message || response?.result?.message || '';
-          
+
           if (response?.result?.trackingId || message) {
             // Regex para UUID estándar
-            const match = message.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-            
+            const match = message.match(
+              /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
+            );
+
             if (match) {
               const uuid = match[0];
               this.log.info('UUID extraído del mensaje de subida:', uuid);
-              
+
               this.fileStorage.obtenerDatosFichero(uuid).subscribe({
                 next: (fileData: any) => {
                   // FileStorageService.obtenerDatosFichero ya hace un map(resp => resp?.data ?? resp)
                   // Pero por seguridad verificamos varios campos
-                  const fileUrl = fileData?.ruta || fileData?.url || fileData?.data?.ruta;
-                  
+                  const fileUrl =
+                    fileData?.ruta || fileData?.url || fileData?.data?.ruta;
+
                   if (fileUrl) {
                     this.handleUploadSuccess(fileUrl);
                   } else {
-                    this.log.error(`No se pudo obtener URL del fichero con UUID: ${uuid}`, fileData);
-                    this.toastService.showError('No se pudo obtener la URL de la imagen', 'Error');
+                    this.log.error(
+                      `No se pudo obtener URL del fichero con UUID: ${uuid}`,
+                      fileData,
+                    );
+                    this.toastService.showError(
+                      'No se pudo obtener la URL de la imagen',
+                      'Error',
+                    );
                   }
                 },
                 error: (err) => {
                   this.log.error('Error obteniendo datos del fichero', err);
-                  this.toastService.showError('Error al obtener datos de la imagen', 'Error');
-                }
+                  this.toastService.showError(
+                    'Error al obtener datos de la imagen',
+                    'Error',
+                  );
+                },
               });
               return;
             }
@@ -208,12 +219,15 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
           // Si llegamos aquí, no se pudo procesar la respuesta
           this.log.error('Respuesta de subida irreconocible', response);
-          this.toastService.showError('No se pudo obtener la URL de la imagen', 'Error');
+          this.toastService.showError(
+            'No se pudo obtener la URL de la imagen',
+            'Error',
+          );
         },
         error: (err) => {
           this.log.error('Error subiendo imagen', err);
           this.toastService.showError('Error al subir la imagen', 'Error');
-        }
+        },
       });
     }
   }
@@ -223,7 +237,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     this.form.markAsDirty();
     this.cdRef.markForCheck();
     this.toastService.showSuccess('Imagen subida correctamente', 'Éxito');
-    
+
     // Refrescar librería si está cargada
     if (this.imagenesComponent) {
       this.imagenesComponent.load();
@@ -235,7 +249,9 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     this.imagenPreviewUrl = null;
     this.form.markAsDirty();
     // Limpiar el input file si es necesario (se puede hacer con ViewChild o simplemente dejarlo)
-    const fileInput = document.getElementById('selImagenDestacada') as HTMLInputElement;
+    const fileInput = document.getElementById(
+      'selImagenDestacada',
+    ) as HTMLInputElement;
     if (fileInput) fileInput.value = '';
     this.cdRef.markForCheck();
   }
@@ -244,14 +260,13 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     return this.form.get('imagenDestacada')?.value;
   }
 
-
   // Carga dinámica del build pesado de CKEditor para reducir tamaño del chunk inicial
   private async loadEditorBuild(): Promise<void> {
     try {
       this.editorLoading = true;
       const mod = await import('@ckeditor/ckeditor5-build-classic');
       // Algunos empaquetados exportan por defecto en default
-      this.Editor = (mod && (mod as any).default) ? (mod as any).default : mod;
+      this.Editor = mod && (mod as any).default ? (mod as any).default : mod;
     } catch (error) {
       this.log.error('❌ Error cargando CKEditor build dinámicamente:', error);
     } finally {
@@ -263,38 +278,45 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   ngOnDestroy(): void {
     window.removeEventListener(
       OPConstants.Events.SAVE_UNSAVED_WORK,
-      this.saveBeforeLogout.bind(this)
+      this.saveBeforeLogout.bind(this),
     );
   }
 
-   private checkNavigationState(): void {
+  private checkNavigationState(): void {
     const navigation = this.router.currentNavigation();
     const state = navigation?.extras?.state as any;
-    
+
     if (state?.temporaryEntry && state?.recoverData) {
-      this.log.info('🔄 Recibiendo entrada temporal desde navegación:', state.temporaryEntry);
+      this.log.info(
+        '🔄 Recibiendo entrada temporal desde navegación:',
+        state.temporaryEntry,
+      );
       this.isRecoveringFromNavigation = true;
-      
+
       // Recuperar los datos en el formulario
       this.recoverTemporaryData(state.temporaryEntry.formData);
-      
+
       // Eliminar la entrada temporal del almacenamiento
       this.temporaryStorage.removeTemporaryEntry(state.temporaryEntry.id);
-      
+
       // Limpiar el estado de navegación
       this.router.navigate([], {
         replaceUrl: true,
-        state: [null]
+        state: [null],
       });
     }
   }
 
   private checkForTemporaryData(): void {
-    const temporaryEntries = this.temporaryStorage.getTemporaryEntriesByType('entrada');
-    
+    const temporaryEntries =
+      this.temporaryStorage.getTemporaryEntriesByType('entrada');
+
     if (temporaryEntries.length > 0 && !this.isRecoveringFromNavigation) {
-      this.log.info('📥 Entradas temporales encontradas en formulario:', temporaryEntries);
-      
+      this.log.info(
+        '📥 Entradas temporales encontradas en formulario:',
+        temporaryEntries,
+      );
+
       // ✅ REVERTIMOS: Volvemos al comportamiento original - mostrar individual
       if (temporaryEntries.length === 1) {
         // Una sola entrada - mostrar notificación individual
@@ -302,10 +324,11 @@ export class EntradaFormComponent implements OnInit, OnChanges {
         this.showRecoveryNotification = true;
       } else {
         // Múltiples entradas - mostrar notificación individual de la más reciente
-        const mostRecent = temporaryEntries.sort((a, b) => 
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        const mostRecent = temporaryEntries.sort(
+          (a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
         )[0];
-        
+
         this.temporaryData = mostRecent;
         this.showRecoveryNotification = true;
       }
@@ -333,7 +356,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   private recoverTemporaryData(formData: any): void {
     try {
       this.log.info('🔄 Recuperando datos temporales...', formData);
-      
+
       // Actualizar el formulario con los datos temporales
       this.form.patchValue({
         titulo: formData.titulo || '',
@@ -345,27 +368,28 @@ export class EntradaFormComponent implements OnInit, OnChanges {
         publicada: formData.publicada || false,
         privado: formData.privado || false,
         permitirComentario: formData.permitirComentario || false,
-        password: formData.password || ''
+        password: formData.password || '',
       });
 
       // Recuperar categorías si existen
       if (formData.categorias && Array.isArray(formData.categorias)) {
         const categoriasArray = this.categoriasArray();
         categoriasArray.clear();
-        
+
         formData.categorias.forEach((categoria: Categoria) => {
           categoriasArray.push(new FormControl(categoria));
         });
       }
-      
+
       this.log.info('✅ Datos temporales recuperados correctamente');
-      
+
       // Limpiar datos temporales después de recuperarlos
       if (this.currentTemporaryEntryId) {
-        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
+        this.temporaryStorage.removeTemporaryEntry(
+          this.currentTemporaryEntryId,
+        );
         this.currentTemporaryEntryId = null;
       }
-      
     } catch (error) {
       this.log.error('❌ Error al recuperar datos temporales:', error);
     }
@@ -379,11 +403,11 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   private saveBeforeLogout(): void {
     this.log.info('💾 Guardando entrada antes del logout...');
-    
+
     if (this.form.valid) {
       this.onSubmit();
     }
-    
+
     // ✅ MODIFICADO: Siempre guardar temporalmente, incluso si el formulario no es válido
     this.saveToTemporaryStorage();
   }
@@ -391,25 +415,31 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   private saveToTemporaryStorage(): void {
     try {
       const formData = this.form.value;
-      
+
       // ✅ NUEVO: Crear entrada temporal con metadatos
       const temporaryEntry = {
         formData: formData,
         timestamp: new Date().toISOString(),
         formType: 'entrada', // Tipo de formulario
         title: formData.titulo || 'Entrada sin título', // Título para mostrar
-        description: `Creada: ${new Date().toLocaleString()}` // Descripción
+        description: `Creada: ${new Date().toLocaleString()}`, // Descripción
       };
 
       // Si ya existe una entrada temporal para este formulario, actualizarla
       if (this.currentTemporaryEntryId) {
-        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
+        this.temporaryStorage.removeTemporaryEntry(
+          this.currentTemporaryEntryId,
+        );
       }
 
       // Guardar nueva entrada temporal
-      this.currentTemporaryEntryId = this.temporaryStorage.saveTemporaryEntry(temporaryEntry);
-      
-      this.log.info('✅ Datos guardados en almacenamiento temporal con ID:', this.currentTemporaryEntryId);
+      this.currentTemporaryEntryId =
+        this.temporaryStorage.saveTemporaryEntry(temporaryEntry);
+
+      this.log.info(
+        '✅ Datos guardados en almacenamiento temporal con ID:',
+        this.currentTemporaryEntryId,
+      );
     } catch (error) {
       this.log.error('❌ Error al guardar temporalmente:', error);
     }
@@ -417,15 +447,17 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   onSubmit() {
     if (!this.form) return;
-    
+
     if (this.form.valid) {
       this.log.info('💾 Intentando guardar entrada...');
       const clean = this.sanitizeHtmlFields(this.form.value);
       this.submitForm.emit(clean as Entrada);
-      
+
       // ✅ MODIFICADO: Limpiar entrada temporal específica al guardar exitosamente
       if (this.currentTemporaryEntryId) {
-        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
+        this.temporaryStorage.removeTemporaryEntry(
+          this.currentTemporaryEntryId,
+        );
         this.currentTemporaryEntryId = null;
       }
     } else {
@@ -459,11 +491,18 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       if (!html || typeof html !== 'string') return html;
       const tpl = document.createElement('template');
       tpl.innerHTML = html;
-      const walker = document.createTreeWalker(tpl.content, NodeFilter.SHOW_ELEMENT, null);
+      const walker = document.createTreeWalker(
+        tpl.content,
+        NodeFilter.SHOW_ELEMENT,
+        null,
+      );
       const toRemove: Element[] = [];
       while (walker.nextNode()) {
         const el = walker.currentNode as Element;
-        if (el.tagName.toLowerCase() === 'script' || el.tagName.toLowerCase() === 'iframe') {
+        if (
+          el.tagName.toLowerCase() === 'script' ||
+          el.tagName.toLowerCase() === 'iframe'
+        ) {
           toRemove.push(el);
           continue;
         }
@@ -473,17 +512,21 @@ export class EntradaFormComponent implements OnInit, OnChanges {
           if (n.startsWith('on')) el.removeAttribute(attr.name);
           if (n === 'src' || n === 'href') {
             const lower = (v || '').toLowerCase().trim();
-            if (lower.startsWith('javascript:') || lower.startsWith('data:text/html')) el.removeAttribute(attr.name);
+            if (
+              lower.startsWith('javascript:') ||
+              lower.startsWith('data:text/html')
+            )
+              el.removeAttribute(attr.name);
           }
         }
       }
-      toRemove.forEach(e => e.remove());
+      toRemove.forEach((e) => e.remove());
       return tpl.innerHTML;
     };
     return {
       ...val,
       contenido: sanitize(val?.contenido),
-      resumen: sanitize(val?.resumen)
+      resumen: sanitize(val?.resumen),
     };
   }
 
@@ -492,7 +535,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   // Helpers para FormArray de categorías (OBJETOS COMPLETOS)
   categoriasArray(): FormArray {
     const ctrl = this.form?.get('categorias');
-    
+
     if (!ctrl) {
       // Si no existe, crea un FormArray vacío en el form
       this.form?.addControl('categorias', new FormArray([]));
@@ -504,8 +547,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   // Verificar si una categoría está seleccionada (por ID)
   isCategoriaSelected(categoria: Categoria): boolean {
     const arr = this.categoriasArray();
-    return arr.controls.some(control => 
-      control.value && control.value.nombre === categoria.nombre
+    return arr.controls.some(
+      (control) => control.value && control.value.nombre === categoria.nombre,
     );
   }
 
@@ -517,7 +560,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     }
 
     const arr = this.categoriasArray();
-    
+
     if (event.target.checked) {
       // Agregar la categoría al FormArray si no existe
       if (!this.isCategoriaSelected(categoria)) {
@@ -525,15 +568,15 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       }
     } else {
       // Buscar y remover la categoría por nombre
-      const index = arr.controls.findIndex(control => 
-        control.value && control.value.nombre === categoria.nombre
+      const index = arr.controls.findIndex(
+        (control) => control.value && control.value.nombre === categoria.nombre,
       );
-      
+
       if (index > -1) {
         arr.removeAt(index);
       }
     }
-    
+
     // Forzar actualización de la vista
     setTimeout(() => {
       this.cdRef.detectChanges();
@@ -543,14 +586,14 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   // Método para seleccionar/deseleccionar todas las categorías (usando FormArray)
   toggleTodasCategorias(event: any): void {
     const arr = this.categoriasArray();
-    
+
     if (event.target.checked) {
       // Limpiar el array primero
       while (arr.length !== 0) {
         arr.removeAt(0);
       }
       // Agregar todas las categorías como objetos completos
-      this.categorias.forEach(categoria => {
+      this.categorias.forEach((categoria) => {
         arr.push(new FormControl(categoria));
       });
     } else {
@@ -579,8 +622,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   getCategoriasIds(): number[] {
     const arr = this.categoriasArray();
     return arr.controls
-      .filter(control => control.value)
-      .map(control => control.value.idCategoria);
+      .filter((control) => control.value)
+      .map((control) => control.value.idCategoria);
   }
 
   // Selector de imagen de librería
@@ -596,47 +639,60 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   onMediaSelected(item: any): void {
     if (item) {
-        // Limpiar preview anterior
-        this.imagenPreviewUrl = null;
+      // Limpiar preview anterior
+      this.imagenPreviewUrl = null;
 
-        // Si hay UUID, intentar cargar preview segura
-        if (item.uuid) {
-            this.cargarPreviewSegura(item.uuid);
-        } else if (item.url) {
-            // Si no hay UUID pero hay URL, asumimos pública
-            this.imagenPreviewUrl = item.url;
-        }
+      // Si hay UUID, intentar cargar preview segura
+      if (item.uuid) {
+        this.cargarPreviewSegura(item.uuid);
+      } else if (item.url) {
+        // Si no hay UUID pero hay URL, asumimos pública
+        this.imagenPreviewUrl = item.url;
+      }
 
-        // Preferir URL directa si existe para guardar en form
-        if (item.url) {
-            this.form.patchValue({ imagenDestacada: item.url });
-        } 
-        // Si no hay URL pero hay UUID, consultar datos del fichero para obtener URL
-        else if (item.uuid) {
-             this.fileStorage.obtenerDatosFichero(item.uuid).subscribe({
-                 next: (fileData: any) => {
-                     const fileUrl = fileData?.ruta || fileData?.url || fileData?.data?.ruta;
-                     if (fileUrl) {
-                         this.form.patchValue({ imagenDestacada: fileUrl });
-                         this.form.markAsDirty();
-                         this.cdRef.detectChanges();
-                     } else {
-                         this.log.error('MediaItem seleccionado tiene UUID pero no retorna URL:', item);
-                         this.toastService.showError('No se pudo obtener la URL de la imagen seleccionada', 'Error');
-                     }
-                 },
-                 error: (err) => {
-                     this.log.error('Error obteniendo datos del fichero seleccionado', err);
-                     this.toastService.showError('Error al procesar la imagen seleccionada', 'Error');
-                 }
-             });
-        }
-        
-        // No necesitamos marcar dirty aquí si es asíncrono, se hace en el subscribe
-        if (this.imagenDestacadaUrl) {
-            this.form.markAsDirty();
-            this.cdRef.detectChanges();
-        }
+      // Preferir URL directa si existe para guardar en form
+      if (item.url) {
+        this.form.patchValue({ imagenDestacada: item.url });
+      }
+      // Si no hay URL pero hay UUID, consultar datos del fichero para obtener URL
+      else if (item.uuid) {
+        this.fileStorage.obtenerDatosFichero(item.uuid).subscribe({
+          next: (fileData: any) => {
+            const fileUrl =
+              fileData?.ruta || fileData?.url || fileData?.data?.ruta;
+            if (fileUrl) {
+              this.form.patchValue({ imagenDestacada: fileUrl });
+              this.form.markAsDirty();
+              this.cdRef.detectChanges();
+            } else {
+              this.log.error(
+                'MediaItem seleccionado tiene UUID pero no retorna URL:',
+                item,
+              );
+              this.toastService.showError(
+                'No se pudo obtener la URL de la imagen seleccionada',
+                'Error',
+              );
+            }
+          },
+          error: (err) => {
+            this.log.error(
+              'Error obteniendo datos del fichero seleccionado',
+              err,
+            );
+            this.toastService.showError(
+              'Error al procesar la imagen seleccionada',
+              'Error',
+            );
+          },
+        });
+      }
+
+      // No necesitamos marcar dirty aquí si es asíncrono, se hace en el subscribe
+      if (this.imagenDestacadaUrl) {
+        this.form.markAsDirty();
+        this.cdRef.detectChanges();
+      }
     }
     this.cerrarSelectorImagen();
   }

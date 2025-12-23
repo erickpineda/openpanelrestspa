@@ -1,5 +1,5 @@
-import { Entrada } from "./entrada.model";
-import { Usuario } from "./usuario.model";
+import { Entrada } from './entrada.model';
+import { Usuario } from './usuario.model';
 
 export class Comentario {
   idComentario: number = 0;
@@ -7,20 +7,18 @@ export class Comentario {
   idEntrada: number = 0;
   fechaCreacion: Date = new Date();
   fechaEdicion: Date = new Date();
-  contenido: string = "";
-  contenidoCensurado: string = "";
+  contenido: string = '';
+  contenidoCensurado: string = '';
   votos: number = 0;
   aprobado: boolean = true;
   cuarentena: boolean = false;
 
   // Fuera del backend
-  username: string = "";
-  tituloEntrada: string = "";
-  fechaCreacionParseada: string = "";
+  username: string = '';
+  tituloEntrada: string = '';
+  fechaCreacionParseada: string = '';
 
-  constructor() {
-
-  }
+  constructor() {}
 }
 
 export interface Comentario {

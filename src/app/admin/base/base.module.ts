@@ -42,7 +42,6 @@ import { SharedCoreUiModule } from '../../shared/shared-coreui.module';
     CrearCategoriaComponent,
     EditarCategoriaComponent,
     CategoriaFormComponent,
-    
   ],
 })
 export class BaseModule {}

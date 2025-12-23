@@ -1,9 +1,9 @@
 export class Privilegio {
   idPrivilegio: number = 0;
-  codigo: string = "";
-  nombre: string = "";
-  descripcion: string = "";
-  
+  codigo: string = '';
+  nombre: string = '';
+  descripcion: string = '';
+
   constructor() {}
 }
 

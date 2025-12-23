@@ -8,35 +8,54 @@
             Categorías:
             @for (c of categoriasMostrar; track c; let last = $last) {
               <span>
-                {{ c.nombre || c }}@if (!last) {
-                <span>, </span>
-              }
-            </span>
-          }
-        </small>
+                {{ c.nombre || c }}
+                @if (!last) {
+                  <span>, </span>
+                }
+              </span>
+            }
+          </small>
+        }
+      </div>
+
+      @if (mostrarBotonesAccion) {
+        <div class="d-flex gap-2">
+          <button cButton color="warning" size="sm" (click)="onEditar()">
+            <svg
+              cIcon
+              name="cilWarning"
+              style="padding-right: 2px"
+              size="sm"
+              title="Editar entrada"
+            ></svg>
+            Editar
+          </button>
+          <button cButton color="danger" size="sm" (click)="onCerrar()">
+            <svg
+              cIcon
+              name="cilX"
+              style="padding-right: 2px"
+              size="sm"
+              title="Cerrar"
+            ></svg>
+            Cerrar
+          </button>
+          <button cButton color="success" size="sm" (click)="onPublicar()">
+            <svg
+              cIcon
+              name="cilPaperPlane"
+              style="padding-right: 2px"
+              size="sm"
+              title="Publicar"
+            ></svg>
+            Publicar
+          </button>
+        </div>
       }
     </div>
+  </c-card-header>
 
-    @if (mostrarBotonesAccion) {
-      <div class="d-flex gap-2">
-        <button cButton color="warning" size="sm" (click)="onEditar()">
-          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Editar entrada"></svg>
-          Editar
-        </button>
-        <button cButton color="danger" size="sm" (click)="onCerrar()">
-          <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cerrar"></svg>
-          Cerrar
-        </button>
-        <button cButton color="success" size="sm" (click)="onPublicar()">
-          <svg cIcon name="cilPaperPlane" style="padding-right: 2px" size="sm" title="Publicar"></svg>
-          Publicar
-        </button>
-      </div>
-    }
-  </div>
-</c-card-header>
-
-<c-card-body>
-  <div class="preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
-</c-card-body>
+  <c-card-body>
+    <div class="preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
+  </c-card-body>
 </c-card>

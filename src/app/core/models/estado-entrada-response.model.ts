@@ -1,11 +1,9 @@
-import { EstadoEntrada } from "./estado-entrada.model";
+import { EstadoEntrada } from './estado-entrada.model';
 
 export class EstadoEntradaResponse {
   estadosEntradas: EstadoEntrada[] = [];
-  
-  constructor() {
 
-  }
+  constructor() {}
 }
 
 export interface EstadoEntradaResponse {

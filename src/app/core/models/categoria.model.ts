@@ -1,13 +1,10 @@
-
 export class Categoria {
   idCategoria: number = 0;
-  nombre: string = "";
-  descripcion: string = "";
+  nombre: string = '';
+  descripcion: string = '';
   cantidadEntradas: number = 0;
 
-  constructor() {
-
-  }
+  constructor() {}
 }
 
 export interface Categoria {
@@ -16,4 +13,3 @@ export interface Categoria {
   descripcion: string;
   cantidadEntradas: number;
 }
-

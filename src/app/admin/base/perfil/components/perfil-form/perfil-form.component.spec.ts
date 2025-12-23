@@ -10,10 +10,9 @@ describe('PerfilFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PerfilFormComponent ],
-      imports: [ ReactiveFormsModule, SharedCoreUiModule, NoopAnimationsModule ]
-    })
-    .compileComponents();
+      declarations: [PerfilFormComponent],
+      imports: [ReactiveFormsModule, SharedCoreUiModule, NoopAnimationsModule],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(PerfilFormComponent);
     component = fixture.componentInstance;
@@ -41,14 +40,14 @@ describe('PerfilFormComponent', () => {
 
   it('should emit save event when valid', () => {
     spyOn(component.save, 'emit');
-    
+
     component.form.controls['nombre'].setValue('Juan');
     component.form.controls['apellido'].setValue('Perez');
     component.form.controls['email'].setValue('juan@test.com');
     component.form.controls['telefono'].setValue('123456');
-    
+
     component.onSubmit();
-    
+
     expect(component.save.emit).toHaveBeenCalledWith(component.form.value);
   });
 });

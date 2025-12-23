@@ -12,12 +12,15 @@ export class ArchivosService extends CrudService<MediaItem, number> {
 
   constructor(
     protected override http: HttpClient,
-    protected override tokenStorageService: TokenStorageService
+    protected override tokenStorageService: TokenStorageService,
   ) {
     super(http, tokenStorageService);
   }
 
-  override listarSafe(pageNo?: number, pageSize?: number): Observable<MediaItem[]> {
+  override listarSafe(
+    pageNo?: number,
+    pageSize?: number,
+  ): Observable<MediaItem[]> {
     const params: any = { type: 'file' };
     if (pageNo != null) params.pageNo = String(pageNo);
     if (pageSize != null) params.pageSize = String(pageSize);
@@ -27,11 +30,15 @@ export class ArchivosService extends CrudService<MediaItem, number> {
       params,
       undefined,
       'media.archivos.listar',
-      context
+      context,
     );
   }
 
-  buscarSafe(payload: any, pageNo?: number, pageSize?: number): Observable<MediaBuscarResponse> {
+  buscarSafe(
+    payload: any,
+    pageNo?: number,
+    pageSize?: number,
+  ): Observable<MediaBuscarResponse> {
     const params: any = { type: 'file' };
     if (pageNo != null) params.pageNo = String(pageNo);
     if (pageSize != null) params.pageSize = String(pageSize);
@@ -43,7 +50,7 @@ export class ArchivosService extends CrudService<MediaItem, number> {
       params,
       undefined,
       'media.archivos.buscar',
-      context
+      context,
     );
   }
 }

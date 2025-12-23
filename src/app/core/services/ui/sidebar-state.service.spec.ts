@@ -6,7 +6,9 @@ describe('SidebarStateService', () => {
 
   beforeEach(() => {
     service = new SidebarStateService();
-    try { localStorage.removeItem('sidebar_expanded_items'); } catch {}
+    try {
+      localStorage.removeItem('sidebar_expanded_items');
+    } catch {}
   });
 
   it('debe expandir Entradas por defecto en primer render', () => {
@@ -27,7 +29,9 @@ describe('SidebarStateService', () => {
     const items = JSON.parse(JSON.stringify(navItems));
     service.updateNavItems(items as any, '/admin/control/categorias');
     const entradas = items.find((i: any) => i.name === 'Entradas') as any;
-    const taxonomia = entradas.children?.find((c: any) => c.name === 'Taxonomía') as any;
+    const taxonomia = entradas.children?.find(
+      (c: any) => c.name === 'Taxonomía',
+    ) as any;
     expect(entradas.open).toBeTrue();
     expect(taxonomia.open).toBeTrue();
   });
@@ -36,15 +40,19 @@ describe('SidebarStateService', () => {
     const items = JSON.parse(JSON.stringify(navItems));
     service.updateNavItems(items as any, '/admin/control/etiquetas');
     const entradas = items.find((i: any) => i.name === 'Entradas') as any;
-    const taxonomia = entradas.children?.find((c: any) => c.name === 'Taxonomía') as any;
+    const taxonomia = entradas.children?.find(
+      (c: any) => c.name === 'Taxonomía',
+    ) as any;
     expect(entradas.open).toBeTrue();
     expect(taxonomia.open).toBeTrue();
   });
-  
+
   it('debe abrir Roles y Permisos al navegar a Privilegios', () => {
     const items = JSON.parse(JSON.stringify(navItems));
     service.updateNavItems(items as any, '/admin/control/gestion/privilegios');
-    const rolesPermisos = items.find((i: any) => i.name === 'Roles y Permisos') as any;
+    const rolesPermisos = items.find(
+      (i: any) => i.name === 'Roles y Permisos',
+    ) as any;
     expect(rolesPermisos.open).toBeTrue();
   });
-}) 
+});

@@ -1,4 +1,4 @@
-<app-comentario-form 
+<app-comentario-form
   [comentario]="comentario"
   [nombreUsuario]="nombreUsuario"
   [emailUsuario]="emailUsuario"
@@ -8,5 +8,6 @@
   [isEditMode]="true"
   (submitComentario)="onSubmit($event)"
   (cancel)="onCancel()"
-  (editarComentario)="onEditarComentario()">
+  (editarComentario)="onEditarComentario()"
+>
 </app-comentario-form>

@@ -7,17 +7,16 @@ import { INavItemEnhanced, UserRole } from '../types/navigation.types';
  * Handles backward compatibility and preserves custom configurations
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NavigationMigrationService {
-
   /**
    * Maps legacy navigation items to the new enhanced structure
    * @param legacyItems - Array of legacy INavData items
    * @returns Array of enhanced navigation items
    */
   migrateLegacyNavigation(legacyItems: INavData[]): INavItemEnhanced[] {
-    return legacyItems.map(item => this.migrateSingleItem(item));
+    return legacyItems.map((item) => this.migrateSingleItem(item));
   }
 
   /**
@@ -29,13 +28,13 @@ export class NavigationMigrationService {
     const enhancedItem: INavItemEnhanced = {
       ...legacyItem,
       priority: this.inferPriority(legacyItem),
-      requiredRoles: this.inferRequiredRoles(legacyItem)
+      requiredRoles: this.inferRequiredRoles(legacyItem),
     };
 
     // Migrate children if they exist
     if (legacyItem.children && legacyItem.children.length > 0) {
-      enhancedItem.children = legacyItem.children.map(child => 
-        this.migrateSingleItem(child)
+      enhancedItem.children = legacyItem.children.map((child) =>
+        this.migrateSingleItem(child),
       );
     }
 
@@ -58,7 +57,10 @@ export class NavigationMigrationService {
     const name = item.name || '';
 
     // Dashboard gets highest priority
-    if (url.includes('dashboard') || name.toLowerCase().includes('escritorio')) {
+    if (
+      url.includes('dashboard') ||
+      name.toLowerCase().includes('escritorio')
+    ) {
       return 100;
     }
 
@@ -96,7 +98,10 @@ export class NavigationMigrationService {
       if (name.toLowerCase().includes('avanzado')) {
         return 25;
       }
-      if (name.toLowerCase().includes('apariencia') || name.toLowerCase().includes('tema')) {
+      if (
+        name.toLowerCase().includes('apariencia') ||
+        name.toLowerCase().includes('tema')
+      ) {
         return 35;
       }
       return 30;
@@ -107,7 +112,10 @@ export class NavigationMigrationService {
       return 15;
     }
 
-    if (url.includes('changepassword') || name.toLowerCase().includes('contraseña')) {
+    if (
+      url.includes('changepassword') ||
+      name.toLowerCase().includes('contraseña')
+    ) {
       return 10;
     }
 
@@ -136,23 +144,55 @@ export class NavigationMigrationService {
 
     // Dashboard - accessible to most roles
     if (url.includes('dashboard')) {
-      return [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO];
+      return [
+        UserRole.AUTOR,
+        UserRole.EDITOR,
+        UserRole.ADMINISTRADOR,
+        UserRole.DESARROLLADOR,
+        UserRole.MANTENIMIENTO,
+        UserRole.PROPIETARIO,
+      ];
     }
 
     // Content creation - authors and above
-    if (url.includes('entradas') || url.includes('paginas') || url.includes('contenido')) {
+    if (
+      url.includes('entradas') ||
+      url.includes('paginas') ||
+      url.includes('contenido')
+    ) {
       if (url.includes('categorias')) {
-        return [UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
+        return [
+          UserRole.EDITOR,
+          UserRole.ADMINISTRADOR,
+          UserRole.DESARROLLADOR,
+          UserRole.PROPIETARIO,
+        ];
       }
       if (url.includes('paginas')) {
-        return [UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
+        return [
+          UserRole.EDITOR,
+          UserRole.ADMINISTRADOR,
+          UserRole.DESARROLLADOR,
+          UserRole.PROPIETARIO,
+        ];
       }
-      return [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
+      return [
+        UserRole.AUTOR,
+        UserRole.EDITOR,
+        UserRole.ADMINISTRADOR,
+        UserRole.DESARROLLADOR,
+        UserRole.PROPIETARIO,
+      ];
     }
 
     // Comments - editors and above
     if (url.includes('comentarios')) {
-      return [UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
+      return [
+        UserRole.EDITOR,
+        UserRole.ADMINISTRADOR,
+        UserRole.DESARROLLADOR,
+        UserRole.PROPIETARIO,
+      ];
     }
 
     // User management - administrators only
@@ -161,13 +201,20 @@ export class NavigationMigrationService {
     }
 
     // Roles and permissions - owners only
-    if (url.includes('roles') || url.includes('permisos') || url.includes('privilegios')) {
+    if (
+      url.includes('roles') ||
+      url.includes('permisos') ||
+      url.includes('privilegios')
+    ) {
       return [UserRole.PROPIETARIO];
     }
 
     // Configuration
     if (url.includes('configuracion') || url.includes('ajustes')) {
-      if (name.toLowerCase().includes('apariencia') || name.toLowerCase().includes('tema')) {
+      if (
+        name.toLowerCase().includes('apariencia') ||
+        name.toLowerCase().includes('tema')
+      ) {
         return [UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
       }
       if (name.toLowerCase().includes('avanzado')) {
@@ -181,21 +228,47 @@ export class NavigationMigrationService {
       if (url.includes('database') || url.includes('dev-tools')) {
         return [UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
       }
-      return [UserRole.MANTENIMIENTO, UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
+      return [
+        UserRole.MANTENIMIENTO,
+        UserRole.DESARROLLADOR,
+        UserRole.PROPIETARIO,
+      ];
     }
 
     // User profile - all authenticated users
     if (url.includes('miperfil') || url.includes('changepassword')) {
-      return [UserRole.LECTOR, UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO];
+      return [
+        UserRole.LECTOR,
+        UserRole.AUTOR,
+        UserRole.EDITOR,
+        UserRole.ADMINISTRADOR,
+        UserRole.DESARROLLADOR,
+        UserRole.MANTENIMIENTO,
+        UserRole.PROPIETARIO,
+      ];
     }
 
     // Quick links - all users
     if (item.attributes?.['target'] === '_blank' || url === '/') {
-      return [UserRole.LECTOR, UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.MANTENIMIENTO, UserRole.PROPIETARIO];
+      return [
+        UserRole.LECTOR,
+        UserRole.AUTOR,
+        UserRole.EDITOR,
+        UserRole.ADMINISTRADOR,
+        UserRole.DESARROLLADOR,
+        UserRole.MANTENIMIENTO,
+        UserRole.PROPIETARIO,
+      ];
     }
 
     // Default - authors and above
-    return [UserRole.AUTOR, UserRole.EDITOR, UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
+    return [
+      UserRole.AUTOR,
+      UserRole.EDITOR,
+      UserRole.ADMINISTRADOR,
+      UserRole.DESARROLLADOR,
+      UserRole.PROPIETARIO,
+    ];
   }
 
   /**
@@ -211,24 +284,27 @@ export class NavigationMigrationService {
       item.dynamicBadge = {
         service: 'BadgeCounterService',
         method: 'getUnmoderatedCommentsCount',
-        refreshInterval: 15000
+        refreshInterval: 15000,
       };
       item.badge = {
         color: 'danger',
-        text: 'Pendientes'
+        text: 'Pendientes',
       };
     }
 
     // Draft entries counter
-    if (url.includes('entradas-temporales') || name.toLowerCase().includes('borrador')) {
+    if (
+      url.includes('entradas-temporales') ||
+      name.toLowerCase().includes('borrador')
+    ) {
       item.dynamicBadge = {
         service: 'BadgeCounterService',
         method: 'getDraftEntriesCount',
-        refreshInterval: 30000
+        refreshInterval: 30000,
       };
       item.badge = {
         color: 'warning',
-        text: 'Pendientes'
+        text: 'Pendientes',
       };
     }
 
@@ -237,11 +313,11 @@ export class NavigationMigrationService {
       item.dynamicBadge = {
         service: 'BadgeCounterService',
         method: 'getPendingUsersCount',
-        refreshInterval: 60000
+        refreshInterval: 60000,
       };
       item.badge = {
         color: 'info',
-        text: 'Nuevos'
+        text: 'Nuevos',
       };
     }
 
@@ -250,11 +326,11 @@ export class NavigationMigrationService {
       item.dynamicBadge = {
         service: 'BadgeCounterService',
         method: 'getSystemAlertsCount',
-        refreshInterval: 120000
+        refreshInterval: 120000,
       };
       item.badge = {
         color: 'warning',
-        text: 'Alertas'
+        text: 'Alertas',
       };
     }
   }
@@ -268,12 +344,14 @@ export class NavigationMigrationService {
     const name = item.name || '';
 
     // Hide less critical items on mobile
-    if (url.includes('mantenimiento') || 
-        name.toLowerCase().includes('avanzado') ||
-        url.includes('dev-tools')) {
+    if (
+      url.includes('mantenimiento') ||
+      name.toLowerCase().includes('avanzado') ||
+      url.includes('dev-tools')
+    ) {
       item.responsiveConfig = {
         hideOnMobile: true,
-        collapseThreshold: 768
+        collapseThreshold: 768,
       };
     }
 
@@ -281,7 +359,7 @@ export class NavigationMigrationService {
     if (item.children && item.children.length > 0) {
       item.responsiveConfig = {
         hideOnMobile: false,
-        collapseThreshold: 1024
+        collapseThreshold: 1024,
       };
     }
   }
@@ -310,7 +388,10 @@ export class NavigationMigrationService {
    * @param items - Array of enhanced navigation items
    * @returns Validation result with any issues found
    */
-  validateMigratedStructure(items: INavItemEnhanced[]): { isValid: boolean; issues: string[] } {
+  validateMigratedStructure(items: INavItemEnhanced[]): {
+    isValid: boolean;
+    issues: string[];
+  } {
     const issues: string[] = [];
 
     // Check for duplicate URLs
@@ -325,7 +406,7 @@ export class NavigationMigrationService {
 
     return {
       isValid: issues.length === 0,
-      issues
+      issues,
     };
   }
 
@@ -335,7 +416,11 @@ export class NavigationMigrationService {
    * @param urls - Set to track URLs
    * @param issues - Array to collect issues
    */
-  private collectUrls(items: INavItemEnhanced[], urls: Set<string>, issues: string[]): void {
+  private collectUrls(
+    items: INavItemEnhanced[],
+    urls: Set<string>,
+    issues: string[],
+  ): void {
     for (const item of items) {
       if (item.url && typeof item.url === 'string') {
         if (urls.has(item.url)) {
@@ -356,18 +441,25 @@ export class NavigationMigrationService {
    * @param items - Navigation items
    * @param issues - Array to collect issues
    */
-  private validateRequiredProperties(items: INavItemEnhanced[], issues: string[]): void {
+  private validateRequiredProperties(
+    items: INavItemEnhanced[],
+    issues: string[],
+  ): void {
     for (const item of items) {
       if (!item.name) {
         issues.push('Navigation item missing name property');
       }
 
       if (!item.title && !item.url) {
-        issues.push(`Navigation item "${item.name}" must have either title or url property`);
+        issues.push(
+          `Navigation item "${item.name}" must have either title or url property`,
+        );
       }
 
       if (item.requiredRoles && item.requiredRoles.length === 0) {
-        issues.push(`Navigation item "${item.name}" has empty requiredRoles array`);
+        issues.push(
+          `Navigation item "${item.name}" has empty requiredRoles array`,
+        );
       }
 
       if (item.children) {
@@ -382,12 +474,18 @@ export class NavigationMigrationService {
    * @param issues - Array to collect issues
    * @param currentDepth - Current depth level
    */
-  private validateHierarchyDepth(items: INavItemEnhanced[], issues: string[], currentDepth: number): void {
+  private validateHierarchyDepth(
+    items: INavItemEnhanced[],
+    issues: string[],
+    currentDepth: number,
+  ): void {
     const maxDepth = 2;
 
     for (const item of items) {
       if (currentDepth >= maxDepth) {
-        issues.push(`Navigation hierarchy exceeds maximum depth of ${maxDepth} levels at item: ${item.name}`);
+        issues.push(
+          `Navigation hierarchy exceeds maximum depth of ${maxDepth} levels at item: ${item.name}`,
+        );
       }
       if (item.children && item.children.length > 0) {
         this.validateHierarchyDepth(item.children, issues, currentDepth + 1);
@@ -402,20 +500,21 @@ export class NavigationMigrationService {
    * @returns Merged navigation items with custom settings preserved
    */
   preserveCustomConfigurations(
-    originalItems: INavItemEnhanced[], 
-    customConfig: Partial<INavItemEnhanced>[]
+    originalItems: INavItemEnhanced[],
+    customConfig: Partial<INavItemEnhanced>[],
   ): INavItemEnhanced[] {
     const configMap = new Map<string, Partial<INavItemEnhanced>>();
-    
+
     // Create a map of custom configurations by URL or name
-    customConfig.forEach(config => {
-      const key = (typeof config.url === 'string' ? config.url : config.name) || '';
+    customConfig.forEach((config) => {
+      const key =
+        (typeof config.url === 'string' ? config.url : config.name) || '';
       if (key) {
         configMap.set(key, config);
       }
     });
 
-    return originalItems.map(item => this.applyCustomConfig(item, configMap));
+    return originalItems.map((item) => this.applyCustomConfig(item, configMap));
   }
 
   /**
@@ -425,8 +524,8 @@ export class NavigationMigrationService {
    * @returns Navigation item with custom config applied
    */
   private applyCustomConfig(
-    item: INavItemEnhanced, 
-    configMap: Map<string, Partial<INavItemEnhanced>>
+    item: INavItemEnhanced,
+    configMap: Map<string, Partial<INavItemEnhanced>>,
   ): INavItemEnhanced {
     const key = (typeof item.url === 'string' ? item.url : item.name) || '';
     const customConfig = configMap.get(key);
@@ -440,14 +539,17 @@ export class NavigationMigrationService {
         ...customConfig,
         // Preserve system-critical properties
         requiredRoles: customConfig.requiredRoles || item.requiredRoles,
-        priority: customConfig.priority !== undefined ? customConfig.priority : item.priority
+        priority:
+          customConfig.priority !== undefined
+            ? customConfig.priority
+            : item.priority,
       };
     }
 
     // Apply custom config to children
     if (item.children) {
-      mergedItem.children = item.children.map(child => 
-        this.applyCustomConfig(child, configMap)
+      mergedItem.children = item.children.map((child) =>
+        this.applyCustomConfig(child, configMap),
       );
     }
 

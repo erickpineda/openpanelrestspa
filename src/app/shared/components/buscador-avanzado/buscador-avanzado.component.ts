@@ -12,7 +12,7 @@
  * 2. Configurar los campos prioritarios y de catálogo según la entidad.
  * 3. Proveer la función de carga de catálogos si es necesario.
  * 4. Escuchar los eventos de filtro para ejecutar la búsqueda.
- * 
+ *
  * Ejemplo de uso del componente `buscador-avanzado` desde un componente padre:
  *
  * En el archivo TypeScript del componente padre (por ejemplo, `app.component.ts`):
@@ -76,18 +76,31 @@
  * </div>
  * ```
  */
-import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  SimpleChanges,
+  OnChanges,
+  OnInit,
+  OnDestroy,
+  ViewEncapsulation,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
-import { getBuscadorDefinicionesAmigables, BuscadorDefinicionesAdaptadas, BuscadorCampoDef } from '../../utils/buscador-definiciones.util';
+import {
+  getBuscadorDefinicionesAmigables,
+  BuscadorDefinicionesAdaptadas,
+  BuscadorCampoDef,
+} from '../../utils/buscador-definiciones.util';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 
 @Component({
-    selector: 'app-buscador-avanzado',
-    templateUrl: './buscador-avanzado.component.html',
-    styleUrls: ['./buscador-avanzado.component.scss'],
-    standalone: false
+  selector: 'app-buscador-avanzado',
+  templateUrl: './buscador-avanzado.component.html',
+  styleUrls: ['./buscador-avanzado.component.scss'],
+  standalone: false,
 })
-
 export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   // =================== Inputs ===================
   /**
@@ -137,7 +150,9 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Función para cargar catálogos externos, debe devolver un Observable<{ [key: string]: string[] }>.
    * El padre debe proveer la función adecuada según la entidad.
    */
-  @Input() cargarCatalogosFn?: () => import('rxjs').Observable<{ [key: string]: string[] }>;
+  @Input() cargarCatalogosFn?: () => import('rxjs').Observable<{
+    [key: string]: string[];
+  }>;
 
   // =================== Outputs ===================
   /**
@@ -235,7 +250,9 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Evita lógica en el template.
    */
   public get campoActual(): BuscadorCampoDef | undefined {
-    return this.adaptedDefs?.campos?.find((c: BuscadorCampoDef) => c.key === this.campoSeleccionado);
+    return this.adaptedDefs?.campos?.find(
+      (c: BuscadorCampoDef) => c.key === this.campoSeleccionado,
+    );
   }
 
   /**
@@ -252,7 +269,10 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     if (defs && defs.dataOptionPermitido) {
       if (Array.isArray(defs.dataOptionPermitido)) {
         return defs.dataOptionPermitido;
-      } else if (typeof defs.dataOptionPermitido === 'object' && defs.dataOptionPermitido !== null) {
+      } else if (
+        typeof defs.dataOptionPermitido === 'object' &&
+        defs.dataOptionPermitido !== null
+      ) {
         return defs.dataOptionPermitido[campo.key] || [];
       }
     }
@@ -264,7 +284,9 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Determina si se debe mostrar el botón de búsqueda, considerando compatibilidad con showButton.
    */
   public debeMostrarBotonBusqueda(): boolean {
-    return this.showSearchButton !== undefined ? this.showSearchButton : this.showButton;
+    return this.showSearchButton !== undefined
+      ? this.showSearchButton
+      : this.showButton;
   }
 
   /**
@@ -279,23 +301,30 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Si autoTrigger está activo, también emite filtroChanged y dispara búsqueda.
    */
   public limpiar(): void {
-    this.campoSeleccionado = this.initialCampoSeleccionado || this.camposDisponibles[0]?.valor || '';
+    this.campoSeleccionado =
+      this.initialCampoSeleccionado || this.camposDisponibles[0]?.valor || '';
     this.actualizarOperacionesDisponibles();
-    const ops = (this.operacionesDisponibles || []).map(o => o.valor);
+    const ops = (this.operacionesDisponibles || []).map((o) => o.valor);
     const initialOp = this.initialOperacionSeleccionada || '';
     const prefersBeginsWith = ops.includes('BEGINS_WITH');
     this.operacionSeleccionada = prefersBeginsWith
       ? 'BEGINS_WITH'
-      : (ops.includes(initialOp) ? initialOp : (ops[0] || ''));
+      : ops.includes(initialOp)
+        ? initialOp
+        : ops[0] || '';
     this.valorBusqueda = '';
     if (this.autoTrigger) {
-      this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });
+      this.filtroChanged.emit({
+        campo: this.campoSeleccionado,
+        operacion: this.operacionSeleccionada,
+        valor: this.valorBusqueda,
+      });
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
     this.filtroSeleccionado.emit({
       campo: this.campoSeleccionado,
       operacion: this.operacionSeleccionada,
-      valor: this.valorBusqueda
+      valor: this.valorBusqueda,
     });
   }
 
@@ -306,7 +335,11 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   public onValorChange(v: string): void {
     this.valorBusqueda = v;
     if (this.autoTrigger) {
-      this.filtroChanged.emit({ campo: this.campoSeleccionado, operacion: this.operacionSeleccionada, valor: this.valorBusqueda });
+      this.filtroChanged.emit({
+        campo: this.campoSeleccionado,
+        operacion: this.operacionSeleccionada,
+        valor: this.valorBusqueda,
+      });
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
   }
@@ -325,9 +358,10 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
         this.catalogOptions = { ...mapped };
       },
       error: (err) => {
-        this.catalogosError = 'Error al cargar catálogos. Intente recargar la página.';
+        this.catalogosError =
+          'Error al cargar catálogos. Intente recargar la página.';
         console.error('Error cargando catálogos:', err);
-      }
+      },
     });
   }
 
@@ -339,7 +373,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     this.filtroSeleccionado.emit({
       campo: this.campoSeleccionado,
       operacion: this.operacionSeleccionada,
-      valor: this.valorBusqueda
+      valor: this.valorBusqueda,
     });
   }
 
@@ -355,20 +389,35 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     // Ordenar campos priorizando los definidos en camposPrioritarios
     const camposOrdenados = [
       ...campos.filter((c: any) => this.camposPrioritarios.includes(c.key)),
-      ...campos.filter((c: any) => !this.camposPrioritarios.includes(c.key)).sort((a: any, b: any) => a.label.localeCompare(b.label))
+      ...campos
+        .filter((c: any) => !this.camposPrioritarios.includes(c.key))
+        .sort((a: any, b: any) => a.label.localeCompare(b.label)),
     ];
-    this.camposDisponibles = camposOrdenados.map((c: any) => ({ nombre: c.label, valor: c.key }));
+    this.camposDisponibles = camposOrdenados.map((c: any) => ({
+      nombre: c.label,
+      valor: c.key,
+    }));
     // Determinar campo inicial: preferir el `defaultField` provisto por el padre si existe en las definiciones;
     // en caso contrario usar el primer campo disponible.
-    const defaultProvided = this.defaultField && this.camposDisponibles.some((cd: any) => cd.valor === this.defaultField);
-    let campoInicial = defaultProvided ? this.defaultField! : this.camposDisponibles[0]?.valor || '';
+    const defaultProvided =
+      this.defaultField &&
+      this.camposDisponibles.some((cd: any) => cd.valor === this.defaultField);
+    let campoInicial = defaultProvided
+      ? this.defaultField!
+      : this.camposDisponibles[0]?.valor || '';
 
     // Precargar ejemplo si viene, pero sólo si el filterKey está permitido
     const ejemplo = this.adaptedDefs?.ejemplo;
-    if (ejemplo && Array.isArray(ejemplo.searchCriteriaList) && ejemplo.searchCriteriaList.length > 0) {
+    if (
+      ejemplo &&
+      Array.isArray(ejemplo.searchCriteriaList) &&
+      ejemplo.searchCriteriaList.length > 0
+    ) {
       const first = ejemplo.searchCriteriaList[0];
       const ejemploKey = first.filterKey;
-      const permitido = this.camposDisponibles.some((cd: any) => cd.valor === ejemploKey);
+      const permitido = this.camposDisponibles.some(
+        (cd: any) => cd.valor === ejemploKey,
+      );
       if (ejemploKey && permitido) {
         campoInicial = ejemploKey;
       }
@@ -379,24 +428,35 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     this.actualizarOperacionesDisponibles();
 
     // Si hay campos de catálogo definidos y función de carga, cargar catálogos
-    const contieneCamposCatalogo = this.camposDisponibles.some(cd => this.camposCatalogo.includes(cd.valor));
+    const contieneCamposCatalogo = this.camposDisponibles.some((cd) =>
+      this.camposCatalogo.includes(cd.valor),
+    );
     if (contieneCamposCatalogo && this.cargarCatalogosFn) {
       this.cargarCatalogosGenerico();
     }
 
     // Si hay ejemplo, intentar precargar operación y valor (si operación es válida para el campo)
-    if (ejemplo && Array.isArray(ejemplo.searchCriteriaList) && ejemplo.searchCriteriaList.length > 0) {
+    if (
+      ejemplo &&
+      Array.isArray(ejemplo.searchCriteriaList) &&
+      ejemplo.searchCriteriaList.length > 0
+    ) {
       const first = ejemplo.searchCriteriaList[0];
       const opEjemplo = first.operation;
       const valorEjemplo = first.value;
-      const opValida = this.operacionesDisponibles.some((o: any) => o.valor === opEjemplo);
+      const opValida = this.operacionesDisponibles.some(
+        (o: any) => o.valor === opEjemplo,
+      );
       if (opEjemplo && opValida) {
         this.operacionSeleccionada = opEjemplo;
       }
       // No prefijar el input con el valor de ejemplo: usarlo como placeholder si el placeholder
       // actual es el por defecto. Dejar valorBusqueda vacío para que el usuario escriba.
       const DEFAULT_PLACEHOLDER = 'Ingrese valor a buscar';
-      if (valorEjemplo !== undefined && this.placeholder === DEFAULT_PLACEHOLDER) {
+      if (
+        valorEjemplo !== undefined &&
+        this.placeholder === DEFAULT_PLACEHOLDER
+      ) {
         this.placeholder = valorEjemplo;
       }
     }
@@ -416,12 +476,14 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
       this.operacionSeleccionada = '';
       return;
     }
-    const campoDef = this.adaptedDefs.campos.find(c => c.key === this.campoSeleccionado);
+    const campoDef = this.adaptedDefs.campos.find(
+      (c) => c.key === this.campoSeleccionado,
+    );
     const operacionesCampo = (campoDef?.operaciones || [])
       .map((op: any) => ({ nombre: op.label, valor: op.value }))
       .sort((a: any, b: any) => a.nombre.localeCompare(b.nombre));
     this.operacionesDisponibles = operacionesCampo;
-    this.operacionSeleccionada = this.operacionesDisponibles[0]?.valor || this.operacionSeleccionada || '';
+    this.operacionSeleccionada =
+      this.operacionesDisponibles[0]?.valor || this.operacionSeleccionada || '';
   }
-  
 }

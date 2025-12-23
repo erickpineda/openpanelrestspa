@@ -1,5 +1,10 @@
 // src/app/public/login/login.component.ts
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
 import { cilUser, cilLockLocked } from '@coreui/icons';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
@@ -8,11 +13,11 @@ import { PostLoginRedirectService } from '../../core/services/auth/post-login-re
 import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
 
 @Component({
-    selector: 'app-login',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css'],
-    standalone: false
+  selector: 'app-login',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css'],
+  standalone: false,
 })
 export class LoginComponent implements OnInit {
   icons = { cilUser, cilLockLocked };
@@ -29,7 +34,7 @@ export class LoginComponent implements OnInit {
     private router: Router, // ✅ Usar Router en lugar del servicio custom
     private authSync: AuthSyncService,
     private cdr: ChangeDetectorRef,
-    private postLoginRedirect: PostLoginRedirectService
+    private postLoginRedirect: PostLoginRedirectService,
   ) {}
 
   ngOnInit(): void {
@@ -52,7 +57,7 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
 
     this.authService.login(username, password).subscribe({
-      next: data => {
+      next: (data) => {
         this.tokenStorage.saveToken(data.jwttoken);
         this.tokenStorage.saveUser(data);
         this.isLoginFailed = false;
@@ -68,11 +73,12 @@ export class LoginComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.errorMessage = err.error?.message ?? err.message ?? 'Error en el login';
+        this.errorMessage =
+          err.error?.message ?? err.message ?? 'Error en el login';
         this.isLoginFailed = true;
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -88,10 +94,20 @@ export class LoginComponent implements OnInit {
           setTimeout(() => {
             try {
               const current = window.location.pathname + window.location.hash;
-              if (!(current.indexOf('#' + target) >= 0 || current.endsWith(target))) {
-                try { window.location.hash = target; } catch (e) { /* ignore */ }
+              if (
+                !(
+                  current.indexOf('#' + target) >= 0 || current.endsWith(target)
+                )
+              ) {
+                try {
+                  window.location.hash = target;
+                } catch (e) {
+                  /* ignore */
+                }
               }
-            } catch (e) { /* ignore */ }
+            } catch (e) {
+              /* ignore */
+            }
           }, 150);
         } catch (e) {
           this.router.navigateByUrl(target);
@@ -99,7 +115,9 @@ export class LoginComponent implements OnInit {
         }
         return;
       }
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
     this.router.navigate(['/admin']);
   }
 

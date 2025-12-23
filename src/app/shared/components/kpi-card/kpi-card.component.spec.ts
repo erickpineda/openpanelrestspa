@@ -9,7 +9,7 @@ describe('KpiCardComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [KpiCardComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     fixture = TestBed.createComponent(KpiCardComponent);
     component = fixture.componentInstance;

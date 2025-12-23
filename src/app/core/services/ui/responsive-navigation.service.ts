@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, fromEvent } from 'rxjs';
-import { map, startWith, distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import {
+  map,
+  startWith,
+  distinctUntilChanged,
+  debounceTime,
+} from 'rxjs/operators';
 import { INavItemEnhanced } from '../../../shared/types/navigation.types';
 
 export interface ResponsiveBreakpoints {
@@ -27,30 +32,66 @@ export interface CriticalFunction {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ResponsiveNavigationService {
   private readonly STORAGE_KEY = 'op.sidebar.collapsed';
   private readonly DEFAULT_BREAKPOINTS: ResponsiveBreakpoints = {
     mobile: 768,
     tablet: 1024,
-    desktop: 1200
+    desktop: 1200,
   };
 
   private readonly CRITICAL_FUNCTIONS: CriticalFunction[] = [
-    { id: 'dashboard', name: 'Escritorio', url: '/admin/dashboard', icon: 'cil-speedometer', priority: 100 },
-    { id: 'new-entry', name: 'Nueva Entrada', url: '/admin/control/entradas/crear', icon: 'cil-plus', priority: 90 },
-    { id: 'entries', name: 'Entradas', url: '/admin/control/entradas', icon: 'cil-pencil', priority: 80 },
-    { id: 'comments', name: 'Comentarios', url: '/admin/control/comentarios', icon: 'cil-comment-square', priority: 70 },
-    { id: 'profile', name: 'Mi Perfil', url: '/admin/control/gestion/miperfil', icon: 'cil-user', priority: 60 }
+    {
+      id: 'dashboard',
+      name: 'Escritorio',
+      url: '/admin/dashboard',
+      icon: 'cil-speedometer',
+      priority: 100,
+    },
+    {
+      id: 'new-entry',
+      name: 'Nueva Entrada',
+      url: '/admin/control/entradas/crear',
+      icon: 'cil-plus',
+      priority: 90,
+    },
+    {
+      id: 'entries',
+      name: 'Entradas',
+      url: '/admin/control/entradas',
+      icon: 'cil-pencil',
+      priority: 80,
+    },
+    {
+      id: 'comments',
+      name: 'Comentarios',
+      url: '/admin/control/comentarios',
+      icon: 'cil-comment-square',
+      priority: 70,
+    },
+    {
+      id: 'profile',
+      name: 'Mi Perfil',
+      url: '/admin/control/gestion/miperfil',
+      icon: 'cil-user',
+      priority: 60,
+    },
   ];
 
   private breakpoints: ResponsiveBreakpoints = this.DEFAULT_BREAKPOINTS;
-  private sidebarCollapsedSubject = new BehaviorSubject<boolean>(this.readCollapsedFromStorage());
-  private responsiveStateSubject = new BehaviorSubject<ResponsiveState>(this.getInitialState());
+  private sidebarCollapsedSubject = new BehaviorSubject<boolean>(
+    this.readCollapsedFromStorage(),
+  );
+  private responsiveStateSubject = new BehaviorSubject<ResponsiveState>(
+    this.getInitialState(),
+  );
 
-  public responsiveState$: Observable<ResponsiveState> = this.responsiveStateSubject.asObservable();
-  public sidebarCollapsed$: Observable<boolean> = this.sidebarCollapsedSubject.asObservable();
+  public responsiveState$: Observable<ResponsiveState> =
+    this.responsiveStateSubject.asObservable();
+  public sidebarCollapsed$: Observable<boolean> =
+    this.sidebarCollapsedSubject.asObservable();
 
   constructor() {
     this.initializeResponsiveListener();
@@ -66,14 +107,15 @@ export class ResponsiveNavigationService {
         .pipe(
           debounceTime(150),
           map(() => this.calculateResponsiveState()),
-          distinctUntilChanged((prev, curr) => 
-            prev.isMobile === curr.isMobile && 
-            prev.isTablet === curr.isTablet && 
-            prev.isDesktop === curr.isDesktop
+          distinctUntilChanged(
+            (prev, curr) =>
+              prev.isMobile === curr.isMobile &&
+              prev.isTablet === curr.isTablet &&
+              prev.isDesktop === curr.isDesktop,
           ),
-          startWith(this.calculateResponsiveState())
+          startWith(this.calculateResponsiveState()),
         )
-        .subscribe(state => {
+        .subscribe((state) => {
           this.responsiveStateSubject.next(state);
           this.handleAutomaticCollapse(state);
         });
@@ -85,11 +127,12 @@ export class ResponsiveNavigationService {
    */
   private initializeTouchDetection(): void {
     if (typeof window !== 'undefined') {
-      const touchEnabled = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const touchEnabled =
+        'ontouchstart' in window || navigator.maxTouchPoints > 0;
       const currentState = this.responsiveStateSubject.value;
       this.responsiveStateSubject.next({
         ...currentState,
-        touchEnabled
+        touchEnabled,
       });
     }
   }
@@ -98,12 +141,17 @@ export class ResponsiveNavigationService {
    * Calcula el estado responsivo actual
    */
   private calculateResponsiveState(): ResponsiveState {
-    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const screenWidth =
+      typeof window !== 'undefined' ? window.innerWidth : 1200;
     const isMobile = screenWidth < this.breakpoints.mobile;
-    const isTablet = screenWidth >= this.breakpoints.mobile && screenWidth < this.breakpoints.desktop;
+    const isTablet =
+      screenWidth >= this.breakpoints.mobile &&
+      screenWidth < this.breakpoints.desktop;
     const isDesktop = screenWidth >= this.breakpoints.desktop;
-    const touchEnabled = typeof window !== 'undefined' ? 
-      ('ontouchstart' in window || navigator.maxTouchPoints > 0) : false;
+    const touchEnabled =
+      typeof window !== 'undefined'
+        ? 'ontouchstart' in window || navigator.maxTouchPoints > 0
+        : false;
 
     return {
       isMobile,
@@ -111,7 +159,7 @@ export class ResponsiveNavigationService {
       isDesktop,
       screenWidth,
       sidebarCollapsed: this.sidebarCollapsedSubject.value,
-      touchEnabled
+      touchEnabled,
     };
   }
 
@@ -169,7 +217,10 @@ export class ResponsiveNavigationService {
 
   private readCollapsedFromStorage(): boolean {
     try {
-      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(this.STORAGE_KEY) : null;
+      const raw =
+        typeof window !== 'undefined'
+          ? window.localStorage.getItem(this.STORAGE_KEY)
+          : null;
       if (raw === null) return false;
       return raw === 'true';
     } catch {
@@ -180,7 +231,10 @@ export class ResponsiveNavigationService {
   private writeCollapsedToStorage(collapsed: boolean): void {
     try {
       if (typeof window !== 'undefined') {
-        window.localStorage.setItem(this.STORAGE_KEY, collapsed ? 'true' : 'false');
+        window.localStorage.setItem(
+          this.STORAGE_KEY,
+          collapsed ? 'true' : 'false',
+        );
       }
     } catch {
       // ignore storage errors
@@ -190,7 +244,10 @@ export class ResponsiveNavigationService {
   /**
    * Adapta los elementos de navegación según el estado responsivo
    */
-  public adaptNavigationItems(items: INavItemEnhanced[], state?: ResponsiveState): INavItemEnhanced[] {
+  public adaptNavigationItems(
+    items: INavItemEnhanced[],
+    state?: ResponsiveState,
+  ): INavItemEnhanced[] {
     const currentState = state || this.responsiveStateSubject.value;
 
     if (currentState.isMobile) {
@@ -207,17 +264,17 @@ export class ResponsiveNavigationService {
    */
   private adaptForMobile(items: INavItemEnhanced[]): INavItemEnhanced[] {
     // En móviles, mostrar solo funciones críticas y colapsar submenús
-    const criticalItems = items.filter(item => 
-      this.isCriticalFunction(item) || item.title === true
+    const criticalItems = items.filter(
+      (item) => this.isCriticalFunction(item) || item.title === true,
     );
 
-    return criticalItems.map(item => ({
+    return criticalItems.map((item) => ({
       ...item,
       children: undefined, // Colapsar todos los submenús en móvil
       responsiveConfig: {
         ...item.responsiveConfig,
-        hideOnMobile: false
-      }
+        hideOnMobile: false,
+      },
     }));
   }
 
@@ -225,13 +282,13 @@ export class ResponsiveNavigationService {
    * Adapta la navegación para tablets
    */
   private adaptForTablet(items: INavItemEnhanced[]): INavItemEnhanced[] {
-    return items.map(item => ({
+    return items.map((item) => ({
       ...item,
       // Optimizar para interacción táctil
       responsiveConfig: {
         ...item.responsiveConfig,
-        collapseThreshold: this.breakpoints.tablet
-      }
+        collapseThreshold: this.breakpoints.tablet,
+      },
     }));
   }
 
@@ -247,8 +304,8 @@ export class ResponsiveNavigationService {
    * Determina si un elemento es una función crítica
    */
   private isCriticalFunction(item: INavItemEnhanced): boolean {
-    return this.CRITICAL_FUNCTIONS.some(critical => 
-      critical.url === item.url || critical.name === item.name
+    return this.CRITICAL_FUNCTIONS.some(
+      (critical) => critical.url === item.url || critical.name === item.name,
     );
   }
 

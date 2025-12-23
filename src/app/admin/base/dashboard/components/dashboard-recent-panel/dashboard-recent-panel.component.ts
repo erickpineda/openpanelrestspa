@@ -1,10 +1,16 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 
 @Component({
-    selector: 'app-dashboard-recent-panel',
-    templateUrl: './dashboard-recent-panel.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-dashboard-recent-panel',
+  templateUrl: './dashboard-recent-panel.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardRecentPanelComponent {
   @Input() recentItems: any[] = [];
@@ -19,4 +25,3 @@ export class DashboardRecentPanelComponent {
   @Output() downloadCsv = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
 }
-

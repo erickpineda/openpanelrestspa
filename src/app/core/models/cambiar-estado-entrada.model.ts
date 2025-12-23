@@ -3,9 +3,7 @@ export class CambiarEstadoEntradaReq {
   idUsuarioEditado: number = 0;
   idEstadoEntrada: number = 0;
 
-  constructor() {
-
-  }
+  constructor() {}
 }
 
 export interface CambiarEstadoEntradaReq {

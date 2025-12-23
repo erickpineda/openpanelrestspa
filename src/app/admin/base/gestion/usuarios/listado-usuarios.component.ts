@@ -11,14 +11,14 @@ import { SearchUtilService } from '../../../../core/services/utils/search-util.s
 import { OPConstants } from '../../../../shared/constants/op-global.constants';
 
 @Component({
-    selector: 'app-usuarios-list',
-    templateUrl: './listado-usuarios.component.html',
-    styleUrls: ['./listado-usuarios.component.scss'],
-    standalone: false
+  selector: 'app-usuarios-list',
+  templateUrl: './listado-usuarios.component.html',
+  styleUrls: ['./listado-usuarios.component.scss'],
+  standalone: false,
 })
 export class UsuariosListComponent implements OnInit, OnDestroy {
   readonly PROPIETARIO_ROLE_CODE = OPConstants.Roles.PROPIETARIO;
-  
+
   loading = false;
   error: string | null = null;
   usuarios: Usuario[] = [];
@@ -44,12 +44,12 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private usuarioService: UsuarioService, 
-    private rolService: RolService, 
-    private toast: ToastService, 
-    private log: LoggerService, 
+    private usuarioService: UsuarioService,
+    private rolService: RolService,
+    private toast: ToastService,
+    private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -65,55 +65,94 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   load(pageNo = this.pageNo): void {
     this.loading = true;
     this.error = null;
-    const hasFilters = !!(this.filtroUsuario || this.filtroRolCodigo != null || this.filtroEmailConfirmado != null);
-    
+    const hasFilters = !!(
+      this.filtroUsuario ||
+      this.filtroRolCodigo != null ||
+      this.filtroEmailConfirmado != null
+    );
+
     const handleResponse = (r: any) => {
       const data = r?.data || r;
-      const list = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
+      const list = Array.isArray(data?.elements)
+        ? data.elements
+        : Array.isArray(data)
+          ? data
+          : [];
       this.usuarios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
       this.numberOfElements = list.length;
     };
-    
+
     const handleError = (err: any) => {
       this.error = 'Error cargando usuarios';
       this.log.error('usuarios listar', err);
     };
-    
+
     if (!hasFilters) {
-      this.usuarioService.listarPaginaSinGlobalLoader(pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
-        }))
+      this.usuarioService
+        .listarPaginaSinGlobalLoader(pageNo, this.pageSize)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          }),
+        )
         .subscribe({ next: handleResponse, error: handleError });
     } else {
-      const criteria: { filterKey: string; value: any; operation: string }[] = [];
-      if (this.filtroUsuario) criteria.push({ filterKey: 'username', value: this.filtroUsuario, operation: 'CONTAINS' });
-      if (this.filtroRolCodigo != null) criteria.push({ filterKey: 'rol.codigo', value: this.filtroRolCodigo, operation: 'EQUAL' });
-      if (this.filtroEmailConfirmado != null) criteria.push({ filterKey: 'emailConfirmado', value: String(this.filtroEmailConfirmado), operation: 'BOOLEAN' });
-      
+      const criteria: { filterKey: string; value: any; operation: string }[] =
+        [];
+      if (this.filtroUsuario)
+        criteria.push({
+          filterKey: 'username',
+          value: this.filtroUsuario,
+          operation: 'CONTAINS',
+        });
+      if (this.filtroRolCodigo != null)
+        criteria.push({
+          filterKey: 'rol.codigo',
+          value: this.filtroRolCodigo,
+          operation: 'EQUAL',
+        });
+      if (this.filtroEmailConfirmado != null)
+        criteria.push({
+          filterKey: 'emailConfirmado',
+          value: String(this.filtroEmailConfirmado),
+          operation: 'BOOLEAN',
+        });
+
       const payload = this.searchUtil.buildRequest('Usuario', criteria, 'ALL');
-      this.usuarioService.buscarSinGlobalLoader(payload, pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
-        }))
+      this.usuarioService
+        .buscarSinGlobalLoader(payload, pageNo, this.pageSize)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          }),
+        )
         .subscribe({ next: handleResponse, error: handleError });
     }
   }
 
   loadRoles(): void {
-    this.rolService.listarPagina(0, 50)
+    this.rolService
+      .listarPagina(0, 50)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (r: any) => {
           const data = r?.data || r;
-          let roles = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data?.content) ? data.content : (Array.isArray(data) ? data : []));
-          
+          let roles = Array.isArray(data?.elements)
+            ? data.elements
+            : Array.isArray(data?.content)
+              ? data.content
+              : Array.isArray(data)
+                ? data
+                : [];
+
           this.roles = roles;
         },
-        error: () => {}
+        error: () => {},
       });
   }
 
@@ -138,7 +177,9 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   }
 
   next(): void {
-    const maxPage = this.totalElements ? Math.ceil(this.totalElements / this.pageSize) - 1 : this.pageNo + 1;
+    const maxPage = this.totalElements
+      ? Math.ceil(this.totalElements / this.pageSize) - 1
+      : this.pageNo + 1;
     if (this.pageNo < maxPage) {
       this.pageNo++;
       this.load();
@@ -147,14 +188,19 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    const safePage = Math.max(
+      0,
+      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
+    );
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.load();
   }
 
   getTotalPages(): number {
-    return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0;
+    return this.totalElements
+      ? Math.ceil(this.totalElements / this.pageSize)
+      : 0;
   }
 
   onBasicSearchTextChange(text: string): void {
@@ -179,11 +225,11 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     this.editModalVisible = true;
   }
 
-  openCreate(): void { 
+  openCreate(): void {
     this.originalUser = null;
     this.editUser = new Usuario();
     // Ensure 0/undefined logic is handled. Usuario defaults to 0.
-    this.editModalVisible = true; 
+    this.editModalVisible = true;
   }
 
   closeEdit(): void {
@@ -199,7 +245,12 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   }
 
   isUserFormValid(): boolean {
-    return !!(this.editUser && this.editUser.username && this.isEmailValid(this.editUser.email) && this.editUser.rolCodigo);
+    return !!(
+      this.editUser &&
+      this.editUser.username &&
+      this.isEmailValid(this.editUser.email) &&
+      this.editUser.rolCodigo
+    );
   }
 
   getUserErrors(): string[] {
@@ -215,40 +266,58 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     if (!this.editUser) return;
     this.loading = true;
     const hasId = !!this.editUser.idUsuario && this.editUser.idUsuario > 0;
-    
+
     let op$;
     if (hasId) {
       // Use partial update with JSON Patch
       if (this.originalUser) {
-        op$ = this.usuarioService.actualizarParcial(this.editUser.idUsuario!, this.editUser);
+        op$ = this.usuarioService.actualizarParcial(
+          this.editUser.idUsuario!,
+          this.editUser,
+        );
       } else {
         // Fallback if original is missing (shouldn't happen in edit mode)
-        op$ = this.usuarioService.actualizar(this.editUser.idUsuario!, this.editUser);
+        op$ = this.usuarioService.actualizar(
+          this.editUser.idUsuario!,
+          this.editUser,
+        );
       }
     } else {
       op$ = this.usuarioService.crear(this.editUser);
     }
-    
+
     op$.subscribe({
       next: () => {
-        this.toast.showSuccess(hasId ? 'Usuario actualizado' : 'Usuario creado', 'Usuarios');
+        this.toast.showSuccess(
+          hasId ? 'Usuario actualizado' : 'Usuario creado',
+          'Usuarios',
+        );
         this.loading = false;
         this.editModalVisible = false;
         this.load();
       },
       error: (err: any) => {
-        this.toast.showError(hasId ? 'Error actualizando' : 'Error creando', 'Usuarios');
+        this.toast.showError(
+          hasId ? 'Error actualizando' : 'Error creando',
+          'Usuarios',
+        );
         this.log.error(hasId ? 'usuarios actualizar' : 'usuarios crear', err);
         this.loading = false;
-      }
+      },
     });
   }
 
   delete(u: Usuario): void {
     if (!u.idUsuario) return;
     // Protección para evitar borrar al propietario
-    if (this.PROPIETARIO_ROLE_CODE && u.rolCodigo === this.PROPIETARIO_ROLE_CODE) {
-      this.toast.showWarning('No se puede eliminar al usuario Propietario', 'Acción no permitida');
+    if (
+      this.PROPIETARIO_ROLE_CODE &&
+      u.rolCodigo === this.PROPIETARIO_ROLE_CODE
+    ) {
+      this.toast.showWarning(
+        'No se puede eliminar al usuario Propietario',
+        'Acción no permitida',
+      );
       return;
     }
     this.userToDelete = u;
@@ -266,7 +335,8 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       return;
     }
     this.loading = true;
-    this.usuarioService.borrar(this.userToDelete.idUsuario)
+    this.usuarioService
+      .borrar(this.userToDelete.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -282,7 +352,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
           this.loading = false;
           this.showDeleteModal = false;
           this.userToDelete = null;
-        }
+        },
       });
   }
 

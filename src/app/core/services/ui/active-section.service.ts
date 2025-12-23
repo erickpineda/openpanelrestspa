@@ -23,7 +23,7 @@ export interface NavigationContext {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ActiveSectionService {
   private readonly STORAGE_KEY = 'navigation-expansion-state';
@@ -33,7 +33,7 @@ export class ActiveSectionService {
     activeUrl: '',
     activeSectionId: null,
     activeItemId: null,
-    breadcrumb: []
+    breadcrumb: [],
   });
 
   private menuExpansionSubject = new BehaviorSubject<MenuExpansionState>({});
@@ -41,12 +41,15 @@ export class ActiveSectionService {
     currentSection: null,
     parentSection: null,
     relatedItems: [],
-    suggestedActions: []
+    suggestedActions: [],
   });
 
-  public activeSection$: Observable<ActiveSectionState> = this.activeSectionSubject.asObservable();
-  public menuExpansion$: Observable<MenuExpansionState> = this.menuExpansionSubject.asObservable();
-  public navigationContext$: Observable<NavigationContext> = this.navigationContextSubject.asObservable();
+  public activeSection$: Observable<ActiveSectionState> =
+    this.activeSectionSubject.asObservable();
+  public menuExpansion$: Observable<MenuExpansionState> =
+    this.menuExpansionSubject.asObservable();
+  public navigationContext$: Observable<NavigationContext> =
+    this.navigationContextSubject.asObservable();
 
   private navigationItems: INavItemEnhanced[] = [];
 
@@ -61,11 +64,11 @@ export class ActiveSectionService {
   private initializeRouterListener(): void {
     this.router.events
       .pipe(
-        filter(event => event instanceof NavigationEnd),
-        map(event => (event as NavigationEnd).url),
-        distinctUntilChanged()
+        filter((event) => event instanceof NavigationEnd),
+        map((event) => (event as NavigationEnd).url),
+        distinctUntilChanged(),
       )
-      .subscribe(url => {
+      .subscribe((url) => {
         this.updateActiveSection(url);
         this.updateNavigationContext(url);
       });
@@ -123,16 +126,19 @@ export class ActiveSectionService {
       activeUrl: cleanUrl,
       activeSectionId,
       activeItemId,
-      breadcrumb
+      breadcrumb,
     };
   }
 
   /**
    * Busca el elemento activo dentro de una sección
    */
-  private findActiveItemInSection(sectionItem: INavItemEnhanced, url: string): { itemId: string; breadcrumb: string[] } | null {
+  private findActiveItemInSection(
+    sectionItem: INavItemEnhanced,
+    url: string,
+  ): { itemId: string; breadcrumb: string[] } | null {
     const nextItems = this.getItemsAfterSection(sectionItem);
-    
+
     for (const item of nextItems) {
       if (item.title) {
         // Llegamos a otra sección, detener búsqueda
@@ -145,7 +151,7 @@ export class ActiveSectionService {
           if (this.isUrlMatch(child.url, url)) {
             return {
               itemId: this.generateItemId(child),
-              breadcrumb: [item.name || '', child.name || '']
+              breadcrumb: [item.name || '', child.name || ''],
             };
           }
         }
@@ -155,7 +161,7 @@ export class ActiveSectionService {
       if (this.isUrlMatch(item.url, url)) {
         return {
           itemId: this.generateItemId(item),
-          breadcrumb: [item.name || '']
+          breadcrumb: [item.name || ''],
         };
       }
     }
@@ -166,7 +172,9 @@ export class ActiveSectionService {
   /**
    * Obtiene los elementos que siguen a una sección
    */
-  private getItemsAfterSection(sectionItem: INavItemEnhanced): INavItemEnhanced[] {
+  private getItemsAfterSection(
+    sectionItem: INavItemEnhanced,
+  ): INavItemEnhanced[] {
     const sectionIndex = this.navigationItems.indexOf(sectionItem);
     if (sectionIndex === -1) return [];
 
@@ -186,18 +194,21 @@ export class ActiveSectionService {
   /**
    * Verifica si una URL coincide con la URL activa
    */
-  private isUrlMatch(itemUrl: string | string[] | undefined, activeUrl: string): boolean {
+  private isUrlMatch(
+    itemUrl: string | string[] | undefined,
+    activeUrl: string,
+  ): boolean {
     if (!itemUrl) return false;
-    
+
     const url = Array.isArray(itemUrl) ? itemUrl.join('/') : itemUrl;
     const cleanItemUrl = this.cleanUrl(url);
-    
+
     // Coincidencia exacta
     if (cleanItemUrl === activeUrl) return true;
-    
+
     // Coincidencia de prefijo para rutas anidadas
     if (activeUrl.startsWith(cleanItemUrl + '/')) return true;
-    
+
     return false;
   }
 
@@ -213,9 +224,17 @@ export class ActiveSectionService {
    */
   private generateItemId(item: INavItemEnhanced): string {
     if (item.url) {
-      return Array.isArray(item.url) ? item.url.join('-') : item.url.replace(/[^a-zA-Z0-9]/g, '-');
+      return Array.isArray(item.url)
+        ? item.url.join('-')
+        : item.url.replace(/[^a-zA-Z0-9]/g, '-');
     }
-    return item.name?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() || 'unknown';
+    return (
+      item.name
+        ?.normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]/g, '-')
+        .toLowerCase() || 'unknown'
+    );
   }
 
   /**
@@ -230,14 +249,19 @@ export class ActiveSectionService {
   /**
    * Calcula el contexto de navegación
    */
-  private calculateNavigationContext(url: string, activeState: ActiveSectionState): NavigationContext {
+  private calculateNavigationContext(
+    url: string,
+    activeState: ActiveSectionState,
+  ): NavigationContext {
     const relatedItems: INavItemEnhanced[] = [];
     const suggestedActions: string[] = [];
-    
+
     // Encontrar elementos relacionados en la misma sección
     if (activeState.activeSectionId) {
       const sectionItems = this.getItemsInSection(activeState.activeSectionId);
-      relatedItems.push(...sectionItems.filter(item => !this.isUrlMatch(item.url, url)));
+      relatedItems.push(
+        ...sectionItems.filter((item) => !this.isUrlMatch(item.url, url)),
+      );
     }
 
     // Generar acciones sugeridas basadas en la ruta actual
@@ -247,7 +271,7 @@ export class ActiveSectionService {
       currentSection: activeState.activeSectionId,
       parentSection: this.findParentSection(activeState.activeSectionId),
       relatedItems,
-      suggestedActions
+      suggestedActions,
     };
   }
 
@@ -255,12 +279,12 @@ export class ActiveSectionService {
    * Obtiene los elementos de una sección específica
    */
   private getItemsInSection(sectionId: string): INavItemEnhanced[] {
-    const sectionItem = this.navigationItems.find(item => 
-      item.title && this.generateItemId(item) === sectionId
+    const sectionItem = this.navigationItems.find(
+      (item) => item.title && this.generateItemId(item) === sectionId,
     );
-    
+
     if (!sectionItem) return [];
-    
+
     return this.getItemsAfterSection(sectionItem);
   }
 
@@ -278,20 +302,24 @@ export class ActiveSectionService {
    */
   private generateSuggestedActions(url: string): string[] {
     const actions: string[] = [];
-    
+
     if (url.includes('/entradas')) {
       actions.push('Nueva Entrada', 'Ver Borradores', 'Gestionar Categorías');
     } else if (url.includes('/usuarios')) {
       actions.push('Nuevo Usuario', 'Gestionar Roles', 'Ver Permisos');
     } else if (url.includes('/comentarios')) {
-      actions.push('Moderar Comentarios', 'Ver Reportados', 'Configurar Filtros');
+      actions.push(
+        'Moderar Comentarios',
+        'Ver Reportados',
+        'Configurar Filtros',
+      );
     } else if (url.includes('/dashboard')) {
       actions.push('Ver Estadísticas', 'Generar Reporte', 'Configurar Widgets');
     } else {
       // Fallback para otras URLs
       actions.push('Ver Estadísticas', 'Generar Reporte', 'Configurar Widgets');
     }
-    
+
     return actions;
   }
 
@@ -321,7 +349,7 @@ export class ActiveSectionService {
   public toggleSection(itemId: string): void {
     const currentState = this.menuExpansionSubject.value;
     const isExpanded = currentState[itemId] || false;
-    
+
     if (isExpanded) {
       this.collapseSection(itemId);
     } else {

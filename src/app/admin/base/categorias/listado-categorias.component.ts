@@ -1,18 +1,18 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { finalize, takeUntil } from 'rxjs/operators';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { Categoria } from "../../../core/models/categoria.model";
-import { CategoriaService } from "../../../core/services/data/categoria.service";
-import { SearchUtilService } from "../../../core/services/utils/search-util.service";
-import { LoggerService } from "../../../core/services/logger.service";
-import { PaginaResponse } from "../../../core/models/pagina-response.model";
+import { Categoria } from '../../../core/models/categoria.model';
+import { CategoriaService } from '../../../core/services/data/categoria.service';
+import { SearchUtilService } from '../../../core/services/utils/search-util.service';
+import { LoggerService } from '../../../core/services/logger.service';
+import { PaginaResponse } from '../../../core/models/pagina-response.model';
 
 @Component({
-    selector: 'app-listado-categorias',
-    templateUrl: './listado-categorias.component.html',
-    styleUrls: ['./listado-categorias.component.scss'],
-    standalone: false
+  selector: 'app-listado-categorias',
+  templateUrl: './listado-categorias.component.html',
+  styleUrls: ['./listado-categorias.component.scss'],
+  standalone: false,
 })
 export class ListadoCategoriasComponent implements OnInit, OnDestroy {
   listaCategorias: Categoria[] = [];
@@ -41,7 +41,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     private categoriaService: CategoriaService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -58,45 +58,75 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     this.errorMsg = null;
     const hasFilters = !!(this.basicSearchText || this.filtroNombre);
     if (!hasFilters) {
-      this.categoriaService.listarPaginaSinGlobalLoader(this.pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
+      this.categoriaService
+        .listarPaginaSinGlobalLoader(this.pageNo, this.pageSize)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.cargando = false;
+            this.cdr.detectChanges();
+          }),
+        )
         .subscribe({
           next: (response: any) => {
             const data = response?.data || response;
             this.setPageData(data);
           },
-          error: (err: any) => this.handleError(err)
+          error: (err: any) => this.handleError(err),
         });
     } else {
       const value = this.basicSearchText || this.filtroNombre || '';
-      const payload = this.searchUtil.buildSingle('Categoria', 'nombre', value, 'CONTAINS', 'AND');
-      this.categoriaService.buscarSinGlobalLoader(payload, this.pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
+      const payload = this.searchUtil.buildSingle(
+        'Categoria',
+        'nombre',
+        value,
+        'CONTAINS',
+        'AND',
+      );
+      this.categoriaService
+        .buscarSinGlobalLoader(payload, this.pageNo, this.pageSize)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.cargando = false;
+            this.cdr.detectChanges();
+          }),
+        )
         .subscribe({
           next: (data: any) => {
             this.setPageData(data);
           },
-          error: (err: any) => this.handleError(err)
+          error: (err: any) => this.handleError(err),
         });
     }
   }
 
   private setPageData(data: any): void {
-    const raw = (data?.elements ?? (Array.isArray(data) ? data : []));
+    const raw = data?.elements ?? (Array.isArray(data) ? data : []);
     const elementos: Categoria[] = Array.isArray(raw) ? raw : [];
-    
-    const hasServerPaging = typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
+
+    const hasServerPaging =
+      typeof data?.totalPages === 'number' ||
+      typeof data?.totalElements === 'number';
 
     if (hasServerPaging) {
       this.listaCategorias = elementos;
       this.allCategorias = [];
       this.totalElements = Number(data?.totalElements || elementos.length || 0);
-      this.totalPages = Number(data?.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1);
-      this.numberOfElements = Number(data?.numberOfElements ?? elementos.length);
+      this.totalPages = Number(
+        data?.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1,
+      );
+      this.numberOfElements = Number(
+        data?.numberOfElements ?? elementos.length,
+      );
       this.pagedCategorias = elementos;
-      
+
       // Si estamos en una página vacía y hay páginas anteriores, volver atrás
-      if (elementos.length === 0 && this.pageNo > 0 && this.pageNo >= this.totalPages) {
+      if (
+        elementos.length === 0 &&
+        this.pageNo > 0 &&
+        this.pageNo >= this.totalPages
+      ) {
         this.pageNo = Math.max(0, this.totalPages - 1);
         this.obtenerListaCategorias();
         return;
@@ -105,12 +135,15 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
       // Fallback paginación cliente
       this.allCategorias = elementos;
       this.totalElements = this.allCategorias.length;
-      this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
-      
+      this.totalPages = Math.max(
+        1,
+        Math.ceil(this.totalElements / this.pageSize),
+      );
+
       if (this.pageNo >= this.totalPages) {
         this.pageNo = Math.max(0, this.totalPages - 1);
       }
-      
+
       this.applyPaging();
     }
     this.cdr.detectChanges();
@@ -124,7 +157,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
       this.numberOfElements = this.pagedCategorias.length;
       this.listaCategorias = this.pagedCategorias;
     } else {
-        // Si no hay allCategorias (server paging), no hacemos nada o asumimos pagedCategorias ya seteado
+      // Si no hay allCategorias (server paging), no hacemos nada o asumimos pagedCategorias ya seteado
     }
     this.cdr.detectChanges();
   }
@@ -162,32 +195,39 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(): void {
-      if (!this.categoriaToDelete?.idCategoria) {
+    if (!this.categoriaToDelete?.idCategoria) {
+      this.showDeleteModal = false;
+      return;
+    }
+
+    this.cargando = true;
+    this.categoriaService
+      .borrar(this.categoriaToDelete.idCategoria)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.cargando = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
           this.showDeleteModal = false;
-          return;
-      }
-      
-      this.cargando = true;
-      this.categoriaService.borrar(this.categoriaToDelete.idCategoria)
-          .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
-          .subscribe({
-              next: () => {
-                  this.showDeleteModal = false;
-                  this.categoriaToDelete = null;
-                  this.obtenerListaCategorias();
-              },
-              error: (err: any) => {
-                  this.log.error('categorias borrar', err);
-                  this.errorMsg = 'Error al borrar la categoría';
-                  this.showDeleteModal = false;
-                  this.categoriaToDelete = null;
-              }
-          });
+          this.categoriaToDelete = null;
+          this.obtenerListaCategorias();
+        },
+        error: (err: any) => {
+          this.log.error('categorias borrar', err);
+          this.errorMsg = 'Error al borrar la categoría';
+          this.showDeleteModal = false;
+          this.categoriaToDelete = null;
+        },
+      });
   }
 
   cancelDelete(): void {
-      this.showDeleteModal = false;
-      this.categoriaToDelete = null;
+    this.showDeleteModal = false;
+    this.categoriaToDelete = null;
   }
 
   trackByCategoriaId(index: number, categoria: Categoria): number {
@@ -195,19 +235,28 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
   }
 
   // ===== Toolbar / Búsqueda / Paginación =====
-  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
-  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.obtenerListaCategorias(); }
-  
-  onPageSizeChange(size: number): void { 
-    this.pageSize = Number(size) || 10; 
-    this.pageNo = 0; 
-    
-    // Si tenemos datos locales completos, repaginar localmente para evitar llamada innecesaria (opcional, pero seguro llamar API)
-    // Por consistencia llamamos a obtenerListaCategorias que decidirá
-    this.obtenerListaCategorias(); 
+  toggleAdvanced(): void {
+    this.showAdvanced = !this.showAdvanced;
+  }
+  onBasicSearchTextChange(text: string): void {
+    this.basicSearchText = text || '';
+    this.pageNo = 0;
+    this.obtenerListaCategorias();
   }
 
-  search(): void { this.pageNo = 0; this.obtenerListaCategorias(); }
+  onPageSizeChange(size: number): void {
+    this.pageSize = Number(size) || 10;
+    this.pageNo = 0;
+
+    // Si tenemos datos locales completos, repaginar localmente para evitar llamada innecesaria (opcional, pero seguro llamar API)
+    // Por consistencia llamamos a obtenerListaCategorias que decidirá
+    this.obtenerListaCategorias();
+  }
+
+  search(): void {
+    this.pageNo = 0;
+    this.obtenerListaCategorias();
+  }
 
   reset(): void {
     this.basicSearchText = '';
@@ -216,21 +265,24 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     this.obtenerListaCategorias();
   }
 
-  prev(): void { 
-    if (this.pageNo > 0) { 
-        this.onPageChange(this.pageNo - 1);
-    } 
+  prev(): void {
+    if (this.pageNo > 0) {
+      this.onPageChange(this.pageNo - 1);
+    }
   }
-  
-  next(): void { 
-    if (this.pageNo < this.getTotalPages() - 1) { 
-        this.onPageChange(this.pageNo + 1);
-    } 
+
+  next(): void {
+    if (this.pageNo < this.getTotalPages() - 1) {
+      this.onPageChange(this.pageNo + 1);
+    }
   }
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    const safePage = Math.max(
+      0,
+      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
+    );
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     if (this.allCategorias.length > 0) {
@@ -239,6 +291,8 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     }
     this.obtenerListaCategorias();
   }
-  
-  getTotalPages(): number { return Math.max(1, this.totalPages); }
+
+  getTotalPages(): number {
+    return Math.max(1, this.totalPages);
+  }
 }

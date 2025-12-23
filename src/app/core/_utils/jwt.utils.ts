@@ -18,5 +18,5 @@ export function isJwtExpired(token: string | null, offsetSeconds = 0): boolean {
   const payload = decodeJwtPayload(token);
   if (!payload || typeof payload.exp !== 'number') return true;
   const now = Math.floor(Date.now() / 1000);
-  return payload.exp <= (now + offsetSeconds);
+  return payload.exp <= now + offsetSeconds;
 }

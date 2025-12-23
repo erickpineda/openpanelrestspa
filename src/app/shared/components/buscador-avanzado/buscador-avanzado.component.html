@@ -1,7 +1,12 @@
 <div class="buscador-avanzado">
   <c-row class="g-2 align-items-end flex-column flex-md-row">
     <c-col xs="12" md="3">
-      <select cSelect cFormControl [(ngModel)]="campoSeleccionado" (change)="actualizarOperacionesDisponibles()">
+      <select
+        cSelect
+        cFormControl
+        [(ngModel)]="campoSeleccionado"
+        (change)="actualizarOperacionesDisponibles()"
+      >
         @for (c of camposDisponibles; track c.valor) {
           <option [value]="c.valor">{{ c.nombre }}</option>
         }
@@ -19,36 +24,45 @@
       @if (campoActual) {
         <!-- String -->
         @if (campoActual.tipo === 'string') {
-          <input type="text"
+          <input
+            type="text"
             cFormControl
             [placeholder]="placeholder"
             [(ngModel)]="valorBusqueda"
             (ngModelChange)="onValorChange($event)"
-            (keyup.enter)="buscar()" />
+            (keyup.enter)="buscar()"
+          />
         }
         <!-- Number -->
         @if (campoActual.tipo === 'number') {
-          <input type="number"
+          <input
+            type="number"
             cFormControl
             [placeholder]="placeholder"
             [(ngModel)]="valorBusqueda"
             (ngModelChange)="onValorChange($event)"
-            (keyup.enter)="buscar()" />
+            (keyup.enter)="buscar()"
+          />
         }
         <!-- Date -->
         @if (campoActual.tipo === 'date') {
-          <input type="date"
+          <input
+            type="date"
             cFormControl
             [placeholder]="placeholder"
             [(ngModel)]="valorBusqueda"
             (ngModelChange)="onValorChange($event)"
-            (keyup.enter)="buscar()" />
+            (keyup.enter)="buscar()"
+          />
         }
         <!-- Boolean -->
         @if (campoActual.tipo === 'boolean') {
-          <select cSelect cFormControl
+          <select
+            cSelect
+            cFormControl
             [(ngModel)]="valorBusqueda"
-            (ngModelChange)="onValorChange($event)">
+            (ngModelChange)="onValorChange($event)"
+          >
             <option [ngValue]="''">--</option>
             <option [ngValue]="true">Sí</option>
             <option [ngValue]="false">No</option>
@@ -56,10 +70,13 @@
         }
         <!-- Select (catálogos) -->
         @if (campoActual.tipo === 'select') {
-          <select cSelect cFormControl
+          <select
+            cSelect
+            cFormControl
             [(ngModel)]="valorBusqueda"
             (ngModelChange)="onValorChange($event)"
-            [disabled]="!!catalogosError">
+            [disabled]="!!catalogosError"
+          >
             <option [ngValue]="''">Seleccione...</option>
             @for (opt of opcionesSelectActual; track opt) {
               <option [ngValue]="opt">{{ opt }}</option>
@@ -74,7 +91,11 @@
       }
     </c-col>
     @if (debeMostrarBotonBusqueda() || showClearButton) {
-      <c-col xs="12" md="2" class="d-flex gap-1 justify-content-md-end mt-2 mt-md-0">
+      <c-col
+        xs="12"
+        md="2"
+        class="d-flex gap-1 justify-content-md-end mt-2 mt-md-0"
+      >
         @if (debeMostrarBotonBusqueda()) {
           <button cButton color="primary" (click)="buscar()">Buscar</button>
         }

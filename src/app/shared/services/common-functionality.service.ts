@@ -3,10 +3,13 @@ import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CommonFunctionalityService {
-  constructor(private router: Router, private datePipe: DatePipe) {}
+  constructor(
+    private router: Router,
+    private datePipe: DatePipe,
+  ) {}
 
   transformaFecha(fecha: Date, formato: string, flag: boolean): string {
     let resultado;
@@ -15,7 +18,14 @@ export class CommonFunctionalityService {
       const [dateComponents, timeComponents] = str.split(' ');
       const [day, month, year] = dateComponents.split('-');
       const [hours, minutes, seconds] = timeComponents.split(':');
-      const fechaObtenida = new Date(+year, +month - 1, +day, +hours, +minutes, +seconds);
+      const fechaObtenida = new Date(
+        +year,
+        +month - 1,
+        +day,
+        +hours,
+        +minutes,
+        +seconds,
+      );
       resultado = this.datePipe.transform(fechaObtenida, formato);
     } else if (fecha && flag) {
       resultado = this.datePipe.transform(fecha, formato);

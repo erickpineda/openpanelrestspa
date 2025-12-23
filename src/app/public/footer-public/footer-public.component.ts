@@ -1,16 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-    selector: 'app-footer-public',
-    templateUrl: './footer-public.component.html',
-    styleUrls: ['./footer-public.component.scss'],
-    standalone: false
+  selector: 'app-footer-public',
+  templateUrl: './footer-public.component.html',
+  styleUrls: ['./footer-public.component.scss'],
+  standalone: false,
 })
 export class FooterPublicComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }

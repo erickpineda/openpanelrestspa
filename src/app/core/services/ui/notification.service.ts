@@ -22,7 +22,7 @@ export class NotificationService {
   show(options: NotificationOptions): void {
     const notification = {
       duration: this.defaultDuration,
-      ...options
+      ...options,
     };
     this.notificationSubject.next(notification);
   }

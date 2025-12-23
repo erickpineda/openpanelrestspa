@@ -6,11 +6,11 @@ import { AjustesComponent } from './ajustes/ajustes.component';
 const routes: Routes = [
   { path: 'temas', component: TemasComponent },
   { path: 'ajustes', component: AjustesComponent },
-  { path: '', redirectTo: 'temas', pathMatch: 'full' }
+  { path: '', redirectTo: 'temas', pathMatch: 'full' },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class ConfiguracionRoutingModule {}

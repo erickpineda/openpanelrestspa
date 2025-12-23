@@ -13,7 +13,7 @@ export class AjustesService extends CrudService<Ajustes, number> {
 
   constructor(
     protected override http: HttpClient,
-    protected override tokenStorageService: TokenStorageService
+    protected override tokenStorageService: TokenStorageService,
   ) {
     super(http, tokenStorageService);
   }
@@ -25,7 +25,7 @@ export class AjustesService extends CrudService<Ajustes, number> {
       undefined,
       undefined,
       'config.ajustes.listar',
-      context
+      context,
     );
   }
 }

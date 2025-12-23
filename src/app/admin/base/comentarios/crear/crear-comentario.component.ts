@@ -7,10 +7,10 @@ import { CommonFunctionalityService } from '../../../../shared/services/common-f
 import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-response.model';
 
 @Component({
-    selector: 'app-crear-comentario',
-    templateUrl: './crear-comentario.component.html',
-    styleUrls: ['./crear-comentario.component.scss'],
-    standalone: false
+  selector: 'app-crear-comentario',
+  templateUrl: './crear-comentario.component.html',
+  styleUrls: ['./crear-comentario.component.scss'],
+  standalone: false,
 })
 export class CrearComentarioComponent {
   comentario: Comentario = new Comentario();
@@ -20,17 +20,22 @@ export class CrearComentarioComponent {
     private comentarioService: ComentarioService,
     private router: Router,
     private tokenStorageService: TokenStorageService,
-    private commonFuncService: CommonFunctionalityService
+    private commonFuncService: CommonFunctionalityService,
   ) {}
 
   onSubmit(comentario: Comentario) {
     this.submitted = true;
     // Assign current user as author
     comentario.idUsuario = this.tokenStorageService.getUser().id;
-    
-    this.comentarioService.crear(comentario).subscribe((response: OpenpanelApiResponse<any>) => {
-        this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
-    });
+
+    this.comentarioService
+      .crear(comentario)
+      .subscribe((response: OpenpanelApiResponse<any>) => {
+        this.commonFuncService.reloadComponent(
+          false,
+          '/admin/control/comentarios',
+        );
+      });
   }
 
   onCancel() {

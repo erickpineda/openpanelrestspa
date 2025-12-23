@@ -22,179 +22,222 @@
       <h5 cCardTitle>Estadísticas Rápidas</h5>
       <div class="hstack gap-3">
         <button cButton color="success" size="sm" (click)="openSettings()">
-          <svg cIcon name="cilSettings" style="padding-right: 2px" size="sm" title="Ajustar Parámetros"></svg>
+          <svg
+            cIcon
+            name="cilSettings"
+            style="padding-right: 2px"
+            size="sm"
+            title="Ajustar Parámetros"
+          ></svg>
           Ajustar Parámetros
         </button>
       </div>
     </div>
-    <hr>
-      <c-row class="g-3">
-        <c-col lg="3">
-          <app-kpi-card label="Usuarios Activos" [value]="cantidadUsuariosActivos" iconName="cilUser" color="primary"></app-kpi-card>
-        </c-col>
-        <c-col lg="3">
-          <app-kpi-card label="Total Entradas" [value]="totalEntradas" iconName="cilNotes" color="info"></app-kpi-card>
-        </c-col>
-        <c-col lg="3">
-          <app-kpi-card label="Publicadas ({{seriesDays}}d)" [value]="kpiPublicadas" iconName="cilCheckCircle" color="success"></app-kpi-card>
-        </c-col>
-        <c-col lg="3">
-          <app-kpi-card label="No publicadas ({{seriesDays}}d)" [value]="kpiNoPublicadas" iconName="cilXCircle" color="warning"></app-kpi-card>
-        </c-col>
-      </c-row>
-      <hr>
-        <c-row>
-          <c-col lg="8">
-            <c-card>
-              <c-card-body>
-                <app-dashboard-series-panel
-                  [seriesDays]="seriesDays"
-                  [seriesGranularity]="seriesGranularity"
-                  [data]="data"
-                  [loadingSeries]="loadingSeries"
-                  [showMetricsTools]="isLocalEnv() && metricsVisible()"
-                  [metricsExpanded]="metricsExpanded"
-                  [perf]="perf"
-                  [perfUpdatedAt]="perfUpdatedAt"
-                  [sumEntradasSerie]="sumEntradasSerie"
-                  [sumComentarios]="sumComentarios"
-                  [sumUsuarios]="sumUsuarios"
-                  [kpiUltimasEntradasColor]="kpiUltimasEntradasColor"
-                  [kpiComentariosColor]="kpiComentariosColor"
-                  [kpiNuevosUsuariosColor]="kpiNuevosUsuariosColor"
-                  (changeDays)="changeSeriesDays($event)"
-                  (changeGranularity)="changeSeriesGranularity($event)"
-                  (downloadCsv)="downloadCsvSeries()"
-                  (toggleMetrics)="metricsToggle()"
-                  (copyPerf)="copyPerfToClipboard()"
-                ></app-dashboard-series-panel>
-                <div class="mt-3">
-                  <app-dashboard-estado-nominal-panel
-                    [estadoNominalChartType]="estadoNominalChartType"
-                    [estadoNominalStacked]="estadoNominalStacked"
-                    [seriesEntriesSplitEstadoNombreData]="seriesEntriesSplitEstadoNombreData"
-                    [estadoNominalChartOptions]="estadoNominalChartOptions"
-                    [errorSplitEstadoNombre]="errorSplitEstadoNombre"
-                    (setChartType)="setEstadoNominalChartType($event)"
-                    (toggleStacked)="toggleEstadoNominalStacked()"
-                    (downloadCsv)="downloadCsvSeriesSplitEstadoNombre()"
-                    (retry)="loadSeriesEntriesSplitEstadoNombre()"
-                  ></app-dashboard-estado-nominal-panel>
-                </div>
-                <div class="mt-3" [attr.aria-busy]="loadingSplitEstado ? 'true' : null">
-                  <app-dashboard-estado-split-panel
-                    [loadingSplitEstado]="loadingSplitEstado"
-                    [seriesEntriesSplitData]="seriesEntriesSplitData"
-                    [errorSplitEstado]="errorSplitEstado"
-                    (downloadCsv)="downloadCsvSeriesSplitEstado()"
-                    (retry)="loadSeriesEntriesSplitEstado()"
-                  ></app-dashboard-estado-split-panel>
-                </div>
-              </c-card-body>
-            </c-card>
-          </c-col>
-          <c-col lg="4">
-            <app-dashboard-recent-panel
-              [recentItems]="recentItems"
-              [loadingRecent]="loadingRecent"
-              [errorRecent]="errorRecent"
-              [recentSize]="recentSize"
-              [recentTotalPages]="recentTotalPages"
-              [recentPage]="recentPage"
-              (changeSize)="onRecentSizeChange($event)"
-              (pageChange)="onRecentPageChange($event)"
-              (downloadCsv)="downloadCsvRecentActivity()"
-              (retry)="loadRecentActivity()"
-            ></app-dashboard-recent-panel>
-            <app-dashboard-storage-panel
-              [loadingStorage]="loadingStorage"
-              [storage]="storage"
-              [formatBytesFn]="formatBytes.bind(this)"
-              (downloadCsv)="downloadCsvStorage()"
-            ></app-dashboard-storage-panel>
-          </c-col>
-        </c-row>
-        <hr>
-          <c-row>
-            <c-col lg="6">
-              @if (errorTopUsers) {
-                <div class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert" aria-live="assertive">
-                  <span>{{ errorTopUsers }}</span>
-                  <button cButton color="danger" size="sm" class="retry-btn-top-users" (click)="loadTopWidgets()">Reintentar</button>
-                </div>
-              }
-              <app-dashboard-top-panel
-                title="Top Usuarios"
-                [items]="topUsers"
-                [loading]="loadingTopUsers"
-                [error]="errorTopUsers"
-                badgeColor="primary"
-                csvDataTestId="btn-csv-top-users"
-                [showPeriodControls]="true"
-                [topLimit]="topLimit"
-                [topPeriodDays]="topPeriodDays"
-                retryBtnClass="retry-btn-top-users"
-                (changeTopLimit)="onChangeTopLimit($event)"
-                (changePeriod)="topPeriodDays=$event; loadTopWidgets()"
-                (downloadCsv)="downloadCsvTopUsers()"
-                (retry)="loadTopWidgets()"
-              ></app-dashboard-top-panel>
-            </c-col>
-            <c-col lg="6">
-              <app-dashboard-top-panel
-                title="Top Categorías"
-                [items]="topCategories"
-                [loading]="loadingTopCategories"
-                [error]="errorTopCategories"
-                badgeColor="info"
-                csvDataTestId="btn-csv-top-categories"
-                retryBtnClass="retry-btn-top-categories"
-                (downloadCsv)="downloadCsvTopCategories()"
-                (retry)="loadTopWidgets()"
-              ></app-dashboard-top-panel>
-            </c-col>
-            <c-col lg="6" class="mt-3">
-              <app-dashboard-top-panel
-                title="Top Tags"
-                [items]="topTags"
-                [loading]="loadingTopTags"
-                [error]="errorTopTags"
-                badgeColor="warning"
-                csvDataTestId="btn-csv-top-tags"
-                retryBtnClass="retry-btn-top-tags"
-                (downloadCsv)="downloadCsvTopTags()"
-                (retry)="loadTopWidgets()"
-              ></app-dashboard-top-panel>
-            </c-col>
-          </c-row>
-          <hr>
-            <c-row>
-              <c-col lg="12">
-                <app-dashboard-content-panel
-                  [loadingContentStats]="loadingContentStats"
-                  [errorContentStats]="errorContentStats"
-                  [contentStats]="contentStats"
-                  [contentStatsChartData]="contentStatsChartData"
-                  [contentEstadoRows]="contentEstadoRows"
-                  [kpiUsuariosTotalColor]="kpiUsuariosTotalColor"
-                  [kpiEntradasTotalColor]="kpiEntradasTotalColor"
-                  [kpiComentariosTotalColor]="kpiComentariosTotalColor"
-                  [kpiFicherosTotalColor]="kpiFicherosTotalColor"
-                  (downloadContentCsv)="downloadCsvContentStats()"
-                  (downloadEstadosCsv)="downloadCsvContentStatsEstados()"
-                  (retry)="loadContentStats()"
-                ></app-dashboard-content-panel>
-              </c-col>
-            </c-row>
+    <hr />
+    <c-row class="g-3">
+      <c-col lg="3">
+        <app-kpi-card
+          label="Usuarios Activos"
+          [value]="cantidadUsuariosActivos"
+          iconName="cilUser"
+          color="primary"
+        ></app-kpi-card>
+      </c-col>
+      <c-col lg="3">
+        <app-kpi-card
+          label="Total Entradas"
+          [value]="totalEntradas"
+          iconName="cilNotes"
+          color="info"
+        ></app-kpi-card>
+      </c-col>
+      <c-col lg="3">
+        <app-kpi-card
+          label="Publicadas ({{ seriesDays }}d)"
+          [value]="kpiPublicadas"
+          iconName="cilCheckCircle"
+          color="success"
+        ></app-kpi-card>
+      </c-col>
+      <c-col lg="3">
+        <app-kpi-card
+          label="No publicadas ({{ seriesDays }}d)"
+          [value]="kpiNoPublicadas"
+          iconName="cilXCircle"
+          color="warning"
+        ></app-kpi-card>
+      </c-col>
+    </c-row>
+    <hr />
+    <c-row>
+      <c-col lg="8">
+        <c-card>
+          <c-card-body>
+            <app-dashboard-series-panel
+              [seriesDays]="seriesDays"
+              [seriesGranularity]="seriesGranularity"
+              [data]="data"
+              [loadingSeries]="loadingSeries"
+              [showMetricsTools]="isLocalEnv() && metricsVisible()"
+              [metricsExpanded]="metricsExpanded"
+              [perf]="perf"
+              [perfUpdatedAt]="perfUpdatedAt"
+              [sumEntradasSerie]="sumEntradasSerie"
+              [sumComentarios]="sumComentarios"
+              [sumUsuarios]="sumUsuarios"
+              [kpiUltimasEntradasColor]="kpiUltimasEntradasColor"
+              [kpiComentariosColor]="kpiComentariosColor"
+              [kpiNuevosUsuariosColor]="kpiNuevosUsuariosColor"
+              (changeDays)="changeSeriesDays($event)"
+              (changeGranularity)="changeSeriesGranularity($event)"
+              (downloadCsv)="downloadCsvSeries()"
+              (toggleMetrics)="metricsToggle()"
+              (copyPerf)="copyPerfToClipboard()"
+            ></app-dashboard-series-panel>
+            <div class="mt-3">
+              <app-dashboard-estado-nominal-panel
+                [estadoNominalChartType]="estadoNominalChartType"
+                [estadoNominalStacked]="estadoNominalStacked"
+                [seriesEntriesSplitEstadoNombreData]="
+                  seriesEntriesSplitEstadoNombreData
+                "
+                [estadoNominalChartOptions]="estadoNominalChartOptions"
+                [errorSplitEstadoNombre]="errorSplitEstadoNombre"
+                (setChartType)="setEstadoNominalChartType($event)"
+                (toggleStacked)="toggleEstadoNominalStacked()"
+                (downloadCsv)="downloadCsvSeriesSplitEstadoNombre()"
+                (retry)="loadSeriesEntriesSplitEstadoNombre()"
+              ></app-dashboard-estado-nominal-panel>
+            </div>
+            <div
+              class="mt-3"
+              [attr.aria-busy]="loadingSplitEstado ? 'true' : null"
+            >
+              <app-dashboard-estado-split-panel
+                [loadingSplitEstado]="loadingSplitEstado"
+                [seriesEntriesSplitData]="seriesEntriesSplitData"
+                [errorSplitEstado]="errorSplitEstado"
+                (downloadCsv)="downloadCsvSeriesSplitEstado()"
+                (retry)="loadSeriesEntriesSplitEstado()"
+              ></app-dashboard-estado-split-panel>
+            </div>
           </c-card-body>
         </c-card>
+      </c-col>
+      <c-col lg="4">
+        <app-dashboard-recent-panel
+          [recentItems]="recentItems"
+          [loadingRecent]="loadingRecent"
+          [errorRecent]="errorRecent"
+          [recentSize]="recentSize"
+          [recentTotalPages]="recentTotalPages"
+          [recentPage]="recentPage"
+          (changeSize)="onRecentSizeChange($event)"
+          (pageChange)="onRecentPageChange($event)"
+          (downloadCsv)="downloadCsvRecentActivity()"
+          (retry)="loadRecentActivity()"
+        ></app-dashboard-recent-panel>
+        <app-dashboard-storage-panel
+          [loadingStorage]="loadingStorage"
+          [storage]="storage"
+          [formatBytesFn]="formatBytes.bind(this)"
+          (downloadCsv)="downloadCsvStorage()"
+        ></app-dashboard-storage-panel>
+      </c-col>
+    </c-row>
+    <hr />
+    <c-row>
+      <c-col lg="6">
+        @if (errorTopUsers) {
+          <div
+            class="alert alert-danger d-flex align-items-center justify-content-between my-2"
+            role="alert"
+            aria-live="assertive"
+          >
+            <span>{{ errorTopUsers }}</span>
+            <button
+              cButton
+              color="danger"
+              size="sm"
+              class="retry-btn-top-users"
+              (click)="loadTopWidgets()"
+            >
+              Reintentar
+            </button>
+          </div>
+        }
+        <app-dashboard-top-panel
+          title="Top Usuarios"
+          [items]="topUsers"
+          [loading]="loadingTopUsers"
+          [error]="errorTopUsers"
+          badgeColor="primary"
+          csvDataTestId="btn-csv-top-users"
+          [showPeriodControls]="true"
+          [topLimit]="topLimit"
+          [topPeriodDays]="topPeriodDays"
+          retryBtnClass="retry-btn-top-users"
+          (changeTopLimit)="onChangeTopLimit($event)"
+          (changePeriod)="topPeriodDays = $event; loadTopWidgets()"
+          (downloadCsv)="downloadCsvTopUsers()"
+          (retry)="loadTopWidgets()"
+        ></app-dashboard-top-panel>
+      </c-col>
+      <c-col lg="6">
+        <app-dashboard-top-panel
+          title="Top Categorías"
+          [items]="topCategories"
+          [loading]="loadingTopCategories"
+          [error]="errorTopCategories"
+          badgeColor="info"
+          csvDataTestId="btn-csv-top-categories"
+          retryBtnClass="retry-btn-top-categories"
+          (downloadCsv)="downloadCsvTopCategories()"
+          (retry)="loadTopWidgets()"
+        ></app-dashboard-top-panel>
+      </c-col>
+      <c-col lg="6" class="mt-3">
+        <app-dashboard-top-panel
+          title="Top Tags"
+          [items]="topTags"
+          [loading]="loadingTopTags"
+          [error]="errorTopTags"
+          badgeColor="warning"
+          csvDataTestId="btn-csv-top-tags"
+          retryBtnClass="retry-btn-top-tags"
+          (downloadCsv)="downloadCsvTopTags()"
+          (retry)="loadTopWidgets()"
+        ></app-dashboard-top-panel>
+      </c-col>
+    </c-row>
+    <hr />
+    <c-row>
+      <c-col lg="12">
+        <app-dashboard-content-panel
+          [loadingContentStats]="loadingContentStats"
+          [errorContentStats]="errorContentStats"
+          [contentStats]="contentStats"
+          [contentStatsChartData]="contentStatsChartData"
+          [contentEstadoRows]="contentEstadoRows"
+          [kpiUsuariosTotalColor]="kpiUsuariosTotalColor"
+          [kpiEntradasTotalColor]="kpiEntradasTotalColor"
+          [kpiComentariosTotalColor]="kpiComentariosTotalColor"
+          [kpiFicherosTotalColor]="kpiFicherosTotalColor"
+          (downloadContentCsv)="downloadCsvContentStats()"
+          (downloadEstadosCsv)="downloadCsvContentStatsEstados()"
+          (retry)="loadContentStats()"
+        ></app-dashboard-content-panel>
+      </c-col>
+    </c-row>
+  </c-card-body>
+</c-card>
 
-        <app-dashboard-settings-modal
-          [visible]="showSettingsModal"
-          (visibleChange)="showSettingsModal=$event"
-          [settings]="settings"
-          [clearFeedback]="clearFeedback"
-          (apply)="applySettings()"
-          (reset)="resetSettings()"
-          (close)="closeSettings()"
-        ></app-dashboard-settings-modal>
+<app-dashboard-settings-modal
+  [visible]="showSettingsModal"
+  (visibleChange)="showSettingsModal = $event"
+  [settings]="settings"
+  [clearFeedback]="clearFeedback"
+  (apply)="applySettings()"
+  (reset)="resetSettings()"
+  (close)="closeSettings()"
+></app-dashboard-settings-modal>

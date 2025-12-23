@@ -1,17 +1,17 @@
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpContext } from "@angular/common/http";
-import { Usuario } from "../../models/usuario.model";
-import { CrudService } from "../../_utils/crud.service";
-import { TokenStorageService } from "../auth/token-storage.service";
-import { catchError, Observable, map, firstValueFrom, of } from "rxjs";
-import { PerfilResponse } from "../../models/perfil-response.model";
-import { OpenpanelApiResponse } from "../../models/openpanel-api-response.model";
-import { NetworkInterceptor } from "../../interceptor/network.interceptor";
-import { PaginaResponse } from "../../models/pagina-response.model";
-import { OPConstants } from "src/app/shared/constants/op-global.constants";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { Usuario } from '../../models/usuario.model';
+import { CrudService } from '../../_utils/crud.service';
+import { TokenStorageService } from '../auth/token-storage.service';
+import { catchError, Observable, map, firstValueFrom, of } from 'rxjs';
+import { PerfilResponse } from '../../models/perfil-response.model';
+import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
+import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { PaginaResponse } from '../../models/pagina-response.model';
+import { OPConstants } from 'src/app/shared/constants/op-global.constants';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root',
 })
 export class UsuarioService extends CrudService<Usuario, number> {
   protected override endpoint = '/usuarios';
@@ -19,14 +19,18 @@ export class UsuarioService extends CrudService<Usuario, number> {
 
   constructor(
     protected override http: HttpClient,
-    protected override tokenStorageService: TokenStorageService
+    protected override tokenStorageService: TokenStorageService,
   ) {
     super(http, tokenStorageService);
   }
 
   // ✅ Métodos migrados de UsuariosService
 
-  buscarSafe(searchRequest: any, pageNo: number, pageSize: number): Observable<PaginaResponse> {
+  buscarSafe(
+    searchRequest: any,
+    pageNo: number,
+    pageSize: number,
+  ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
@@ -38,16 +42,29 @@ export class UsuarioService extends CrudService<Usuario, number> {
       params,
       undefined,
       'usuarios.buscar',
-      context
+      context,
     );
   }
 
-  buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<any> {
+  buscarSinGlobalLoader(
+    searchRequest: any,
+    pageNo: number,
+    pageSize: number,
+  ): Observable<any> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.post<any>(`${this.endpoint}/buscar`, searchRequest, params, undefined, context);
+    const context = new HttpContext().set(
+      NetworkInterceptor.SKIP_GLOBAL_LOADER,
+      true,
+    );
+    return this.post<any>(
+      `${this.endpoint}/buscar`,
+      searchRequest,
+      params,
+      undefined,
+      context,
+    );
   }
 
   // ✅ SOLO los métodos esenciales seguros
@@ -61,7 +78,7 @@ export class UsuarioService extends CrudService<Usuario, number> {
       {} as PerfilResponse,
       undefined,
       undefined,
-      'usuarios.obtenerDatosSesionActual'
+      'usuarios.obtenerDatosSesionActual',
     );
   }
 
@@ -82,10 +99,20 @@ export class UsuarioService extends CrudService<Usuario, number> {
     return this.get<PerfilResponse>(`${this.endpoint}/perfil/yo`);
   }
 
-  actualizarParcial(id: number, modificado: Usuario): Observable<OpenpanelApiResponse<any>> {
+  actualizarParcial(
+    id: number,
+    modificado: Usuario,
+  ): Observable<OpenpanelApiResponse<any>> {
     // Content-Type application/json-patch+json is required for JSON Patch (even if body is Usuario model as per backend requirement)
-    const headers = this.setHeaders({ 'Content-Type': 'application/json-patch+json' });
-    return this.patch<any>(`${this.endpoint}/perfil/${id}`, modificado, undefined, headers);
+    const headers = this.setHeaders({
+      'Content-Type': 'application/json-patch+json',
+    });
+    return this.patch<any>(
+      `${this.endpoint}/perfil/${id}`,
+      modificado,
+      undefined,
+      headers,
+    );
   }
 
   // ✅ Implementación mínima requerida

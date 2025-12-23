@@ -1,4 +1,4 @@
-@use "sass:color";
+@use 'sass:color';
 /* ===== ESTILOS BASE ===== */
 .loading-overlay {
   position: absolute; /* modo local por defecto */
@@ -24,7 +24,7 @@
   align-items: flex-start;
   padding-top: 2rem;
   border-bottom: 1px solid #e9ecef;
-  
+
   .loader-content {
     margin-top: 0;
     animation: slideDown 0.3s ease-out;
@@ -71,7 +71,7 @@
   .loader-content {
     padding: 1.5rem;
   }
-  
+
   .loader-message {
     font-size: 0.875rem;
   }
@@ -87,7 +87,7 @@
   .loader-content {
     padding: 3rem;
   }
-  
+
   .loader-message {
     font-size: 1.125rem;
   }
@@ -98,30 +98,50 @@
   .spinner-loader c-spinner {
     color: $color !important;
   }
-  
+
   .dots-loader .dot {
     background-color: $color;
   }
-  
+
   .pulse-loader .pulse-circle {
-    background: radial-gradient(circle, $color 0%, color.adjust($color, $lightness: 20%) 100%);
+    background: radial-gradient(
+      circle,
+      $color 0%,
+      color.adjust($color, $lightness: 20%) 100%
+    );
   }
-  
+
   .progress-loader .progress-fill {
-    background: linear-gradient(90deg, $color, color.adjust($color, $lightness: 10%));
+    background: linear-gradient(
+      90deg,
+      $color,
+      color.adjust($color, $lightness: 10%)
+    );
   }
-  
+
   .modern-loader .ring {
     border-color: $color transparent transparent transparent;
   }
 }
 
-.loader-color-primary { @include apply-color(#0d6efd); }
-.loader-color-secondary { @include apply-color(#6c757d); }
-.loader-color-success { @include apply-color(#198754); }
-.loader-color-danger { @include apply-color(#dc3545); }
-.loader-color-warning { @include apply-color(#ffc107); }
-.loader-color-info { @include apply-color(#0dcaf0); }
+.loader-color-primary {
+  @include apply-color(#0d6efd);
+}
+.loader-color-secondary {
+  @include apply-color(#6c757d);
+}
+.loader-color-success {
+  @include apply-color(#198754);
+}
+.loader-color-danger {
+  @include apply-color(#dc3545);
+}
+.loader-color-warning {
+  @include apply-color(#ffc107);
+}
+.loader-color-info {
+  @include apply-color(#0dcaf0);
+}
 
 /* ===== VARIANTE 1: SPINNER CLÁSICO ===== */
 .spinner-loader {
@@ -129,14 +149,14 @@
     display: flex;
     gap: 0.5rem;
     justify-content: center;
-    
+
     c-spinner {
       animation: spinner-grow 1.5s ease-in-out infinite;
-      
+
       &:nth-child(2) {
         animation-delay: 0.2s;
       }
-      
+
       &:nth-child(3) {
         animation-delay: 0.4s;
       }
@@ -145,7 +165,8 @@
 }
 
 @keyframes spinner-grow {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(0.8);
     opacity: 0.7;
   }
@@ -162,21 +183,29 @@
     gap: 0.5rem;
     justify-content: center;
   }
-  
+
   .dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     animation: dot-bounce 1.4s ease-in-out infinite both;
-    
-    &:nth-child(1) { animation-delay: -0.32s; }
-    &:nth-child(2) { animation-delay: -0.16s; }
-    &:nth-child(3) { animation-delay: 0s; }
+
+    &:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+    &:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+    &:nth-child(3) {
+      animation-delay: 0s;
+    }
   }
 }
 
 @keyframes dot-bounce {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0.8);
     opacity: 0.5;
   }
@@ -192,7 +221,7 @@
     display: flex;
     justify-content: center;
   }
-  
+
   .pulse-circle {
     width: 50px;
     height: 50px;
@@ -222,7 +251,7 @@
     width: 200px;
     margin: 0 auto;
   }
-  
+
   .progress-bar {
     height: 4px;
     background: #e9ecef;
@@ -230,7 +259,7 @@
     overflow: hidden;
     position: relative;
   }
-  
+
   .progress-fill {
     height: 100%;
     width: 45%;
@@ -257,14 +286,14 @@
     display: flex;
     justify-content: center;
   }
-  
+
   .modern-spinner {
     display: inline-block;
     position: relative;
     width: 80px;
     height: 80px;
   }
-  
+
   .ring {
     box-sizing: border-box;
     display: block;
@@ -275,15 +304,15 @@
     border: 4px solid;
     border-radius: 50%;
     animation: modern-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    
+
     &:nth-child(1) {
       animation-delay: -0.45s;
     }
-    
+
     &:nth-child(2) {
       animation-delay: -0.3s;
     }
-    
+
     &:nth-child(3) {
       animation-delay: -0.15s;
     }
@@ -320,16 +349,16 @@
   .loading-overlay {
     background: rgba(0, 0, 0, 0.85);
   }
-  
+
   .loader-content {
     background: #2b2b2b;
     border: 1px solid #404040;
   }
-  
+
   .loader-message {
     color: #adb5bd;
   }
-  
+
   .progress-loader .progress-bar {
     background: #404040;
   }
@@ -341,7 +370,7 @@
     margin: 1rem;
     padding: 1.5rem;
   }
-  
+
   .progress-loader .progress-container {
     width: 150px;
   }

@@ -8,16 +8,16 @@ import { LoggerService } from '../../../../core/services/logger.service';
 import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
 
 @Component({
-    selector: 'app-privilegios-list',
-    templateUrl: './listado-privilegios.component.html',
-    styleUrls: ['./listado-privilegios.component.scss'],
-    standalone: false
+  selector: 'app-privilegios-list',
+  templateUrl: './listado-privilegios.component.html',
+  styleUrls: ['./listado-privilegios.component.scss'],
+  standalone: false,
 })
 export class PrivilegiosListComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   privilegios: Privilegio[] = [];
-  
+
   pageNo = 0;
   pageSize = 10;
   totalElements = 0;
@@ -42,7 +42,7 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -58,11 +58,15 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    const hasFilters = !!(this.filtroNombre);
+    const hasFilters = !!this.filtroNombre;
 
     const handleResponse = (r: any) => {
       const data = r?.data || r;
-      const list = Array.isArray(data?.elements) ? data.elements : (Array.isArray(data) ? data : []);
+      const list = Array.isArray(data?.elements)
+        ? data.elements
+        : Array.isArray(data)
+          ? data
+          : [];
       this.privilegios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
       this.numberOfElements = list.length;
@@ -74,22 +78,40 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     };
 
     if (!hasFilters) {
-      this.privilegioService.listarPaginaSinGlobalLoader(pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
-        }))
+      this.privilegioService
+        .listarPaginaSinGlobalLoader(pageNo, this.pageSize)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          }),
+        )
         .subscribe({ next: handleResponse, error: handleError });
     } else {
-      const criteria: { filterKey: string; value: any; operation: string }[] = [];
-      if (this.filtroNombre) criteria.push({ filterKey: 'nombre', value: this.filtroNombre, operation: 'CONTAINS' });
-      
-      const payload = this.searchUtil.buildRequest('Privilegio', criteria, 'ALL');
-      this.privilegioService.buscarSinGlobalLoader(payload, pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
-        }))
+      const criteria: { filterKey: string; value: any; operation: string }[] =
+        [];
+      if (this.filtroNombre)
+        criteria.push({
+          filterKey: 'nombre',
+          value: this.filtroNombre,
+          operation: 'CONTAINS',
+        });
+
+      const payload = this.searchUtil.buildRequest(
+        'Privilegio',
+        criteria,
+        'ALL',
+      );
+      this.privilegioService
+        .buscarSinGlobalLoader(payload, pageNo, this.pageSize)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          }),
+        )
         .subscribe({ next: handleResponse, error: handleError });
     }
   }
@@ -125,21 +147,38 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     this.load();
   }
 
-  prev(): void { if (this.pageNo > 0) { this.pageNo--; this.load(); } }
-  next(): void { 
-    const maxPage = this.totalElements ? Math.ceil(this.totalElements / this.pageSize) - 1 : this.pageNo + 1;
-    if (this.pageNo < maxPage) { this.pageNo++; this.load(); } 
+  prev(): void {
+    if (this.pageNo > 0) {
+      this.pageNo--;
+      this.load();
+    }
+  }
+  next(): void {
+    const maxPage = this.totalElements
+      ? Math.ceil(this.totalElements / this.pageSize) - 1
+      : this.pageNo + 1;
+    if (this.pageNo < maxPage) {
+      this.pageNo++;
+      this.load();
+    }
   }
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    const safePage = Math.max(
+      0,
+      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
+    );
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.load();
   }
 
-  getTotalPages(): number { return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0; }
+  getTotalPages(): number {
+    return this.totalElements
+      ? Math.ceil(this.totalElements / this.pageSize)
+      : 0;
+  }
 
   // CRUD
 
@@ -162,13 +201,19 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
   }
 
   isFormValid(): boolean {
-    return !!(this.editPrivilegio && this.editPrivilegio.nombre && this.editPrivilegio.nombre.trim().length > 0 && this.editPrivilegio.codigo && this.editPrivilegio.codigo.trim().length > 0);
+    return !!(
+      this.editPrivilegio &&
+      this.editPrivilegio.nombre &&
+      this.editPrivilegio.nombre.trim().length > 0 &&
+      this.editPrivilegio.codigo &&
+      this.editPrivilegio.codigo.trim().length > 0
+    );
   }
 
   onNombreInput(value: string): void {
     if (!this.editPrivilegio) return;
     this.editPrivilegio.nombre = value;
-    
+
     if (!this.isEditing && !this.manualCodeEntry) {
       this.generateCodeFromNombre(value);
     }
@@ -189,25 +234,35 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
   saveEdit(): void {
     if (!this.editPrivilegio) return;
     this.loading = true;
-    
-    const op$ = this.isEditing 
-      ? this.privilegioService.actualizar(this.editPrivilegio.codigo, this.editPrivilegio)
+
+    const op$ = this.isEditing
+      ? this.privilegioService.actualizar(
+          this.editPrivilegio.codigo,
+          this.editPrivilegio,
+        )
       : this.privilegioService.crear(this.editPrivilegio);
 
-    op$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
+    op$.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        this.toast.showSuccess(this.isEditing ? 'Privilegio actualizado' : 'Privilegio creado', 'Privilegios');
+        this.toast.showSuccess(
+          this.isEditing ? 'Privilegio actualizado' : 'Privilegio creado',
+          'Privilegios',
+        );
         this.loading = false;
         this.editModalVisible = false;
         this.load();
       },
       error: (err: any) => {
-        this.toast.showError(this.isEditing ? 'Error actualizando' : 'Error creando', 'Privilegios');
-        this.log.error(this.isEditing ? 'privilegios actualizar' : 'privilegios crear', err);
+        this.toast.showError(
+          this.isEditing ? 'Error actualizando' : 'Error creando',
+          'Privilegios',
+        );
+        this.log.error(
+          this.isEditing ? 'privilegios actualizar' : 'privilegios crear',
+          err,
+        );
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -230,7 +285,8 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
       return;
     }
     this.loading = true;
-    this.privilegioService.borrar(this.privilegioToDelete.codigo)
+    this.privilegioService
+      .borrar(this.privilegioToDelete.codigo)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -244,7 +300,7 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
           this.log.error('privilegios borrar', err);
           this.loading = false;
           this.cancelDelete();
-        }
+        },
       });
   }
 

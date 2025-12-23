@@ -13,7 +13,7 @@ import { MediaSharedModule } from './media-shared.module';
     ContenidoRoutingModule,
     SharedOPModule,
     FormsModule,
-    MediaSharedModule
-  ]
+    MediaSharedModule,
+  ],
 })
 export class ContenidoModule {}

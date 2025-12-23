@@ -11,17 +11,17 @@ import { LoggerService } from '../../../../core/services/logger.service';
 import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-response.model';
 
 @Component({
-    selector: 'app-editar-comentario',
-    templateUrl: './editar-comentario.component.html',
-    styleUrls: ['./editar-comentario.component.scss'],
-    standalone: false
+  selector: 'app-editar-comentario',
+  templateUrl: './editar-comentario.component.html',
+  styleUrls: ['./editar-comentario.component.scss'],
+  standalone: false,
 })
 export class EditarComentarioComponent implements OnInit {
   comentario?: Comentario;
   nombreUsuario?: string;
   emailUsuario?: string;
   tituloEntrada?: string;
-  
+
   submitted = false;
   disabled = true;
 
@@ -33,7 +33,7 @@ export class EditarComentarioComponent implements OnInit {
     private entradaService: EntradaService,
     private commonFuncService: CommonFunctionalityService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -44,52 +44,59 @@ export class EditarComentarioComponent implements OnInit {
   }
 
   private obtenerDatos(id: any) {
-      this.comentarioService.obtenerPorId(id).subscribe({
-          next: (response: OpenpanelApiResponse<any>) => {
-            this.comentario = response.data;
-            if (this.comentario) {
-                this.obtenerDatosUsuario(this.comentario.idUsuario);
-                this.obtenerDatosEntrada(this.comentario.idEntrada);
-            }
-            this.cdr.detectChanges();
-          },
-          error: (err) => {
-              this.log.error("Error al obtener comentario", err);
-          }
-      });
+    this.comentarioService.obtenerPorId(id).subscribe({
+      next: (response: OpenpanelApiResponse<any>) => {
+        this.comentario = response.data;
+        if (this.comentario) {
+          this.obtenerDatosUsuario(this.comentario.idUsuario);
+          this.obtenerDatosEntrada(this.comentario.idEntrada);
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.log.error('Error al obtener comentario', err);
+      },
+    });
   }
 
   private obtenerDatosUsuario(idUsuario: number) {
-      this.usuarioService.obtenerPorId(idUsuario).subscribe({
-          next: (response: OpenpanelApiResponse<any>) => {
-              const usuario: Usuario = response.data;
-              if (usuario) {
-                  this.nombreUsuario = usuario.username;
-                  this.emailUsuario = usuario.email;
-                  this.cdr.detectChanges();
-              }
-          }
-      });
+    this.usuarioService.obtenerPorId(idUsuario).subscribe({
+      next: (response: OpenpanelApiResponse<any>) => {
+        const usuario: Usuario = response.data;
+        if (usuario) {
+          this.nombreUsuario = usuario.username;
+          this.emailUsuario = usuario.email;
+          this.cdr.detectChanges();
+        }
+      },
+    });
   }
 
   private obtenerDatosEntrada(idEntrada: number) {
-      this.entradaService.obtenerPorId(idEntrada).subscribe({
-          next: (response: OpenpanelApiResponse<any>) => {
-              const entrada: Entrada = response.data;
-              if (entrada) {
-                  this.tituloEntrada = entrada.titulo;
-                  this.cdr.detectChanges();
-              }
-          }
-      });
+    this.entradaService.obtenerPorId(idEntrada).subscribe({
+      next: (response: OpenpanelApiResponse<any>) => {
+        const entrada: Entrada = response.data;
+        if (entrada) {
+          this.tituloEntrada = entrada.titulo;
+          this.cdr.detectChanges();
+        }
+      },
+    });
   }
 
   onSubmit(comentario: Comentario) {
     this.submitted = true;
-    this.comentarioService.actualizar(comentario.idComentario, comentario).subscribe((response: OpenpanelApiResponse<any>) => {
-        this.log.info('Se ha actualizado el comentario ' + comentario.idComentario);
-        this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
-    });
+    this.comentarioService
+      .actualizar(comentario.idComentario, comentario)
+      .subscribe((response: OpenpanelApiResponse<any>) => {
+        this.log.info(
+          'Se ha actualizado el comentario ' + comentario.idComentario,
+        );
+        this.commonFuncService.reloadComponent(
+          false,
+          '/admin/control/comentarios',
+        );
+      });
   }
 
   onCancel() {
@@ -97,6 +104,6 @@ export class EditarComentarioComponent implements OnInit {
   }
 
   onEditarComentario() {
-      this.disabled = false;
+    this.disabled = false;
   }
 }

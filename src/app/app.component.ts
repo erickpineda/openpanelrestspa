@@ -8,10 +8,10 @@ import { RouteTrackerService } from './core/services/auth/route-tracker.service'
 import { OPConstants } from './shared/constants/op-global.constants';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css'],
-    standalone: false
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   title = 'openpanelspa';
@@ -22,8 +22,8 @@ export class AppComponent implements OnInit {
     private log: LoggerService,
     private authService: AuthService,
     private routeTracker: RouteTrackerService, // sólo para activar el tracking
-    private tokenStorage: TokenStorageService
-  ){ }
+    private tokenStorage: TokenStorageService,
+  ) {}
 
   ngOnInit(): void {
     // Inicializar sincronización entre pestañas
@@ -38,7 +38,9 @@ export class AppComponent implements OnInit {
 
     // Escuchar cambios de estado de autenticación
     window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, () => {
-      this.log.info('🔄 Estado de autenticación cambiado, actualizando interfaz...');
+      this.log.info(
+        '🔄 Estado de autenticación cambiado, actualizando interfaz...',
+      );
       // Aquí podrías forzar la actualización de componentes si es necesario
     });
   }

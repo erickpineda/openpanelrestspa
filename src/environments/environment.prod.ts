@@ -1,4 +1,4 @@
-import { base } from "./environment.prod.es";
+import { base } from './environment.prod.es';
 
 export const environment = base;
 

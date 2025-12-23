@@ -1,12 +1,18 @@
-import { Component, Output, EventEmitter, OnInit, OnDestroy } from "@angular/core";
-import { FormGroup } from "@angular/forms";
-import { Subject } from "rxjs";
+import {
+  Component,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { Subject } from 'rxjs';
 
 @Component({ template: '' })
 export abstract class BaseFormComponent<T> implements OnInit, OnDestroy {
   @Output() submitForm = new EventEmitter<T>();
   @Output() cancel = new EventEmitter<T>();
-  
+
   form!: FormGroup;
   loading = false;
   protected destroy$ = new Subject<void>();
@@ -24,7 +30,7 @@ export abstract class BaseFormComponent<T> implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  protected onInit(): void { }
+  protected onInit(): void {}
 
   onSubmit(): void {
     if (this.form.valid && !this.loading) {
@@ -44,7 +50,7 @@ export abstract class BaseFormComponent<T> implements OnInit, OnDestroy {
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.values(formGroup.controls).forEach(control => {
+    Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);

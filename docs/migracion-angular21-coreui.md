@@ -1,6 +1,7 @@
 # Migración a Angular 21 y CoreUI (última versión)
 
 ## 1. Requisitos previos
+
 - Versión actual:
   - Angular 16 (`package.json:24–33`)
   - CoreUI Angular `~4.5.28` (`package.json:39,44`), CoreUI CSS `^4.2.6` (`package.json:42`)
@@ -34,6 +35,7 @@
   - `loader-utils 3.2.1`, `serve ^14.0.1` (auditar uso real y remover si no se usan)
 
 ## 2. Plan de migración Angular 21
+
 - Estado: **COMPLETADO (Fase 2)**
 - Pasos realizados:
   - Actualización de Node a v22.21.1.
@@ -47,6 +49,7 @@
   - Se mantienen los polyfills y Zone.js por ahora (estrategia conservadora).
 
 ## 3. Migración a CoreUI
+
 - Estado: **COMPLETADO (Fase 4)**
 - Versión actual:
   - `@coreui/angular`: 5.x (Latest)
@@ -58,6 +61,7 @@
   - Validación de build (con warnings de deprecación de SASS aceptados temporalmente).
 
 ## 4. Cronograma estimado
+
 - **Fase 0 — Preparación:** (Completado)
   - Auditoría y limpieza de dependencias.
 - **Fase 1 — Node & TypeScript:** (Completado)
@@ -72,6 +76,7 @@
   - CKEditor actualizado a v11.x (wrapper) y v44.x (build).
 
 ### 4.0. Estrategia y ruta crítica de migración
+
 Orden recomendado de ataque para minimizar bloqueos y maximizar estabilidad progresiva:
 
 1. **Core & Shared (Cimientos):**
@@ -94,6 +99,7 @@ Orden recomendado de ataque para minimizar bloqueos y maximizar estabilidad prog
    - Dependen de todo lo anterior + CKEditor 5 (la parte más riesgosa).
 
 ### 4.1. Mapa detallado: Entradas y Dashboard
+
 - Entradas (`src/app/admin/base/entradas`):
   - Componentes clave:
     - `listado-entradas.component.ts` (`src/app/admin/base/entradas/listado-entradas.component.ts:1–30`)
@@ -127,10 +133,12 @@ Orden recomendado de ataque para minimizar bloqueos y maximizar estabilidad prog
     - HTTP: `DashboardApiService` aprovecha `HttpClient` por defecto; evaluar retiro de `HttpClientModule` del `AppModule`.
 
 Notas transversales:
+
 - Layout Admin: `NgScrollbarModule` en `AdminModule` (`src/app/admin/admin.module.ts:1–20`); actualizar `ngx-scrollbar` a versión compatible.
 - Shared CoreUI: `shared-coreui.module.ts` consolida imports CoreUI (`src/app/shared/shared-coreui.module.ts:1–30`); migrar a CoreUI 5.6 y revisar APIs.
 
 ### 4.2. Mapa detallado: Páginas
+
 - Páginas (`src/app/admin/base/paginas`):
   - Componentes clave:
     - `listado-paginas.component.ts` (`src/app/admin/base/paginas/listado-paginas.component.ts:1–30, 194–240, 271–287, 339–349, 425–447`)
@@ -146,6 +154,7 @@ Notas transversales:
     - Angular 21: lógica de paginación, `ChangeDetectorRef` y `NgZone` similares a Entradas; revisar posibles NG0100 en previews y modales.
 
 ### 4.3. Mapa detallado: Comentarios
+
 - Comentarios (`src/app/admin/base/comentarios`):
   - Componentes clave:
     - `listado-comentarios.component.ts` (`src/app/admin/base/comentarios/listado-comentarios.component.ts:1–47, 110–134, 275–308`)
@@ -159,6 +168,7 @@ Notas transversales:
     - HTTP: `ComentarioService`, `EntradaService`, `UsuarioService` en `src/app/core/services/data/*.service.ts` deben alinearse con HttpClient actualizado.
 
 ### 4.4. Mapa detallado: Categorías y Etiquetas
+
 - Categorías (`src/app/admin/base/categorias`):
   - Componentes:
     - `listado-categorias.component.ts` (`src/app/admin/base/categorias/listado-categorias.component.ts:1–36, 144–160`)
@@ -183,6 +193,7 @@ Notas transversales:
     - HTTP: `EtiquetaService` y `SearchUtilService` para filtros avanzados (`src/app/core/services/utils/search-util.service.ts:1–24`).
 
 ### 4.5. Mapa detallado: Gestión (usuarios, roles, privilegios)
+
 - Gestión (`src/app/admin/base/gestion`):
   - Módulo:
     - `GestionModule` y routing (`src/app/admin/base/gestion/gestion.module.ts:1–15`, `gestion-routing.module.ts:1–22`)
@@ -203,6 +214,7 @@ Notas transversales:
     - HTTP: `UsuarioService`, `RolService`, `PrivilegioService` dependen de `CrudService` y `NetworkInterceptor`.
 
 ### 4.6. Mapa detallado: Perfil
+
 - Perfil (`src/app/admin/base/perfil`):
   - Módulo:
     - `PerfilModule` (`src/app/admin/base/perfil/perfil.module.ts:1–24`)
@@ -216,6 +228,7 @@ Notas transversales:
     - HTTP: `UsuarioService` para datos de perfil.
 
 ### 4.7. Mapa detallado: Configuración (Ajustes, Temas)
+
 - Configuración (`src/app/admin/base/configuracion`):
   - Módulo:
     - `ConfiguracionModule` (`src/app/admin/base/configuracion/configuracion.module.ts:1–13`)
@@ -231,6 +244,7 @@ Notas transversales:
     - HTTP: `AjustesService`, `TemasService` y su integración con backend.
 
 ### 4.8. Mapa detallado: Contenido (archivos, imágenes)
+
 - Contenido (`src/app/admin/base/contenido`):
   - Módulo:
     - `ContenidoModule` (`src/app/admin/base/contenido/contenido.module.ts:1–19`)
@@ -247,6 +261,7 @@ Notas transversales:
     - HTTP: `FileStorageService` (`src/app/core/services/file-storage.service.ts`) ajustado a Angular 21 y `NetworkInterceptor`.
 
 ### 4.9. Mapa detallado: Mantenimiento
+
 - Mantenimiento (`src/app/admin/base/mantenimiento`):
   - Módulo:
     - `MantenimientoModule` (`src/app/admin/base/mantenimiento/mantenimiento.module.ts:1–19`)
@@ -262,6 +277,7 @@ Notas transversales:
     - Angular 21: timers (`setInterval` en logs), suscripciones y limpieza adecuada en zoneless.
 
 ### 4.10. Mapa detallado: Layout Admin, Core y App
+
 - Layout Admin:
   - `AdminModule` (`src/app/admin/admin.module.ts:1–42`), `AdminRoutingModule` (`src/app/admin/admin-routing.module.ts:1–30`)
   - Componentes: `AdminComponent`, `DefaultHeaderComponent`, `DefaultFooterComponent`, sidebar y navegación (`src/app/admin/default-layout/*`, `src/app/admin/admin.component.html:1–40`)
@@ -284,6 +300,7 @@ Notas transversales:
     - Revisión de `HttpClientModule` (retirar si se usa `provideHttpClient`) y `BrowserAnimationsModule`.
 
 ## 5. Pruebas requeridas
+
 - Pruebas unitarias:
   - Interceptores (`Auth`, `Network`, `Error`, `Timeout`) con orden y comportamiento (`src/app/core/core.module.ts:45–63`).
   - Servicios HTTP (`auth.service`, `dashboard-api.service`, `usuario.service`) validando parámetros y rutas; ejemplo existente: `dashboard-api.service.spec.ts`.
@@ -294,6 +311,7 @@ Notas transversales:
 - Pruebas de regresión visual:
 
 ## 6. Seguridad y rendimiento post-migración
+
 - NPM: Resuelto conflicto de `@coreui/angular-chartjs@5.6.2` con `@coreui/chartjs`. Actualizado `@coreui/chartjs` a `^4.1.0` en `package.json` para cumplir peer dependency.
 - Auditoría: `npm audit` detectó 61 vulnerabilidades de baja severidad (principalmente CKEditor 5). No hay vulnerabilidades críticas/altas.
 - Mitigación CKEditor:
@@ -305,14 +323,15 @@ Notas transversales:
 - Validación de funcionalidad:
   - Rendimiento: respetar `budgets` (`angular.json:56–66`) y revisar paquetes CommonJS.
   - Comprobación zoneless/Zone según decisión: estabilidad de detección de cambios.
- - Pruebas de compatibilidad de librerías:
-   - `ngx-scrollbar` y CKEditor contra Angular 21/TS 5.9; actualizar versiones y pruebas de integración.
-   - `@coreui/angular-chartjs` y Chart.js v4 en gráficas actuales.
- - Pruebas específicas CKEditor:
-   - Inicialización en contenedores, eventos `ready` y `change`, y watchdog.
-   - Carga de plugins utilizados (CKBox/premium) y validación de tipos en TS.
+- Pruebas de compatibilidad de librerías:
+  - `ngx-scrollbar` y CKEditor contra Angular 21/TS 5.9; actualizar versiones y pruebas de integración.
+  - `@coreui/angular-chartjs` y Chart.js v4 en gráficas actuales.
+- Pruebas específicas CKEditor:
+  - Inicialización en contenedores, eventos `ready` y `change`, y watchdog.
+  - Carga de plugins utilizados (CKBox/premium) y validación de tipos en TS.
 
 ## 6. Documentación adicional
+
 - Guía de referencia para cambios importantes:
   - Compatibilidad Angular 21 (Node/TS/RxJS): https://angular.dev/reference/versions
   - Novedades Angular 21 y migraciones (`NgClass`/`NgStyle`, control flow, zoneless): https://blog.ninja-squad.com/2025/11/20/what-is-new-angular-21.0
@@ -337,6 +356,7 @@ Notas transversales:
 ---
 
 ## Apéndice: ubicaciones clave del proyecto
+
 - `package.json` (`c:\dev\git\openpanelrestspa\package.json`)
 - `angular.json` (`c:\dev\git\openpanelrestspa\angular.json`)
 - `src/main.ts` (`c:\dev\git\openpanelrestspa\src\main.ts:11`)
@@ -344,7 +364,6 @@ Notas transversales:
 - `AppModule` (`c:\dev\git\openpanelrestspa\src\app\app.module.ts:1–44`)
 - `CoreModule` (`c:\dev\git\openpanelrestspa\src\app\core\core.module.ts:1–69`)
 - `DashboardApiService tests` (`c:\dev\git\openpanelrestspa\src\app\core\services\dashboard-api.service.spec.ts`)
- - `tsconfig.json` (`c:\dev\git\openpanelrestspa\tsconfig.json`)
- - `tsconfig.app.json` (`c:\dev\git\openpanelrestspa\tsconfig.app.json`)
- - `tsconfig.spec.json` (`c:\dev\git\openpanelrestspa\tsconfig.spec.json`)
-
+- `tsconfig.json` (`c:\dev\git\openpanelrestspa\tsconfig.json`)
+- `tsconfig.app.json` (`c:\dev\git\openpanelrestspa\tsconfig.app.json`)
+- `tsconfig.spec.json` (`c:\dev\git\openpanelrestspa\tsconfig.spec.json`)

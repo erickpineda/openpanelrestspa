@@ -1,6 +1,12 @@
 // src/app/core/interceptors/auth.interceptor.ts
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Observable, EMPTY, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TokenStorageService } from '../services/auth/token-storage.service';
@@ -13,21 +19,29 @@ const TOKEN_HEADER_KEY = 'Authorization';
 export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private tokenStorage: TokenStorageService,
-    private authSync: AuthSyncService
-  ) { }
+    private authSync: AuthSyncService,
+  ) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(
+    req: HttpRequest<any>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<any>> {
     const token = this.tokenStorage.getToken();
 
     const url = req.url || '';
-    const isAuthEndpoint = url.includes('/login') || url.includes('/auth') || url.includes('/refresh');
+    const isAuthEndpoint =
+      url.includes('/login') ||
+      url.includes('/auth') ||
+      url.includes('/refresh');
 
     // Si hay token pero está caducado: forzar logout y cancelar la petición
     if (token && isJwtExpired(token, 0)) {
       try {
         this.tokenStorage.signOut();
         this.authSync.notifyLogout();
-      } catch (e) { /* swallow */ }
+      } catch (e) {
+        /* swallow */
+      }
 
       window.location.href = '/login';
       return EMPTY;
@@ -35,7 +49,9 @@ export class AuthInterceptor implements HttpInterceptor {
 
     let authReq = req;
     if (token && !isAuthEndpoint) {
-      authReq = req.clone({ headers: req.headers.set(TOKEN_HEADER_KEY, `Bearer ${token}`) });
+      authReq = req.clone({
+        headers: req.headers.set(TOKEN_HEADER_KEY, `Bearer ${token}`),
+      });
     }
 
     return next.handle(authReq).pipe(
@@ -45,13 +61,15 @@ export class AuthInterceptor implements HttpInterceptor {
             try {
               this.tokenStorage.signOut();
               this.authSync.notifyLogout();
-            } catch (e) { /* swallow */ }
+            } catch (e) {
+              /* swallow */
+            }
             window.location.href = '/login';
             return EMPTY;
           }
         }
         return throwError(() => err);
-      })
+      }),
     );
   }
 }

@@ -24,7 +24,7 @@ interface BuscarResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EntradaService extends CrudService<Entrada, number> {
   protected endpoint = '/entradas';
@@ -40,14 +40,12 @@ export class EntradaService extends CrudService<Entrada, number> {
       { tiposEntradas: [] },
       undefined,
       undefined,
-      'entradas.tiposEntradas'
-    ).pipe(
-      map(response => response.tiposEntradas)
-    );
+      'entradas.tiposEntradas',
+    ).pipe(map((response) => response.tiposEntradas));
   }
 
   /**
-   * Obtiene estados de entrada de forma segura  
+   * Obtiene estados de entrada de forma segura
    */
   listarEstadosEntradasSafe(): Observable<EstadoEntrada[]> {
     return this.safeGetData<EstadosEntradasResponse>(
@@ -55,18 +53,23 @@ export class EntradaService extends CrudService<Entrada, number> {
       { estadosEntradas: [] },
       undefined,
       undefined,
-      'entradas.estadosEntradas'
-    ).pipe(
-      map(response => response.estadosEntradas)
-    );
+      'entradas.estadosEntradas',
+    ).pipe(map((response) => response.estadosEntradas));
   }
 
   /**
    * Busca entradas de forma segura
    */
-  buscarSafe(searchRequest: any, page: number, size: number): Observable<BuscarResponse> {
+  buscarSafe(
+    searchRequest: any,
+    page: number,
+    size: number,
+  ): Observable<BuscarResponse> {
     const params = { pageNo: page.toString(), pageSize: size.toString() };
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(
+      NetworkInterceptor.SKIP_GLOBAL_LOADER,
+      true,
+    );
     return this.safePostData<BuscarResponse>(
       `${this.endpoint}/buscar`,
       searchRequest,
@@ -74,7 +77,7 @@ export class EntradaService extends CrudService<Entrada, number> {
       params,
       undefined,
       'entradas.buscar',
-      context
+      context,
     );
   }
 
@@ -82,14 +85,17 @@ export class EntradaService extends CrudService<Entrada, number> {
    * Obtiene definiciones del buscador de forma segura
    */
   obtenerDefinicionesBuscadorSafe(): Observable<any> {
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(
+      NetworkInterceptor.SKIP_GLOBAL_LOADER,
+      true,
+    );
     return this.safeGetData<any>(
       `${this.endpoint}/buscar/definicionesBuscador`,
       {},
       undefined,
       undefined,
       'entradas.definicionesBuscador',
-      context
+      context,
     );
   }
 

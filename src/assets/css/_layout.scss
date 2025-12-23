@@ -1,8 +1,8 @@
-@use "../../../node_modules/@coreui/coreui/scss/coreui" as coreui;
+@use '../../../node_modules/@coreui/coreui/scss/coreui' as coreui;
 .wrapper {
   width: 100%;
-  @include coreui.ltr-rtl("padding-left", var(--cui-sidebar-occupy-start, 0));
-  @include coreui.ltr-rtl("padding-right", var(--cui-sidebar-occupy-end, 0));
+  @include coreui.ltr-rtl('padding-left', var(--cui-sidebar-occupy-start, 0));
+  @include coreui.ltr-rtl('padding-right', var(--cui-sidebar-occupy-end, 0));
   will-change: auto;
-  @include coreui.transition(padding .15s);
+  @include coreui.transition(padding 0.15s);
 }

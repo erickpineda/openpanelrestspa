@@ -6,10 +6,10 @@ import { CategoriaFacadeService } from '../categoria-form/srv/categoria-facade.s
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-    selector: 'app-crear-categoria',
-    templateUrl: './crear-categoria.component.html',
-    styleUrls: ['./crear-categoria.component.scss'],
-    standalone: false
+  selector: 'app-crear-categoria',
+  templateUrl: './crear-categoria.component.html',
+  styleUrls: ['./crear-categoria.component.scss'],
+  standalone: false,
 })
 export class CrearCategoriaComponent implements OnInit {
   listaCategorias: Categoria[] = [];
@@ -19,25 +19,33 @@ export class CrearCategoriaComponent implements OnInit {
     private facade: CategoriaFacadeService,
     private router: Router,
     private commonFuncService: CommonFunctionalityService,
-    private toastService: ToastService
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
-    this.facade.obtenerListaCategorias().subscribe(cats => this.listaCategorias = cats);
+    this.facade
+      .obtenerListaCategorias()
+      .subscribe((cats) => (this.listaCategorias = cats));
   }
 
   crear(cat: Categoria) {
     this.facade.crearCategoria(cat).subscribe({
       next: () => {
-        this.toastService.showSuccess('La categoría se ha creado correctamente.', 'Categoría creada');
-        this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
+        this.toastService.showSuccess(
+          'La categoría se ha creado correctamente.',
+          'Categoría creada',
+        );
+        this.commonFuncService.reloadComponent(
+          false,
+          '/admin/control/categorias',
+        );
       },
       error: (err) => {
         console.error('Error al crear la categoría:', err);
         // Emitir evento de error al componente hijo
         const form = document.querySelector('app-categoria-form') as any;
         form?.onError.emit();
-      }
+      },
     });
   }
 

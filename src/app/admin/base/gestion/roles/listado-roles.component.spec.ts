@@ -23,44 +23,62 @@ describe('RolesListComponent', () => {
 
   const mockPrivilegios: Privilegio[] = [
     { idPrivilegio: 1, nombre: 'P1', codigo: 'P1', descripcion: 'D1' },
-    { idPrivilegio: 2, nombre: 'P2', codigo: 'P2', descripcion: 'D2' }
+    { idPrivilegio: 2, nombre: 'P2', codigo: 'P2', descripcion: 'D2' },
   ];
 
   beforeEach(async () => {
-    const rSpy = jasmine.createSpyObj('RolService', ['listarPaginaSinGlobalLoader', 'crear', 'actualizar', 'borrar', 'obtenerPorCodigos', 'actualizarPrivilegios']);
+    const rSpy = jasmine.createSpyObj('RolService', [
+      'listarPaginaSinGlobalLoader',
+      'crear',
+      'actualizar',
+      'borrar',
+      'obtenerPorCodigos',
+      'actualizarPrivilegios',
+    ]);
     const pSpy = jasmine.createSpyObj('PrivilegioService', ['listarSafe']);
-    const tSpy = jasmine.createSpyObj('ToastService', ['showSuccess', 'showError', 'showWarning']);
+    const tSpy = jasmine.createSpyObj('ToastService', [
+      'showSuccess',
+      'showError',
+      'showWarning',
+    ]);
     const lSpy = jasmine.createSpyObj('LoggerService', ['error']);
     const sSpy = jasmine.createSpyObj('SearchUtilService', ['buildRequest']);
 
     await TestBed.configureTestingModule({
-      declarations: [ RolesListComponent ],
+      declarations: [RolesListComponent],
       providers: [
         { provide: RolService, useValue: rSpy },
         { provide: PrivilegioService, useValue: pSpy },
         { provide: ToastService, useValue: tSpy },
         { provide: LoggerService, useValue: lSpy },
-        { provide: SearchUtilService, useValue: sSpy }
+        { provide: SearchUtilService, useValue: sSpy },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    })
-    .compileComponents();
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
 
     rolServiceSpy = TestBed.inject(RolService) as jasmine.SpyObj<RolService>;
-    privilegioServiceSpy = TestBed.inject(PrivilegioService) as jasmine.SpyObj<PrivilegioService>;
+    privilegioServiceSpy = TestBed.inject(
+      PrivilegioService,
+    ) as jasmine.SpyObj<PrivilegioService>;
     toastSpy = TestBed.inject(ToastService) as jasmine.SpyObj<ToastService>;
     loggerSpy = TestBed.inject(LoggerService) as jasmine.SpyObj<LoggerService>;
-    searchUtilSpy = TestBed.inject(SearchUtilService) as jasmine.SpyObj<SearchUtilService>;
+    searchUtilSpy = TestBed.inject(
+      SearchUtilService,
+    ) as jasmine.SpyObj<SearchUtilService>;
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(RolesListComponent);
     component = fixture.componentInstance;
-    
+
     // Setup default returns
-    rolServiceSpy.listarPaginaSinGlobalLoader.and.returnValue(of({ elements: [], totalElements: 0 } as any));
+    rolServiceSpy.listarPaginaSinGlobalLoader.and.returnValue(
+      of({ elements: [], totalElements: 0 } as any),
+    );
     privilegioServiceSpy.listarSafe.and.returnValue(of(mockPrivilegios));
-    rolServiceSpy.obtenerPorCodigos.and.returnValue(of({ elements: [], totalElements: 0 }));
+    rolServiceSpy.obtenerPorCodigos.and.returnValue(
+      of({ elements: [], totalElements: 0 }),
+    );
 
     fixture.detectChanges();
   });
@@ -82,24 +100,29 @@ describe('RolesListComponent', () => {
 
     it('should prevent deletion of PROPIETARIO role', () => {
       component.delete(propRol);
-      expect(toastSpy.showWarning).toHaveBeenCalledWith(jasmine.stringMatching(/no se puede eliminar/i), jasmine.any(String));
-      expect(component.rolToDelete).toBeNull(); 
+      expect(toastSpy.showWarning).toHaveBeenCalledWith(
+        jasmine.stringMatching(/no se puede eliminar/i),
+        jasmine.any(String),
+      );
+      expect(component.rolToDelete).toBeNull();
     });
 
     it('should ensure PROPIETARIO has all privileges when opening edit', () => {
       component.privilegios = mockPrivilegios;
       component.openEdit(propRol);
-      
-      expect(component.editRol?.privilegios.length).toBe(mockPrivilegios.length);
+
+      expect(component.editRol?.privilegios.length).toBe(
+        mockPrivilegios.length,
+      );
       expect(component.editRol?.privilegios).toEqual(mockPrivilegios);
     });
 
     it('should prevent removing privileges via togglePrivilegio', () => {
       component.editRol = { ...propRol, privilegios: [...mockPrivilegios] };
       const privToRemove = mockPrivilegios[0];
-      
+
       component.togglePrivilegio(privToRemove, false); // Try to uncheck
-      
+
       expect(component.editRol.privilegios.length).toBe(mockPrivilegios.length);
       expect(component.editRol.privilegios).toContain(privToRemove);
     });
@@ -107,14 +130,14 @@ describe('RolesListComponent', () => {
     it('should prevent unchecking all privileges', () => {
       component.editRol = { ...propRol, privilegios: [...mockPrivilegios] };
       component.toggleAllPrivilegios(false); // Try to uncheck all
-      
+
       expect(component.editRol.privilegios.length).toBe(mockPrivilegios.length);
     });
 
     it('should enforce all privileges on saveEdit even if modified', () => {
       component.editRol = { ...propRol, privilegios: [] }; // Simulate empty privileges
       component.isEditing = true;
-      
+
       rolServiceSpy.actualizar.and.returnValue(of({}));
       rolServiceSpy.actualizarPrivilegios.and.returnValue(of({}));
 
@@ -125,8 +148,11 @@ describe('RolesListComponent', () => {
       // Verify update call
       expect(rolServiceSpy.actualizar).toHaveBeenCalled();
       // Verify privileges update call uses all codes
-      const expectedCodes = mockPrivilegios.map(p => p.codigo);
-      expect(rolServiceSpy.actualizarPrivilegios).toHaveBeenCalledWith(propRol.codigo, expectedCodes);
+      const expectedCodes = mockPrivilegios.map((p) => p.codigo);
+      expect(rolServiceSpy.actualizarPrivilegios).toHaveBeenCalledWith(
+        propRol.codigo,
+        expectedCodes,
+      );
     });
   });
 
@@ -143,7 +169,10 @@ describe('RolesListComponent', () => {
 
     it('should prevent deletion of ADMIN role', () => {
       component.delete(adminRol);
-      expect(toastSpy.showWarning).toHaveBeenCalledWith(jasmine.stringMatching(/no se puede eliminar/i), jasmine.any(String));
+      expect(toastSpy.showWarning).toHaveBeenCalledWith(
+        jasmine.stringMatching(/no se puede eliminar/i),
+        jasmine.any(String),
+      );
     });
 
     it('should prevent saving ADMIN role with no privileges', () => {
@@ -152,7 +181,10 @@ describe('RolesListComponent', () => {
 
       component.saveEdit();
 
-      expect(toastSpy.showWarning).toHaveBeenCalledWith(jasmine.stringMatching(/no puede quedar sin privilegios/i), jasmine.any(String));
+      expect(toastSpy.showWarning).toHaveBeenCalledWith(
+        jasmine.stringMatching(/no puede quedar sin privilegios/i),
+        jasmine.any(String),
+      );
       expect(rolServiceSpy.actualizar).not.toHaveBeenCalled();
     });
 

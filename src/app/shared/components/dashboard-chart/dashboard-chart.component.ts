@@ -1,11 +1,11 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-    selector: 'app-dashboard-chart',
-    templateUrl: './dashboard-chart.component.html',
-    styleUrls: ['./dashboard-chart.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-dashboard-chart',
+  templateUrl: './dashboard-chart.component.html',
+  styleUrls: ['./dashboard-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardChartComponent {
   @Input() data: any = { labels: [], datasets: [] };

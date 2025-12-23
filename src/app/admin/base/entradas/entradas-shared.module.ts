@@ -11,24 +11,21 @@ import { EntradaFormComponent } from './entrada-form/entrada-form.component';
 import { PreviaEntradaComponent } from './previa/preview-entrada.component';
 
 @NgModule({
-  declarations: [
-    EntradaFormComponent,
-    PreviaEntradaComponent
-  ],
+  declarations: [EntradaFormComponent, PreviaEntradaComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     CKEditorModule,
     SharedOPModule,
     SharedCoreUiModule,
-    MediaSharedModule
+    MediaSharedModule,
   ],
   exports: [
     EntradaFormComponent,
     PreviaEntradaComponent,
-    // Re-export modules useful for consumers if needed, 
-    // but usually better to keep explicit. 
+    // Re-export modules useful for consumers if needed,
+    // but usually better to keep explicit.
     // However, since we are splitting EntradasModule, let's keep it simple.
-  ]
+  ],
 })
 export class EntradasSharedModule {}

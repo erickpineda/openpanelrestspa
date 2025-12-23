@@ -1,15 +1,23 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { UntypedFormGroup } from '@angular/forms';
 import { Entrada } from '../../../../core/models/entrada.model';
 import { Categoria } from '../../../../core/models/categoria.model';
 
 @Component({
-    selector: 'app-previa-entrada',
-    templateUrl: './preview-entrada.component.html',
-    styleUrls: ['./preview-entrada.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-previa-entrada',
+  templateUrl: './preview-entrada.component.html',
+  styleUrls: ['./preview-entrada.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class PreviaEntradaComponent implements OnChanges {
   @Input() form?: UntypedFormGroup;
@@ -28,7 +36,7 @@ export class PreviaEntradaComponent implements OnChanges {
   constructor(private sanitizer: DomSanitizer) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['form'] || changes['entrada'] || changes['categoriasMeta']){
+    if (changes['form'] || changes['entrada'] || changes['categoriasMeta']) {
       this.refreshPreview();
     }
   }
@@ -44,9 +52,12 @@ export class PreviaEntradaComponent implements OnChanges {
     }
 
     // CONTENIDO
-    const contenidoRaw = this.form && this.form.get('contenido')
-      ? this.form.get('contenido')?.value
-      : (this.entrada ? this.entrada.contenido : '');
+    const contenidoRaw =
+      this.form && this.form.get('contenido')
+        ? this.form.get('contenido')?.value
+        : this.entrada
+          ? this.entrada.contenido
+          : '';
 
     this.contenidoSeguro = this.sanitizeHtml(contenidoRaw);
 
@@ -56,7 +67,11 @@ export class PreviaEntradaComponent implements OnChanges {
 
   private resolveCategorias(): Categoria[] {
     // Prioridad: entrada.categorias > form.categorias (objetos) > form.categorias (ids + categoriasMeta)
-    if (this.entrada && Array.isArray(this.entrada.categorias) && this.entrada.categorias.length) {
+    if (
+      this.entrada &&
+      Array.isArray(this.entrada.categorias) &&
+      this.entrada.categorias.length
+    ) {
       return this.entrada.categorias;
     }
 
@@ -72,7 +87,9 @@ export class PreviaEntradaComponent implements OnChanges {
       // si son ids (números o strings)
       if (this.categoriasMeta && this.categoriasMeta.length) {
         const ids = formCats.map((x: any) => Number(x));
-        return this.categoriasMeta.filter(c => ids.includes(Number(c.idCategoria)));
+        return this.categoriasMeta.filter((c) =>
+          ids.includes(Number(c.idCategoria)),
+        );
       }
     }
 
@@ -94,7 +111,10 @@ export class PreviaEntradaComponent implements OnChanges {
 
   onPublicar(): void {
     // opcional: emitimos objeto combinado (por si falta información en form)
-    const payload: Entrada = { ...(this.entrada || {}), ...(this.form ? this.form.value : {}) } as Entrada;
+    const payload: Entrada = {
+      ...(this.entrada || {}),
+      ...(this.form ? this.form.value : {}),
+    } as Entrada;
     this.publicar.emit(payload);
   }
 }

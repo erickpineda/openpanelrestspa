@@ -4,8 +4,20 @@
       <span>Archivos</span>
       <div class="btn-toolbar gap-2">
         <div class="btn-group" role="group" aria-label="Subida de archivos">
-          <input type="file" #fileInput (change)="onFileSelected($event)" [disabled]="uploading" hidden />
-          <button cButton color="primary" size="sm" (click)="openUpload(fileInput)" [disabled]="uploading">
+          <input
+            type="file"
+            #fileInput
+            (change)="onFileSelected($event)"
+            [disabled]="uploading"
+            hidden
+          />
+          <button
+            cButton
+            color="primary"
+            size="sm"
+            (click)="openUpload(fileInput)"
+            [disabled]="uploading"
+          >
             <svg cIcon name="cilCloudUpload" class="me-2"></svg>
             {{ uploading ? 'Subiendo...' : 'Subir' }}
           </button>
@@ -14,9 +26,14 @@
     </c-card-header>
     <c-card-body [attr.aria-busy]="loading ? 'true' : null">
       @if (error) {
-        <div class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
+        <div
+          class="alert alert-danger d-flex align-items-center justify-content-between my-2"
+          role="alert"
+        >
           <span>{{ error }}</span>
-          <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
+          <button cButton color="danger" size="sm" (click)="load()">
+            Reintentar
+          </button>
         </div>
       }
 
@@ -26,11 +43,39 @@
             <div class="text-muted small">Total {{ totalElements }}</div>
           </c-col>
           <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-            <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar nombre..." style="max-width: 280px;" [disabled]="loading" />
-            <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
+            <input
+              cFormControl
+              type="text"
+              [value]="basicSearchText"
+              (input)="onBasicSearchTextChange($any($event.target).value)"
+              placeholder="Buscar nombre..."
+              style="max-width: 280px"
+              [disabled]="loading"
+            />
+            <button
+              cButton
+              color="secondary"
+              variant="ghost"
+              size="sm"
+              (click)="toggleAdvanced()"
+              [disabled]="loading"
+            >
+              Avanzado
+            </button>
           </c-col>
-          <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-            <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;" [disabled]="loading">
+          <c-col
+            xs="12"
+            md="4"
+            class="d-flex justify-content-md-end gap-2 align-items-center"
+          >
+            <select
+              cSelect
+              [ngModel]="pageSize"
+              (ngModelChange)="onPageSizeChange($event)"
+              name="pageSizeSelect"
+              style="max-width: 100px"
+              [disabled]="loading"
+            >
               <option [ngValue]="5">5</option>
               <option [ngValue]="10">10</option>
               <option [ngValue]="20">20</option>
@@ -43,7 +88,12 @@
             <c-row class="g-3 align-items-end">
               <c-col xs="12" md="4">
                 <label class="form-label mb-1">Tipo MIME</label>
-                <select cSelect class="form-select-sm" [(ngModel)]="filtroMime" [disabled]="loading">
+                <select
+                  cSelect
+                  class="form-select-sm"
+                  [(ngModel)]="filtroMime"
+                  [disabled]="loading"
+                >
                   <option value="">Todos</option>
                   <option value="application/pdf">application/pdf</option>
                   <option value="application/zip">application/zip</option>
@@ -52,17 +102,47 @@
               </c-col>
               <c-col xs="6" md="4">
                 <label class="form-label mb-1">Desde</label>
-                <input cFormControl class="form-control-sm" type="date" [(ngModel)]="fechaDesde" [disabled]="loading" />
+                <input
+                  cFormControl
+                  class="form-control-sm"
+                  type="date"
+                  [(ngModel)]="fechaDesde"
+                  [disabled]="loading"
+                />
               </c-col>
               <c-col xs="6" md="4">
                 <label class="form-label mb-1">Hasta</label>
-                <input cFormControl class="form-control-sm" type="date" [(ngModel)]="fechaHasta" [disabled]="loading" />
+                <input
+                  cFormControl
+                  class="form-control-sm"
+                  type="date"
+                  [(ngModel)]="fechaHasta"
+                  [disabled]="loading"
+                />
               </c-col>
-              <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
-                <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="loading">
+              <c-col
+                xs="12"
+                md="12"
+                class="d-flex justify-content-md-end gap-2"
+              >
+                <button
+                  cButton
+                  size="sm"
+                  color="primary"
+                  variant="outline"
+                  (click)="search()"
+                  [disabled]="loading"
+                >
                   <svg cIcon name="cilSearch"></svg> Buscar
                 </button>
-                <button cButton size="sm" color="secondary" variant="outline" (click)="reset()" [disabled]="loading">
+                <button
+                  cButton
+                  size="sm"
+                  color="secondary"
+                  variant="outline"
+                  (click)="reset()"
+                  [disabled]="loading"
+                >
                   <svg cIcon name="cilReload"></svg> Limpiar
                 </button>
               </c-col>
@@ -72,7 +152,14 @@
 
         <div class="tabla-con-loader-wrapper position-relative">
           @if (loading) {
-            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+            <div
+              class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+              style="
+                z-index: 10;
+                background-color: rgba(255, 255, 255, 0.8);
+                min-height: 200px;
+              "
+            >
               <div class="text-center">
                 <c-spinner [attr.aria-label]="'Cargando archivos'"></c-spinner>
                 <p class="mt-2 text-muted">Cargando archivos...</p>
@@ -81,26 +168,59 @@
           }
 
           <div [class.opacity-50]="loading" class="table-responsive">
-            <table responsive cAlign="top" cTable hover class="align-middle mb-0 border tabla-con-loader" role="table" aria-label="Tabla de archivos">
+            <table
+              responsive
+              cAlign="top"
+              cTable
+              hover
+              class="align-middle mb-0 border tabla-con-loader"
+              role="table"
+              aria-label="Tabla de archivos"
+            >
               <thead cTableColor="light">
                 <tr>
-                  <th scope="col" style="min-width: 200px;">Nombre</th>
-                  <th scope="col" class="text-end" style="min-width: 120px;">Tamaño</th>
-                  <th scope="col" class="text-center" style="min-width: 160px;">Fecha</th>
-                  <th scope="col" class="text-center" style="min-width: 110px;">Acciones</th>
+                  <th scope="col" style="min-width: 200px">Nombre</th>
+                  <th scope="col" class="text-end" style="min-width: 120px">
+                    Tamaño
+                  </th>
+                  <th scope="col" class="text-center" style="min-width: 160px">
+                    Fecha
+                  </th>
+                  <th scope="col" class="text-center" style="min-width: 110px">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 @for (f of items; track trackByMediaItem($index, f)) {
                   <tr>
                     <td>
-                      <span class="fw-semibold text-truncate d-inline-block" style="max-width: 320px;" [title]="f.nombre">{{ f.nombre }}</span>
+                      <span
+                        class="fw-semibold text-truncate d-inline-block"
+                        style="max-width: 320px"
+                        [title]="f.nombre"
+                        >{{ f.nombre }}</span
+                      >
                     </td>
                     <td class="text-end">{{ f.tamano | number }}</td>
-                    <td class="text-center">{{ f.fechaCreacion | date:'dd-MM-yyyy HH:mm' }}</td>
                     <td class="text-center">
-                      <div class="btn-group" role="group" aria-label="Acciones de archivo">
-                        <button cButton color="secondary" size="sm" variant="ghost" (click)="download(f)" [disabled]="!f.uuid && !f.url" [attr.aria-label]="'Descargar ' + (f.nombre || '')">
+                      {{ f.fechaCreacion | date: 'dd-MM-yyyy HH:mm' }}
+                    </td>
+                    <td class="text-center">
+                      <div
+                        class="btn-group"
+                        role="group"
+                        aria-label="Acciones de archivo"
+                      >
+                        <button
+                          cButton
+                          color="secondary"
+                          size="sm"
+                          variant="ghost"
+                          (click)="download(f)"
+                          [disabled]="!f.uuid && !f.url"
+                          [attr.aria-label]="'Descargar ' + (f.nombre || '')"
+                        >
                           <svg cIcon name="cilCloudDownload" size="sm"></svg>
                         </button>
                       </div>
@@ -111,10 +231,21 @@
                 @if (items.length === 0) {
                   <tr>
                     <td colspan="4" class="text-center py-5">
-                      <div class="d-flex flex-column align-items-center justify-content-center">
-                        <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
-                        <h6 class="text-muted">No se han encontrado archivos</h6>
-                        <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+                      <div
+                        class="d-flex flex-column align-items-center justify-content-center"
+                      >
+                        <svg
+                          cIcon
+                          name="cilSearch"
+                          size="3xl"
+                          class="text-muted mb-3"
+                        ></svg>
+                        <h6 class="text-muted">
+                          No se han encontrado archivos
+                        </h6>
+                        <p class="text-muted small">
+                          Intenta ajustar los filtros de búsqueda
+                        </p>
                       </div>
                     </td>
                   </tr>
@@ -127,16 +258,38 @@
                 [align]="'center'"
                 [totalPages]="totalPages"
                 [currentPage]="pageNo"
-                (pageChange)="onPageChange($event)">
+                (pageChange)="onPageChange($event)"
+              >
               </app-op-pagination>
             }
 
             @if (totalElements > 0) {
               <c-row class="mt-2">
-                <c-col class="d-flex justify-content-end align-items-center gap-2">
-                  <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">Anterior</button>
-                  <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">Siguiente</button>
-                  <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+                <c-col
+                  class="d-flex justify-content-end align-items-center gap-2"
+                >
+                  <button
+                    cButton
+                    color="light"
+                    size="sm"
+                    (click)="prev()"
+                    [disabled]="!canPrev"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    cButton
+                    color="light"
+                    size="sm"
+                    (click)="next()"
+                    [disabled]="!canNext"
+                  >
+                    Siguiente
+                  </button>
+                  <div class="text-muted small ms-2">
+                    Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
+                    {{ totalElements }} · Mostrando {{ numberOfElements }}
+                  </div>
                 </c-col>
               </c-row>
             }

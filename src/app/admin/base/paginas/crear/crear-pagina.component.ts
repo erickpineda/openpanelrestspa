@@ -11,13 +11,13 @@ import { LoggerService } from '../../../../core/services/logger.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
-    selector: 'app-crear-pagina',
-    templateUrl: './crear-pagina.component.html',
-    styleUrls: ['./crear-pagina.component.scss'],
-    standalone: false
+  selector: 'app-crear-pagina',
+  templateUrl: './crear-pagina.component.html',
+  styleUrls: ['./crear-pagina.component.scss'],
+  standalone: false,
 })
 export class CrearPaginaComponent implements OnInit {
-  entradaForm : UntypedFormGroup;
+  entradaForm: UntypedFormGroup;
   tiposEntr: TipoEntrada[] = [];
   estadosEntr: EstadoEntrada[] = [];
   categorias: Categoria[] = [];
@@ -32,7 +32,7 @@ export class CrearPaginaComponent implements OnInit {
     private facade: EntradaFacadeService,
     private router: Router,
     private toastService: ToastService,
-    private log: LoggerService
+    private log: LoggerService,
   ) {
     this.entradaForm = this.vf.buildForm();
   }
@@ -41,17 +41,17 @@ export class CrearPaginaComponent implements OnInit {
     const data = await this.facade.loadInitData();
     this.estadosEntr = data.estados;
     this.categorias = data.categorias;
-    
+
     // Filtrar solo el tipo 'Página'
-    const tipoPagina = data.tipos.find(t => t.nombre === 'Página');
+    const tipoPagina = data.tipos.find((t) => t.nombre === 'Página');
     if (tipoPagina) {
-        this.tiposEntr = [tipoPagina];
-        this.entradaForm.get('tipoEntrada')?.setValue(tipoPagina);
+      this.tiposEntr = [tipoPagina];
+      this.entradaForm.get('tipoEntrada')?.setValue(tipoPagina);
     } else {
-        // Fallback si no existe 'Página', mostramos todos? O error?
-        // Mostramos todos por seguridad pero logueamos
-        this.log.error('No se encontró el tipo de entrada "Página"');
-        this.tiposEntr = data.tipos;
+      // Fallback si no existe 'Página', mostramos todos? O error?
+      // Mostramos todos por seguridad pero logueamos
+      this.log.error('No se encontró el tipo de entrada "Página"');
+      this.tiposEntr = data.tipos;
     }
 
     this.entradaForm.enable();
@@ -60,28 +60,34 @@ export class CrearPaginaComponent implements OnInit {
   async onGuardar(ent: any) {
     this.submitted = true;
     if (this.entradaForm.invalid) return;
-    
+
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuario = usuario?.idUsuario ?? null;
-    
+
     // Asegurar que el tipo es Página si no lo seleccionó (aunque debería estar seleccionado)
     if (!ent.tipoEntrada && this.tiposEntr.length === 1) {
-        ent.tipoEntrada = this.tiposEntr[0];
+      ent.tipoEntrada = this.tiposEntr[0];
     }
 
     this.facade.crearEntrada(ent).subscribe({
       next: () => {
-        this.toastService.showInfo('Se ha creado la página correctamente', 'Página creada');
+        this.toastService.showInfo(
+          'Se ha creado la página correctamente',
+          'Página creada',
+        );
         this.router.navigateByUrl('/admin/control/paginas');
       },
       error: (error) => {
         this.log.error('Error creando página:', error);
-      }
+      },
     });
   }
 
   onPreviewEmit(payload: Partial<Entrada>) {
-    this.entradaParaPrevia = { ...(this.entradaParaPrevia || {}), ...(payload as Entrada) } as Entrada;
+    this.entradaParaPrevia = {
+      ...(this.entradaParaPrevia || {}),
+      ...(payload as Entrada),
+    } as Entrada;
     this.modalPreviaVisible = true;
   }
 

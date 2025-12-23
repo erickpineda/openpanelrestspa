@@ -1,14 +1,11 @@
-
 export class Etiqueta {
   idEtiqueta: number = 0;
-  nombre: string = "";
+  nombre: string = '';
   frecuencia: number = 0;
-  descripcion: string = "";
-  colorHex: string = "";
+  descripcion: string = '';
+  colorHex: string = '';
 
-  constructor() {
-
-  }
+  constructor() {}
 }
 
 export interface Etiqueta {

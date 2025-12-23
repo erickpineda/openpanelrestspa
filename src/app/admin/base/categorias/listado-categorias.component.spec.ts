@@ -10,8 +10,12 @@ describe('ListadoCategoriasComponent Spinner', () => {
 
   beforeEach(() => {
     mockService = {
-      listarPaginaSinGlobalLoader: jasmine.createSpy('listarPaginaSinGlobalLoader').and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
-      buscarSinGlobalLoader: jasmine.createSpy('buscarSinGlobalLoader').and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
+      listarPaginaSinGlobalLoader: jasmine
+        .createSpy('listarPaginaSinGlobalLoader')
+        .and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
+      buscarSinGlobalLoader: jasmine
+        .createSpy('buscarSinGlobalLoader')
+        .and.returnValue({ pipe: () => ({ subscribe: () => {} }) }),
     };
     TestBed.configureTestingModule({
       declarations: [ListadoCategoriasComponent],
@@ -20,9 +24,17 @@ describe('ListadoCategoriasComponent Spinner', () => {
       providers: [
         { provide: Router, useValue: { navigate: () => {} } },
         { provide: CategoriaService, useValue: mockService },
-        { provide: LoggerService, useValue: { error: () => {}, warn: () => {}, info: () => {}, debug: () => {} } },
+        {
+          provide: LoggerService,
+          useValue: {
+            error: () => {},
+            warn: () => {},
+            info: () => {},
+            debug: () => {},
+          },
+        },
         { provide: SearchUtilService, useValue: { buildSingle: () => ({}) } },
-      ]
+      ],
     });
     fixture = TestBed.createComponent(ListadoCategoriasComponent);
     component = fixture.componentInstance;
@@ -38,17 +50,19 @@ describe('ListadoCategoriasComponent Spinner', () => {
   it('oculta spinner cuando cargando=false', async () => {
     // Evitar que obtenerListaCategorias se ejecute y ponga cargando=true
     spyOn(component, 'obtenerListaCategorias');
-    
+
     // Configurar estado inicial
     component.cargando = false;
-    component.pagedCategorias = [{ idCategoria: 1, nombre: 'A', descripcion: '' } as any];
-    
+    component.pagedCategorias = [
+      { idCategoria: 1, nombre: 'A', descripcion: '' } as any,
+    ];
+
     // IMPORTANTE: Primero detectChanges() para que Angular procese los bindings
     fixture.detectChanges();
     await fixture.whenStable();
-    
+
     const el: HTMLElement = fixture.nativeElement;
-    
+
     // Verificar que el componente realmente tiene cargando en false
     expect(component.cargando).toBeFalse();
 
@@ -58,7 +72,8 @@ describe('ListadoCategoriasComponent Spinner', () => {
 
   it('usa listarPaginaSinGlobalLoader en paginación', () => {
     (component as any).ngOnInit = () => {};
-    component.pageNo = 0; component.pageSize = 5;
+    component.pageNo = 0;
+    component.pageSize = 5;
     (component as any).obtenerListaCategorias();
     expect(mockService.listarPaginaSinGlobalLoader).toHaveBeenCalledWith(0, 5);
   });

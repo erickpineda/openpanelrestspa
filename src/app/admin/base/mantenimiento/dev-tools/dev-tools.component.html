@@ -7,9 +7,13 @@
       <c-card-body>
         <ul class="list-group">
           @for (f of features; track trackByFeature($index, f)) {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
               <span>{{ f.name }}</span>
-              <button cButton color="dark" (click)="toggle(f)">{{ f.enabled ? 'Desactivar' : 'Activar' }}</button>
+              <button cButton color="dark" (click)="toggle(f)">
+                {{ f.enabled ? 'Desactivar' : 'Activar' }}
+              </button>
             </li>
           }
         </ul>

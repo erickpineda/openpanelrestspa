@@ -7,7 +7,8 @@ import {
   DropdownModule,
   GridModule,
   HeaderModule,
-  NavModule, SidebarModule
+  NavModule,
+  SidebarModule,
 } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from '../../../shared/components/icons/icon-subset';
@@ -22,10 +23,19 @@ describe('DefaultHeaderComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [DefaultHeaderComponent],
-      imports: [GridModule, HeaderModule, NavModule, BadgeModule, AvatarModule, DropdownModule, BreadcrumbModule, RouterTestingModule, SidebarModule],
-      providers: [IconSetService]
-    })
-      .compileComponents();
+      imports: [
+        GridModule,
+        HeaderModule,
+        NavModule,
+        BadgeModule,
+        AvatarModule,
+        DropdownModule,
+        BreadcrumbModule,
+        RouterTestingModule,
+        SidebarModule,
+      ],
+      providers: [IconSetService],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -47,9 +57,15 @@ describe('DefaultHeaderComponent', () => {
     const el: HTMLElement = fixture.nativeElement;
     const navs = el.querySelectorAll('c-header-nav');
     expect(navs.length).toBeGreaterThan(0);
-    const hasMainNav = Array.from(navs).some(n => n.getAttribute('aria-label') === 'Navegación principal');
-    const hasQuickActions = Array.from(navs).some(n => n.getAttribute('aria-label') === 'Acciones rápidas');
-    const hasUserMenu = Array.from(navs).some(n => n.getAttribute('aria-label') === 'Menú de usuario');
+    const hasMainNav = Array.from(navs).some(
+      (n) => n.getAttribute('aria-label') === 'Navegación principal',
+    );
+    const hasQuickActions = Array.from(navs).some(
+      (n) => n.getAttribute('aria-label') === 'Acciones rápidas',
+    );
+    const hasUserMenu = Array.from(navs).some(
+      (n) => n.getAttribute('aria-label') === 'Menú de usuario',
+    );
     expect(hasMainNav && hasQuickActions && hasUserMenu).toBeTrue();
   });
 
@@ -57,7 +73,7 @@ describe('DefaultHeaderComponent', () => {
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     const badges = el.querySelectorAll('c-badge');
-    const texts = Array.from(badges).map(b => (b.textContent || '').trim());
+    const texts = Array.from(badges).map((b) => (b.textContent || '').trim());
     expect(texts).toContain(String(component.notificationsCount));
     expect(texts).toContain(String(component.messagesCount));
     expect(texts).toContain(String(component.tasksCount));
@@ -66,14 +82,19 @@ describe('DefaultHeaderComponent', () => {
 
   it('updates badge counts when userCounts input changes', () => {
     // Set initial values directly to avoid NG0100
-    component.userCounts = { notifications: 3, tasks: 7, messages: 9, comments: 11 };
-    
+    component.userCounts = {
+      notifications: 3,
+      tasks: 7,
+      messages: 9,
+      comments: 11,
+    };
+
     // Initial render
     fixture.detectChanges();
-    
+
     const el: HTMLElement = fixture.nativeElement;
     const badges = el.querySelectorAll('c-badge');
-    const texts = Array.from(badges).map(b => (b.textContent || '').trim());
+    const texts = Array.from(badges).map((b) => (b.textContent || '').trim());
     expect(texts).toContain('3');
     expect(texts).toContain('7');
     expect(texts).toContain('9');

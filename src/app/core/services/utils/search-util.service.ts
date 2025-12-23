@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
-import { SearchOperation, getSimpleOperation, getDataOption } from '../../_utils/search-operation.util';
+import {
+  SearchOperation,
+  getSimpleOperation,
+  getDataOption,
+} from '../../_utils/search-operation.util';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SearchUtilService {
   getOperation(input: string): SearchOperation | null {
@@ -21,12 +25,16 @@ export class SearchUtilService {
       { nombre: 'Mayor que', valor: SearchOperation.GREATER_THAN },
       { nombre: 'Menor que', valor: SearchOperation.LESS_THAN },
       { nombre: 'Es nulo', valor: SearchOperation.NUL },
-      { nombre: 'No es nulo', valor: SearchOperation.NOT_NULL }
+      { nombre: 'No es nulo', valor: SearchOperation.NOT_NULL },
     ];
   }
 
-  buildRequest(entityName: string | null, criteria: { filterKey: string; value: any; operation: string }[], dataOption: string): any {
-    const list = (criteria || []).map(c => ({
+  buildRequest(
+    entityName: string | null,
+    criteria: { filterKey: string; value: any; operation: string }[],
+    dataOption: string,
+  ): any {
+    const list = (criteria || []).map((c) => ({
       filterKey: c.filterKey,
       value: c.value != null ? String(c.value) : '',
       operation: c.operation,
@@ -36,7 +44,17 @@ export class SearchUtilService {
     return { dataOption, searchCriteriaList: list };
   }
 
-  buildSingle(entityName: string | null, filterKey: string, value: any, operation: string, dataOption: string = 'AND'): any {
-    return this.buildRequest(entityName, [{ filterKey, value, operation }], dataOption);
+  buildSingle(
+    entityName: string | null,
+    filterKey: string,
+    value: any,
+    operation: string,
+    dataOption: string = 'AND',
+  ): any {
+    return this.buildRequest(
+      entityName,
+      [{ filterKey, value, operation }],
+      dataOption,
+    );
   }
 }

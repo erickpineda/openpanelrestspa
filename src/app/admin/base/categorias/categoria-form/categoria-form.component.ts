@@ -1,12 +1,19 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Categoria } from '../../../../core/models/categoria.model';
 
 @Component({
-    selector: 'app-categoria-form',
-    styleUrls: ['./categoria-form.component.scss'],
-    templateUrl: './categoria-form.component.html',
-    standalone: false
+  selector: 'app-categoria-form',
+  styleUrls: ['./categoria-form.component.scss'],
+  templateUrl: './categoria-form.component.html',
+  standalone: false,
 })
 export class CategoriaFormComponent implements OnChanges {
   @Input() categoria?: Categoria;
@@ -30,7 +37,7 @@ export class CategoriaFormComponent implements OnChanges {
       idCategoria: [null],
       nombre: [null, Validators.required],
       descripcion: [null],
-      cantidadEntradas: [0]
+      cantidadEntradas: [0],
     });
   }
 
@@ -51,7 +58,9 @@ export class CategoriaFormComponent implements OnChanges {
       }
     }
     if (changes['listaCategorias']) {
-      const list = Array.isArray(this.listaCategorias) ? this.listaCategorias : [];
+      const list = Array.isArray(this.listaCategorias)
+        ? this.listaCategorias
+        : [];
       this.displayListaCategorias = this.assignDummyCounts(list);
     }
   }
@@ -69,7 +78,9 @@ export class CategoriaFormComponent implements OnChanges {
       // Restablecer el estado enviando después de un tiempo límite
       setTimeout(() => {
         if (this.enviando) {
-          console.warn('Tiempo de espera agotado. Restableciendo estado enviando.');
+          console.warn(
+            'Tiempo de espera agotado. Restableciendo estado enviando.',
+          );
           this.enviando = false;
         }
       }, 1000); // 10 segundos como tiempo límite
@@ -91,9 +102,10 @@ export class CategoriaFormComponent implements OnChanges {
   }
 
   private assignDummyCounts(list: Categoria[]): Categoria[] {
-    return list.map(c => {
+    return list.map((c) => {
       // Mantener valor real si existe; si no, asignar un número ficticio pequeño (1-5)
-      const cantidad = (c as any).cantidadEntradas ?? Math.floor(Math.random() * 5) + 1;
+      const cantidad =
+        (c as any).cantidadEntradas ?? Math.floor(Math.random() * 5) + 1;
       return { ...c, cantidadEntradas: cantidad } as Categoria;
     });
   }

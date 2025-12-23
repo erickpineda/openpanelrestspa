@@ -36,8 +36,8 @@
     "openpanelspa": {
       "projectType": "application",
       "schematics": {
-        "@schematics/angular:component": {"style": "scss" },
-        "@schematics/angular:application": {"strict": true}  
+        "@schematics/angular:component": { "style": "scss" },
+        "@schematics/angular:application": { "strict": true }
       },
       "root": "",
       "sourceRoot": "src",
@@ -50,23 +50,16 @@
               "base": "dist/openpanelspa"
             },
             "index": "src/index.html",
-            "polyfills": [
-              "src/polyfills.ts"
-            ],
+            "polyfills": ["src/polyfills.ts"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "preserveSymlinks": true,
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
               "node_modules/@coreui/coreui/dist/css/coreui.min.css",
               "src/styles.scss"
             ],
-            "scripts": [
-
-            ],
+            "scripts": [],
             "allowedCommonJsDependencies": [
               "chart.js",
               "@coreui/chartjs/dist/js/coreui-chartjs.js",
@@ -133,21 +126,18 @@
           "builder": "@angular/build:karma",
           "options": {
             "main": "src/test.ts",
-            "polyfills": [
-              "src/polyfills.ts"
-            ],
+            "polyfills": ["src/polyfills.ts"],
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
+            "codeCoverage": true,
+            "codeCoverageExclude": [
+              "src/test.ts",
+              "src/polyfills.ts",
+              "src/app/admin/default-layout/_nav.ts"
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
-            "scripts": [
-
-            ]
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
+            "scripts": []
           }
         }
       }

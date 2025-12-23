@@ -1,18 +1,18 @@
 export class PerfilResponse {
   idUsuario: number = 0;
   idRol: number = 0;
-  username: string = "";
-  password: string = "";
-  nombre: string = "";
-  apellido: string = "";
+  username: string = '';
+  password: string = '';
+  nombre: string = '';
+  apellido: string = '';
   fechaNacimiento: any;
-  email: string = "";
-  genero: string = "";
+  email: string = '';
+  genero: string = '';
   telefono: number = 0;
   emailConfirmado: boolean = false;
-  website: string = "";
+  website: string = '';
   imagen: string[] = [];
-  infouser: string = "";
+  infouser: string = '';
 }
 
 export interface PerfilResponse {

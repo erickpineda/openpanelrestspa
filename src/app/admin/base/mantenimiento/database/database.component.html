@@ -5,10 +5,26 @@
         <strong>Base de Datos</strong>
       </c-card-header>
       <c-card-body>
-        <p>Estado actual: <span class="badge bg-success">{{ status }}</span></p>
+        <p>
+          Estado actual: <span class="badge bg-success">{{ status }}</span>
+        </p>
         <div class="actions">
-          <button cButton color="primary" [disabled]="optimizeRunning" (click)="runOptimize()">Optimizar</button>
-          <button cButton color="secondary" [disabled]="backupRunning" (click)="runBackup()">Backup</button>
+          <button
+            cButton
+            color="primary"
+            [disabled]="optimizeRunning"
+            (click)="runOptimize()"
+          >
+            Optimizar
+          </button>
+          <button
+            cButton
+            color="secondary"
+            [disabled]="backupRunning"
+            (click)="runBackup()"
+          >
+            Backup
+          </button>
         </div>
         <div class="mt-2">
           @if (optimizeRunning || backupRunning) {

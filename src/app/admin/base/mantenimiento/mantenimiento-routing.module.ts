@@ -8,11 +8,11 @@ const routes: Routes = [
   { path: 'logs', component: LogsComponent },
   { path: 'database', component: DatabaseComponent },
   { path: 'dev-tools', component: DevToolsComponent },
-  { path: '', redirectTo: 'logs', pathMatch: 'full' }
+  { path: '', redirectTo: 'logs', pathMatch: 'full' },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class MantenimientoRoutingModule { }
+export class MantenimientoRoutingModule {}

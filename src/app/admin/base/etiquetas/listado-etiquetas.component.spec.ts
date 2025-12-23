@@ -10,7 +10,7 @@ class MockEtiquetaService {
     nombre: `Etiqueta ${i + 1}`,
     frecuencia: 0,
     descripcion: `Desc ${i + 1}`,
-    colorHex: '#4ECDC4'
+    colorHex: '#4ECDC4',
   }));
 
   listarPaginaSinGlobalLoader(pageNo: number, pageSize: number) {
@@ -22,7 +22,9 @@ class MockEtiquetaService {
     return of({ data: { elements: slice, totalElements, totalPages } });
   }
 
-  buscarSinGlobalLoader() { return of({ data: { elements: [], totalElements: 0, totalPages: 0 } }); }
+  buscarSinGlobalLoader() {
+    return of({ data: { elements: [], totalElements: 0, totalPages: 0 } });
+  }
 }
 
 describe('EtiquetasListComponent - paginación', () => {
@@ -33,15 +35,20 @@ describe('EtiquetasListComponent - paginación', () => {
       providers: [
         { provide: EtiquetaService, useClass: MockEtiquetaService },
         FormBuilder,
-      ]
+      ],
     });
     component = new EtiquetasListComponent(
       TestBed.inject(EtiquetaService),
       TestBed.inject(FormBuilder),
       { showError: () => {}, showSuccess: () => {} } as any,
-      { error: () => {}, info: () => {}, warn: () => {}, debug: () => {} } as any,
+      {
+        error: () => {},
+        info: () => {},
+        warn: () => {},
+        debug: () => {},
+      } as any,
       { buildRequest: () => ({}) } as any,
-      { detectChanges: () => {} } as any
+      { detectChanges: () => {} } as any,
     );
   });
 

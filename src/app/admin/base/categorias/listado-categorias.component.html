@@ -12,22 +12,57 @@
   </c-card-header>
   <c-card-body [attr.aria-busy]="cargando ? 'true' : null">
     @if (errorMsg) {
-      <div class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
+      <div
+        class="alert alert-danger d-flex align-items-center justify-content-between my-2"
+        role="alert"
+      >
         <span>{{ errorMsg }}</span>
-        <button cButton color="danger" size="sm" (click)="refrescar()">Reintentar</button>
+        <button cButton color="danger" size="sm" (click)="refrescar()">
+          Reintentar
+        </button>
       </div>
     }
 
     <c-row class="align-items-center mb-3 g-2">
       <c-col xs="12" md="4">
-        <div class="text-muted small">Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+        <div class="text-muted small">
+          Total {{ totalElements }} · Mostrando {{ numberOfElements }}
+        </div>
       </c-col>
       <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-        <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar categoría..." style="max-width: 280px;" [disabled]="cargando" />
-        <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="cargando">Avanzado</button>
+        <input
+          cFormControl
+          type="text"
+          [value]="basicSearchText"
+          (input)="onBasicSearchTextChange($any($event.target).value)"
+          placeholder="Buscar categoría..."
+          style="max-width: 280px"
+          [disabled]="cargando"
+        />
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          size="sm"
+          (click)="toggleAdvanced()"
+          [disabled]="cargando"
+        >
+          Avanzado
+        </button>
       </c-col>
-      <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-        <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;" [disabled]="cargando">
+      <c-col
+        xs="12"
+        md="4"
+        class="d-flex justify-content-md-end gap-2 align-items-center"
+      >
+        <select
+          cSelect
+          [ngModel]="pageSize"
+          (ngModelChange)="onPageSizeChange($event)"
+          name="pageSizeSelect"
+          style="max-width: 100px"
+          [disabled]="cargando"
+        >
           <option value="5">5</option>
           <option value="10">10</option>
           <option value="20">20</option>
@@ -40,13 +75,35 @@
         <c-row class="g-3 align-items-end">
           <c-col xs="12" md="6">
             <label class="form-label mb-1">Nombre</label>
-            <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por nombre..." [value]="filtroNombre" (input)="filtroNombre=$any($event.target).value" [disabled]="cargando" />
+            <input
+              cFormControl
+              class="form-control-sm"
+              type="text"
+              placeholder="Buscar por nombre..."
+              [value]="filtroNombre"
+              (input)="filtroNombre = $any($event.target).value"
+              [disabled]="cargando"
+            />
           </c-col>
           <c-col xs="12" md="6" class="d-flex justify-content-md-end gap-2">
-            <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="cargando">
+            <button
+              cButton
+              size="sm"
+              color="primary"
+              variant="outline"
+              (click)="search()"
+              [disabled]="cargando"
+            >
               <svg cIcon name="cilSearch"></svg> Buscar
             </button>
-            <button cButton size="sm" color="secondary" variant="outline" (click)="reset()" [disabled]="cargando">
+            <button
+              cButton
+              size="sm"
+              color="secondary"
+              variant="outline"
+              (click)="reset()"
+              [disabled]="cargando"
+            >
               <svg cIcon name="cilReload"></svg> Limpiar
             </button>
           </c-col>
@@ -56,7 +113,14 @@
 
     <div class="tabla-con-loader-wrapper position-relative">
       @if (cargando) {
-        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 10; background-color: rgba(255,255,255,0.8); min-height: 200px;">
+        <div
+          class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+          style="
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.8);
+            min-height: 200px;
+          "
+        >
           <div class="text-center">
             <c-spinner [attr.aria-label]="'Cargando categorías'"></c-spinner>
             <p class="mt-2 text-muted">Cargando categorías...</p>
@@ -65,41 +129,81 @@
       }
 
       <div [class.opacity-50]="cargando" class="table-responsive">
-        <table responsive cAlign="top" cTable hover striped class="align-middle mb-0 border text-nowrap op-table tabla-con-loader" role="table" aria-label="Tabla de categorías">
+        <table
+          responsive
+          cAlign="top"
+          cTable
+          hover
+          striped
+          class="align-middle mb-0 border text-nowrap op-table tabla-con-loader"
+          role="table"
+          aria-label="Tabla de categorías"
+        >
           <thead cTableColor="light">
             <tr>
-              <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
-              <th scope="col" class="text-start" style="min-width: 250px;">Descripción</th>
-              <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
+              <th scope="col" class="text-start" style="min-width: 200px">
+                Nombre
+              </th>
+              <th scope="col" class="text-start" style="min-width: 250px">
+                Descripción
+              </th>
+              <th scope="col" class="text-center" style="min-width: 100px">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
-            @for (categ of pagedCategorias; track trackByCategoriaId($index, categ)) {
+            @for (
+              categ of pagedCategorias;
+              track trackByCategoriaId($index, categ)
+            ) {
               <tr>
                 <td>
                   <div class="d-flex flex-column">
-                    <span class="fw-semibold text-truncate" style="max-width: 250px;" [title]="categ.nombre">
+                    <span
+                      class="fw-semibold text-truncate"
+                      style="max-width: 250px"
+                      [title]="categ.nombre"
+                    >
                       {{ categ.nombre }}
                     </span>
                   </div>
                 </td>
                 <td>
-                  <span class="d-inline-block text-truncate" style="max-width: 300px;" [title]="categ.descripcion">
+                  <span
+                    class="d-inline-block text-truncate"
+                    style="max-width: 300px"
+                    [title]="categ.descripcion"
+                  >
                     {{ categ.descripcion || 'Sin descripción' }}
                   </span>
                 </td>
                 <td class="text-center">
-                  <div class="btn-group" role="group" aria-label="Acciones de categoría">
-                    <button cButton color="warning" size="sm" variant="ghost"
+                  <div
+                    class="btn-group"
+                    role="group"
+                    aria-label="Acciones de categoría"
+                  >
+                    <button
+                      cButton
+                      color="warning"
+                      size="sm"
+                      variant="ghost"
                       (click)="editarCategoria(categ.idCategoria)"
                       [cTooltip]="'Editar categoría'"
-                      [attr.aria-label]="'Editar categoría ' + categ.nombre">
+                      [attr.aria-label]="'Editar categoría ' + categ.nombre"
+                    >
                       <svg cIcon name="cilPencil" size="sm"></svg>
                     </button>
-                    <button cButton color="danger" size="sm" variant="ghost"
+                    <button
+                      cButton
+                      color="danger"
+                      size="sm"
+                      variant="ghost"
                       (click)="borrarCategoria(categ)"
                       [cTooltip]="'Borrar categoría'"
-                      [attr.aria-label]="'Borrar categoría ' + categ.nombre">
+                      [attr.aria-label]="'Borrar categoría ' + categ.nombre"
+                    >
                       <svg cIcon name="cilTrash" size="sm"></svg>
                     </button>
                   </div>
@@ -109,10 +213,19 @@
             @if (pagedCategorias.length === 0) {
               <tr>
                 <td colspan="3" class="text-center py-5">
-                  <div class="d-flex flex-column align-items-center justify-content-center">
-                    <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                  <div
+                    class="d-flex flex-column align-items-center justify-content-center"
+                  >
+                    <svg
+                      cIcon
+                      name="cilSearch"
+                      size="3xl"
+                      class="text-muted mb-3"
+                    ></svg>
                     <h6 class="text-muted">No se han encontrado categorías</h6>
-                    <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+                    <p class="text-muted small">
+                      Intenta ajustar los filtros de búsqueda
+                    </p>
                   </div>
                 </td>
               </tr>
@@ -125,16 +238,36 @@
             [align]="'center'"
             [totalPages]="getTotalPages()"
             [currentPage]="pageNo"
-            (pageChange)="onPageChange($event)">
+            (pageChange)="onPageChange($event)"
+          >
           </app-op-pagination>
         }
 
         @if (pagedCategorias.length > 0) {
           <c-row class="mt-2">
             <c-col class="d-flex justify-content-end align-items-center gap-2">
-              <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
-              <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-              <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
+              <button
+                cButton
+                color="light"
+                size="sm"
+                (click)="prev()"
+                [disabled]="pageNo <= 0"
+              >
+                Anterior
+              </button>
+              <button
+                cButton
+                color="light"
+                size="sm"
+                (click)="next()"
+                [disabled]="pageNo >= getTotalPages() - 1"
+              >
+                Siguiente
+              </button>
+              <div class="text-muted small ms-2">
+                Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
+                {{ totalElements }} · Mostrando {{ numberOfElements }}
+              </div>
             </c-col>
           </c-row>
         }
@@ -143,12 +276,21 @@
   </c-card-body>
 </c-card>
 
-<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal=$event" alignment="center" [attr.data-testid]="'eliminar-categoria-modal'">
+<c-modal
+  [visible]="showDeleteModal"
+  (visibleChange)="showDeleteModal = $event"
+  alignment="center"
+  [attr.data-testid]="'eliminar-categoria-modal'"
+>
   <c-modal-header>
     <h5 cModalTitle>Confirmar eliminación</h5>
   </c-modal-header>
   <c-modal-body>
-    <p>¿Desea eliminar la categoría <strong>{{ categoriaToDelete?.nombre }}</strong>? Esta acción no se puede deshacer.</p>
+    <p>
+      ¿Desea eliminar la categoría
+      <strong>{{ categoriaToDelete?.nombre }}</strong
+      >? Esta acción no se puede deshacer.
+    </p>
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>

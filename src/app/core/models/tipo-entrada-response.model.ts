@@ -1,11 +1,9 @@
-import { TipoEntrada } from "./tipo-entrada.model";
+import { TipoEntrada } from './tipo-entrada.model';
 
 export class TipoEntradaResponse {
   tiposEntradas: TipoEntrada[] = [];
-  
-  constructor() {
 
-  }
+  constructor() {}
 }
 
 export interface TipoEntradaResponse {

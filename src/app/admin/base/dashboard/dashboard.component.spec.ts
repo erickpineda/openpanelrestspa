@@ -2,7 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { DashboardComponent } from './dashboard.component';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -10,11 +13,14 @@ describe('DashboardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [DashboardComponent],
-    schemas: [NO_ERRORS_SCHEMA],
-    imports: [],
-    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-}).compileComponents();
+      declarations: [DashboardComponent],
+      schemas: [NO_ERRORS_SCHEMA],
+      imports: [],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
+    }).compileComponents();
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
   });
@@ -41,37 +47,65 @@ describe('DashboardComponent', () => {
   });
 
   it('formatea mensual con nombre de mes', () => {
-    const label = (component as any).formatLabelFromDate('2025-01-05', 'month', false);
+    const label = (component as any).formatLabelFromDate(
+      '2025-01-05',
+      'month',
+      false,
+    );
     expect(label).toBe('Enero 2025');
   });
 
   it('formatea mensual abreviado en móvil', () => {
-    const label = (component as any).formatLabelFromDate('2025-01-05', 'month', true);
+    const label = (component as any).formatLabelFromDate(
+      '2025-01-05',
+      'month',
+      true,
+    );
     expect(label).toBe('Ene 2025');
   });
 
   it('formatea mensual desde YYYY-MM', () => {
-    const label = (component as any).formatLabelFromDate('2025-02', 'month', false);
+    const label = (component as any).formatLabelFromDate(
+      '2025-02',
+      'month',
+      false,
+    );
     expect(label).toBe('Febrero 2025');
   });
 
   it('formatea mensual desde YYYYMM', () => {
-    const label = (component as any).formatLabelFromDate('202503', 'month', false);
+    const label = (component as any).formatLabelFromDate(
+      '202503',
+      'month',
+      false,
+    );
     expect(label).toBe('Marzo 2025');
   });
 
   it('formatea mensual desde MM-YYYY', () => {
-    const label = (component as any).formatLabelFromDate('04-2025', 'month', false);
+    const label = (component as any).formatLabelFromDate(
+      '04-2025',
+      'month',
+      false,
+    );
     expect(label).toBe('Abril 2025');
   });
 
   it('formatea mensual desde MM/YYYY', () => {
-    const label = (component as any).formatLabelFromDate('05/2025', 'month', false);
+    const label = (component as any).formatLabelFromDate(
+      '05/2025',
+      'month',
+      false,
+    );
     expect(label).toBe('Mayo 2025');
   });
 
   it('formatea mensual desde DD-MM-YYYY', () => {
-    const label = (component as any).formatLabelFromDate('15-06-2025', 'month', false);
+    const label = (component as any).formatLabelFromDate(
+      '15-06-2025',
+      'month',
+      false,
+    );
     expect(label).toBe('Junio 2025');
   });
   it('inicializa coherente: 30 días y granularidad diaria', async () => {
@@ -102,17 +136,17 @@ describe('DashboardComponent', () => {
 
   it('CSV de serie incluye date_raw', () => {
     component.data = {
-      labels: ['01/02/2025','02/02/2025'],
+      labels: ['01/02/2025', '02/02/2025'],
       datasets: [
-        { label: 'Entradas', data: [1,2] },
-        { label: 'Comentarios', data: [3,4] }
-      ]
+        { label: 'Entradas', data: [1, 2] },
+        { label: 'Comentarios', data: [3, 4] },
+      ],
     } as any;
-    (component as any).dataRawLabels = ['2025-02-01','2025-02-02'];
+    (component as any).dataRawLabels = ['2025-02-01', '2025-02-02'];
     const spy = spyOn(component as any, 'saveCsv');
     component.downloadCsvSeries();
     expect(spy).toHaveBeenCalledTimes(1);
-    const args = (spy.calls.mostRecent().args);
+    const args = spy.calls.mostRecent().args;
     const csv = String(args[1]);
     const lines = csv.trim().split('\n');
     expect(lines[0]).toContain('date,date_raw');
@@ -122,17 +156,17 @@ describe('DashboardComponent', () => {
 
   it('CSV de split nominal incluye date_raw', () => {
     (component as any).seriesEntriesSplitEstadoNombreData = {
-      labels: ['01/02/2025','02/02/2025'],
+      labels: ['01/02/2025', '02/02/2025'],
       datasets: [
-        { label: 'PUBLICADA', data: [1,2] },
-        { label: 'NO PUBLICADA', data: [0,1] }
+        { label: 'PUBLICADA', data: [1, 2] },
+        { label: 'NO PUBLICADA', data: [0, 1] },
       ],
-      _rawLabels: ['2025-02-01','2025-02-02']
+      _rawLabels: ['2025-02-01', '2025-02-02'],
     };
     const spy = spyOn(component as any, 'saveCsv');
     component.downloadCsvSeriesSplitEstadoNombre();
     expect(spy).toHaveBeenCalledTimes(1);
-    const args = (spy.calls.mostRecent().args);
+    const args = spy.calls.mostRecent().args;
     const csv = String(args[1]);
     const lines = csv.trim().split('\n');
     expect(lines[0]).toContain('date,date_raw');
@@ -142,17 +176,17 @@ describe('DashboardComponent', () => {
 
   it('CSV de split estado incluye date_raw', () => {
     (component as any).seriesEntriesSplitData = {
-      labels: ['01/02/2025','02/02/2025'],
+      labels: ['01/02/2025', '02/02/2025'],
       datasets: [
-        { label: 'PUBLICADA', data: [1,2] },
-        { label: 'NO PUBLICADA', data: [0,1] }
+        { label: 'PUBLICADA', data: [1, 2] },
+        { label: 'NO PUBLICADA', data: [0, 1] },
       ],
-      _rawLabels: ['2025-02-01','2025-02-02']
+      _rawLabels: ['2025-02-01', '2025-02-02'],
     };
     const spy = spyOn(component as any, 'saveCsv');
     component.downloadCsvSeriesSplitEstado();
     expect(spy).toHaveBeenCalledTimes(1);
-    const args = (spy.calls.mostRecent().args);
+    const args = spy.calls.mostRecent().args;
     const csv = String(args[1]);
     const lines = csv.trim().split('\n');
     expect(lines[0]).toContain('date,date_raw');

@@ -1,4 +1,14 @@
-import { Component, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef, NgZone, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  ChangeDetectorRef,
+  NgZone,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Observable } from 'rxjs';
 import { EntradaCatalogService } from '../../../core/services/data/entrada-catalog.service';
 import { catchError, Subject, takeUntil, throwError, finalize } from 'rxjs';
@@ -13,20 +23,22 @@ import { LoggerService } from '../../../core/services/logger.service';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'app-listado-entradas',
-    templateUrl: './listado-entradas.component.html',
-    styleUrls: ['./listado-entradas.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-listado-entradas',
+  templateUrl: './listado-entradas.component.html',
+  styleUrls: ['./listado-entradas.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
-export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ListadoEntradasComponent
+  implements OnInit, OnDestroy, AfterViewInit
+{
   // #region Properties
-  
+
   // Data
   listaEntradas: Entrada[] = [];
   allEntradas: Entrada[] = []; // Fallback client-side
   definiciones: any;
-  
+
   // Paging & Stats
   totalPages: number = 0;
   currentPage: number = 0;
@@ -34,7 +46,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   totalElements = 0;
   numberOfElements = 0;
   estaVacio: boolean = false;
-  
+
   // Search & Filters
   campoSeleccionado: string = '';
   operacionSeleccionada: string = '';
@@ -42,13 +54,13 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   dataOptionSeleccionada: string = 'AND';
   showAdvanced = false;
   basicSearchText = '';
-  
+
   // UI State
   cargando: boolean = false;
   cargandoTabla: boolean = false;
   visible = false; // Modal borrado
   entradaABorrar: Entrada | null = null;
-  
+
   // Preview State
   previewEntrada?: Entrada;
   previewVisible: boolean = false;
@@ -70,7 +82,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     private router: Router,
     private entradaCatalogService: EntradaCatalogService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   // #region Lifecycle Methods
@@ -79,12 +91,14 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     this.cargarDefinicionesBuscador();
     this.busquedaService.iniciarBusqueda(
       (term, page) => this.realizarBusquedaEntradas(term, page),
-      (response) => this.procesarResultadosBusqueda(response)
+      (response) => this.procesarResultadosBusqueda(response),
     );
   }
 
   ngAfterViewInit(): void {
-    try { this.cdr.detectChanges(); } catch {}
+    try {
+      this.cdr.detectChanges();
+    } catch {}
   }
 
   ngOnDestroy(): void {
@@ -93,7 +107,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     this.errorBoundaryService.unregisterBoundary(this.boundaryId);
     this.busquedaService.limpiarBusqueda();
   }
-  
+
   onBoundaryInit(boundary: ErrorBoundaryComponent): void {
     this.errorBoundaryService.registerBoundary(this.boundaryId, boundary);
   }
@@ -105,19 +119,24 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   private cargarDefinicionesBuscador(): void {
     this.cargando = true;
     this.cdr.markForCheck();
-    
-    this.entradaService.obtenerDefinicionesBuscadorSafe()
+
+    this.entradaService
+      .obtenerDefinicionesBuscadorSafe()
       .pipe(
-          takeUntil(this.destroy$),
-          finalize(() => {
-            this.cargando = false;
-            this.cdr.detectChanges();
-          }),
-          catchError((error) => {
-            this.errorBoundaryService.reportErrorToBoundary(this.boundaryId, error, 'CargarDefinicionesBuscador');
-            return throwError(() => error);
-          })
-        )
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.cargando = false;
+          this.cdr.detectChanges();
+        }),
+        catchError((error) => {
+          this.errorBoundaryService.reportErrorToBoundary(
+            this.boundaryId,
+            error,
+            'CargarDefinicionesBuscador',
+          );
+          return throwError(() => error);
+        }),
+      )
       .subscribe({
         next: (response) => {
           if (response) {
@@ -129,27 +148,38 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
         error: (error) => {
           this.log.error('Error secundario:', error);
           this.cdr.markForCheck();
-        }
+        },
       });
   }
 
   private inicializarCamposBusqueda(): void {
-    const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]) || [];
-    
+    const campos =
+      (this.definiciones.filterKeySegunClazzNamePermitido as string[]) || [];
+
     // Ordenar campos: 'titulo' primero, luego el resto alfabéticamente
     const camposOrdenados = [
-      ...campos.filter(k => k === 'titulo'),
-      ...campos.filter(k => k !== 'titulo').sort((a, b) => a.localeCompare(b))
+      ...campos.filter((k) => k === 'titulo'),
+      ...campos
+        .filter((k) => k !== 'titulo')
+        .sort((a, b) => a.localeCompare(b)),
     ];
-    
+
     this.campoSeleccionado = camposOrdenados[0] || '';
-    const operaciones = this.definiciones.operationPermitido?.[this.campoSeleccionado];
-    this.operacionSeleccionada = Array.isArray(operaciones) ? operaciones[0] : '';
+    const operaciones =
+      this.definiciones.operationPermitido?.[this.campoSeleccionado];
+    this.operacionSeleccionada = Array.isArray(operaciones)
+      ? operaciones[0]
+      : '';
     this.valorBusqueda = '';
     this.currentPage = 0;
-    
+
     if (this.campoSeleccionado && this.operacionSeleccionada) {
-      this.zone.run(() => setTimeout(() => this.busquedaService.triggerBusqueda(this.valorBusqueda), 0));
+      this.zone.run(() =>
+        setTimeout(
+          () => this.busquedaService.triggerBusqueda(this.valorBusqueda),
+          0,
+        ),
+      );
     }
   }
 
@@ -158,21 +188,24 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     this.cdr.markForCheck();
     const searchRequest = {
       dataOption: this.dataOptionSeleccionada,
-      searchCriteriaList: [{
-        filterKey: this.campoSeleccionado,
-        value: term,
-        operation: this.operacionSeleccionada,
-        clazzName: 'Entrada'
-      }]
+      searchCriteriaList: [
+        {
+          filterKey: this.campoSeleccionado,
+          value: term,
+          operation: this.operacionSeleccionada,
+          clazzName: 'Entrada',
+        },
+      ],
     };
     const pageToUse = page !== undefined ? page : this.currentPage;
-    return this.entradaService.buscarSafe(searchRequest, pageToUse, this.pageSize)
+    return this.entradaService
+      .buscarSafe(searchRequest, pageToUse, this.pageSize)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
           this.cargandoTabla = false;
           this.cdr.detectChanges();
-        })
+        }),
       );
   }
 
@@ -181,36 +214,52 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   private setPageData(data: any): void {
-    const raw = (data?.elements ?? (data as any)?.items ?? (data as any)?.content ?? (Array.isArray(data) ? data : []));
+    const raw =
+      data?.elements ??
+      (data as any)?.items ??
+      (data as any)?.content ??
+      (Array.isArray(data) ? data : []);
     let elementos: Entrada[] = Array.isArray(raw) ? raw : [];
-    
+
     // Mapear categorías
     elementos = elementos.map((entrada: Entrada) => ({
       ...entrada,
-      categoriasConComas: entrada.categorias?.map(e => e.nombre).join(', ') || ''
+      categoriasConComas:
+        entrada.categorias?.map((e) => e.nombre).join(', ') || '',
     }));
 
-    const hasServerPaging = typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
+    const hasServerPaging =
+      typeof data?.totalPages === 'number' ||
+      typeof data?.totalElements === 'number';
 
     if (hasServerPaging) {
       this.listaEntradas = elementos;
       this.totalElements = Number(data.totalElements || elementos.length || 0);
-      this.totalPages = Number(data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1);
+      this.totalPages = Number(
+        data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1,
+      );
       this.numberOfElements = Number(data.numberOfElements ?? elementos.length);
       this.estaVacio = elementos.length === 0;
       this.allEntradas = []; // Limpiar caché cliente si es server paging
 
       // Boundary check
-      if (elementos.length === 0 && this.currentPage > 0 && this.currentPage >= this.totalPages) {
-         this.currentPage = Math.max(0, this.totalPages - 1);
-         this.busquedaService.triggerBusqueda(this.valorBusqueda);
-         return;
+      if (
+        elementos.length === 0 &&
+        this.currentPage > 0 &&
+        this.currentPage >= this.totalPages
+      ) {
+        this.currentPage = Math.max(0, this.totalPages - 1);
+        this.busquedaService.triggerBusqueda(this.valorBusqueda);
+        return;
       }
     } else {
       // Fallback Client Paging
       this.allEntradas = elementos;
       this.totalElements = this.allEntradas.length;
-      this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
+      this.totalPages = Math.max(
+        1,
+        Math.ceil(this.totalElements / this.pageSize),
+      );
       this.estaVacio = this.totalElements === 0;
 
       if (this.currentPage >= this.totalPages) {
@@ -219,33 +268,38 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       this.applyPaging();
     }
     this.cdr.markForCheck();
-    try { this.cdr.detectChanges(); } catch {}
+    try {
+      this.cdr.detectChanges();
+    } catch {}
   }
 
   obtenerListaEntradas(page: number): void {
     this.currentPage = page;
-    
+
     if (this.allEntradas.length > 0) {
-        // Paginación cliente
-        this.applyPaging();
+      // Paginación cliente
+      this.applyPaging();
     } else {
-        // Paginación servidor
-        this.busquedaService.searchNow(this.valorBusqueda, this.currentPage)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: (response) => this.procesarResultadosBusqueda(response),
-            error: (error) => this.mostrarError('Error en búsqueda: ' + error)
-          });
+      // Paginación servidor
+      this.busquedaService
+        .searchNow(this.valorBusqueda, this.currentPage)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => this.procesarResultadosBusqueda(response),
+          error: (error) => this.mostrarError('Error en búsqueda: ' + error),
+        });
     }
     this.cdr.markForCheck();
   }
-  
+
   refrescarDatos(): void {
     this.currentPage = 0;
     this.busquedaService.triggerBusqueda(this.valorBusqueda);
   }
 
-  public cargarCatalogosEntrada = (): Observable<{ [key: string]: string[] }> => {
+  public cargarCatalogosEntrada = (): Observable<{
+    [key: string]: string[];
+  }> => {
     return this.entradaCatalogService.obtenerCatalogosEntrada();
   };
 
@@ -261,14 +315,17 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       this.numberOfElements = this.listaEntradas.length;
     } else {
       if (this.allEntradas.length === 0 && !this.estaVacio) {
-         // Si allEntradas está vacío pero no es porque no haya resultados, sino porque estamos en server paging, no hacemos nada aquí.
-      } else if (this.allEntradas.length > 0) { // Caso redundante pero por seguridad
-          this.listaEntradas = [];
-          this.numberOfElements = 0;
+        // Si allEntradas está vacío pero no es porque no haya resultados, sino porque estamos en server paging, no hacemos nada aquí.
+      } else if (this.allEntradas.length > 0) {
+        // Caso redundante pero por seguridad
+        this.listaEntradas = [];
+        this.numberOfElements = 0;
       }
     }
     this.cdr.markForCheck();
-    try { this.cdr.detectChanges(); } catch {}
+    try {
+      this.cdr.detectChanges();
+    } catch {}
   }
 
   public onPageSizeChange(size: number): void {
@@ -276,11 +333,14 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     this.currentPage = 0;
     // Forzar recarga
     if (this.allEntradas.length > 0) {
-       // Si estamos en modo cliente, solo reaplicar paginación
-       this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
-       this.applyPaging();
+      // Si estamos en modo cliente, solo reaplicar paginación
+      this.totalPages = Math.max(
+        1,
+        Math.ceil(this.totalElements / this.pageSize),
+      );
+      this.applyPaging();
     } else {
-       this.busquedaService.triggerBusqueda(this.valorBusqueda);
+      this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
   }
 
@@ -311,11 +371,14 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   public onBasicSearchTextChange(text: string): void {
     this.basicSearchText = text;
     this.campoSeleccionado = 'titulo';
-    
+
     // Intentar obtener operación válida para título, por defecto CONTAINS
     const operaciones = this.definiciones?.operationPermitido?.['titulo'];
-    this.operacionSeleccionada = Array.isArray(operaciones) && operaciones.length > 0 ? operaciones[0] : 'CONTAINS';
-    
+    this.operacionSeleccionada =
+      Array.isArray(operaciones) && operaciones.length > 0
+        ? operaciones[0]
+        : 'CONTAINS';
+
     this.valorBusqueda = text;
     this.currentPage = 0;
     this.busquedaService.triggerBusqueda(text);
@@ -327,7 +390,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     this.valorBusqueda = filtro.valor;
     this.currentPage = 0;
     this.cdr.markForCheck();
-    
+
     if (this.campoSeleccionado && this.operacionSeleccionada) {
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
@@ -353,14 +416,18 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   confirmarBorrado(): void {
     if (this.entradaABorrar) {
-      this.entradaService.borrar(this.entradaABorrar.idEntrada)
+      this.entradaService
+        .borrar(this.entradaABorrar.idEntrada)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
             this.obtenerListaEntradas(this.currentPage);
             this.entradaABorrar = null;
             this.visible = false;
-            this.toastService.showSuccess('La entrada se ha eliminado correctamente.', 'Entrada eliminada');
+            this.toastService.showSuccess(
+              'La entrada se ha eliminado correctamente.',
+              'Entrada eliminada',
+            );
             this.cdr.markForCheck();
           },
           error: (error) => {
@@ -368,7 +435,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
             this.visible = false;
             this.mostrarError('Error al eliminar la entrada: ' + error.message);
             this.cdr.markForCheck();
-          }
+          },
         });
     }
   }
@@ -387,7 +454,9 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       this.entradaABorrar = null;
     }
     this.cdr.markForCheck();
-    try { this.cdr.detectChanges(); } catch {}
+    try {
+      this.cdr.detectChanges();
+    } catch {}
   }
 
   // #endregion
@@ -421,14 +490,20 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   onEditarDesdePreview(): void {
     if (this.previewEntrada && this.previewEntrada.idEntrada) {
-      this.router.navigate(['/admin/control/entradas/editar', this.previewEntrada.idEntrada]);
+      this.router.navigate([
+        '/admin/control/entradas/editar',
+        this.previewEntrada.idEntrada,
+      ]);
       this.closePreview();
     }
   }
 
   onPublicarDesdePreview(entrada: Entrada): void {
     this.closePreview();
-    this.toastService.showInfo('Solicitud de publicación enviada (acción no implementada).', 'Publicar');
+    this.toastService.showInfo(
+      'Solicitud de publicación enviada (acción no implementada).',
+      'Publicar',
+    );
   }
 
   // #endregion
@@ -437,18 +512,34 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   checkFechaPublicacion(fechaPublicacion: Date): string {
     return fechaPublicacion
-      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', false)
+      ? this.commonFuncService.transformaFecha(
+          fechaPublicacion,
+          'dd-MM-yyyy',
+          false,
+        )
       : 'No publicada';
   }
 
-  getEstadoInfo(entrada: Entrada): { icon: string, color: string, tooltip: string } {
+  getEstadoInfo(entrada: Entrada): {
+    icon: string;
+    color: string;
+    tooltip: string;
+  } {
     if (entrada.publicada) {
-      return { icon: 'cilCheckCircle', color: 'text-success', tooltip: 'Publicada' };
+      return {
+        icon: 'cilCheckCircle',
+        color: 'text-success',
+        tooltip: 'Publicada',
+      };
     }
     if (entrada.borrador) {
       return { icon: 'cilFile', color: 'text-warning', tooltip: 'Borrador' };
     }
-    return { icon: 'cilHistory', color: 'text-warning', tooltip: entrada.estadoEntrada?.nombre || 'Pendiente' };
+    return {
+      icon: 'cilHistory',
+      color: 'text-warning',
+      tooltip: entrada.estadoEntrada?.nombre || 'Pendiente',
+    };
   }
 
   trackByEntradaId(index: number, entrada: Entrada): number {

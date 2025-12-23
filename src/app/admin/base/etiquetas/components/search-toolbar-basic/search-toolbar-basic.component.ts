@@ -1,10 +1,16 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 
 @Component({
-    selector: 'app-search-toolbar-basic',
-    templateUrl: './search-toolbar-basic.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-search-toolbar-basic',
+  templateUrl: './search-toolbar-basic.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SearchToolbarBasicComponent {
   @Input() total = 0;
@@ -20,7 +26,10 @@ export class SearchToolbarBasicComponent {
   @Output() searchTextChange = new EventEmitter<string>();
   @Output() toggleAdvanced = new EventEmitter<void>();
 
-  onPrev(): void { if (this.page > 1) this.pageChange.emit(this.page - 1); }
-  onNext(): void { if (this.page < this.totalPages) this.pageChange.emit(this.page + 1); }
+  onPrev(): void {
+    if (this.page > 1) this.pageChange.emit(this.page - 1);
+  }
+  onNext(): void {
+    if (this.page < this.totalPages) this.pageChange.emit(this.page + 1);
+  }
 }
-
