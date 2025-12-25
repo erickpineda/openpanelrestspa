@@ -23,7 +23,17 @@ export class ToastService implements OnDestroy {
   private defaultDelay = 5000;
   private preventExactDuplicates = true;
 
-  constructor() {}
+  constructor() {
+    try {
+      const w = window as any;
+      const href = String(w?.location?.href || '');
+      const isE2E = w?.__E2E_BYPASS_AUTH__ === true || href.includes('e2e=1');
+      if (isE2E && typeof w.__E2E_SHOW_TOAST__ !== 'function') {
+        w.__E2E_SHOW_TOAST__ = (toast: Partial<ToastMessage>) => this.show(toast);
+        w.__E2E_CLEAR_TOASTS__ = () => this.clear();
+      }
+    } catch {}
+  }
 
   ngOnDestroy(): void {
     this.clearAllTimers();

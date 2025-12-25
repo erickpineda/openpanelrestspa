@@ -18,6 +18,7 @@ import { SessionExpiredComponent } from './core/features/session-expired.compone
 import { UnsavedWorkModalComponent } from './core/features/unsaved-work-modal.component';
 import { GlobalNotificationsComponent } from './shared/components/global-notifications/global-notifications.component';
 import { SharedOPModule } from './shared/shared.module';
+import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { SharedOPModule } from './shared/shared.module';
   providers: [
     DatePipe,
     CustomPreloadingStrategyService,
+    { provide: ErrorHandler, useExisting: GlobalErrorHandlerService },
     { provide: LOCALE_ID, useValue: 'es-ES' },
     provideHttpClient(withInterceptorsFromDi()),
   ],

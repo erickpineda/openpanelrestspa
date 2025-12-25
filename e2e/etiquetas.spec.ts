@@ -73,10 +73,11 @@ test.describe('Gestión de Etiquetas', () => {
   test('debe mostrar la página de etiquetas correctamente', async ({
     page,
   }) => {
-    await expect(page.locator('h5.mb-0')).toContainText('Gestión de Etiquetas');
+    await expect(page.locator('[data-testid="etiquetas-list"]')).toBeVisible();
     await expect(
-      page.locator('button:has-text("Nueva Etiqueta")'),
-    ).toBeVisible();
+      page.locator('[data-testid="etiquetas-list"] c-card-header'),
+    ).toContainText('Etiquetas');
+    await expect(page.locator('[data-testid="btn-nueva-etiqueta"]')).toBeVisible();
     await expect(page.locator('table')).toBeVisible();
   });
 

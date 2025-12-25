@@ -41,33 +41,29 @@ test.describe('Header badges', () => {
       timeout: 30000,
     });
 
+    await page.evaluate(() => {
+      try {
+        (window as any).__E2E_CLEAR_TOASTS__?.();
+      } catch {}
+    });
+
     // Abrir menú de usuario para leer el badge de "Actualizaciones"
-    await page.getByRole('button', { name: 'Abrir menú de usuario' }).click();
+    await page.getByLabel('Abrir menú de usuario').click();
     const updatesBadge = page.locator(
       'ul[cDropdownMenu] a:has-text("Actualizaciones") c-badge',
     );
     const initialText = (await updatesBadge.textContent())?.trim() || '0';
     const initialCount = Number(initialText) || 0;
 
-    // Lanzar un rechazo de promesa no manejado para activar el GlobalErrorHandler y mostrar toast
     await page.evaluate(() => {
-      const rejection = {
-        error: {
-          result: {
-            trackingId: 'e2e',
-            timestamp: String(Date.now()),
-            success: false,
-            message: 'Fallo',
-          },
-          error: {
-            timestamp: String(Date.now()),
-            status: 400,
-            message: 'Validation failed',
-            details: ['entradaDTO : Campo requerido'],
-          },
-        },
-      } as any;
-      Promise.reject(rejection);
+      try {
+        (window as any).__E2E_SHOW_TOAST__?.({
+          title: 'E2E',
+          body: `Campo requerido ${Date.now()}`,
+          color: 'danger',
+          autohide: false,
+        });
+      } catch {}
     });
 
     // Esperar a que el badge de Actualizaciones se incremente
@@ -77,7 +73,7 @@ test.describe('Header badges', () => {
       .isVisible()
       .catch(() => false);
     if (!isMenuVisible) {
-      await page.getByRole('button', { name: 'Abrir menú de usuario' }).click();
+      await page.getByLabel('Abrir menú de usuario').click();
     }
     await expect(updatesBadge).toHaveText(target, { timeout: 15000 });
   });

@@ -6,6 +6,7 @@ import { LoggerService } from './core/services/logger.service';
 import { AuthService } from './core/services/auth/auth.service'; // inyectado para comprobar token
 import { RouteTrackerService } from './core/services/auth/route-tracker.service';
 import { OPConstants } from './shared/constants/op-global.constants';
+import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ export class AppComponent implements OnInit {
     private authService: AuthService,
     private routeTracker: RouteTrackerService, // sólo para activar el tracking
     private tokenStorage: TokenStorageService,
+    private globalErrorHandler: GlobalErrorHandlerService,
   ) {}
 
   ngOnInit(): void {

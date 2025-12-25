@@ -124,7 +124,7 @@ export class AuthService {
     } finally {
       // Redirigir al login con recarga completa (evita problemas de estado parcial)
       // Ajusta la ruta si tu login no está en '/login'
-      window.location.href = '/login';
+      window.location.href = '/#/login';
     }
   }
 }

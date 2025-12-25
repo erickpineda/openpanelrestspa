@@ -91,18 +91,32 @@ export class GlobalErrorHandlerService implements ErrorHandler {
   // ✅ Nuevo método para capturar rechazos de promesas
   private setupUnhandledPromiseRejectionHandler(): void {
     if (typeof window !== 'undefined' && window.addEventListener) {
-      window.addEventListener('unhandledrejection', (event) => {
-        event.preventDefault();
+      const handler = (event: any) => {
+        try {
+          event?.preventDefault?.();
+        } catch {}
 
         this.log.info(
           '🔍 [PROMISE] Unhandled rejection capturado:',
-          event.reason,
+          event?.reason,
         );
 
-        // Convertir el rechazo de promesa a un error manejable
-        const promiseError = this.normalizePromiseRejection(event.reason);
+        const promiseError = this.normalizePromiseRejection(event?.reason);
         this.handleError(promiseError);
-      });
+      };
+
+      window.addEventListener('unhandledrejection', handler as any, true);
+
+      try {
+        const previous = (window as any).onunhandledrejection;
+        (window as any).onunhandledrejection = (event: any) => {
+          handler(event);
+          if (typeof previous === 'function') {
+            return previous.call(window, event);
+          }
+          return false;
+        };
+      } catch {}
     }
   }
 
@@ -115,11 +129,17 @@ export class GlobalErrorHandlerService implements ErrorHandler {
 
     // Si es el objeto de error de tu backend, crear un HttpErrorResponse simulado
     if (rejection && rejection.error && rejection.error.result) {
+      const status =
+        typeof rejection.status === 'number'
+          ? rejection.status
+          : typeof rejection.error?.error?.status === 'number'
+            ? rejection.error.error.status
+            : 0;
       return new HttpErrorResponse({
-        error: rejection,
-        status: rejection.status || 0,
+        error: rejection.error,
+        status,
         statusText: rejection.statusText || 'Promise Rejection',
-        url: rejection.url,
+        url: rejection.url || rejection.error?.result?.trackingId,
       });
     }
 

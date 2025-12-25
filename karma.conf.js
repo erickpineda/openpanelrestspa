@@ -1,17 +1,16 @@
 // Karma configuration file, see link for more information
 // karma-runner.github.io
 const path = require('path');
+const fs = require('fs');
 
 module.exports = function (config) {
   try {
-    // Intenta usar puppeteer si está disponible, si no, usa el Chrome del sistema.
-    process.env.CHROME_BIN = require('puppeteer').executablePath();
-  } catch (e) {
-    // Manejo de error si puppeteer no está instalado
-    console.warn(
-      'Puppeteer no encontrado, usando Chrome instalado localmente.',
-    );
-  }
+    const { chromium } = require('playwright');
+    const chromePath = chromium.executablePath();
+    if (chromePath && fs.existsSync(chromePath)) {
+      process.env.CHROME_BIN = chromePath;
+    }
+  } catch (e) {}
 
   config.set({
     basePath: '',

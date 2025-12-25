@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Protección de rutas y sesión', () => {
+  test.setTimeout(60000);
+
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
       try {
@@ -59,6 +61,7 @@ test.describe('Protección de rutas y sesión', () => {
     });
     await page.goto('/#/admin/dashboard', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(300);
+    await expect(page).toHaveURL(/#\/login$/, { timeout: 30000 });
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible({
       timeout: 30000,
     });
@@ -76,6 +79,7 @@ test.describe('Protección de rutas y sesión', () => {
     });
     await page.goto('/#/', { waitUntil: 'domcontentloaded' });
     await page.goto('/#/admin', { waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(/#\/login$/, { timeout: 30000 });
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible({
       timeout: 30000,
     });
@@ -107,6 +111,7 @@ test.describe('Protección de rutas y sesión', () => {
 
     await page.goto('/#/admin/dashboard', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(300);
+    await expect(page).toHaveURL(/#\/login$/, { timeout: 30000 });
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible({
       timeout: 30000,
     });
@@ -126,7 +131,7 @@ test.describe('Protección de rutas y sesión', () => {
       await route.continue();
     });
     await page.goto('/#/admin', { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL(/#\/login$/);
+    await expect(page).toHaveURL(/#\/login$/, { timeout: 30000 });
     await expect(page.locator('[data-testid="admin-root"]')).toHaveCount(0);
   });
 });

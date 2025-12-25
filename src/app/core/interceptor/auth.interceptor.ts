@@ -43,7 +43,7 @@ export class AuthInterceptor implements HttpInterceptor {
         /* swallow */
       }
 
-      window.location.href = '/login';
+      window.location.href = '/#/login';
       return EMPTY;
     }
 
@@ -64,7 +64,7 @@ export class AuthInterceptor implements HttpInterceptor {
             } catch (e) {
               /* swallow */
             }
-            window.location.href = '/login';
+            window.location.href = '/#/login';
             return EMPTY;
           }
         }
