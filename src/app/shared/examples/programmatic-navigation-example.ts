@@ -28,16 +28,10 @@ export class ProgrammaticNavigationExample {
     });
 
     // Aumentar la prioridad de "Nueva Entrada"
-    this.navigationService.setElementPriority(
-      '/admin/control/entradas/crear',
-      100,
-    );
+    this.navigationService.setElementPriority('/admin/control/entradas/crear', 100);
 
     // Ocultar herramientas de desarrollo para usuarios no desarrolladores
-    this.navigationService.setElementVisibility(
-      '/admin/control/mantenimiento/dev-tools',
-      false,
-    );
+    this.navigationService.setElementVisibility('/admin/control/mantenimiento/dev-tools', false);
   }
 
   /**
@@ -53,10 +47,7 @@ export class ProgrammaticNavigationExample {
         });
 
         // Ocultar gestión de usuarios
-        this.navigationService.setElementVisibility(
-          '/admin/control/gestion/usuarios',
-          false,
-        );
+        this.navigationService.setElementVisibility('/admin/control/gestion/usuarios', false);
         break;
 
       case UserRole.EDITOR:
@@ -69,13 +60,10 @@ export class ProgrammaticNavigationExample {
 
       case UserRole.ADMINISTRADOR:
         // Para administradores, destacar gestión de usuarios
-        this.navigationService.setElementBadge(
-          '/admin/control/gestion/usuarios',
-          {
-            color: 'info',
-            text: 'Gestión',
-          },
-        );
+        this.navigationService.setElementBadge('/admin/control/gestion/usuarios', {
+          color: 'info',
+          text: 'Gestión',
+        });
         break;
 
       case UserRole.DESARROLLADOR:
@@ -131,18 +119,15 @@ export class ProgrammaticNavigationExample {
     });
 
     // Agregar acción para limpiar logs
-    this.navigationService.addElementAction(
-      '/admin/control/mantenimiento/logs',
-      {
-        name: 'Limpiar',
-        icon: 'cil-trash',
-        action: () => {
-          // Lógica para limpiar logs
-          console.log('Limpiando logs...');
-        },
-        tooltip: 'Limpiar logs del sistema',
+    this.navigationService.addElementAction('/admin/control/mantenimiento/logs', {
+      name: 'Limpiar',
+      icon: 'cil-trash',
+      action: () => {
+        // Lógica para limpiar logs
+        console.log('Limpiando logs...');
       },
-    );
+      tooltip: 'Limpiar logs del sistema',
+    });
   }
 
   /**
@@ -163,31 +148,22 @@ export class ProgrammaticNavigationExample {
     }
 
     if (systemState.hasDraftEntries) {
-      this.navigationService.setElementBadge(
-        '/admin/control/entradas/entradas-temporales',
-        {
-          color: 'warning',
-          text: 'Borradores',
-        },
-      );
+      this.navigationService.setElementBadge('/admin/control/entradas/entradas-temporales', {
+        color: 'warning',
+        text: 'Borradores',
+      });
     }
 
     if (systemState.hasSystemAlerts) {
-      this.navigationService.setElementBadge(
-        '/admin/control/mantenimiento/logs',
-        {
-          color: 'danger',
-          text: 'Alertas',
-        },
-      );
+      this.navigationService.setElementBadge('/admin/control/mantenimiento/logs', {
+        color: 'danger',
+        text: 'Alertas',
+      });
     }
 
     // En modo mantenimiento, destacar herramientas de mantenimiento
     if (systemState.maintenanceMode) {
-      this.navigationService.setElementPriority(
-        '/admin/control/mantenimiento',
-        95,
-      );
+      this.navigationService.setElementPriority('/admin/control/mantenimiento', 95);
       this.navigationService.setElementBadge('/admin/control/mantenimiento', {
         color: 'warning',
         text: 'Activo',
@@ -200,8 +176,7 @@ export class ProgrammaticNavigationExample {
    */
   applyTemporaryConfiguration(): () => void {
     // Guardar configuración actual
-    const currentConfig =
-      this.navigationService.exportProgrammaticConfigurations();
+    const currentConfig = this.navigationService.exportProgrammaticConfigurations();
 
     // Aplicar configuración temporal
     this.navigationService.setElementBadge('/admin/dashboard', {
@@ -209,10 +184,7 @@ export class ProgrammaticNavigationExample {
       text: 'Temporal',
     });
 
-    this.navigationService.setElementPriority(
-      '/admin/control/configuracion',
-      100,
-    );
+    this.navigationService.setElementPriority('/admin/control/configuracion', 100);
 
     // Retornar función para restaurar configuración
     return () => {
@@ -327,8 +299,7 @@ export class ProgrammaticNavigationExample {
         name: 'Ayuda',
         icon: 'cil-info',
         action: () => console.log('Mostrar ayuda'),
-        tooltip:
-          'Mostrar información de ayuda detallada para el dashboard principal',
+        tooltip: 'Mostrar información de ayuda detallada para el dashboard principal',
       });
     }
 
@@ -348,7 +319,7 @@ export class ProgrammaticNavigationExample {
 export class NavigationConfigurationUsageExample {
   constructor(
     private navigationService: NavigationService,
-    private exampleService: ProgrammaticNavigationExample,
+    private exampleService: ProgrammaticNavigationExample
   ) {}
 
   ngOnInit(): void {

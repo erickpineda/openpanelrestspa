@@ -26,18 +26,16 @@ describe('DashboardFacadeService', () => {
 
     const service = new DashboardFacadeService(apiSpy as any);
 
-    service
-      .refreshAll(30, 'day', 10, true, '2025-01-01', '2025-01-31')
-      .subscribe((res) => {
-        expect(apiSpy.getSummary).toHaveBeenCalledWith(true);
-        expect(apiSpy.getSeriesActivity).toHaveBeenCalledWith(30, true, 'day');
-        expect(apiSpy.getTop).toHaveBeenCalled();
-        expect(apiSpy.getStorage).toHaveBeenCalled();
-        expect(apiSpy.getContentStats).toHaveBeenCalled();
-        expect(Array.isArray(res)).toBeTrue();
-        expect(res.length).toBe(7);
-        done();
-      });
+    service.refreshAll(30, 'day', 10, true, '2025-01-01', '2025-01-31').subscribe((res) => {
+      expect(apiSpy.getSummary).toHaveBeenCalledWith(true);
+      expect(apiSpy.getSeriesActivity).toHaveBeenCalledWith(30, true, 'day');
+      expect(apiSpy.getTop).toHaveBeenCalled();
+      expect(apiSpy.getStorage).toHaveBeenCalled();
+      expect(apiSpy.getContentStats).toHaveBeenCalled();
+      expect(Array.isArray(res)).toBeTrue();
+      expect(res.length).toBe(7);
+      done();
+    });
   });
 
   it('proxy methods should delegate to api', () => {
@@ -69,22 +67,10 @@ describe('DashboardFacadeService', () => {
     expect(apiSpy.getSeriesActivity).toHaveBeenCalledWith(7, false, 'week');
 
     service.getTop('users', 5, true).subscribe(() => {});
-    expect(apiSpy.getTop).toHaveBeenCalledWith(
-      'users',
-      5,
-      true,
-      undefined,
-      undefined,
-    );
+    expect(apiSpy.getTop).toHaveBeenCalledWith('users', 5, true, undefined, undefined);
 
     service.getTop('tags', 1).subscribe(() => {});
-    expect(apiSpy.getTop).toHaveBeenCalledWith(
-      'tags',
-      1,
-      false,
-      undefined,
-      undefined,
-    );
+    expect(apiSpy.getTop).toHaveBeenCalledWith('tags', 1, false, undefined, undefined);
 
     service.getStorage().subscribe(() => {});
     expect(apiSpy.getStorage).toHaveBeenCalled();
@@ -98,20 +84,10 @@ describe('DashboardFacadeService', () => {
     expect(apiSpy.getRecentActivity).toHaveBeenCalledWith(0, 5);
 
     service.getSeriesEntriesSplitEstado(7, 'day', true).subscribe(() => {});
-    expect(apiSpy.getSeriesEntriesSplitEstado).toHaveBeenCalledWith(
-      7,
-      'day',
-      true,
-    );
+    expect(apiSpy.getSeriesEntriesSplitEstado).toHaveBeenCalledWith(7, 'day', true);
 
-    service
-      .getSeriesEntriesSplitEstadoNombre(7, 'day', true)
-      .subscribe(() => {});
-    expect(apiSpy.getSeriesEntriesSplitEstadoNombre).toHaveBeenCalledWith(
-      7,
-      'day',
-      true,
-    );
+    service.getSeriesEntriesSplitEstadoNombre(7, 'day', true).subscribe(() => {});
+    expect(apiSpy.getSeriesEntriesSplitEstadoNombre).toHaveBeenCalledWith(7, 'day', true);
   });
 
   it('evict methods should call api', () => {

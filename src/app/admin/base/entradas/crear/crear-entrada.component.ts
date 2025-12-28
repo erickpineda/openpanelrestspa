@@ -33,7 +33,7 @@ export class CrearEntradaComponent implements OnInit {
     private facade: EntradaFacadeService,
     private router: Router,
     private toastService: ToastService,
-    private log: LoggerService,
+    private log: LoggerService
   ) {
     this.entradaForm = this.vf.buildForm();
   }
@@ -55,10 +55,7 @@ export class CrearEntradaComponent implements OnInit {
 
     this.facade.crearEntrada(ent).subscribe({
       next: () => {
-        this.toastService.showInfo(
-          'Se ha creado la entrada correctamente',
-          'Entrada creada',
-        );
+        this.toastService.showInfo('Se ha creado la entrada correctamente', 'Entrada creada');
         // ✅ Solo navegar si es exitoso
         this.router.navigateByUrl('/admin/control/entradas');
       },

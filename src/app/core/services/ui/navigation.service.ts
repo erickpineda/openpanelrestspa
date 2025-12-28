@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, combineLatest, of } from 'rxjs';
-import {
-  map,
-  distinctUntilChanged,
-  catchError,
-  switchMap,
-} from 'rxjs/operators';
+import { map, distinctUntilChanged, catchError, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import {
   INavigationService,
@@ -42,18 +37,12 @@ export enum NavigationErrorCodes {
   providedIn: 'root',
 })
 export class NavigationService implements INavigationService {
-  private readonly navigationItemsSubject = new BehaviorSubject<
-    INavItemEnhanced[]
-  >([]);
-  private readonly badgeCountsSubject = new BehaviorSubject<
-    Map<string, number>
-  >(new Map());
-  private readonly contextualActionsSubject = new BehaviorSubject<
-    Map<string, IContextualAction[]>
-  >(new Map());
-  private readonly currentUserRoleSubject = new BehaviorSubject<UserRole>(
-    UserRole.ANONYMOUS,
+  private readonly navigationItemsSubject = new BehaviorSubject<INavItemEnhanced[]>([]);
+  private readonly badgeCountsSubject = new BehaviorSubject<Map<string, number>>(new Map());
+  private readonly contextualActionsSubject = new BehaviorSubject<Map<string, IContextualAction[]>>(
+    new Map()
   );
+  private readonly currentUserRoleSubject = new BehaviorSubject<UserRole>(UserRole.ANONYMOUS);
   private readonly activeSectionSubject = new BehaviorSubject<string>('');
   private readonly errorLogSubject = new BehaviorSubject<any[]>([]);
 
@@ -66,7 +55,7 @@ export class NavigationService implements INavigationService {
     private sidebarStateService: SidebarStateService,
     private activeSectionService: ActiveSectionService,
     private programmaticConfigService: ProgrammaticNavigationConfigService,
-    private performanceService: NavigationPerformanceService,
+    private performanceService: NavigationPerformanceService
   ) {
     this.initializeNavigation();
     this.initializePerformanceOptimizations();
@@ -91,45 +80,34 @@ export class NavigationService implements INavigationService {
             this.logPermissionError(
               userRole,
               NavigationErrorCodes.INVALID_STRUCTURE,
-              'Navigation items is not an array',
+              'Navigation items is not an array'
             );
             return this.getFallbackNavigationItems(userRole);
           }
 
           // Aplicar configuraciones programáticas primero
-          let configuredItems =
-            this.programmaticConfigService.applyDynamicConfigurations(items);
+          let configuredItems = this.programmaticConfigService.applyDynamicConfigurations(items);
 
           // Aplicar badges dinámicos y acciones contextuales con manejo de errores
           configuredItems = this.safeApplyDynamicContent(
             configuredItems,
             badgeCounts,
-            contextualActions,
+            contextualActions
           );
 
           return configuredItems;
         } catch (error) {
-          this.logPermissionError(
-            userRole,
-            NavigationErrorCodes.CONFIGURATION_INVALID,
-            error,
-          );
+          this.logPermissionError(userRole, NavigationErrorCodes.CONFIGURATION_INVALID, error);
           return this.getFallbackNavigationItems(userRole);
         }
       }),
       // Usar el servicio de rendimiento para optimizaciones
-      switchMap((items) =>
-        this.performanceService.getOptimizedNavigationItems(items, userRole),
-      ),
+      switchMap((items) => this.performanceService.getOptimizedNavigationItems(items, userRole)),
       catchError((error) => {
-        this.logPermissionError(
-          userRole,
-          NavigationErrorCodes.CONFIGURATION_INVALID,
-          error,
-        );
+        this.logPermissionError(userRole, NavigationErrorCodes.CONFIGURATION_INVALID, error);
         return of(this.getFallbackNavigationItems(userRole));
       }),
-      distinctUntilChanged(),
+      distinctUntilChanged()
     );
   }
 
@@ -142,11 +120,9 @@ export class NavigationService implements INavigationService {
     newCounts.set(itemId, count);
 
     // Usar optimización de badges del servicio de rendimiento
-    this.performanceService
-      .optimizeBadgeUpdates(of(newCounts))
-      .subscribe((optimizedCounts) => {
-        this.badgeCountsSubject.next(optimizedCounts);
-      });
+    this.performanceService.optimizeBadgeUpdates(of(newCounts)).subscribe((optimizedCounts) => {
+      this.badgeCountsSubject.next(optimizedCounts);
+    });
   }
 
   /**
@@ -157,8 +133,7 @@ export class NavigationService implements INavigationService {
     this.activeSectionService.toggleSection(sectionId);
 
     // También actualizar el servicio existente para compatibilidad
-    const isCurrentlyExpanded =
-      this.activeSectionService.isSectionExpanded(sectionId);
+    const isCurrentlyExpanded = this.activeSectionService.isSectionExpanded(sectionId);
     this.sidebarStateService.toggleItem(sectionId, isCurrentlyExpanded);
   }
 
@@ -183,10 +158,7 @@ export class NavigationService implements INavigationService {
   /**
    * Filtra elementos por permisos (implementación de la interfaz)
    */
-  filterByPermissions(
-    items: INavItemEnhanced[],
-    userRole: UserRole,
-  ): INavItemEnhanced[] {
+  filterByPermissions(items: INavItemEnhanced[], userRole: UserRole): INavItemEnhanced[] {
     return NavigationUtils.filterByPermissions(items, userRole);
   }
 
@@ -196,14 +168,13 @@ export class NavigationService implements INavigationService {
   loadNavigationConfig(config: NavigationConfig): void {
     try {
       // Validar la configuración antes de cargarla
-      const validationResult =
-        NavigationValidators.validateNavigationConfig(config);
+      const validationResult = NavigationValidators.validateNavigationConfig(config);
 
       if (!validationResult.isValid) {
         this.logConfigurationError(
           NavigationErrorCodes.CONFIGURATION_INVALID,
           'Invalid navigation configuration',
-          validationResult.errors,
+          validationResult.errors
         );
 
         // Usar configuración de fallback
@@ -213,10 +184,7 @@ export class NavigationService implements INavigationService {
       }
 
       if (validationResult.warnings.length > 0) {
-        console.warn(
-          'Navigation configuration warnings:',
-          validationResult.warnings,
-        );
+        console.warn('Navigation configuration warnings:', validationResult.warnings);
       }
 
       this.baseNavigationConfig = config;
@@ -225,7 +193,7 @@ export class NavigationService implements INavigationService {
       this.logConfigurationError(
         NavigationErrorCodes.CONFIGURATION_INVALID,
         'Error loading navigation configuration',
-        error,
+        error
       );
 
       // Usar configuración de fallback en caso de error
@@ -260,16 +228,10 @@ export class NavigationService implements INavigationService {
   /**
    * Aplica configuración responsiva basada en el ancho de pantalla
    */
-  applyResponsiveConfiguration(
-    screenWidth: number,
-  ): Observable<INavItemEnhanced[]> {
+  applyResponsiveConfiguration(screenWidth: number): Observable<INavItemEnhanced[]> {
     return this.navigationItemsSubject
       .asObservable()
-      .pipe(
-        map((items) =>
-          NavigationUtils.applyResponsiveConfig(items, screenWidth),
-        ),
-      );
+      .pipe(map((items) => NavigationUtils.applyResponsiveConfig(items, screenWidth)));
   }
 
   /**
@@ -310,24 +272,18 @@ export class NavigationService implements INavigationService {
     if (!this.baseNavigationConfig) return;
 
     // Convertir secciones a elementos de navegación planos
-    const items = this.convertSectionsToNavItems(
-      this.baseNavigationConfig.sections,
-    );
+    const items = this.convertSectionsToNavItems(this.baseNavigationConfig.sections);
     this.navigationItemsSubject.next(items);
   }
 
   /**
    * Convierte secciones de configuración a elementos de navegación
    */
-  private convertSectionsToNavItems(
-    sections: NavigationSection[],
-  ): INavItemEnhanced[] {
+  private convertSectionsToNavItems(sections: NavigationSection[]): INavItemEnhanced[] {
     const items: INavItemEnhanced[] = [];
 
     // Ordenar secciones por prioridad antes de convertir
-    const sortedSections = [...sections].sort(
-      (a, b) => b.priority - a.priority,
-    );
+    const sortedSections = [...sections].sort((a, b) => b.priority - a.priority);
 
     for (const section of sortedSections) {
       // Agregar título de sección si tiene elementos
@@ -376,9 +332,7 @@ export class NavigationService implements INavigationService {
 
     // Agregar children si existen
     if (item.children && item.children.length > 0) {
-      navItem.children = item.children.map((child: any) =>
-        this.convertNavigationItem(child),
-      );
+      navItem.children = item.children.map((child: any) => this.convertNavigationItem(child));
     }
 
     return navItem;
@@ -390,7 +344,7 @@ export class NavigationService implements INavigationService {
   private applyDynamicContent(
     items: INavItemEnhanced[],
     badgeCounts: Map<string, number>,
-    contextualActions: Map<string, IContextualAction[]>,
+    contextualActions: Map<string, IContextualAction[]>
   ): INavItemEnhanced[] {
     return items.map((item) => {
       const itemId = NavigationUtils.generateItemId(item);
@@ -417,7 +371,7 @@ export class NavigationService implements INavigationService {
         updatedItem.children = this.applyDynamicContent(
           item.children,
           badgeCounts,
-          contextualActions,
+          contextualActions
         );
       }
 
@@ -438,10 +392,7 @@ export class NavigationService implements INavigationService {
   /**
    * Encuentra la sección activa basada en la URL
    */
-  private findActiveSectionByUrl(
-    items: INavItemEnhanced[],
-    currentUrl: string,
-  ): string {
+  private findActiveSectionByUrl(items: INavItemEnhanced[], currentUrl: string): string {
     for (const item of items) {
       if (NavigationUtils.isItemActive(item, currentUrl)) {
         // Si es un título de sección, devolver su nombre
@@ -451,10 +402,7 @@ export class NavigationService implements INavigationService {
 
         // Si es un elemento con children activos, buscar en la estructura
         if (item.children && item.children.length > 0) {
-          const childSection = this.findActiveSectionByUrl(
-            item.children,
-            currentUrl,
-          );
+          const childSection = this.findActiveSectionByUrl(item.children, currentUrl);
           if (childSection) return childSection;
         }
 
@@ -540,20 +488,14 @@ export class NavigationService implements INavigationService {
    */
   private safeFilterByPermissions(
     items: INavItemEnhanced[],
-    userRole: UserRole,
+    userRole: UserRole
   ): INavItemEnhanced[] {
     try {
       return NavigationUtils.filterByPermissions(items, userRole);
     } catch (error) {
-      this.logPermissionError(
-        userRole,
-        NavigationErrorCodes.PERMISSION_DENIED,
-        error,
-      );
+      this.logPermissionError(userRole, NavigationErrorCodes.PERMISSION_DENIED, error);
       // Retornar solo elementos básicos sin restricciones
-      return items.filter(
-        (item) => !item.requiredRoles || item.requiredRoles.length === 0,
-      );
+      return items.filter((item) => !item.requiredRoles || item.requiredRoles.length === 0);
     }
   }
 
@@ -563,7 +505,7 @@ export class NavigationService implements INavigationService {
   private safeApplyDynamicContent(
     items: INavItemEnhanced[],
     badgeCounts: Map<string, number>,
-    contextualActions: Map<string, IContextualAction[]>,
+    contextualActions: Map<string, IContextualAction[]>
   ): INavItemEnhanced[] {
     try {
       return this.applyDynamicContent(items, badgeCounts, contextualActions);
@@ -571,7 +513,7 @@ export class NavigationService implements INavigationService {
       this.logConfigurationError(
         NavigationErrorCodes.COUNTER_SERVICE_UNAVAILABLE,
         'Error applying dynamic content',
-        error,
+        error
       );
       // Retornar elementos sin contenido dinámico
       return items;
@@ -584,7 +526,7 @@ export class NavigationService implements INavigationService {
   private logPermissionError(
     userRole: UserRole,
     errorCode: NavigationErrorCodes,
-    error: any,
+    error: any
   ): void {
     const errorKey = `${userRole}-${errorCode}`;
     const currentCount = this.permissionErrors.get(errorKey) || 0;
@@ -609,7 +551,7 @@ export class NavigationService implements INavigationService {
       window.dispatchEvent(
         new CustomEvent('navigation-permission-error', {
           detail: errorInfo,
-        }),
+        })
       );
     }
   }
@@ -620,7 +562,7 @@ export class NavigationService implements INavigationService {
   private logConfigurationError(
     errorCode: NavigationErrorCodes,
     message: string,
-    error: any,
+    error: any
   ): void {
     const errorInfo = {
       timestamp: new Date().toISOString(),
@@ -640,7 +582,7 @@ export class NavigationService implements INavigationService {
       window.dispatchEvent(
         new CustomEvent('navigation-configuration-error', {
           detail: errorInfo,
-        }),
+        })
       );
     }
   }
@@ -737,9 +679,10 @@ export class NavigationService implements INavigationService {
     permissionErrors: number;
   } {
     const totalErrors = this.errorLogSubject.value.length;
-    const totalPermissionErrors = Array.from(
-      this.permissionErrors.values(),
-    ).reduce((sum, count) => sum + count, 0);
+    const totalPermissionErrors = Array.from(this.permissionErrors.values()).reduce(
+      (sum, count) => sum + count,
+      0
+    );
 
     return {
       healthy: totalErrors === 0 && totalPermissionErrors === 0,
@@ -765,20 +708,14 @@ export class NavigationService implements INavigationService {
     config: Partial<{
       icon: string;
       badge: {
-        color:
-          | 'primary'
-          | 'secondary'
-          | 'success'
-          | 'warning'
-          | 'danger'
-          | 'info';
+        color: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
         text: string;
       };
       priority: number;
       visible: boolean;
       requiredRoles: UserRole[];
       contextualActions: IContextualAction[];
-    }>,
+    }>
   ): void {
     this.programmaticConfigService.configureElement({
       itemId,
@@ -799,15 +736,9 @@ export class NavigationService implements INavigationService {
   public setElementBadge(
     itemId: string,
     badge: {
-      color:
-        | 'primary'
-        | 'secondary'
-        | 'success'
-        | 'warning'
-        | 'danger'
-        | 'info';
+      color: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
       text: string;
-    },
+    }
   ): void {
     this.programmaticConfigService.setBadge(itemId, badge);
   }
@@ -860,7 +791,7 @@ export class NavigationService implements INavigationService {
       collapsible?: boolean;
       defaultExpanded?: boolean;
       requiredRoles?: UserRole[];
-    },
+    }
   ): void {
     this.programmaticConfigService.createGroup({
       groupId,
@@ -881,7 +812,7 @@ export class NavigationService implements INavigationService {
       collapsible: boolean;
       defaultExpanded: boolean;
       requiredRoles: UserRole[];
-    }>,
+    }>
   ): void {
     this.programmaticConfigService.updateGroup(groupId, config);
   }
@@ -902,9 +833,7 @@ export class NavigationService implements INavigationService {
 
     // Generar configuración con grupos dinámicos
     const enhancedConfig =
-      this.programmaticConfigService.generateNavigationWithDynamicGroups(
-        config,
-      );
+      this.programmaticConfigService.generateNavigationWithDynamicGroups(config);
 
     // Actualizar la configuración base con los grupos dinámicos
     this.baseNavigationConfig = enhancedConfig;
@@ -924,10 +853,7 @@ export class NavigationService implements INavigationService {
   /**
    * Importa configuraciones programáticas
    */
-  public importProgrammaticConfigurations(data: {
-    elements: any[];
-    groups: any[];
-  }): void {
+  public importProgrammaticConfigurations(data: { elements: any[]; groups: any[] }): void {
     this.programmaticConfigService.importConfigurations(data);
   }
 
@@ -970,11 +896,8 @@ export class NavigationService implements INavigationService {
       cacheEfficiency: {
         hitRate:
           performanceStats.permissionCacheHits /
-            (performanceStats.permissionCacheHits +
-              performanceStats.permissionCacheMisses) || 0,
-        totalQueries:
-          performanceStats.permissionCacheHits +
-          performanceStats.permissionCacheMisses,
+            (performanceStats.permissionCacheHits + performanceStats.permissionCacheMisses) || 0,
+        totalQueries: performanceStats.permissionCacheHits + performanceStats.permissionCacheMisses,
       },
     };
   }
@@ -1013,10 +936,7 @@ export class NavigationService implements INavigationService {
   /**
    * Verifica si un elemento tiene permisos usando cache memoizado
    */
-  public checkPermissionMemoized(
-    item: INavItemEnhanced,
-    userRole: UserRole,
-  ): boolean {
+  public checkPermissionMemoized(item: INavItemEnhanced, userRole: UserRole): boolean {
     return this.performanceService.checkPermissionMemoized(item, userRole);
   }
 

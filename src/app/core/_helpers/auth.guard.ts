@@ -20,9 +20,7 @@ import { AuthService } from '../services/auth/auth.service';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard
-  implements CanActivate, CanActivateChild, CanLoad, CanMatch
-{
+export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMatch {
   // margen en segundos para considerar "a punto de expirar"
   private readonly EXPIRY_MARGIN_SECONDS = 30;
 
@@ -31,7 +29,7 @@ export class AuthGuard
     private authSync: AuthSyncService,
     private router: Router,
     private log: LoggerService,
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
 
   // Common check reused by the three guards
@@ -60,7 +58,7 @@ export class AuthGuard
 
     if (!this.authService.isTokenValid(this.EXPIRY_MARGIN_SECONDS)) {
       this.log.info(
-        '🔐 AuthGuard - Token caducado o a punto de caducar -> redirigiendo (sin emitir logout)',
+        '🔐 AuthGuard - Token caducado o a punto de caducar -> redirigiendo (sin emitir logout)'
       );
       return false;
     }
@@ -90,10 +88,7 @@ export class AuthGuard
         Array.isArray(user?.roles) &&
         user.roles.some((role: string) => requiredRoles.includes(role));
       if (!hasRole) {
-        this.log.info(
-          '🔐 AuthGuard - Usuario no tiene los roles requeridos:',
-          requiredRoles,
-        );
+        this.log.info('🔐 AuthGuard - Usuario no tiene los roles requeridos:', requiredRoles);
         return this.router.parseUrl('/login');
       }
     }

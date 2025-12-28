@@ -39,14 +39,13 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
   constructor(
     private responsiveNavigationService: ResponsiveNavigationService,
     private navigationService: NavigationService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {
     this.responsiveState$ = this.responsiveNavigationService.responsiveState$;
   }
 
   ngOnInit(): void {
-    this.criticalFunctions =
-      this.responsiveNavigationService.getCriticalFunctions();
+    this.criticalFunctions = this.responsiveNavigationService.getCriticalFunctions();
     this.initializeResponsiveNavigation();
   }
 
@@ -81,11 +80,10 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
    * Adapta la navegación para el estado actual
    */
   private adaptNavigationForCurrentState(state: ResponsiveState): void {
-    this.adaptedNavigationItems =
-      this.responsiveNavigationService.adaptNavigationItems(
-        this.navigationItems,
-        state,
-      );
+    this.adaptedNavigationItems = this.responsiveNavigationService.adaptNavigationItems(
+      this.navigationItems,
+      state
+    );
   }
 
   /**
@@ -129,10 +127,7 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
   /**
    * Verifica si un elemento debe mostrarse en el modo actual
    */
-  public shouldShowItem(
-    item: INavItemEnhanced,
-    state: ResponsiveState,
-  ): boolean {
+  public shouldShowItem(item: INavItemEnhanced, state: ResponsiveState): boolean {
     if (item.responsiveConfig?.hideOnMobile && state.isMobile) {
       return false;
     }
@@ -150,7 +145,7 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
    */
   private isCriticalFunction(item: INavItemEnhanced): boolean {
     return this.criticalFunctions.some(
-      (critical) => critical.url === item.url || critical.name === item.name,
+      (critical) => critical.url === item.url || critical.name === item.name
     );
   }
 
@@ -182,10 +177,7 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
   /**
    * Obtiene las clases CSS para un elemento de navegación
    */
-  public getItemClasses(
-    item: INavItemEnhanced,
-    state: ResponsiveState,
-  ): string[] {
+  public getItemClasses(item: INavItemEnhanced, state: ResponsiveState): string[] {
     const classes = ['nav-item'];
 
     if (item.title) {
@@ -239,9 +231,7 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
     return (item.url as string) || item.name || index.toString();
   }
 
-  public getBadgeClasses(
-    badge?: { color?: string; text?: string } | null,
-  ): string[] {
+  public getBadgeClasses(badge?: { color?: string; text?: string } | null): string[] {
     const color = badge?.color || 'info';
     const classes = ['badge-' + color];
     if (badge?.text === '0') classes.push('zero-count');

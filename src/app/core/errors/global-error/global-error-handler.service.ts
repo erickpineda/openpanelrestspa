@@ -43,7 +43,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
   constructor(
     private injector: Injector,
     private ngZone: NgZone,
-    private log: LoggerService,
+    private log: LoggerService
   ) {
     // ✅ Capturar errores de promesas no manejadas
     this.setupUnhandledPromiseRejectionHandler();
@@ -82,9 +82,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
       severity: this.determineSeverity(error),
       category: isBackendError ? 'validation' : this.categorizeError(error),
       originalError: error,
-      validationErrors: isBackendError
-        ? this.extractValidationErrors(error)
-        : undefined,
+      validationErrors: isBackendError ? this.extractValidationErrors(error) : undefined,
     };
   }
 
@@ -96,10 +94,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
           event?.preventDefault?.();
         } catch {}
 
-        this.log.info(
-          '🔍 [PROMISE] Unhandled rejection capturado:',
-          event?.reason,
-        );
+        this.log.info('🔍 [PROMISE] Unhandled rejection capturado:', event?.reason);
 
         const promiseError = this.normalizePromiseRejection(event?.reason);
         this.handleError(promiseError);
@@ -144,9 +139,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
     }
 
     // Para otros tipos de rechazos
-    return new Error(
-      `Unhandled Promise rejection: ${rejection?.message || rejection}`,
-    );
+    return new Error(`Unhandled Promise rejection: ${rejection?.message || rejection}`);
   }
 
   private processError(error: AppError): void {
@@ -200,22 +193,15 @@ export class GlobalErrorHandlerService implements ErrorHandler {
     }
   }
 
-  private showValidationErrors(
-    error: AppError,
-    toastService: ToastService,
-  ): void {
+  private showValidationErrors(error: AppError, toastService: ToastService): void {
     if (error.validationErrors && error.validationErrors.length > 0) {
       if (error.validationErrors.length === 1) {
         // Un solo error - mostrar directamente
-        const cleanMessage = this.cleanValidationMessage(
-          error.validationErrors[0],
-        );
+        const cleanMessage = this.cleanValidationMessage(error.validationErrors[0]);
         toastService.showError(cleanMessage, 'Error de Validación');
       } else {
         // Múltiples errores
-        const mainError = this.cleanValidationMessage(
-          error.validationErrors[0],
-        );
+        const mainError = this.cleanValidationMessage(error.validationErrors[0]);
         const additionalCount = error.validationErrors.length - 1;
         const message =
           additionalCount > 0
@@ -225,10 +211,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
         toastService.showError(message, 'Errores de Validación');
 
         if (this.isDevelopment()) {
-          this.log.warn(
-            '📋 Todos los errores de validación:',
-            error.validationErrors,
-          );
+          this.log.warn('📋 Todos los errores de validación:', error.validationErrors);
         }
       }
     }
@@ -253,7 +236,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
     this.log.info('🔍 [USER MESSAGE] Tipo de error:', typeof error);
     this.log.info(
       '🔍 [USER MESSAGE] error instanceof HttpErrorResponse:',
-      error instanceof HttpErrorResponse,
+      error instanceof HttpErrorResponse
     );
 
     if (error instanceof HttpErrorResponse) {
@@ -308,16 +291,14 @@ export class GlobalErrorHandlerService implements ErrorHandler {
   }
 
   private isBackendErrorResponse(
-    error: any,
+    error: any
   ): error is HttpErrorResponse & { error: BackendErrorResponse } {
     if (!error || !error.error) {
       return false;
     }
 
     const hasValidStructure =
-      error.error.result &&
-      error.error.error &&
-      Array.isArray(error.error.error.details);
+      error.error.result && error.error.error && Array.isArray(error.error.error.details);
 
     this.log.info('🔍 [BACKEND CHECK] Estructura válida:', hasValidStructure);
     return hasValidStructure;

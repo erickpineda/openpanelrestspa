@@ -39,11 +39,7 @@
             Avanzado
           </button>
         </c-col>
-        <c-col
-          xs="12"
-          md="4"
-          class="d-flex justify-content-md-end gap-2 align-items-center"
-        >
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
           <select
             cSelect
             [ngModel]="pageSize"
@@ -119,11 +115,7 @@
         @if (loading) {
           <div
             class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-            style="
-              z-index: 10;
-              background-color: rgba(255, 255, 255, 0.8);
-              min-height: 200px;
-            "
+            style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
           >
             <div class="text-center">
               <c-spinner [attr.aria-label]="'Cargando etiquetas'"></c-spinner>
@@ -147,16 +139,11 @@
                 <th scope="col" style="min-width: 90px">Color</th>
                 <th scope="col" style="min-width: 200px">Nombre</th>
                 <th scope="col" style="min-width: 250px">Descripción</th>
-                <th scope="col" class="text-center" style="min-width: 100px">
-                  Acciones
-                </th>
+                <th scope="col" class="text-center" style="min-width: 100px">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              @for (
-                etiqueta of pagedEtiquetas;
-                track trackByEtiqueta($index, etiqueta)
-              ) {
+              @for (etiqueta of pagedEtiquetas; track trackByEtiqueta($index, etiqueta)) {
                 <tr role="row">
                   <td>
                     <span
@@ -192,9 +179,7 @@
                         (click)="onEdit(etiqueta)"
                         [attr.aria-label]="'Editar etiqueta ' + etiqueta.nombre"
                         role="button"
-                        [attr.data-testid]="
-                          'btn-editar-etiqueta-' + etiqueta.idEtiqueta
-                        "
+                        [attr.data-testid]="'btn-editar-etiqueta-' + etiqueta.idEtiqueta"
                       >
                         <svg cIcon name="cilPencil" size="sm"></svg>
                       </button>
@@ -204,13 +189,9 @@
                         color="danger"
                         variant="ghost"
                         (click)="onDelete(etiqueta)"
-                        [attr.aria-label]="
-                          'Eliminar etiqueta ' + etiqueta.nombre
-                        "
+                        [attr.aria-label]="'Eliminar etiqueta ' + etiqueta.nombre"
                         role="button"
-                        [attr.data-testid]="
-                          'btn-eliminar-etiqueta-' + etiqueta.idEtiqueta
-                        "
+                        [attr.data-testid]="'btn-eliminar-etiqueta-' + etiqueta.idEtiqueta"
                       >
                         <svg cIcon name="cilTrash" size="sm"></svg>
                       </button>
@@ -222,19 +203,10 @@
               @if (pagedEtiquetas.length === 0) {
                 <tr>
                   <td colspan="4" class="text-center py-5">
-                    <div
-                      class="d-flex flex-column align-items-center justify-content-center"
-                    >
-                      <svg
-                        cIcon
-                        name="cilSearch"
-                        size="3xl"
-                        class="text-muted mb-3"
-                      ></svg>
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
                       <h6 class="text-muted">No se han encontrado etiquetas</h6>
-                      <p class="text-muted small">
-                        Intenta ajustar los filtros de búsqueda
-                      </p>
+                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                     </div>
                   </td>
                 </tr>
@@ -254,16 +226,8 @@
 
           @if (pagedEtiquetas.length > 0) {
             <c-row class="mt-2">
-              <c-col
-                class="d-flex justify-content-end align-items-center gap-2"
-              >
-                <button
-                  cButton
-                  color="light"
-                  size="sm"
-                  (click)="onPrev()"
-                  [disabled]="pageNo <= 0"
-                >
+              <c-col class="d-flex justify-content-end align-items-center gap-2">
+                <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="pageNo <= 0">
                   Anterior
                 </button>
                 <button
@@ -276,8 +240,8 @@
                   Siguiente
                 </button>
                 <div class="text-muted small ms-2">
-                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
-                  {{ totalItems }} · Mostrando {{ numberOfElements }}
+                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalItems }} ·
+                  Mostrando {{ numberOfElements }}
                 </div>
               </c-col>
             </c-row>
@@ -291,9 +255,7 @@
 <c-modal
   [visible]="showCreateModal || showEditModal"
   (visibleChange)="onModalVisibleChange($event)"
-  [attr.data-testid]="
-    showCreateModal ? 'crear-etiqueta-modal' : 'editar-etiqueta-modal'
-  "
+  [attr.data-testid]="showCreateModal ? 'crear-etiqueta-modal' : 'editar-etiqueta-modal'"
 >
   <c-modal-header
     ><h5 cModalTitle>
@@ -311,9 +273,7 @@
     }
   </c-modal-body>
   <c-modal-footer
-    ><button cButton color="secondary" (click)="onModalClose()">
-      Cerrar
-    </button></c-modal-footer
+    ><button cButton color="secondary" (click)="onModalClose()">Cerrar</button></c-modal-footer
   >
 </c-modal>
 

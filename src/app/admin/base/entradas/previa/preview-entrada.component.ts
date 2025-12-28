@@ -67,11 +67,7 @@ export class PreviaEntradaComponent implements OnChanges {
 
   private resolveCategorias(): Categoria[] {
     // Prioridad: entrada.categorias > form.categorias (objetos) > form.categorias (ids + categoriasMeta)
-    if (
-      this.entrada &&
-      Array.isArray(this.entrada.categorias) &&
-      this.entrada.categorias.length
-    ) {
+    if (this.entrada && Array.isArray(this.entrada.categorias) && this.entrada.categorias.length) {
       return this.entrada.categorias;
     }
 
@@ -87,9 +83,7 @@ export class PreviaEntradaComponent implements OnChanges {
       // si son ids (números o strings)
       if (this.categoriasMeta && this.categoriasMeta.length) {
         const ids = formCats.map((x: any) => Number(x));
-        return this.categoriasMeta.filter((c) =>
-          ids.includes(Number(c.idCategoria)),
-        );
+        return this.categoriasMeta.filter((c) => ids.includes(Number(c.idCategoria)));
       }
     }
 

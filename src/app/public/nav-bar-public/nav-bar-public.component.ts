@@ -32,7 +32,7 @@ export class NavBarPublicComponent implements OnInit {
     private authService: AuthService,
     private authSync: AuthSyncService,
     private router: Router,
-    private log: LoggerService,
+    private log: LoggerService
   ) {
     // Escuchar cambios de estado de autenticación
     window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, () => {

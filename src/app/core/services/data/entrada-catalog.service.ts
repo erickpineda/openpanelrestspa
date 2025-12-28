@@ -14,7 +14,7 @@ export class EntradaCatalogService {
   constructor(
     private entradaService: EntradaService,
     private categoriaService: CategoriaService,
-    private etiquetaService: EtiquetaService,
+    private etiquetaService: EtiquetaService
   ) {}
 
   /**
@@ -32,22 +32,14 @@ export class EntradaCatalogService {
     return forkJoin([tipos$, estados$, categorias$, etiquetas$]).pipe(
       map(([tipos, estados, categorias, etiquetas]) => {
         const mapped: { [key: string]: string[] } = {
-          'tipoEntrada.nombre': Array.isArray(tipos)
-            ? tipos.map((t: any) => t.nombre)
-            : [],
-          'estadoEntrada.nombre': Array.isArray(estados)
-            ? estados.map((e: any) => e.nombre)
-            : [],
-          'categoria.nombre': Array.isArray(categorias)
-            ? categorias.map((c: any) => c.nombre)
-            : [],
-          'etiqueta.nombre': Array.isArray(etiquetas)
-            ? etiquetas.map((t: any) => t.nombre)
-            : [],
+          'tipoEntrada.nombre': Array.isArray(tipos) ? tipos.map((t: any) => t.nombre) : [],
+          'estadoEntrada.nombre': Array.isArray(estados) ? estados.map((e: any) => e.nombre) : [],
+          'categoria.nombre': Array.isArray(categorias) ? categorias.map((c: any) => c.nombre) : [],
+          'etiqueta.nombre': Array.isArray(etiquetas) ? etiquetas.map((t: any) => t.nombre) : [],
         };
         this.cache = mapped;
         return mapped;
-      }),
+      })
     );
   }
 

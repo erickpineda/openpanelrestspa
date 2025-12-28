@@ -1,12 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  ResponsiveNavigationService,
-  ResponsiveState,
-} from './responsive-navigation.service';
-import {
-  INavItemEnhanced,
-  UserRole,
-} from '../../../shared/types/navigation.types';
+import { ResponsiveNavigationService, ResponsiveState } from './responsive-navigation.service';
+import { INavItemEnhanced, UserRole } from '../../../shared/types/navigation.types';
 
 describe('ResponsiveNavigationService', () => {
   let service: ResponsiveNavigationService;
@@ -100,9 +94,7 @@ describe('ResponsiveNavigationService', () => {
     it('should include dashboard as critical function', () => {
       const criticalFunctions = service.getCriticalFunctions();
 
-      const dashboard = criticalFunctions.find(
-        (func) => func.id === 'dashboard',
-      );
+      const dashboard = criticalFunctions.find((func) => func.id === 'dashboard');
       expect(dashboard).toBeDefined();
       expect(dashboard?.name).toBe('Escritorio');
       expect(dashboard?.url).toBe('/admin/dashboard');
@@ -165,10 +157,7 @@ describe('ResponsiveNavigationService', () => {
         touchEnabled: true,
       };
 
-      const adaptedItems = service.adaptNavigationItems(
-        mockNavItems,
-        mobileState,
-      );
+      const adaptedItems = service.adaptNavigationItems(mockNavItems, mobileState);
 
       // Should filter to critical functions and section titles
       expect(adaptedItems.length).toBeLessThan(mockNavItems.length);
@@ -195,10 +184,7 @@ describe('ResponsiveNavigationService', () => {
         touchEnabled: true,
       };
 
-      const adaptedItems = service.adaptNavigationItems(
-        mockNavItems,
-        tabletState,
-      );
+      const adaptedItems = service.adaptNavigationItems(mockNavItems, tabletState);
 
       // Should keep all items for tablet
       expect(adaptedItems.length).toBe(mockNavItems.length);
@@ -221,10 +207,7 @@ describe('ResponsiveNavigationService', () => {
         touchEnabled: false,
       };
 
-      const adaptedItems = service.adaptNavigationItems(
-        mockNavItems,
-        desktopState,
-      );
+      const adaptedItems = service.adaptNavigationItems(mockNavItems, desktopState);
 
       // Should keep all items unchanged for desktop
       expect(adaptedItems.length).toBe(mockNavItems.length);
@@ -316,16 +299,11 @@ describe('ResponsiveNavigationService', () => {
         touchEnabled: true,
       };
 
-      const mobileAdapted = service.adaptNavigationItems(
-        testNavItems,
-        mobileState,
-      );
+      const mobileAdapted = service.adaptNavigationItems(testNavItems, mobileState);
 
       // Verify critical functions are preserved in mobile
       criticalUrls.forEach((criticalUrl) => {
-        const foundInMobile = mobileAdapted.some(
-          (item) => item.url === criticalUrl,
-        );
+        const foundInMobile = mobileAdapted.some((item) => item.url === criticalUrl);
         if (testNavItems.some((item) => item.url === criticalUrl)) {
           expect(foundInMobile).toBe(true);
         }
@@ -341,10 +319,7 @@ describe('ResponsiveNavigationService', () => {
         touchEnabled: true,
       };
 
-      const tabletAdapted = service.adaptNavigationItems(
-        testNavItems,
-        tabletState,
-      );
+      const tabletAdapted = service.adaptNavigationItems(testNavItems, tabletState);
 
       // Tablet should maintain all functions
       expect(tabletAdapted.length).toBe(testNavItems.length);
@@ -359,10 +334,7 @@ describe('ResponsiveNavigationService', () => {
         touchEnabled: false,
       };
 
-      const desktopAdapted = service.adaptNavigationItems(
-        testNavItems,
-        desktopState,
-      );
+      const desktopAdapted = service.adaptNavigationItems(testNavItems, desktopState);
 
       // Desktop should maintain all functions
       expect(desktopAdapted.length).toBe(testNavItems.length);
@@ -416,10 +388,7 @@ describe('ResponsiveNavigationService', () => {
         touchEnabled: true,
       };
 
-      const adaptedItems = service.adaptNavigationItems(
-        testNavItems,
-        tabletState,
-      );
+      const adaptedItems = service.adaptNavigationItems(testNavItems, tabletState);
 
       // Should optimize for touch interaction
       adaptedItems.forEach((item) => {
@@ -496,18 +465,9 @@ describe('ResponsiveNavigationService', () => {
         touchEnabled: false,
       };
 
-      const mobileAdapted = service.adaptNavigationItems(
-        testNavItems,
-        mobileState,
-      );
-      const tabletAdapted = service.adaptNavigationItems(
-        testNavItems,
-        tabletState,
-      );
-      const desktopAdapted = service.adaptNavigationItems(
-        testNavItems,
-        desktopState,
-      );
+      const mobileAdapted = service.adaptNavigationItems(testNavItems, mobileState);
+      const tabletAdapted = service.adaptNavigationItems(testNavItems, tabletState);
+      const desktopAdapted = service.adaptNavigationItems(testNavItems, desktopState);
 
       // Mobile should have fewer items (critical functions only)
       expect(mobileAdapted.length).toBeLessThanOrEqual(testNavItems.length);
@@ -520,15 +480,9 @@ describe('ResponsiveNavigationService', () => {
       expect(desktopAdapted).toEqual(testNavItems);
 
       // Critical functions should be preserved across all sizes
-      const dashboardInMobile = mobileAdapted.find(
-        (item) => item.name === 'Dashboard',
-      );
-      const dashboardInTablet = tabletAdapted.find(
-        (item) => item.name === 'Dashboard',
-      );
-      const dashboardInDesktop = desktopAdapted.find(
-        (item) => item.name === 'Dashboard',
-      );
+      const dashboardInMobile = mobileAdapted.find((item) => item.name === 'Dashboard');
+      const dashboardInTablet = tabletAdapted.find((item) => item.name === 'Dashboard');
+      const dashboardInDesktop = desktopAdapted.find((item) => item.name === 'Dashboard');
 
       expect(dashboardInMobile).toBeDefined();
       expect(dashboardInTablet).toBeDefined();

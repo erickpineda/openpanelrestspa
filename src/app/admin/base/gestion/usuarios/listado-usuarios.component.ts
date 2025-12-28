@@ -49,7 +49,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -73,11 +73,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
     const handleResponse = (r: any) => {
       const data = r?.data || r;
-      const list = Array.isArray(data?.elements)
-        ? data.elements
-        : Array.isArray(data)
-          ? data
-          : [];
+      const list = Array.isArray(data?.elements) ? data.elements : Array.isArray(data) ? data : [];
       this.usuarios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
       this.numberOfElements = list.length;
@@ -96,12 +92,11 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.loading = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({ next: handleResponse, error: handleError });
     } else {
-      const criteria: { filterKey: string; value: any; operation: string }[] =
-        [];
+      const criteria: { filterKey: string; value: any; operation: string }[] = [];
       if (this.filtroUsuario)
         criteria.push({
           filterKey: 'username',
@@ -129,7 +124,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.loading = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({ next: handleResponse, error: handleError });
     }
@@ -188,19 +183,14 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(
-      0,
-      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
-    );
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.load();
   }
 
   getTotalPages(): number {
-    return this.totalElements
-      ? Math.ceil(this.totalElements / this.pageSize)
-      : 0;
+    return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0;
   }
 
   onBasicSearchTextChange(text: string): void {
@@ -271,16 +261,10 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     if (hasId) {
       // Use partial update with JSON Patch
       if (this.originalUser) {
-        op$ = this.usuarioService.actualizarParcial(
-          this.editUser.idUsuario!,
-          this.editUser,
-        );
+        op$ = this.usuarioService.actualizarParcial(this.editUser.idUsuario!, this.editUser);
       } else {
         // Fallback if original is missing (shouldn't happen in edit mode)
-        op$ = this.usuarioService.actualizar(
-          this.editUser.idUsuario!,
-          this.editUser,
-        );
+        op$ = this.usuarioService.actualizar(this.editUser.idUsuario!, this.editUser);
       }
     } else {
       op$ = this.usuarioService.crear(this.editUser);
@@ -288,19 +272,13 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
     op$.subscribe({
       next: () => {
-        this.toast.showSuccess(
-          hasId ? 'Usuario actualizado' : 'Usuario creado',
-          'Usuarios',
-        );
+        this.toast.showSuccess(hasId ? 'Usuario actualizado' : 'Usuario creado', 'Usuarios');
         this.loading = false;
         this.editModalVisible = false;
         this.load();
       },
       error: (err: any) => {
-        this.toast.showError(
-          hasId ? 'Error actualizando' : 'Error creando',
-          'Usuarios',
-        );
+        this.toast.showError(hasId ? 'Error actualizando' : 'Error creando', 'Usuarios');
         this.log.error(hasId ? 'usuarios actualizar' : 'usuarios crear', err);
         this.loading = false;
       },
@@ -310,14 +288,8 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   delete(u: Usuario): void {
     if (!u.idUsuario) return;
     // Protección para evitar borrar al propietario
-    if (
-      this.PROPIETARIO_ROLE_CODE &&
-      u.rolCodigo === this.PROPIETARIO_ROLE_CODE
-    ) {
-      this.toast.showWarning(
-        'No se puede eliminar al usuario Propietario',
-        'Acción no permitida',
-      );
+    if (this.PROPIETARIO_ROLE_CODE && u.rolCodigo === this.PROPIETARIO_ROLE_CODE) {
+      this.toast.showWarning('No se puede eliminar al usuario Propietario', 'Acción no permitida');
       return;
     }
     this.userToDelete = u;

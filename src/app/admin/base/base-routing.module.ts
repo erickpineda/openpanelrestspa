@@ -16,54 +16,44 @@ const routes: Routes = [
     children: [
       {
         path: 'entradas',
-        loadChildren: () =>
-          import('./entradas/entradas.module').then((m) => m.EntradasModule),
+        loadChildren: () => import('./entradas/entradas.module').then((m) => m.EntradasModule),
         data: { preload: true, delay: 1000 },
       },
       {
         path: 'paginas',
-        loadChildren: () =>
-          import('./paginas/paginas.module').then((m) => m.PaginasModule),
+        loadChildren: () => import('./paginas/paginas.module').then((m) => m.PaginasModule),
         data: { preload: true, delay: 1100 },
       },
       // Secciones reubicadas bajo base
       {
         path: 'configuracion',
         loadChildren: () =>
-          import('./configuracion/configuracion.module').then(
-            (m) => m.ConfiguracionModule,
-          ),
+          import('./configuracion/configuracion.module').then((m) => m.ConfiguracionModule),
         data: { preload: true, delay: 1200 },
       },
       {
         path: 'contenido',
-        loadChildren: () =>
-          import('./contenido/contenido.module').then((m) => m.ContenidoModule),
+        loadChildren: () => import('./contenido/contenido.module').then((m) => m.ContenidoModule),
         data: { preload: true, delay: 1400 },
       },
       {
         path: 'gestion',
-        loadChildren: () =>
-          import('./gestion/gestion.module').then((m) => m.GestionModule),
+        loadChildren: () => import('./gestion/gestion.module').then((m) => m.GestionModule),
         data: { preload: true, delay: 1600 },
       },
       {
         path: 'etiquetas',
-        loadChildren: () =>
-          import('./etiquetas/etiquetas.module').then((m) => m.EtiquetasModule),
+        loadChildren: () => import('./etiquetas/etiquetas.module').then((m) => m.EtiquetasModule),
         data: { preload: true, delay: 1800 },
       },
       {
         path: 'perfil',
-        loadChildren: () =>
-          import('./perfil/perfil.module').then((m) => m.PerfilModule),
+        loadChildren: () => import('./perfil/perfil.module').then((m) => m.PerfilModule),
       },
       {
         path: 'mantenimiento',
         loadChildren: () =>
-          import('./mantenimiento/mantenimiento.module').then(
-            (m) => m.MantenimientoModule,
-          ),
+          import('./mantenimiento/mantenimiento.module').then((m) => m.MantenimientoModule),
         data: { preload: true, delay: 2000 },
       },
       {

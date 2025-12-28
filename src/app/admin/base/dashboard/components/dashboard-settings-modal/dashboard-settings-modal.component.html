@@ -1,8 +1,4 @@
-<c-modal
-  [visible]="visible"
-  (visibleChange)="visibleChange.emit($event)"
-  alignment="center"
->
+<c-modal [visible]="visible" (visibleChange)="visibleChange.emit($event)" alignment="center">
   <c-modal-header>
     <h5 cModalTitle>Parámetros del Dashboard</h5>
   </c-modal-header>
@@ -10,13 +6,7 @@
     <c-row>
       <c-col lg="6">
         <label class="form-label">Días de serie</label>
-        <input
-          cFormControl
-          type="number"
-          min="1"
-          max="365"
-          [(ngModel)]="settings.seriesDays"
-        />
+        <input cFormControl type="number" min="1" max="365" [(ngModel)]="settings.seriesDays" />
       </c-col>
       <c-col lg="6">
         <label class="form-label">Granularidad</label>
@@ -29,13 +19,7 @@
       </c-col>
       <c-col lg="6">
         <label class="form-label">Top límite</label>
-        <input
-          cFormControl
-          type="number"
-          min="1"
-          max="200"
-          [(ngModel)]="settings.topLimit"
-        />
+        <input cFormControl type="number" min="1" max="200" [(ngModel)]="settings.topLimit" />
       </c-col>
       <c-col lg="6">
         <label class="form-label">Periodo Top (días)</label>
@@ -47,9 +31,7 @@
       </c-col>
       <c-col lg="12">
         <hr />
-        <div class="small text-muted mb-2">
-          Rango exacto para Top (opcional)
-        </div>
+        <div class="small text-muted mb-2">Rango exacto para Top (opcional)</div>
       </c-col>
       <c-col lg="6">
         <label class="form-label" for="topStartDate">Fecha inicio</label>

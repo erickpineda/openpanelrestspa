@@ -20,10 +20,6 @@ import { CrearPaginaComponent } from './crear/crear-pagina.component';
     SharedCoreUiModule,
     EntradasSharedModule,
   ],
-  declarations: [
-    ListadoPaginasComponent,
-    CrearPaginaComponent,
-    EditarPaginaComponent,
-  ],
+  declarations: [ListadoPaginasComponent, CrearPaginaComponent, EditarPaginaComponent],
 })
 export class PaginasModule {}

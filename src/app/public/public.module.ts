@@ -17,10 +17,7 @@ import { IconModule } from '@coreui/icons-angular';
 import { SharedOPModule } from '../shared/shared.module';
 import { SharedCoreUiModule } from '../shared/shared-coreui.module';
 import { CoreModule } from '../core/core.module';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 @NgModule({
   declarations: [

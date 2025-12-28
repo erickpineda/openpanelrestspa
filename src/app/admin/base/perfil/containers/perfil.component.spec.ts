@@ -17,10 +17,7 @@ describe('PerfilComponent', () => {
       'obtenerDatosSesionActualSafe',
       'actualizarParcial',
     ]);
-    toastSpy = jasmine.createSpyObj('ToastService', [
-      'showError',
-      'showSuccess',
-    ]);
+    toastSpy = jasmine.createSpyObj('ToastService', ['showError', 'showSuccess']);
     fileStorageSpy = jasmine.createSpyObj('FileStorageService', ['uploadFile']);
 
     await TestBed.configureTestingModule({
@@ -40,7 +37,7 @@ describe('PerfilComponent', () => {
 
   it('debe ocultar el spinner tras carga exitosa', () => {
     usuarioServiceSpy.obtenerDatosSesionActualSafe.and.returnValue(
-      of({ idUsuario: 1, username: 'test' } as any),
+      of({ idUsuario: 1, username: 'test' } as any)
     );
     component.ngOnInit();
     expect(component.loading).toBeFalse();
@@ -49,7 +46,7 @@ describe('PerfilComponent', () => {
 
   it('debe ocultar el spinner y mostrar error ante fallo', () => {
     usuarioServiceSpy.obtenerDatosSesionActualSafe.and.returnValue(
-      throwError(() => new Error('fail')),
+      throwError(() => new Error('fail'))
     );
     component.ngOnInit();
     expect(component.loading).toBeFalse();
@@ -78,9 +75,7 @@ describe('PerfilComponent', () => {
 
   it('onSave should show error when actualizarParcial fails', () => {
     component.usuario = { idUsuario: 7 } as any;
-    usuarioServiceSpy.actualizarParcial.and.returnValue(
-      throwError(() => new Error('fail')),
-    );
+    usuarioServiceSpy.actualizarParcial.and.returnValue(throwError(() => new Error('fail')));
 
     component.onSave({ username: 'x' } as any);
     expect(toastSpy.showError).toHaveBeenCalled();
@@ -121,9 +116,6 @@ describe('PerfilComponent', () => {
 
     component.onFileSelected({ target: { files: [file] } } as any);
 
-    expect(toastSpy.showError).toHaveBeenCalledWith(
-      'Error al subir imagen',
-      'Error',
-    );
+    expect(toastSpy.showError).toHaveBeenCalledWith('Error al subir imagen', 'Error');
   });
 });

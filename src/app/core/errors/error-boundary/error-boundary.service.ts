@@ -42,11 +42,7 @@ export class ErrorBoundaryService {
     this.boundaries.delete(id);
   }
 
-  reportErrorToBoundary(
-    boundaryId: string,
-    error: any,
-    componentName: string = '',
-  ): void {
+  reportErrorToBoundary(boundaryId: string, error: any, componentName: string = ''): void {
     const boundary = this.boundaries.get(boundaryId);
     if (boundary) {
       boundary.captureError(error, componentName);

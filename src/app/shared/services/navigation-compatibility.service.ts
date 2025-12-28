@@ -46,7 +46,7 @@ export class NavigationCompatibilityService {
     // Convert children if they exist
     if (enhancedItem.children && enhancedItem.children.length > 0) {
       legacyItem.children = enhancedItem.children.map((child) =>
-        this.convertSingleItemToLegacy(child),
+        this.convertSingleItemToLegacy(child)
       );
     }
 
@@ -58,9 +58,7 @@ export class NavigationCompatibilityService {
    * @param enhancedNavigation$ - Observable of enhanced navigation items
    * @returns Observable of legacy navigation items
    */
-  getLegacyNavigation(
-    enhancedNavigation$: Observable<INavItemEnhanced[]>,
-  ): Observable<INavData[]> {
+  getLegacyNavigation(enhancedNavigation$: Observable<INavItemEnhanced[]>): Observable<INavData[]> {
     return new Observable((subscriber) => {
       enhancedNavigation$.subscribe({
         next: (enhancedItems) => {
@@ -116,7 +114,7 @@ export class NavigationCompatibilityService {
    */
   adaptForLegacyComponent(
     enhancedItems: INavItemEnhanced[],
-    legacyExpectations: LegacyComponentExpectations,
+    legacyExpectations: LegacyComponentExpectations
   ): INavData[] {
     let adaptedItems = this.convertToLegacyFormat(enhancedItems);
 
@@ -134,10 +132,7 @@ export class NavigationCompatibilityService {
     }
 
     if (legacyExpectations.filterByUrls) {
-      adaptedItems = this.filterItemsByUrls(
-        adaptedItems,
-        legacyExpectations.allowedUrls || [],
-      );
+      adaptedItems = this.filterItemsByUrls(adaptedItems, legacyExpectations.allowedUrls || []);
     }
 
     return adaptedItems;
@@ -220,10 +215,7 @@ export class NavigationCompatibilityService {
    * @param allowedUrls - Array of allowed URLs
    * @returns Filtered navigation items
    */
-  private filterItemsByUrls(
-    items: INavData[],
-    allowedUrls: string[],
-  ): INavData[] {
+  private filterItemsByUrls(items: INavData[], allowedUrls: string[]): INavData[] {
     return items.filter((item) => {
       // Include title items (section headers)
       if (item.title) {
@@ -231,20 +223,13 @@ export class NavigationCompatibilityService {
       }
 
       // Include items with allowed URLs
-      if (
-        item.url &&
-        typeof item.url === 'string' &&
-        allowedUrls.includes(item.url)
-      ) {
+      if (item.url && typeof item.url === 'string' && allowedUrls.includes(item.url)) {
         return true;
       }
 
       // Include items with children that have allowed URLs
       if (item.children) {
-        const filteredChildren = this.filterItemsByUrls(
-          item.children,
-          allowedUrls,
-        );
+        const filteredChildren = this.filterItemsByUrls(item.children, allowedUrls);
         if (filteredChildren.length > 0) {
           item.children = filteredChildren;
           return true;
@@ -260,20 +245,15 @@ export class NavigationCompatibilityService {
    * @param componentName - Name of the component using legacy patterns
    * @param deprecatedFeatures - List of deprecated features being used
    */
-  logMigrationWarnings(
-    componentName: string,
-    deprecatedFeatures: string[],
-  ): void {
+  logMigrationWarnings(componentName: string, deprecatedFeatures: string[]): void {
     if (deprecatedFeatures.length > 0) {
       console.warn(
-        `[NavigationCompatibility] Component "${componentName}" is using deprecated features:`,
+        `[NavigationCompatibility] Component "${componentName}" is using deprecated features:`
       );
       deprecatedFeatures.forEach((feature) => {
         console.warn(`  - ${feature}`);
       });
-      console.warn(
-        'Consider migrating to the new enhanced navigation structure.',
-      );
+      console.warn('Consider migrating to the new enhanced navigation structure.');
     }
   }
 
@@ -293,9 +273,7 @@ export class NavigationCompatibilityService {
 
       if (!firstItem.priority && !firstItem.requiredRoles) {
         warnings.push('Navigation items are using legacy INavData format');
-        suggestions.push(
-          'Consider migrating to INavItemEnhanced for better functionality',
-        );
+        suggestions.push('Consider migrating to INavItemEnhanced for better functionality');
       }
 
       // Check for deprecated properties
@@ -306,7 +284,7 @@ export class NavigationCompatibilityService {
 
         if (item.roles && !item.requiredRoles) {
           warnings.push(
-            `Item ${index} uses deprecated 'roles' property, use 'requiredRoles' instead`,
+            `Item ${index} uses deprecated 'roles' property, use 'requiredRoles' instead`
           );
         }
       });

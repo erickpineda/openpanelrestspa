@@ -19,7 +19,7 @@ export class DashboardFacadeService {
     topLimit: number,
     force: boolean,
     topStartDate?: string,
-    topEndDate?: string,
+    topEndDate?: string
   ): Observable<
     [
       SummaryDTO,
@@ -33,27 +33,9 @@ export class DashboardFacadeService {
   > {
     const summary$ = this.api.getSummary(force);
     const series$ = this.api.getSeriesActivity(seriesDays, force, granularity);
-    const topUsers$ = this.api.getTop(
-      'users',
-      topLimit,
-      force,
-      topStartDate,
-      topEndDate,
-    );
-    const topCategories$ = this.api.getTop(
-      'categories',
-      topLimit,
-      force,
-      topStartDate,
-      topEndDate,
-    );
-    const topTags$ = this.api.getTop(
-      'tags',
-      topLimit,
-      force,
-      topStartDate,
-      topEndDate,
-    );
+    const topUsers$ = this.api.getTop('users', topLimit, force, topStartDate, topEndDate);
+    const topCategories$ = this.api.getTop('categories', topLimit, force, topStartDate, topEndDate);
+    const topTags$ = this.api.getTop('tags', topLimit, force, topStartDate, topEndDate);
     const storage$ = this.api.getStorage();
     const contentStats$ = this.api.getContentStats();
     return forkJoin([
@@ -70,7 +52,7 @@ export class DashboardFacadeService {
   getSeries(
     days: number,
     force: boolean,
-    granularity: 'hour' | 'day' | 'week' | 'month',
+    granularity: 'hour' | 'day' | 'week' | 'month'
   ): Observable<ActivityPointDTO[]> {
     return this.api.getSeriesActivity(days, force, granularity);
   }
@@ -80,7 +62,7 @@ export class DashboardFacadeService {
     limit: number,
     force = false,
     startDate?: string,
-    endDate?: string,
+    endDate?: string
   ): Observable<TopItemDTO[]> {
     return this.api.getTop(type, limit, force, startDate, endDate);
   }
@@ -100,7 +82,7 @@ export class DashboardFacadeService {
   getSeriesEntriesSplitEstado(
     days: number,
     granularity: 'hour' | 'day' | 'week' | 'month',
-    force = false,
+    force = false
   ): Observable<any[]> {
     return this.api.getSeriesEntriesSplitEstado(days, granularity, force);
   }
@@ -108,7 +90,7 @@ export class DashboardFacadeService {
   getSeriesEntriesSplitEstadoNombre(
     days: number,
     granularity: 'hour' | 'day' | 'week' | 'month',
-    force = false,
+    force = false
   ): Observable<any[]> {
     return this.api.getSeriesEntriesSplitEstadoNombre(days, granularity, force);
   }

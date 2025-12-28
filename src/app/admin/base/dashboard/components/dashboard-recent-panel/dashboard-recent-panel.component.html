@@ -40,13 +40,7 @@
         aria-live="assertive"
       >
         <span>{{ errorRecent }}</span>
-        <button
-          cButton
-          color="danger"
-          size="sm"
-          class="retry-btn-recent"
-          (click)="retry.emit()"
-        >
+        <button cButton color="danger" size="sm" class="retry-btn-recent" (click)="retry.emit()">
           Reintentar
         </button>
       </div>
@@ -64,19 +58,12 @@
       <div class="mb-2"><c-spinner></c-spinner></div>
     }
     <ul class="list-group list-group-flush">
-      @for (
-        e of recentItems;
-        track e.id ?? e.idEntrada ?? e.username ?? e.name ?? $index
-      ) {
+      @for (e of recentItems; track e.id ?? e.idEntrada ?? e.username ?? e.name ?? $index) {
         <li class="list-group-item">
           <div class="d-flex justify-content-between">
             <div>
               <strong>{{
-                e?.titulo ||
-                  e?.contenidoCorto ||
-                  e?.username ||
-                  e?.name ||
-                  'Item'
+                e?.titulo || e?.contenidoCorto || e?.username || e?.name || 'Item'
               }}</strong>
               <div class="small text-muted">
                 {{ e?.fechaCreacion || e?.fechaRegistro || e?.date }}

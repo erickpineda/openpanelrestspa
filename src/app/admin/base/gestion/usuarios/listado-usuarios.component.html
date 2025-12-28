@@ -17,9 +17,7 @@
         role="alert"
       >
         <span>{{ error }}</span>
-        <button cButton color="danger" size="sm" (click)="load()">
-          Reintentar
-        </button>
+        <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
       </div>
     }
     <div>
@@ -48,11 +46,7 @@
             Avanzado
           </button>
         </c-col>
-        <c-col
-          xs="12"
-          md="4"
-          class="d-flex justify-content-md-end gap-2 align-items-center"
-        >
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
           <select
             cSelect
             [ngModel]="pageSize"
@@ -102,17 +96,11 @@
                 cSelect
                 class="form-select-sm"
                 [value]="
-                  filtroEmailConfirmado === null
-                    ? ''
-                    : filtroEmailConfirmado
-                      ? 'true'
-                      : 'false'
+                  filtroEmailConfirmado === null ? '' : filtroEmailConfirmado ? 'true' : 'false'
                 "
                 (change)="
                   filtroEmailConfirmado =
-                    $any($event.target).value === ''
-                      ? null
-                      : $any($event.target).value === 'true'
+                    $any($event.target).value === '' ? null : $any($event.target).value === 'true'
                 "
                 [disabled]="loading"
               >
@@ -151,11 +139,7 @@
         @if (loading) {
           <div
             class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-            style="
-              z-index: 10;
-              background-color: rgba(255, 255, 255, 0.8);
-              min-height: 200px;
-            "
+            style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
           >
             <div class="text-center">
               <c-spinner [attr.aria-label]="'Cargando usuarios'"></c-spinner>
@@ -180,9 +164,7 @@
                 <th scope="col" style="min-width: 160px">Nombre</th>
                 <th scope="col" style="min-width: 250px">Email</th>
                 <th scope="col" style="min-width: 120px">Rol</th>
-                <th scope="col" class="text-center" style="min-width: 100px">
-                  Acciones
-                </th>
+                <th scope="col" class="text-center" style="min-width: 100px">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -214,11 +196,7 @@
                   </td>
                   <td>{{ u.rolCodigo }}</td>
                   <td class="text-center">
-                    <div
-                      class="btn-group"
-                      role="group"
-                      aria-label="Acciones de usuario"
-                    >
+                    <div class="btn-group" role="group" aria-label="Acciones de usuario">
                       <button
                         cButton
                         color="warning"
@@ -235,10 +213,7 @@
                         size="sm"
                         variant="ghost"
                         (click)="delete(u)"
-                        [disabled]="
-                          PROPIETARIO_ROLE_CODE &&
-                          u.rolCodigo === PROPIETARIO_ROLE_CODE
-                        "
+                        [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE"
                         [attr.aria-label]="'Eliminar usuario ' + u.username"
                       >
                         <svg cIcon name="cilTrash" size="sm"></svg>
@@ -251,19 +226,10 @@
               @if (usuarios.length === 0) {
                 <tr>
                   <td colspan="5" class="text-center py-5">
-                    <div
-                      class="d-flex flex-column align-items-center justify-content-center"
-                    >
-                      <svg
-                        cIcon
-                        name="cilSearch"
-                        size="3xl"
-                        class="text-muted mb-3"
-                      ></svg>
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
                       <h6 class="text-muted">No se han encontrado usuarios</h6>
-                      <p class="text-muted small">
-                        Intenta ajustar los filtros de búsqueda
-                      </p>
+                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                     </div>
                   </td>
                 </tr>
@@ -283,16 +249,8 @@
 
           @if (usuarios.length > 0) {
             <c-row class="mt-2">
-              <c-col
-                class="d-flex justify-content-end align-items-center gap-2"
-              >
-                <button
-                  cButton
-                  color="light"
-                  size="sm"
-                  (click)="prev()"
-                  [disabled]="pageNo <= 0"
-                >
+              <c-col class="d-flex justify-content-end align-items-center gap-2">
+                <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo <= 0">
                   Anterior
                 </button>
                 <button
@@ -305,8 +263,8 @@
                   Siguiente
                 </button>
                 <div class="text-muted small ms-2">
-                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
-                  {{ totalElements }} · Mostrando {{ numberOfElements }}
+                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} ·
+                  Mostrando {{ numberOfElements }}
                 </div>
               </c-col>
             </c-row>
@@ -339,9 +297,7 @@
             cFormControl
             type="text"
             [value]="editUser.username || ''"
-            (input)="
-              editUser && (editUser.username = $any($event.target).value)
-            "
+            (input)="editUser && (editUser.username = $any($event.target).value)"
             [class.is-invalid]="!editUser.username"
             [disabled]="!!editUser.idUsuario"
           />
@@ -369,9 +325,7 @@
             cFormControl
             type="text"
             [value]="editUser.apellido || ''"
-            (input)="
-              editUser && (editUser.apellido = $any($event.target).value)
-            "
+            (input)="editUser && (editUser.apellido = $any($event.target).value)"
           />
         </div>
         <div class="mb-3">
@@ -394,23 +348,15 @@
               type="checkbox"
               id="userEnabled"
               [checked]="editUser.habilitado"
-              (change)="
-                editUser && (editUser.habilitado = $any($event.target).checked)
-              "
-              [disabled]="
-                PROPIETARIO_ROLE_CODE &&
-                editUser.rolCodigo === PROPIETARIO_ROLE_CODE
-              "
+              (change)="editUser && (editUser.habilitado = $any($event.target).checked)"
+              [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE"
             />
             <label cFormCheckLabel for="userEnabled">Habilitar Usuario</label>
           </c-form-check>
-          @if (
-            PROPIETARIO_ROLE_CODE &&
-            editUser.rolCodigo === PROPIETARIO_ROLE_CODE
-          ) {
+          @if (PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE) {
             <div class="text-info small mt-1">
-              <svg cIcon name="cilLockLocked" size="sm"></svg>El rol de
-              Propietario no se puede deshabilitar.
+              <svg cIcon name="cilLockLocked" size="sm"></svg>El rol de Propietario no se puede
+              deshabilitar.
             </div>
           }
         </div>
@@ -420,16 +366,12 @@
             cSelect
             [(ngModel)]="editUser.rolCodigo"
             [class.is-invalid]="!editUser.rolCodigo"
-            [disabled]="
-              PROPIETARIO_ROLE_CODE &&
-              editUser.rolCodigo === PROPIETARIO_ROLE_CODE
-            "
+            [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE"
           >
             <option value="">Seleccione rol</option>
             @for (r of roles; track trackByRol($index, r)) {
               @if (
-                r.codigo !== PROPIETARIO_ROLE_CODE ||
-                editUser.rolCodigo === PROPIETARIO_ROLE_CODE
+                r.codigo !== PROPIETARIO_ROLE_CODE || editUser.rolCodigo === PROPIETARIO_ROLE_CODE
               ) {
                 <option [value]="r.codigo">
                   {{ r.nombre }}
@@ -440,13 +382,10 @@
           @if (!editUser.rolCodigo) {
             <div class="invalid-feedback d-block">Rol requerido</div>
           }
-          @if (
-            PROPIETARIO_ROLE_CODE &&
-            editUser.rolCodigo === PROPIETARIO_ROLE_CODE
-          ) {
+          @if (PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE) {
             <div class="text-info small mt-1">
-              <svg cIcon name="cilLockLocked" size="sm"></svg> El rol de
-              Propietario no se puede modificar.
+              <svg cIcon name="cilLockLocked" size="sm"></svg> El rol de Propietario no se puede
+              modificar.
             </div>
           }
         </div>
@@ -455,12 +394,7 @@
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="closeEdit()">Cerrar</button>
-    <button
-      cButton
-      color="primary"
-      [disabled]="!isUserFormValid()"
-      (click)="saveEdit()"
-    >
+    <button cButton color="primary" [disabled]="!isUserFormValid()" (click)="saveEdit()">
       Guardar
     </button>
   </c-modal-footer>

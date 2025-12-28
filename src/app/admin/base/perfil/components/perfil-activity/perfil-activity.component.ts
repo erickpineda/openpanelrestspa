@@ -43,9 +43,7 @@ export class PerfilActivityComponent implements OnInit {
 
   trackByActivity(index: number, activity: any): string {
     const time =
-      activity?.date instanceof Date
-        ? activity.date.getTime()
-        : new Date(activity?.date).getTime();
+      activity?.date instanceof Date ? activity.date.getTime() : new Date(activity?.date).getTime();
     return `${activity?.action || ''}-${time}-${activity?.ip || ''}-${activity?.device || ''}`;
   }
 }

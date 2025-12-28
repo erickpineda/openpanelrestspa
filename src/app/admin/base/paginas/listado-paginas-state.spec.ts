@@ -31,7 +31,7 @@ describe('ListadoPaginasComponent', () => {
       mockRouter,
       mockCatalog,
       mockCdr,
-      mockZone,
+      mockZone
     );
   });
 
@@ -142,10 +142,7 @@ describe('ListadoPaginasComponent', () => {
 
     component.onEditarDesdePreview();
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([
-      '/admin/control/paginas/editar',
-      7,
-    ]);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/admin/control/paginas/editar', 7]);
     expect(component.previewVisible).toBeFalse();
     expect(component.previewEntrada).toBeUndefined();
   });

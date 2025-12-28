@@ -58,13 +58,13 @@ describe('DefaultHeaderComponent', () => {
     const navs = el.querySelectorAll('c-header-nav');
     expect(navs.length).toBeGreaterThan(0);
     const hasMainNav = Array.from(navs).some(
-      (n) => n.getAttribute('aria-label') === 'Navegación principal',
+      (n) => n.getAttribute('aria-label') === 'Navegación principal'
     );
     const hasQuickActions = Array.from(navs).some(
-      (n) => n.getAttribute('aria-label') === 'Acciones rápidas',
+      (n) => n.getAttribute('aria-label') === 'Acciones rápidas'
     );
     const hasUserMenu = Array.from(navs).some(
-      (n) => n.getAttribute('aria-label') === 'Menú de usuario',
+      (n) => n.getAttribute('aria-label') === 'Menú de usuario'
     );
     expect(hasMainNav && hasQuickActions && hasUserMenu).toBeTrue();
   });

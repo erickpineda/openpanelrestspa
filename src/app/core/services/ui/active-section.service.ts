@@ -44,10 +44,8 @@ export class ActiveSectionService {
     suggestedActions: [],
   });
 
-  public activeSection$: Observable<ActiveSectionState> =
-    this.activeSectionSubject.asObservable();
-  public menuExpansion$: Observable<MenuExpansionState> =
-    this.menuExpansionSubject.asObservable();
+  public activeSection$: Observable<ActiveSectionState> = this.activeSectionSubject.asObservable();
+  public menuExpansion$: Observable<MenuExpansionState> = this.menuExpansionSubject.asObservable();
   public navigationContext$: Observable<NavigationContext> =
     this.navigationContextSubject.asObservable();
 
@@ -66,7 +64,7 @@ export class ActiveSectionService {
       .pipe(
         filter((event) => event instanceof NavigationEnd),
         map((event) => (event as NavigationEnd).url),
-        distinctUntilChanged(),
+        distinctUntilChanged()
       )
       .subscribe((url) => {
         this.updateActiveSection(url);
@@ -135,7 +133,7 @@ export class ActiveSectionService {
    */
   private findActiveItemInSection(
     sectionItem: INavItemEnhanced,
-    url: string,
+    url: string
   ): { itemId: string; breadcrumb: string[] } | null {
     const nextItems = this.getItemsAfterSection(sectionItem);
 
@@ -172,9 +170,7 @@ export class ActiveSectionService {
   /**
    * Obtiene los elementos que siguen a una sección
    */
-  private getItemsAfterSection(
-    sectionItem: INavItemEnhanced,
-  ): INavItemEnhanced[] {
+  private getItemsAfterSection(sectionItem: INavItemEnhanced): INavItemEnhanced[] {
     const sectionIndex = this.navigationItems.indexOf(sectionItem);
     if (sectionIndex === -1) return [];
 
@@ -194,10 +190,7 @@ export class ActiveSectionService {
   /**
    * Verifica si una URL coincide con la URL activa
    */
-  private isUrlMatch(
-    itemUrl: string | string[] | undefined,
-    activeUrl: string,
-  ): boolean {
+  private isUrlMatch(itemUrl: string | string[] | undefined, activeUrl: string): boolean {
     if (!itemUrl) return false;
 
     const url = Array.isArray(itemUrl) ? itemUrl.join('/') : itemUrl;
@@ -224,9 +217,7 @@ export class ActiveSectionService {
    */
   private generateItemId(item: INavItemEnhanced): string {
     if (item.url) {
-      return Array.isArray(item.url)
-        ? item.url.join('-')
-        : item.url.replace(/[^a-zA-Z0-9]/g, '-');
+      return Array.isArray(item.url) ? item.url.join('-') : item.url.replace(/[^a-zA-Z0-9]/g, '-');
     }
     return (
       item.name
@@ -251,7 +242,7 @@ export class ActiveSectionService {
    */
   private calculateNavigationContext(
     url: string,
-    activeState: ActiveSectionState,
+    activeState: ActiveSectionState
   ): NavigationContext {
     const relatedItems: INavItemEnhanced[] = [];
     const suggestedActions: string[] = [];
@@ -259,9 +250,7 @@ export class ActiveSectionService {
     // Encontrar elementos relacionados en la misma sección
     if (activeState.activeSectionId) {
       const sectionItems = this.getItemsInSection(activeState.activeSectionId);
-      relatedItems.push(
-        ...sectionItems.filter((item) => !this.isUrlMatch(item.url, url)),
-      );
+      relatedItems.push(...sectionItems.filter((item) => !this.isUrlMatch(item.url, url)));
     }
 
     // Generar acciones sugeridas basadas en la ruta actual
@@ -280,7 +269,7 @@ export class ActiveSectionService {
    */
   private getItemsInSection(sectionId: string): INavItemEnhanced[] {
     const sectionItem = this.navigationItems.find(
-      (item) => item.title && this.generateItemId(item) === sectionId,
+      (item) => item.title && this.generateItemId(item) === sectionId
     );
 
     if (!sectionItem) return [];
@@ -308,11 +297,7 @@ export class ActiveSectionService {
     } else if (url.includes('/usuarios')) {
       actions.push('Nuevo Usuario', 'Gestionar Roles', 'Ver Permisos');
     } else if (url.includes('/comentarios')) {
-      actions.push(
-        'Moderar Comentarios',
-        'Ver Reportados',
-        'Configurar Filtros',
-      );
+      actions.push('Moderar Comentarios', 'Ver Reportados', 'Configurar Filtros');
     } else if (url.includes('/dashboard')) {
       actions.push('Ver Estadísticas', 'Generar Reporte', 'Configurar Widgets');
     } else {

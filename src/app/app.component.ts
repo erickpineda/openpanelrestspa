@@ -7,6 +7,7 @@ import { AuthService } from './core/services/auth/auth.service'; // inyectado pa
 import { RouteTrackerService } from './core/services/auth/route-tracker.service';
 import { OPConstants } from './shared/constants/op-global.constants';
 import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
+import { UiAnomalyMonitorService } from './core/services/ui/ui-anomaly-monitor.service';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,7 @@ export class AppComponent implements OnInit {
     private routeTracker: RouteTrackerService, // sólo para activar el tracking
     private tokenStorage: TokenStorageService,
     private globalErrorHandler: GlobalErrorHandlerService,
+    private uiMonitor: UiAnomalyMonitorService
   ) {}
 
   ngOnInit(): void {
@@ -40,10 +42,10 @@ export class AppComponent implements OnInit {
 
     // Escuchar cambios de estado de autenticación
     window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, () => {
-      this.log.info(
-        '🔄 Estado de autenticación cambiado, actualizando interfaz...',
-      );
+      this.log.info('🔄 Estado de autenticación cambiado, actualizando interfaz...');
       // Aquí podrías forzar la actualización de componentes si es necesario
     });
+
+    this.uiMonitor.start();
   }
 }

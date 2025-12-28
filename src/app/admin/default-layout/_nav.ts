@@ -1,7 +1,4 @@
-import {
-  INavItemEnhanced,
-  UserRole,
-} from '../../shared/types/navigation.types';
+import { INavItemEnhanced, UserRole } from '../../shared/types/navigation.types';
 
 export const navItems: INavItemEnhanced[] = [
   // Dashboard Section
@@ -334,22 +331,14 @@ export const navItems: INavItemEnhanced[] = [
     title: true,
     name: 'Mantenimiento',
     priority: 5,
-    requiredRoles: [
-      UserRole.MANTENIMIENTO,
-      UserRole.DESARROLLADOR,
-      UserRole.PROPIETARIO,
-    ],
+    requiredRoles: [UserRole.MANTENIMIENTO, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
   },
   {
     name: 'Logs del Sistema',
     url: '/admin/control/mantenimiento/logs',
     iconComponent: { name: 'cil-search' },
     priority: 4,
-    requiredRoles: [
-      UserRole.MANTENIMIENTO,
-      UserRole.DESARROLLADOR,
-      UserRole.PROPIETARIO,
-    ],
+    requiredRoles: [UserRole.MANTENIMIENTO, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
     dynamicBadge: {
       service: 'BadgeCounterService',
       method: 'getSystemAlertsCount',

@@ -8,10 +8,7 @@ import {
   PerformanceConfig,
   NavigationChunk,
 } from './navigation-performance.service';
-import {
-  INavItemEnhanced,
-  UserRole,
-} from '../../../shared/types/navigation.types';
+import { INavItemEnhanced, UserRole } from '../../../shared/types/navigation.types';
 
 describe('NavigationPerformanceService', () => {
   let service: NavigationPerformanceService;
@@ -34,16 +31,10 @@ describe('NavigationPerformanceService', () => {
       };
 
       // Primera llamada - debería calcular y cachear
-      const result1 = service.checkPermissionMemoized(
-        item,
-        UserRole.ADMINISTRADOR,
-      );
+      const result1 = service.checkPermissionMemoized(item, UserRole.ADMINISTRADOR);
 
       // Segunda llamada - debería usar cache
-      const result2 = service.checkPermissionMemoized(
-        item,
-        UserRole.ADMINISTRADOR,
-      );
+      const result2 = service.checkPermissionMemoized(item, UserRole.ADMINISTRADOR);
 
       expect(result1).toBe(result2);
       expect(result1).toBe(true);
@@ -162,15 +153,13 @@ describe('NavigationPerformanceService', () => {
     it('should debounce badge updates', (done) => {
       const badgeUpdates = new BehaviorSubject(new Map([['item1', 5]]));
 
-      service
-        .optimizeBadgeUpdates(badgeUpdates.asObservable())
-        .subscribe((updates) => {
-          expect(updates.get('item1')).toBe(5);
+      service.optimizeBadgeUpdates(badgeUpdates.asObservable()).subscribe((updates) => {
+        expect(updates.get('item1')).toBe(5);
 
-          const stats = service.getPerformanceStats();
-          expect(stats.badgeUpdatesDebounced).toBeGreaterThan(0);
-          done();
-        });
+        const stats = service.getPerformanceStats();
+        expect(stats.badgeUpdatesDebounced).toBeGreaterThan(0);
+        done();
+      });
     });
 
     it('should handle multiple badge updates efficiently', (done) => {
@@ -182,15 +171,13 @@ describe('NavigationPerformanceService', () => {
 
       const badgeUpdates = new BehaviorSubject(initialUpdates);
 
-      service
-        .optimizeBadgeUpdates(badgeUpdates.asObservable())
-        .subscribe((updates) => {
-          expect(updates.size).toBe(3);
-          expect(updates.get('item1')).toBe(1);
-          expect(updates.get('item2')).toBe(2);
-          expect(updates.get('item3')).toBe(3);
-          done();
-        });
+      service.optimizeBadgeUpdates(badgeUpdates.asObservable()).subscribe((updates) => {
+        expect(updates.size).toBe(3);
+        expect(updates.get('item1')).toBe(1);
+        expect(updates.get('item2')).toBe(2);
+        expect(updates.get('item3')).toBe(3);
+        done();
+      });
     });
   });
 
@@ -278,15 +265,11 @@ describe('NavigationPerformanceService', () => {
         .pipe(take(1))
         .subscribe((optimizedItems) => {
           // LECTOR no debería ver el item de admin
-          const adminItem = optimizedItems.find(
-            (item) => item.name === 'Admin Item',
-          );
+          const adminItem = optimizedItems.find((item) => item.name === 'Admin Item');
           expect(adminItem).toBeFalsy();
 
           // Pero sí debería ver el item público
-          const publicItem = optimizedItems.find(
-            (item) => item.name === 'Public Item',
-          );
+          const publicItem = optimizedItems.find((item) => item.name === 'Public Item');
           expect(publicItem).toBeTruthy();
 
           done();
@@ -315,7 +298,7 @@ describe('NavigationPerformanceService', () => {
 
       // La optimización debería mantener o reducir el uso de memoria
       expect(statsAfter.memoryUsage.cacheSize).toBeLessThanOrEqual(
-        statsBefore.memoryUsage.cacheSize + 10,
+        statsBefore.memoryUsage.cacheSize + 10
       );
     });
   });
@@ -347,14 +330,10 @@ describe('NavigationPerformanceService', () => {
             .pipe(take(1))
             .subscribe((finalResult) => {
               initialResult.forEach((ii) => {
-                const exists = finalResult.some(
-                  (fi) => fi.name === ii.name && fi.url === ii.url,
-                );
+                const exists = finalResult.some((fi) => fi.name === ii.name && fi.url === ii.url);
                 expect(exists).toBeTrue();
               });
-              expect(finalResult.length).toBeGreaterThanOrEqual(
-                initialResult.length,
-              );
+              expect(finalResult.length).toBeGreaterThanOrEqual(initialResult.length);
               done();
             });
         });
@@ -367,15 +346,12 @@ describe('NavigationPerformanceService', () => {
     it('should maintain performance with large datasets', (done) => {
       const itemCount = 150;
       const userRole = UserRole.EDITOR;
-      const largeDataset: INavItemEnhanced[] = Array.from(
-        { length: itemCount },
-        (_, i) => ({
-          name: `Item ${i}`,
-          url: `/item${i}`,
-          priority: i,
-          requiredRoles: i % 2 === 0 ? [userRole] : undefined,
-        }),
-      );
+      const largeDataset: INavItemEnhanced[] = Array.from({ length: itemCount }, (_, i) => ({
+        name: `Item ${i}`,
+        url: `/item${i}`,
+        priority: i,
+        requiredRoles: i % 2 === 0 ? [userRole] : undefined,
+      }));
       const startTime = performance.now();
       service
         .getOptimizedNavigationItems(largeDataset, userRole)
@@ -383,14 +359,10 @@ describe('NavigationPerformanceService', () => {
         .subscribe((processedItems) => {
           const endTime = performance.now();
           const processingTime = endTime - startTime;
-          expect(processedItems.length).toBeLessThanOrEqual(
-            largeDataset.length,
-          );
+          expect(processedItems.length).toBeLessThanOrEqual(largeDataset.length);
           expect(processingTime).toBeLessThan(1000);
           const stats = service.getPerformanceStats();
-          expect(
-            stats.permissionCacheHits + stats.permissionCacheMisses,
-          ).toBeGreaterThan(0);
+          expect(stats.permissionCacheHits + stats.permissionCacheMisses).toBeGreaterThan(0);
           done();
         });
     });
@@ -410,18 +382,13 @@ describe('NavigationPerformanceService', () => {
         .createNavigationChunks(items)
         .pipe(take(1))
         .subscribe((chunks) => {
-          const totalItemsInChunks = chunks.reduce(
-            (sum, chunk) => sum + chunk.items.length,
-            0,
-          );
+          const totalItemsInChunks = chunks.reduce((sum, chunk) => sum + chunk.items.length, 0);
           expect(totalItemsInChunks).toBe(items.length);
           expect(chunks.some((c) => c.loaded)).toBeTrue();
           const ids = chunks.map((c) => c.id);
           expect(ids.length).toBe(new Set(ids).size);
           for (let i = 1; i < chunks.length; i++) {
-            expect(chunks[i].priority).toBeLessThanOrEqual(
-              chunks[i - 1].priority,
-            );
+            expect(chunks[i].priority).toBeLessThanOrEqual(chunks[i - 1].priority);
           }
           done();
         });
@@ -475,9 +442,7 @@ describe('NavigationPerformanceService', () => {
       }
       service.optimizeMemoryUsage();
       const statsAfter = service.getPerformanceStats();
-      expect(statsAfter.memoryUsage.cacheSize).toBeLessThanOrEqual(
-        Math.floor(cacheSize / 2) + 10,
-      );
+      expect(statsAfter.memoryUsage.cacheSize).toBeLessThanOrEqual(Math.floor(cacheSize / 2) + 10);
       expect(statsAfter.memoryUsage.chunksLoaded).toBeGreaterThanOrEqual(0);
       expect(statsAfter.memoryUsage.totalItems).toBeGreaterThanOrEqual(0);
     });

@@ -3,10 +3,7 @@ import { decodeJwtPayload, isJwtExpired } from './jwt.utils';
 describe('jwt.utils', () => {
   function b64UrlEncode(obj: any): string {
     const json = JSON.stringify(obj);
-    const base64 = btoa(json)
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/g, '');
+    const base64 = btoa(json).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
     return base64;
   }
 

@@ -22,8 +22,7 @@ export class LoggerBufferService {
       args,
     };
     this.entries.unshift(entry);
-    if (this.entries.length > this.max)
-      this.entries = this.entries.slice(0, this.max);
+    if (this.entries.length > this.max) this.entries = this.entries.slice(0, this.max);
     this.subject.next(this.entries.slice());
   }
 

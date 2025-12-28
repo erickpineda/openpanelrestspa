@@ -7,9 +7,7 @@
       <c-card-body>
         <ul class="list-group">
           @for (f of features; track trackByFeature($index, f)) {
-            <li
-              class="list-group-item d-flex justify-content-between align-items-center"
-            >
+            <li class="list-group-item d-flex justify-content-between align-items-center">
               <span>{{ f.name }}</span>
               <button cButton color="dark" (click)="toggle(f)">
                 {{ f.enabled ? 'Desactivar' : 'Activar' }}
@@ -17,6 +15,140 @@
             </li>
           }
         </ul>
+
+        <hr />
+
+        <h6 class="mb-2">Análisis de HAR (red)</h6>
+        <div class="mb-2 text-muted small">
+          Pega aquí el HAR exportado desde el navegador para identificar fallos de recursos y
+          latencias anómalas.
+        </div>
+        <textarea
+          class="form-control"
+          rows="8"
+          [(ngModel)]="harText"
+          placeholder="Pega el JSON del HAR aquí..."
+        ></textarea>
+        <div class="d-flex gap-2 mt-2">
+          <button cButton color="primary" (click)="analyzeHar()">Analizar HAR</button>
+          <button cButton color="secondary" variant="outline" (click)="harText = ''; harSummary = undefined; harError = ''">
+            Limpiar
+          </button>
+        </div>
+
+        @if (harError) {
+          <div class="alert alert-warning mt-3">{{ harError }}</div>
+        }
+
+        @if (harSummary; as s) {
+          <div class="mt-3">
+            <div class="row g-2">
+              <div class="col-md-3">
+                <div class="border rounded p-2">
+                  <div class="text-muted small">Total</div>
+                  <div class="fs-5">{{ s.total }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="border rounded p-2">
+                  <div class="text-muted small">Fallos (status 0/4xx/5xx)</div>
+                  <div class="fs-5">{{ s.failed.count }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="border rounded p-2">
+                  <div class="text-muted small">Lentos (≥ {{ s.slow.thresholdMs }}ms)</div>
+                  <div class="fs-5">{{ s.slow.count }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="border rounded p-2">
+                  <div class="text-muted small">Assets críticos fallidos</div>
+                  <div class="small">
+                    JS: {{ s.assetIssues.scriptsFailed }} · CSS: {{ s.assetIssues.stylesFailed }} · Fonts:
+                    {{ s.assetIssues.fontsFailed }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <div class="text-muted small mb-1">Estados</div>
+              <div class="small">
+                2xx: {{ s.byStatus.ok2xx }} · 3xx: {{ s.byStatus.redir3xx }} · 4xx:
+                {{ s.byStatus.client4xx }} · 5xx: {{ s.byStatus.server5xx }} · otros:
+                {{ s.byStatus.other }}
+              </div>
+            </div>
+
+            @if (s.failed.count > 0) {
+              <div class="mt-3">
+                <div class="text-muted small mb-1">Fallos (top 30)</div>
+                <div class="table-responsive">
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th>Status</th>
+                        <th>Método</th>
+                        <th>Tipo</th>
+                        <th>URL</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (f of s.failed.items; track $index) {
+                        <tr>
+                          <td>{{ f.status }}</td>
+                          <td>{{ f.method }}</td>
+                          <td>{{ f.mimeType || '-' }}</td>
+                          <td class="text-truncate" style="max-width: 520px">{{ f.url }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+            @if (s.slow.count > 0) {
+              <div class="mt-3">
+                <div class="text-muted small mb-1">Lentos (top 30)</div>
+                <div class="table-responsive">
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th>ms</th>
+                        <th>Status</th>
+                        <th>Tipo</th>
+                        <th>URL</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (r of s.slow.items; track $index) {
+                        <tr>
+                          <td>{{ r.timeMs }}</td>
+                          <td>{{ r.status }}</td>
+                          <td>{{ r.mimeType || '-' }}</td>
+                          <td class="text-truncate" style="max-width: 520px">{{ r.url }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <hr />
+
+        <h6 class="mb-2">Capturas de bloqueo UI</h6>
+        <div class="d-flex gap-2 mb-2">
+          <button cButton color="primary" (click)="loadUiSnapshots()">Cargar capturas</button>
+          <button cButton color="danger" variant="outline" (click)="clearUiSnapshots()">
+            Borrar capturas
+          </button>
+        </div>
+        <textarea class="form-control" rows="6" [value]="uiSnapshotsRaw" readonly></textarea>
       </c-card-body>
     </c-card>
   </c-col>

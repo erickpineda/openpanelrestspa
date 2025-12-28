@@ -20,7 +20,7 @@ export class CrearComentarioComponent {
     private comentarioService: ComentarioService,
     private router: Router,
     private tokenStorageService: TokenStorageService,
-    private commonFuncService: CommonFunctionalityService,
+    private commonFuncService: CommonFunctionalityService
   ) {}
 
   onSubmit(comentario: Comentario) {
@@ -28,14 +28,9 @@ export class CrearComentarioComponent {
     // Assign current user as author
     comentario.idUsuario = this.tokenStorageService.getUser().id;
 
-    this.comentarioService
-      .crear(comentario)
-      .subscribe((response: OpenpanelApiResponse<any>) => {
-        this.commonFuncService.reloadComponent(
-          false,
-          '/admin/control/comentarios',
-        );
-      });
+    this.comentarioService.crear(comentario).subscribe((response: OpenpanelApiResponse<any>) => {
+      this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
+    });
   }
 
   onCancel() {

@@ -42,7 +42,7 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -62,11 +62,7 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
 
     const handleResponse = (r: any) => {
       const data = r?.data || r;
-      const list = Array.isArray(data?.elements)
-        ? data.elements
-        : Array.isArray(data)
-          ? data
-          : [];
+      const list = Array.isArray(data?.elements) ? data.elements : Array.isArray(data) ? data : [];
       this.privilegios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
       this.numberOfElements = list.length;
@@ -85,12 +81,11 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.loading = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({ next: handleResponse, error: handleError });
     } else {
-      const criteria: { filterKey: string; value: any; operation: string }[] =
-        [];
+      const criteria: { filterKey: string; value: any; operation: string }[] = [];
       if (this.filtroNombre)
         criteria.push({
           filterKey: 'nombre',
@@ -98,11 +93,7 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
           operation: 'CONTAINS',
         });
 
-      const payload = this.searchUtil.buildRequest(
-        'Privilegio',
-        criteria,
-        'ALL',
-      );
+      const payload = this.searchUtil.buildRequest('Privilegio', criteria, 'ALL');
       this.privilegioService
         .buscarSinGlobalLoader(payload, pageNo, this.pageSize)
         .pipe(
@@ -110,7 +101,7 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.loading = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({ next: handleResponse, error: handleError });
     }
@@ -165,19 +156,14 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(
-      0,
-      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
-    );
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.load();
   }
 
   getTotalPages(): number {
-    return this.totalElements
-      ? Math.ceil(this.totalElements / this.pageSize)
-      : 0;
+    return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0;
   }
 
   // CRUD
@@ -236,17 +222,14 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     const op$ = this.isEditing
-      ? this.privilegioService.actualizar(
-          this.editPrivilegio.codigo,
-          this.editPrivilegio,
-        )
+      ? this.privilegioService.actualizar(this.editPrivilegio.codigo, this.editPrivilegio)
       : this.privilegioService.crear(this.editPrivilegio);
 
     op$.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.toast.showSuccess(
           this.isEditing ? 'Privilegio actualizado' : 'Privilegio creado',
-          'Privilegios',
+          'Privilegios'
         );
         this.loading = false;
         this.editModalVisible = false;
@@ -255,12 +238,9 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
       error: (err: any) => {
         this.toast.showError(
           this.isEditing ? 'Error actualizando' : 'Error creando',
-          'Privilegios',
+          'Privilegios'
         );
-        this.log.error(
-          this.isEditing ? 'privilegios actualizar' : 'privilegios crear',
-          err,
-        );
+        this.log.error(this.isEditing ? 'privilegios actualizar' : 'privilegios crear', err);
         this.loading = false;
       },
     });

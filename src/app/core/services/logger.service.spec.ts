@@ -7,15 +7,10 @@ describe('LoggerService', () => {
   let buffer: jasmine.SpyObj<LoggerBufferService>;
 
   beforeEach(() => {
-    buffer = jasmine.createSpyObj<LoggerBufferService>('LoggerBufferService', [
-      'record',
-    ]);
+    buffer = jasmine.createSpyObj<LoggerBufferService>('LoggerBufferService', ['record']);
 
     TestBed.configureTestingModule({
-      providers: [
-        LoggerService,
-        { provide: LoggerBufferService, useValue: buffer },
-      ],
+      providers: [LoggerService, { provide: LoggerBufferService, useValue: buffer }],
     });
     service = TestBed.inject(LoggerService);
   });

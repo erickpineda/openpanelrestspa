@@ -1,12 +1,7 @@
 // Mapeo de tipos de campo para el BuscadorAvanzadoComponent
 // Extensible por entidad y campo. Usar 'string', 'number', 'date', 'boolean', 'select', etc.
 
-export type TipoCampoBuscador =
-  | 'string'
-  | 'number'
-  | 'date'
-  | 'boolean'
-  | 'select';
+export type TipoCampoBuscador = 'string' | 'number' | 'date' | 'boolean' | 'select';
 
 export interface MapeoTiposCampos {
   [entidad: string]: {
@@ -58,7 +53,7 @@ export const TIPOS_CAMPOS_POR_ENTIDAD: MapeoTiposCampos = {
  */
 export function obtenerTipoCampoBuscador(
   key: string,
-  clazzCandidates?: string[] | null,
+  clazzCandidates?: string[] | null
 ): TipoCampoBuscador {
   if (!key) return 'string';
   if (Array.isArray(clazzCandidates)) {
@@ -69,8 +64,7 @@ export function obtenerTipoCampoBuscador(
   }
   // Fallback: buscar en todas las entidades
   for (const clazz in TIPOS_CAMPOS_POR_ENTIDAD) {
-    if (TIPOS_CAMPOS_POR_ENTIDAD[clazz][key])
-      return TIPOS_CAMPOS_POR_ENTIDAD[clazz][key];
+    if (TIPOS_CAMPOS_POR_ENTIDAD[clazz][key]) return TIPOS_CAMPOS_POR_ENTIDAD[clazz][key];
   }
   return 'string';
 }

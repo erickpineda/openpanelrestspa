@@ -41,7 +41,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     private categoriaService: CategoriaService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -65,7 +65,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.cargando = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({
           next: (response: any) => {
@@ -76,13 +76,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
         });
     } else {
       const value = this.basicSearchText || this.filtroNombre || '';
-      const payload = this.searchUtil.buildSingle(
-        'Categoria',
-        'nombre',
-        value,
-        'CONTAINS',
-        'AND',
-      );
+      const payload = this.searchUtil.buildSingle('Categoria', 'nombre', value, 'CONTAINS', 'AND');
       this.categoriaService
         .buscarSinGlobalLoader(payload, this.pageNo, this.pageSize)
         .pipe(
@@ -90,7 +84,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.cargando = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({
           next: (data: any) => {
@@ -106,27 +100,20 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     const elementos: Categoria[] = Array.isArray(raw) ? raw : [];
 
     const hasServerPaging =
-      typeof data?.totalPages === 'number' ||
-      typeof data?.totalElements === 'number';
+      typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
 
     if (hasServerPaging) {
       this.listaCategorias = elementos;
       this.allCategorias = [];
       this.totalElements = Number(data?.totalElements || elementos.length || 0);
       this.totalPages = Number(
-        data?.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1,
+        data?.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1
       );
-      this.numberOfElements = Number(
-        data?.numberOfElements ?? elementos.length,
-      );
+      this.numberOfElements = Number(data?.numberOfElements ?? elementos.length);
       this.pagedCategorias = elementos;
 
       // Si estamos en una página vacía y hay páginas anteriores, volver atrás
-      if (
-        elementos.length === 0 &&
-        this.pageNo > 0 &&
-        this.pageNo >= this.totalPages
-      ) {
+      if (elementos.length === 0 && this.pageNo > 0 && this.pageNo >= this.totalPages) {
         this.pageNo = Math.max(0, this.totalPages - 1);
         this.obtenerListaCategorias();
         return;
@@ -135,10 +122,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
       // Fallback paginación cliente
       this.allCategorias = elementos;
       this.totalElements = this.allCategorias.length;
-      this.totalPages = Math.max(
-        1,
-        Math.ceil(this.totalElements / this.pageSize),
-      );
+      this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
 
       if (this.pageNo >= this.totalPages) {
         this.pageNo = Math.max(0, this.totalPages - 1);
@@ -208,7 +192,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.cargando = false;
           this.cdr.detectChanges();
-        }),
+        })
       )
       .subscribe({
         next: () => {
@@ -279,10 +263,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(
-      0,
-      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
-    );
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     if (this.allCategorias.length > 0) {

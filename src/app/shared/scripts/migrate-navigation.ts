@@ -35,7 +35,7 @@ export class NavigationMigrationScript {
    */
   static async migrateNavigationFile(
     legacyNavPath: string,
-    options: MigrationOptions = {},
+    options: MigrationOptions = {}
   ): Promise<MigrationResult> {
     try {
       // Load legacy navigation configuration
@@ -81,9 +81,7 @@ export class NavigationMigrationScript {
    * @param filePath - Path to the legacy navigation file
    * @returns Legacy navigation items
    */
-  private static async loadLegacyNavigation(
-    filePath: string,
-  ): Promise<INavData[]> {
+  private static async loadLegacyNavigation(filePath: string): Promise<INavData[]> {
     // In a real implementation, this would read from the file system
     // For now, we'll return a sample legacy configuration
     return [
@@ -143,12 +141,10 @@ export class NavigationMigrationScript {
    */
   private static performMigration(
     legacyItems: INavData[],
-    options: MigrationOptions,
+    options: MigrationOptions
   ): INavItemEnhanced[] {
     // Convert legacy items to enhanced format
-    const migratedItems = legacyItems.map((item) =>
-      this.migrateSingleItem(item),
-    );
+    const migratedItems = legacyItems.map((item) => this.migrateSingleItem(item));
 
     // Apply route mappings
     const mappedItems = this.applyRouteMappings(migratedItems);
@@ -176,9 +172,7 @@ export class NavigationMigrationScript {
 
     // Migrate children if they exist
     if (legacyItem.children && legacyItem.children.length > 0) {
-      enhancedItem.children = legacyItem.children.map((child) =>
-        this.migrateSingleItem(child),
-      );
+      enhancedItem.children = legacyItem.children.map((child) => this.migrateSingleItem(child));
     }
 
     // Add dynamic badges for specific items
@@ -195,9 +189,7 @@ export class NavigationMigrationScript {
    * @param items - Navigation items to update
    * @returns Items with updated URLs
    */
-  private static applyRouteMappings(
-    items: INavItemEnhanced[],
-  ): INavItemEnhanced[] {
+  private static applyRouteMappings(items: INavItemEnhanced[]): INavItemEnhanced[] {
     const routeMap = this.getRouteMapping();
 
     return items.map((item) => {
@@ -339,10 +331,7 @@ export class NavigationMigrationScript {
       };
     }
 
-    if (
-      url.includes('entradas-temporales') ||
-      name.toLowerCase().includes('borrador')
-    ) {
+    if (url.includes('entradas-temporales') || name.toLowerCase().includes('borrador')) {
       item.dynamicBadge = {
         service: 'BadgeCounterService',
         method: 'getDraftEntriesCount',
@@ -410,11 +399,7 @@ export class NavigationMigrationScript {
    * @param urls - Set to track URLs
    * @param issues - Array to collect issues
    */
-  private static collectUrls(
-    items: INavItemEnhanced[],
-    urls: Set<string>,
-    issues: string[],
-  ): void {
+  private static collectUrls(items: INavItemEnhanced[], urls: Set<string>, issues: string[]): void {
     for (const item of items) {
       if (item.url) {
         if (urls.has(item.url)) {
@@ -435,19 +420,14 @@ export class NavigationMigrationScript {
    * @param items - Navigation items
    * @param issues - Array to collect issues
    */
-  private static validateRequiredProperties(
-    items: INavItemEnhanced[],
-    issues: string[],
-  ): void {
+  private static validateRequiredProperties(items: INavItemEnhanced[], issues: string[]): void {
     for (const item of items) {
       if (!item.name) {
         issues.push('Navigation item missing name property');
       }
 
       if (!item.title && !item.url) {
-        issues.push(
-          `Navigation item "${item.name}" must have either title or url property`,
-        );
+        issues.push(`Navigation item "${item.name}" must have either title or url property`);
       }
 
       if (item.children) {
@@ -465,7 +445,7 @@ export class NavigationMigrationScript {
   private static validateHierarchyDepth(
     items: INavItemEnhanced[],
     issues: string[],
-    currentDepth: number,
+    currentDepth: number
   ): void {
     const maxDepth = 2;
 
@@ -473,7 +453,7 @@ export class NavigationMigrationScript {
       if (item.children && item.children.length > 0) {
         if (currentDepth >= maxDepth) {
           issues.push(
-            `Navigation hierarchy exceeds maximum depth of ${maxDepth} levels at item: ${item.name}`,
+            `Navigation hierarchy exceeds maximum depth of ${maxDepth} levels at item: ${item.name}`
           );
         } else {
           this.validateHierarchyDepth(item.children, issues, currentDepth + 1);
@@ -489,7 +469,7 @@ export class NavigationMigrationScript {
    */
   private static async saveMigratedNavigation(
     items: INavItemEnhanced[],
-    outputPath: string,
+    outputPath: string
   ): Promise<void> {
     const output = this.generateNavigationFile(items);
 
@@ -533,18 +513,13 @@ export class MigrationCLI {
       outputPath: this.getArgValue(args, '--output'),
     };
 
-    const inputPath =
-      this.getArgValue(args, '--input') ||
-      'src/app/admin/default-layout/_nav.ts';
+    const inputPath = this.getArgValue(args, '--input') || 'src/app/admin/default-layout/_nav.ts';
 
     console.log('Starting navigation migration...');
     console.log(`Input: ${inputPath}`);
     console.log(`Options:`, options);
 
-    const result = await NavigationMigrationScript.migrateNavigationFile(
-      inputPath,
-      options,
-    );
+    const result = await NavigationMigrationScript.migrateNavigationFile(inputPath, options);
 
     if (result.success) {
       console.log('✅ Migration completed successfully!');
@@ -554,9 +529,7 @@ export class MigrationCLI {
           console.log('✅ Validation passed');
         } else {
           console.log('⚠️  Validation issues found:');
-          result.validationResult.issues.forEach((issue) =>
-            console.log(`  - ${issue}`),
-          );
+          result.validationResult.issues.forEach((issue) => console.log(`  - ${issue}`));
         }
       }
 
@@ -564,9 +537,7 @@ export class MigrationCLI {
         console.log(`📁 Backup created: ${result.backupPath}`);
       }
 
-      console.log(
-        `📊 Migrated ${result.migratedItems.length} navigation items`,
-      );
+      console.log(`📊 Migrated ${result.migratedItems.length} navigation items`);
     } else {
       console.log('❌ Migration failed:');
       result.errors?.forEach((error) => console.log(`  - ${error}`));
@@ -579,14 +550,9 @@ export class MigrationCLI {
    * @param argName - Argument name to find
    * @returns Argument value or undefined
    */
-  private static getArgValue(
-    args: string[],
-    argName: string,
-  ): string | undefined {
+  private static getArgValue(args: string[], argName: string): string | undefined {
     const index = args.indexOf(argName);
-    return index !== -1 && index + 1 < args.length
-      ? args[index + 1]
-      : undefined;
+    return index !== -1 && index + 1 < args.length ? args[index + 1] : undefined;
   }
 }
 

@@ -40,13 +40,7 @@
         aria-live="assertive"
       >
         <span>{{ errorContentStats }}</span>
-        <button
-          cButton
-          color="danger"
-          size="sm"
-          class="retry-btn-content"
-          (click)="retry.emit()"
-        >
+        <button cButton color="danger" size="sm" class="retry-btn-content" (click)="retry.emit()">
           Reintentar
         </button>
       </div>
@@ -120,9 +114,7 @@
                   <c-badge color="secondary">{{ row.total }}</c-badge>
                 </td>
                 <td class="text-end">
-                  <c-badge color="light" class="text-dark"
-                    >{{ row.porcentaje }}%</c-badge
-                  >
+                  <c-badge color="light" class="text-dark">{{ row.porcentaje }}%</c-badge>
                 </td>
               </tr>
             }

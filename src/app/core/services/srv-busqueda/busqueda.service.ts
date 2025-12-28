@@ -16,10 +16,7 @@ interface BuscarResponse {
 export class BusquedaService {
   private searchSubject = new Subject<string>();
   private currentSubscription?: Subscription;
-  private searchFunction?: (
-    term: string,
-    page?: number,
-  ) => Observable<BuscarResponse>;
+  private searchFunction?: (term: string, page?: number) => Observable<BuscarResponse>;
 
   // Modificar método de limpieza
   limpiarBusqueda(): void {
@@ -33,7 +30,7 @@ export class BusquedaService {
   iniciarBusqueda(
     searchFunction: (term: string, page?: number) => Observable<BuscarResponse>,
     callback: (results: BuscarResponse) => void,
-    delay: number = 300,
+    delay: number = 300
   ): void {
     this.limpiarBusqueda();
     this.searchFunction = searchFunction;
@@ -44,10 +41,8 @@ export class BusquedaService {
         switchMap((term) =>
           // use stored function; when invoked by the subject we rely on the component
           // to manage currentPage internally (searchFunction may use component state)
-          this.searchFunction
-            ? this.searchFunction(term)
-            : of({ elements: [], totalPages: 0 }),
-        ),
+          this.searchFunction ? this.searchFunction(term) : of({ elements: [], totalPages: 0 })
+        )
       )
       .subscribe((response) => {
         if (response?.elements) {

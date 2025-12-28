@@ -4,10 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminComponent } from './admin.component';
-import {
-  DefaultFooterComponent,
-  DefaultHeaderComponent,
-} from './default-layout';
+import { DefaultFooterComponent, DefaultHeaderComponent } from './default-layout';
 
 // Módulos externos
 import { NgScrollbarModule } from 'ngx-scrollbar';
@@ -17,11 +14,7 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { SharedCoreUiModule } from '../shared/shared-coreui.module';
 import { SharedWidgetsModule } from '../shared/shared-widgets.module';
 
-const APP_CONTAINERS = [
-  DefaultFooterComponent,
-  DefaultHeaderComponent,
-  AdminComponent,
-];
+const APP_CONTAINERS = [DefaultFooterComponent, DefaultHeaderComponent, AdminComponent];
 
 @NgModule({
   declarations: [...APP_CONTAINERS],

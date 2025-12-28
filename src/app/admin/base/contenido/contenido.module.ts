@@ -8,12 +8,6 @@ import { MediaSharedModule } from './media-shared.module';
 
 @NgModule({
   declarations: [ArchivosComponent],
-  imports: [
-    CommonModule,
-    ContenidoRoutingModule,
-    SharedOPModule,
-    FormsModule,
-    MediaSharedModule,
-  ],
+  imports: [CommonModule, ContenidoRoutingModule, SharedOPModule, FormsModule, MediaSharedModule],
 })
 export class ContenidoModule {}

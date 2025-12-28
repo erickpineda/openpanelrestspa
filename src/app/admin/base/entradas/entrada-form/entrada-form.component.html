@@ -4,13 +4,7 @@
       <h2 cCardTitle class="h5 mb-3 mb-lg-0">Entrada</h2>
       @if (modoLectura) {
         <div class="hstack gap-3">
-          <button
-            cButton
-            color="warning"
-            size="sm"
-            (click)="onEditar()"
-            [disabled]="form.enabled"
-          >
+          <button cButton color="warning" size="sm" (click)="onEditar()" [disabled]="form.enabled">
             <svg
               cIcon
               name="cilWarning"
@@ -30,10 +24,7 @@
     @if (showRecoveryNotification) {
       <app-data-recovery-notification
         title="📥 Entrada recuperada"
-        [message]="
-          'Se encontró una entrada no guardada: ' +
-          (temporaryData?.title || 'Sin título')
-        "
+        [message]="'Se encontró una entrada no guardada: ' + (temporaryData?.title || 'Sin título')"
         recoverText="Recuperar"
         ignoreText="Ignorar"
         discardText="Descartar"
@@ -62,20 +53,8 @@
             {{ estaEditando ? 'Editar Entrada' : 'Crear Entrada' }}
           </h2>
           <div class="hstack gap-3">
-            <button
-              cButton
-              color="danger"
-              size="sm"
-              type="reset"
-              [tabindex]="'0'"
-            >
-              <svg
-                cIcon
-                name="cilX"
-                style="padding-right: 2px"
-                size="sm"
-                title="Cancelar"
-              ></svg>
+            <button cButton color="danger" size="sm" type="reset" [tabindex]="'0'">
+              <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
               Cancelar
             </button>
 
@@ -87,13 +66,7 @@
               [disabled]="modoLectura || form.pristine || form.invalid"
               [tabindex]="'0'"
             >
-              <svg
-                cIcon
-                name="cilSave"
-                style="padding-right: 2px"
-                size="sm"
-                title="Guardar"
-              ></svg>
+              <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
               Guardar
             </button>
 
@@ -139,24 +112,20 @@
                         [autofocus]="true"
                         [ngClass]="{
                           'is-invalid':
-                            (submitted || control('titulo')?.touched) &&
-                            control('titulo')?.invalid,
+                            (submitted || control('titulo')?.touched) && control('titulo')?.invalid,
                           'is-valid':
-                            control('titulo')?.valid &&
-                            (submitted || control('titulo')?.touched),
+                            control('titulo')?.valid && (submitted || control('titulo')?.touched),
                         }"
                       />
 
                       <small id="passwordHelpInline" class="text-muted">
-                        <abbr
-                          title="El título de la entrada ha de tener entre 1 y 30 caracteres"
+                        <abbr title="El título de la entrada ha de tener entre 1 y 30 caracteres"
                           >Mínimo 1, Máximo 30 caracteres.</abbr
                         >
                       </small>
 
                       @if (
-                        (submitted || control('titulo')?.touched) &&
-                        control('titulo')?.invalid
+                        (submitted || control('titulo')?.touched) && control('titulo')?.invalid
                       ) {
                         <div class="invalid-feedback animated-fade">
                           @if (control('titulo')?.errors?.['required']) {
@@ -164,13 +133,8 @@
                           }
                         </div>
                       }
-                      @if (
-                        control('titulo')?.valid &&
-                        (submitted || control('titulo')?.touched)
-                      ) {
-                        <div class="valid-feedback animated-fade">
-                          ¡Título válido!
-                        </div>
+                      @if (control('titulo')?.valid && (submitted || control('titulo')?.touched)) {
+                        <div class="valid-feedback animated-fade">¡Título válido!</div>
                       }
                     </div>
                   </c-col>
@@ -178,11 +142,7 @@
                   <c-col lg="12">
                     <div>
                       <label cCol cLabel="col">Subtitulo</label>
-                      <input
-                        type="text"
-                        formControlName="subtitulo"
-                        cFormControl
-                      />
+                      <input type="text" formControlName="subtitulo" cFormControl />
                     </div>
                   </c-col>
                 </c-row>
@@ -205,17 +165,14 @@
                           formControlName="estadoEntrada"
                           [ngClass]="{
                             'is-invalid':
-                              (submitted ||
-                                control('estadoEntrada')?.touched) &&
+                              (submitted || control('estadoEntrada')?.touched) &&
                               control('estadoEntrada')?.invalid,
                             'is-valid':
                               control('estadoEntrada')?.valid &&
                               (submitted || control('estadoEntrada')?.touched),
                           }"
                         >
-                          <option [ngValue]="null" disabled>
-                            Selecciona un estado
-                          </option>
+                          <option [ngValue]="null" disabled>Selecciona un estado</option>
                           @for (ee of estadosEntr; track ee.nombre) {
                             <option [ngValue]="ee">{{ ee.nombre }}</option>
                           }
@@ -235,9 +192,7 @@
                         control('estadoEntrada')?.valid &&
                         (submitted || control('estadoEntrada')?.touched)
                       ) {
-                        <div class="valid-feedback animated-fade">
-                          ¡Estado válido!
-                        </div>
+                        <div class="valid-feedback animated-fade">¡Estado válido!</div>
                       }
                     </div>
                   </c-col>
@@ -259,9 +214,7 @@
                               (submitted || control('tipoEntrada')?.touched),
                           }"
                         >
-                          <option [ngValue]="null" disabled>
-                            Selecciona un tipo
-                          </option>
+                          <option [ngValue]="null" disabled>Selecciona un tipo</option>
                           @for (te of tiposEntr; track te.nombre) {
                             <option [ngValue]="te">{{ te.nombre }}</option>
                           }
@@ -281,9 +234,7 @@
                         control('tipoEntrada')?.valid &&
                         (submitted || control('tipoEntrada')?.touched)
                       ) {
-                        <div class="valid-feedback animated-fade">
-                          ¡Tipo de entrada válido!
-                        </div>
+                        <div class="valid-feedback animated-fade">¡Tipo de entrada válido!</div>
                       }
                     </div>
                   </c-col>
@@ -295,9 +246,7 @@
           <c-col lg="12">
             <c-card class="mb-4">
               <c-card-body>
-                <h3 cCardTitle class="h6 card-title">
-                  Contenido de la entrada
-                </h3>
+                <h3 cCardTitle class="h6 card-title">Contenido de la entrada</h3>
                 @if (Editor) {
                   <ckeditor
                     id="ckeditor"
@@ -315,8 +264,7 @@
                         (submitted || control('contenido')?.touched) &&
                         control('contenido')?.invalid,
                       'is-valid':
-                        control('contenido')?.valid &&
-                        (submitted || control('contenido')?.touched),
+                        control('contenido')?.valid && (submitted || control('contenido')?.touched),
                     }"
                   >
                   </ckeditor>
@@ -327,8 +275,7 @@
                 }
 
                 @if (
-                  (submitted || control('contenido')?.touched) &&
-                  control('contenido')?.invalid
+                  (submitted || control('contenido')?.touched) && control('contenido')?.invalid
                 ) {
                   <div class="invalid-feedback animated-fade">
                     @if (control('contenido')?.errors?.['required']) {
@@ -336,13 +283,8 @@
                     }
                   </div>
                 }
-                @if (
-                  control('contenido')?.valid &&
-                  (submitted || control('contenido')?.touched)
-                ) {
-                  <div class="valid-feedback animated-fade">
-                    ¡Contenido válido!
-                  </div>
+                @if (control('contenido')?.valid && (submitted || control('contenido')?.touched)) {
+                  <div class="valid-feedback animated-fade">¡Contenido válido!</div>
                 }
               </c-card-body>
             </c-card>
@@ -396,18 +338,14 @@
                         variant="outline"
                         class="btn btn-outline-secondary"
                         (click)="onQuitarImagen()"
-                        [disabled]="
-                          (!imagenDestacadaUrl && !imagenPreviewUrl) ||
-                          form.disabled
-                        "
+                        [disabled]="(!imagenDestacadaUrl && !imagenPreviewUrl) || form.disabled"
                       >
                         Quitar
                       </button>
                     </c-input-group>
 
                     <div class="mt-2 text-muted small fst-italic">
-                      Si quiere ver la imagen en detalle use la sección de
-                      multimedia para verla.
+                      Si quiere ver la imagen en detalle use la sección de multimedia para verla.
                     </div>
                   </c-card-body>
                 </c-card>
@@ -433,9 +371,7 @@
               <!-- Categorías -->
               <c-col lg="12">
                 <c-card class="mb-4">
-                  <c-card-header
-                    class="d-flex justify-content-between align-items-center"
-                  >
+                  <c-card-header class="d-flex justify-content-between align-items-center">
                     <h3 cCardTitle class="h6 card-title">
                       <c-icon name="cil-tags" class="me-2"></c-icon>
                       Categorías
@@ -457,9 +393,7 @@
                             type="checkbox"
                             id="todas-categorias"
                             [checked]="estanTodasCategoriasSeleccionadas()"
-                            [indeterminate]="
-                              estanAlgunasCategoriasSeleccionadas()
-                            "
+                            [indeterminate]="estanAlgunasCategoriasSeleccionadas()"
                             (change)="toggleTodasCategorias($event)"
                             [disabled]="!form.enabled"
                           />
@@ -474,10 +408,7 @@
                     <!-- Grid de categorías -->
                     @if (categorias.length > 0) {
                       <div class="categorias-grid">
-                        @for (
-                          categoria of categorias;
-                          track categoria.idCategoria
-                        ) {
+                        @for (categoria of categorias; track categoria.idCategoria) {
                           <c-form-check class="categoria-item">
                             <input
                               cFormCheckInput
@@ -490,12 +421,8 @@
                             <label
                               class="form-check-label"
                               [for]="'categoria-' + categoria.idCategoria"
-                              [class.text-success]="
-                                isCategoriaSelected(categoria)
-                              "
-                              [class.text-muted]="
-                                !isCategoriaSelected(categoria)
-                              "
+                              [class.text-success]="isCategoriaSelected(categoria)"
+                              [class.text-muted]="!isCategoriaSelected(categoria)"
                             >
                               {{ categoria.nombre }}
                               @if (categoria.descripcion) {
@@ -512,14 +439,8 @@
                     <!-- Sin categorías -->
                     @if (categorias.length === 0) {
                       <div class="text-center py-3">
-                        <c-icon
-                          name="cil-inbox"
-                          size="xl"
-                          class="text-muted mb-2"
-                        ></c-icon>
-                        <p class="text-muted mb-0">
-                          No hay categorías disponibles
-                        </p>
+                        <c-icon name="cil-inbox" size="xl" class="text-muted mb-2"></c-icon>
+                        <p class="text-muted mb-0">No hay categorías disponibles</p>
                       </div>
                     }
                   </c-card-body>
@@ -572,10 +493,7 @@
                       >
                         <div class="ms-2 me-auto">
                           <h6 class="mb-0">Privada</h6>
-                          <small
-                            >Sólo puede ser vista por el
-                            autor/administrador</small
-                          >
+                          <small>Sólo puede ser vista por el autor/administrador</small>
                         </div>
                         <c-form-check [switch]="true">
                           <input
@@ -626,14 +544,9 @@
     <button (click)="cerrarSelectorImagen()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
-    <app-imagenes
-      [mode]="'selector'"
-      (selectItem)="onMediaSelected($event)"
-    ></app-imagenes>
+    <app-imagenes [mode]="'selector'" (selectItem)="onMediaSelected($event)"></app-imagenes>
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="cerrarSelectorImagen()" cButton color="secondary">
-      Cancelar
-    </button>
+    <button (click)="cerrarSelectorImagen()" cButton color="secondary">Cancelar</button>
   </c-modal-footer>
 </c-modal>

@@ -1,13 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
-import {
-  HttpClient,
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CrudService } from './crud.service';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
@@ -53,12 +46,8 @@ describe('CrudService base behaviors', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/things'));
     expect(req.request.method).toBe('GET');
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe(
-      '1',
-    );
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe(
-      null,
-    );
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe('1');
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe(null);
     req.flush({ data: { elements: [] } });
   });
 
@@ -67,9 +56,7 @@ describe('CrudService base behaviors', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/things'));
     expect(req.request.method).toBe('GET');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(
-      true,
-    );
+    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [] } });
   });
 

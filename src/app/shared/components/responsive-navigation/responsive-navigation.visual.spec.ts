@@ -17,8 +17,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
   let fixture: ComponentFixture<ResponsiveNavigationComponent>;
   let mockResponsiveService: jasmine.SpyObj<ResponsiveNavigationService>;
   let mockNavigationService: jasmine.SpyObj<NavigationService>;
-  type RS =
-    import('../../../core/services/ui/responsive-navigation.service').ResponsiveState;
+  type RS = import('../../../core/services/ui/responsive-navigation.service').ResponsiveState;
   let responsiveStateSubject: BehaviorSubject<RS>;
   let navigationItemsSubject: BehaviorSubject<INavItemEnhanced[]>;
 
@@ -96,7 +95,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       ],
       {
         responsiveState$: responsiveStateSubject.asObservable(),
-      },
+      }
     );
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', [
@@ -120,23 +119,15 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
     fixture = TestBed.createComponent(ResponsiveNavigationComponent);
     component = fixture.componentInstance;
     mockResponsiveService = TestBed.inject(
-      ResponsiveNavigationService,
+      ResponsiveNavigationService
     ) as jasmine.SpyObj<ResponsiveNavigationService>;
-    mockNavigationService = TestBed.inject(
-      NavigationService,
-    ) as jasmine.SpyObj<NavigationService>;
+    mockNavigationService = TestBed.inject(NavigationService) as jasmine.SpyObj<NavigationService>;
 
     mockResponsiveService.getCurrentState.and.returnValue(initialState);
     mockResponsiveService.getCriticalFunctions.and.returnValue([]);
-    mockResponsiveService.adaptNavigationItems.and.callFake(
-      (items: any) => items,
-    );
-    navigationItemsSubject = new BehaviorSubject<INavItemEnhanced[]>([
-      ...mockNavigationItems,
-    ]);
-    mockNavigationService.getNavigationItems.and.returnValue(
-      navigationItemsSubject,
-    );
+    mockResponsiveService.adaptNavigationItems.and.callFake((items: any) => items);
+    navigationItemsSubject = new BehaviorSubject<INavItemEnhanced[]>([...mockNavigationItems]);
+    mockNavigationService.getNavigationItems.and.returnValue(navigationItemsSubject);
     mockNavigationService.isItemActive.and.returnValue(false);
     mockNavigationService.isSectionActive.and.returnValue(false);
   });
@@ -146,7 +137,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       fixture.detectChanges();
 
       const dashboardItem = fixture.debugElement.query(
-        By.css('[data-testid="nav-item-dashboard"]'),
+        By.css('[data-testid="nav-item-dashboard"]')
       );
       expect(dashboardItem).toBeTruthy();
 
@@ -159,9 +150,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
     it('should render dynamic badges with correct styling', () => {
       fixture.detectChanges();
 
-      const entradasItem = fixture.debugElement.query(
-        By.css('[data-testid="nav-item-entradas"]'),
-      );
+      const entradasItem = fixture.debugElement.query(By.css('[data-testid="nav-item-entradas"]'));
       expect(entradasItem).toBeTruthy();
 
       const badge = entradasItem.query(By.css('.nav-badge'));
@@ -175,7 +164,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
 
       const updatedItems = [...mockNavigationItems];
       const entradasIndex = updatedItems.findIndex(
-        (i) => (i.name || '').toLowerCase() === 'entradas',
+        (i) => (i.name || '').toLowerCase() === 'entradas'
       );
       expect(entradasIndex).toBeGreaterThanOrEqual(0);
       updatedItems[entradasIndex] = {
@@ -188,9 +177,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       navigationItemsSubject.next(updatedItems);
       fixture.detectChanges();
 
-      const entradasItem = fixture.debugElement.query(
-        By.css('[data-testid="nav-item-entradas"]'),
-      );
+      const entradasItem = fixture.debugElement.query(By.css('[data-testid="nav-item-entradas"]'));
       const badge = entradasItem.query(By.css('.nav-badge'));
 
       expect(badge.nativeElement.textContent.trim()).toBe('8');
@@ -200,7 +187,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       fixture.detectChanges();
 
       const comentariosItem = fixture.debugElement.query(
-        By.css('[data-testid="nav-item-comentarios"]'),
+        By.css('[data-testid="nav-item-comentarios"]')
       );
       const badge = comentariosItem.query(By.css('.nav-badge'));
 
@@ -213,7 +200,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
 
       const updatedItems = [...mockNavigationItems];
       const entradasIndex = updatedItems.findIndex(
-        (i) => (i.name || '').toLowerCase() === 'entradas',
+        (i) => (i.name || '').toLowerCase() === 'entradas'
       );
       expect(entradasIndex).toBeGreaterThanOrEqual(0);
       updatedItems[entradasIndex] = {
@@ -226,9 +213,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       navigationItemsSubject.next(updatedItems);
       fixture.detectChanges();
 
-      const entradasItem = fixture.debugElement.query(
-        By.css('[data-testid="nav-item-entradas"]'),
-      );
+      const entradasItem = fixture.debugElement.query(By.css('[data-testid="nav-item-entradas"]'));
       const badge = entradasItem.query(By.css('.nav-badge.zero-count'));
 
       expect(badge).toBeTruthy();
@@ -248,7 +233,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       fixture.detectChanges();
 
       const newItemElement = fixture.debugElement.query(
-        By.css('[data-testid="nav-item-nuevo-item"]'),
+        By.css('[data-testid="nav-item-nuevo-item"]')
       );
       expect(newItemElement).toBeTruthy();
       const badge = newItemElement.query(By.css('.nav-badge'));
@@ -268,9 +253,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       mockResponsiveService.getCurrentState.and.returnValue(nextState);
       fixture.detectChanges();
 
-      const container = fixture.debugElement.query(
-        By.css('.responsive-navigation-container'),
-      );
+      const container = fixture.debugElement.query(By.css('.responsive-navigation-container'));
       expect(container.nativeElement).toHaveClass('mobile-layout');
     });
 
@@ -285,9 +268,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       mockResponsiveService.getCurrentState.and.returnValue(nextState);
       fixture.detectChanges();
 
-      const container = fixture.debugElement.query(
-        By.css('.responsive-navigation-container'),
-      );
+      const container = fixture.debugElement.query(By.css('.responsive-navigation-container'));
       expect(container.nativeElement).toHaveClass('tablet-layout');
     });
 
@@ -302,9 +283,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       mockResponsiveService.getCurrentState.and.returnValue(nextState);
       fixture.detectChanges();
 
-      const container = fixture.debugElement.query(
-        By.css('.responsive-navigation-container'),
-      );
+      const container = fixture.debugElement.query(By.css('.responsive-navigation-container'));
       expect(container.nativeElement).toHaveClass('desktop-layout');
     });
 
@@ -337,14 +316,10 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
 
       fixture.detectChanges();
 
-      const criticalBar = fixture.debugElement.query(
-        By.css('.critical-functions-bar'),
-      );
+      const criticalBar = fixture.debugElement.query(By.css('.critical-functions-bar'));
       expect(criticalBar).toBeTruthy();
 
-      const criticalFunctions = fixture.debugElement.queryAll(
-        By.css('.critical-function-btn'),
-      );
+      const criticalFunctions = fixture.debugElement.queryAll(By.css('.critical-function-btn'));
       expect(criticalFunctions.length).toBe(2);
     });
 
@@ -359,9 +334,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       mockResponsiveService.getCurrentState.and.returnValue(nextState);
       fixture.detectChanges();
 
-      const criticalBar = fixture.debugElement.query(
-        By.css('.critical-functions-bar'),
-      );
+      const criticalBar = fixture.debugElement.query(By.css('.critical-functions-bar'));
       expect(criticalBar).toBeFalsy();
     });
 
@@ -374,9 +347,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       mockResponsiveService.getCurrentState.and.returnValue(nextState);
       fixture.detectChanges();
 
-      const container = fixture.debugElement.query(
-        By.css('.responsive-navigation-container'),
-      );
+      const container = fixture.debugElement.query(By.css('.responsive-navigation-container'));
       expect(container.nativeElement).toHaveClass('touch-enabled');
 
       const navLinks = fixture.debugElement.queryAll(By.css('.nav-link'));
@@ -401,9 +372,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
 
       fixture.detectChanges();
 
-      const navigationMenu = fixture.debugElement.query(
-        By.css('.navigation-menu'),
-      );
+      const navigationMenu = fixture.debugElement.query(By.css('.navigation-menu'));
       expect(navigationMenu.nativeElement).toHaveClass('collapsed');
 
       // Simular apertura del menú
@@ -426,18 +395,14 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
 
       // Simular hover
       expect(navLink).toBeTruthy();
-      expect(() =>
-        navLink.nativeElement.dispatchEvent(new MouseEvent('mouseenter')),
-      ).not.toThrow();
+      expect(() => navLink.nativeElement.dispatchEvent(new MouseEvent('mouseenter'))).not.toThrow();
       fixture.detectChanges();
     });
 
     it('should animate badge updates', async () => {
       fixture.detectChanges();
 
-      const entradasItem = fixture.debugElement.query(
-        By.css('[data-testid="nav-item-entradas"]'),
-      );
+      const entradasItem = fixture.debugElement.query(By.css('[data-testid="nav-item-entradas"]'));
       const badge = entradasItem.query(By.css('.nav-badge'));
 
       // Simular actualización de badge
@@ -460,9 +425,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       mockResponsiveService.getCurrentState.and.returnValue(expandedState);
       fixture.detectChanges();
 
-      const navigationMenu = fixture.debugElement.query(
-        By.css('.navigation-menu'),
-      );
+      const navigationMenu = fixture.debugElement.query(By.css('.navigation-menu'));
 
       const collapsedState: RS = {
         ...(mockResponsiveService.getCurrentState() as RS),
@@ -479,9 +442,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
     it('should render section titles', async () => {
       fixture.detectChanges();
 
-      const sectionTitles = fixture.debugElement.queryAll(
-        By.css('.nav-section-title'),
-      );
+      const sectionTitles = fixture.debugElement.queryAll(By.css('.nav-section-title'));
       expect(sectionTitles.length).toBeGreaterThan(0);
     });
   });
@@ -532,9 +493,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
     it('should maintain visual hierarchy with section titles', () => {
       fixture.detectChanges();
 
-      const sectionTitles = fixture.debugElement.queryAll(
-        By.css('.nav-section-title'),
-      );
+      const sectionTitles = fixture.debugElement.queryAll(By.css('.nav-section-title'));
 
       sectionTitles.forEach((title) => {
         const styles = getComputedStyle(title.nativeElement);
@@ -560,7 +519,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
       fixture.detectChanges();
 
       const touchTargets = fixture.debugElement.queryAll(
-        By.css('.nav-link, .critical-function-btn'),
+        By.css('.nav-link, .critical-function-btn')
       );
 
       touchTargets.forEach((target) => {
@@ -610,19 +569,14 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
 
     it('should handle large navigation lists efficiently', () => {
       // Crear lista grande de navegación
-      const largeNavList: INavItemEnhanced[] = Array.from(
-        { length: 100 },
-        (_, i) => ({
-          name: `Item ${i}`,
-          url: `/item${i}`,
-          iconComponent: { name: 'cil-circle' },
-          priority: 100 - i,
-        }),
-      );
+      const largeNavList: INavItemEnhanced[] = Array.from({ length: 100 }, (_, i) => ({
+        name: `Item ${i}`,
+        url: `/item${i}`,
+        iconComponent: { name: 'cil-circle' },
+        priority: 100 - i,
+      }));
 
-      mockNavigationService.getNavigationItems.and.returnValue(
-        new BehaviorSubject(largeNavList),
-      );
+      mockNavigationService.getNavigationItems.and.returnValue(new BehaviorSubject(largeNavList));
 
       fixture.detectChanges();
 
@@ -636,7 +590,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
     // Add helper methods to component for testing
     (component as any).updateBadgeCount = (itemId: string, count: number) => {
       const item = mockNavigationItems.find(
-        (item) => item.name?.toLowerCase().replace(/\s+/g, '-') === itemId,
+        (item) => item.name?.toLowerCase().replace(/\s+/g, '-') === itemId
       );
       if (item && item.badge) {
         item.badge.text = count.toString();
@@ -646,7 +600,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
     (component as any).addNavigationItem = (item: INavItemEnhanced) => {
       mockNavigationItems.push(item);
       mockNavigationService.getNavigationItems.and.returnValue(
-        new BehaviorSubject([...mockNavigationItems]),
+        new BehaviorSubject([...mockNavigationItems])
       );
     };
   });

@@ -1,9 +1,6 @@
 <!-- CoreUI Responsive Navigation Component -->
 @if (responsiveState$ | async; as state) {
-  <div
-    class="responsive-navigation-container"
-    [ngClass]="getNavigationClasses(state)"
-  >
+  <div class="responsive-navigation-container" [ngClass]="getNavigationClasses(state)">
     <!-- CoreUI Toggle Button for Mobile/Tablet -->
     @if (shouldShowToggleButton(state)) {
       <c-button
@@ -14,11 +11,7 @@
         [attr.aria-label]="getToggleButtonText(state)"
         (click)="toggleSidebar()"
       >
-        <svg
-          cIcon
-          [name]="state.sidebarCollapsed ? 'cilMenu' : 'cilX'"
-          size="lg"
-        ></svg>
+        <svg cIcon [name]="state.sidebarCollapsed ? 'cilMenu' : 'cilX'" size="lg"></svg>
         @if (!state.isMobile) {
           <span class="toggle-text">
             {{ getToggleButtonText(state) }}
@@ -40,17 +33,11 @@
         <div class="mobile-overlay" (click)="collapseSidebar()"></div>
       }
       <!-- CoreUI Navigation Items -->
-      @for (
-        item of adaptedNavigationItems;
-        track trackByNavItem($index, item)
-      ) {
+      @for (item of adaptedNavigationItems; track trackByNavItem($index, item)) {
         @if (shouldShowItem(item, state)) {
           <!-- Section Title using CoreUI -->
           @if (item.title) {
-            <c-nav-title
-              class="nav-section-title"
-              [class.mobile-hidden]="state.isMobile"
-            >
+            <c-nav-title class="nav-section-title" [class.mobile-hidden]="state.isMobile">
               {{ item.name }}
             </c-nav-title>
           }
@@ -69,11 +56,7 @@
               >
                 <!-- CoreUI Icon -->
                 @if (item.iconComponent?.name) {
-                  <svg
-                    cIcon
-                    [name]="item.iconComponent.name"
-                    class="nav-icon"
-                  ></svg>
+                  <svg cIcon [name]="item.iconComponent.name" class="nav-icon"></svg>
                 }
                 @if (item.icon && !item.iconComponent) {
                   <svg cIcon [name]="item.icon" class="nav-icon"></svg>
@@ -104,15 +87,10 @@
                 }
               </c-nav-link>
               <!-- CoreUI Submenu -->
-              @if (
-                item.children && item.children.length > 0 && !state.isMobile
-              ) {
+              @if (item.children && item.children.length > 0 && !state.isMobile) {
                 <c-nav-group [compact]="state.sidebarCollapsed">
                   <div class="nav-section-content">
-                    @for (
-                      child of item.children;
-                      track trackByNavItem($index, child)
-                    ) {
+                    @for (child of item.children; track trackByNavItem($index, child)) {
                       <c-nav-item>
                         <c-nav-link
                           [routerLink]="child.url"
@@ -124,11 +102,7 @@
                           (click)="onNavigationItemClick(child)"
                         >
                           @if (child.icon) {
-                            <svg
-                              cIcon
-                              [name]="child.icon"
-                              class="nav-subicon"
-                            ></svg>
+                            <svg cIcon [name]="child.icon" class="nav-subicon"></svg>
                           }
                           @if (!state.sidebarCollapsed) {
                             {{ child.name }}
@@ -183,9 +157,7 @@
       class="sidebar-bottom-toggle"
       role="button"
       tabindex="0"
-      [attr.aria-label]="
-        state.sidebarCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'
-      "
+      [attr.aria-label]="state.sidebarCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'"
       [attr.aria-pressed]="!state.sidebarCollapsed"
       (click)="toggleSidebar()"
       (keydown)="onBottomToggleKeydown($event)"

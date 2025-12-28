@@ -50,14 +50,8 @@
       </div>
     }
     @if (seriesEntriesSplitData) {
-      <div
-        class="chart-container mb-2"
-        [attr.aria-busy]="loadingSplitEstado ? 'true' : null"
-      >
-        <app-dashboard-chart
-          [data]="seriesEntriesSplitData"
-          type="bar"
-        ></app-dashboard-chart>
+      <div class="chart-container mb-2" [attr.aria-busy]="loadingSplitEstado ? 'true' : null">
+        <app-dashboard-chart [data]="seriesEntriesSplitData" type="bar"></app-dashboard-chart>
       </div>
     }
     @if (!seriesEntriesSplitData) {

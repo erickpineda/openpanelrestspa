@@ -1,9 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LoggerService } from '../../../../core/services/logger.service';
-import {
-  LoggerBufferService,
-  LogEntry,
-} from '../../../../core/services/logger-buffer.service';
+import { LoggerBufferService, LogEntry } from '../../../../core/services/logger-buffer.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -22,7 +19,7 @@ export class LogsComponent implements OnInit, OnDestroy {
 
   constructor(
     private logger: LoggerService,
-    private buffer: LoggerBufferService,
+    private buffer: LoggerBufferService
   ) {}
 
   ngOnInit(): void {
@@ -68,9 +65,7 @@ export class LogsComponent implements OnInit, OnDestroy {
       return;
     }
     this.filtered = this.entries.filter(
-      (e) =>
-        e.message.toLowerCase().includes(f) ||
-        e.level.toLowerCase().includes(f),
+      (e) => e.message.toLowerCase().includes(f) || e.level.toLowerCase().includes(f)
     );
   }
 

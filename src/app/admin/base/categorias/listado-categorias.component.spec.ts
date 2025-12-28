@@ -53,9 +53,7 @@ describe('ListadoCategoriasComponent Spinner', () => {
 
     // Configurar estado inicial
     component.cargando = false;
-    component.pagedCategorias = [
-      { idCategoria: 1, nombre: 'A', descripcion: '' } as any,
-    ];
+    component.pagedCategorias = [{ idCategoria: 1, nombre: 'A', descripcion: '' } as any];
 
     // IMPORTANTE: Primero detectChanges() para que Angular procese los bindings
     fixture.detectChanges();

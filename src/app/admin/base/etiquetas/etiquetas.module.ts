@@ -8,17 +8,7 @@ import { SearchToolbarBasicComponent } from './components/search-toolbar-basic/s
 import { SharedOPModule } from '../../../shared/shared.module';
 
 @NgModule({
-  declarations: [
-    EtiquetasListComponent,
-    EtiquetaFormComponent,
-    SearchToolbarBasicComponent,
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    SharedOPModule,
-    EtiquetasRoutingModule,
-  ],
+  declarations: [EtiquetasListComponent, EtiquetaFormComponent, SearchToolbarBasicComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SharedOPModule, EtiquetasRoutingModule],
 })
 export class EtiquetasModule {}

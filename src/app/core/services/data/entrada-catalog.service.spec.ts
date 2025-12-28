@@ -7,26 +7,18 @@ describe('EntradaCatalogService', () => {
       'listarTiposEntradasSafe',
       'listarEstadosEntradasSafe',
     ]);
-    const categoriaService = jasmine.createSpyObj('CategoriaService', [
-      'listarSafe',
-    ]);
-    const etiquetaService = jasmine.createSpyObj('EtiquetaService', [
-      'listarSafe',
-    ]);
+    const categoriaService = jasmine.createSpyObj('CategoriaService', ['listarSafe']);
+    const etiquetaService = jasmine.createSpyObj('EtiquetaService', ['listarSafe']);
 
-    entradaService.listarTiposEntradasSafe.and.returnValue(
-      of([{ nombre: 'Blog' }] as any),
-    );
-    entradaService.listarEstadosEntradasSafe.and.returnValue(
-      of([{ nombre: 'Borrador' }] as any),
-    );
+    entradaService.listarTiposEntradasSafe.and.returnValue(of([{ nombre: 'Blog' }] as any));
+    entradaService.listarEstadosEntradasSafe.and.returnValue(of([{ nombre: 'Borrador' }] as any));
     categoriaService.listarSafe.and.returnValue(of([{ nombre: 'Cat' }] as any));
     etiquetaService.listarSafe.and.returnValue(of([{ nombre: 'Tag' }] as any));
 
     const service = new EntradaCatalogService(
       entradaService as any,
       categoriaService as any,
-      etiquetaService as any,
+      etiquetaService as any
     );
 
     service.obtenerCatalogosEntrada().subscribe((mapped) => {
@@ -43,12 +35,8 @@ describe('EntradaCatalogService', () => {
       'listarTiposEntradasSafe',
       'listarEstadosEntradasSafe',
     ]);
-    const categoriaService = jasmine.createSpyObj('CategoriaService', [
-      'listarSafe',
-    ]);
-    const etiquetaService = jasmine.createSpyObj('EtiquetaService', [
-      'listarSafe',
-    ]);
+    const categoriaService = jasmine.createSpyObj('CategoriaService', ['listarSafe']);
+    const etiquetaService = jasmine.createSpyObj('EtiquetaService', ['listarSafe']);
 
     entradaService.listarTiposEntradasSafe.and.returnValue(of([] as any));
     entradaService.listarEstadosEntradasSafe.and.returnValue(of([] as any));
@@ -58,23 +46,19 @@ describe('EntradaCatalogService', () => {
     const service = new EntradaCatalogService(
       entradaService as any,
       categoriaService as any,
-      etiquetaService as any,
+      etiquetaService as any
     );
 
     service.obtenerCatalogosEntrada().subscribe(() => {
       service.obtenerCatalogosEntrada().subscribe(() => {
         expect(entradaService.listarTiposEntradasSafe).toHaveBeenCalledTimes(1);
-        expect(entradaService.listarEstadosEntradasSafe).toHaveBeenCalledTimes(
-          1,
-        );
+        expect(entradaService.listarEstadosEntradasSafe).toHaveBeenCalledTimes(1);
         expect(categoriaService.listarSafe).toHaveBeenCalledTimes(1);
         expect(etiquetaService.listarSafe).toHaveBeenCalledTimes(1);
 
         service.clearCache();
         service.obtenerCatalogosEntrada().subscribe(() => {
-          expect(entradaService.listarTiposEntradasSafe).toHaveBeenCalledTimes(
-            2,
-          );
+          expect(entradaService.listarTiposEntradasSafe).toHaveBeenCalledTimes(2);
           done();
         });
       });

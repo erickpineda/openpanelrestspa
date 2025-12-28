@@ -52,11 +52,7 @@
       </c-nav-item>
     </c-header-nav>
 
-    <c-header-nav
-      class="d-none d-lg-flex"
-      role="navigation"
-      aria-label="Acciones rápidas"
-    >
+    <c-header-nav class="d-none d-lg-flex" role="navigation" aria-label="Acciones rápidas">
       <c-nav-item>
         <a routerLink="./" cNavLink aria-label="Notificaciones">
           <svg cIcon name="cilBell" size="lg"></svg>
@@ -119,27 +115,21 @@
         <a routerLink="./" cDropdownItem>
           <svg cIcon class="me-2" name="cilBell"></svg>
           {{ labelUpdates }}
-          <c-badge class="ms-2 float-end" color="info">{{
-            notificationsCount
-          }}</c-badge>
+          <c-badge class="ms-2 float-end" color="info">{{ notificationsCount }}</c-badge>
         </a>
       </li>
       <li>
         <a routerLink="./" cDropdownItem>
           <svg cIcon class="me-2" name="cilEnvelopeOpen"></svg>
           {{ labelMessages }}
-          <c-badge class="ms-2 float-end" color="success">{{
-            messagesCount
-          }}</c-badge>
+          <c-badge class="ms-2 float-end" color="success">{{ messagesCount }}</c-badge>
         </a>
       </li>
       <li>
         <a routerLink="./" cDropdownItem>
           <svg cIcon class="me-2" name="cilTask"></svg>
           {{ labelTasks }}
-          <c-badge class="ms-2 float-end" color="danger">{{
-            tasksCount
-          }}</c-badge>
+          <c-badge class="ms-2 float-end" color="danger">{{ tasksCount }}</c-badge>
         </a>
       </li>
       <li>
@@ -174,9 +164,7 @@
         <a routerLink="/admin/control/entradas" cDropdownItem>
           <svg cIcon class="me-2" name="cilFile"></svg>
           {{ labelProjects }}
-          <c-badge class="ms-2 float-end" color="primary">{{
-            projectsCount
-          }}</c-badge>
+          <c-badge class="ms-2 float-end" color="primary">{{ projectsCount }}</c-badge>
         </a>
       </li>
       <li>

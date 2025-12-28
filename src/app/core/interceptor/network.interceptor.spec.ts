@@ -1,8 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import {
   HTTP_INTERCEPTORS,
   HttpClient,
@@ -75,10 +72,7 @@ describe('NetworkInterceptor', () => {
   });
 
   it('omite loader global cuando el contexto lo indica', () => {
-    const context = new HttpContext().set(
-      NetworkInterceptor.SKIP_GLOBAL_LOADER,
-      true,
-    );
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
 
     http.get('/api/v1/demo2', { context }).subscribe();
     const req = httpMock.expectOne((r) => r.url === '/api/v1/demo2');
@@ -89,9 +83,7 @@ describe('NetworkInterceptor', () => {
 
   it('omite loader global para URLs excluidas', () => {
     http.get('/api/v1/auth/refreshToken').subscribe();
-    const req = httpMock.expectOne(
-      (r) => r.url === '/api/v1/auth/refreshToken',
-    );
+    const req = httpMock.expectOne((r) => r.url === '/api/v1/auth/refreshToken');
     req.flush({ data: {} });
 
     expect(loading.setGlobalLoading).not.toHaveBeenCalled();
@@ -113,9 +105,7 @@ describe('NetworkInterceptor', () => {
     req.flush('x', { status: 404, statusText: 'Not Found' });
 
     expect(logger.warn).toHaveBeenCalled();
-    expect(notifications.warning).toHaveBeenCalledWith(
-      'El recurso solicitado no fue encontrado.',
-    );
+    expect(notifications.warning).toHaveBeenCalledWith('El recurso solicitado no fue encontrado.');
   });
 
   it('no fuerza Content-Type cuando el body es FormData', () => {

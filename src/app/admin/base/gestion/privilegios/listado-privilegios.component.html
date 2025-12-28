@@ -17,9 +17,7 @@
         role="alert"
       >
         <span>{{ error }}</span>
-        <button cButton color="danger" size="sm" (click)="load()">
-          Reintentar
-        </button>
+        <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
       </div>
     }
 
@@ -49,11 +47,7 @@
             Avanzado
           </button>
         </c-col>
-        <c-col
-          xs="12"
-          md="4"
-          class="d-flex justify-content-md-end gap-2 align-items-center"
-        >
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
           <select
             cSelect
             [ngModel]="pageSize"
@@ -114,11 +108,7 @@
         @if (loading) {
           <div
             class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-            style="
-              z-index: 10;
-              background-color: rgba(255, 255, 255, 0.8);
-              min-height: 200px;
-            "
+            style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
           >
             <div class="text-center">
               <c-spinner [attr.aria-label]="'Cargando privilegios'"></c-spinner>
@@ -142,9 +132,7 @@
                 <th scope="col" style="min-width: 120px">Código</th>
                 <th scope="col" style="min-width: 200px">Nombre</th>
                 <th scope="col" style="min-width: 250px">Descripción</th>
-                <th scope="col" class="text-center" style="min-width: 100px">
-                  Acciones
-                </th>
+                <th scope="col" class="text-center" style="min-width: 100px">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -168,20 +156,14 @@
                     >
                   </td>
                   <td class="text-center">
-                    <div
-                      class="btn-group"
-                      role="group"
-                      aria-label="Acciones de privilegio"
-                    >
+                    <div class="btn-group" role="group" aria-label="Acciones de privilegio">
                       <button
                         cButton
                         color="warning"
                         size="sm"
                         variant="ghost"
                         (click)="openEdit(p)"
-                        [attr.aria-label]="
-                          'Editar privilegio ' + (p.nombre || p.codigo || '')
-                        "
+                        [attr.aria-label]="'Editar privilegio ' + (p.nombre || p.codigo || '')"
                       >
                         <svg cIcon name="cilPencil" size="sm"></svg>
                       </button>
@@ -191,9 +173,7 @@
                         size="sm"
                         variant="ghost"
                         (click)="delete(p)"
-                        [attr.aria-label]="
-                          'Eliminar privilegio ' + (p.nombre || p.codigo || '')
-                        "
+                        [attr.aria-label]="'Eliminar privilegio ' + (p.nombre || p.codigo || '')"
                       >
                         <svg cIcon name="cilTrash" size="sm"></svg>
                       </button>
@@ -205,21 +185,10 @@
               @if (privilegios.length === 0) {
                 <tr>
                   <td colspan="4" class="text-center py-5">
-                    <div
-                      class="d-flex flex-column align-items-center justify-content-center"
-                    >
-                      <svg
-                        cIcon
-                        name="cilSearch"
-                        size="3xl"
-                        class="text-muted mb-3"
-                      ></svg>
-                      <h6 class="text-muted">
-                        No se han encontrado privilegios
-                      </h6>
-                      <p class="text-muted small">
-                        Intenta ajustar los filtros de búsqueda
-                      </p>
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                      <h6 class="text-muted">No se han encontrado privilegios</h6>
+                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                     </div>
                   </td>
                 </tr>
@@ -239,16 +208,8 @@
 
           @if (privilegios.length > 0) {
             <c-row class="mt-2">
-              <c-col
-                class="d-flex justify-content-end align-items-center gap-2"
-              >
-                <button
-                  cButton
-                  color="light"
-                  size="sm"
-                  (click)="prev()"
-                  [disabled]="pageNo <= 0"
-                >
+              <c-col class="d-flex justify-content-end align-items-center gap-2">
+                <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo <= 0">
                   Anterior
                 </button>
                 <button
@@ -261,8 +222,8 @@
                   Siguiente
                 </button>
                 <div class="text-muted small ms-2">
-                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
-                  {{ totalElements }} · Mostrando {{ numberOfElements }}
+                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} ·
+                  Mostrando {{ numberOfElements }}
                 </div>
               </c-col>
             </c-row>
@@ -300,14 +261,11 @@
             placeholder="Máx. 20 caracteres"
           />
           @if (!editPrivilegio.codigo) {
-            <div class="invalid-feedback d-block">
-              Código requerido (máx 20 caracteres)
-            </div>
+            <div class="invalid-feedback d-block">Código requerido (máx 20 caracteres)</div>
           }
           @if (!isEditing) {
             <div class="form-text text-muted">
-              Se autogenerará desde el nombre si se deja vacío o no se modifica
-              manualmente.
+              Se autogenerará desde el nombre si se deja vacío o no se modifica manualmente.
             </div>
           }
         </div>
@@ -330,10 +288,7 @@
             cFormControl
             rows="2"
             [value]="editPrivilegio.descripcion || ''"
-            (input)="
-              editPrivilegio &&
-                (editPrivilegio.descripcion = $any($event.target).value)
-            "
+            (input)="editPrivilegio && (editPrivilegio.descripcion = $any($event.target).value)"
           ></textarea>
         </div>
       </div>
@@ -341,12 +296,7 @@
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="closeEdit()">Cerrar</button>
-    <button
-      cButton
-      color="primary"
-      [disabled]="!isFormValid()"
-      (click)="saveEdit()"
-    >
+    <button cButton color="primary" [disabled]="!isFormValid()" (click)="saveEdit()">
       Guardar
     </button>
   </c-modal-footer>

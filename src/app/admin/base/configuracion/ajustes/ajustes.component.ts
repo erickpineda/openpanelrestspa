@@ -37,7 +37,7 @@ export class AjustesComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private toast: ToastService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       categoria: ['', [Validators.required, Validators.maxLength(50)]],
@@ -65,7 +65,7 @@ export class AjustesComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.loading = false;
           this.cdr.detectChanges();
-        }),
+        })
       )
       .subscribe({
         next: (list: Ajustes[]) => {
@@ -165,8 +165,7 @@ export class AjustesComponent implements OnInit, OnDestroy {
       const c = (a.categoria || '').toLowerCase();
       const k = (a.clave || '').toLowerCase();
       const v = (a.valor || '').toLowerCase();
-      const mBasic =
-        !term || c.includes(term) || k.includes(term) || v.includes(term);
+      const mBasic = !term || c.includes(term) || k.includes(term) || v.includes(term);
       const mCat = !categoria || c.includes(categoria);
       const mClave = !clave || k.includes(clave);
       return mBasic && mCat && mClave;
@@ -199,10 +198,7 @@ export class AjustesComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(
-      0,
-      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
-    );
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.updatePage();

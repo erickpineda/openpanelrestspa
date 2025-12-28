@@ -2,10 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { DashboardComponent } from './dashboard.component';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -16,10 +13,7 @@ describe('DashboardComponent', () => {
       declarations: [DashboardComponent],
       schemas: [NO_ERRORS_SCHEMA],
       imports: [],
-      providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-      ],
+      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
     }).compileComponents();
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
@@ -47,65 +41,37 @@ describe('DashboardComponent', () => {
   });
 
   it('formatea mensual con nombre de mes', () => {
-    const label = (component as any).formatLabelFromDate(
-      '2025-01-05',
-      'month',
-      false,
-    );
+    const label = (component as any).formatLabelFromDate('2025-01-05', 'month', false);
     expect(label).toBe('Enero 2025');
   });
 
   it('formatea mensual abreviado en móvil', () => {
-    const label = (component as any).formatLabelFromDate(
-      '2025-01-05',
-      'month',
-      true,
-    );
+    const label = (component as any).formatLabelFromDate('2025-01-05', 'month', true);
     expect(label).toBe('Ene 2025');
   });
 
   it('formatea mensual desde YYYY-MM', () => {
-    const label = (component as any).formatLabelFromDate(
-      '2025-02',
-      'month',
-      false,
-    );
+    const label = (component as any).formatLabelFromDate('2025-02', 'month', false);
     expect(label).toBe('Febrero 2025');
   });
 
   it('formatea mensual desde YYYYMM', () => {
-    const label = (component as any).formatLabelFromDate(
-      '202503',
-      'month',
-      false,
-    );
+    const label = (component as any).formatLabelFromDate('202503', 'month', false);
     expect(label).toBe('Marzo 2025');
   });
 
   it('formatea mensual desde MM-YYYY', () => {
-    const label = (component as any).formatLabelFromDate(
-      '04-2025',
-      'month',
-      false,
-    );
+    const label = (component as any).formatLabelFromDate('04-2025', 'month', false);
     expect(label).toBe('Abril 2025');
   });
 
   it('formatea mensual desde MM/YYYY', () => {
-    const label = (component as any).formatLabelFromDate(
-      '05/2025',
-      'month',
-      false,
-    );
+    const label = (component as any).formatLabelFromDate('05/2025', 'month', false);
     expect(label).toBe('Mayo 2025');
   });
 
   it('formatea mensual desde DD-MM-YYYY', () => {
-    const label = (component as any).formatLabelFromDate(
-      '15-06-2025',
-      'month',
-      false,
-    );
+    const label = (component as any).formatLabelFromDate('15-06-2025', 'month', false);
     expect(label).toBe('Junio 2025');
   });
   it('inicializa coherente: 30 días y granularidad diaria', async () => {

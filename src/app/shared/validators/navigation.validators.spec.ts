@@ -1,8 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  NavigationValidators,
-  ValidationResult,
-} from './navigation.validators';
+import { NavigationValidators, ValidationResult } from './navigation.validators';
 import {
   INavItemEnhanced,
   NavigationConfig,
@@ -93,8 +90,7 @@ describe('NavigationValidators', () => {
         },
       ];
 
-      const validResult =
-        NavigationValidators.validateNavigationItems(validItems);
+      const validResult = NavigationValidators.validateNavigationItems(validItems);
       const depthValid = NavigationUtils.validateNavigationDepth(validItems);
 
       expect(depthValid).toBeTrue();
@@ -123,17 +119,13 @@ describe('NavigationValidators', () => {
         },
       ];
 
-      const invalidResult =
-        NavigationValidators.validateNavigationItems(invalidItems);
-      const depthInvalid =
-        NavigationUtils.validateNavigationDepth(invalidItems);
+      const invalidResult = NavigationValidators.validateNavigationItems(invalidItems);
+      const depthInvalid = NavigationUtils.validateNavigationDepth(invalidItems);
 
       expect(depthInvalid).toBeFalse();
       expect(invalidResult.isValid).toBeFalse();
       expect(
-        invalidResult.errors.some((error) =>
-          error.message.includes('excede la profundidad máxima'),
-        ),
+        invalidResult.errors.some((error) => error.message.includes('excede la profundidad máxima'))
       ).toBeTrue();
     });
 
@@ -147,13 +139,10 @@ describe('NavigationValidators', () => {
         },
       ];
 
-      const result =
-        NavigationValidators.validateNavigationItems(itemsWithEmptyName);
+      const result = NavigationValidators.validateNavigationItems(itemsWithEmptyName);
 
       expect(result.isValid).toBeFalse();
-      expect(
-        result.errors.some((error) => error.message.includes('nombre válido')),
-      ).toBeTrue();
+      expect(result.errors.some((error) => error.message.includes('nombre válido'))).toBeTrue();
     });
 
     it('should validate dynamic badge configuration', () => {
@@ -170,15 +159,11 @@ describe('NavigationValidators', () => {
         },
       ];
 
-      const result = NavigationValidators.validateNavigationItems(
-        itemsWithInvalidBadge,
-      );
+      const result = NavigationValidators.validateNavigationItems(itemsWithInvalidBadge);
 
       expect(result.isValid).toBeFalse();
       expect(
-        result.errors.some((error) =>
-          error.message.includes('Badge dinámico mal configurado'),
-        ),
+        result.errors.some((error) => error.message.includes('Badge dinámico mal configurado'))
       ).toBeTrue();
     });
 
@@ -205,14 +190,10 @@ describe('NavigationValidators', () => {
         },
       };
 
-      const result = NavigationValidators.validateNavigationConfig(
-        configWithInvalidSection,
-      );
+      const result = NavigationValidators.validateNavigationConfig(configWithInvalidSection);
 
       expect(result.isValid).toBeFalse();
-      expect(
-        result.errors.some((error) => error.message.includes('ID válido')),
-      ).toBeTrue();
+      expect(result.errors.some((error) => error.message.includes('ID válido'))).toBeTrue();
     });
   });
 });

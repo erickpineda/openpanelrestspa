@@ -27,7 +27,7 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
     private sessionManager: SessionManagerService,
     private unsavedWorkService: UnsavedWorkService,
     private temporaryStorage: TemporaryStorageService,
-    private log: LoggerService,
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
@@ -37,8 +37,7 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
       this.sessionManager.sessionExpired$.subscribe((data) => {
         this.log.info('📡 UnsavedWorkModalComponent: Evento recibido:', data);
 
-        const isLogoutWithSave =
-          data.type === 'LOGOUT' && data.allowSave === true;
+        const isLogoutWithSave = data.type === 'LOGOUT' && data.allowSave === true;
         this.log.info('🔍 Es logout con allowSave:', isLogoutWithSave);
 
         if (isLogoutWithSave) {
@@ -49,12 +48,12 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
           this.log.info('❌ No se muestra modal, redirigiendo...');
           this.sessionManager.performLogout(data);
         }
-      }),
+      })
     );
 
     window.addEventListener(
       OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
-      this.handleSaveWork.bind(this),
+      this.handleSaveWork.bind(this)
     );
     this.log.info('✅ UnsavedWorkModalComponent: Inicializado correctamente');
   }
@@ -63,7 +62,7 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
     window.removeEventListener(
       OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
-      this.handleSaveWork.bind(this),
+      this.handleSaveWork.bind(this)
     );
   }
 

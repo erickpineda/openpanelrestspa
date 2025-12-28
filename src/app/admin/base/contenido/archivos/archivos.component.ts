@@ -37,7 +37,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   constructor(
     private fileStorage: FileStorageService,
     private toast: ToastService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -52,10 +52,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
     this.hasFilters =
-      !!this.filtroNombre ||
-      !!this.filtroMime ||
-      !!this.fechaDesde ||
-      !!this.fechaHasta;
+      !!this.filtroNombre || !!this.filtroMime || !!this.fechaDesde || !!this.fechaHasta;
 
     this.fileStorage
       .listarFicheros(true)
@@ -64,17 +61,13 @@ export class ArchivosComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.loading = false;
           this.cdr.detectChanges();
-        }),
+        })
       )
       .subscribe({
         next: (fs) => {
           const base = (fs || []).filter((i) => i.tipo !== 'image');
           const filtered = this.applyFilters(base);
-          const { pageItems, totalPages } = this.paginate(
-            filtered,
-            pageNo,
-            this.pageSize,
-          );
+          const { pageItems, totalPages } = this.paginate(filtered, pageNo, this.pageSize);
           this.items = pageItems;
           this.totalPages = totalPages;
           this.totalElements = filtered.length;
@@ -114,10 +107,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(page: number): void {
-    const safePage = Math.max(
-      0,
-      Math.min(Number(page) || 0, Math.max(0, this.totalPages - 1)),
-    );
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, this.totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.load();
@@ -169,23 +159,20 @@ export class ArchivosComponent implements OnInit, OnDestroy {
 
   download(item: MediaItem): void {
     if (!item) return;
-    const filename =
-      item.nombre && item.nombre.trim() ? item.nombre!.trim() : 'archivo';
+    const filename = item.nombre && item.nombre.trim() ? item.nombre!.trim() : 'archivo';
     if (item.uuid) {
       this.fileStorage.obtenerDatosFichero(item.uuid).subscribe({
         next: (datos: any) => {
           try {
             const b64: string | undefined = datos?.contenido;
-            const mime: string =
-              datos?.tipo || item.mime || 'application/octet-stream';
+            const mime: string = datos?.tipo || item.mime || 'application/octet-stream';
             if (!b64) {
               this.toast.showError('Contenido no disponible', 'Archivos');
               return;
             }
             const byteChars = atob(b64);
             const byteNums = new Array(byteChars.length);
-            for (let i = 0; i < byteChars.length; i++)
-              byteNums[i] = byteChars.charCodeAt(i);
+            for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i);
             const blob = new Blob([new Uint8Array(byteNums)], { type: mime });
             saveAs(blob, filename);
           } catch {
@@ -217,32 +204,22 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     let res = list;
     if (this.filtroNombre)
       res = res.filter((i) =>
-        (i.nombre || '')
-          .toLowerCase()
-          .includes(this.filtroNombre.toLowerCase()),
+        (i.nombre || '').toLowerCase().includes(this.filtroNombre.toLowerCase())
       );
     if (this.filtroMime)
-      res = res.filter((i) =>
-        (i.mime || '').toLowerCase().includes(this.filtroMime.toLowerCase()),
-      );
+      res = res.filter((i) => (i.mime || '').toLowerCase().includes(this.filtroMime.toLowerCase()));
     // FechaDesde/FechaHasta: si se proveen en formato ISO o yyyy-MM-dd, comparar
     const d = this.fechaDesde ? new Date(this.fechaDesde) : null;
     const h = this.fechaHasta ? new Date(this.fechaHasta) : null;
-    if (d)
-      res = res.filter((i) =>
-        i.fechaCreacion ? new Date(i.fechaCreacion) >= d : true,
-      );
-    if (h)
-      res = res.filter((i) =>
-        i.fechaCreacion ? new Date(i.fechaCreacion) <= h : true,
-      );
+    if (d) res = res.filter((i) => (i.fechaCreacion ? new Date(i.fechaCreacion) >= d : true));
+    if (h) res = res.filter((i) => (i.fechaCreacion ? new Date(i.fechaCreacion) <= h : true));
     return res;
   }
 
   private paginate(
     list: MediaItem[],
     pageNo: number,
-    pageSize: number,
+    pageSize: number
   ): { pageItems: MediaItem[]; totalPages: number } {
     const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
     const start = pageNo * pageSize;
@@ -251,10 +228,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   }
 
   trackByMediaItem(index: number, item: MediaItem): string {
-    return (
-      item?.uuid ||
-      item?.url ||
-      `${item?.nombre || ''}-${item?.fechaCreacion || ''}`
-    );
+    return item?.uuid || item?.url || `${item?.nombre || ''}-${item?.fechaCreacion || ''}`;
   }
 }

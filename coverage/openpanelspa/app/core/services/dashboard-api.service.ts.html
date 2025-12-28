@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">81.63% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>80/98</span>
+                <span class='fraction'>80/96</span>
             </div>
         
             
@@ -277,17 +277,7 @@
 <a name='L212'></a><a href='#L212'>212</a>
 <a name='L213'></a><a href='#L213'>213</a>
 <a name='L214'></a><a href='#L214'>214</a>
-<a name='L215'></a><a href='#L215'>215</a>
-<a name='L216'></a><a href='#L216'>216</a>
-<a name='L217'></a><a href='#L217'>217</a>
-<a name='L218'></a><a href='#L218'>218</a>
-<a name='L219'></a><a href='#L219'>219</a>
-<a name='L220'></a><a href='#L220'>220</a>
-<a name='L221'></a><a href='#L221'>221</a>
-<a name='L222'></a><a href='#L222'>222</a>
-<a name='L223'></a><a href='#L223'>223</a>
-<a name='L224'></a><a href='#L224'>224</a>
-<a name='L225'></a><a href='#L225'>225</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L215'></a><a href='#L215'>215</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -320,10 +310,6 @@
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
@@ -358,8 +344,6 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -375,8 +359,6 @@
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
@@ -487,8 +469,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -545,11 +525,7 @@ export class DashboardApiService {
 &nbsp;
   constructor(private http: HttpClient) {}
 &nbsp;
-  private getCached&lt;T&gt;(
-    key: string,
-    ttl: number,
-    getter: () =&gt; Observable&lt;T&gt;,
-  ): Observable&lt;T&gt; {
+  private getCached&lt;T&gt;(key: string, ttl: number, getter: () =&gt; Observable&lt;T&gt;): Observable&lt;T&gt; {
     const now = Date.now();
     const entry = this.cache.get(key);
     <span class="missing-if-branch" title="if path not taken" >I</span>if (entry &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >now - entry.ts &lt; ttl)</span> {
@@ -557,7 +533,7 @@ export class DashboardApiService {
     }
     const obs$ = getter().pipe(
       tap((v) =&gt; this.cache.set(key, { ts: Date.now(), value: v })),
-      shareReplay(1),
+      shareReplay(1)
     );
     // store a placeholder subscription-less value after resolved via tap, so return obs$ directly
     return obs$;
@@ -581,9 +557,7 @@ export class DashboardApiService {
     const p = Math.max(0, Number(page) || 0);
     const sRaw = Number(size) || <span class="branch-1 cbranch-no" title="branch not covered" >5;</span>
     const s = Math.max(1, Math.min(200, sRaw));
-    const params = new HttpParams()
-      .set('page', String(p))
-      .set('size', String(s));
+    const params = new HttpParams().set('page', String(p)).set('size', String(s));
     return this.http
       .get&lt;any&gt;(`${this.base}/recent-activity`, { params })
       .pipe(map(<span class="fstat-no" title="function not covered" >(r</span>) =&gt; (<span class="cstat-no" title="statement not covered" >r &amp;&amp; r.data ? r.data : r)</span>));
@@ -592,20 +566,18 @@ export class DashboardApiService {
   getSeriesActivity(
     days = <span class="branch-0 cbranch-no" title="branch not covered" >30,</span>
     force = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
-    granularity: 'hour' | 'day' | 'week' | 'month' = <span class="branch-0 cbranch-no" title="branch not covered" >'day',</span>
+    granularity: 'hour' | 'day' | 'week' | 'month' = <span class="branch-0 cbranch-no" title="branch not covered" >'day'</span>
   ): Observable&lt;ActivityPointDTO[]&gt; {
     const dRaw = Number(days) || <span class="branch-1 cbranch-no" title="branch not covered" >30;</span>
     const d = Math.max(1, Math.min(365, dRaw));
     const key = `dashboard:series:activity:days:${d}:gran:${granularity}`;
     if (force) this.cache.delete(key);
-    let params = new HttpParams()
-      .set('days', String(d))
-      .set('granularity', granularity);
+    let params = new HttpParams().set('days', String(d)).set('granularity', granularity);
     if (force) params = params.set('force', 'true');
     return this.getCached&lt;ActivityPointDTO[]&gt;(key, this.ttlSeries, () =&gt;
       this.http
         .get&lt;any&gt;(`${this.base}/series/activity`, { params })
-        .pipe(map((r) =&gt; (r &amp;&amp; r.data ? (r.data as ActivityPointDTO[]) : <span class="branch-1 cbranch-no" title="branch not covered" >r)</span>)),
+        .pipe(map((r) =&gt; (r &amp;&amp; r.data ? (r.data as ActivityPointDTO[]) : <span class="branch-1 cbranch-no" title="branch not covered" >r)</span>))
     );
   }
 &nbsp;
@@ -613,7 +585,7 @@ export class DashboardApiService {
   getSeriesEntriesSplitEstado(
     days = <span class="branch-0 cbranch-no" title="branch not covered" >30,</span>
     granularity: 'hour' | 'day' | 'week' | 'month' = <span class="branch-0 cbranch-no" title="branch not covered" >'day',</span>
-    force = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
+    force = <span class="branch-0 cbranch-no" title="branch not covered" >false</span>
   ): Observable&lt;{ date: string; publicadas: number; noPublicadas: number }[]&gt; {
     const dRaw = Number(days) || <span class="branch-1 cbranch-no" title="branch not covered" >30;</span>
     const d = Math.max(1, Math.min(365, dRaw));
@@ -627,14 +599,14 @@ export class DashboardApiService {
     return this.getCached&lt;any[]&gt;(key, this.ttlSeries, () =&gt;
       this.http
         .get&lt;any&gt;(`${this.base}/series/entries`, { params })
-        .pipe(map(<span class="fstat-no" title="function not covered" >(r</span>) =&gt; (<span class="cstat-no" title="statement not covered" >r &amp;&amp; r.data ? r.data : r)</span>)),
+        .pipe(map(<span class="fstat-no" title="function not covered" >(r</span>) =&gt; (<span class="cstat-no" title="statement not covered" >r &amp;&amp; r.data ? r.data : r)</span>))
     );
   }
 &nbsp;
   getSeriesEntriesSplitEstadoNombre(
     days = <span class="branch-0 cbranch-no" title="branch not covered" >30,</span>
     granularity: 'hour' | 'day' | 'week' | 'month' = <span class="branch-0 cbranch-no" title="branch not covered" >'day',</span>
-    force = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
+    force = <span class="branch-0 cbranch-no" title="branch not covered" >false</span>
   ): Observable&lt;any[]&gt; {
     const dRaw = Number(days) || <span class="branch-1 cbranch-no" title="branch not covered" >30;</span>
     const d = Math.max(1, Math.min(365, dRaw));
@@ -648,7 +620,7 @@ export class DashboardApiService {
     return this.getCached&lt;any[]&gt;(key, this.ttlSeries, () =&gt;
       this.http
         .get&lt;any&gt;(`${this.base}/series/entries`, { params })
-        .pipe(map(<span class="fstat-no" title="function not covered" >(r</span>) =&gt; (<span class="cstat-no" title="statement not covered" >r &amp;&amp; r.data ? r.data : r)</span>)),
+        .pipe(map(<span class="fstat-no" title="function not covered" >(r</span>) =&gt; (<span class="cstat-no" title="statement not covered" >r &amp;&amp; r.data ? r.data : r)</span>))
     );
   }
 &nbsp;
@@ -657,7 +629,7 @@ export class DashboardApiService {
     limit = <span class="branch-0 cbranch-no" title="branch not covered" >10,</span>
     force = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
     startDate?: string,
-    endDate?: string,
+    endDate?: string
   ): Observable&lt;TopItemDTO[]&gt; {
     const t = type === 'categories' ? 'categories' : 'users';
     const tt = type === 'tags' ? 'tags' : t;
@@ -688,7 +660,7 @@ export class DashboardApiService {
     return this.getCached&lt;ContentStatsDTO&gt;(key, this.ttlSeries, () =&gt;
       this.http
         .get&lt;any&gt;(`${this.base}/content-stats`)
-        .pipe(map(<span class="fstat-no" title="function not covered" >(r</span>) =&gt; (<span class="cstat-no" title="statement not covered" >r &amp;&amp; r.data ? (r.data as ContentStatsDTO) : r)</span>)),
+        .pipe(map(<span class="fstat-no" title="function not covered" >(r</span>) =&gt; (<span class="cstat-no" title="statement not covered" >r &amp;&amp; r.data ? (r.data as ContentStatsDTO) : r)</span>))
     );
   }
 &nbsp;
@@ -713,10 +685,8 @@ export class DashboardApiService {
     } else <span class="missing-if-branch" title="else path not taken" >E</span>{
 <span class="cstat-no" title="statement not covered" >      Array.from(this.cache.keys()).forEach(<span class="fstat-no" title="function not covered" >(k</span>) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (k.startsWith('dashboard:series:activity')) <span class="cstat-no" title="statement not covered" >this.cache.delete(k);</span></span>
-<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (k.startsWith('dashboard:series:entries:split:estado'))</span>
-<span class="cstat-no" title="statement not covered" >          this.cache.delete(k);</span>
-<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (k.startsWith('dashboard:series:entries:split:estadoNombre'))</span>
-<span class="cstat-no" title="statement not covered" >          this.cache.delete(k);</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (k.startsWith('dashboard:series:entries:split:estado')) <span class="cstat-no" title="statement not covered" >this.cache.delete(k);</span></span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (k.startsWith('dashboard:series:entries:split:estadoNombre')) <span class="cstat-no" title="statement not covered" >this.cache.delete(k);</span></span>
       });
     }
   }
@@ -742,7 +712,7 @@ export class DashboardApiService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-25T15:28:51.812Z
+                at 2025-12-26T15:52:04.855Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

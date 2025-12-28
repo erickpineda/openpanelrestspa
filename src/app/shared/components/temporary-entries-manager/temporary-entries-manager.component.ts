@@ -21,7 +21,7 @@ export class TemporaryEntriesManagerComponent implements OnInit {
   constructor(
     private temporaryStorage: TemporaryStorageService,
     private router: Router,
-    private log: LoggerService,
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
@@ -57,20 +57,14 @@ export class TemporaryEntriesManagerComponent implements OnInit {
   }
 
   deleteEntry(id: string): void {
-    if (
-      confirm('¿Estás seguro de que quieres eliminar esta entrada temporal?')
-    ) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta entrada temporal?')) {
       this.temporaryStorage.removeTemporaryEntry(id);
       this.loadEntries();
     }
   }
 
   clearAll(): void {
-    if (
-      confirm(
-        '¿Estás seguro de que quieres eliminar TODAS las entradas temporales?',
-      )
-    ) {
+    if (confirm('¿Estás seguro de que quieres eliminar TODAS las entradas temporales?')) {
       this.temporaryStorage.clearTemporaryEntriesByType('entrada');
       this.loadEntries();
     }

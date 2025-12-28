@@ -87,9 +87,7 @@ export class NavigationValidators {
   /**
    * Valida una sección de navegación
    */
-  static validateNavigationSection(
-    section: NavigationSection,
-  ): ValidationResult {
+  static validateNavigationSection(section: NavigationSection): ValidationResult {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
@@ -118,8 +116,7 @@ export class NavigationValidators {
     // Validar límite de elementos por sección
     if (
       section.items &&
-      section.items.length >
-        NavigationConstants.STRUCTURE_LIMITS.MAX_ITEMS_PER_SECTION
+      section.items.length > NavigationConstants.STRUCTURE_LIMITS.MAX_ITEMS_PER_SECTION
     ) {
       result.warnings.push({
         message: `La sección '${section.title}' tiene demasiados elementos (${section.items.length}). Se recomienda no exceder ${NavigationConstants.STRUCTURE_LIMITS.MAX_ITEMS_PER_SECTION}`,
@@ -188,10 +185,7 @@ export class NavigationValidators {
   /**
    * Valida un elemento individual de navegación
    */
-  static validateNavigationItem(
-    item: INavItemEnhanced,
-    depth: number = 0,
-  ): ValidationResult {
+  static validateNavigationItem(item: INavItemEnhanced, depth: number = 0): ValidationResult {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
@@ -209,10 +203,7 @@ export class NavigationValidators {
     }
 
     // Validar campos requeridos
-    if (
-      !item.name ||
-      (typeof item.name === 'string' && item.name.trim() === '')
-    ) {
+    if (!item.name || (typeof item.name === 'string' && item.name.trim() === '')) {
       result.errors.push({
         code: NavigationErrorCodes.INVALID_STRUCTURE,
         message: 'El elemento debe tener un nombre válido',
@@ -222,10 +213,7 @@ export class NavigationValidators {
     }
 
     // Validar URL si no es un título de sección
-    if (
-      !item.title &&
-      (!item.url || (typeof item.url === 'string' && item.url.trim() === ''))
-    ) {
+    if (!item.title && (!item.url || (typeof item.url === 'string' && item.url.trim() === ''))) {
       result.warnings.push({
         message: `El elemento '${item.name}' no tiene URL definida`,
         item,
@@ -318,7 +306,7 @@ export class NavigationValidators {
    */
   private static collectUrls(
     items: INavItemEnhanced[],
-    urlMap: Map<string, INavItemEnhanced[]>,
+    urlMap: Map<string, INavItemEnhanced[]>
   ): void {
     for (const item of items) {
       if (item.url && typeof item.url === 'string') {
@@ -340,13 +328,13 @@ export class NavigationValidators {
   private static validateParentChildRoles(
     parent: INavItemEnhanced,
     children: INavItemEnhanced[],
-    result: ValidationResult,
+    result: ValidationResult
   ): void {
     for (const child of children) {
       // Si el padre tiene roles específicos, los hijos deberían ser igual o más restrictivos
       if (parent.requiredRoles && child.requiredRoles) {
         const parentHasMorePermissiveRoles = parent.requiredRoles.some(
-          (role) => !child.requiredRoles!.includes(role),
+          (role) => !child.requiredRoles!.includes(role)
         );
 
         if (parentHasMorePermissiveRoles) {

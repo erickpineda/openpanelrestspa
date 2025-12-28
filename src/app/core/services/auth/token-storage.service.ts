@@ -42,10 +42,7 @@ export class TokenStorageService {
 
   public savePostLoginRedirectBase(value: string): void {
     try {
-      localStorage.setItem(
-        POST_LOGIN_REDIRECT,
-        `${value}|${new Date().toISOString()}`,
-      );
+      localStorage.setItem(POST_LOGIN_REDIRECT, `${value}|${new Date().toISOString()}`);
     } catch {}
   }
 
@@ -76,10 +73,7 @@ export class TokenStorageService {
   public savePostLoginRedirectForTab(value: string): void {
     const key = this.getPostLoginKeyForThisTab();
     try {
-      window.sessionStorage.setItem(
-        key,
-        `${value}|${new Date().toISOString()}`,
-      );
+      window.sessionStorage.setItem(key, `${value}|${new Date().toISOString()}`);
     } catch {}
   }
 
@@ -142,7 +136,7 @@ export class TokenStorageService {
     if (this.postLoginMaintenanceTimer) return;
     this.postLoginMaintenanceTimer = setInterval(
       () => this.cleanExpiredPostLoginRedirects(),
-      intervalMs,
+      intervalMs
     );
   }
 

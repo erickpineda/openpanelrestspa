@@ -12,9 +12,7 @@ describe('BadgeCounterService', () => {
   let mockUsuarioService: jasmine.SpyObj<UsuarioService>;
 
   beforeEach(() => {
-    const comentarioSpy = jasmine.createSpyObj('ComentarioService', [
-      'listarSafe',
-    ]);
+    const comentarioSpy = jasmine.createSpyObj('ComentarioService', ['listarSafe']);
     const entradaSpy = jasmine.createSpyObj('EntradaService', ['listarSafe']);
     const usuarioSpy = jasmine.createSpyObj('UsuarioService', ['listarSafe']);
 
@@ -33,15 +31,9 @@ describe('BadgeCounterService', () => {
     });
 
     service = TestBed.inject(BadgeCounterService);
-    mockComentarioService = TestBed.inject(
-      ComentarioService,
-    ) as jasmine.SpyObj<ComentarioService>;
-    mockEntradaService = TestBed.inject(
-      EntradaService,
-    ) as jasmine.SpyObj<EntradaService>;
-    mockUsuarioService = TestBed.inject(
-      UsuarioService,
-    ) as jasmine.SpyObj<UsuarioService>;
+    mockComentarioService = TestBed.inject(ComentarioService) as jasmine.SpyObj<ComentarioService>;
+    mockEntradaService = TestBed.inject(EntradaService) as jasmine.SpyObj<EntradaService>;
+    mockUsuarioService = TestBed.inject(UsuarioService) as jasmine.SpyObj<UsuarioService>;
 
     service.configureFallbacks({
       retryDelayMs: 10,
@@ -67,9 +59,7 @@ describe('BadgeCounterService', () => {
         { id: 4, estado: 'PENDIENTE', texto: 'Comment 4' },
       ];
 
-      mockComentarioService.listarSafe.and.returnValue(
-        of(mockComentarios as any),
-      );
+      mockComentarioService.listarSafe.and.returnValue(of(mockComentarios as any));
 
       service.getUnmoderatedCommentsCount().subscribe((count) => {
         expect(count).toBe(3); // 2 PENDIENTE + 1 REPORTADO
@@ -78,9 +68,7 @@ describe('BadgeCounterService', () => {
     });
 
     it('should return 0 when service fails', (done) => {
-      mockComentarioService.listarSafe.and.returnValue(
-        throwError('Service error'),
-      );
+      mockComentarioService.listarSafe.and.returnValue(throwError('Service error'));
 
       service.getUnmoderatedCommentsCount().subscribe((count) => {
         expect(count).toBe(0);
@@ -106,9 +94,7 @@ describe('BadgeCounterService', () => {
     });
 
     it('should return 0 when service fails', (done) => {
-      mockEntradaService.listarSafe.and.returnValue(
-        throwError('Service error'),
-      );
+      mockEntradaService.listarSafe.and.returnValue(throwError('Service error'));
 
       service.getDraftEntriesCount().subscribe((count) => {
         expect(count).toBe(0);
@@ -134,9 +120,7 @@ describe('BadgeCounterService', () => {
     });
 
     it('should return 0 when service fails', (done) => {
-      mockUsuarioService.listarSafe.and.returnValue(
-        throwError('Service error'),
-      );
+      mockUsuarioService.listarSafe.and.returnValue(throwError('Service error'));
 
       service.getPendingUsersCount().subscribe((count) => {
         expect(count).toBe(0);
@@ -150,18 +134,18 @@ describe('BadgeCounterService', () => {
       // Mock services to return high counts
       mockComentarioService.listarSafe.and.returnValue(
         of(
-          Array(15).fill({ estado: 'PENDIENTE' }) as any, // 15 pending comments > 10 threshold
-        ),
+          Array(15).fill({ estado: 'PENDIENTE' }) as any // 15 pending comments > 10 threshold
+        )
       );
       mockEntradaService.listarSafe.and.returnValue(
         of(
-          Array(25).fill({ estado: 'BORRADOR' }) as any, // 25 drafts > 20 threshold
-        ),
+          Array(25).fill({ estado: 'BORRADOR' }) as any // 25 drafts > 20 threshold
+        )
       );
       mockUsuarioService.listarSafe.and.returnValue(
         of(
-          Array(8).fill({ estado: 'PENDIENTE' }) as any, // 8 pending users > 5 threshold
-        ),
+          Array(8).fill({ estado: 'PENDIENTE' }) as any // 8 pending users > 5 threshold
+        )
       );
 
       service.getSystemAlertsCount().subscribe((count) => {
@@ -174,18 +158,18 @@ describe('BadgeCounterService', () => {
       // Mock services to return low counts
       mockComentarioService.listarSafe.and.returnValue(
         of(
-          Array(5).fill({ estado: 'PENDIENTE' }) as any, // 5 < 10 threshold
-        ),
+          Array(5).fill({ estado: 'PENDIENTE' }) as any // 5 < 10 threshold
+        )
       );
       mockEntradaService.listarSafe.and.returnValue(
         of(
-          Array(10).fill({ estado: 'BORRADOR' }) as any, // 10 < 20 threshold
-        ),
+          Array(10).fill({ estado: 'BORRADOR' }) as any // 10 < 20 threshold
+        )
       );
       mockUsuarioService.listarSafe.and.returnValue(
         of(
-          Array(3).fill({ estado: 'PENDIENTE' }) as any, // 3 < 5 threshold
-        ),
+          Array(3).fill({ estado: 'PENDIENTE' }) as any // 3 < 5 threshold
+        )
       );
 
       service.getSystemAlertsCount().subscribe((count) => {
@@ -309,9 +293,7 @@ describe('BadgeCounterService', () => {
       const mockEntradas = Array(3).fill({ estado: 'BORRADOR' });
       const mockUsuarios = Array(2).fill({ estado: 'PENDIENTE' });
 
-      mockComentarioService.listarSafe.and.returnValue(
-        of(mockComentarios as any),
-      );
+      mockComentarioService.listarSafe.and.returnValue(of(mockComentarios as any));
       mockEntradaService.listarSafe.and.returnValue(of(mockEntradas as any));
       mockUsuarioService.listarSafe.and.returnValue(of(mockUsuarios as any));
 
@@ -364,17 +346,13 @@ describe('BadgeCounterService', () => {
       const updatedComentarios = Array(7).fill({ estado: 'PENDIENTE' });
 
       // Act: First call with initial data
-      mockComentarioService.listarSafe.and.returnValue(
-        of(initialComentarios as any),
-      );
+      mockComentarioService.listarSafe.and.returnValue(of(initialComentarios as any));
 
       service.getUnmoderatedCommentsCount().subscribe((initialCount) => {
         expect(initialCount).toBe(3);
 
         // Update mock to return new data
-        mockComentarioService.listarSafe.and.returnValue(
-          of(updatedComentarios as any),
-        );
+        mockComentarioService.listarSafe.and.returnValue(of(updatedComentarios as any));
 
         // Second call should reflect updated data
         service.getUnmoderatedCommentsCount().subscribe((updatedCount) => {
@@ -388,14 +366,10 @@ describe('BadgeCounterService', () => {
     it('should provide consistent fallback behavior on service failures', (done) => {
       // Arrange: Mock service failures
       mockComentarioService.listarSafe.and.returnValue(
-        throwError(() => new Error('Service error')),
+        throwError(() => new Error('Service error'))
       );
-      mockEntradaService.listarSafe.and.returnValue(
-        throwError(() => new Error('Service error')),
-      );
-      mockUsuarioService.listarSafe.and.returnValue(
-        throwError(() => new Error('Service error')),
-      );
+      mockEntradaService.listarSafe.and.returnValue(throwError(() => new Error('Service error')));
+      mockUsuarioService.listarSafe.and.returnValue(throwError(() => new Error('Service error')));
 
       let completedCalls = 0;
       const expectedCalls = 4;
@@ -474,15 +448,9 @@ describe('BadgeCounterService', () => {
       const entriesBelowThreshold = Array(15).fill({ estado: 'BORRADOR' }); // < 20
       const usersAboveThreshold = Array(8).fill({ estado: 'PENDIENTE' }); // > 5
 
-      mockComentarioService.listarSafe.and.returnValue(
-        of(commentsAboveThreshold as any),
-      );
-      mockEntradaService.listarSafe.and.returnValue(
-        of(entriesBelowThreshold as any),
-      );
-      mockUsuarioService.listarSafe.and.returnValue(
-        of(usersAboveThreshold as any),
-      );
+      mockComentarioService.listarSafe.and.returnValue(of(commentsAboveThreshold as any));
+      mockEntradaService.listarSafe.and.returnValue(of(entriesBelowThreshold as any));
+      mockUsuarioService.listarSafe.and.returnValue(of(usersAboveThreshold as any));
 
       // Act & Assert: Should have exactly 2 alerts (comments + users, but not entries)
       service.getSystemAlertsCount().subscribe((alertCount) => {

@@ -17,9 +17,7 @@ describe('BusquedaService', () => {
     const callback = jasmine.createSpy('callback');
     const searchFn = jasmine
       .createSpy('searchFn')
-      .and.returnValue(
-        of({ elements: [{ idEntrada: 1 } as any], totalPages: 2 }),
-      );
+      .and.returnValue(of({ elements: [{ idEntrada: 1 } as any], totalPages: 2 }));
 
     service.iniciarBusqueda(searchFn as any, callback, 0);
     service.triggerBusqueda('abc');

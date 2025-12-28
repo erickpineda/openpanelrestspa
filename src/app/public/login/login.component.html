@@ -30,9 +30,7 @@
                   />
                 </c-input-group>
                 @if (username.errors && f.submitted) {
-                  <c-alert color="danger" fade
-                    >El nombre de usuario es obligatorio</c-alert
-                  >
+                  <c-alert color="danger" fade>El nombre de usuario es obligatorio</c-alert>
                 }
                 <c-input-group class="mb-4">
                   <span cInputGroupText>
@@ -57,18 +55,14 @@
                       <span>La contraseña es obligatoria</span>
                     }
                     @if (password.errors['minlength']) {
-                      <span
-                        >La contraseña debe tener 6 caracteres como mínimo</span
-                      >
+                      <span>La contraseña debe tener 6 caracteres como mínimo</span>
                     }
                   </c-alert>
                 }
                 <c-row>
                   <c-col xs="6">
                     @if (!isLoading) {
-                      <button class="btn btn-primary" type="submit">
-                        Login
-                      </button>
+                      <button class="btn btn-primary" type="submit">Login</button>
                     }
                     @if (isLoading) {
                       <button class="btn btn-primary" type="button" disabled>
@@ -89,18 +83,14 @@
                 </c-row>
                 <c-row>
                   @if (isLoginFailed) {
-                    <c-alert color="danger" fade
-                      >Error: {{ errorMessage }}</c-alert
-                    >
+                    <c-alert color="danger" fade>Error: {{ errorMessage }}</c-alert>
                   }
                 </c-row>
               </form>
             }
             <c-row>
               @if (isLoggedIn) {
-                <c-alert color="success"
-                  >El rol del usuario es {{ roles }}.</c-alert
-                >
+                <c-alert color="success">El rol del usuario es {{ roles }}.</c-alert>
               }
             </c-row>
           </c-card-body>

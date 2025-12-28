@@ -2,24 +2,16 @@ import { OPRestMethods } from './op-restapi.constants';
 
 describe('OPRestMethods', () => {
   it('debe generar rutas parametrizadas', () => {
-    expect(OPRestMethods.ENTRADAS.OBTENER_POR_ID(1)).toBe(
-      '/entradas/obtenerPorId/1',
-    );
+    expect(OPRestMethods.ENTRADAS.OBTENER_POR_ID(1)).toBe('/entradas/obtenerPorId/1');
     expect(OPRestMethods.ENTRADAS.ACTUALIZAR(2)).toBe('/entradas/2');
     expect(OPRestMethods.ROLES.ELIMINAR(3)).toBe('/roles/3');
-    expect(OPRestMethods.USUARIOS.OBTENER_POR_ID(9)).toBe(
-      '/usuarios/obtenerPorId/9',
-    );
+    expect(OPRestMethods.USUARIOS.OBTENER_POR_ID(9)).toBe('/usuarios/obtenerPorId/9');
     expect(OPRestMethods.COMENTARIOS.ACTUALIZAR(4)).toBe('/comentarios/4');
     expect(OPRestMethods.CATEGORIAS.ELIMINAR(5)).toBe('/categorias/5');
-    expect(OPRestMethods.ETIQUETAS.OBTENER_POR_ID(6)).toBe(
-      '/etiquetas/obtenerPorId/6',
-    );
+    expect(OPRestMethods.ETIQUETAS.OBTENER_POR_ID(6)).toBe('/etiquetas/obtenerPorId/6');
     expect(OPRestMethods.FILE_STORAGE.ELIMINAR(7)).toBe('/fileStorage/7');
     expect(OPRestMethods.PERFILES.ACTUALIZAR(8)).toBe('/perfil/8');
-    expect(OPRestMethods.PRIVILEGIOS.OBTENER_POR_ID(10)).toBe(
-      '/privilegios/obtenerPorId/10',
-    );
+    expect(OPRestMethods.PRIVILEGIOS.OBTENER_POR_ID(10)).toBe('/privilegios/obtenerPorId/10');
   });
 
   it('debe exponer rutas estáticas esperadas', () => {
@@ -36,18 +28,10 @@ describe('OPRestMethods', () => {
     expect(OPRestMethods.AUTH.BASE).toBe('/auth');
     expect(OPRestMethods.AUTH.LOGIN).toBe('/login');
     expect(OPRestMethods.AUTH.REFRESH_TOKEN).toBe('/auth/refreshToken');
-    expect(OPRestMethods.BUSCAR.DEFINICIONES).toBe(
-      '/buscar/definicionesBuscador',
-    );
+    expect(OPRestMethods.BUSCAR.DEFINICIONES).toBe('/buscar/definicionesBuscador');
     expect(OPRestMethods.REDIS.BASE).toBe('/redis');
-    expect(OPRestMethods.CONFIRM_REGISTER.BASE).toBe(
-      '/validaRegistro/confirmarRegistroUsuario',
-    );
-    expect(OPRestMethods.HERRAMIENTAS_AUXILIAR.BASE).toBe(
-      '/herramientas/sistema',
-    );
-    expect(OPRestMethods.FICHEROS.RUTA_INTERNA).toBe(
-      '/fileStorage/ficheros/obtenerDatos/',
-    );
+    expect(OPRestMethods.CONFIRM_REGISTER.BASE).toBe('/validaRegistro/confirmarRegistroUsuario');
+    expect(OPRestMethods.HERRAMIENTAS_AUXILIAR.BASE).toBe('/herramientas/sistema');
+    expect(OPRestMethods.FICHEROS.RUTA_INTERNA).toBe('/fileStorage/ficheros/obtenerDatos/');
   });
 });

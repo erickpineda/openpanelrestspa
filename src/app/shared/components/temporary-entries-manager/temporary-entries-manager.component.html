@@ -5,8 +5,7 @@
       <div>
         <h2 cCardTitle>Entradas Temporales No Guardadas</h2>
         <p class="text-muted">
-          Estas son las entradas que se guardaron temporalmente durante cierres
-          de sesión.
+          Estas son las entradas que se guardaron temporalmente durante cierres de sesión.
         </p>
       </div>
       <button cButton color="primary" (click)="createNewEntry()">
@@ -37,28 +36,13 @@
                   </small>
                 </p>
                 <div class="btn-group">
-                  <button
-                    cButton
-                    color="success"
-                    size="sm"
-                    (click)="recoverEntry(entry)"
-                  >
+                  <button cButton color="success" size="sm" (click)="recoverEntry(entry)">
                     <i class="cil-download me-1"></i> Recuperar
                   </button>
-                  <button
-                    cButton
-                    color="secondary"
-                    size="sm"
-                    (click)="viewEntry(entry)"
-                  >
+                  <button cButton color="secondary" size="sm" (click)="viewEntry(entry)">
                     <i class="cil-file me-1"></i> Ver
                   </button>
-                  <button
-                    cButton
-                    color="danger"
-                    size="sm"
-                    (click)="deleteEntry(entry.id)"
-                  >
+                  <button cButton color="danger" size="sm" (click)="deleteEntry(entry.id)">
                     <i class="cil-trash me-1"></i> Eliminar
                   </button>
                 </div>
@@ -112,11 +96,7 @@
     }
   </c-modal-body>
   <c-modal-footer>
-    <button cButton color="secondary" (click)="viewModalVisible = false">
-      Cerrar
-    </button>
-    <button cButton color="primary" (click)="recoverSelectedEntry()">
-      Recuperar
-    </button>
+    <button cButton color="secondary" (click)="viewModalVisible = false">Cerrar</button>
+    <button cButton color="primary" (click)="recoverSelectedEntry()">Recuperar</button>
   </c-modal-footer>
 </c-modal>

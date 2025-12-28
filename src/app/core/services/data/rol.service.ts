@@ -12,45 +12,24 @@ import { OPConstants } from '../../../shared/constants/op-global.constants';
 export class RolService extends CrudService<Rol, string> {
   protected override endpoint = '/roles';
 
-  buscarSinGlobalLoader(
-    searchRequest: any,
-    pageNo: number,
-    pageSize: number,
-  ): Observable<any> {
+  buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<any> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
-    const context = new HttpContext().set(
-      NetworkInterceptor.SKIP_GLOBAL_LOADER,
-      true,
-    );
-    return this.post<any>(
-      `${this.endpoint}/buscar`,
-      searchRequest,
-      params,
-      undefined,
-      context,
-    );
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.post<any>(`${this.endpoint}/buscar`, searchRequest, params, undefined, context);
   }
 
   obtenerPrivilegios(codigo: string): Observable<any> {
     return this.get<any>(`${this.endpoint}/obtenerPrivilegios/${codigo}`);
   }
 
-  obtenerPorCodigos(
-    codigos: string[],
-    pageNo: number = 0,
-    pageSize: number = 50,
-  ): Observable<any> {
+  obtenerPorCodigos(codigos: string[], pageNo: number = 0, pageSize: number = 50): Observable<any> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
     const payload = { codigosRol: codigos };
-    return this.post<any>(
-      `${this.endpoint}/obtenerPorCodigos`,
-      payload,
-      params,
-    );
+    return this.post<any>(`${this.endpoint}/obtenerPorCodigos`, payload, params);
   }
 
   // Overrides for code-based endpoints
@@ -73,7 +52,7 @@ export class RolService extends CrudService<Rol, string> {
       {} as Rol,
       undefined,
       undefined,
-      `${this.endpoint}.obtenerPorCodigo`,
+      `${this.endpoint}.obtenerPorCodigo`
     );
   }
 
@@ -84,7 +63,7 @@ export class RolService extends CrudService<Rol, string> {
       {} as Rol,
       undefined,
       undefined,
-      `${this.endpoint}.actualizarPorCodigo`,
+      `${this.endpoint}.actualizarPorCodigo`
     );
   }
 
@@ -93,18 +72,12 @@ export class RolService extends CrudService<Rol, string> {
       `${this.endpoint}/borrarPorCodigo/${id}`,
       undefined,
       undefined,
-      `${this.endpoint}.borrarPorCodigo`,
+      `${this.endpoint}.borrarPorCodigo`
     );
   }
 
-  actualizarPrivilegios(
-    codigo: string,
-    codigosPrivilegios: string[],
-  ): Observable<any> {
+  actualizarPrivilegios(codigo: string, codigosPrivilegios: string[]): Observable<any> {
     const payload = { codigosPrivilegios };
-    return this.put<any>(
-      `${this.endpoint}/actualizarPrivilegios/${codigo}`,
-      payload,
-    );
+    return this.put<any>(`${this.endpoint}/actualizarPrivilegios/${codigo}`, payload);
   }
 }

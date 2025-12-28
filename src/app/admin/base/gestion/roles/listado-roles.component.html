@@ -17,9 +17,7 @@
         role="alert"
       >
         <span>{{ error }}</span>
-        <button cButton color="danger" size="sm" (click)="load()">
-          Reintentar
-        </button>
+        <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
       </div>
     }
 
@@ -49,11 +47,7 @@
             Avanzado
           </button>
         </c-col>
-        <c-col
-          xs="12"
-          md="4"
-          class="d-flex justify-content-md-end gap-2 align-items-center"
-        >
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
           <select
             cSelect
             [ngModel]="pageSize"
@@ -113,11 +107,7 @@
         @if (loading) {
           <div
             class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-            style="
-              z-index: 10;
-              background-color: rgba(255, 255, 255, 0.8);
-              min-height: 200px;
-            "
+            style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
           >
             <div class="text-center">
               <c-spinner [attr.aria-label]="'Cargando roles'"></c-spinner>
@@ -141,20 +131,15 @@
                 <th scope="col" style="min-width: 120px">Código</th>
                 <th scope="col" style="min-width: 200px">Nombre</th>
                 <th scope="col" style="min-width: 250px">Descripción</th>
-                <th scope="col" class="text-center" style="min-width: 110px">
-                  Privilegios
-                </th>
-                <th scope="col" class="text-center" style="min-width: 100px">
-                  Acciones
-                </th>
+                <th scope="col" class="text-center" style="min-width: 110px">Privilegios</th>
+                <th scope="col" class="text-center" style="min-width: 100px">Acciones</th>
               </tr>
             </thead>
             <tbody>
               @for (r of roles; track trackByRol($index, r)) {
                 <tr
                   [class.table-row-disabled]="
-                    r.codigo === PROPIETARIO_ROLE_CODE ||
-                    r.codigo === ADMIN_ROLE_CODE
+                    r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE
                   "
                 >
                   <td>{{ r.codigo }}</td>
@@ -180,11 +165,7 @@
                     }}</c-badge>
                   </td>
                   <td class="text-center">
-                    <div
-                      class="btn-group"
-                      role="group"
-                      aria-label="Acciones de rol"
-                    >
+                    <div class="btn-group" role="group" aria-label="Acciones de rol">
                       <button
                         cButton
                         color="warning"
@@ -202,8 +183,7 @@
                         variant="ghost"
                         (click)="delete(r)"
                         [disabled]="
-                          r.codigo === PROPIETARIO_ROLE_CODE ||
-                          r.codigo === ADMIN_ROLE_CODE
+                          r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE
                         "
                         [attr.aria-label]="'Eliminar rol ' + r.nombre"
                       >
@@ -217,19 +197,10 @@
               @if (roles.length === 0) {
                 <tr>
                   <td colspan="5" class="text-center py-5">
-                    <div
-                      class="d-flex flex-column align-items-center justify-content-center"
-                    >
-                      <svg
-                        cIcon
-                        name="cilSearch"
-                        size="3xl"
-                        class="text-muted mb-3"
-                      ></svg>
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
                       <h6 class="text-muted">No se han encontrado roles</h6>
-                      <p class="text-muted small">
-                        Intenta ajustar los filtros de búsqueda
-                      </p>
+                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                     </div>
                   </td>
                 </tr>
@@ -249,16 +220,8 @@
 
           @if (roles.length > 0) {
             <c-row class="mt-2">
-              <c-col
-                class="d-flex justify-content-end align-items-center gap-2"
-              >
-                <button
-                  cButton
-                  color="light"
-                  size="sm"
-                  (click)="prev()"
-                  [disabled]="pageNo <= 0"
-                >
+              <c-col class="d-flex justify-content-end align-items-center gap-2">
+                <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo <= 0">
                   Anterior
                 </button>
                 <button
@@ -271,8 +234,8 @@
                   Siguiente
                 </button>
                 <div class="text-muted small ms-2">
-                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
-                  {{ totalElements }} · Mostrando {{ numberOfElements }}
+                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} ·
+                  Mostrando {{ numberOfElements }}
                 </div>
               </c-col>
             </c-row>
@@ -308,14 +271,11 @@
             placeholder="Máx. 5 caracteres"
           />
           @if (!editRol.codigo) {
-            <div class="invalid-feedback d-block">
-              Código requerido (máx 5 caracteres)
-            </div>
+            <div class="invalid-feedback d-block">Código requerido (máx 5 caracteres)</div>
           }
           @if (!isEditing) {
             <div class="form-text text-muted">
-              Se autogenerará desde el nombre si se deja vacío o no se modifica
-              manualmente.
+              Se autogenerará desde el nombre si se deja vacío o no se modifica manualmente.
             </div>
           }
         </div>
@@ -344,9 +304,7 @@
             cFormControl
             rows="2"
             [value]="editRol.descripcion || ''"
-            (input)="
-              editRol && (editRol.descripcion = $any($event.target).value)
-            "
+            (input)="editRol && (editRol.descripcion = $any($event.target).value)"
           ></textarea>
         </div>
         <div class="mb-3">
@@ -362,23 +320,15 @@
                 (change)="toggleAllPrivilegios($any($event.target).checked)"
                 [disabled]="privilegios.length === 0"
               />
-              <label cFormCheckLabel for="selectAllPrivilegios">
-                Seleccionar todos
-              </label>
+              <label cFormCheckLabel for="selectAllPrivilegios"> Seleccionar todos </label>
             </c-form-check>
           </div>
           <div
             class="border rounded p-3"
-            style="
-              max-height: 300px;
-              overflow-y: auto;
-              background-color: #f8f9fa;
-            "
+            style="max-height: 300px; overflow-y: auto; background-color: #f8f9fa"
           >
             @if (privilegios.length === 0) {
-              <div class="text-muted text-center py-2">
-                No hay privilegios disponibles
-              </div>
+              <div class="text-muted text-center py-2">No hay privilegios disponibles</div>
             }
             <div class="row">
               @for (p of privilegios; track trackByPrivilegio($index, p)) {
@@ -389,9 +339,7 @@
                       type="checkbox"
                       [id]="'privilegio-' + p.codigo"
                       [checked]="hasPrivilegio(p)"
-                      (change)="
-                        togglePrivilegio(p, $any($event.target).checked)
-                      "
+                      (change)="togglePrivilegio(p, $any($event.target).checked)"
                     />
                     <label
                       cFormCheckLabel
@@ -415,22 +363,13 @@
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="closeEdit()">Cerrar</button>
-    <button
-      cButton
-      color="primary"
-      [disabled]="!isRolFormValid()"
-      (click)="saveEdit()"
-    >
+    <button cButton color="primary" [disabled]="!isRolFormValid()" (click)="saveEdit()">
       Guardar
     </button>
   </c-modal-footer>
 </c-modal>
 
-<c-modal
-  [visible]="showDeleteModal"
-  (visibleChange)="showDeleteModal = $event"
-  id="deleteRolModal"
->
+<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal = $event" id="deleteRolModal">
   <c-modal-header>
     <h5 cModalTitle>Confirmar eliminación</h5>
   </c-modal-header>

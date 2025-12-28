@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-dashboard-series-panel',
@@ -29,9 +23,7 @@ export class DashboardSeriesPanelComponent {
   @Input() kpiNuevosUsuariosColor: string = 'secondary';
 
   @Output() changeDays = new EventEmitter<number>();
-  @Output() changeGranularity = new EventEmitter<
-    'hour' | 'day' | 'week' | 'month'
-  >();
+  @Output() changeGranularity = new EventEmitter<'hour' | 'day' | 'week' | 'month'>();
   @Output() downloadCsv = new EventEmitter<void>();
   @Output() toggleMetrics = new EventEmitter<void>();
   @Output() copyPerf = new EventEmitter<void>();

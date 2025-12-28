@@ -4,12 +4,8 @@ import { RouteTrackerService } from './route-tracker.service';
 
 describe('SessionManagerService', () => {
   it('handleLogoutFromSync fuerza logout inmediato si no hay cambios sin guardar', () => {
-    const tokenStorage = jasmine.createSpyObj('TokenStorageService', [
-      'signOut',
-    ]);
-    const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', [
-      'hasUnsavedWork',
-    ]);
+    const tokenStorage = jasmine.createSpyObj('TokenStorageService', ['signOut']);
+    const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', ['hasUnsavedWork']);
     unsavedWorkService.hasUnsavedWork.and.returnValue(false);
     const router = jasmine.createSpyObj('Router', ['navigate']);
     const log = jasmine.createSpyObj('LoggerService', ['info', 'error']);
@@ -29,28 +25,21 @@ describe('SessionManagerService', () => {
       unsavedWorkService as any,
       router as any,
       log as any,
-      postLoginRedirect as any,
+      postLoginRedirect as any
     );
 
     service.handleLogoutFromSync({ timestamp: 123 });
 
-    expect(postLoginRedirect.saveLastValidRoute).toHaveBeenCalledWith(
-      '/admin/x',
-    );
+    expect(postLoginRedirect.saveLastValidRoute).toHaveBeenCalledWith('/admin/x');
     expect(tokenStorage.signOut).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(
-      [OPConstants.Session.ROUTE_SESSION_EXPIRED],
-      { state: { sessionData: jasmine.any(Object) } },
-    );
+    expect(router.navigate).toHaveBeenCalledWith([OPConstants.Session.ROUTE_SESSION_EXPIRED], {
+      state: { sessionData: jasmine.any(Object) },
+    });
   });
 
   it('emite evento si hay trabajo sin guardar y allowSave=true', (done) => {
-    const tokenStorage = jasmine.createSpyObj('TokenStorageService', [
-      'signOut',
-    ]);
-    const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', [
-      'hasUnsavedWork',
-    ]);
+    const tokenStorage = jasmine.createSpyObj('TokenStorageService', ['signOut']);
+    const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', ['hasUnsavedWork']);
     unsavedWorkService.hasUnsavedWork.and.returnValue(true);
     const router = jasmine.createSpyObj('Router', ['navigate']);
     const log = jasmine.createSpyObj('LoggerService', ['info', 'error']);
@@ -69,7 +58,7 @@ describe('SessionManagerService', () => {
       unsavedWorkService as any,
       router as any,
       log as any,
-      postLoginRedirect as any,
+      postLoginRedirect as any
     );
 
     service.sessionExpired$.subscribe((payload) => {
@@ -85,12 +74,8 @@ describe('SessionManagerService', () => {
   it('saveWorkAndLogout emite evento y fuerza logout tras timeout', () => {
     jasmine.clock().install();
 
-    const tokenStorage = jasmine.createSpyObj('TokenStorageService', [
-      'signOut',
-    ]);
-    const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', [
-      'hasUnsavedWork',
-    ]);
+    const tokenStorage = jasmine.createSpyObj('TokenStorageService', ['signOut']);
+    const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', ['hasUnsavedWork']);
     unsavedWorkService.hasUnsavedWork.and.returnValue(false);
     const router = jasmine.createSpyObj('Router', ['navigate']);
     const log = jasmine.createSpyObj('LoggerService', ['info', 'error']);
@@ -101,9 +86,7 @@ describe('SessionManagerService', () => {
       'markPostLoginHandled',
     ]);
 
-    const addEventListenerSpy = spyOn(window, 'addEventListener').and.callFake(
-      () => {},
-    );
+    const addEventListenerSpy = spyOn(window, 'addEventListener').and.callFake(() => {});
     expect(addEventListenerSpy).toBeDefined();
 
     const dispatchSpy = spyOn(window, 'dispatchEvent').and.callThrough();
@@ -114,7 +97,7 @@ describe('SessionManagerService', () => {
       unsavedWorkService as any,
       router as any,
       log as any,
-      postLoginRedirect as any,
+      postLoginRedirect as any
     );
 
     spyOn(service, 'performLogout');
@@ -128,7 +111,7 @@ describe('SessionManagerService', () => {
     expect(dispatchSpy).toHaveBeenCalledWith(
       jasmine.objectContaining({
         type: OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
-      }),
+      })
     );
     jasmine.clock().tick(30000);
     expect(service.performLogout).toHaveBeenCalled();

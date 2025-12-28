@@ -33,9 +33,7 @@ export class NavigationMigrationService {
 
     // Migrate children if they exist
     if (legacyItem.children && legacyItem.children.length > 0) {
-      enhancedItem.children = legacyItem.children.map((child) =>
-        this.migrateSingleItem(child),
-      );
+      enhancedItem.children = legacyItem.children.map((child) => this.migrateSingleItem(child));
     }
 
     // Add dynamic badges for specific items
@@ -57,10 +55,7 @@ export class NavigationMigrationService {
     const name = item.name || '';
 
     // Dashboard gets highest priority
-    if (
-      url.includes('dashboard') ||
-      name.toLowerCase().includes('escritorio')
-    ) {
+    if (url.includes('dashboard') || name.toLowerCase().includes('escritorio')) {
       return 100;
     }
 
@@ -98,10 +93,7 @@ export class NavigationMigrationService {
       if (name.toLowerCase().includes('avanzado')) {
         return 25;
       }
-      if (
-        name.toLowerCase().includes('apariencia') ||
-        name.toLowerCase().includes('tema')
-      ) {
+      if (name.toLowerCase().includes('apariencia') || name.toLowerCase().includes('tema')) {
         return 35;
       }
       return 30;
@@ -112,10 +104,7 @@ export class NavigationMigrationService {
       return 15;
     }
 
-    if (
-      url.includes('changepassword') ||
-      name.toLowerCase().includes('contraseña')
-    ) {
+    if (url.includes('changepassword') || name.toLowerCase().includes('contraseña')) {
       return 10;
     }
 
@@ -155,11 +144,7 @@ export class NavigationMigrationService {
     }
 
     // Content creation - authors and above
-    if (
-      url.includes('entradas') ||
-      url.includes('paginas') ||
-      url.includes('contenido')
-    ) {
+    if (url.includes('entradas') || url.includes('paginas') || url.includes('contenido')) {
       if (url.includes('categorias')) {
         return [
           UserRole.EDITOR,
@@ -201,20 +186,13 @@ export class NavigationMigrationService {
     }
 
     // Roles and permissions - owners only
-    if (
-      url.includes('roles') ||
-      url.includes('permisos') ||
-      url.includes('privilegios')
-    ) {
+    if (url.includes('roles') || url.includes('permisos') || url.includes('privilegios')) {
       return [UserRole.PROPIETARIO];
     }
 
     // Configuration
     if (url.includes('configuracion') || url.includes('ajustes')) {
-      if (
-        name.toLowerCase().includes('apariencia') ||
-        name.toLowerCase().includes('tema')
-      ) {
+      if (name.toLowerCase().includes('apariencia') || name.toLowerCase().includes('tema')) {
         return [UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
       }
       if (name.toLowerCase().includes('avanzado')) {
@@ -228,11 +206,7 @@ export class NavigationMigrationService {
       if (url.includes('database') || url.includes('dev-tools')) {
         return [UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
       }
-      return [
-        UserRole.MANTENIMIENTO,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
-      ];
+      return [UserRole.MANTENIMIENTO, UserRole.DESARROLLADOR, UserRole.PROPIETARIO];
     }
 
     // User profile - all authenticated users
@@ -293,10 +267,7 @@ export class NavigationMigrationService {
     }
 
     // Draft entries counter
-    if (
-      url.includes('entradas-temporales') ||
-      name.toLowerCase().includes('borrador')
-    ) {
+    if (url.includes('entradas-temporales') || name.toLowerCase().includes('borrador')) {
       item.dynamicBadge = {
         service: 'BadgeCounterService',
         method: 'getDraftEntriesCount',
@@ -416,11 +387,7 @@ export class NavigationMigrationService {
    * @param urls - Set to track URLs
    * @param issues - Array to collect issues
    */
-  private collectUrls(
-    items: INavItemEnhanced[],
-    urls: Set<string>,
-    issues: string[],
-  ): void {
+  private collectUrls(items: INavItemEnhanced[], urls: Set<string>, issues: string[]): void {
     for (const item of items) {
       if (item.url && typeof item.url === 'string') {
         if (urls.has(item.url)) {
@@ -441,25 +408,18 @@ export class NavigationMigrationService {
    * @param items - Navigation items
    * @param issues - Array to collect issues
    */
-  private validateRequiredProperties(
-    items: INavItemEnhanced[],
-    issues: string[],
-  ): void {
+  private validateRequiredProperties(items: INavItemEnhanced[], issues: string[]): void {
     for (const item of items) {
       if (!item.name) {
         issues.push('Navigation item missing name property');
       }
 
       if (!item.title && !item.url) {
-        issues.push(
-          `Navigation item "${item.name}" must have either title or url property`,
-        );
+        issues.push(`Navigation item "${item.name}" must have either title or url property`);
       }
 
       if (item.requiredRoles && item.requiredRoles.length === 0) {
-        issues.push(
-          `Navigation item "${item.name}" has empty requiredRoles array`,
-        );
+        issues.push(`Navigation item "${item.name}" has empty requiredRoles array`);
       }
 
       if (item.children) {
@@ -477,14 +437,14 @@ export class NavigationMigrationService {
   private validateHierarchyDepth(
     items: INavItemEnhanced[],
     issues: string[],
-    currentDepth: number,
+    currentDepth: number
   ): void {
     const maxDepth = 2;
 
     for (const item of items) {
       if (currentDepth >= maxDepth) {
         issues.push(
-          `Navigation hierarchy exceeds maximum depth of ${maxDepth} levels at item: ${item.name}`,
+          `Navigation hierarchy exceeds maximum depth of ${maxDepth} levels at item: ${item.name}`
         );
       }
       if (item.children && item.children.length > 0) {
@@ -501,14 +461,13 @@ export class NavigationMigrationService {
    */
   preserveCustomConfigurations(
     originalItems: INavItemEnhanced[],
-    customConfig: Partial<INavItemEnhanced>[],
+    customConfig: Partial<INavItemEnhanced>[]
   ): INavItemEnhanced[] {
     const configMap = new Map<string, Partial<INavItemEnhanced>>();
 
     // Create a map of custom configurations by URL or name
     customConfig.forEach((config) => {
-      const key =
-        (typeof config.url === 'string' ? config.url : config.name) || '';
+      const key = (typeof config.url === 'string' ? config.url : config.name) || '';
       if (key) {
         configMap.set(key, config);
       }
@@ -525,7 +484,7 @@ export class NavigationMigrationService {
    */
   private applyCustomConfig(
     item: INavItemEnhanced,
-    configMap: Map<string, Partial<INavItemEnhanced>>,
+    configMap: Map<string, Partial<INavItemEnhanced>>
   ): INavItemEnhanced {
     const key = (typeof item.url === 'string' ? item.url : item.name) || '';
     const customConfig = configMap.get(key);
@@ -539,18 +498,13 @@ export class NavigationMigrationService {
         ...customConfig,
         // Preserve system-critical properties
         requiredRoles: customConfig.requiredRoles || item.requiredRoles,
-        priority:
-          customConfig.priority !== undefined
-            ? customConfig.priority
-            : item.priority,
+        priority: customConfig.priority !== undefined ? customConfig.priority : item.priority,
       };
     }
 
     // Apply custom config to children
     if (item.children) {
-      mergedItem.children = item.children.map((child) =>
-        this.applyCustomConfig(child, configMap),
-      );
+      mergedItem.children = item.children.map((child) => this.applyCustomConfig(child, configMap));
     }
 
     return mergedItem;

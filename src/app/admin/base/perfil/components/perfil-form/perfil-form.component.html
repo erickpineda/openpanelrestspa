@@ -6,12 +6,8 @@
         cFormControl
         id="nombre"
         formControlName="nombre"
-        [class.is-valid]="
-          form.get('nombre')?.touched && form.get('nombre')?.valid
-        "
-        [class.is-invalid]="
-          form.get('nombre')?.touched && form.get('nombre')?.invalid
-        "
+        [class.is-valid]="form.get('nombre')?.touched && form.get('nombre')?.valid"
+        [class.is-invalid]="form.get('nombre')?.touched && form.get('nombre')?.invalid"
       />
       <c-form-feedback [valid]="false">El nombre es requerido.</c-form-feedback>
     </c-col>
@@ -21,16 +17,10 @@
         cFormControl
         id="apellido"
         formControlName="apellido"
-        [class.is-valid]="
-          form.get('apellido')?.touched && form.get('apellido')?.valid
-        "
-        [class.is-invalid]="
-          form.get('apellido')?.touched && form.get('apellido')?.invalid
-        "
+        [class.is-valid]="form.get('apellido')?.touched && form.get('apellido')?.valid"
+        [class.is-invalid]="form.get('apellido')?.touched && form.get('apellido')?.invalid"
       />
-      <c-form-feedback [valid]="false"
-        >El apellido es requerido.</c-form-feedback
-      >
+      <c-form-feedback [valid]="false">El apellido es requerido.</c-form-feedback>
     </c-col>
   </c-row>
 
@@ -42,12 +32,8 @@
         id="email"
         type="email"
         formControlName="email"
-        [class.is-valid]="
-          form.get('email')?.touched && form.get('email')?.valid
-        "
-        [class.is-invalid]="
-          form.get('email')?.touched && form.get('email')?.invalid
-        "
+        [class.is-valid]="form.get('email')?.touched && form.get('email')?.valid"
+        [class.is-invalid]="form.get('email')?.touched && form.get('email')?.invalid"
       />
       <c-form-feedback [valid]="false">Email inválido.</c-form-feedback>
     </c-col>
@@ -57,16 +43,10 @@
         cFormControl
         id="telefono"
         formControlName="telefono"
-        [class.is-valid]="
-          form.get('telefono')?.touched && form.get('telefono')?.valid
-        "
-        [class.is-invalid]="
-          form.get('telefono')?.touched && form.get('telefono')?.invalid
-        "
+        [class.is-valid]="form.get('telefono')?.touched && form.get('telefono')?.valid"
+        [class.is-invalid]="form.get('telefono')?.touched && form.get('telefono')?.invalid"
       />
-      <c-form-feedback [valid]="false"
-        >Solo números permitidos.</c-form-feedback
-      >
+      <c-form-feedback [valid]="false">Solo números permitidos.</c-form-feedback>
     </c-col>
   </c-row>
 

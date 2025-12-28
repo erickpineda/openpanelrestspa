@@ -29,7 +29,7 @@ describe('SearchUtilService', () => {
     const req = service.buildRequest(
       'Privilegio',
       [{ filterKey: 'nombre', value: 12, operation: 'CONTAINS' }],
-      'ALL',
+      'ALL'
     );
 
     expect(req.dataOption).toBe('ALL');
@@ -49,7 +49,7 @@ describe('SearchUtilService', () => {
     const req = service.buildRequest(
       null,
       [{ filterKey: 'nombre', value: null, operation: 'EQUAL' }],
-      'ANY',
+      'ANY'
     );
 
     expect(req.searchCriteriaList[0].clazzName).toBeUndefined();
@@ -58,13 +58,7 @@ describe('SearchUtilService', () => {
 
   it('buildSingle should delegate to buildRequest', () => {
     const service = new SearchUtilService();
-    const req = service.buildSingle(
-      'Entrada',
-      'titulo',
-      'a',
-      'CONTAINS',
-      'AND',
-    );
+    const req = service.buildSingle('Entrada', 'titulo', 'a', 'CONTAINS', 'AND');
     expect(req.dataOption).toBe('AND');
     expect(req.searchCriteriaList.length).toBe(1);
   });

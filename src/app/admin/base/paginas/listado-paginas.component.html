@@ -6,13 +6,7 @@
     <c-col [sm]="6">
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button cButton color="light" size="sm" aria-label="Imprimir listado">
-          <svg
-            cIcon
-            name="cilPrint"
-            style="padding-right: 2px"
-            size="sm"
-            title="Imprimir"
-          ></svg>
+          <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
           Imprimir
         </button>
         <button cButton color="warning" size="sm">
@@ -63,21 +57,11 @@
             placeholder="Buscar página..."
             style="max-width: 280px"
           />
-          <button
-            cButton
-            color="secondary"
-            variant="ghost"
-            size="sm"
-            (click)="toggleAdvanced()"
-          >
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">
             Avanzado
           </button>
         </c-col>
-        <c-col
-          xs="12"
-          md="4"
-          class="d-flex justify-content-md-end gap-2 align-items-center"
-        >
+        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
           <select
             cSelect
             [ngModel]="pageSize"
@@ -133,11 +117,7 @@
       @if (cargandoTabla) {
         <div
           class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style="
-            z-index: 10;
-            background-color: rgba(255, 255, 255, 0.8);
-            min-height: 200px;
-          "
+          style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
         >
           <div class="text-center">
             <c-spinner [attr.aria-label]="'Cargando páginas'"></c-spinner>
@@ -154,19 +134,12 @@
               <th scope="col" style="min-width: 120px">Autor</th>
               <th scope="col" style="min-width: 120px">Publicación</th>
               <th scope="col" style="min-width: 150px">Categorías</th>
-              <th scope="col" class="text-center" style="min-width: 80px">
-                Estado
-              </th>
-              <th scope="col" class="text-center" style="min-width: 140px">
-                Acciones
-              </th>
+              <th scope="col" class="text-center" style="min-width: 80px">Estado</th>
+              <th scope="col" class="text-center" style="min-width: 140px">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            @for (
-              entrada of listaEntradas;
-              track trackByEntradaId($index, entrada)
-            ) {
+            @for (entrada of listaEntradas; track trackByEntradaId($index, entrada)) {
               <tr>
                 <td>
                   <span
@@ -191,30 +164,18 @@
                 <td class="text-center">
                   @if (getEstadoInfo(entrada); as estado) {
                     <div [cTooltip]="estado.tooltip">
-                      <svg
-                        cIcon
-                        [name]="estado.icon"
-                        [class]="estado.color"
-                        size="lg"
-                      ></svg>
+                      <svg cIcon [name]="estado.icon" [class]="estado.color" size="lg"></svg>
                     </div>
                   }
                 </td>
                 <td class="text-center">
-                  <div
-                    class="btn-group"
-                    role="group"
-                    aria-label="Acciones de página"
-                  >
+                  <div class="btn-group" role="group" aria-label="Acciones de página">
                     <button
                       cButton
                       color="warning"
                       size="sm"
                       variant="ghost"
-                      [routerLink]="[
-                        '/admin/control/paginas/editar',
-                        entrada.idEntrada,
-                      ]"
+                      [routerLink]="['/admin/control/paginas/editar', entrada.idEntrada]"
                       [cTooltip]="'Editar página'"
                       [attr.aria-label]="'Editar página ' + entrada.titulo"
                     >
@@ -250,19 +211,10 @@
             @if (listaEntradas.length === 0) {
               <tr>
                 <td colspan="6" class="text-center py-5">
-                  <div
-                    class="d-flex flex-column align-items-center justify-content-center"
-                  >
-                    <svg
-                      cIcon
-                      name="cilSearch"
-                      size="3xl"
-                      class="text-muted mb-3"
-                    ></svg>
+                  <div class="d-flex flex-column align-items-center justify-content-center">
+                    <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
                     <h6 class="text-muted">No se han encontrado páginas</h6>
-                    <p class="text-muted small">
-                      Intenta ajustar los filtros de búsqueda
-                    </p>
+                    <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                   </div>
                 </td>
               </tr>
@@ -304,8 +256,8 @@
                 Siguiente
               </button>
               <div class="text-muted small ms-2">
-                Página {{ currentPage + 1 }} | Tamaño {{ pageSize }} | Total
-                {{ totalElements }} · Mostrando {{ numberOfElements }}
+                Página {{ currentPage + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} ·
+                Mostrando {{ numberOfElements }}
               </div>
             </c-col>
           </c-row>
@@ -323,11 +275,7 @@
     >
       <c-modal-header>
         <h5 cModalTitle>Confirmar eliminación</h5>
-        <button
-          (click)="toggleModal()"
-          cButtonClose
-          aria-label="Cerrar modal"
-        ></button>
+        <button (click)="toggleModal()" cButtonClose aria-label="Cerrar modal"></button>
       </c-modal-header>
       <c-modal-body>
         <p>¿Está seguro de que desea eliminar la siguiente página?</p>
@@ -338,12 +286,8 @@
         <p class="text-danger">Esta acción no se puede deshacer.</p>
       </c-modal-body>
       <c-modal-footer>
-        <button (click)="toggleModal()" cButton color="secondary">
-          Cancelar
-        </button>
-        <button cButton color="danger" (click)="confirmarBorrado()">
-          Eliminar
-        </button>
+        <button (click)="toggleModal()" cButton color="secondary">Cancelar</button>
+        <button cButton color="danger" (click)="confirmarBorrado()">Eliminar</button>
       </c-modal-footer>
     </c-modal>
 

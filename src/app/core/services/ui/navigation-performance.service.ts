@@ -1,16 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, combineLatest, timer } from 'rxjs';
-import {
-  map,
-  distinctUntilChanged,
-  debounceTime,
-  shareReplay,
-  startWith,
-} from 'rxjs/operators';
-import {
-  INavItemEnhanced,
-  UserRole,
-} from '../../../shared/types/navigation.types';
+import { map, distinctUntilChanged, debounceTime, shareReplay, startWith } from 'rxjs/operators';
+import { INavItemEnhanced, UserRole } from '../../../shared/types/navigation.types';
 import { NavigationUtils } from '../../../shared/utils/navigation.utils';
 
 /**
@@ -98,9 +89,7 @@ export class NavigationPerformanceService {
 
   // Chunks de navegación para lazy loading
   private navigationChunks = new Map<string, NavigationChunk>();
-  private chunksSubject = new BehaviorSubject<Map<string, NavigationChunk>>(
-    new Map(),
-  );
+  private chunksSubject = new BehaviorSubject<Map<string, NavigationChunk>>(new Map());
 
   // Estadísticas de rendimiento
   private stats: PerformanceStats = {
@@ -118,9 +107,7 @@ export class NavigationPerformanceService {
 
   // Observables optimizados
   private memoizedPermissionChecks = new Map<string, Observable<boolean>>();
-  private debouncedBadgeUpdates = new BehaviorSubject<Map<string, number>>(
-    new Map(),
-  );
+  private debouncedBadgeUpdates = new BehaviorSubject<Map<string, number>>(new Map());
 
   constructor() {
     this.initializePerformanceOptimizations();
@@ -169,9 +156,7 @@ export class NavigationPerformanceService {
   /**
    * Crea chunks de navegación para lazy loading
    */
-  createNavigationChunks(
-    items: INavItemEnhanced[],
-  ): Observable<NavigationChunk[]> {
+  createNavigationChunks(items: INavItemEnhanced[]): Observable<NavigationChunk[]> {
     if (items.length <= this.config.lazyLoadThreshold) {
       // No necesita lazy loading, devolver todo como un chunk
       const singleChunk: NavigationChunk = {
@@ -185,9 +170,7 @@ export class NavigationPerformanceService {
       this.navigationChunks.set('main', singleChunk);
       this.chunksSubject.next(new Map(this.navigationChunks));
 
-      return this.chunksSubject
-        .asObservable()
-        .pipe(map((chunks) => Array.from(chunks.values())));
+      return this.chunksSubject.asObservable().pipe(map((chunks) => Array.from(chunks.values())));
     }
 
     // Crear chunks basados en prioridad y agrupación lógica
@@ -206,9 +189,7 @@ export class NavigationPerformanceService {
 
     this.chunksSubject.next(new Map(this.navigationChunks));
 
-    return this.chunksSubject
-      .asObservable()
-      .pipe(map((chunks) => Array.from(chunks.values())));
+    return this.chunksSubject.asObservable().pipe(map((chunks) => Array.from(chunks.values())));
   }
 
   /**
@@ -242,7 +223,7 @@ export class NavigationPerformanceService {
 
         return chunk;
       }),
-      shareReplay(1),
+      shareReplay(1)
     );
   }
 
@@ -250,7 +231,7 @@ export class NavigationPerformanceService {
    * Optimiza actualizaciones de badges con debounce y batching
    */
   optimizeBadgeUpdates(
-    badgeUpdates: Observable<Map<string, number>>,
+    badgeUpdates: Observable<Map<string, number>>
   ): Observable<Map<string, number>> {
     return badgeUpdates.pipe(
       debounceTime(this.config.badgeUpdateDebounce),
@@ -265,7 +246,7 @@ export class NavigationPerformanceService {
         return updates;
       }),
       distinctUntilChanged((prev, curr) => this.areBadgeMapsEqual(prev, curr)),
-      shareReplay(1),
+      shareReplay(1)
     );
   }
 
@@ -274,7 +255,7 @@ export class NavigationPerformanceService {
    */
   getOptimizedNavigationItems(
     items: INavItemEnhanced[],
-    userRole: UserRole,
+    userRole: UserRole
   ): Observable<INavItemEnhanced[]> {
     const startTime = performance.now();
 
@@ -293,7 +274,7 @@ export class NavigationPerformanceService {
 
         // Aplicar filtrado de permisos memoizado
         const filteredItems = allItems.filter((item) =>
-          this.checkPermissionMemoized(item, userRole),
+          this.checkPermissionMemoized(item, userRole)
         );
 
         // Actualizar estadísticas de rendimiento
@@ -305,7 +286,7 @@ export class NavigationPerformanceService {
       }),
       debounceTime(this.config.renderDebounce),
       distinctUntilChanged(),
-      shareReplay(1),
+      shareReplay(1)
     );
   }
 
@@ -429,9 +410,7 @@ export class NavigationPerformanceService {
   private cleanupCacheIfNeeded(): void {
     if (this.permissionCache.size > this.config.permissionCacheSize) {
       // Mantener solo las entradas más recientes
-      const keysToKeep = this.cacheAccessOrder.slice(
-        -this.config.permissionCacheSize,
-      );
+      const keysToKeep = this.cacheAccessOrder.slice(-this.config.permissionCacheSize);
       const newCache = new Map<string, PermissionCacheEntry>();
 
       keysToKeep.forEach((key) => {
@@ -522,16 +501,12 @@ export class NavigationPerformanceService {
   /**
    * Crea lotes de actualizaciones de badges
    */
-  private createBadgeUpdateBatches(
-    updates: Map<string, number>,
-  ): Map<string, number>[] {
+  private createBadgeUpdateBatches(updates: Map<string, number>): Map<string, number>[] {
     const batches: Map<string, number>[] = [];
     const entries = Array.from(updates.entries());
 
     for (let i = 0; i < entries.length; i += this.config.badgeUpdateBatchSize) {
-      const batch = new Map(
-        entries.slice(i, i + this.config.badgeUpdateBatchSize),
-      );
+      const batch = new Map(entries.slice(i, i + this.config.badgeUpdateBatchSize));
       batches.push(batch);
     }
 
@@ -541,10 +516,7 @@ export class NavigationPerformanceService {
   /**
    * Compara dos mapas de badges para detectar cambios
    */
-  private areBadgeMapsEqual(
-    map1: Map<string, number>,
-    map2: Map<string, number>,
-  ): boolean {
+  private areBadgeMapsEqual(map1: Map<string, number>, map2: Map<string, number>): boolean {
     if (map1.size !== map2.size) return false;
 
     for (const [key, value] of map1) {
@@ -559,8 +531,7 @@ export class NavigationPerformanceService {
    */
   private updateRenderTime(renderTime: number): void {
     // Calcular promedio móvil simple
-    this.stats.averageRenderTime =
-      (this.stats.averageRenderTime + renderTime) / 2;
+    this.stats.averageRenderTime = (this.stats.averageRenderTime + renderTime) / 2;
   }
 
   /**
@@ -569,12 +540,10 @@ export class NavigationPerformanceService {
   private updateMemoryStats(): void {
     this.stats.memoryUsage = {
       cacheSize: this.permissionCache.size,
-      chunksLoaded: Array.from(this.navigationChunks.values()).filter(
-        (c) => c.loaded,
-      ).length,
+      chunksLoaded: Array.from(this.navigationChunks.values()).filter((c) => c.loaded).length,
       totalItems: Array.from(this.navigationChunks.values()).reduce(
         (sum, chunk) => sum + chunk.items.length,
-        0,
+        0
       ),
     };
   }
@@ -650,10 +619,7 @@ export class NavigationPerformanceService {
   /**
    * Calcula si un elemento tiene permisos para un rol específico
    */
-  private calculateItemPermission(
-    item: INavItemEnhanced,
-    userRole: UserRole,
-  ): boolean {
+  private calculateItemPermission(item: INavItemEnhanced, userRole: UserRole): boolean {
     // Si el item tiene roles requeridos específicos, verificar contra esos
     if (item.requiredRoles && item.requiredRoles.length > 0) {
       return item.requiredRoles.includes(userRole);

@@ -18,9 +18,7 @@
           role="alert"
         >
           <span>{{ error }}</span>
-          <button cButton color="danger" size="sm" (click)="load()">
-            Reintentar
-          </button>
+          <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
         </div>
       }
 
@@ -50,11 +48,7 @@
               Avanzado
             </button>
           </c-col>
-          <c-col
-            xs="12"
-            md="4"
-            class="d-flex justify-content-md-end gap-2 align-items-center"
-          >
+          <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
             <select
               cSelect
               [ngModel]="pageSize"
@@ -90,14 +84,10 @@
                 <select
                   cSelect
                   class="form-select-sm"
-                  [value]="
-                    filtroActivo === null ? '' : filtroActivo ? 'true' : 'false'
-                  "
+                  [value]="filtroActivo === null ? '' : filtroActivo ? 'true' : 'false'"
                   (change)="
                     filtroActivo =
-                      $any($event.target).value === ''
-                        ? null
-                        : $any($event.target).value === 'true'
+                      $any($event.target).value === '' ? null : $any($event.target).value === 'true'
                   "
                   [disabled]="loading"
                 >
@@ -106,11 +96,7 @@
                   <option value="false">No</option>
                 </select>
               </c-col>
-              <c-col
-                xs="12"
-                md="12"
-                class="d-flex justify-content-md-end gap-2"
-              >
+              <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
                 <button
                   cButton
                   size="sm"
@@ -140,11 +126,7 @@
           @if (loading) {
             <div
               class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-              style="
-                z-index: 10;
-                background-color: rgba(255, 255, 255, 0.8);
-                min-height: 200px;
-              "
+              style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
             >
               <div class="text-center">
                 <c-spinner [attr.aria-label]="'Cargando temas'"></c-spinner>
@@ -166,13 +148,9 @@
               <thead cTableColor="light">
                 <tr>
                   <th scope="col" style="min-width: 200px">Nombre</th>
-                  <th scope="col" class="text-center" style="min-width: 90px">
-                    Activo
-                  </th>
+                  <th scope="col" class="text-center" style="min-width: 90px">Activo</th>
                   <th scope="col" style="min-width: 200px">Esquema</th>
-                  <th scope="col" class="text-center" style="min-width: 100px">
-                    Acciones
-                  </th>
+                  <th scope="col" class="text-center" style="min-width: 100px">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -196,11 +174,7 @@
                       >
                     </td>
                     <td class="text-center">
-                      <div
-                        class="btn-group"
-                        role="group"
-                        aria-label="Acciones de tema"
-                      >
+                      <div class="btn-group" role="group" aria-label="Acciones de tema">
                         <button
                           cButton
                           color="warning"
@@ -229,19 +203,10 @@
                 @if (pagedTemas.length === 0) {
                   <tr>
                     <td colspan="4" class="text-center py-5">
-                      <div
-                        class="d-flex flex-column align-items-center justify-content-center"
-                      >
-                        <svg
-                          cIcon
-                          name="cilSearch"
-                          size="3xl"
-                          class="text-muted mb-3"
-                        ></svg>
+                      <div class="d-flex flex-column align-items-center justify-content-center">
+                        <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
                         <h6 class="text-muted">No se han encontrado temas</h6>
-                        <p class="text-muted small">
-                          Intenta ajustar los filtros de búsqueda
-                        </p>
+                        <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                       </div>
                     </td>
                   </tr>
@@ -261,16 +226,8 @@
 
             @if (pagedTemas.length > 0) {
               <c-row class="mt-2">
-                <c-col
-                  class="d-flex justify-content-end align-items-center gap-2"
-                >
-                  <button
-                    cButton
-                    color="light"
-                    size="sm"
-                    (click)="prev()"
-                    [disabled]="pageNo <= 0"
-                  >
+                <c-col class="d-flex justify-content-end align-items-center gap-2">
+                  <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo <= 0">
                     Anterior
                   </button>
                   <button
@@ -321,8 +278,6 @@
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="closeModal()">Cancelar</button>
-    <button cButton color="primary" [disabled]="form.invalid" (click)="save()">
-      Guardar
-    </button>
+    <button cButton color="primary" [disabled]="form.invalid" (click)="save()">Guardar</button>
   </c-modal-footer>
 </c-modal>

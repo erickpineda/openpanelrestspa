@@ -31,9 +31,7 @@
           role="alert"
         >
           <span>{{ error }}</span>
-          <button cButton color="danger" size="sm" (click)="load()">
-            Reintentar
-          </button>
+          <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
         </div>
       }
 
@@ -63,11 +61,7 @@
               Avanzado
             </button>
           </c-col>
-          <c-col
-            xs="12"
-            md="4"
-            class="d-flex justify-content-md-end gap-2 align-items-center"
-          >
+          <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
             <select
               cSelect
               [ngModel]="pageSize"
@@ -120,11 +114,7 @@
                   [disabled]="loading"
                 />
               </c-col>
-              <c-col
-                xs="12"
-                md="12"
-                class="d-flex justify-content-md-end gap-2"
-              >
+              <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
                 <button
                   cButton
                   size="sm"
@@ -154,11 +144,7 @@
           @if (loading) {
             <div
               class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-              style="
-                z-index: 10;
-                background-color: rgba(255, 255, 255, 0.8);
-                min-height: 200px;
-              "
+              style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
             >
               <div class="text-center">
                 <c-spinner [attr.aria-label]="'Cargando archivos'"></c-spinner>
@@ -180,15 +166,9 @@
               <thead cTableColor="light">
                 <tr>
                   <th scope="col" style="min-width: 200px">Nombre</th>
-                  <th scope="col" class="text-end" style="min-width: 120px">
-                    Tamaño
-                  </th>
-                  <th scope="col" class="text-center" style="min-width: 160px">
-                    Fecha
-                  </th>
-                  <th scope="col" class="text-center" style="min-width: 110px">
-                    Acciones
-                  </th>
+                  <th scope="col" class="text-end" style="min-width: 120px">Tamaño</th>
+                  <th scope="col" class="text-center" style="min-width: 160px">Fecha</th>
+                  <th scope="col" class="text-center" style="min-width: 110px">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -207,11 +187,7 @@
                       {{ f.fechaCreacion | date: 'dd-MM-yyyy HH:mm' }}
                     </td>
                     <td class="text-center">
-                      <div
-                        class="btn-group"
-                        role="group"
-                        aria-label="Acciones de archivo"
-                      >
+                      <div class="btn-group" role="group" aria-label="Acciones de archivo">
                         <button
                           cButton
                           color="secondary"
@@ -231,21 +207,10 @@
                 @if (items.length === 0) {
                   <tr>
                     <td colspan="4" class="text-center py-5">
-                      <div
-                        class="d-flex flex-column align-items-center justify-content-center"
-                      >
-                        <svg
-                          cIcon
-                          name="cilSearch"
-                          size="3xl"
-                          class="text-muted mb-3"
-                        ></svg>
-                        <h6 class="text-muted">
-                          No se han encontrado archivos
-                        </h6>
-                        <p class="text-muted small">
-                          Intenta ajustar los filtros de búsqueda
-                        </p>
+                      <div class="d-flex flex-column align-items-center justify-content-center">
+                        <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
+                        <h6 class="text-muted">No se han encontrado archivos</h6>
+                        <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                       </div>
                     </td>
                   </tr>
@@ -265,30 +230,16 @@
 
             @if (totalElements > 0) {
               <c-row class="mt-2">
-                <c-col
-                  class="d-flex justify-content-end align-items-center gap-2"
-                >
-                  <button
-                    cButton
-                    color="light"
-                    size="sm"
-                    (click)="prev()"
-                    [disabled]="!canPrev"
-                  >
+                <c-col class="d-flex justify-content-end align-items-center gap-2">
+                  <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">
                     Anterior
                   </button>
-                  <button
-                    cButton
-                    color="light"
-                    size="sm"
-                    (click)="next()"
-                    [disabled]="!canNext"
-                  >
+                  <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">
                     Siguiente
                   </button>
                   <div class="text-muted small ms-2">
-                    Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
-                    {{ totalElements }} · Mostrando {{ numberOfElements }}
+                    Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} ·
+                    Mostrando {{ numberOfElements }}
                   </div>
                 </c-col>
               </c-row>

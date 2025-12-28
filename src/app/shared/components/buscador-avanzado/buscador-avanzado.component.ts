@@ -251,7 +251,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    */
   public get campoActual(): BuscadorCampoDef | undefined {
     return this.adaptedDefs?.campos?.find(
-      (c: BuscadorCampoDef) => c.key === this.campoSeleccionado,
+      (c: BuscadorCampoDef) => c.key === this.campoSeleccionado
     );
   }
 
@@ -284,9 +284,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Determina si se debe mostrar el botón de búsqueda, considerando compatibilidad con showButton.
    */
   public debeMostrarBotonBusqueda(): boolean {
-    return this.showSearchButton !== undefined
-      ? this.showSearchButton
-      : this.showButton;
+    return this.showSearchButton !== undefined ? this.showSearchButton : this.showButton;
   }
 
   /**
@@ -358,8 +356,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
         this.catalogOptions = { ...mapped };
       },
       error: (err) => {
-        this.catalogosError =
-          'Error al cargar catálogos. Intente recargar la página.';
+        this.catalogosError = 'Error al cargar catálogos. Intente recargar la página.';
         console.error('Error cargando catálogos:', err);
       },
     });
@@ -400,8 +397,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     // Determinar campo inicial: preferir el `defaultField` provisto por el padre si existe en las definiciones;
     // en caso contrario usar el primer campo disponible.
     const defaultProvided =
-      this.defaultField &&
-      this.camposDisponibles.some((cd: any) => cd.valor === this.defaultField);
+      this.defaultField && this.camposDisponibles.some((cd: any) => cd.valor === this.defaultField);
     let campoInicial = defaultProvided
       ? this.defaultField!
       : this.camposDisponibles[0]?.valor || '';
@@ -415,9 +411,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     ) {
       const first = ejemplo.searchCriteriaList[0];
       const ejemploKey = first.filterKey;
-      const permitido = this.camposDisponibles.some(
-        (cd: any) => cd.valor === ejemploKey,
-      );
+      const permitido = this.camposDisponibles.some((cd: any) => cd.valor === ejemploKey);
       if (ejemploKey && permitido) {
         campoInicial = ejemploKey;
       }
@@ -429,7 +423,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
 
     // Si hay campos de catálogo definidos y función de carga, cargar catálogos
     const contieneCamposCatalogo = this.camposDisponibles.some((cd) =>
-      this.camposCatalogo.includes(cd.valor),
+      this.camposCatalogo.includes(cd.valor)
     );
     if (contieneCamposCatalogo && this.cargarCatalogosFn) {
       this.cargarCatalogosGenerico();
@@ -444,19 +438,14 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
       const first = ejemplo.searchCriteriaList[0];
       const opEjemplo = first.operation;
       const valorEjemplo = first.value;
-      const opValida = this.operacionesDisponibles.some(
-        (o: any) => o.valor === opEjemplo,
-      );
+      const opValida = this.operacionesDisponibles.some((o: any) => o.valor === opEjemplo);
       if (opEjemplo && opValida) {
         this.operacionSeleccionada = opEjemplo;
       }
       // No prefijar el input con el valor de ejemplo: usarlo como placeholder si el placeholder
       // actual es el por defecto. Dejar valorBusqueda vacío para que el usuario escriba.
       const DEFAULT_PLACEHOLDER = 'Ingrese valor a buscar';
-      if (
-        valorEjemplo !== undefined &&
-        this.placeholder === DEFAULT_PLACEHOLDER
-      ) {
+      if (valorEjemplo !== undefined && this.placeholder === DEFAULT_PLACEHOLDER) {
         this.placeholder = valorEjemplo;
       }
     }
@@ -476,9 +465,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
       this.operacionSeleccionada = '';
       return;
     }
-    const campoDef = this.adaptedDefs.campos.find(
-      (c) => c.key === this.campoSeleccionado,
-    );
+    const campoDef = this.adaptedDefs.campos.find((c) => c.key === this.campoSeleccionado);
     const operacionesCampo = (campoDef?.operaciones || [])
       .map((op: any) => ({ nombre: op.label, valor: op.value }))
       .sort((a: any, b: any) => a.nombre.localeCompare(b.nombre));

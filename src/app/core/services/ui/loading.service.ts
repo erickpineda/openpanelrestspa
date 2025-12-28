@@ -27,7 +27,7 @@ export class LoadingService {
   public state$ = this.stateSubject.asObservable();
   public globalLoading$: Observable<boolean> = this.state$.pipe(
     map((state) => state.global),
-    distinctUntilChanged(),
+    distinctUntilChanged()
   );
 
   private httpRequestCount = 0;
@@ -46,7 +46,7 @@ export class LoadingService {
 
   constructor(
     private logger: LoggerService,
-    private notifications: NotificationService,
+    private notifications: NotificationService
   ) {}
 
   setGlobalLoading(loading: boolean, requestId?: string): void {
@@ -108,9 +108,7 @@ export class LoadingService {
         const msg = 'Tiempo de espera agotado. El servidor no responde.';
         this.setError(msg, 'TIMEOUT');
         this.notifications.error(msg, 'Error de conexión');
-        this.logger.error(
-          'Loading global timeout alcanzado (30s): backend no responde',
-        );
+        this.logger.error('Loading global timeout alcanzado (30s): backend no responde');
         // Detener loader
         this.forceStopLoading();
       }

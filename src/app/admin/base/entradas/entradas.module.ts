@@ -29,10 +29,6 @@ import { EntradasSharedModule } from './entradas-shared.module';
     MediaSharedModule,
     EntradasSharedModule,
   ],
-  declarations: [
-    ListadoEntradasComponent,
-    CrearEntradaComponent,
-    EditarEntradaComponent,
-  ],
+  declarations: [ListadoEntradasComponent, CrearEntradaComponent, EditarEntradaComponent],
 })
 export class EntradasModule {}

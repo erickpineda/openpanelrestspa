@@ -1,8 +1,4 @@
-import {
-  UserRole,
-  NavigationTheme,
-  BadgeConfig,
-} from '../types/navigation.types';
+import { UserRole, NavigationTheme, BadgeConfig } from '../types/navigation.types';
 
 /**
  * Constantes para configuración de navegación
@@ -165,8 +161,7 @@ export const NavigationConstants = {
     PERMISSION_DENIED: 'No tiene permisos para acceder a esta sección',
     COUNTER_SERVICE_UNAVAILABLE: 'El servicio de contadores no está disponible',
     CONFIGURATION_INVALID: 'La configuración de navegación es inválida',
-    RESPONSIVE_ADAPTATION_FAILED:
-      'Error al adaptar la navegación para este dispositivo',
+    RESPONSIVE_ADAPTATION_FAILED: 'Error al adaptar la navegación para este dispositivo',
   } as const,
 
   /**

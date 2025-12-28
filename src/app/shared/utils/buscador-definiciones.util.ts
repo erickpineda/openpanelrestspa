@@ -3,10 +3,7 @@
 // mapeo de operaciones cortas -> tokens del backend. Devuelve también metadatos útiles.
 
 import { traducirCampoPorEntidad } from './buscador-traducciones.util';
-import {
-  obtenerTipoCampoBuscador,
-  TipoCampoBuscador,
-} from './buscador-tipos-campos.util';
+import { obtenerTipoCampoBuscador, TipoCampoBuscador } from './buscador-tipos-campos.util';
 
 const TRADUCCIONES_OPERACIONES: Record<string, string> = {
   CONTAINS: 'Contiene',
@@ -74,7 +71,7 @@ export function getBuscadorDefinicionesAmigables(
   opciones?: {
     camposMostrar?: string[]; // Si quieres limitar los campos
     camposOrden?: string[]; // Si quieres forzar un orden
-  },
+  }
 ): BuscadorDefinicionesAdaptadas {
   if (!defs) return { campos: [] };
   // Aceptar tanto el objeto completo ({result, data}) como directamente el `data`
@@ -90,9 +87,7 @@ export function getBuscadorDefinicionesAmigables(
   }
   // Ordenar si se indica
   if (opciones?.camposOrden) {
-    campos = opciones.camposOrden.concat(
-      campos.filter((c) => !opciones.camposOrden!.includes(c)),
-    );
+    campos = opciones.camposOrden.concat(campos.filter((c) => !opciones.camposOrden!.includes(c)));
   }
 
   // Mapear a estructura amigable

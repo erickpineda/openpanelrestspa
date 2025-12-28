@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  ElementRef,
-  Renderer2,
-  RendererFactory2,
-} from '@angular/core';
+import { Injectable, ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
 import { Observable, Subject, timer } from 'rxjs';
 
 /**
@@ -29,13 +24,7 @@ export interface AnimationConfig {
   type: NavigationAnimationType;
   duration?: number;
   delay?: number;
-  easing?:
-    | 'ease'
-    | 'ease-in'
-    | 'ease-out'
-    | 'ease-in-out'
-    | 'bounce'
-    | 'elastic';
+  easing?: 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'bounce' | 'elastic';
   infinite?: boolean;
 }
 
@@ -97,10 +86,7 @@ export class NavigationAnimationService {
 
       // Configurar variables CSS personalizadas
       if (config.duration) {
-        element.style.setProperty(
-          '--nav-transition-duration',
-          `${config.duration}ms`,
-        );
+        element.style.setProperty('--nav-transition-duration', `${config.duration}ms`);
       }
 
       // Registrar animación activa
@@ -150,9 +136,7 @@ export class NavigationAnimationService {
   /**
    * Anima múltiples elementos en secuencia
    */
-  animateSequence(
-    animations: { element: HTMLElement; config: AnimationConfig }[],
-  ): Promise<void> {
+  animateSequence(animations: { element: HTMLElement; config: AnimationConfig }[]): Promise<void> {
     return animations.reduce((promise, { element, config }) => {
       return promise.then(() => this.animate(element, config));
     }, Promise.resolve());
@@ -162,11 +146,9 @@ export class NavigationAnimationService {
    * Anima múltiples elementos en paralelo
    */
   animateParallel(
-    animations: { element: HTMLElement; config: AnimationConfig }[],
+    animations: { element: HTMLElement; config: AnimationConfig }[]
   ): Promise<void[]> {
-    const promises = animations.map(({ element, config }) =>
-      this.animate(element, config),
-    );
+    const promises = animations.map(({ element, config }) => this.animate(element, config));
     return Promise.all(promises);
   }
 
@@ -176,7 +158,7 @@ export class NavigationAnimationService {
   animateStagger(
     elements: HTMLElement[],
     config: AnimationConfig,
-    staggerDelay: number = 100,
+    staggerDelay: number = 100
   ): Promise<void[]> {
     const animations = elements.map((element, index) => ({
       element,
@@ -256,9 +238,7 @@ export class NavigationAnimationService {
    * Obtiene el tipo de animación activa de un elemento
    */
   getActiveAnimationType(element: HTMLElement): NavigationAnimationType | null {
-    return (
-      (this.activeAnimations.get(element) as NavigationAnimationType) || null
-    );
+    return (this.activeAnimations.get(element) as NavigationAnimationType) || null;
   }
 
   /**

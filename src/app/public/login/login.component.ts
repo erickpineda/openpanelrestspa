@@ -1,10 +1,5 @@
 // src/app/public/login/login.component.ts
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { cilUser, cilLockLocked } from '@coreui/icons';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
@@ -34,7 +29,7 @@ export class LoginComponent implements OnInit {
     private router: Router, // ✅ Usar Router en lugar del servicio custom
     private authSync: AuthSyncService,
     private cdr: ChangeDetectorRef,
-    private postLoginRedirect: PostLoginRedirectService,
+    private postLoginRedirect: PostLoginRedirectService
   ) {}
 
   ngOnInit(): void {
@@ -73,8 +68,7 @@ export class LoginComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.errorMessage =
-          err.error?.message ?? err.message ?? 'Error en el login';
+        this.errorMessage = err.error?.message ?? err.message ?? 'Error en el login';
         this.isLoginFailed = true;
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -94,11 +88,7 @@ export class LoginComponent implements OnInit {
           setTimeout(() => {
             try {
               const current = window.location.pathname + window.location.hash;
-              if (
-                !(
-                  current.indexOf('#' + target) >= 0 || current.endsWith(target)
-                )
-              ) {
+              if (!(current.indexOf('#' + target) >= 0 || current.endsWith(target))) {
                 try {
                   window.location.hash = target;
                 } catch (e) {

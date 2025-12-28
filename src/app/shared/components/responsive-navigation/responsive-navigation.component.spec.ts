@@ -58,9 +58,7 @@ describe('ResponsiveNavigationComponent', () => {
   ];
 
   beforeEach(async () => {
-    responsiveStateSubject = new BehaviorSubject<ResponsiveState>(
-      mockResponsiveState,
-    );
+    responsiveStateSubject = new BehaviorSubject<ResponsiveState>(mockResponsiveState);
 
     const responsiveNavSpy = jasmine.createSpyObj(
       'ResponsiveNavigationService',
@@ -74,12 +72,10 @@ describe('ResponsiveNavigationComponent', () => {
       ],
       {
         responsiveState$: responsiveStateSubject.asObservable(),
-      },
+      }
     );
 
-    const navSpy = jasmine.createSpyObj('NavigationService', [
-      'getNavigationItems',
-    ]);
+    const navSpy = jasmine.createSpyObj('NavigationService', ['getNavigationItems']);
 
     responsiveNavSpy.getCurrentState.and.returnValue(mockResponsiveState);
     responsiveNavSpy.adaptNavigationItems.and.returnValue(mockNavItems);
@@ -104,11 +100,9 @@ describe('ResponsiveNavigationComponent', () => {
     }).compileComponents();
 
     mockResponsiveNavigationService = TestBed.inject(
-      ResponsiveNavigationService,
+      ResponsiveNavigationService
     ) as jasmine.SpyObj<ResponsiveNavigationService>;
-    mockNavigationService = TestBed.inject(
-      NavigationService,
-    ) as jasmine.SpyObj<NavigationService>;
+    mockNavigationService = TestBed.inject(NavigationService) as jasmine.SpyObj<NavigationService>;
   });
 
   beforeEach(() => {
@@ -140,9 +134,7 @@ describe('ResponsiveNavigationComponent', () => {
     });
 
     it('should load navigation items on init', () => {
-      expect(mockNavigationService.getNavigationItems).toHaveBeenCalledWith(
-        UserRole.ADMINISTRADOR,
-      );
+      expect(mockNavigationService.getNavigationItems).toHaveBeenCalledWith(UserRole.ADMINISTRADOR);
     });
   });
 
@@ -156,9 +148,7 @@ describe('ResponsiveNavigationComponent', () => {
     it('should collapse sidebar', () => {
       component.collapseSidebar();
 
-      expect(
-        mockResponsiveNavigationService.collapseSidebar,
-      ).toHaveBeenCalled();
+      expect(mockResponsiveNavigationService.collapseSidebar).toHaveBeenCalled();
     });
 
     it('should expand sidebar', () => {
@@ -173,7 +163,7 @@ describe('ResponsiveNavigationComponent', () => {
       component.toggleSidebar();
 
       expect(component.sidebarToggle.emit).toHaveBeenCalledWith(
-        mockResponsiveState.sidebarCollapsed,
+        mockResponsiveState.sidebarCollapsed
       );
     });
   });
@@ -195,9 +185,7 @@ describe('ResponsiveNavigationComponent', () => {
         sidebarCollapsed: false,
       };
 
-      mockResponsiveNavigationService.getCurrentState.and.returnValue(
-        mobileState,
-      );
+      mockResponsiveNavigationService.getCurrentState.and.returnValue(mobileState);
 
       component.onNavigationItemClick(mockNavItems[0]);
 
@@ -207,9 +195,7 @@ describe('ResponsiveNavigationComponent', () => {
     it('should not auto-collapse on desktop after navigation', () => {
       component.onNavigationItemClick(mockNavItems[0]);
 
-      expect(
-        mockResponsiveNavigationService.toggleSidebar,
-      ).not.toHaveBeenCalled();
+      expect(mockResponsiveNavigationService.toggleSidebar).not.toHaveBeenCalled();
     });
   });
 
@@ -234,9 +220,7 @@ describe('ResponsiveNavigationComponent', () => {
       };
 
       const titleItem = mockNavItems.find((item) => item.title);
-      const dashboardItem = mockNavItems.find(
-        (item) => item.name === 'Dashboard',
-      );
+      const dashboardItem = mockNavItems.find((item) => item.name === 'Dashboard');
       const entriesItem = mockNavItems.find((item) => item.name === 'Entries');
 
       expect(component.shouldShowItem(titleItem!, mobileState)).toBe(true);
@@ -260,9 +244,7 @@ describe('ResponsiveNavigationComponent', () => {
         },
       };
 
-      expect(component.shouldShowItem(itemWithHideConfig, mobileState)).toBe(
-        false,
-      );
+      expect(component.shouldShowItem(itemWithHideConfig, mobileState)).toBe(false);
     });
   });
 
@@ -324,12 +306,9 @@ describe('ResponsiveNavigationComponent', () => {
 
     it('should generate correct classes for items with children', () => {
       const itemWithChildren = mockNavItems.find(
-        (item) => item.children && item.children.length > 0,
+        (item) => item.children && item.children.length > 0
       )!;
-      const classes = component.getItemClasses(
-        itemWithChildren,
-        mockResponsiveState,
-      );
+      const classes = component.getItemClasses(itemWithChildren, mockResponsiveState);
 
       expect(classes).toContain('nav-item');
       expect(classes).toContain('has-children');
@@ -379,12 +358,8 @@ describe('ResponsiveNavigationComponent', () => {
         sidebarCollapsed: false,
       };
 
-      expect(component.getToggleButtonText(mobileCollapsed)).toBe(
-        'Mostrar menú',
-      );
-      expect(component.getToggleButtonText(mobileExpanded)).toBe(
-        'Ocultar menú',
-      );
+      expect(component.getToggleButtonText(mobileCollapsed)).toBe('Mostrar menú');
+      expect(component.getToggleButtonText(mobileExpanded)).toBe('Ocultar menú');
     });
 
     it('should generate correct toggle button text for desktop', () => {
@@ -400,12 +375,8 @@ describe('ResponsiveNavigationComponent', () => {
         sidebarCollapsed: false,
       };
 
-      expect(component.getToggleButtonText(desktopCollapsed)).toBe(
-        'Expandir sidebar',
-      );
-      expect(component.getToggleButtonText(desktopExpanded)).toBe(
-        'Colapsar sidebar',
-      );
+      expect(component.getToggleButtonText(desktopCollapsed)).toBe('Expandir sidebar');
+      expect(component.getToggleButtonText(desktopExpanded)).toBe('Colapsar sidebar');
     });
   });
 
@@ -449,9 +420,10 @@ describe('ResponsiveNavigationComponent', () => {
 
       responsiveStateSubject.next(newState);
 
-      expect(
-        mockResponsiveNavigationService.adaptNavigationItems,
-      ).toHaveBeenCalledWith(component.navigationItems, newState);
+      expect(mockResponsiveNavigationService.adaptNavigationItems).toHaveBeenCalledWith(
+        component.navigationItems,
+        newState
+      );
     });
 
     it('should adapt navigation when navigation items change', () => {
@@ -468,9 +440,10 @@ describe('ResponsiveNavigationComponent', () => {
       // Trigger ngOnInit again
       component.ngOnInit();
 
-      expect(
-        mockResponsiveNavigationService.adaptNavigationItems,
-      ).toHaveBeenCalledWith(newItems, mockResponsiveState);
+      expect(mockResponsiveNavigationService.adaptNavigationItems).toHaveBeenCalledWith(
+        newItems,
+        mockResponsiveState
+      );
     });
   });
 });

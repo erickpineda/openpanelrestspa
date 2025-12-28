@@ -24,23 +24,20 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private entradaService: EntradaService,
-    private log: LoggerService,
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
     this.obtenerListaEntradas()
       .then((listaRes: Entrada[]) => {
         listaRes.forEach((entradaRes) => {
-          entradaRes.categoriasConComas = entradaRes.categorias
-            .map((e) => e.nombre)
-            .join(', ');
+          entradaRes.categoriasConComas = entradaRes.categorias.map((e) => e.nombre).join(', ');
         });
         this.refreshEntradas(); // Refrescar las entradas después de obtener la lista
       })
       .catch((error) => {
         this.log.error('Error al obtener lista de entradas:', error.message);
-        this.errorMsg =
-          'No se pudieron cargar las entradas, intenta nuevamente más tarde.';
+        this.errorMsg = 'No se pudieron cargar las entradas, intenta nuevamente más tarde.';
         this.log.error(this.errorMsg);
       });
   }
@@ -73,7 +70,7 @@ export class HomeComponent implements OnInit {
   refreshEntradas() {
     this.pagedEntradas = this.entradas.slice(
       (this.page - 1) * this.pageSize,
-      (this.page - 1) * this.pageSize + this.pageSize,
+      (this.page - 1) * this.pageSize + this.pageSize
     );
   }
 

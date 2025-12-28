@@ -32,7 +32,7 @@ export class CrearPaginaComponent implements OnInit {
     private facade: EntradaFacadeService,
     private router: Router,
     private toastService: ToastService,
-    private log: LoggerService,
+    private log: LoggerService
   ) {
     this.entradaForm = this.vf.buildForm();
   }
@@ -71,10 +71,7 @@ export class CrearPaginaComponent implements OnInit {
 
     this.facade.crearEntrada(ent).subscribe({
       next: () => {
-        this.toastService.showInfo(
-          'Se ha creado la página correctamente',
-          'Página creada',
-        );
+        this.toastService.showInfo('Se ha creado la página correctamente', 'Página creada');
         this.router.navigateByUrl('/admin/control/paginas');
       },
       error: (error) => {

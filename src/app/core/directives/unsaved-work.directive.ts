@@ -16,16 +16,14 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
   constructor(
     private el: ElementRef,
     private unsavedWorkService: UnsavedWorkService,
-    private log: LoggerService,
+    private log: LoggerService
   ) {}
 
   ngOnInit(): void {
     const form = this.el.nativeElement;
     this.formId = this.appUnsavedWork || `form-${Date.now()}`;
 
-    this.log.info(
-      `📝 UnsavedWorkDirective: Registrando formulario: ${this.formId}`,
-    );
+    this.log.info(`📝 UnsavedWorkDirective: Registrando formulario: ${this.formId}`);
 
     // Guardar estado inicial
     this.initialFormData = this.getFormData(form);
@@ -42,9 +40,7 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     form.classList.add('unsaved-work-tracked');
     form.setAttribute('data-tracked-form', this.formId);
 
-    this.log.info(
-      `✅ UnsavedWorkDirective: Formulario ${this.formId} registrado`,
-    );
+    this.log.info(`✅ UnsavedWorkDirective: Formulario ${this.formId} registrado`);
   }
 
   ngOnDestroy(): void {
@@ -52,17 +48,12 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
   }
 
   private saveToLocalStorage(): void {
-    const forms = JSON.parse(
-      localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}',
-    );
+    const forms = JSON.parse(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}');
     forms[this.formId] = {
       initialData: this.initialFormData,
       hasChanges: false,
     };
-    localStorage.setItem(
-      OPConstants.Storage.UNSAVED_FORMS_KEY,
-      JSON.stringify(forms),
-    );
+    localStorage.setItem(OPConstants.Storage.UNSAVED_FORMS_KEY, JSON.stringify(forms));
   }
 
   private setupMutationObserver(form: any): void {
@@ -97,10 +88,7 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
 
   private checkFormChanges(form: any): void {
     const currentData = this.getFormData(form);
-    const hasChanges = this.hasFormDataChanged(
-      this.initialFormData,
-      currentData,
-    );
+    const hasChanges = this.hasFormDataChanged(this.initialFormData, currentData);
 
     if (hasChanges) {
       this.markFormAsUnsaved(form, currentData);
@@ -144,16 +132,11 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     this.unsavedWorkService.updateFormValue(this.formId, currentData);
 
     // Actualizar en localStorage
-    const forms = JSON.parse(
-      localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}',
-    );
+    const forms = JSON.parse(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}');
     if (forms[this.formId]) {
       forms[this.formId].hasChanges = true;
       forms[this.formId].currentData = currentData;
-      localStorage.setItem(
-        OPConstants.Storage.UNSAVED_FORMS_KEY,
-        JSON.stringify(forms),
-      );
+      localStorage.setItem(OPConstants.Storage.UNSAVED_FORMS_KEY, JSON.stringify(forms));
     }
   }
 
@@ -164,15 +147,10 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     this.unsavedWorkService.markFormAsSaved(this.formId);
 
     // Actualizar en localStorage
-    const forms = JSON.parse(
-      localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}',
-    );
+    const forms = JSON.parse(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}');
     if (forms[this.formId]) {
       forms[this.formId].hasChanges = false;
-      localStorage.setItem(
-        OPConstants.Storage.UNSAVED_FORMS_KEY,
-        JSON.stringify(forms),
-      );
+      localStorage.setItem(OPConstants.Storage.UNSAVED_FORMS_KEY, JSON.stringify(forms));
     }
   }
 }

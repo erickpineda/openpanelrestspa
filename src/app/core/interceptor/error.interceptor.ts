@@ -16,13 +16,10 @@ import { LoggerService } from '../services/logger.service';
 export class ErrorInterceptor implements HttpInterceptor {
   constructor(
     private errorHandler: GlobalErrorHandlerService,
-    private log: LoggerService,
+    private log: LoggerService
   ) {}
 
-  intercept(
-    request: HttpRequest<any>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<any>> {
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((error: unknown) => {
         // Convertir a HttpErrorResponse si es necesario
@@ -40,7 +37,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         // Propagar el error para que los componentes puedan manejarlo también
         return throwError(() => httpError);
-      }),
+      })
     );
   }
 
@@ -50,8 +47,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     }
 
     // Si no es HttpErrorResponse, crear uno
-    const errorMessage =
-      error instanceof Error ? error.message : 'Error desconocido';
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     return new HttpErrorResponse({
       error: error,
       status: 0, // Unknown status

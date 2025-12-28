@@ -15,31 +15,22 @@ export class NavigationUtils {
   static hasPermission(
     userRole: UserRole,
     functionality: string,
-    customMatrix?: RolePermissionMatrix,
+    customMatrix?: RolePermissionMatrix
   ): boolean {
     const matrix = customMatrix || DEFAULT_PERMISSION_MATRIX;
 
     if (!matrix[functionality]) {
-      console.warn(
-        `Functionality '${functionality}' not found in permission matrix`,
-      );
+      console.warn(`Functionality '${functionality}' not found in permission matrix`);
       return false;
     }
 
-    return (
-      matrix[functionality][
-        userRole as keyof (typeof matrix)[typeof functionality]
-      ] || false
-    );
+    return matrix[functionality][userRole as keyof (typeof matrix)[typeof functionality]] || false;
   }
 
   /**
    * Filtra elementos de navegación basado en los permisos del rol del usuario
    */
-  static filterByPermissions(
-    items: INavItemEnhanced[],
-    userRole: UserRole,
-  ): INavItemEnhanced[] {
+  static filterByPermissions(items: INavItemEnhanced[], userRole: UserRole): INavItemEnhanced[] {
     return items
       .filter((item) => {
         // Si el item tiene roles requeridos específicos, verificar contra esos
@@ -58,10 +49,7 @@ export class NavigationUtils {
       .map((item) => {
         // Recursivamente filtrar children si existen
         if (item.children && item.children.length > 0) {
-          const filteredChildren = this.filterByPermissions(
-            item.children,
-            userRole,
-          );
+          const filteredChildren = this.filterByPermissions(item.children, userRole);
           return {
             ...item,
             children: filteredChildren,
@@ -123,9 +111,7 @@ export class NavigationUtils {
   /**
    * Encuentra elementos de navegación que requieren badges dinámicos
    */
-  static findItemsWithDynamicBadges(
-    items: INavItemEnhanced[],
-  ): INavItemEnhanced[] {
+  static findItemsWithDynamicBadges(items: INavItemEnhanced[]): INavItemEnhanced[] {
     const result: INavItemEnhanced[] = [];
 
     for (const item of items) {
@@ -187,9 +173,7 @@ export class NavigationUtils {
 
     // Verificar children si existen
     if (item.children && item.children.length > 0) {
-      return item.children.some((child) =>
-        this.isItemActive(child, currentUrl),
-      );
+      return item.children.some((child) => this.isItemActive(child, currentUrl));
     }
 
     return false;
@@ -198,10 +182,7 @@ export class NavigationUtils {
   /**
    * Aplica configuración responsiva a elementos de navegación
    */
-  static applyResponsiveConfig(
-    items: INavItemEnhanced[],
-    screenWidth: number,
-  ): INavItemEnhanced[] {
+  static applyResponsiveConfig(items: INavItemEnhanced[], screenWidth: number): INavItemEnhanced[] {
     return items.filter((item) => {
       if (item.responsiveConfig?.hideOnMobile && screenWidth < 768) {
         return false;
@@ -222,10 +203,7 @@ export class NavigationUtils {
   /**
    * Valida que la estructura de navegación no exceda la profundidad máxima permitida
    */
-  static validateNavigationDepth(
-    items: INavItemEnhanced[],
-    currentDepth: number = 0,
-  ): boolean {
+  static validateNavigationDepth(items: INavItemEnhanced[], currentDepth: number = 0): boolean {
     const maxDepth = 2; // Según los requisitos, máximo 2 niveles
 
     // Si la profundidad actual es igual o mayor al máximo, es inválida

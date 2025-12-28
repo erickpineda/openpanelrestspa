@@ -139,10 +139,7 @@ export interface INavigationService {
   toggleSection(sectionId: string): void;
   getActiveSection(): string;
   setContextualActions(itemId: string, actions: IContextualAction[]): void;
-  filterByPermissions(
-    items: INavItemEnhanced[],
-    userRole: UserRole,
-  ): INavItemEnhanced[];
+  filterByPermissions(items: INavItemEnhanced[], userRole: UserRole): INavItemEnhanced[];
 }
 
 /**

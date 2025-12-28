@@ -21,7 +21,7 @@ export class EntradaFacadeService {
   constructor(
     private entradaService: EntradaService,
     private categoriaService: CategoriaService,
-    private usuarioService: UsuarioService,
+    private usuarioService: UsuarioService
   ) {}
 
   // Carga inicial: tipos, estados, categorias en paralelo
@@ -61,9 +61,7 @@ export class EntradaFacadeService {
 
   async getUsuarioSesion(): Promise<PerfilResponse> {
     if (this.usuarioSesion) return this.usuarioSesion;
-    const resp = await firstValueFrom(
-      this.usuarioService.obtenerDatosSesionActualSafe(),
-    );
+    const resp = await firstValueFrom(this.usuarioService.obtenerDatosSesionActualSafe());
     this.usuarioSesion = resp ?? null;
     return this.usuarioSesion;
   }

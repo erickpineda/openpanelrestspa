@@ -27,11 +27,6 @@ import { ChartjsModule } from '@coreui/angular-chartjs';
     DashboardEstadoSplitPanelComponent,
     DashboardSettingsModalComponent,
   ],
-  imports: [
-    CommonModule,
-    DashboardRoutingModule,
-    SharedOPModule,
-    ChartjsModule,
-  ],
+  imports: [CommonModule, DashboardRoutingModule, SharedOPModule, ChartjsModule],
 })
 export class DashboardModule {}

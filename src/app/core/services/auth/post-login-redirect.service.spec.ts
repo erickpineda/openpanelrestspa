@@ -31,9 +31,7 @@ describe('PostLoginRedirectService', () => {
   it('getAndClearRedirectForTab cae a POST_LOGIN_REDIRECT y limpia clave base', () => {
     localStorage.setItem(OPConstants.Session.POST_LOGIN_REDIRECT, '/admin/y');
     expect(service.getAndClearRedirectForTab()).toBe('/admin/y');
-    expect(
-      localStorage.getItem(OPConstants.Session.POST_LOGIN_REDIRECT),
-    ).toBeNull();
+    expect(localStorage.getItem(OPConstants.Session.POST_LOGIN_REDIRECT)).toBeNull();
   });
 
   it('normalizeRoute soporta HashLocationStrategy y rutas relativas', () => {
@@ -50,9 +48,7 @@ describe('PostLoginRedirectService', () => {
     service.markPostLoginHandled();
     expect(service.shouldIgnoreRouteSave()).toBeTrue();
 
-    (Date.now as any).and.returnValue(
-      now + OPConstants.Session.IGNORE_WINDOW_MS + 1,
-    );
+    (Date.now as any).and.returnValue(now + OPConstants.Session.IGNORE_WINDOW_MS + 1);
     expect(service.shouldIgnoreRouteSave()).toBeFalse();
   });
 });

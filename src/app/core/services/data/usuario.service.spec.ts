@@ -1,12 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { UsuarioService } from './usuario.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
@@ -43,12 +37,8 @@ describe('UsuarioService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/usuarios/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe(
-      '1',
-    );
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe(
-      '20',
-    );
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe('1');
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe('20');
     req.flush({ data: { elements: [], totalPages: 0 } });
   });
 
@@ -57,15 +47,9 @@ describe('UsuarioService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/usuarios/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe(
-      '0',
-    );
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe(
-      '10',
-    );
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(
-      true,
-    );
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe('0');
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe('10');
+    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [], totalPages: 0 } });
   });
 
@@ -74,18 +58,14 @@ describe('UsuarioService request shapes', () => {
       expect(p.username).toBe('u');
     });
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/usuarios/perfil/yo'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/usuarios/perfil/yo'));
     expect(req.request.method).toBe('GET');
     req.flush({ data: { username: 'u' } });
   });
 
   it('obtenerDatosSesionActual uses raw GET endpoint', () => {
     service.obtenerDatosSesionActual().subscribe(() => {});
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/usuarios/perfil/yo'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/usuarios/perfil/yo'));
     expect(req.request.method).toBe('GET');
     req.flush({ data: { username: 'u' } });
   });
@@ -95,25 +75,19 @@ describe('UsuarioService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/usuarios/perfil/5'));
     expect(req.request.method).toBe('PATCH');
-    expect(req.request.headers.get('Content-Type')).toBe(
-      'application/json-patch+json',
-    );
+    expect(req.request.headers.get('Content-Type')).toBe('application/json-patch+json');
     req.flush({ result: { success: true }, data: {} });
   });
 
   it('getUsernameActual returns username when available', async () => {
-    spyOn(service, 'obtenerDatosSesionActualSafe').and.returnValue(
-      of({ username: 'u' } as any),
-    );
+    spyOn(service, 'obtenerDatosSesionActualSafe').and.returnValue(of({ username: 'u' } as any));
     await expectAsync(service.getUsernameActual()).toBeResolvedTo('u');
   });
 
   it('getUsernameActual returns fallback when observable errors', async () => {
     spyOn(service, 'obtenerDatosSesionActualSafe').and.returnValue(
-      throwError(() => new Error('fail')),
+      throwError(() => new Error('fail'))
     );
-    await expectAsync(service.getUsernameActual()).toBeResolvedTo(
-      'Usuario no disponible',
-    );
+    await expectAsync(service.getUsernameActual()).toBeResolvedTo('Usuario no disponible');
   });
 });

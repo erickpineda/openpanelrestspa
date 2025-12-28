@@ -34,18 +34,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // showRefreshFeedback eliminado, se usará ToastService
   // Suma total de un estado específico en el periodo actual
   getKpiPorEstado(estado: string): number {
-    if (
-      this.seriesEntriesSplitData &&
-      Array.isArray(this.seriesEntriesSplitData.datasets)
-    ) {
-      const ds = this.seriesEntriesSplitData.datasets.find(
-        (d: any) => d.label === estado,
-      );
+    if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
+      const ds = this.seriesEntriesSplitData.datasets.find((d: any) => d.label === estado);
       if (ds && Array.isArray(ds.data)) {
-        return ds.data.reduce(
-          (acc: number, v: number) => acc + (Number(v) || 0),
-          0,
-        );
+        return ds.data.reduce((acc: number, v: number) => acc + (Number(v) || 0), 0);
       }
     }
     return 0;
@@ -53,22 +45,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Suma total de todos los estados excepto el indicado
   getKpiExceptoEstado(estado: string): number {
-    if (
-      this.seriesEntriesSplitData &&
-      Array.isArray(this.seriesEntriesSplitData.datasets)
-    ) {
+    if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
       return this.seriesEntriesSplitData.datasets
         .filter((d: any) => d.label !== estado)
         .reduce(
           (acc: number, ds: any) =>
             acc +
             (Array.isArray(ds.data)
-              ? ds.data.reduce(
-                  (a: number, v: number) => a + (Number(v) || 0),
-                  0,
-                )
+              ? ds.data.reduce((a: number, v: number) => a + (Number(v) || 0), 0)
               : 0),
-          0,
+          0
         );
     }
     return 0;
@@ -152,8 +138,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ];
   private colorForLabel(label: string, i: number = 0): string {
     let h = 0;
-    for (let k = 0; k < label.length; k++)
-      h = (h * 31 + label.charCodeAt(k)) >>> 0;
+    for (let k = 0; k < label.length; k++) h = (h * 31 + label.charCodeAt(k)) >>> 0;
     const idx = (h + i) % this.colorPalette.length;
     return this.colorPalette[idx];
   }
@@ -211,7 +196,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private dashboardFacade: DashboardFacadeService,
     private loadingService: LoadingService,
     private toastService: ToastService,
-    private authSync: AuthSyncService,
+    private authSync: AuthSyncService
   ) {}
 
   private initDefaultData(): void {
@@ -219,9 +204,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const rawLabels: string[] = [];
     const now = new Date();
     for (let i = this.seriesDays - 1; i >= 0; i--) {
-      const d = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-      );
+      const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
       d.setUTCDate(d.getUTCDate() - i);
       const s = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
       labels.push(this.formatLabelFromDate(s, 'day', false));
@@ -242,9 +225,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.initDefaultData();
     try {
-      const s = sessionStorage.getItem(
-        OPConstants.Storage.DASH_METRICS_EXPANDED_KEY,
-      );
+      const s = sessionStorage.getItem(OPConstants.Storage.DASH_METRICS_EXPANDED_KEY);
       this.metricsExpanded = s === '1';
     } catch {}
     try {
@@ -271,17 +252,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     };
     try {
-      window.addEventListener(
-        OPConstants.Events.AUTH_CHANGED,
-        this.onAuthChangedHandler as any,
-      );
+      window.addEventListener(OPConstants.Events.AUTH_CHANGED, this.onAuthChangedHandler as any);
     } catch {}
   }
 
   private markPerf(t0: number, name: string): void {
     try {
-      const now =
-        typeof performance !== 'undefined' ? performance.now() : Date.now();
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
       const elapsed = Math.round(now - t0);
       this.perf[name] = elapsed;
       this.perfUpdatedAt = new Date();
@@ -297,9 +274,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const hash = win ? win.location.hash || '' : '';
       const qm = hash.indexOf('?');
       const hashFlag =
-        qm >= 0
-          ? new URLSearchParams(hash.substring(qm + 1)).get('metrics') === '1'
-          : false;
+        qm >= 0 ? new URLSearchParams(hash.substring(qm + 1)).get('metrics') === '1' : false;
       const urlFlag = searchFlag || hashFlag;
       return this.isLocalEnv() && (this.metricsExpanded || urlFlag);
     } catch {
@@ -328,7 +303,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     try {
       sessionStorage.setItem(
         OPConstants.Storage.DASH_METRICS_EXPANDED_KEY,
-        this.metricsExpanded ? '1' : '0',
+        this.metricsExpanded ? '1' : '0'
       );
     } catch {}
   }
@@ -336,10 +311,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   toggleForceFromDb(): void {
     this.forceFromDb = !this.forceFromDb;
     try {
-      sessionStorage.setItem(
-        OPConstants.Storage.DASH_FORCE_DB_KEY,
-        this.forceFromDb ? '1' : '0',
-      );
+      sessionStorage.setItem(OPConstants.Storage.DASH_FORCE_DB_KEY, this.forceFromDb ? '1' : '0');
     } catch {}
     try {
       this.authSync.notifyChanged({
@@ -356,11 +328,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         perf: this.perf,
       };
       const text = JSON.stringify(payload, null, 2);
-      if (
-        navigator &&
-        (navigator as any).clipboard &&
-        (navigator as any).clipboard.writeText
-      ) {
+      if (navigator && (navigator as any).clipboard && (navigator as any).clipboard.writeText) {
         await (navigator as any).clipboard.writeText(text);
       } else {
         const ta = document.createElement('textarea');
@@ -372,10 +340,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this.toastService.showSuccess('Métricas copiadas', 'Dashboard');
     } catch {
-      this.toastService.showError(
-        'No se pudieron copiar las métricas',
-        'Dashboard',
-      );
+      this.toastService.showError('No se pudieron copiar las métricas', 'Dashboard');
     }
   }
 
@@ -385,9 +350,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private loadAllDashboardData(force: boolean = true): void {
     const t0 = Date.now();
-    this.loadingService.registerRetryHandler(() =>
-      this.loadAllDashboardData(true),
-    );
+    this.loadingService.registerRetryHandler(() => this.loadAllDashboardData(true));
     this.loadingService.setGlobalLoading(true);
     this.loadingSeries = true;
     this.errorSummary = null;
@@ -399,12 +362,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.dashboardApi.evictContentStats();
       } catch {}
     }
-    const start =
-      typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const start = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const mark = (name: string) => {
       try {
-        const now =
-          typeof performance !== 'undefined' ? performance.now() : Date.now();
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
         this.log.debug(`[perf] ${name} ms`, Math.round(now - start));
         this.markPerf(start, name);
       } catch {}
@@ -416,32 +377,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.topLimit,
         force,
         this.topCustomStartDate,
-        this.topCustomEndDate,
+        this.topCustomEndDate
       )
       .subscribe({
-        next: ([
-          summary,
-          series,
-          topUsers,
-          topCategories,
-          topTags,
-          storage,
-          contentStats,
-        ]) => {
+        next: ([summary, series, topUsers, topCategories, topTags, storage, contentStats]) => {
           try {
             if (summary) {
               this.totalEntradas = (summary as SummaryDTO).totalEntradas || 0;
-              this.cantidadUsuariosActivos =
-                (summary as SummaryDTO).totalUsuarios || 0;
-              this.latestEntries =
-                (summary as SummaryDTO).ultimasEntradas || [];
+              this.cantidadUsuariosActivos = (summary as SummaryDTO).totalUsuarios || 0;
+              this.latestEntries = (summary as SummaryDTO).ultimasEntradas || [];
             }
 
             if (Array.isArray(series)) {
               this.data = {
-                labels: (series as ActivityPointDTO[]).map((p) =>
-                  this.formatLabelFromDate(p.date),
-                ),
+                labels: (series as ActivityPointDTO[]).map((p) => this.formatLabelFromDate(p.date)),
                 datasets: [
                   {
                     label: 'Entradas',
@@ -451,9 +400,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   {
                     label: 'Comentarios',
                     backgroundColor: '#ff7f0e',
-                    data: (series as ActivityPointDTO[]).map(
-                      (p) => p.comentarios,
-                    ),
+                    data: (series as ActivityPointDTO[]).map((p) => p.comentarios),
                   },
                   {
                     label: 'Usuarios',
@@ -462,21 +409,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   },
                 ],
               };
-              this.dataRawLabels = (series as ActivityPointDTO[]).map((p) =>
-                String(p.date || ''),
-              );
+              this.dataRawLabels = (series as ActivityPointDTO[]).map((p) => String(p.date || ''));
             }
             this.topUsers = Array.isArray(topUsers) ? topUsers : this.topUsers;
-            this.topCategories = Array.isArray(topCategories)
-              ? topCategories
-              : this.topCategories;
+            this.topCategories = Array.isArray(topCategories) ? topCategories : this.topCategories;
             this.topTags = Array.isArray(topTags) ? topTags : this.topTags;
             this.storage = storage as StorageDTO;
             this.contentStats = contentStats as ContentStatsDTO;
-            if (
-              contentStats &&
-              (contentStats as ContentStatsDTO).entradasByEstado
-            ) {
+            if (contentStats && (contentStats as ContentStatsDTO).entradasByEstado) {
               this.updateContentStatsChart(contentStats as ContentStatsDTO);
             }
             this.loadSeriesEntriesSplitEstado();
@@ -512,18 +452,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (this.onAuthChangedHandler)
         window.removeEventListener(
           OPConstants.Events.AUTH_CHANGED,
-          this.onAuthChangedHandler as any,
+          this.onAuthChangedHandler as any
         );
     } catch {}
   }
 
   async cargarEstadisticas(): Promise<void> {
-    const t0 =
-      typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const mark = (name: string) => {
       try {
-        const now =
-          typeof performance !== 'undefined' ? performance.now() : Date.now();
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
         this.log.debug(`[perf] ${name} ms`, Math.round(now - t0));
         this.markPerf(t0, name);
       } catch {}
@@ -607,12 +545,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadTopWidgets(): void {
-    const t0 =
-      typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const mark = (name: string) => {
       try {
-        const now =
-          typeof performance !== 'undefined' ? performance.now() : Date.now();
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
         this.log.debug(`[perf] ${name} ms`, Math.round(now - t0));
         this.markPerf(t0, name);
       } catch {}
@@ -705,12 +641,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadContentStats(): void {
-    const t0 =
-      typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const mark = (name: string) => {
       try {
-        const now =
-          typeof performance !== 'undefined' ? performance.now() : Date.now();
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
         this.log.debug(`[perf] ${name} ms`, Math.round(now - t0));
         this.markPerf(t0, name);
       } catch {}
@@ -736,49 +670,45 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadRecentActivity(): void {
-    const t0 =
-      typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const mark = (name: string) => {
       try {
-        const now =
-          typeof performance !== 'undefined' ? performance.now() : Date.now();
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
         this.log.debug(`[perf] ${name} ms`, Math.round(now - t0));
       } catch {}
     };
     this.loadingRecent = true;
     this.errorRecent = null;
-    const sub = this.dashboardFacade
-      .getRecentActivity(this.recentPage, this.recentSize)
-      .subscribe({
-        next: (r: any) => {
-          if (Array.isArray(r)) {
-            this.recentItems = r;
-            this.recentTotalPages = r.length ? 1 : 0;
-          } else if (r && Array.isArray(r.content)) {
-            this.recentItems = r.content;
-            this.recentTotalPages = Number(r.totalPages) || 0;
-            this.recentPage = Number(r.number) || this.recentPage;
-          } else if (r && Array.isArray(r.elements)) {
-            this.recentItems = r.elements;
-            this.recentTotalPages = Number(r.totalPages) || 0;
-          } else if (r && Array.isArray(r.ultimasEntradas)) {
-            this.recentItems = r.ultimasEntradas;
-            this.recentTotalPages = 1;
-          } else {
-            this.recentItems = [];
-            this.recentTotalPages = 0;
-          }
-          this.loadingRecent = false;
-          mark('recent');
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.errorRecent = 'Error obteniendo actividad reciente';
-          this.loadingRecent = false;
-          mark('recent:error');
-          this.focusRetry('.retry-btn-recent');
-        },
-      });
+    const sub = this.dashboardFacade.getRecentActivity(this.recentPage, this.recentSize).subscribe({
+      next: (r: any) => {
+        if (Array.isArray(r)) {
+          this.recentItems = r;
+          this.recentTotalPages = r.length ? 1 : 0;
+        } else if (r && Array.isArray(r.content)) {
+          this.recentItems = r.content;
+          this.recentTotalPages = Number(r.totalPages) || 0;
+          this.recentPage = Number(r.number) || this.recentPage;
+        } else if (r && Array.isArray(r.elements)) {
+          this.recentItems = r.elements;
+          this.recentTotalPages = Number(r.totalPages) || 0;
+        } else if (r && Array.isArray(r.ultimasEntradas)) {
+          this.recentItems = r.ultimasEntradas;
+          this.recentTotalPages = 1;
+        } else {
+          this.recentItems = [];
+          this.recentTotalPages = 0;
+        }
+        this.loadingRecent = false;
+        mark('recent');
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.errorRecent = 'Error obteniendo actividad reciente';
+        this.loadingRecent = false;
+        mark('recent:error');
+        this.focusRetry('.retry-btn-recent');
+      },
+    });
     this.subscription.add(sub);
   }
 
@@ -863,17 +793,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   applySettings(): void {
-    const sd = Math.max(
-      1,
-      Math.min(365, Number(this.settings.seriesDays) || this.seriesDays),
-    );
-    const tl = Math.max(
-      1,
-      Math.min(200, Number(this.settings.topLimit) || this.topLimit),
-    );
+    const sd = Math.max(1, Math.min(365, Number(this.settings.seriesDays) || this.seriesDays));
+    const tl = Math.max(1, Math.min(200, Number(this.settings.topLimit) || this.topLimit));
     const tp = Math.max(
       1,
-      Math.min(365, Number(this.settings.topPeriodDays) || this.topPeriodDays),
+      Math.min(365, Number(this.settings.topPeriodDays) || this.topPeriodDays)
     );
 
     const gran = this.settings.seriesGranularity;
@@ -902,12 +826,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.dashboardFacade.evictSeries(sd);
       this.changeSeriesDays(this.seriesDays);
     }
-    if (
-      changedTopLimit ||
-      changedTopPeriod ||
-      this.topCustomStartDate ||
-      this.topCustomEndDate
-    ) {
+    if (changedTopLimit || changedTopPeriod || this.topCustomStartDate || this.topCustomEndDate) {
       this.dashboardFacade.evictTop('users');
       this.dashboardFacade.evictTop('categories');
       this.dashboardFacade.evictTop('tags');
@@ -934,11 +853,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     try {
       const sd = new Date(s + 'T00:00:00Z');
       const ed = new Date(e + 'T00:00:00Z');
-      return (
-        !isNaN(sd.getTime()) &&
-        !isNaN(ed.getTime()) &&
-        sd.getTime() <= ed.getTime()
-      );
+      return !isNaN(sd.getTime()) && !isNaN(ed.getTime()) && sd.getTime() <= ed.getTime();
     } catch {
       return false;
     }
@@ -991,9 +906,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private buildCsv(headers: string[], rows: any[][]): string {
     const head = headers.map((h) => this.csvEscape(h)).join(',');
-    const body = rows
-      .map((r) => r.map((c) => this.csvEscape(c)).join(','))
-      .join('\n');
+    const body = rows.map((r) => r.map((c) => this.csvEscape(c)).join(',')).join('\n');
     return `${head}\n${body}\n`;
   }
 
@@ -1016,23 +929,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
 
       // Serie principal
-      if (
-        this.data &&
-        Array.isArray(this.data.labels) &&
-        Array.isArray(this.data.datasets)
-      ) {
+      if (this.data && Array.isArray(this.data.labels) && Array.isArray(this.data.datasets)) {
         const headers = [
           'date',
           ...this.data.datasets.map((ds: any) => String(ds.label || 'serie')),
         ];
-        const rows: any[][] = (this.data.labels as string[]).map(
-          (d: string, i: number) => [
-            d,
-            ...this.data.datasets.map((ds: any) =>
-              Array.isArray(ds.data) ? (ds.data[i] ?? '') : '',
-            ),
-          ],
-        );
+        const rows: any[][] = (this.data.labels as string[]).map((d: string, i: number) => [
+          d,
+          ...this.data.datasets.map((ds: any) =>
+            Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+          ),
+        ]);
         const csv = this.buildCsv(headers, rows);
         this.saveCsv(`dashboard_series_${datePart}_${timePart}.csv`, csv);
       }
@@ -1045,23 +952,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
       ) {
         const headers = [
           'date',
-          ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
-            String(ds.label || 'valor'),
-          ),
+          ...this.seriesEntriesSplitData.datasets.map((ds: any) => String(ds.label || 'valor')),
         ];
-        const rows: any[][] = (
-          this.seriesEntriesSplitData.labels as string[]
-        ).map((d: string, i: number) => [
-          d,
-          ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : '',
-          ),
-        ]);
-        const csv = this.buildCsv(headers, rows);
-        this.saveCsv(
-          `dashboard_series_split_estado_${datePart}_${timePart}.csv`,
-          csv,
+        const rows: any[][] = (this.seriesEntriesSplitData.labels as string[]).map(
+          (d: string, i: number) => [
+            d,
+            ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
+              Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+            ),
+          ]
         );
+        const csv = this.buildCsv(headers, rows);
+        this.saveCsv(`dashboard_series_split_estado_${datePart}_${timePart}.csv`, csv);
       }
 
       // Split estado nombre (pivot)
@@ -1073,22 +975,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const headers = [
           'date',
           ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
-            String(ds.label || 'estado'),
+            String(ds.label || 'estado')
           ),
         ];
-        const rows: any[][] = (
-          this.seriesEntriesSplitEstadoNombreData.labels as string[]
-        ).map((d: string, i: number) => [
-          d,
-          ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : '',
-          ),
-        ]);
-        const csv = this.buildCsv(headers, rows);
-        this.saveCsv(
-          `dashboard_series_split_estado_nombre_${datePart}_${timePart}.csv`,
-          csv,
+        const rows: any[][] = (this.seriesEntriesSplitEstadoNombreData.labels as string[]).map(
+          (d: string, i: number) => [
+            d,
+            ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
+              Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+            ),
+          ]
         );
+        const csv = this.buildCsv(headers, rows);
+        this.saveCsv(`dashboard_series_split_estado_nombre_${datePart}_${timePart}.csv`, csv);
       }
 
       // Top lists
@@ -1115,16 +1014,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ];
         this.saveCsv(
           `dashboard_content_stats_${datePart}_${timePart}.csv`,
-          this.buildCsv(baseHeaders, baseRows),
+          this.buildCsv(baseHeaders, baseRows)
         );
         if (this.contentStats.entradasByEstado) {
           const headers = ['estado', 'count'];
-          const rows = Object.entries(this.contentStats.entradasByEstado).map(
-            ([k, v]) => [k, Number(v) || 0],
-          );
+          const rows = Object.entries(this.contentStats.entradasByEstado).map(([k, v]) => [
+            k,
+            Number(v) || 0,
+          ]);
           this.saveCsv(
             `dashboard_content_stats_estados_${datePart}_${timePart}.csv`,
-            this.buildCsv(headers, rows),
+            this.buildCsv(headers, rows)
           );
         }
       }
@@ -1136,21 +1036,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
           ['totalFiles', this.storage.totalFiles ?? 0],
           ['storageBytes', this.storage.storageBytes ?? 0],
         ];
-        this.saveCsv(
-          `dashboard_storage_${datePart}_${timePart}.csv`,
-          this.buildCsv(headers, rows),
-        );
+        this.saveCsv(`dashboard_storage_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
       }
 
       // Latest entries (si disponible en summary)
       if (Array.isArray(this.latestEntries) && this.latestEntries.length) {
-        const headers = [
-          'id',
-          'titulo',
-          'fechaCreacion',
-          'idUsuario',
-          'estado',
-        ];
+        const headers = ['id', 'titulo', 'fechaCreacion', 'idUsuario', 'estado'];
         const rows = this.latestEntries.map((e) => [
           e.id ?? '',
           e.titulo ?? '',
@@ -1160,7 +1051,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ]);
         this.saveCsv(
           `dashboard_latest_entries_${datePart}_${timePart}.csv`,
-          this.buildCsv(headers, rows),
+          this.buildCsv(headers, rows)
         );
       }
     } catch {}
@@ -1181,23 +1072,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (folder) folder.file(name, content);
       };
 
-      if (
-        this.data &&
-        Array.isArray(this.data.labels) &&
-        Array.isArray(this.data.datasets)
-      ) {
+      if (this.data && Array.isArray(this.data.labels) && Array.isArray(this.data.datasets)) {
         const headers = [
           'date',
           ...this.data.datasets.map((ds: any) => String(ds.label || 'serie')),
         ];
-        const rows: any[][] = (this.data.labels as string[]).map(
-          (d: string, i: number) => [
-            d,
-            ...this.data.datasets.map((ds: any) =>
-              Array.isArray(ds.data) ? (ds.data[i] ?? '') : '',
-            ),
-          ],
-        );
+        const rows: any[][] = (this.data.labels as string[]).map((d: string, i: number) => [
+          d,
+          ...this.data.datasets.map((ds: any) =>
+            Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+          ),
+        ]);
         addFile('series.csv', this.buildCsv(headers, rows));
       }
 
@@ -1208,18 +1093,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       ) {
         const headers = [
           'date',
-          ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
-            String(ds.label || 'valor'),
-          ),
+          ...this.seriesEntriesSplitData.datasets.map((ds: any) => String(ds.label || 'valor')),
         ];
-        const rows: any[][] = (
-          this.seriesEntriesSplitData.labels as string[]
-        ).map((d: string, i: number) => [
-          d,
-          ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : '',
-          ),
-        ]);
+        const rows: any[][] = (this.seriesEntriesSplitData.labels as string[]).map(
+          (d: string, i: number) => [
+            d,
+            ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
+              Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+            ),
+          ]
+        );
         addFile('series_split_estado.csv', this.buildCsv(headers, rows));
       }
 
@@ -1231,17 +1114,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const headers = [
           'date',
           ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
-            String(ds.label || 'estado'),
+            String(ds.label || 'estado')
           ),
         ];
-        const rows: any[][] = (
-          this.seriesEntriesSplitEstadoNombreData.labels as string[]
-        ).map((d: string, i: number) => [
-          d,
-          ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : '',
-          ),
-        ]);
+        const rows: any[][] = (this.seriesEntriesSplitEstadoNombreData.labels as string[]).map(
+          (d: string, i: number) => [
+            d,
+            ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
+              Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+            ),
+          ]
+        );
         addFile('series_split_estado_nombre.csv', this.buildCsv(headers, rows));
       }
 
@@ -1267,9 +1150,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         addFile('content_stats.csv', this.buildCsv(baseHeaders, baseRows));
         if (this.contentStats.entradasByEstado) {
           const headers = ['estado', 'count'];
-          const rows = Object.entries(this.contentStats.entradasByEstado).map(
-            ([k, v]) => [k, Number(v) || 0],
-          );
+          const rows = Object.entries(this.contentStats.entradasByEstado).map(([k, v]) => [
+            k,
+            Number(v) || 0,
+          ]);
           addFile('content_stats_estados.csv', this.buildCsv(headers, rows));
         }
       }
@@ -1284,13 +1168,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
 
       if (Array.isArray(this.latestEntries) && this.latestEntries.length) {
-        const headers = [
-          'id',
-          'titulo',
-          'fechaCreacion',
-          'idUsuario',
-          'estado',
-        ];
+        const headers = ['id', 'titulo', 'fechaCreacion', 'idUsuario', 'estado'];
         const rows = this.latestEntries.map((e) => [
           e.id ?? '',
           e.titulo ?? '',
@@ -1309,8 +1187,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const zipName = `dashboard_csv_${datePart}_${timePart}.zip`;
       saveAs(blob, zipName);
     } catch (e) {
-      this.exportError =
-        'No se pudo generar el ZIP. Intenta las descargas individuales.';
+      this.exportError = 'No se pudo generar el ZIP. Intenta las descargas individuales.';
     } finally {
       this.exportingZip = false;
       this.cdr.detectChanges();
@@ -1318,11 +1195,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   downloadCsvSeries(): void {
-    if (
-      this.data &&
-      Array.isArray(this.data.labels) &&
-      Array.isArray(this.data.datasets)
-    ) {
+    if (this.data && Array.isArray(this.data.labels) && Array.isArray(this.data.datasets)) {
       const now = new Date();
       const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
@@ -1358,44 +1231,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const p = this.parseBackendDate(raw);
           if (p) {
             const day = p.getDay();
-            const start = new Date(
-              p.getFullYear(),
-              p.getMonth(),
-              p.getDate() - day,
-            );
-            const end = new Date(
-              start.getFullYear(),
-              start.getMonth(),
-              start.getDate() + 6,
-            );
+            const start = new Date(p.getFullYear(), p.getMonth(), p.getDate() - day);
+            const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
             const s = `${String(start.getDate()).padStart(2, '0')}-${String(start.getMonth() + 1).padStart(2, '0')}-${start.getFullYear()}`;
             const e = `${String(end.getDate()).padStart(2, '0')}-${String(end.getMonth() + 1).padStart(2, '0')}-${end.getFullYear()}`;
             return `${s} - ${e}`;
           }
         }
         if (g === 'month') {
-          const label = this.formatLabelFromDate(
-            raw,
-            'month',
-            this.isSmallScreen(),
-          );
+          const label = this.formatLabelFromDate(raw, 'month', this.isSmallScreen());
           return label;
         }
         return raw;
       };
-      const rows: any[][] = (this.dataRawLabels as string[]).map(
-        (raw: string, i: number) => [
-          fmt(raw),
-          raw,
-          ...this.data.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : '',
-          ),
-        ],
-      );
-      this.saveCsv(
-        `dashboard_series_${datePart}_${timePart}.csv`,
-        this.buildCsv(headers, rows),
-      );
+      const rows: any[][] = (this.dataRawLabels as string[]).map((raw: string, i: number) => [
+        fmt(raw),
+        raw,
+        ...this.data.datasets.map((ds: any) => (Array.isArray(ds.data) ? (ds.data[i] ?? '') : '')),
+      ]);
+      this.saveCsv(`dashboard_series_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
     }
   }
 
@@ -1411,22 +1265,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const headers = [
         'date',
         'date_raw',
-        ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
-          String(ds.label || 'valor'),
-        ),
+        ...this.seriesEntriesSplitData.datasets.map((ds: any) => String(ds.label || 'valor')),
       ];
-      const raw =
-        ((this.seriesEntriesSplitData as any)._rawLabels as string[]) || [];
+      const raw = ((this.seriesEntriesSplitData as any)._rawLabels as string[]) || [];
       const rows: any[][] = raw.map((r: string, i: number) => [
         this.formatLabelFromDate(r, this.seriesGranularity),
         r,
         ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
-          Array.isArray(ds.data) ? (ds.data[i] ?? '') : '',
+          Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
         ),
       ]);
       this.saveCsv(
         `dashboard_series_split_estado_${datePart}_${timePart}.csv`,
-        this.buildCsv(headers, rows),
+        this.buildCsv(headers, rows)
       );
     }
   }
@@ -1444,22 +1295,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
         'date',
         'date_raw',
         ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
-          String(ds.label || 'estado'),
+          String(ds.label || 'estado')
         ),
       ];
-      const raw =
-        ((this.seriesEntriesSplitEstadoNombreData as any)
-          ._rawLabels as string[]) || [];
+      const raw = ((this.seriesEntriesSplitEstadoNombreData as any)._rawLabels as string[]) || [];
       const rows: any[][] = raw.map((r: string, i: number) => [
         this.formatLabelFromDate(r, this.seriesGranularity),
         r,
         ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
-          Array.isArray(ds.data) ? (ds.data[i] ?? '') : '',
+          Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
         ),
       ]);
       this.saveCsv(
         `dashboard_series_split_estado_nombre_${datePart}_${timePart}.csv`,
-        this.buildCsv(headers, rows),
+        this.buildCsv(headers, rows)
       );
     }
   }
@@ -1472,10 +1321,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!Array.isArray(items) || items.length === 0) return;
     const headers = ['name', 'count'];
     const rows = items.map((it) => [it?.name ?? '', it?.count ?? 0]);
-    this.saveCsv(
-      `dashboard_top_users_${datePart}_${timePart}.csv`,
-      this.buildCsv(headers, rows),
-    );
+    this.saveCsv(`dashboard_top_users_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
   }
 
   downloadCsvTopCategories(): void {
@@ -1488,7 +1334,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const rows = items.map((it) => [it?.name ?? '', it?.count ?? 0]);
     this.saveCsv(
       `dashboard_top_categories_${datePart}_${timePart}.csv`,
-      this.buildCsv(headers, rows),
+      this.buildCsv(headers, rows)
     );
   }
 
@@ -1500,10 +1346,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!Array.isArray(items) || items.length === 0) return;
     const headers = ['name', 'count'];
     const rows = items.map((it) => [it?.name ?? '', it?.count ?? 0]);
-    this.saveCsv(
-      `dashboard_top_tags_${datePart}_${timePart}.csv`,
-      this.buildCsv(headers, rows),
-    );
+    this.saveCsv(`dashboard_top_tags_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
   }
 
   downloadCsvContentStats(): void {
@@ -1521,7 +1364,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ];
     this.saveCsv(
       `dashboard_content_stats_${datePart}_${timePart}.csv`,
-      this.buildCsv(headers, rows),
+      this.buildCsv(headers, rows)
     );
   }
 
@@ -1531,12 +1374,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
     const headers = ['estado', 'count'];
-    const rows = Object.entries(this.contentStats.entradasByEstado).map(
-      ([k, v]) => [k, Number(v) || 0],
-    );
+    const rows = Object.entries(this.contentStats.entradasByEstado).map(([k, v]) => [
+      k,
+      Number(v) || 0,
+    ]);
     this.saveCsv(
       `dashboard_content_stats_estados_${datePart}_${timePart}.csv`,
-      this.buildCsv(headers, rows),
+      this.buildCsv(headers, rows)
     );
   }
 
@@ -1550,15 +1394,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       ['totalFiles', this.storage.totalFiles ?? 0],
       ['storageBytes', this.storage.storageBytes ?? 0],
     ];
-    this.saveCsv(
-      `dashboard_storage_${datePart}_${timePart}.csv`,
-      this.buildCsv(headers, rows),
-    );
+    this.saveCsv(`dashboard_storage_${datePart}_${timePart}.csv`, this.buildCsv(headers, rows));
   }
 
   downloadCsvLatestEntries(): void {
-    if (!Array.isArray(this.latestEntries) || !this.latestEntries.length)
-      return;
+    if (!Array.isArray(this.latestEntries) || !this.latestEntries.length) return;
     const now = new Date();
     const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
@@ -1572,7 +1412,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ]);
     this.saveCsv(
       `dashboard_latest_entries_${datePart}_${timePart}.csv`,
-      this.buildCsv(headers, rows),
+      this.buildCsv(headers, rows)
     );
   }
 
@@ -1590,7 +1430,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ]);
     this.saveCsv(
       `dashboard_recent_activity_${datePart}_${timePart}.csv`,
-      this.buildCsv(headers, rows),
+      this.buildCsv(headers, rows)
     );
   }
 
@@ -1600,16 +1440,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .getSeriesEntriesSplitEstado(
         this.seriesDays,
         this.seriesGranularity,
-        this.forceFromDb === true,
+        this.forceFromDb === true
       )
       .subscribe({
         next: (arr: any[]) => {
           if (arr && arr.length) {
             // Detectar todos los estados presentes en la serie
             const estados = Array.from(
-              new Set(
-                arr.flatMap((p) => Object.keys(p.entradasByEstado || {})),
-              ),
+              new Set(arr.flatMap((p) => Object.keys(p.entradasByEstado || {})))
             );
             const colores = this.colorPalette;
             this.seriesEntriesSplitData = {
@@ -1620,9 +1458,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 data: arr.map((p) => Number(p.entradasByEstado?.[estado]) || 0),
               })),
             };
-            (this.seriesEntriesSplitData as any)._rawLabels = arr.map((p) =>
-              String(p.date || ''),
-            );
+            (this.seriesEntriesSplitData as any)._rawLabels = arr.map((p) => String(p.date || ''));
             this.cdr.detectChanges();
           }
           this.loadingSplitEstado = false;
@@ -1643,29 +1479,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .getSeriesEntriesSplitEstadoNombre(
         this.seriesDays,
         this.seriesGranularity,
-        this.forceFromDb === true,
+        this.forceFromDb === true
       )
       .subscribe({
         next: (arr: any[]) => {
           if (arr && arr.length) {
             // Desanidar si los estados vienen en 'entradasByEstado'
             const flatArr = arr.map((p) => {
-              if (
-                p.entradasByEstado &&
-                typeof p.entradasByEstado === 'object'
-              ) {
+              if (p.entradasByEstado && typeof p.entradasByEstado === 'object') {
                 return { date: p.date, ...p.entradasByEstado };
               }
               return p;
             });
-            const labels = flatArr.map((p) =>
-              this.formatLabelFromDate(p.date, 'day'),
-            );
+            const labels = flatArr.map((p) => this.formatLabelFromDate(p.date, 'day'));
             const allKeys = new Set<string>();
             flatArr.forEach((p) =>
               Object.keys(p).forEach((k) => {
                 if (k !== 'date') allKeys.add(k);
-              }),
+              })
             );
             const keys = Array.from(allKeys);
             const colors = this.colorPalette;
@@ -1678,16 +1509,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
               data: flatArr.map((p) => Number(p[k]) || 0),
             }));
             this.seriesEntriesSplitEstadoNombreData = { labels, datasets };
-            (this.seriesEntriesSplitEstadoNombreData as any)._rawLabels =
-              flatArr.map((p) => String(p.date || ''));
+            (this.seriesEntriesSplitEstadoNombreData as any)._rawLabels = flatArr.map((p) =>
+              String(p.date || '')
+            );
             this.cdr.detectChanges();
             this.updateEstadoNominalOptions();
           }
           this.loadingSplitEstadoNombre = false;
         },
         error: () => {
-          this.errorSplitEstadoNombre =
-            'Error obteniendo serie por estado nominal';
+          this.errorSplitEstadoNombre = 'Error obteniendo serie por estado nominal';
           this.loadingSplitEstadoNombre = false;
           this.focusRetry('.retry-btn-split-nominal');
         },
@@ -1722,8 +1553,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private updateEstadoNominalOptions(): void {
-    const stacked =
-      this.estadoNominalChartType === 'bar' && this.estadoNominalStacked;
+    const stacked = this.estadoNominalChartType === 'bar' && this.estadoNominalStacked;
     this.estadoNominalChartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -1746,8 +1576,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ? Object.entries(this.contentStats.entradasByEstado)
         : [];
     const total =
-      this.contentStats?.totalEntradas ||
-      entries.reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
+      this.contentStats?.totalEntradas || entries.reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
     return entries
       .map(([k, v]) => {
         const count = Number(v) || 0;
@@ -1759,11 +1588,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private getPeriodDates(days: number): { startDate: string; endDate: string } {
     const now = new Date();
-    const end = new Date(
-      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()),
-    );
-    const startMs =
-      end.getTime() - Math.max(1, Number(days) || 30) * 24 * 60 * 60 * 1000;
+    const end = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    const startMs = end.getTime() - Math.max(1, Number(days) || 30) * 24 * 60 * 60 * 1000;
     const start = new Date(startMs);
     const fmt = (d: Date) =>
       `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
@@ -1816,8 +1642,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private updateContentStatsChart(cs: ContentStatsDTO): void {
-    const entries =
-      cs && cs.entradasByEstado ? Object.entries(cs.entradasByEstado) : [];
+    const entries = cs && cs.entradasByEstado ? Object.entries(cs.entradasByEstado) : [];
     const labels = entries.map(([k]) => k);
     const values = entries.map(([, v]) => Number(v) || 0);
     const colors = labels.map((l, i) => this.colorForLabel(l, i));
@@ -1836,13 +1661,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   get sumComentarios(): number {
     try {
       const arr =
-        (this.data.datasets &&
-          this.data.datasets[1] &&
-          (this.data.datasets[1].data as number[])) ||
+        (this.data.datasets && this.data.datasets[1] && (this.data.datasets[1].data as number[])) ||
         [];
-      return Array.isArray(arr)
-        ? arr.reduce((a, b) => a + (Number(b) || 0), 0)
-        : 0;
+      return Array.isArray(arr) ? arr.reduce((a, b) => a + (Number(b) || 0), 0) : 0;
     } catch {
       return 0;
     }
@@ -1860,13 +1681,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return arrPub.reduce((a, b) => a + (Number(b) || 0), 0);
       }
       const arr =
-        (this.data.datasets &&
-          this.data.datasets[0] &&
-          (this.data.datasets[0].data as number[])) ||
+        (this.data.datasets && this.data.datasets[0] && (this.data.datasets[0].data as number[])) ||
         [];
-      return Array.isArray(arr)
-        ? arr.reduce((a, b) => a + (Number(b) || 0), 0)
-        : 0;
+      return Array.isArray(arr) ? arr.reduce((a, b) => a + (Number(b) || 0), 0) : 0;
     } catch (e) {
       return 0;
     }
@@ -1880,9 +1697,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.seriesEntriesSplitData.datasets[1] &&
           (this.seriesEntriesSplitData.datasets[1].data as number[])) ||
         [];
-      return Array.isArray(arrNo)
-        ? arrNo.reduce((a, b) => a + (Number(b) || 0), 0)
-        : 0;
+      return Array.isArray(arrNo) ? arrNo.reduce((a, b) => a + (Number(b) || 0), 0) : 0;
     } catch (e) {
       return 0;
     }
@@ -1891,13 +1706,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   get sumUsuarios(): number {
     try {
       const arr =
-        (this.data.datasets &&
-          this.data.datasets[2] &&
-          (this.data.datasets[2].data as number[])) ||
+        (this.data.datasets && this.data.datasets[2] && (this.data.datasets[2].data as number[])) ||
         [];
-      return Array.isArray(arr)
-        ? arr.reduce((a, b) => a + (Number(b) || 0), 0)
-        : 0;
+      return Array.isArray(arr) ? arr.reduce((a, b) => a + (Number(b) || 0), 0) : 0;
     } catch {
       return 0;
     }
@@ -1912,9 +1723,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       ) {
         for (const ds of this.seriesEntriesSplitEstadoNombreData.datasets) {
           const arr = (ds.data as number[]) || [];
-          const total = Array.isArray(arr)
-            ? arr.reduce((a, b) => a + (Number(b) || 0), 0)
-            : 0;
+          const total = Array.isArray(arr) ? arr.reduce((a, b) => a + (Number(b) || 0), 0) : 0;
           out.push({ label: ds.label, total });
         }
         return out;
@@ -2019,12 +1828,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
           sec = 0;
         if (parts.length > 1) {
           const timeSegments = parts[1].split(':').map((s) => Number(s));
-          if (timeSegments.length >= 1 && !isNaN(timeSegments[0]))
-            hh = timeSegments[0];
-          if (timeSegments.length >= 2 && !isNaN(timeSegments[1]))
-            min = timeSegments[1];
-          if (timeSegments.length >= 3 && !isNaN(timeSegments[2]))
-            sec = timeSegments[2];
+          if (timeSegments.length >= 1 && !isNaN(timeSegments[0])) hh = timeSegments[0];
+          if (timeSegments.length >= 2 && !isNaN(timeSegments[1])) min = timeSegments[1];
+          if (timeSegments.length >= 3 && !isNaN(timeSegments[2])) sec = timeSegments[2];
         }
         return new Date(yyyy, mm - 1, dd, hh, min, sec);
       }
@@ -2038,18 +1844,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // - day: dd/MM/yyyy
   // - week: dd/MM/yyyy - dd/MM/yyyy (domingo a sábado)
   // - month: en móviles 'Ene 2025'; en escritorio 'Enero 2025'
-  private formatLabelFromDate(
-    dateStr?: string,
-    granularity?: string,
-    mobile?: boolean,
-  ): string {
+  private formatLabelFromDate(dateStr?: string, granularity?: string, mobile?: boolean): string {
     const s = String(dateStr || '');
     const gran = granularity || this.seriesGranularity;
     const parsed = this.parseBackendDate(s);
     const fmtDMY = (d: Date) =>
       `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-    const cap = (str: string) =>
-      str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
+    const cap = (str: string) => (str ? str.charAt(0).toUpperCase() + str.slice(1) : str);
     const isMobile = mobile ?? this.isSmallScreen();
     const monthLabel = (year: number, month1to12: number, short: boolean) => {
       const ref = new Date(year, month1to12 - 1, 1);
@@ -2106,11 +1907,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return label;
       }
       if (parsed) {
-        const label = monthLabel(
-          parsed.getFullYear(),
-          parsed.getMonth() + 1,
-          isMobile,
-        );
+        const label = monthLabel(parsed.getFullYear(), parsed.getMonth() + 1, isMobile);
         try {
           this.log.debug('formatLabelFromDate(month,fallback):', {
             in: s,
@@ -2146,16 +1943,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
     if (gran === 'week') {
       const day = parsed.getDay();
-      const start = new Date(
-        parsed.getFullYear(),
-        parsed.getMonth(),
-        parsed.getDate() - day,
-      );
-      const end = new Date(
-        start.getFullYear(),
-        start.getMonth(),
-        start.getDate() + 6,
-      );
+      const start = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate() - day);
+      const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
       const sdd = String(start.getDate()).padStart(2, '0');
       const smm = String(start.getMonth() + 1).padStart(2, '0');
       const syy = start.getFullYear();

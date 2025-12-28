@@ -1,12 +1,6 @@
 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
   <button cButton color="primary" size="sm" (click)="refresh.emit()">
-    <svg
-      cIcon
-      name="cilChart"
-      style="padding-right: 2px"
-      size="sm"
-      title="Ver Gráfico"
-    ></svg>
+    <svg cIcon name="cilChart" style="padding-right: 2px" size="sm" title="Ver Gráfico"></svg>
     Refrescar Gráficos
   </button>
   <button
@@ -55,11 +49,7 @@
     Exportar ZIP
   </button>
   @if (exportingZip) {
-    <div
-      class="d-inline-flex align-items-center ms-2"
-      aria-live="polite"
-      aria-busy="true"
-    >
+    <div class="d-inline-flex align-items-center ms-2" aria-live="polite" aria-busy="true">
       <c-spinner size="sm"></c-spinner>
       <span class="small text-muted ms-2">Generando ZIP...</span>
     </div>

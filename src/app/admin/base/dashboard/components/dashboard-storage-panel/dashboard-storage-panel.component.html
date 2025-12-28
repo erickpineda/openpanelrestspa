@@ -25,16 +25,10 @@
     @if (loadingStorage) {
       <div class="mb-2"><c-spinner></c-spinner></div>
     }
-    <div class="mb-2 small text-muted">
-      Ficheros: {{ storage?.totalFiles || 0 }}
-    </div>
+    <div class="mb-2 small text-muted">Ficheros: {{ storage?.totalFiles || 0 }}</div>
     <div class="mb-2 small text-muted">
       Bytes:
-      {{
-        formatBytesFn
-          ? formatBytesFn(storage?.storageBytes)
-          : (storage?.storageBytes | number)
-      }}
+      {{ formatBytesFn ? formatBytesFn(storage?.storageBytes) : (storage?.storageBytes | number) }}
     </div>
   </c-card-body>
 </c-card>

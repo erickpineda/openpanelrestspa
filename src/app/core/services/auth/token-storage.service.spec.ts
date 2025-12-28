@@ -56,12 +56,8 @@ describe('TokenStorageService', () => {
   it('saveUser y getUser sincronizan sessionStorage y localStorage', () => {
     const user = { id: 1 };
     service.saveUser(user);
-    expect(JSON.parse(sessionStorage.getItem(USER_KEY) as string)).toEqual(
-      user,
-    );
-    expect(JSON.parse(localStorage.getItem(SYNC_USER_KEY) as string)).toEqual(
-      user,
-    );
+    expect(JSON.parse(sessionStorage.getItem(USER_KEY) as string)).toEqual(user);
+    expect(JSON.parse(localStorage.getItem(SYNC_USER_KEY) as string)).toEqual(user);
     expect(service.getUser()).toEqual(user);
   });
 
@@ -83,12 +79,8 @@ describe('TokenStorageService', () => {
     expect(localStorage.getItem(SYNC_TOKEN_KEY)).toBeNull();
     expect(localStorage.getItem(SYNC_USER_KEY)).toBeNull();
     expect(localStorage.getItem(OPConstants.Session.AUTH_SYNC_KEY)).toBeNull();
-    expect(
-      localStorage.getItem(OPConstants.Session.SESSION_ACTIVE_KEY),
-    ).toBeNull();
-    expect(
-      localStorage.getItem(OPConstants.Session.SESSION_TIMESTAMP_KEY),
-    ).toBeNull();
+    expect(localStorage.getItem(OPConstants.Session.SESSION_ACTIVE_KEY)).toBeNull();
+    expect(localStorage.getItem(OPConstants.Session.SESSION_TIMESTAMP_KEY)).toBeNull();
   });
 
   it('getPostLoginRedirectBase expira y limpia cuando supera TTL', () => {

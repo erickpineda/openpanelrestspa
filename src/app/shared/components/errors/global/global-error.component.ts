@@ -4,21 +4,15 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-global-error',
   template: `
-    <div
-      class="container-fluid vh-100 d-flex align-items-center justify-content-center"
-    >
+    <div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
       <div class="text-center">
         <h1 class="display-1 text-danger">😵</h1>
         <h2>Error {{ errorCode }}</h2>
         <p class="lead">{{ errorMessage }}</p>
 
         <div class="mt-4">
-          <button cButton color="primary" routerLink="/">
-            Volver al Inicio
-          </button>
-          <button cButton color="secondary" class="ms-2" (click)="reload()">
-            Reintentar
-          </button>
+          <button cButton color="primary" routerLink="/">Volver al Inicio</button>
+          <button cButton color="secondary" class="ms-2" (click)="reload()">Reintentar</button>
         </div>
       </div>
     </div>
@@ -43,8 +37,7 @@ export class GlobalErrorComponent {
       critical: 'Error crítico en la aplicación.',
     };
 
-    this.errorMessage =
-      messages[this.errorCode] || 'Ha ocurrido un error inesperado.';
+    this.errorMessage = messages[this.errorCode] || 'Ha ocurrido un error inesperado.';
   }
 
   reload(): void {

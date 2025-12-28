@@ -97,14 +97,11 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     private log: LoggerService,
     private fileStorage: FileStorageService,
     private toastService: ToastService,
-    private sanitizer: DomSanitizer,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
-    window.addEventListener(
-      OPConstants.Events.SAVE_UNSAVED_WORK,
-      this.saveBeforeLogout.bind(this),
-    );
+    window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.saveBeforeLogout.bind(this));
 
     // Verificar navegación con recuperación
     this.checkNavigationState();
@@ -178,7 +175,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
           if (response?.result?.trackingId || message) {
             // Regex para UUID estándar
             const match = message.match(
-              /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
+              /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
             );
 
             if (match) {
@@ -189,28 +186,21 @@ export class EntradaFormComponent implements OnInit, OnChanges {
                 next: (fileData: any) => {
                   // FileStorageService.obtenerDatosFichero ya hace un map(resp => resp?.data ?? resp)
                   // Pero por seguridad verificamos varios campos
-                  const fileUrl =
-                    fileData?.ruta || fileData?.url || fileData?.data?.ruta;
+                  const fileUrl = fileData?.ruta || fileData?.url || fileData?.data?.ruta;
 
                   if (fileUrl) {
                     this.handleUploadSuccess(fileUrl);
                   } else {
                     this.log.error(
                       `No se pudo obtener URL del fichero con UUID: ${uuid}`,
-                      fileData,
+                      fileData
                     );
-                    this.toastService.showError(
-                      'No se pudo obtener la URL de la imagen',
-                      'Error',
-                    );
+                    this.toastService.showError('No se pudo obtener la URL de la imagen', 'Error');
                   }
                 },
                 error: (err) => {
                   this.log.error('Error obteniendo datos del fichero', err);
-                  this.toastService.showError(
-                    'Error al obtener datos de la imagen',
-                    'Error',
-                  );
+                  this.toastService.showError('Error al obtener datos de la imagen', 'Error');
                 },
               });
               return;
@@ -219,10 +209,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
           // Si llegamos aquí, no se pudo procesar la respuesta
           this.log.error('Respuesta de subida irreconocible', response);
-          this.toastService.showError(
-            'No se pudo obtener la URL de la imagen',
-            'Error',
-          );
+          this.toastService.showError('No se pudo obtener la URL de la imagen', 'Error');
         },
         error: (err) => {
           this.log.error('Error subiendo imagen', err);
@@ -249,9 +236,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     this.imagenPreviewUrl = null;
     this.form.markAsDirty();
     // Limpiar el input file si es necesario (se puede hacer con ViewChild o simplemente dejarlo)
-    const fileInput = document.getElementById(
-      'selImagenDestacada',
-    ) as HTMLInputElement;
+    const fileInput = document.getElementById('selImagenDestacada') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
     this.cdRef.markForCheck();
   }
@@ -278,7 +263,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   ngOnDestroy(): void {
     window.removeEventListener(
       OPConstants.Events.SAVE_UNSAVED_WORK,
-      this.saveBeforeLogout.bind(this),
+      this.saveBeforeLogout.bind(this)
     );
   }
 
@@ -287,10 +272,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     const state = navigation?.extras?.state as any;
 
     if (state?.temporaryEntry && state?.recoverData) {
-      this.log.info(
-        '🔄 Recibiendo entrada temporal desde navegación:',
-        state.temporaryEntry,
-      );
+      this.log.info('🔄 Recibiendo entrada temporal desde navegación:', state.temporaryEntry);
       this.isRecoveringFromNavigation = true;
 
       // Recuperar los datos en el formulario
@@ -308,14 +290,10 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   }
 
   private checkForTemporaryData(): void {
-    const temporaryEntries =
-      this.temporaryStorage.getTemporaryEntriesByType('entrada');
+    const temporaryEntries = this.temporaryStorage.getTemporaryEntriesByType('entrada');
 
     if (temporaryEntries.length > 0 && !this.isRecoveringFromNavigation) {
-      this.log.info(
-        '📥 Entradas temporales encontradas en formulario:',
-        temporaryEntries,
-      );
+      this.log.info('📥 Entradas temporales encontradas en formulario:', temporaryEntries);
 
       // ✅ REVERTIMOS: Volvemos al comportamiento original - mostrar individual
       if (temporaryEntries.length === 1) {
@@ -325,8 +303,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       } else {
         // Múltiples entradas - mostrar notificación individual de la más reciente
         const mostRecent = temporaryEntries.sort(
-          (a, b) =>
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         )[0];
 
         this.temporaryData = mostRecent;
@@ -385,9 +362,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
       // Limpiar datos temporales después de recuperarlos
       if (this.currentTemporaryEntryId) {
-        this.temporaryStorage.removeTemporaryEntry(
-          this.currentTemporaryEntryId,
-        );
+        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
         this.currentTemporaryEntryId = null;
       }
     } catch (error) {
@@ -427,18 +402,15 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
       // Si ya existe una entrada temporal para este formulario, actualizarla
       if (this.currentTemporaryEntryId) {
-        this.temporaryStorage.removeTemporaryEntry(
-          this.currentTemporaryEntryId,
-        );
+        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
       }
 
       // Guardar nueva entrada temporal
-      this.currentTemporaryEntryId =
-        this.temporaryStorage.saveTemporaryEntry(temporaryEntry);
+      this.currentTemporaryEntryId = this.temporaryStorage.saveTemporaryEntry(temporaryEntry);
 
       this.log.info(
         '✅ Datos guardados en almacenamiento temporal con ID:',
-        this.currentTemporaryEntryId,
+        this.currentTemporaryEntryId
       );
     } catch (error) {
       this.log.error('❌ Error al guardar temporalmente:', error);
@@ -455,9 +427,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
       // ✅ MODIFICADO: Limpiar entrada temporal específica al guardar exitosamente
       if (this.currentTemporaryEntryId) {
-        this.temporaryStorage.removeTemporaryEntry(
-          this.currentTemporaryEntryId,
-        );
+        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
         this.currentTemporaryEntryId = null;
       }
     } else {
@@ -491,18 +461,11 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       if (!html || typeof html !== 'string') return html;
       const tpl = document.createElement('template');
       tpl.innerHTML = html;
-      const walker = document.createTreeWalker(
-        tpl.content,
-        NodeFilter.SHOW_ELEMENT,
-        null,
-      );
+      const walker = document.createTreeWalker(tpl.content, NodeFilter.SHOW_ELEMENT, null);
       const toRemove: Element[] = [];
       while (walker.nextNode()) {
         const el = walker.currentNode as Element;
-        if (
-          el.tagName.toLowerCase() === 'script' ||
-          el.tagName.toLowerCase() === 'iframe'
-        ) {
+        if (el.tagName.toLowerCase() === 'script' || el.tagName.toLowerCase() === 'iframe') {
           toRemove.push(el);
           continue;
         }
@@ -512,10 +475,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
           if (n.startsWith('on')) el.removeAttribute(attr.name);
           if (n === 'src' || n === 'href') {
             const lower = (v || '').toLowerCase().trim();
-            if (
-              lower.startsWith('javascript:') ||
-              lower.startsWith('data:text/html')
-            )
+            if (lower.startsWith('javascript:') || lower.startsWith('data:text/html'))
               el.removeAttribute(attr.name);
           }
         }
@@ -548,7 +508,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   isCategoriaSelected(categoria: Categoria): boolean {
     const arr = this.categoriasArray();
     return arr.controls.some(
-      (control) => control.value && control.value.nombre === categoria.nombre,
+      (control) => control.value && control.value.nombre === categoria.nombre
     );
   }
 
@@ -569,7 +529,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     } else {
       // Buscar y remover la categoría por nombre
       const index = arr.controls.findIndex(
-        (control) => control.value && control.value.nombre === categoria.nombre,
+        (control) => control.value && control.value.nombre === categoria.nombre
       );
 
       if (index > -1) {
@@ -658,32 +618,22 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       else if (item.uuid) {
         this.fileStorage.obtenerDatosFichero(item.uuid).subscribe({
           next: (fileData: any) => {
-            const fileUrl =
-              fileData?.ruta || fileData?.url || fileData?.data?.ruta;
+            const fileUrl = fileData?.ruta || fileData?.url || fileData?.data?.ruta;
             if (fileUrl) {
               this.form.patchValue({ imagenDestacada: fileUrl });
               this.form.markAsDirty();
               this.cdRef.detectChanges();
             } else {
-              this.log.error(
-                'MediaItem seleccionado tiene UUID pero no retorna URL:',
-                item,
-              );
+              this.log.error('MediaItem seleccionado tiene UUID pero no retorna URL:', item);
               this.toastService.showError(
                 'No se pudo obtener la URL de la imagen seleccionada',
-                'Error',
+                'Error'
               );
             }
           },
           error: (err) => {
-            this.log.error(
-              'Error obteniendo datos del fichero seleccionado',
-              err,
-            );
-            this.toastService.showError(
-              'Error al procesar la imagen seleccionada',
-              'Error',
-            );
+            this.log.error('Error obteniendo datos del fichero seleccionado', err);
+            this.toastService.showError('Error al procesar la imagen seleccionada', 'Error');
           },
         });
       }

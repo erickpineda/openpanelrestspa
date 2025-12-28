@@ -1,10 +1,7 @@
 // Traducciones de campos por entidad para el BuscadorAvanzado
 // Añadir nuevas entidades aquí según se necesite.
 
-export const TRADUCCIONES_POR_ENTIDAD: Record<
-  string,
-  Record<string, string>
-> = {
+export const TRADUCCIONES_POR_ENTIDAD: Record<string, Record<string, string>> = {
   Entrada: {
     titulo: 'Título',
     auditFechaCancel: 'Fecha de cancelación',
@@ -45,10 +42,7 @@ export const TRADUCCIONES_POR_ENTIDAD: Record<
  * Traduce la clave `key` buscando en las entidades provistas en `clazzCandidates`.
  * Si no se encuentra traducción, devuelve la clave original.
  */
-export function traducirCampoPorEntidad(
-  key: string,
-  clazzCandidates?: string[] | null,
-): string {
+export function traducirCampoPorEntidad(key: string, clazzCandidates?: string[] | null): string {
   if (!key) return key;
   if (Array.isArray(clazzCandidates)) {
     for (const clazz of clazzCandidates) {
@@ -58,8 +52,7 @@ export function traducirCampoPorEntidad(
   }
   // Fallback: intentar buscar en todas las entidades
   for (const clazz in TRADUCCIONES_POR_ENTIDAD) {
-    if (TRADUCCIONES_POR_ENTIDAD[clazz][key])
-      return TRADUCCIONES_POR_ENTIDAD[clazz][key];
+    if (TRADUCCIONES_POR_ENTIDAD[clazz][key]) return TRADUCCIONES_POR_ENTIDAD[clazz][key];
   }
   return key;
 }

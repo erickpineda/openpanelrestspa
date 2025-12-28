@@ -39,27 +39,20 @@ export class NetworkInterceptor implements HttpInterceptor {
   constructor(
     private loadingService: LoadingService,
     private notificationService: NotificationService,
-    private logger: LoggerService,
+    private logger: LoggerService
   ) {}
 
   // Contexto para saltar loader global sin enviar cabeceras al servidor (evita CORS)
-  public static readonly SKIP_GLOBAL_LOADER = new HttpContextToken<boolean>(
-    () => false,
-  );
+  public static readonly SKIP_GLOBAL_LOADER = new HttpContextToken<boolean>(() => false);
 
-  intercept(
-    request: HttpRequest<unknown>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<unknown>> {
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const requestKey = this.generateRequestKey(request);
     const shouldSkipLoading = this.shouldSkipLoading(request);
     const isSilentRequest = this.isSilentRequest(request);
 
     // Evitar peticiones duplicadas
     if (this.activeRequests.has(requestKey)) {
-      this.logger.debug(
-        `Petición duplicada detectada: ${request.method} ${request.url}`,
-      );
+      this.logger.debug(`Petición duplicada detectada: ${request.method} ${request.url}`);
       // Aquí podrías retornar un observable vacío o la petición existente
       // return of(); // Opción: cancelar duplicados
     }
@@ -94,7 +87,7 @@ export class NetworkInterceptor implements HttpInterceptor {
         }
 
         this.logRequestCompletion(request);
-      }),
+      })
     );
   }
 
@@ -105,8 +98,7 @@ export class NetworkInterceptor implements HttpInterceptor {
   }
 
   private shouldSkipLoading(request: HttpRequest<unknown>): boolean {
-    const skipByContext =
-      request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER) === true;
+    const skipByContext = request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER) === true;
     if (skipByContext) return true;
     return this.excludedUrls.some((url) => request.url.includes(url));
   }
@@ -123,8 +115,7 @@ export class NetworkInterceptor implements HttpInterceptor {
 
   private addContentType(request: HttpRequest<unknown>): HttpRequest<unknown> {
     const isApi = request.url.includes('/api/');
-    const isFormData =
-      typeof FormData !== 'undefined' && request.body instanceof FormData;
+    const isFormData = typeof FormData !== 'undefined' && request.body instanceof FormData;
 
     let headersToSet: { [name: string]: string } = {};
 
@@ -155,7 +146,7 @@ export class NetworkInterceptor implements HttpInterceptor {
   private handleError(
     error: HttpErrorResponse,
     request: HttpRequest<unknown>,
-    isSilent: boolean,
+    isSilent: boolean
   ): void {
     const errorContext = {
       url: request.url,
@@ -181,7 +172,7 @@ export class NetworkInterceptor implements HttpInterceptor {
       case 0:
         // Error de conexión
         this.notificationService.error(
-          'No se pudo conectar con el servidor. Verifica tu conexión a internet.',
+          'No se pudo conectar con el servidor. Verifica tu conexión a internet.'
         );
         break;
 
@@ -190,46 +181,36 @@ export class NetworkInterceptor implements HttpInterceptor {
         break;
 
       case 403:
-        this.notificationService.error(
-          'No tienes permisos para realizar esta acción.',
-        );
+        this.notificationService.error('No tienes permisos para realizar esta acción.');
         break;
 
       case 404:
-        this.notificationService.warning(
-          'El recurso solicitado no fue encontrado.',
-        );
+        this.notificationService.warning('El recurso solicitado no fue encontrado.');
         break;
 
       case 429:
-        this.notificationService.warning(
-          'Demasiadas peticiones. Por favor, espera un momento.',
-        );
+        this.notificationService.warning('Demasiadas peticiones. Por favor, espera un momento.');
         break;
 
       case 500:
-        this.notificationService.error(
-          'Error interno del servidor. Por favor, intenta más tarde.',
-        );
+        this.notificationService.error('Error interno del servidor. Por favor, intenta más tarde.');
         break;
 
       case 502:
       case 503:
       case 504:
         this.notificationService.error(
-          'El servidor no está disponible en este momento. Por favor, intenta más tarde.',
+          'El servidor no está disponible en este momento. Por favor, intenta más tarde.'
         );
         break;
 
       default:
         if (error.status >= 400 && error.status < 500) {
           this.notificationService.error(
-            'Error en la petición. Verifica los datos e intenta nuevamente.',
+            'Error en la petición. Verifica los datos e intenta nuevamente.'
           );
         } else if (error.status >= 500) {
-          this.notificationService.error(
-            'Error del servidor. Por favor, intenta más tarde.',
-          );
+          this.notificationService.error('Error del servidor. Por favor, intenta más tarde.');
         }
         break;
     }
@@ -239,9 +220,7 @@ export class NetworkInterceptor implements HttpInterceptor {
     const duration = this.activeRequests.get(this.generateRequestKey(request));
     if (duration) {
       const requestTime = Date.now() - duration;
-      this.logger.debug(
-        `Petición completada: ${request.method} ${request.url} (${requestTime}ms)`,
-      );
+      this.logger.debug(`Petición completada: ${request.method} ${request.url} (${requestTime}ms)`);
     }
   }
 
@@ -256,9 +235,7 @@ export class NetworkInterceptor implements HttpInterceptor {
 
   // Método para cancelar todas las peticiones activas (útil en logout)
   cancelAllRequests(): void {
-    this.logger.warn(
-      `Cancelando ${this.activeRequests.size} peticiones activas`,
-    );
+    this.logger.warn(`Cancelando ${this.activeRequests.size} peticiones activas`);
     this.activeRequests.clear();
   }
 }

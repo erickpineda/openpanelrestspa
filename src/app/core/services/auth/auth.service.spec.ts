@@ -1,12 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { TokenStorageService } from './token-storage.service';
 import { AuthSyncService } from './auth-sync.service';
@@ -46,13 +40,8 @@ describe('AuthService', () => {
     tokenStorage.getToken.and.returnValue('t');
     tokenStorage.getOrCreateTabId.and.returnValue('tab');
 
-    authSync = jasmine.createSpyObj('AuthSyncService', [
-      'notifyLogin',
-      'notifyLogout',
-    ]);
-    sessionManager = jasmine.createSpyObj('SessionManagerService', [
-      'performLogout',
-    ]);
+    authSync = jasmine.createSpyObj('AuthSyncService', ['notifyLogin', 'notifyLogout']);
+    sessionManager = jasmine.createSpyObj('SessionManagerService', ['performLogout']);
 
     TestBed.configureTestingModule({
       providers: [

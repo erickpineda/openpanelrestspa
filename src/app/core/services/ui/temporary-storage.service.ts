@@ -49,9 +49,7 @@ export class TemporaryStorageService {
   // ✅ NUEVO: Obtener entradas por tipo
   getTemporaryEntriesByType(formType: string): TemporaryEntry[] {
     const entries = this.getTemporaryEntries();
-    return Object.values(entries).filter(
-      (entry) => entry.formType === formType,
-    );
+    return Object.values(entries).filter((entry) => entry.formType === formType);
   }
 
   getAllTemporaryEntries(): TemporaryEntry[] {

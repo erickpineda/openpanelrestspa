@@ -1,11 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnChanges,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-op-pagination',
@@ -35,13 +28,10 @@ export class OpPaginationComponent implements OnChanges {
     const middle = Math.floor(this.paginasRange / 2);
     const start = Math.max(
       0,
-      Math.min(this.currentPage - middle, this.totalPages - this.paginasRange),
+      Math.min(this.currentPage - middle, this.totalPages - this.paginasRange)
     );
     const end = Math.min(this.totalPages, start + this.paginasRange);
-    this.paginasVisibles = Array.from(
-      { length: end - start },
-      (_, i) => start + i,
-    );
+    this.paginasVisibles = Array.from({ length: end - start }, (_, i) => start + i);
   }
 
   cambiarPagina(incremento: number): void {

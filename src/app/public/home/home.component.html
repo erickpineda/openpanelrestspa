@@ -8,15 +8,9 @@
         <div>
           <h5 cCardTitle>No hay entradas</h5>
           <p cCardText>
-            Este blog no tiene entradas, contacta con los vagos del Blog para
-            que publiquen algo..
+            Este blog no tiene entradas, contacta con los vagos del Blog para que publiquen algo..
           </p>
-          <button
-            cButton
-            href="#about"
-            color="primary"
-            (click)="refrescarPagina()"
-          >
+          <button cButton href="#about" color="primary" (click)="refrescarPagina()">
             Refrescar
           </button>
         </div>
@@ -27,10 +21,7 @@
           @if (pagedEntradas.length > 0) {
             <div class="large-entry mb-4">
               <c-card>
-                <img
-                  src="../../../../assets/img/brand/coreui-base.svg"
-                  class="card-img-top"
-                />
+                <img src="../../../../assets/img/brand/coreui-base.svg" class="card-img-top" />
                 <c-card-body>
                   <h5 cCardTitle>{{ pagedEntradas[0]?.titulo }}</h5>
                   <p cCardText>{{ pagedEntradas[0]?.resumen }}</p>
@@ -51,10 +42,7 @@
                   ) {
                     <div>
                       <small class="text-medium-emphasis"
-                        >Categorías:
-                        <a cCardLink [routerLink]>{{
-                          categoria.nombre
-                        }}</a></small
+                        >Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small
                       >
                     </div>
                   }
@@ -63,31 +51,19 @@
             </div>
           }
           <c-row>
-            @for (
-              entrada of pagedEntradas.slice(1);
-              track trackByEntrada($index, entrada)
-            ) {
+            @for (entrada of pagedEntradas.slice(1); track trackByEntrada($index, entrada)) {
               <c-col [md]="4" class="mb-4">
                 <c-card>
-                  <img
-                    src="../../../../assets/img/brand/coreui-base.svg"
-                    class="card-img-top"
-                  />
+                  <img src="../../../../assets/img/brand/coreui-base.svg" class="card-img-top" />
                   <c-card-body>
                     <h5 cCardTitle>{{ entrada.titulo }}</h5>
                     <p cCardText>{{ entrada.resumen }}</p>
-                    <button cButton color="primary">
-                      Continuar leyendo...
-                    </button>
+                    <button cButton color="primary">Continuar leyendo...</button>
                   </c-card-body>
                   <c-card-footer>
                     <small class="text-medium-emphasis">
                       Fecha publicación:
-                      {{
-                        entrada.fechaPublicacion
-                          ? entrada.fechaPublicacion
-                          : 'No Publicada'
-                      }}
+                      {{ entrada.fechaPublicacion ? entrada.fechaPublicacion : 'No Publicada' }}
                     </small>
                     @for (
                       categoria of entrada.categorias;
@@ -95,10 +71,7 @@
                     ) {
                       <div>
                         <small class="text-medium-emphasis"
-                          >Categorías:
-                          <a cCardLink [routerLink]>{{
-                            categoria.nombre
-                          }}</a></small
+                          >Categorías: <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small
                         >
                       </div>
                     }

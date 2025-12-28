@@ -10,9 +10,7 @@ export class LoggerService {
 
   // Niveles de log
   private levels = ['debug', 'info', 'warn', 'error'] as const;
-  private minLevel: (typeof this.levels)[number] = this.isProduction
-    ? 'warn'
-    : 'debug';
+  private minLevel: (typeof this.levels)[number] = this.isProduction ? 'warn' : 'debug';
   constructor(private buffer: LoggerBufferService) {}
 
   private shouldLog(level: (typeof this.levels)[number]): boolean {
@@ -21,11 +19,7 @@ export class LoggerService {
     return levelIndex >= minLevelIndex;
   }
 
-  log(
-    level: (typeof this.levels)[number],
-    message: string,
-    ...args: any[]
-  ): void {
+  log(level: (typeof this.levels)[number], message: string, ...args: any[]): void {
     if (!this.shouldLog(level)) return;
 
     const timestamp = new Date().toISOString();

@@ -20,10 +20,7 @@ describe('LoadingService', () => {
       'warn',
       'error',
     ]);
-    notifications = jasmine.createSpyObj<NotificationService>(
-      'NotificationService',
-      ['error'],
-    );
+    notifications = jasmine.createSpyObj<NotificationService>('NotificationService', ['error']);
 
     TestBed.configureTestingModule({
       providers: [

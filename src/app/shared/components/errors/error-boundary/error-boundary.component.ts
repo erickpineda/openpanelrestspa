@@ -14,33 +14,17 @@ import { LoggerService } from '../../../../core/services/logger.service';
     } @else {
       <c-alert color="warning" class="error-boundary p-3">
         <div class="d-flex align-items-start">
-          <c-icon
-            name="cil-warning"
-            class="text-warning me-3"
-            size="lg"
-          ></c-icon>
+          <c-icon name="cil-warning" class="text-warning me-3" size="lg"></c-icon>
           <div class="flex-fill">
             <h6 class="mb-1">{{ fallbackMessage }}</h6>
             <p class="mb-2 small text-muted">
               {{ fallbackDescription }}
             </p>
-            <div
-              class="btn-group btn-group-sm"
-              role="group"
-              aria-label="Acciones de error"
-            >
-              <button
-                type="button"
-                class="btn btn-outline-primary"
-                (click)="retry()"
-              >
+            <div class="btn-group btn-group-sm" role="group" aria-label="Acciones de error">
+              <button type="button" class="btn btn-outline-primary" (click)="retry()">
                 Reintentar
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                (click)="reset()"
-              >
+              <button type="button" class="btn btn-outline-secondary" (click)="reset()">
                 Restablecer
               </button>
             </div>
@@ -97,7 +81,7 @@ export class ErrorBoundaryComponent {
 
   constructor(
     private errorHandler: GlobalErrorHandlerService,
-    private log: LoggerService,
+    private log: LoggerService
   ) {}
 
   /**
@@ -157,8 +141,6 @@ export class ErrorBoundaryComponent {
   }
 
   public get isProduction(): boolean {
-    return !(
-      typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    );
+    return !(typeof window !== 'undefined' && window.location.hostname === 'localhost');
   }
 }

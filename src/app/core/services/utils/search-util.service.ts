@@ -32,7 +32,7 @@ export class SearchUtilService {
   buildRequest(
     entityName: string | null,
     criteria: { filterKey: string; value: any; operation: string }[],
-    dataOption: string,
+    dataOption: string
   ): any {
     const list = (criteria || []).map((c) => ({
       filterKey: c.filterKey,
@@ -49,12 +49,8 @@ export class SearchUtilService {
     filterKey: string,
     value: any,
     operation: string,
-    dataOption: string = 'AND',
+    dataOption: string = 'AND'
   ): any {
-    return this.buildRequest(
-      entityName,
-      [{ filterKey, value, operation }],
-      dataOption,
-    );
+    return this.buildRequest(entityName, [{ filterKey, value, operation }], dataOption);
   }
 }

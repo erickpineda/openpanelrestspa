@@ -33,7 +33,7 @@ export class EditarComentarioComponent implements OnInit {
     private entradaService: EntradaService,
     private commonFuncService: CommonFunctionalityService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -89,13 +89,8 @@ export class EditarComentarioComponent implements OnInit {
     this.comentarioService
       .actualizar(comentario.idComentario, comentario)
       .subscribe((response: OpenpanelApiResponse<any>) => {
-        this.log.info(
-          'Se ha actualizado el comentario ' + comentario.idComentario,
-        );
-        this.commonFuncService.reloadComponent(
-          false,
-          '/admin/control/comentarios',
-        );
+        this.log.info('Se ha actualizado el comentario ' + comentario.idComentario);
+        this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
       });
   }
 

@@ -35,7 +35,7 @@ describe('ListadoEntradasComponent', () => {
       mockRouter,
       mockCatalog,
       mockCdr,
-      mockZone,
+      mockZone
     );
   });
 

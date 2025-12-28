@@ -26,16 +26,11 @@
     </c-sidebar-header>
 
     <ng-scrollbar pointerEventsMethod="scrollbar" visibility="hover">
-      <c-sidebar-nav
-        [navItems]="navItems"
-        [dropdownMode]="'none'"
-      ></c-sidebar-nav>
+      <c-sidebar-nav [navItems]="navItems" [dropdownMode]="'none'"></c-sidebar-nav>
     </ng-scrollbar>
     <c-sidebar-footer
       class="border-top d-flex align-items-end justify-content-end"
-      [attr.aria-label]="
-        sidebarNarrow ? 'Expandir sidebar' : 'Compactar sidebar'
-      "
+      [attr.aria-label]="sidebarNarrow ? 'Expandir sidebar' : 'Compactar sidebar'"
     >
       <button
         type="button"
@@ -54,9 +49,7 @@
         <app-data-recovery-notification
           title="📥 Entradas no guardadas"
           [message]="
-            'Tienes ' +
-            temporaryEntriesCount +
-            ' entrada(s) no guardada(s) de sesiones anteriores'
+            'Tienes ' + temporaryEntriesCount + ' entrada(s) no guardada(s) de sesiones anteriores'
           "
           recoverText="Ver entradas temporales"
           ignoreText="Más tarde"

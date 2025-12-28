@@ -342,26 +342,7 @@
 <a name='L277'></a><a href='#L277'>277</a>
 <a name='L278'></a><a href='#L278'>278</a>
 <a name='L279'></a><a href='#L279'>279</a>
-<a name='L280'></a><a href='#L280'>280</a>
-<a name='L281'></a><a href='#L281'>281</a>
-<a name='L282'></a><a href='#L282'>282</a>
-<a name='L283'></a><a href='#L283'>283</a>
-<a name='L284'></a><a href='#L284'>284</a>
-<a name='L285'></a><a href='#L285'>285</a>
-<a name='L286'></a><a href='#L286'>286</a>
-<a name='L287'></a><a href='#L287'>287</a>
-<a name='L288'></a><a href='#L288'>288</a>
-<a name='L289'></a><a href='#L289'>289</a>
-<a name='L290'></a><a href='#L290'>290</a>
-<a name='L291'></a><a href='#L291'>291</a>
-<a name='L292'></a><a href='#L292'>292</a>
-<a name='L293'></a><a href='#L293'>293</a>
-<a name='L294'></a><a href='#L294'>294</a>
-<a name='L295'></a><a href='#L295'>295</a>
-<a name='L296'></a><a href='#L296'>296</a>
-<a name='L297'></a><a href='#L297'>297</a>
-<a name='L298'></a><a href='#L298'>298</a>
-<a name='L299'></a><a href='#L299'>299</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L280'></a><a href='#L280'>280</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -440,12 +421,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -471,7 +446,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -480,16 +454,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -499,9 +467,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -643,9 +608,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -702,7 +664,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     private categoriaService: CategoriaService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 &nbsp;
   ngOnInit(): void {
@@ -726,7 +688,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
           finalize(<span class="fstat-no" title="function not covered" >() =</span>&gt; {
 <span class="cstat-no" title="statement not covered" >            this.cargando = false;</span>
 <span class="cstat-no" title="statement not covered" >            this.cdr.detectChanges();</span>
-          }),
+          })
         )
         .subscribe({
           next: <span class="fstat-no" title="function not covered" >(r</span>esponse: any) =&gt; {
@@ -737,13 +699,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
         });
     } else <span class="missing-if-branch" title="else path not taken" >E</span>{
       const value = <span class="cstat-no" title="statement not covered" >this.basicSearchText || this.filtroNombre || '';</span>
-      const payload = <span class="cstat-no" title="statement not covered" >this.searchUtil.buildSingle(</span>
-        'Categoria',
-        'nombre',
-        value,
-        'CONTAINS',
-        'AND',
-      );
+      const payload = <span class="cstat-no" title="statement not covered" >this.searchUtil.buildSingle('Categoria', 'nombre', value, 'CONTAINS', 'AND');</span>
 <span class="cstat-no" title="statement not covered" >      this.categoriaService</span>
         .buscarSinGlobalLoader(payload, this.pageNo, this.pageSize)
         .pipe(
@@ -751,7 +707,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
           finalize(<span class="fstat-no" title="function not covered" >() =</span>&gt; {
 <span class="cstat-no" title="statement not covered" >            this.cargando = false;</span>
 <span class="cstat-no" title="statement not covered" >            this.cdr.detectChanges();</span>
-          }),
+          })
         )
         .subscribe({
           next: <span class="fstat-no" title="function not covered" >(d</span>ata: any) =&gt; {
@@ -767,27 +723,20 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     const elementos: Categoria[] = <span class="cstat-no" title="statement not covered" >Array.isArray(raw) ? raw : [];</span>
 &nbsp;
     const hasServerPaging =
-<span class="cstat-no" title="statement not covered" >      typeof data?.totalPages === 'number' ||</span>
-      typeof data?.totalElements === 'number';
+<span class="cstat-no" title="statement not covered" >      typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (hasServerPaging) {</span>
 <span class="cstat-no" title="statement not covered" >      this.listaCategorias = elementos;</span>
 <span class="cstat-no" title="statement not covered" >      this.allCategorias = [];</span>
 <span class="cstat-no" title="statement not covered" >      this.totalElements = Number(data?.totalElements || elementos.length || 0);</span>
 <span class="cstat-no" title="statement not covered" >      this.totalPages = Number(</span>
-        data?.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1,
+        data?.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1
       );
-<span class="cstat-no" title="statement not covered" >      this.numberOfElements = Number(</span>
-        data?.numberOfElements ?? elementos.length,
-      );
+<span class="cstat-no" title="statement not covered" >      this.numberOfElements = Number(data?.numberOfElements ?? elementos.length);</span>
 <span class="cstat-no" title="statement not covered" >      this.pagedCategorias = elementos;</span>
 &nbsp;
       // Si estamos en una página vacía y hay páginas anteriores, volver atrás
-<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (</span>
-        elementos.length === 0 &amp;&amp;
-        this.pageNo &gt; 0 &amp;&amp;
-        this.pageNo &gt;= this.totalPages
-      ) {
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (elementos.length === 0 &amp;&amp; this.pageNo &gt; 0 &amp;&amp; this.pageNo &gt;= this.totalPages) {</span>
 <span class="cstat-no" title="statement not covered" >        this.pageNo = Math.max(0, this.totalPages - 1);</span>
 <span class="cstat-no" title="statement not covered" >        this.obtenerListaCategorias();</span>
 <span class="cstat-no" title="statement not covered" >        return;</span>
@@ -796,10 +745,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
       // Fallback paginación cliente
 <span class="cstat-no" title="statement not covered" >      this.allCategorias = elementos;</span>
 <span class="cstat-no" title="statement not covered" >      this.totalElements = this.allCategorias.length;</span>
-<span class="cstat-no" title="statement not covered" >      this.totalPages = Math.max(</span>
-        1,
-        Math.ceil(this.totalElements / this.pageSize),
-      );
+<span class="cstat-no" title="statement not covered" >      this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (this.pageNo &gt;= this.totalPages) {</span>
 <span class="cstat-no" title="statement not covered" >        this.pageNo = Math.max(0, this.totalPages - 1);</span>
@@ -869,7 +815,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
         finalize(<span class="fstat-no" title="function not covered" >() =</span>&gt; {
 <span class="cstat-no" title="statement not covered" >          this.cargando = false;</span>
 <span class="cstat-no" title="statement not covered" >          this.cdr.detectChanges();</span>
-        }),
+        })
       )
       .subscribe({
         next: <span class="fstat-no" title="function not covered" >() =</span>&gt; {
@@ -940,10 +886,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  onPageChange(</span>page: number): void {
     const totalPages = <span class="cstat-no" title="statement not covered" >this.getTotalPages();</span>
-    const safePage = <span class="cstat-no" title="statement not covered" >Math.max(</span>
-      0,
-      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
-    );
+    const safePage = <span class="cstat-no" title="statement not covered" >Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (safePage === this.pageNo) <span class="cstat-no" title="statement not covered" >return;</span></span>
 <span class="cstat-no" title="statement not covered" >    this.pageNo = safePage;</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.allCategorias.length &gt; 0) {</span>
@@ -964,7 +907,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-25T15:28:51.812Z
+                at 2025-12-26T15:52:04.855Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

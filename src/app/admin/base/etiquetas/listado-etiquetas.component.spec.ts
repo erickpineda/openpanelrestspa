@@ -32,10 +32,7 @@ describe('EtiquetasListComponent - paginación', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        { provide: EtiquetaService, useClass: MockEtiquetaService },
-        FormBuilder,
-      ],
+      providers: [{ provide: EtiquetaService, useClass: MockEtiquetaService }, FormBuilder],
     });
     component = new EtiquetasListComponent(
       TestBed.inject(EtiquetaService),
@@ -48,7 +45,7 @@ describe('EtiquetasListComponent - paginación', () => {
         debug: () => {},
       } as any,
       { buildRequest: () => ({}) } as any,
-      { detectChanges: () => {} } as any,
+      { detectChanges: () => {} } as any
     );
   });
 

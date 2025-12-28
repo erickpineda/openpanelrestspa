@@ -9,20 +9,10 @@
           Estado actual: <span class="badge bg-success">{{ status }}</span>
         </p>
         <div class="actions">
-          <button
-            cButton
-            color="primary"
-            [disabled]="optimizeRunning"
-            (click)="runOptimize()"
-          >
+          <button cButton color="primary" [disabled]="optimizeRunning" (click)="runOptimize()">
             Optimizar
           </button>
-          <button
-            cButton
-            color="secondary"
-            [disabled]="backupRunning"
-            (click)="runBackup()"
-          >
+          <button cButton color="secondary" [disabled]="backupRunning" (click)="runBackup()">
             Backup
           </button>
         </div>

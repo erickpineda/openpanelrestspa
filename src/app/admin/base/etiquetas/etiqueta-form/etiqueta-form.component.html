@@ -3,31 +3,21 @@
   (ngSubmit)="onSubmit()"
   role="form"
   [attr.aria-label]="
-    isEdit
-      ? 'Formulario de edición de etiqueta'
-      : 'Formulario de creación de etiqueta'
+    isEdit ? 'Formulario de edición de etiqueta' : 'Formulario de creación de etiqueta'
   "
   data-testid="etiqueta-form"
 >
   <div class="mb-3">
-    <label for="nombre" class="form-label"
-      >Nombre <span class="text-danger">*</span></label
-    >
+    <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
     <input
       type="text"
       id="nombre"
       cFormControl
       formControlName="nombre"
-      [class.is-invalid]="
-        form.get('nombre')?.invalid && form.get('nombre')?.touched
-      "
-      [attr.aria-invalid]="
-        form.get('nombre')?.invalid && form.get('nombre')?.touched
-      "
+      [class.is-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
+      [attr.aria-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
       [attr.aria-describedby]="
-        form.get('nombre')?.invalid && form.get('nombre')?.touched
-          ? 'nombre-error'
-          : null
+        form.get('nombre')?.invalid && form.get('nombre')?.touched ? 'nombre-error' : null
       "
       [attr.aria-label]="'Ingrese el nombre de la etiqueta'"
       placeholder="Ingrese el nombre de la etiqueta"
@@ -52,9 +42,7 @@
       id="descripcion"
       cFormControl
       formControlName="descripcion"
-      [class.is-invalid]="
-        form.get('descripcion')?.invalid && form.get('descripcion')?.touched
-      "
+      [class.is-invalid]="form.get('descripcion')?.invalid && form.get('descripcion')?.touched"
       [attr.aria-label]="'Ingrese una descripción opcional para la etiqueta'"
       rows="3"
       placeholder="Ingrese una descripción opcional para la etiqueta"

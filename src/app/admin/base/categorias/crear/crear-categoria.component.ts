@@ -19,13 +19,11 @@ export class CrearCategoriaComponent implements OnInit {
     private facade: CategoriaFacadeService,
     private router: Router,
     private commonFuncService: CommonFunctionalityService,
-    private toastService: ToastService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
-    this.facade
-      .obtenerListaCategorias()
-      .subscribe((cats) => (this.listaCategorias = cats));
+    this.facade.obtenerListaCategorias().subscribe((cats) => (this.listaCategorias = cats));
   }
 
   crear(cat: Categoria) {
@@ -33,12 +31,9 @@ export class CrearCategoriaComponent implements OnInit {
       next: () => {
         this.toastService.showSuccess(
           'La categoría se ha creado correctamente.',
-          'Categoría creada',
+          'Categoría creada'
         );
-        this.commonFuncService.reloadComponent(
-          false,
-          '/admin/control/categorias',
-        );
+        this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
       },
       error: (err) => {
         console.error('Error al crear la categoría:', err);

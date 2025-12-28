@@ -84,9 +84,7 @@ describe('NavigationMigrationService', () => {
 
       expect(result[0].dynamicBadge).toBeDefined();
       expect(result[0].dynamicBadge!.service).toBe('BadgeCounterService');
-      expect(result[0].dynamicBadge!.method).toBe(
-        'getUnmoderatedCommentsCount',
-      );
+      expect(result[0].dynamicBadge!.method).toBe('getUnmoderatedCommentsCount');
       expect(result[0].badge!.color).toBe('danger');
 
       expect(result[1].dynamicBadge).toBeDefined();
@@ -113,10 +111,7 @@ describe('NavigationMigrationService', () => {
       const result = service.migrateLegacyNavigation(legacyItems);
 
       // Users management - admin only
-      expect(result[0].requiredRoles).toEqual([
-        UserRole.ADMINISTRADOR,
-        UserRole.PROPIETARIO,
-      ]);
+      expect(result[0].requiredRoles).toEqual([UserRole.ADMINISTRADOR, UserRole.PROPIETARIO]);
 
       // Roles management - owner only
       expect(result[1].requiredRoles).toEqual([UserRole.PROPIETARIO]);
@@ -135,9 +130,7 @@ describe('NavigationMigrationService', () => {
         {
           name: 'Entradas',
           url: '/admin/control/entradas',
-          children: [
-            { name: 'Nueva Entrada', url: '/admin/control/entradas/crear' },
-          ],
+          children: [{ name: 'Nueva Entrada', url: '/admin/control/entradas/crear' }],
         },
       ];
 
@@ -156,12 +149,8 @@ describe('NavigationMigrationService', () => {
       const routeMap = service.getRouteMapping();
 
       expect(routeMap.get('/admin/entradas')).toBe('/admin/control/entradas');
-      expect(routeMap.get('/admin/usuarios')).toBe(
-        '/admin/control/gestion/usuarios',
-      );
-      expect(routeMap.get('/admin/perfil')).toBe(
-        '/admin/control/gestion/miperfil',
-      );
+      expect(routeMap.get('/admin/usuarios')).toBe('/admin/control/gestion/usuarios');
+      expect(routeMap.get('/admin/perfil')).toBe('/admin/control/gestion/miperfil');
     });
 
     it('should have mappings for all common legacy routes', () => {
@@ -253,12 +242,8 @@ describe('NavigationMigrationService', () => {
       const result = service.validateMigratedStructure(invalidItems);
 
       expect(result.isValid).toBe(false);
-      expect(
-        result.issues.some((issue) => issue.includes('missing name')),
-      ).toBe(true);
-      expect(
-        result.issues.some((issue) => issue.includes('empty requiredRoles')),
-      ).toBe(true);
+      expect(result.issues.some((issue) => issue.includes('missing name'))).toBe(true);
+      expect(result.issues.some((issue) => issue.includes('empty requiredRoles'))).toBe(true);
     });
 
     it('should detect excessive hierarchy depth', () => {
@@ -290,9 +275,7 @@ describe('NavigationMigrationService', () => {
       const result = service.validateMigratedStructure(deepItems);
 
       expect(result.isValid).toBe(false);
-      expect(
-        result.issues.some((issue) => issue.includes('exceeds maximum depth')),
-      ).toBe(true);
+      expect(result.issues.some((issue) => issue.includes('exceeds maximum depth'))).toBe(true);
     });
   });
 
@@ -315,10 +298,7 @@ describe('NavigationMigrationService', () => {
         },
       ];
 
-      const result = service.preserveCustomConfigurations(
-        originalItems,
-        customConfig,
-      );
+      const result = service.preserveCustomConfigurations(originalItems, customConfig);
 
       expect(result[0].priority).toBe(150);
       expect(result[0].badge?.text).toBe('Custom');
@@ -351,10 +331,7 @@ describe('NavigationMigrationService', () => {
         },
       ];
 
-      const result = service.preserveCustomConfigurations(
-        originalItems,
-        customConfig,
-      );
+      const result = service.preserveCustomConfigurations(originalItems, customConfig);
 
       expect(result[0].children![0].priority).toBe(200);
       expect(result[0].children![0].badge?.text).toBe('Hot');
@@ -368,15 +345,9 @@ describe('NavigationMigrationService', () => {
         { name: 'B', url: '/b', children: [{ name: 'B1', url: '/b/1' }] },
       ];
       const migrated = service.migrateLegacyNavigation(legacyItems);
-      expect(
-        migrated.every((item) => item.name && item.name.length > 0),
-      ).toBeTrue();
-      expect(
-        migrated.every((item) => typeof item.priority === 'number'),
-      ).toBeTrue();
-      expect(
-        migrated.every((item) => Array.isArray(item.requiredRoles)),
-      ).toBeTrue();
+      expect(migrated.every((item) => item.name && item.name.length > 0)).toBeTrue();
+      expect(migrated.every((item) => typeof item.priority === 'number')).toBeTrue();
+      expect(migrated.every((item) => Array.isArray(item.requiredRoles))).toBeTrue();
       const validation = service.validateMigratedStructure(migrated);
       expect(validation.isValid).toBeTrue();
     });

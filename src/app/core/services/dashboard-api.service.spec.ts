@@ -1,13 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { DashboardApiService } from './dashboard-api.service';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { RolService } from './data/rol.service';
 import { PrivilegioService } from './data/privilegio.service';
 import { FileStorageService } from './file-storage.service';
@@ -22,10 +16,7 @@ describe('DashboardApiService force param', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
-      providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-      ],
+      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
     });
     service = TestBed.inject(DashboardApiService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -45,9 +36,7 @@ describe('DashboardApiService force param', () => {
 
   it('adds force=true to series activity when forced', () => {
     service.getSeriesActivity(30, true, 'day').subscribe();
-    const req = httpMock.expectOne((r) =>
-      r.url.endsWith('/dashboard/series/activity'),
-    );
+    const req = httpMock.expectOne((r) => r.url.endsWith('/dashboard/series/activity'));
     expect(req.request.params.get('force')).toBe('true');
     req.flush({ data: [] });
   });
@@ -86,21 +75,13 @@ describe('Data services request shapes', () => {
   it('RolService.buscarSinGlobalLoader sets paging params and skip-loader context', () => {
     const service = TestBed.inject(RolService);
 
-    service
-      .buscarSinGlobalLoader({ any: 'payload' }, 0, 10)
-      .subscribe(() => {});
+    service.buscarSinGlobalLoader({ any: 'payload' }, 0, 10).subscribe(() => {});
 
     const req = httpMock.expectOne((r) => r.url.includes('/roles/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe(
-      '0',
-    );
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe(
-      '10',
-    );
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(
-      true,
-    );
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe('0');
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe('10');
+    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [] } });
   });
 
@@ -109,17 +90,11 @@ describe('Data services request shapes', () => {
 
     service.obtenerPorCodigos(['R1', 'R2'], 1, 50).subscribe(() => {});
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/roles/obtenerPorCodigos'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/roles/obtenerPorCodigos'));
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ codigosRol: ['R1', 'R2'] });
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe(
-      '1',
-    );
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe(
-      '50',
-    );
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe('1');
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe('50');
     req.flush({ data: { elements: [] } });
   });
 
@@ -128,9 +103,7 @@ describe('Data services request shapes', () => {
 
     service.obtenerPorId('P1').subscribe(() => {});
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/privilegios/obtenerPorCodigo/P1'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/privilegios/obtenerPorCodigo/P1'));
     expect(req.request.method).toBe('GET');
     req.flush({ data: { codigo: 'P1' } });
   });
@@ -140,19 +113,11 @@ describe('Data services request shapes', () => {
 
     service.buscarSinGlobalLoader({ q: 'x' }, 0, 25).subscribe(() => {});
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/privilegios/buscar'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/privilegios/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe(
-      '0',
-    );
-    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe(
-      '25',
-    );
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(
-      true,
-    );
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe('0');
+    expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe('25');
+    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [] } });
   });
 
@@ -174,9 +139,7 @@ describe('Data services request shapes', () => {
 
     service.actualizar('P1', payload).subscribe(() => {});
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/privilegios/actualizarPorCodigo/P1'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/privilegios/actualizarPorCodigo/P1'));
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual(payload);
     req.flush({ data: payload });
@@ -187,9 +150,7 @@ describe('Data services request shapes', () => {
 
     service.borrar('P1').subscribe(() => {});
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/privilegios/borrarPorCodigo/P1'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/privilegios/borrarPorCodigo/P1'));
     expect(req.request.method).toBe('DELETE');
     req.flush({ data: 'ok' });
   });
@@ -222,9 +183,7 @@ describe('FileStorageService request shapes', () => {
   it('descargarFichero sets Authorization header when token exists', () => {
     service.descargarFichero('abc').subscribe(() => {});
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/fileStorage/ficheros/descargar/abc'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/fileStorage/ficheros/descargar/abc'));
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.get('Authorization')).toBe('Bearer token');
     expect(req.request.responseType).toBe('blob');
@@ -236,9 +195,7 @@ describe('FileStorageService request shapes', () => {
 
     service.uploadFile(file).subscribe(() => {});
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/fileStorage/subirFichero'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/fileStorage/subirFichero'));
     expect(req.request.method).toBe('POST');
     expect(req.request.body instanceof FormData).toBeTrue();
 
@@ -253,9 +210,7 @@ describe('FileStorageService request shapes', () => {
 
     service.uploadFile(file, 'docs').subscribe(() => {});
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/fileStorage/subirFichero'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/fileStorage/subirFichero'));
     const body = req.request.body as FormData;
     expect(body.get('folder')).toBe('docs');
     req.flush({ data: { ok: true } });
@@ -269,12 +224,8 @@ describe('FileStorageService request shapes', () => {
       expect(items[0].url).toBe('/img.jpg');
     });
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/fileStorage/ficheros'),
-    );
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(
-      true,
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/fileStorage/ficheros'));
+    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({
       data: [
         {
@@ -293,12 +244,8 @@ describe('FileStorageService request shapes', () => {
       expect(data).toEqual({ uuid: 'u1' });
     });
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/fileStorage/ficheros/obtenerDatos/u1'),
-    );
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(
-      true,
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/fileStorage/ficheros/obtenerDatos/u1'));
+    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { uuid: 'u1' } });
   });
 

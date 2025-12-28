@@ -22,7 +22,7 @@ export class EditarCategoriaComponent implements OnInit {
     private facade: CategoriaFacadeService,
     private router: Router,
     private commonFuncService: CommonFunctionalityService,
-    private toastService: ToastService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -31,9 +31,7 @@ export class EditarCategoriaComponent implements OnInit {
       this.categoria = cat || undefined;
       this.formDisabled = true;
     });
-    this.facade
-      .obtenerListaCategorias()
-      .subscribe((cats) => (this.listaCategorias = cats));
+    this.facade.obtenerListaCategorias().subscribe((cats) => (this.listaCategorias = cats));
   }
 
   editar(cat: Categoria) {
@@ -42,12 +40,9 @@ export class EditarCategoriaComponent implements OnInit {
       next: () => {
         this.toastService.showSuccess(
           'La categoría se ha modificado correctamente.',
-          'Categoría modificada',
+          'Categoría modificada'
         );
-        this.commonFuncService.reloadComponent(
-          false,
-          '/admin/control/categorias',
-        );
+        this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
       },
       error: (err) => {
         console.error('Error al actualizar la categoría:', err);

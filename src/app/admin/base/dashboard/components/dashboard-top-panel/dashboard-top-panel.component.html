@@ -69,13 +69,7 @@
         aria-live="assertive"
       >
         <span>{{ error }}</span>
-        <button
-          cButton
-          color="danger"
-          size="sm"
-          [ngClass]="retryBtnClass"
-          (click)="retry.emit()"
-        >
+        <button cButton color="danger" size="sm" [ngClass]="retryBtnClass" (click)="retry.emit()">
           Reintentar
         </button>
       </div>

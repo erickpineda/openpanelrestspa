@@ -53,35 +53,19 @@
             </c-card-header>
             <c-card-body>
               <c-nav variant="tabs">
-                <a
-                  [active]="true"
-                  [cTabContent]="tabContent"
-                  [routerLink]
-                  [tabPaneIdx]="0"
-                  cNavLink
+                <a [active]="true" [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="0" cNavLink
                   >Información Personal</a
                 >
-                <a
-                  [cTabContent]="tabContent"
-                  [routerLink]
-                  [tabPaneIdx]="1"
-                  cNavLink
+                <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="1" cNavLink
                   >Preferencias</a
                 >
-                <a
-                  [cTabContent]="tabContent"
-                  [routerLink]
-                  [tabPaneIdx]="2"
-                  cNavLink
+                <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="2" cNavLink
                   >Actividad Reciente</a
                 >
               </c-nav>
               <c-tab-content #tabContent="cTabContent" [activeTabPaneIdx]="0">
                 <c-tab-pane class="p-3">
-                  <app-perfil-form
-                    [usuario]="usuario"
-                    (save)="onSave($event)"
-                  ></app-perfil-form>
+                  <app-perfil-form [usuario]="usuario" (save)="onSave($event)"></app-perfil-form>
                 </c-tab-pane>
                 <c-tab-pane class="p-3">
                   <app-perfil-preferences
@@ -90,9 +74,7 @@
                   ></app-perfil-preferences>
                 </c-tab-pane>
                 <c-tab-pane class="p-3">
-                  <app-perfil-activity
-                    [usuarioId]="usuario.idUsuario"
-                  ></app-perfil-activity>
+                  <app-perfil-activity [usuarioId]="usuario.idUsuario"></app-perfil-activity>
                 </c-tab-pane>
               </c-tab-content>
             </c-card-body>
@@ -102,10 +84,7 @@
     }
 
     @if (loading) {
-      <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 50vh"
-      >
+      <div class="d-flex justify-content-center align-items-center" style="height: 50vh">
         <c-spinner color="primary"></c-spinner>
       </div>
     }

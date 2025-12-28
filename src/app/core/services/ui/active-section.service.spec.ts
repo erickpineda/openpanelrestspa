@@ -6,10 +6,7 @@ import {
   ActiveSectionState,
   MenuExpansionState,
 } from './active-section.service';
-import {
-  INavItemEnhanced,
-  UserRole,
-} from '../../../shared/types/navigation.types';
+import { INavItemEnhanced, UserRole } from '../../../shared/types/navigation.types';
 
 describe('ActiveSectionService', () => {
   let service: ActiveSectionService;
@@ -69,7 +66,7 @@ describe('ActiveSectionService', () => {
 
   beforeEach(() => {
     routerEventsSubject = new BehaviorSubject(
-      new NavigationEnd(1, '/admin/dashboard', '/admin/dashboard'),
+      new NavigationEnd(1, '/admin/dashboard', '/admin/dashboard')
     );
 
     const routerSpy = jasmine.createSpyObj('Router', ['navigate'], {
@@ -78,10 +75,7 @@ describe('ActiveSectionService', () => {
     });
 
     TestBed.configureTestingModule({
-      providers: [
-        ActiveSectionService,
-        { provide: Router, useValue: routerSpy },
-      ],
+      providers: [ActiveSectionService, { provide: Router, useValue: routerSpy }],
     });
 
     service = TestBed.inject(ActiveSectionService);
@@ -131,11 +125,7 @@ describe('ActiveSectionService', () => {
       expect(activeState.activeUrl).toBe('/admin/control/entradas/crear');
       expect(activeState.activeSectionId).toBe('gestion-de-contenido');
       expect(activeState.activeItemId).toBe('-admin-control-entradas-crear');
-      expect(activeState.breadcrumb).toEqual([
-        'Gestión de Contenido',
-        'Entradas',
-        'Nueva Entrada',
-      ]);
+      expect(activeState.breadcrumb).toEqual(['Gestión de Contenido', 'Entradas', 'Nueva Entrada']);
     });
 
     it('should handle URLs with query parameters and fragments', () => {
@@ -194,9 +184,7 @@ describe('ActiveSectionService', () => {
 
       const activeState = service.getCurrentActiveState();
       if (activeState.activeSectionId) {
-        expect(service.isSectionExpanded(activeState.activeSectionId)).toBe(
-          true,
-        );
+        expect(service.isSectionExpanded(activeState.activeSectionId)).toBe(true);
       }
     });
   });
@@ -277,12 +265,8 @@ describe('ActiveSectionService', () => {
     it('should correctly identify active items', () => {
       service.updateActiveSection('/admin/control/entradas');
 
-      const entriesItem = mockNavigationItems.find(
-        (item) => item.name === 'Entradas',
-      )!;
-      const dashboardItem = mockNavigationItems.find(
-        (item) => item.name === 'Dashboard',
-      )!;
+      const entriesItem = mockNavigationItems.find((item) => item.name === 'Entradas')!;
+      const dashboardItem = mockNavigationItems.find((item) => item.name === 'Dashboard')!;
 
       expect(service.isItemActive(entriesItem)).toBe(true);
       expect(service.isItemActive(dashboardItem)).toBe(false);
@@ -292,11 +276,9 @@ describe('ActiveSectionService', () => {
       service.updateActiveSection('/admin/control/entradas');
 
       const contentSection = mockNavigationItems.find(
-        (item) => item.name === 'Gestión de Contenido',
+        (item) => item.name === 'Gestión de Contenido'
       )!;
-      const adminSection = mockNavigationItems.find(
-        (item) => item.name === 'Administración',
-      )!;
+      const adminSection = mockNavigationItems.find((item) => item.name === 'Administración')!;
 
       expect(service.isSectionActive(contentSection)).toBe(true);
       expect(service.isSectionActive(adminSection)).toBe(false);
@@ -337,22 +319,14 @@ describe('ActiveSectionService', () => {
       service.updateActiveSection('/admin/control/entradas');
 
       const breadcrumb = service.getCurrentBreadcrumb();
-      expect(breadcrumb).toEqual([
-        'Gestión de Contenido',
-        'Entradas',
-        'Todas las Entradas',
-      ]);
+      expect(breadcrumb).toEqual(['Gestión de Contenido', 'Entradas', 'Todas las Entradas']);
     });
 
     it('should generate correct breadcrumb for child item', () => {
       service.updateActiveSection('/admin/control/entradas/crear');
 
       const breadcrumb = service.getCurrentBreadcrumb();
-      expect(breadcrumb).toEqual([
-        'Gestión de Contenido',
-        'Entradas',
-        'Nueva Entrada',
-      ]);
+      expect(breadcrumb).toEqual(['Gestión de Contenido', 'Entradas', 'Nueva Entrada']);
     });
   });
 
@@ -460,9 +434,7 @@ describe('ActiveSectionService', () => {
         expect(activeState.activeItemId).toBe('-admin-control-entradas');
 
         // Verify the entries item is marked as active
-        const entriesItem = mockNavigationItems.find(
-          (item) => item.name === 'Entradas',
-        )!;
+        const entriesItem = mockNavigationItems.find((item) => item.name === 'Entradas')!;
         expect(service.isItemActive(entriesItem)).toBe(true);
       });
     });
@@ -483,11 +455,9 @@ describe('ActiveSectionService', () => {
 
       // Verify section identification methods work
       const contentSection = mockNavigationItems.find(
-        (item) => item.name === 'Gestión de Contenido',
+        (item) => item.name === 'Gestión de Contenido'
       )!;
-      const entriesItem = mockNavigationItems.find(
-        (item) => item.name === 'Entradas',
-      )!;
+      const entriesItem = mockNavigationItems.find((item) => item.name === 'Entradas')!;
 
       expect(service.isSectionActive(contentSection)).toBe(true);
       expect(service.isItemActive(entriesItem)).toBe(true);
@@ -641,9 +611,7 @@ describe('ActiveSectionService', () => {
 
         // If there's an active section, it should be expanded
         if (activeState.activeSectionId) {
-          expect(service.isSectionExpanded(activeState.activeSectionId)).toBe(
-            true,
-          );
+          expect(service.isSectionExpanded(activeState.activeSectionId)).toBe(true);
         }
       });
 

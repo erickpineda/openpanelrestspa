@@ -3,11 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntradaFacadeService } from '../entrada-form/srv/entrada-facade.service';
 import { ValidationEntradaFormsService } from '../entrada-form/srv/validation-entrada-forms.service';
-import {
-  UntypedFormArray,
-  UntypedFormControl,
-  UntypedFormGroup,
-} from '@angular/forms';
+import { UntypedFormArray, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Entrada } from '../../../../core/models/entrada.model';
 import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
 import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
@@ -39,7 +35,7 @@ export class EditarEntradaComponent implements OnInit {
     private vf: ValidationEntradaFormsService,
     private facade: EntradaFacadeService,
     private router: Router,
-    private toastService: ToastService,
+    private toastService: ToastService
   ) {}
 
   async ngOnInit() {
@@ -58,10 +54,10 @@ export class EditarEntradaComponent implements OnInit {
 
       // Busca los objetos reales por referencia
       const estadoCorrecto = this.estadosEntr.find(
-        (e) => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada,
+        (e) => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada
       );
       const tipoCorrecto = this.tiposEntr.find(
-        (t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada,
+        (t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada
       );
 
       this.entradaForm.patchValue({
@@ -73,9 +69,7 @@ export class EditarEntradaComponent implements OnInit {
       // Rellenar categorías igual que antes
       const arr = this.entradaForm.get('categorias') as UntypedFormArray;
       if (ent.categorias && Array.isArray(ent.categorias)) {
-        ent.categorias.forEach((cat: any) =>
-          arr.push(new UntypedFormControl(cat)),
-        );
+        ent.categorias.forEach((cat: any) => arr.push(new UntypedFormControl(cat)));
       }
 
       // Por defecto en modo lectura
@@ -105,7 +99,7 @@ export class EditarEntradaComponent implements OnInit {
     this.facade.actualizarEntrada(this.idEntrada, ent).subscribe(() => {
       this.toastService.showSuccess(
         'La entrada se ha actualizado correctamente.',
-        'Entrada actualizada',
+        'Entrada actualizada'
       );
       this.router.navigateByUrl('/admin/control/entradas');
     });

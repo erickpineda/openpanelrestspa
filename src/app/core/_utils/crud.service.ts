@@ -17,7 +17,7 @@ export abstract class CrudService<T, ID> extends BaseService {
 
   constructor(
     protected override http: HttpClient,
-    protected override tokenStorageService: TokenStorageService,
+    protected override tokenStorageService: TokenStorageService
   ) {
     super(http, tokenStorageService);
   }
@@ -27,40 +27,27 @@ export abstract class CrudService<T, ID> extends BaseService {
    */
   listarSafe(pageNo?: number, pageSize?: number): Observable<T[]> {
     const params: any = {};
-    if (pageNo != null)
-      params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
 
-    return this.safeGetList<T>(
-      this.endpoint,
-      params,
-      undefined,
-      `${this.endpoint}.listar`,
-    );
+    return this.safeGetList<T>(this.endpoint, params, undefined, `${this.endpoint}.listar`);
   }
 
   /**
    * Lista elementos de forma segura sin loader global
    */
-  listarSafeSinGlobalLoader(
-    pageNo?: number,
-    pageSize?: number,
-  ): Observable<T[]> {
+  listarSafeSinGlobalLoader(pageNo?: number, pageSize?: number): Observable<T[]> {
     const params: any = {};
-    if (pageNo != null)
-      params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
 
-    const context = new HttpContext().set(
-      NetworkInterceptor.SKIP_GLOBAL_LOADER,
-      true,
-    );
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.safeGetList<T>(
       this.endpoint,
       params,
       undefined,
       `${this.endpoint}.listar`,
-      context,
+      context
     );
   }
 
@@ -73,7 +60,7 @@ export abstract class CrudService<T, ID> extends BaseService {
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
-      `${this.endpoint}.obtenerPorId`,
+      `${this.endpoint}.obtenerPorId`
     );
   }
 
@@ -87,19 +74,17 @@ export abstract class CrudService<T, ID> extends BaseService {
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
-      `${this.endpoint}.crear`,
+      `${this.endpoint}.crear`
     );
   }
 
   /**
    * Crear elemento con estado
    */
-  crearConEstado(
-    entity: T,
-  ): Observable<{ success: boolean; data?: T; error?: any }> {
+  crearConEstado(entity: T): Observable<{ success: boolean; data?: T; error?: any }> {
     return this.safeOperationWithState<T>(
       this.post<T>(`${this.endpoint}/crear`, entity),
-      `${this.endpoint}.crear`,
+      `${this.endpoint}.crear`
     );
   }
 
@@ -113,7 +98,7 @@ export abstract class CrudService<T, ID> extends BaseService {
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
-      `${this.endpoint}.actualizar`,
+      `${this.endpoint}.actualizar`
     );
   }
 
@@ -125,35 +110,27 @@ export abstract class CrudService<T, ID> extends BaseService {
       `${this.endpoint}/${id}`,
       undefined,
       undefined,
-      `${this.endpoint}.eliminar`,
+      `${this.endpoint}.eliminar`
     );
   }
 
   // ✅ MÉTODOS ORIGINALES (mantener exactamente como están)
 
-  public listarPagina(
-    pageNo?: number,
-    pageSize?: number,
-  ): Observable<OpenpanelApiResponse<any>> {
+  public listarPagina(pageNo?: number, pageSize?: number): Observable<OpenpanelApiResponse<any>> {
     const params: any = {};
-    if (pageNo != null)
-      params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     return this.get<any>(this.endpoint, params);
   }
 
   public listarPaginaSinGlobalLoader(
     pageNo: number,
-    pageSize: number,
+    pageSize: number
   ): Observable<OpenpanelApiResponse<any>> {
     const params: any = {};
-    if (pageNo != null)
-      params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
-    const context = new HttpContext().set(
-      NetworkInterceptor.SKIP_GLOBAL_LOADER,
-      true,
-    );
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.get<any>(this.endpoint, params, undefined, context);
   }
 

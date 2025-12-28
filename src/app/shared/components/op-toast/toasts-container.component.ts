@@ -20,9 +20,7 @@ import { ToastMessage } from '../../../core/models/toast.model'; // ajusta ruta
           <c-toast-header [ngClass]="headerClass(toast)" [closeButton]="false">
             <strong class="me-auto">{{ toast.title || 'Notificación' }}</strong>
             @if (toast.delay) {
-              <small class="text-muted">{{
-                dateAsString(toast.createdAt)
-              }}</small>
+              <small class="text-muted">{{ dateAsString(toast.createdAt) }}</small>
             }
             <button
               type="button"

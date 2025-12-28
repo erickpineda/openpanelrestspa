@@ -17,7 +17,7 @@ import { INavItemEnhanced, UserRole } from '../types/navigation.types';
 export class PerformanceOptimizationExampleService {
   constructor(
     private navigationService: NavigationService,
-    private performanceService: NavigationPerformanceService,
+    private performanceService: NavigationPerformanceService
   ) {}
 
   /**
@@ -76,10 +76,7 @@ export class PerformanceOptimizationExampleService {
   /**
    * Ejemplo 5: Verificación de permisos con cache memoizado
    */
-  checkPermissionWithCache(
-    item: INavItemEnhanced,
-    userRole: UserRole,
-  ): boolean {
+  checkPermissionWithCache(item: INavItemEnhanced, userRole: UserRole): boolean {
     // Usa cache automático para mejorar rendimiento
     return this.navigationService.checkPermissionMemoized(item, userRole);
   }
@@ -120,10 +117,7 @@ export class PerformanceOptimizationExampleService {
       }
 
       if (stats.performance.averageRenderTime > 150) {
-        console.warn(
-          'Render time is high:',
-          stats.performance.averageRenderTime,
-        );
+        console.warn('Render time is high:', stats.performance.averageRenderTime);
       }
     }, 30000);
   }
@@ -187,30 +181,25 @@ export class PerformanceOptimizationExampleService {
   /**
    * Ejemplo 12: Benchmarking de rendimiento
    */
-  benchmarkPerformance(
-    items: INavItemEnhanced[],
-    userRole: UserRole,
-  ): Promise<any> {
+  benchmarkPerformance(items: INavItemEnhanced[], userRole: UserRole): Promise<any> {
     return new Promise((resolve) => {
       const startTime = performance.now();
 
-      this.navigationService
-        .getNavigationItems(userRole)
-        .subscribe((result) => {
-          const endTime = performance.now();
-          const processingTime = endTime - startTime;
+      this.navigationService.getNavigationItems(userRole).subscribe((result) => {
+        const endTime = performance.now();
+        const processingTime = endTime - startTime;
 
-          const benchmark = {
-            processingTime,
-            itemCount: items.length,
-            resultCount: result.length,
-            itemsPerMs: result.length / processingTime,
-            performanceStats: this.navigationService.getPerformanceStatistics(),
-          };
+        const benchmark = {
+          processingTime,
+          itemCount: items.length,
+          resultCount: result.length,
+          itemsPerMs: result.length / processingTime,
+          performanceStats: this.navigationService.getPerformanceStatistics(),
+        };
 
-          console.log('Performance Benchmark:', benchmark);
-          resolve(benchmark);
-        });
+        console.log('Performance Benchmark:', benchmark);
+        resolve(benchmark);
+      });
     });
   }
 

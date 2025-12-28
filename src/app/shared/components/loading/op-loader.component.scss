@@ -104,19 +104,11 @@
   }
 
   .pulse-loader .pulse-circle {
-    background: radial-gradient(
-      circle,
-      $color 0%,
-      color.adjust($color, $lightness: 20%) 100%
-    );
+    background: radial-gradient(circle, $color 0%, color.adjust($color, $lightness: 20%) 100%);
   }
 
   .progress-loader .progress-fill {
-    background: linear-gradient(
-      90deg,
-      $color,
-      color.adjust($color, $lightness: 10%)
-    );
+    background: linear-gradient(90deg, $color, color.adjust($color, $lightness: 10%));
   }
 
   .modern-loader .ring {

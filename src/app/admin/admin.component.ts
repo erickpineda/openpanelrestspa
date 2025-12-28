@@ -62,7 +62,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private tokenStorage: TokenStorageService,
     private authService: AuthService,
-    private sidebarState: SidebarStateService,
+    private sidebarState: SidebarStateService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
@@ -83,8 +83,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   public labelLockAccount = 'Lock Account';
 
   ngOnInit(): void {
-    const ok =
-      this.tokenStorage.isLoggedIn() && this.authService.isTokenValid(30);
+    const ok = this.tokenStorage.isLoggedIn() && this.authService.isTokenValid(30);
     if (!ok) {
       this.router.navigate(['/login'], { replaceUrl: true });
       return;
@@ -93,8 +92,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.ready = true;
     this.checkForTemporaryData();
     this.cargaFinalizada = true;
-    const locale =
-      navigator && navigator.language ? navigator.language : 'es-ES';
+    const locale = navigator && navigator.language ? navigator.language : 'es-ES';
     this.setHeaderLabels(locale);
     const isDashboardRoute = this.router.url.includes('/admin/base/dashboard');
     if (isDashboardRoute) {
@@ -135,10 +133,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.temporaryEntriesCount = temporaryEntries.length;
 
     if (this.temporaryEntriesCount > 0) {
-      this.log.info(
-        '📥 Datos temporales encontrados en admin:',
-        temporaryEntries,
-      );
+      this.log.info('📥 Datos temporales encontrados en admin:', temporaryEntries);
 
       // ✅ MODIFICADO: Siempre mostrar notificación múltiple, incluso con una sola entrada
       this.showGlobalRecoveryNotification = true;

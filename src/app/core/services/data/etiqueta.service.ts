@@ -44,32 +44,17 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
 
   buscar(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
     const params: any = {};
-    if (pageNo != null)
-      params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     return this.post<any>(`${this.endpoint}/buscar`, payload, params);
   }
 
-  buscarSinGlobalLoader(
-    payload: any,
-    pageNo?: number,
-    pageSize?: number,
-  ): Observable<any> {
+  buscarSinGlobalLoader(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
     const params: any = {};
-    if (pageNo != null)
-      params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
+    if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
-    const context = new HttpContext().set(
-      NetworkInterceptor.SKIP_GLOBAL_LOADER,
-      true,
-    );
-    return this.post<any>(
-      `${this.endpoint}/buscar`,
-      payload,
-      params,
-      undefined,
-      context,
-    );
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    return this.post<any>(`${this.endpoint}/buscar`, payload, params, undefined, context);
   }
 
   asociarConEntrada(etiquetaId: number, entradaId: number): Observable<any> {
@@ -81,10 +66,7 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
     return this.post<any>(`${this.endpoint}/asociar`, asociacion);
   }
 
-  asociarConCategoria(
-    etiquetaId: number,
-    categoriaId: number,
-  ): Observable<any> {
+  asociarConCategoria(etiquetaId: number, categoriaId: number): Observable<any> {
     const asociacion: AsociacionEtiquetaDTO = {
       etiquetaId,
       entidadId: categoriaId,
@@ -94,18 +76,11 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
   }
 
   desasociarDeEntrada(etiquetaId: number, entradaId: number): Observable<any> {
-    return this.delete<any>(
-      `${this.endpoint}/desasociar/ENTRADA/${etiquetaId}/${entradaId}`,
-    );
+    return this.delete<any>(`${this.endpoint}/desasociar/ENTRADA/${etiquetaId}/${entradaId}`);
   }
 
-  desasociarDeCategoria(
-    etiquetaId: number,
-    categoriaId: number,
-  ): Observable<any> {
-    return this.delete<any>(
-      `${this.endpoint}/desasociar/CATEGORIA/${etiquetaId}/${categoriaId}`,
-    );
+  desasociarDeCategoria(etiquetaId: number, categoriaId: number): Observable<any> {
+    return this.delete<any>(`${this.endpoint}/desasociar/CATEGORIA/${etiquetaId}/${categoriaId}`);
   }
 
   obtenerEtiquetasPorEntrada(entradaId: number): Observable<any> {

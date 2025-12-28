@@ -43,7 +43,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {
     this.searchForm = this.fb.group({
       nombre: [''],
@@ -63,9 +63,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   loadEtiquetas(): void {
     this.loading = true;
     const nombre = (this.searchForm.get('nombre')?.value || '').trim();
-    const descripcion = (
-      this.searchForm.get('descripcion')?.value || ''
-    ).trim();
+    const descripcion = (this.searchForm.get('descripcion')?.value || '').trim();
     const hasFilters = !!(this.basicSearchText || nombre || descripcion);
     if (!hasFilters) {
       this.etiquetasService
@@ -75,7 +73,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.loading = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({
           next: (response: any) => {
@@ -111,11 +109,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
         value: descripcion,
         operation: 'CONTAINS',
       });
-    const searchRequest = this.searchUtil.buildRequest(
-      'Etiqueta',
-      criteria,
-      'AND',
-    );
+    const searchRequest = this.searchUtil.buildRequest('Etiqueta', criteria, 'AND');
 
     this.etiquetasService
       .buscarSinGlobalLoader(searchRequest, this.pageNo, this.pageSize)
@@ -124,7 +118,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.loading = false;
           this.cdr.detectChanges();
-        }),
+        })
       )
       .subscribe({
         next: (response: any) => {
@@ -247,12 +241,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   }
 
   getTotalPages(): number {
-    return Math.max(
-      1,
-      Number(
-        this.totalPages || Math.ceil(this.totalItems / this.pageSize) || 1,
-      ),
-    );
+    return Math.max(1, Number(this.totalPages || Math.ceil(this.totalItems / this.pageSize) || 1));
   }
 
   isNextDisabled(): boolean {
@@ -260,10 +249,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   }
 
   private setPageData(data: PaginaResponse): void {
-    const raw = (data?.elements ??
-      (data as any)?.items ??
-      (data as any)?.content ??
-      []) as any[];
+    const raw = (data?.elements ?? (data as any)?.items ?? (data as any)?.content ?? []) as any[];
     const mapped = Array.isArray(raw)
       ? (raw.map((e: any) => ({
           idEtiqueta: e?.idEtiqueta ?? e?.id ?? e?.id_tag ?? e?.idLabel,
@@ -280,23 +266,13 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
 
     if (hasServerPaging) {
       this.etiquetas = mapped;
-      this.totalItems = Number(
-        (data as any)?.totalElements ?? mapped.length ?? 0,
-      );
+      this.totalItems = Number((data as any)?.totalElements ?? mapped.length ?? 0);
       this.totalPages = Number(
-        (data as any)?.totalPages ??
-          Math.ceil(this.totalItems / this.pageSize) ??
-          1,
+        (data as any)?.totalPages ?? Math.ceil(this.totalItems / this.pageSize) ?? 1
       );
-      this.numberOfElements = Number(
-        (data as any)?.numberOfElements ?? mapped.length,
-      );
+      this.numberOfElements = Number((data as any)?.numberOfElements ?? mapped.length);
       this.pagedEtiquetas = mapped;
-      if (
-        mapped.length === 0 &&
-        this.pageNo > 0 &&
-        this.pageNo >= this.totalPages
-      ) {
+      if (mapped.length === 0 && this.pageNo > 0 && this.pageNo >= this.totalPages) {
         this.pageNo = Math.max(0, this.totalPages - 1);
         this.loadEtiquetas();
         return;
@@ -306,8 +282,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
       const total = this.allEtiquetas.length;
       this.totalItems = total;
       this.totalPages = Math.max(1, Math.ceil(total / this.pageSize));
-      if (this.pageNo >= this.totalPages)
-        this.pageNo = Math.max(0, this.totalPages - 1);
+      if (this.pageNo >= this.totalPages) this.pageNo = Math.max(0, this.totalPages - 1);
       const start = this.pageNo * this.pageSize;
       const end = start + this.pageSize;
       this.pagedEtiquetas = this.allEtiquetas.slice(start, end);
@@ -321,8 +296,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
     if (total > 0) {
       this.totalItems = total;
       this.totalPages = Math.max(1, Math.ceil(total / this.pageSize));
-      if (this.pageNo >= this.totalPages)
-        this.pageNo = Math.max(0, this.totalPages - 1);
+      if (this.pageNo >= this.totalPages) this.pageNo = Math.max(0, this.totalPages - 1);
       const start = this.pageNo * this.pageSize;
       const end = start + this.pageSize;
       this.pagedEtiquetas = this.allEtiquetas.slice(start, end);

@@ -91,11 +91,7 @@
       }
     </c-col>
     @if (debeMostrarBotonBusqueda() || showClearButton) {
-      <c-col
-        xs="12"
-        md="2"
-        class="d-flex gap-1 justify-content-md-end mt-2 mt-md-0"
-      >
+      <c-col xs="12" md="2" class="d-flex gap-1 justify-content-md-end mt-2 mt-md-0">
         @if (debeMostrarBotonBusqueda()) {
           <button cButton color="primary" (click)="buscar()">Buscar</button>
         }

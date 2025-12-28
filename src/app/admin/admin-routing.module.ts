@@ -15,15 +15,12 @@ const routes: Routes = [
       {
         path: 'dashboard',
         loadChildren: () =>
-          import('./base/dashboard/dashboard.module').then(
-            (m) => m.DashboardModule,
-          ),
+          import('./base/dashboard/dashboard.module').then((m) => m.DashboardModule),
         data: { preload: true, delay: 1000 },
       },
       {
         path: 'control',
-        loadChildren: () =>
-          import('./base/base.module').then((m) => m.BaseModule),
+        loadChildren: () => import('./base/base.module').then((m) => m.BaseModule),
         data: { preload: true, delay: 1000 },
         canLoad: [AuthGuard], // evita la carga del módulo si no estamos autenticados
       },

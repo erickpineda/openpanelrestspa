@@ -1,12 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EntradaService } from './entrada.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { NetworkInterceptor } from '../../interceptor/network.interceptor';
@@ -44,9 +38,7 @@ describe('EntradaService request shapes', () => {
       done();
     });
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/entradas/tiposEntradas'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/entradas/tiposEntradas'));
     expect(req.request.method).toBe('GET');
     req.flush({ data: { tiposEntradas: [{ nombre: 'Blog' }] } });
   });
@@ -58,9 +50,7 @@ describe('EntradaService request shapes', () => {
       done();
     });
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/entradas/estadosEntradas'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/entradas/estadosEntradas'));
     expect(req.request.method).toBe('GET');
     req.flush({ data: { estadosEntradas: [{ nombre: 'Borrador' }] } });
   });
@@ -74,9 +64,7 @@ describe('EntradaService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/entradas/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(
-      true,
-    );
+    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
     expect(req.request.params.get('pageNo')).toBe('1');
     expect(req.request.params.get('pageSize')).toBe('10');
     req.flush({ data: { elements: [{}], totalPages: 2 } });
@@ -87,13 +75,9 @@ describe('EntradaService request shapes', () => {
       expect(resp).toEqual({ a: 1 });
     });
 
-    const req = httpMock.expectOne((r) =>
-      r.url.includes('/entradas/buscar/definicionesBuscador'),
-    );
+    const req = httpMock.expectOne((r) => r.url.includes('/entradas/buscar/definicionesBuscador'));
     expect(req.request.method).toBe('GET');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(
-      true,
-    );
+    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { a: 1 } });
   });
 
@@ -102,9 +86,7 @@ describe('EntradaService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/entradas/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(
-      false,
-    );
+    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(false);
     expect(req.request.params.get('pageNo')).toBe('0');
     expect(req.request.params.get('pageSize')).toBe('5');
     req.flush({ result: { success: true }, data: {} });

@@ -355,14 +355,11 @@ describe('ProgrammaticNavigationConfigService', () => {
         requiredRoles: [UserRole.DESARROLLADOR],
       });
 
-      const enhancedConfig =
-        service.generateNavigationWithDynamicGroups(baseConfig);
+      const enhancedConfig = service.generateNavigationWithDynamicGroups(baseConfig);
 
       expect(enhancedConfig.sections.length).toBe(2);
 
-      const dynamicSection = enhancedConfig.sections.find(
-        (s) => s.id === 'dynamic-tools',
-      );
+      const dynamicSection = enhancedConfig.sections.find((s) => s.id === 'dynamic-tools');
       expect(dynamicSection).toBeDefined();
       expect(dynamicSection?.title).toBe('Dynamic Tools');
       expect(dynamicSection?.priority).toBe(80);
@@ -485,9 +482,7 @@ describe('ProgrammaticNavigationConfigService', () => {
 
         expect(config).toBeDefined();
         expect(config?.icon).toBe(`cil-icon-${index}`);
-        expect(config?.badge?.color).toBe(
-          index % 2 === 0 ? 'success' : 'warning',
-        );
+        expect(config?.badge?.color).toBe(index % 2 === 0 ? 'success' : 'warning');
         expect(config?.badge?.text).toBe(`Badge ${index}`);
         expect(config?.priority).toBe((index + 1) * 10);
         expect(config?.visible).toBe(true);
@@ -536,9 +531,7 @@ describe('ProgrammaticNavigationConfigService', () => {
           expect(actualGroup?.icon).toBe(expectedConfig.icon);
           expect(actualGroup?.priority).toBe(expectedConfig.priority);
           expect(actualGroup?.items).toEqual(expectedConfig.items);
-          expect(actualGroup?.requiredRoles).toEqual(
-            expectedConfig.requiredRoles,
-          );
+          expect(actualGroup?.requiredRoles).toEqual(expectedConfig.requiredRoles);
         });
       });
     });
@@ -603,11 +596,7 @@ describe('ProgrammaticNavigationConfigService', () => {
       // Assert: Verify actions were added
       let config = service.getElementConfig('test-element');
       expect(config?.contextualActions?.length).toBe(3);
-      expect(config?.contextualActions?.map((a) => a.name)).toEqual([
-        'Edit',
-        'Delete',
-        'Share',
-      ]);
+      expect(config?.contextualActions?.map((a) => a.name)).toEqual(['Edit', 'Delete', 'Share']);
 
       // Act: Remove one action programmatically
       service.removeContextualAction('test-element', 'Delete');
@@ -615,10 +604,7 @@ describe('ProgrammaticNavigationConfigService', () => {
       // Assert: Verify action was removed
       config = service.getElementConfig('test-element');
       expect(config?.contextualActions?.length).toBe(2);
-      expect(config?.contextualActions?.map((a) => a.name)).toEqual([
-        'Edit',
-        'Share',
-      ]);
+      expect(config?.contextualActions?.map((a) => a.name)).toEqual(['Edit', 'Share']);
     });
 
     it('should maintain configuration consistency across multiple operations', () => {
@@ -655,10 +641,7 @@ describe('ProgrammaticNavigationConfigService', () => {
       expect(finalConfig?.badge?.text).toBe('Step 2'); // Last badge change
       expect(finalConfig?.priority).toBe(50); // Last priority change
       expect(finalConfig?.contextualActions?.length).toBe(2); // Both actions added
-      expect(finalConfig?.contextualActions?.map((a) => a.name)).toEqual([
-        'Action1',
-        'Action2',
-      ]);
+      expect(finalConfig?.contextualActions?.map((a) => a.name)).toEqual(['Action1', 'Action2']);
     });
   });
 });

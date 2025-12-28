@@ -35,9 +35,7 @@
         role="form"
         aria-label="Formulario de categoría"
       >
-        <div
-          class="d-flex flex-wrap justify-content-between align-items-end gap-2 gap-md-3"
-        >
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 gap-md-3">
           <h2 cCardTitle class="h5 mb-3 mb-lg-0">Crear/Editar Categoria</h2>
           <div class="d-flex flex-wrap gap-2 gap-md-3">
             <button
@@ -49,13 +47,7 @@
               [tabindex]="'0'"
               aria-label="Cancelar y volver a la lista"
             >
-              <svg
-                cIcon
-                name="cilX"
-                style="padding-right: 2px"
-                size="sm"
-                title="Cancelar"
-              ></svg>
+              <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
               Cancelar
             </button>
             <button
@@ -63,19 +55,11 @@
               color="success"
               size="sm"
               type="submit"
-              [disabled]="
-                form.disabled || form.pristine || form.invalid || enviando
-              "
+              [disabled]="form.disabled || form.pristine || form.invalid || enviando"
               [tabindex]="'0'"
               aria-label="Guardar categoría"
             >
-              <svg
-                cIcon
-                name="cilSave"
-                style="padding-right: 2px"
-                size="sm"
-                title="Guardar"
-              ></svg>
+              <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
               @if (!enviando) {
                 <span>Guardar</span>
               }
@@ -123,9 +107,7 @@
                         for="nombre"
                         required
                         [ngClass]="{
-                          'is-invalid':
-                            (submitted || f['nombre'].touched) &&
-                            f['nombre'].invalid,
+                          'is-invalid': (submitted || f['nombre'].touched) && f['nombre'].invalid,
                         }"
                       >
                         Nombre
@@ -139,40 +121,24 @@
                           aria-label="Nombre de la categoría"
                           aria-describedby="nombreHelp"
                           [ngClass]="{
-                            'is-invalid':
-                              (submitted || f['nombre'].touched) &&
-                              f['nombre'].invalid,
-                            'is-valid':
-                              f['nombre'].valid &&
-                              (submitted || f['nombre'].touched),
+                            'is-invalid': (submitted || f['nombre'].touched) && f['nombre'].invalid,
+                            'is-valid': f['nombre'].valid && (submitted || f['nombre'].touched),
                           }"
                           (input)="mostrarFeedback = true"
                         />
-                        <div id="nombreHelp" class="form-text">
-                          El nombre es obligatorio.
-                        </div>
-                        @if (
-                          (submitted || f['nombre'].touched) &&
-                          f['nombre'].invalid
-                        ) {
+                        <div id="nombreHelp" class="form-text">El nombre es obligatorio.</div>
+                        @if ((submitted || f['nombre'].touched) && f['nombre'].invalid) {
                           <div class="invalid-feedback animated-fade">
                             El nombre es obligatorio.
                           </div>
                         }
-                        @if (
-                          f['nombre'].valid &&
-                          (submitted || f['nombre'].touched)
-                        ) {
-                          <div class="valid-feedback animated-fade">
-                            ¡Nombre válido!
-                          </div>
+                        @if (f['nombre'].valid && (submitted || f['nombre'].touched)) {
+                          <div class="valid-feedback animated-fade">¡Nombre válido!</div>
                         }
                       </c-col>
                     </c-row>
                     <c-row class="mt-3">
-                      <label [sm]="3" cCol cLabel="col" for="descripcion"
-                        >Descripción</label
-                      >
+                      <label [sm]="3" cCol cLabel="col" for="descripcion">Descripción</label>
                       <c-col [sm]="10">
                         <textarea
                           aria-label="Descripción de la categoría"
@@ -196,10 +162,7 @@
               <c-card-body>
                 <h3 cCardTitle class="h6 mb-4">Categorias existentes</h3>
                 <div cListGroup>
-                  @for (
-                    categoria of displayListaCategorias;
-                    track categoria.nombre
-                  ) {
+                  @for (categoria of displayListaCategorias; track categoria.nombre) {
                     <button
                       type="button"
                       cListGroupItem

@@ -17,9 +17,7 @@
         role="alert"
       >
         <span>{{ errorMsg }}</span>
-        <button cButton color="danger" size="sm" (click)="refrescar()">
-          Reintentar
-        </button>
+        <button cButton color="danger" size="sm" (click)="refrescar()">Reintentar</button>
       </div>
     }
 
@@ -50,11 +48,7 @@
           Avanzado
         </button>
       </c-col>
-      <c-col
-        xs="12"
-        md="4"
-        class="d-flex justify-content-md-end gap-2 align-items-center"
-      >
+      <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
         <select
           cSelect
           [ngModel]="pageSize"
@@ -115,11 +109,7 @@
       @if (cargando) {
         <div
           class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style="
-            z-index: 10;
-            background-color: rgba(255, 255, 255, 0.8);
-            min-height: 200px;
-          "
+          style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
         >
           <div class="text-center">
             <c-spinner [attr.aria-label]="'Cargando categorías'"></c-spinner>
@@ -141,22 +131,13 @@
         >
           <thead cTableColor="light">
             <tr>
-              <th scope="col" class="text-start" style="min-width: 200px">
-                Nombre
-              </th>
-              <th scope="col" class="text-start" style="min-width: 250px">
-                Descripción
-              </th>
-              <th scope="col" class="text-center" style="min-width: 100px">
-                Acciones
-              </th>
+              <th scope="col" class="text-start" style="min-width: 200px">Nombre</th>
+              <th scope="col" class="text-start" style="min-width: 250px">Descripción</th>
+              <th scope="col" class="text-center" style="min-width: 100px">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            @for (
-              categ of pagedCategorias;
-              track trackByCategoriaId($index, categ)
-            ) {
+            @for (categ of pagedCategorias; track trackByCategoriaId($index, categ)) {
               <tr>
                 <td>
                   <div class="d-flex flex-column">
@@ -179,11 +160,7 @@
                   </span>
                 </td>
                 <td class="text-center">
-                  <div
-                    class="btn-group"
-                    role="group"
-                    aria-label="Acciones de categoría"
-                  >
+                  <div class="btn-group" role="group" aria-label="Acciones de categoría">
                     <button
                       cButton
                       color="warning"
@@ -213,19 +190,10 @@
             @if (pagedCategorias.length === 0) {
               <tr>
                 <td colspan="3" class="text-center py-5">
-                  <div
-                    class="d-flex flex-column align-items-center justify-content-center"
-                  >
-                    <svg
-                      cIcon
-                      name="cilSearch"
-                      size="3xl"
-                      class="text-muted mb-3"
-                    ></svg>
+                  <div class="d-flex flex-column align-items-center justify-content-center">
+                    <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
                     <h6 class="text-muted">No se han encontrado categorías</h6>
-                    <p class="text-muted small">
-                      Intenta ajustar los filtros de búsqueda
-                    </p>
+                    <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
                   </div>
                 </td>
               </tr>
@@ -246,13 +214,7 @@
         @if (pagedCategorias.length > 0) {
           <c-row class="mt-2">
             <c-col class="d-flex justify-content-end align-items-center gap-2">
-              <button
-                cButton
-                color="light"
-                size="sm"
-                (click)="prev()"
-                [disabled]="pageNo <= 0"
-              >
+              <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo <= 0">
                 Anterior
               </button>
               <button
@@ -265,8 +227,8 @@
                 Siguiente
               </button>
               <div class="text-muted small ms-2">
-                Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total
-                {{ totalElements }} · Mostrando {{ numberOfElements }}
+                Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} ·
+                Mostrando {{ numberOfElements }}
               </div>
             </c-col>
           </c-row>

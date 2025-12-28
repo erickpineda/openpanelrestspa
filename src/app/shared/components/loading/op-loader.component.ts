@@ -1,11 +1,4 @@
-import {
-  Component,
-  Input,
-  OnDestroy,
-  OnInit,
-  OnChanges,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { LoadingService } from '../../../core/services/ui/loading.service';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -28,13 +21,7 @@ export class OpLoaderComponent implements OnInit, OnDestroy, OnChanges {
   @Input() debounceTime = 100;
   @Input() loaderStyle: LoaderStyle = 'progress';
   @Input() size: 'sm' = 'sm';
-  @Input() color:
-    | 'primary'
-    | 'secondary'
-    | 'success'
-    | 'danger'
-    | 'warning'
-    | 'info' = 'primary';
+  @Input() color: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' = 'primary';
 
   @Input() useGlobal: boolean = true;
   private _active: boolean = false;

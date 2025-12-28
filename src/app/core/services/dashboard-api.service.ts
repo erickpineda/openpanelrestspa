@@ -32,11 +32,7 @@ export class DashboardApiService {
 
   constructor(private http: HttpClient) {}
 
-  private getCached<T>(
-    key: string,
-    ttl: number,
-    getter: () => Observable<T>,
-  ): Observable<T> {
+  private getCached<T>(key: string, ttl: number, getter: () => Observable<T>): Observable<T> {
     const now = Date.now();
     const entry = this.cache.get(key);
     if (entry && now - entry.ts < ttl) {
@@ -44,7 +40,7 @@ export class DashboardApiService {
     }
     const obs$ = getter().pipe(
       tap((v) => this.cache.set(key, { ts: Date.now(), value: v })),
-      shareReplay(1),
+      shareReplay(1)
     );
     // store a placeholder subscription-less value after resolved via tap, so return obs$ directly
     return obs$;
@@ -68,9 +64,7 @@ export class DashboardApiService {
     const p = Math.max(0, Number(page) || 0);
     const sRaw = Number(size) || 5;
     const s = Math.max(1, Math.min(200, sRaw));
-    const params = new HttpParams()
-      .set('page', String(p))
-      .set('size', String(s));
+    const params = new HttpParams().set('page', String(p)).set('size', String(s));
     return this.http
       .get<any>(`${this.base}/recent-activity`, { params })
       .pipe(map((r) => (r && r.data ? r.data : r)));
@@ -79,20 +73,18 @@ export class DashboardApiService {
   getSeriesActivity(
     days = 30,
     force = false,
-    granularity: 'hour' | 'day' | 'week' | 'month' = 'day',
+    granularity: 'hour' | 'day' | 'week' | 'month' = 'day'
   ): Observable<ActivityPointDTO[]> {
     const dRaw = Number(days) || 30;
     const d = Math.max(1, Math.min(365, dRaw));
     const key = `dashboard:series:activity:days:${d}:gran:${granularity}`;
     if (force) this.cache.delete(key);
-    let params = new HttpParams()
-      .set('days', String(d))
-      .set('granularity', granularity);
+    let params = new HttpParams().set('days', String(d)).set('granularity', granularity);
     if (force) params = params.set('force', 'true');
     return this.getCached<ActivityPointDTO[]>(key, this.ttlSeries, () =>
       this.http
         .get<any>(`${this.base}/series/activity`, { params })
-        .pipe(map((r) => (r && r.data ? (r.data as ActivityPointDTO[]) : r))),
+        .pipe(map((r) => (r && r.data ? (r.data as ActivityPointDTO[]) : r)))
     );
   }
 
@@ -100,7 +92,7 @@ export class DashboardApiService {
   getSeriesEntriesSplitEstado(
     days = 30,
     granularity: 'hour' | 'day' | 'week' | 'month' = 'day',
-    force = false,
+    force = false
   ): Observable<{ date: string; publicadas: number; noPublicadas: number }[]> {
     const dRaw = Number(days) || 30;
     const d = Math.max(1, Math.min(365, dRaw));
@@ -114,14 +106,14 @@ export class DashboardApiService {
     return this.getCached<any[]>(key, this.ttlSeries, () =>
       this.http
         .get<any>(`${this.base}/series/entries`, { params })
-        .pipe(map((r) => (r && r.data ? r.data : r))),
+        .pipe(map((r) => (r && r.data ? r.data : r)))
     );
   }
 
   getSeriesEntriesSplitEstadoNombre(
     days = 30,
     granularity: 'hour' | 'day' | 'week' | 'month' = 'day',
-    force = false,
+    force = false
   ): Observable<any[]> {
     const dRaw = Number(days) || 30;
     const d = Math.max(1, Math.min(365, dRaw));
@@ -135,7 +127,7 @@ export class DashboardApiService {
     return this.getCached<any[]>(key, this.ttlSeries, () =>
       this.http
         .get<any>(`${this.base}/series/entries`, { params })
-        .pipe(map((r) => (r && r.data ? r.data : r))),
+        .pipe(map((r) => (r && r.data ? r.data : r)))
     );
   }
 
@@ -144,7 +136,7 @@ export class DashboardApiService {
     limit = 10,
     force = false,
     startDate?: string,
-    endDate?: string,
+    endDate?: string
   ): Observable<TopItemDTO[]> {
     const t = type === 'categories' ? 'categories' : 'users';
     const tt = type === 'tags' ? 'tags' : t;
@@ -175,7 +167,7 @@ export class DashboardApiService {
     return this.getCached<ContentStatsDTO>(key, this.ttlSeries, () =>
       this.http
         .get<any>(`${this.base}/content-stats`)
-        .pipe(map((r) => (r && r.data ? (r.data as ContentStatsDTO) : r))),
+        .pipe(map((r) => (r && r.data ? (r.data as ContentStatsDTO) : r)))
     );
   }
 
@@ -200,10 +192,8 @@ export class DashboardApiService {
     } else {
       Array.from(this.cache.keys()).forEach((k) => {
         if (k.startsWith('dashboard:series:activity')) this.cache.delete(k);
-        if (k.startsWith('dashboard:series:entries:split:estado'))
-          this.cache.delete(k);
-        if (k.startsWith('dashboard:series:entries:split:estadoNombre'))
-          this.cache.delete(k);
+        if (k.startsWith('dashboard:series:entries:split:estado')) this.cache.delete(k);
+        if (k.startsWith('dashboard:series:entries:split:estadoNombre')) this.cache.delete(k);
       });
     }
   }

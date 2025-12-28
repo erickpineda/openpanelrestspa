@@ -9,11 +9,6 @@ import { DevToolsComponent } from './dev-tools/dev-tools.component';
 
 @NgModule({
   declarations: [LogsComponent, DatabaseComponent, DevToolsComponent],
-  imports: [
-    CommonModule,
-    FormsModule,
-    SharedOPModule,
-    MantenimientoRoutingModule,
-  ],
+  imports: [CommonModule, FormsModule, SharedOPModule, MantenimientoRoutingModule],
 })
 export class MantenimientoModule {}

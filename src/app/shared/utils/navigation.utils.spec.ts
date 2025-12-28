@@ -5,11 +5,7 @@ describe('NavigationUtils', () => {
   it('hasPermission devuelve false y avisa si no existe la funcionalidad', () => {
     const warnSpy = spyOn(console, 'warn');
 
-    const result = NavigationUtils.hasPermission(
-      UserRole.ADMINISTRADOR,
-      'MISSING',
-      {},
-    );
+    const result = NavigationUtils.hasPermission(UserRole.ADMINISTRADOR, 'MISSING', {});
 
     expect(result).toBe(false);
     expect(warnSpy).toHaveBeenCalled();
@@ -23,12 +19,8 @@ describe('NavigationUtils', () => {
       },
     };
 
-    expect(
-      NavigationUtils.hasPermission(UserRole.ADMINISTRADOR, 'F1', matrix),
-    ).toBe(true);
-    expect(NavigationUtils.hasPermission(UserRole.LECTOR, 'F1', matrix)).toBe(
-      false,
-    );
+    expect(NavigationUtils.hasPermission(UserRole.ADMINISTRADOR, 'F1', matrix)).toBe(true);
+    expect(NavigationUtils.hasPermission(UserRole.LECTOR, 'F1', matrix)).toBe(false);
   });
 
   it('filterByPermissions respeta requiredRoles, minRole y children', () => {
@@ -60,10 +52,7 @@ describe('NavigationUtils', () => {
       },
     ];
 
-    const asEditor = NavigationUtils.filterByPermissions(
-      items,
-      UserRole.EDITOR,
-    );
+    const asEditor = NavigationUtils.filterByPermissions(items, UserRole.EDITOR);
     expect(asEditor.some((i) => i.url === '/a')).toBe(false);
     expect(asEditor.some((i) => i.url === '/b')).toBe(true);
     const c = asEditor.find((i) => i.url === '/c')!;
@@ -72,12 +61,8 @@ describe('NavigationUtils', () => {
   });
 
   it('hasMinimumRole aplica jerarquía', () => {
-    expect(
-      NavigationUtils.hasMinimumRole(UserRole.ADMINISTRADOR, UserRole.LECTOR),
-    ).toBe(true);
-    expect(
-      NavigationUtils.hasMinimumRole(UserRole.LECTOR, UserRole.ADMINISTRADOR),
-    ).toBe(false);
+    expect(NavigationUtils.hasMinimumRole(UserRole.ADMINISTRADOR, UserRole.LECTOR)).toBe(true);
+    expect(NavigationUtils.hasMinimumRole(UserRole.LECTOR, UserRole.ADMINISTRADOR)).toBe(false);
   });
 
   it('sortByPriority ordena por prioridad descendente', () => {
@@ -134,13 +119,9 @@ describe('NavigationUtils', () => {
   });
 
   it('generateItemId usa url, name o un fallback aleatorio', () => {
-    expect(NavigationUtils.generateItemId({ name: 'n', url: '/A B' })).toBe(
-      '-a-b',
-    );
+    expect(NavigationUtils.generateItemId({ name: 'n', url: '/A B' })).toBe('-a-b');
 
-    expect(NavigationUtils.generateItemId({ name: 'Hola Mundo' })).toBe(
-      'hola-mundo',
-    );
+    expect(NavigationUtils.generateItemId({ name: 'Hola Mundo' })).toBe('hola-mundo');
 
     spyOn(Math, 'random').and.returnValue(0.1);
     const id = NavigationUtils.generateItemId({} as any);
@@ -149,9 +130,7 @@ describe('NavigationUtils', () => {
 
   it('isItemActive evalúa coincidencia exacta, prefijo y children', () => {
     expect(NavigationUtils.isItemActive({ url: '/x' } as any, '/x')).toBe(true);
-    expect(NavigationUtils.isItemActive({ url: '/x' } as any, '/x/1')).toBe(
-      true,
-    );
+    expect(NavigationUtils.isItemActive({ url: '/x' } as any, '/x/1')).toBe(true);
     expect(NavigationUtils.isItemActive({} as any, '/x')).toBe(false);
 
     const item: INavItemEnhanced = {

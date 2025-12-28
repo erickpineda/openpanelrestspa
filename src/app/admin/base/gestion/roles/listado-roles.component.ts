@@ -50,7 +50,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -71,11 +71,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
     const handleResponse = (r: any) => {
       const data = r?.data || r;
-      const list = Array.isArray(data?.elements)
-        ? data.elements
-        : Array.isArray(data)
-          ? data
-          : [];
+      const list = Array.isArray(data?.elements) ? data.elements : Array.isArray(data) ? data : [];
       this.roles = list.map((item: any) => {
         // Mapear permisos a privilegios si es necesario
         if (!item.privilegios && item.permisos) {
@@ -101,12 +97,11 @@ export class RolesListComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.loading = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({ next: handleResponse, error: handleError });
     } else {
-      const criteria: { filterKey: string; value: any; operation: string }[] =
-        [];
+      const criteria: { filterKey: string; value: any; operation: string }[] = [];
       if (this.filtroNombre)
         criteria.push({
           filterKey: 'nombre',
@@ -122,7 +117,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.loading = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({ next: handleResponse, error: handleError });
     }
@@ -139,11 +134,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
     this.fetchPrivilegiosRecursively(codigos, 0, roles);
   }
 
-  private fetchPrivilegiosRecursively(
-    codigos: string[],
-    pageNo: number,
-    roles: Rol[],
-  ): void {
+  private fetchPrivilegiosRecursively(codigos: string[], pageNo: number, roles: Rol[]): void {
     const PAGE_SIZE = 50; // Ajustable según necesidad
 
     this.rolService
@@ -181,10 +172,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
           }
         },
         error: (err) => {
-          this.log.error(
-            `Error cargando privilegios para roles (página ${pageNo})`,
-            err,
-          );
+          this.log.error(`Error cargando privilegios para roles (página ${pageNo})`, err);
         },
       });
   }
@@ -256,29 +244,21 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(
-      0,
-      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
-    );
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.load();
   }
 
   getTotalPages(): number {
-    return this.totalElements
-      ? Math.ceil(this.totalElements / this.pageSize)
-      : 0;
+    return this.totalElements ? Math.ceil(this.totalElements / this.pageSize) : 0;
   }
 
   // CRUD
 
   isProtectedRole(rol: Rol | null): boolean {
     if (!rol || !rol.codigo) return false;
-    return (
-      rol.codigo === this.PROPIETARIO_ROLE_CODE ||
-      rol.codigo === this.ADMIN_ROLE_CODE
-    );
+    return rol.codigo === this.PROPIETARIO_ROLE_CODE || rol.codigo === this.ADMIN_ROLE_CODE;
   }
 
   openCreate(): void {
@@ -363,15 +343,13 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
     if (checked) {
       // Agregar si no existe
-      if (
-        !this.editRol.privilegios.some((p) => p.codigo === privilegio.codigo)
-      ) {
+      if (!this.editRol.privilegios.some((p) => p.codigo === privilegio.codigo)) {
         this.editRol.privilegios.push(privilegio);
       }
     } else {
       // Remover
       this.editRol.privilegios = this.editRol.privilegios.filter(
-        (p) => p.codigo !== privilegio.codigo,
+        (p) => p.codigo !== privilegio.codigo
       );
     }
   }
@@ -383,9 +361,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
    */
   hasPrivilegio(privilegio: Privilegio): boolean {
     if (!this.editRol || !this.editRol.privilegios) return false;
-    return this.editRol.privilegios.some(
-      (p) => p.idPrivilegio === privilegio.idPrivilegio,
-    );
+    return this.editRol.privilegios.some((p) => p.idPrivilegio === privilegio.idPrivilegio);
   }
 
   /**
@@ -393,18 +369,9 @@ export class RolesListComponent implements OnInit, OnDestroy {
    * Se usa para el estado 'checked' del checkbox "Seleccionar todos".
    */
   areAllPrivilegiosSelected(): boolean {
-    if (
-      !this.editRol ||
-      !this.editRol.privilegios ||
-      this.privilegios.length === 0
-    )
-      return false;
-    const rolPrivilegiosIds = this.editRol.privilegios.map(
-      (p) => p.idPrivilegio,
-    );
-    return this.privilegios.every((p) =>
-      rolPrivilegiosIds.includes(p.idPrivilegio),
-    );
+    if (!this.editRol || !this.editRol.privilegios || this.privilegios.length === 0) return false;
+    const rolPrivilegiosIds = this.editRol.privilegios.map((p) => p.idPrivilegio);
+    return this.privilegios.every((p) => rolPrivilegiosIds.includes(p.idPrivilegio));
   }
 
   /**
@@ -412,12 +379,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
    * Se usa para el estado 'indeterminate' del checkbox "Seleccionar todos".
    */
   areSomePrivilegiosSelected(): boolean {
-    if (
-      !this.editRol ||
-      !this.editRol.privilegios ||
-      this.privilegios.length === 0
-    )
-      return false;
+    if (!this.editRol || !this.editRol.privilegios || this.privilegios.length === 0) return false;
     const count = this.editRol.privilegios.length;
     return count > 0 && count < this.privilegios.length;
   }
@@ -458,7 +420,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
       if (!this.editRol.privilegios || this.editRol.privilegios.length === 0) {
         this.toast.showWarning(
           'El rol de Administrador no puede quedar sin privilegios.',
-          'Validación',
+          'Validación'
         );
         this.loading = false;
         return;
@@ -491,27 +453,18 @@ export class RolesListComponent implements OnInit, OnDestroy {
             return this.rolService.actualizarPrivilegios(rolCode, codigos);
           }
           return of(res);
-        }),
+        })
       )
       .subscribe({
         next: () => {
-          this.toast.showSuccess(
-            this.isEditing ? 'Rol actualizado' : 'Rol creado',
-            'Roles',
-          );
+          this.toast.showSuccess(this.isEditing ? 'Rol actualizado' : 'Rol creado', 'Roles');
           this.loading = false;
           this.editModalVisible = false;
           this.load();
         },
         error: (err: any) => {
-          this.toast.showError(
-            this.isEditing ? 'Error actualizando' : 'Error creando',
-            'Roles',
-          );
-          this.log.error(
-            this.isEditing ? 'roles actualizar' : 'roles crear',
-            err,
-          );
+          this.toast.showError(this.isEditing ? 'Error actualizando' : 'Error creando', 'Roles');
+          this.log.error(this.isEditing ? 'roles actualizar' : 'roles crear', err);
           this.loading = false;
         },
       });
@@ -519,13 +472,10 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
   delete(rol: Rol): void {
     if (!rol.codigo) return;
-    if (
-      rol.codigo === this.PROPIETARIO_ROLE_CODE ||
-      rol.codigo === this.ADMIN_ROLE_CODE
-    ) {
+    if (rol.codigo === this.PROPIETARIO_ROLE_CODE || rol.codigo === this.ADMIN_ROLE_CODE) {
       this.toast.showWarning(
         'No se puede eliminar un rol protegido (Propietario o Admin)',
-        'Acción no permitida',
+        'Acción no permitida'
       );
       return;
     }

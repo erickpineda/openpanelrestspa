@@ -13,7 +13,7 @@ export class TemasService extends CrudService<Tema, number> {
 
   constructor(
     protected override http: HttpClient,
-    protected override tokenStorageService: TokenStorageService,
+    protected override tokenStorageService: TokenStorageService
   ) {
     super(http, tokenStorageService);
   }
@@ -25,7 +25,7 @@ export class TemasService extends CrudService<Tema, number> {
       undefined,
       undefined,
       'config.temas.listar',
-      context,
+      context
     );
   }
 }

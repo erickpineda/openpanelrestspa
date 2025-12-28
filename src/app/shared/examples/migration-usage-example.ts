@@ -24,7 +24,7 @@ import { INavItemEnhanced, UserRole } from '../types/navigation.types';
 export class MigrationUsageExampleService {
   constructor(
     private migrationService: NavigationMigrationService,
-    private compatibilityService: NavigationCompatibilityService,
+    private compatibilityService: NavigationCompatibilityService
   ) {}
 
   /**
@@ -63,16 +63,14 @@ export class MigrationUsageExampleService {
     ];
 
     // Migrate to enhanced format
-    const enhancedNavigation =
-      this.migrationService.migrateLegacyNavigation(legacyNavigation);
+    const enhancedNavigation = this.migrationService.migrateLegacyNavigation(legacyNavigation);
 
     console.log('Original items:', legacyNavigation.length);
     console.log('Migrated items:', enhancedNavigation.length);
     console.log('First migrated item:', enhancedNavigation[0]);
 
     // Validate the migrated structure
-    const validation =
-      this.migrationService.validateMigratedStructure(enhancedNavigation);
+    const validation = this.migrationService.validateMigratedStructure(enhancedNavigation);
     console.log('Validation result:', validation);
 
     if (!validation.isValid) {
@@ -118,7 +116,7 @@ export class MigrationUsageExampleService {
     // Apply custom configurations
     const finalNavigation = this.migrationService.preserveCustomConfigurations(
       migratedNavigation,
-      customConfig,
+      customConfig
     );
 
     console.log('Final navigation with custom config:', finalNavigation);
@@ -164,8 +162,7 @@ export class MigrationUsageExampleService {
     ];
 
     // Convert to legacy format for old components
-    const legacyFormat =
-      this.compatibilityService.convertToLegacyFormat(enhancedNavigation);
+    const legacyFormat = this.compatibilityService.convertToLegacyFormat(enhancedNavigation);
     console.log('Legacy format:', legacyFormat);
 
     // Adapt for specific legacy component requirements
@@ -177,7 +174,7 @@ export class MigrationUsageExampleService {
 
     const adaptedNavigation = this.compatibilityService.adaptForLegacyComponent(
       enhancedNavigation,
-      legacyExpectations,
+      legacyExpectations
     );
 
     console.log('Adapted for legacy component:', adaptedNavigation);
@@ -197,8 +194,7 @@ export class MigrationUsageExampleService {
     ];
 
     for (const legacyUrl of legacyUrls) {
-      const newUrl =
-        this.compatibilityService.handleLegacyRouteRedirect(legacyUrl);
+      const newUrl = this.compatibilityService.handleLegacyRouteRedirect(legacyUrl);
       console.log(`${legacyUrl} -> ${newUrl}`);
 
       // In a real application, you might set up route guards or redirects
@@ -234,8 +230,7 @@ export class MigrationUsageExampleService {
       },
     ];
 
-    const compatibilityReport =
-      this.compatibilityService.checkCompatibility(problematicConfig);
+    const compatibilityReport = this.compatibilityService.checkCompatibility(problematicConfig);
 
     console.log('Compatibility Report:');
     console.log('Is Compatible:', compatibilityReport.isCompatible);
@@ -262,42 +257,34 @@ export class MigrationUsageExampleService {
     return legacyNavigation$.pipe(
       map((legacyItems) => {
         // Step 2: Check compatibility
-        const compatibilityReport =
-          this.compatibilityService.checkCompatibility(legacyItems);
+        const compatibilityReport = this.compatibilityService.checkCompatibility(legacyItems);
 
         if (!compatibilityReport.isCompatible) {
-          console.warn(
-            'Compatibility issues found:',
-            compatibilityReport.issues,
-          );
+          console.warn('Compatibility issues found:', compatibilityReport.issues);
         }
 
         // Step 3: Migrate to enhanced format
-        const migratedItems =
-          this.migrationService.migrateLegacyNavigation(legacyItems);
+        const migratedItems = this.migrationService.migrateLegacyNavigation(legacyItems);
 
         // Step 4: Validate migrated structure
-        const validation =
-          this.migrationService.validateMigratedStructure(migratedItems);
+        const validation = this.migrationService.validateMigratedStructure(migratedItems);
 
         if (!validation.isValid) {
-          throw new Error(
-            `Migration validation failed: ${validation.issues.join(', ')}`,
-          );
+          throw new Error(`Migration validation failed: ${validation.issues.join(', ')}`);
         }
 
         // Step 5: Apply any custom configurations
         const customConfig = this.loadCustomConfiguration();
         const finalItems = this.migrationService.preserveCustomConfigurations(
           migratedItems,
-          customConfig,
+          customConfig
         );
 
         console.log('Migration completed successfully!');
         console.log(`Migrated ${finalItems.length} navigation items`);
 
         return finalItems;
-      }),
+      })
     );
   }
 
@@ -305,7 +292,7 @@ export class MigrationUsageExampleService {
    * Example 7: Using migration in Angular component
    */
   getNavigationForComponent(
-    componentType: 'modern' | 'legacy',
+    componentType: 'modern' | 'legacy'
   ): Observable<INavData[] | INavItemEnhanced[]> {
     // Get enhanced navigation
     const enhancedNavigation$ = this.completeMigrationWorkflow();
@@ -313,9 +300,7 @@ export class MigrationUsageExampleService {
     if (componentType === 'legacy') {
       // Convert to legacy format for old components
       return enhancedNavigation$.pipe(
-        map((enhancedItems) =>
-          this.compatibilityService.convertToLegacyFormat(enhancedItems),
-        ),
+        map((enhancedItems) => this.compatibilityService.convertToLegacyFormat(enhancedItems))
       );
     }
 
@@ -362,7 +347,7 @@ export class MigrationUsageExampleService {
 export class ExampleNavigationComponent {
   constructor(
     private migrationExample: MigrationUsageExampleService,
-    private compatibilityService: NavigationCompatibilityService,
+    private compatibilityService: NavigationCompatibilityService
   ) {}
 
   ngOnInit(): void {
@@ -374,17 +359,13 @@ export class ExampleNavigationComponent {
     this.migrationExample.compatibilityCheckExample();
 
     // Get navigation for this component
-    this.migrationExample
-      .getNavigationForComponent('modern')
-      .subscribe((navigation) => {
-        console.log('Navigation for modern component:', navigation);
-      });
+    this.migrationExample.getNavigationForComponent('modern').subscribe((navigation) => {
+      console.log('Navigation for modern component:', navigation);
+    });
 
-    this.migrationExample
-      .getNavigationForComponent('legacy')
-      .subscribe((navigation) => {
-        console.log('Navigation for legacy component:', navigation);
-      });
+    this.migrationExample.getNavigationForComponent('legacy').subscribe((navigation) => {
+      console.log('Navigation for legacy component:', navigation);
+    });
   }
 }
 
@@ -399,14 +380,12 @@ export class LegacyRouteGuard {
     const fullUrl = `/${url}`;
 
     // Check if this is a legacy route that needs redirection
-    return this.compatibilityService
-      .redirectLegacyRoute(fullUrl)
-      .then((redirected) => {
-        if (redirected) {
-          return false; // Prevent activation, redirect happened
-        }
-        return true; // Allow normal activation
-      });
+    return this.compatibilityService.redirectLegacyRoute(fullUrl).then((redirected) => {
+      if (redirected) {
+        return false; // Prevent activation, redirect happened
+      }
+      return true; // Allow normal activation
+    });
   }
 }
 

@@ -43,7 +43,7 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private etiquetasService: EtiquetaService,
     private toast: ToastService,
-    private log: LoggerService,
+    private log: LoggerService
   ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(50)]],
@@ -78,17 +78,14 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
       const etiquetaData: Etiqueta = { ...this.form.value } as Etiqueta;
       const operation =
         this.isEdit && this.etiqueta?.idEtiqueta
-          ? this.etiquetasService.actualizar(
-              this.etiqueta.idEtiqueta,
-              etiquetaData,
-            )
+          ? this.etiquetasService.actualizar(this.etiqueta.idEtiqueta, etiquetaData)
           : this.etiquetasService.crear(etiquetaData);
       operation.subscribe({
         next: () => {
           this.loading = false;
           this.toast.showSuccess(
             this.isEdit ? 'Etiqueta actualizada' : 'Etiqueta creada',
-            'Etiquetas',
+            'Etiquetas'
           );
           this.save.emit({
             ...etiquetaData,

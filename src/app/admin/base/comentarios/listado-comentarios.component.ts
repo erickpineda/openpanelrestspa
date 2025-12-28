@@ -52,7 +52,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     private entradaService: EntradaService,
     private commonFuncService: CommonFunctionalityService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -94,9 +94,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(idEntrada).subscribe({
         next: (response: OpenpanelApiResponse<any>) => {
-          const entrada: Entrada = response.data
-            ? response.data.elements
-            : Entrada;
+          const entrada: Entrada = response.data ? response.data.elements : Entrada;
           resolve(entrada);
         },
         error: (err: any) => {
@@ -117,7 +115,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.cargando = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({
           next: (response: OpenpanelApiResponse<any>) => {
@@ -135,7 +133,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
           finalize(() => {
             this.cargando = false;
             this.cdr.detectChanges();
-          }),
+          })
         )
         .subscribe({
           next: (data: PaginaResponse) => {
@@ -198,10 +196,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(
-      0,
-      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
-    );
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     if (this.allComentarios.length > 0) {
@@ -221,30 +216,23 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
 
     // Detectar si es server paging o lista completa
     const hasServerPaging =
-      typeof data?.totalPages === 'number' ||
-      typeof data?.totalElements === 'number';
+      typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
 
     if (hasServerPaging) {
       this.listaComentarios = elementos;
       this.allComentarios = [];
       this.estaVacio = !!data.empty;
-      this.totalElements = Number(
-        data.totalElements || this.listaComentarios.length || 0,
-      );
+      this.totalElements = Number(data.totalElements || this.listaComentarios.length || 0);
       this.totalPages = Number(
-        data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1,
+        data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1
       );
       this.numberOfElements = Number(
-        (data as any).numberOfElements ?? this.listaComentarios.length,
+        (data as any).numberOfElements ?? this.listaComentarios.length
       );
       this.pagedComentarios = this.listaComentarios;
 
       // Boundary check
-      if (
-        elementos.length === 0 &&
-        this.pageNo > 0 &&
-        this.pageNo >= this.totalPages
-      ) {
+      if (elementos.length === 0 && this.pageNo > 0 && this.pageNo >= this.totalPages) {
         this.pageNo = Math.max(0, this.totalPages - 1);
         this.obtenerListaComentarios();
         return;
@@ -253,10 +241,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
       // Fallback client paging
       this.allComentarios = elementos;
       this.totalElements = this.allComentarios.length;
-      this.totalPages = Math.max(
-        1,
-        Math.ceil(this.totalElements / this.pageSize),
-      );
+      this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
       this.estaVacio = this.totalElements === 0;
 
       if (this.pageNo >= this.totalPages) {
@@ -293,8 +278,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     if (this.basicSearchText) payload['term'] = this.basicSearchText;
     if (this.filtroUsuario) payload['username'] = this.filtroUsuario;
     if (this.filtroAprobado !== null) payload['aprobado'] = this.filtroAprobado;
-    if (this.filtroCuarentena !== null)
-      payload['cuarentena'] = this.filtroCuarentena;
+    if (this.filtroCuarentena !== null) payload['cuarentena'] = this.filtroCuarentena;
     return payload;
   }
 
@@ -343,7 +327,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.cargando = false;
           this.cdr.detectChanges();
-        }),
+        })
       )
       .subscribe({
         next: () => {

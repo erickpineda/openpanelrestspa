@@ -37,7 +37,7 @@ export class TemasComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private toast: ToastService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
@@ -65,7 +65,7 @@ export class TemasComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.loading = false;
           this.cdr.detectChanges();
-        }),
+        })
       )
       .subscribe({
         next: (list: Tema[]) => {
@@ -200,10 +200,7 @@ export class TemasComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
-    const safePage = Math.max(
-      0,
-      Math.min(Number(page) || 0, Math.max(0, totalPages - 1)),
-    );
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.updatePage();

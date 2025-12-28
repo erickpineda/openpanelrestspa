@@ -598,10 +598,7 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
       color: var(--cui-sidebar-nav-link-color-dark, #e2e8f0);
 
       &:hover {
-        background: var(
-          --cui-sidebar-nav-link-hover-bg-dark,
-          rgba(255, 255, 255, 0.1)
-        );
+        background: var(--cui-sidebar-nav-link-hover-bg-dark, rgba(255, 255, 255, 0.1));
         color: var(--cui-sidebar-nav-link-hover-color-dark, #f7fafc);
       }
     }
@@ -614,10 +611,7 @@ $nav-bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
       color: var(--cui-sidebar-nav-link-color-dark, #e2e8f0);
 
       &:hover {
-        background: var(
-          --cui-sidebar-nav-link-hover-bg-dark,
-          rgba(255, 255, 255, 0.1)
-        );
+        background: var(--cui-sidebar-nav-link-hover-bg-dark, rgba(255, 255, 255, 0.1));
         color: var(--cui-sidebar-nav-link-hover-color-dark, #f7fafc);
       }
     }

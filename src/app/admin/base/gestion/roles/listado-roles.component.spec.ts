@@ -36,11 +36,7 @@ describe('RolesListComponent', () => {
       'actualizarPrivilegios',
     ]);
     const pSpy = jasmine.createSpyObj('PrivilegioService', ['listarSafe']);
-    const tSpy = jasmine.createSpyObj('ToastService', [
-      'showSuccess',
-      'showError',
-      'showWarning',
-    ]);
+    const tSpy = jasmine.createSpyObj('ToastService', ['showSuccess', 'showError', 'showWarning']);
     const lSpy = jasmine.createSpyObj('LoggerService', ['error']);
     const sSpy = jasmine.createSpyObj('SearchUtilService', ['buildRequest']);
 
@@ -57,14 +53,10 @@ describe('RolesListComponent', () => {
     }).compileComponents();
 
     rolServiceSpy = TestBed.inject(RolService) as jasmine.SpyObj<RolService>;
-    privilegioServiceSpy = TestBed.inject(
-      PrivilegioService,
-    ) as jasmine.SpyObj<PrivilegioService>;
+    privilegioServiceSpy = TestBed.inject(PrivilegioService) as jasmine.SpyObj<PrivilegioService>;
     toastSpy = TestBed.inject(ToastService) as jasmine.SpyObj<ToastService>;
     loggerSpy = TestBed.inject(LoggerService) as jasmine.SpyObj<LoggerService>;
-    searchUtilSpy = TestBed.inject(
-      SearchUtilService,
-    ) as jasmine.SpyObj<SearchUtilService>;
+    searchUtilSpy = TestBed.inject(SearchUtilService) as jasmine.SpyObj<SearchUtilService>;
   });
 
   beforeEach(() => {
@@ -73,12 +65,10 @@ describe('RolesListComponent', () => {
 
     // Setup default returns
     rolServiceSpy.listarPaginaSinGlobalLoader.and.returnValue(
-      of({ elements: [], totalElements: 0 } as any),
+      of({ elements: [], totalElements: 0 } as any)
     );
     privilegioServiceSpy.listarSafe.and.returnValue(of(mockPrivilegios));
-    rolServiceSpy.obtenerPorCodigos.and.returnValue(
-      of({ elements: [], totalElements: 0 }),
-    );
+    rolServiceSpy.obtenerPorCodigos.and.returnValue(of({ elements: [], totalElements: 0 }));
 
     fixture.detectChanges();
   });
@@ -102,7 +92,7 @@ describe('RolesListComponent', () => {
       component.delete(propRol);
       expect(toastSpy.showWarning).toHaveBeenCalledWith(
         jasmine.stringMatching(/no se puede eliminar/i),
-        jasmine.any(String),
+        jasmine.any(String)
       );
       expect(component.rolToDelete).toBeNull();
     });
@@ -111,9 +101,7 @@ describe('RolesListComponent', () => {
       component.privilegios = mockPrivilegios;
       component.openEdit(propRol);
 
-      expect(component.editRol?.privilegios.length).toBe(
-        mockPrivilegios.length,
-      );
+      expect(component.editRol?.privilegios.length).toBe(mockPrivilegios.length);
       expect(component.editRol?.privilegios).toEqual(mockPrivilegios);
     });
 
@@ -151,7 +139,7 @@ describe('RolesListComponent', () => {
       const expectedCodes = mockPrivilegios.map((p) => p.codigo);
       expect(rolServiceSpy.actualizarPrivilegios).toHaveBeenCalledWith(
         propRol.codigo,
-        expectedCodes,
+        expectedCodes
       );
     });
   });
@@ -171,7 +159,7 @@ describe('RolesListComponent', () => {
       component.delete(adminRol);
       expect(toastSpy.showWarning).toHaveBeenCalledWith(
         jasmine.stringMatching(/no se puede eliminar/i),
-        jasmine.any(String),
+        jasmine.any(String)
       );
     });
 
@@ -183,7 +171,7 @@ describe('RolesListComponent', () => {
 
       expect(toastSpy.showWarning).toHaveBeenCalledWith(
         jasmine.stringMatching(/no puede quedar sin privilegios/i),
-        jasmine.any(String),
+        jasmine.any(String)
       );
       expect(rolServiceSpy.actualizar).not.toHaveBeenCalled();
     });

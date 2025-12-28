@@ -123,11 +123,7 @@ describe('NavigationCompatibilityService', () => {
     });
 
     it('should return null for non-legacy routes', () => {
-      const nonLegacyRoutes = [
-        '/admin/control/entradas',
-        '/admin/dashboard',
-        '/some/other/route',
-      ];
+      const nonLegacyRoutes = ['/admin/control/entradas', '/admin/dashboard', '/some/other/route'];
 
       nonLegacyRoutes.forEach((route) => {
         const result = service.handleLegacyRouteRedirect(route);
@@ -143,9 +139,7 @@ describe('NavigationCompatibilityService', () => {
       const result = await service.redirectLegacyRoute('/admin/entradas');
 
       expect(result).toBe(true);
-      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith(
-        '/admin/control/entradas',
-      );
+      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/admin/control/entradas');
     });
 
     it('should return false for non-legacy routes', async () => {
@@ -191,10 +185,7 @@ describe('NavigationCompatibilityService', () => {
         flattenHierarchy: true,
       };
 
-      const result = service.adaptForLegacyComponent(
-        sampleEnhancedItems,
-        expectations,
-      );
+      const result = service.adaptForLegacyComponent(sampleEnhancedItems, expectations);
 
       expect(result.length).toBe(3); // Parent + Child + Simple
       expect(result[0].name).toBe('Parent Item');
@@ -209,10 +200,7 @@ describe('NavigationCompatibilityService', () => {
         removeBadges: true,
       };
 
-      const result = service.adaptForLegacyComponent(
-        sampleEnhancedItems,
-        expectations,
-      );
+      const result = service.adaptForLegacyComponent(sampleEnhancedItems, expectations);
 
       result.forEach((item) => {
         expect(item.badge).toBeUndefined();
@@ -224,10 +212,7 @@ describe('NavigationCompatibilityService', () => {
         simplifyIcons: true,
       };
 
-      const result = service.adaptForLegacyComponent(
-        sampleEnhancedItems,
-        expectations,
-      );
+      const result = service.adaptForLegacyComponent(sampleEnhancedItems, expectations);
 
       expect(result[0].icon).toBe('cil-parent');
       expect(result[0].iconComponent).toBeUndefined();
@@ -239,10 +224,7 @@ describe('NavigationCompatibilityService', () => {
         allowedUrls: ['/parent'],
       };
 
-      const result = service.adaptForLegacyComponent(
-        sampleEnhancedItems,
-        expectations,
-      );
+      const result = service.adaptForLegacyComponent(sampleEnhancedItems, expectations);
 
       expect(result.length).toBe(1);
       expect(result[0].url).toBe('/parent');
@@ -255,10 +237,7 @@ describe('NavigationCompatibilityService', () => {
         simplifyIcons: true,
       };
 
-      const result = service.adaptForLegacyComponent(
-        sampleEnhancedItems,
-        expectations,
-      );
+      const result = service.adaptForLegacyComponent(sampleEnhancedItems, expectations);
 
       expect(result.length).toBe(3); // Flattened
       expect(result[0].badge).toBeUndefined(); // No badges
@@ -278,11 +257,9 @@ describe('NavigationCompatibilityService', () => {
 
       const result = service.checkCompatibility(legacyConfig);
 
-      expect(result.warnings).toContain(
-        'Navigation items are using legacy INavData format',
-      );
+      expect(result.warnings).toContain('Navigation items are using legacy INavData format');
       expect(result.suggestions).toContain(
-        'Consider migrating to INavItemEnhanced for better functionality',
+        'Consider migrating to INavItemEnhanced for better functionality'
       );
     });
 
@@ -298,11 +275,9 @@ describe('NavigationCompatibilityService', () => {
       const result = service.checkCompatibility(configWithDeprecatedBadge);
 
       expect(result.isCompatible).toBe(false);
-      expect(
-        result.issues.some((issue) =>
-          issue.includes('deprecated string badge format'),
-        ),
-      ).toBe(true);
+      expect(result.issues.some((issue) => issue.includes('deprecated string badge format'))).toBe(
+        true
+      );
     });
 
     it('should detect deprecated roles property', () => {
@@ -317,9 +292,7 @@ describe('NavigationCompatibilityService', () => {
       const result = service.checkCompatibility(configWithDeprecatedRoles);
 
       expect(
-        result.warnings.some((warning) =>
-          warning.includes("deprecated 'roles' property"),
-        ),
+        result.warnings.some((warning) => warning.includes("deprecated 'roles' property"))
       ).toBe(true);
     });
 
@@ -371,12 +344,7 @@ describe('NavigationCompatibilityService', () => {
     });
 
     it('route mappings redirect to valid routes', () => {
-      const routes = [
-        '/admin/entradas',
-        '/admin/usuarios',
-        '/admin/perfil',
-        '/admin/comentarios',
-      ];
+      const routes = ['/admin/entradas', '/admin/usuarios', '/admin/perfil', '/admin/comentarios'];
       routes.forEach((r) => {
         const newRoute = service.handleLegacyRouteRedirect(r);
         expect(newRoute).toBeDefined();

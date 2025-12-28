@@ -11,7 +11,7 @@ declare const require: {
   context(
     path: string,
     deep?: boolean,
-    filter?: RegExp,
+    filter?: RegExp
   ): {
     <T>(id: string): T;
     keys(): string[];
@@ -19,10 +19,7 @@ declare const require: {
 };
 
 // First, initialize the Angular testing environment.
-getTestBed().initTestEnvironment(
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting(),
-);
+getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
 
 // Then we find all the tests (compatibilidad Webpack 5 / Firefox headless)
 import './app/app.component.spec';

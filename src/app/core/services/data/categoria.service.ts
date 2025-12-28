@@ -15,11 +15,7 @@ export class CategoriaService extends CrudService<Categoria, number> {
   protected endpoint = '/categorias';
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
-  buscarSafe(
-    searchRequest: any,
-    pageNo: number,
-    size: number,
-  ): Observable<PaginaResponse> {
+  buscarSafe(searchRequest: any, pageNo: number, size: number): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = size.toString();
@@ -31,22 +27,19 @@ export class CategoriaService extends CrudService<Categoria, number> {
       params,
       undefined,
       'categorias.buscar',
-      context,
+      context
     );
   }
 
   buscarSinGlobalLoader(
     searchRequest: any,
     pageNo: number,
-    pageSize: number,
+    pageSize: number
   ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
-    const context = new HttpContext().set(
-      NetworkInterceptor.SKIP_GLOBAL_LOADER,
-      true,
-    );
+    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.safePostData<PaginaResponse>(
       `${this.endpoint}/buscar`,
       searchRequest,
@@ -54,7 +47,7 @@ export class CategoriaService extends CrudService<Categoria, number> {
       params,
       undefined,
       'categorias.buscar',
-      context,
+      context
     );
   }
 }

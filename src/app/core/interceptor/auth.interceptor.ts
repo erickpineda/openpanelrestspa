@@ -19,20 +19,15 @@ const TOKEN_HEADER_KEY = 'Authorization';
 export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private tokenStorage: TokenStorageService,
-    private authSync: AuthSyncService,
+    private authSync: AuthSyncService
   ) {}
 
-  intercept(
-    req: HttpRequest<any>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<any>> {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.tokenStorage.getToken();
 
     const url = req.url || '';
     const isAuthEndpoint =
-      url.includes('/login') ||
-      url.includes('/auth') ||
-      url.includes('/refresh');
+      url.includes('/login') || url.includes('/auth') || url.includes('/refresh');
 
     // Si hay token pero está caducado: forzar logout y cancelar la petición
     if (token && isJwtExpired(token, 0)) {
@@ -69,7 +64,7 @@ export class AuthInterceptor implements HttpInterceptor {
           }
         }
         return throwError(() => err);
-      }),
+      })
     );
   }
 }

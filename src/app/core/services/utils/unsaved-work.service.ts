@@ -17,11 +17,11 @@ export class UnsavedWorkService {
     // Compatibilidad: escucha evento legacy y evento nuevo
     window.addEventListener(
       OPConstants.Events.SAVE_UNSAVED_WORK,
-      this.saveAllUnsavedWork.bind(this),
+      this.saveAllUnsavedWork.bind(this)
     );
     window.addEventListener(
       OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
-      this.saveAllUnsavedWork.bind(this),
+      this.saveAllUnsavedWork.bind(this)
     );
   }
 
@@ -46,44 +46,36 @@ export class UnsavedWorkService {
     const currentValueStr = JSON.stringify(currentValue);
 
     const hasChanged = initialValue !== currentValueStr;
-    this.log.info(
-      `📝 UnsavedWorkService: Formulario ${formId} - Cambios: ${hasChanged}`,
-    );
+    this.log.info(`📝 UnsavedWorkService: Formulario ${formId} - Cambios: ${hasChanged}`);
 
     this.unsavedForms.set(formId, hasChanged);
     this.updateUnsavedWorkStatus();
   }
 
   public markFormAsSaved(formId: string): void {
-    this.log.info(
-      `📝 UnsavedWorkService: Formulario ${formId} marcado como guardado`,
-    );
+    this.log.info(`📝 UnsavedWorkService: Formulario ${formId} marcado como guardado`);
     this.unsavedForms.set(formId, false);
     this.updateUnsavedWorkStatus();
   }
 
   private updateUnsavedWorkStatus(): void {
     const hasUnsaved = this.hasUnsavedWork();
-    this.log.info(
-      `📝 UnsavedWorkService: Estado actual - Trabajo sin guardar: ${hasUnsaved}`,
-    );
+    this.log.info(`📝 UnsavedWorkService: Estado actual - Trabajo sin guardar: ${hasUnsaved}`);
     this.unsavedWorkSubject.next(hasUnsaved);
     (window as any).__UNSAVED_WORK__ = hasUnsaved;
   }
 
   public hasUnsavedWork(): boolean {
-    const hasUnsaved = Array.from(this.unsavedForms.values()).some(
-      (hasUnsaved) => hasUnsaved,
-    );
+    const hasUnsaved = Array.from(this.unsavedForms.values()).some((hasUnsaved) => hasUnsaved);
     this.log.info(
-      `📝 UnsavedWorkService: Verificando trabajo sin guardar - Resultado: ${hasUnsaved}`,
+      `📝 UnsavedWorkService: Verificando trabajo sin guardar - Resultado: ${hasUnsaved}`
     );
     return hasUnsaved;
   }
 
   private saveAllUnsavedWork(): void {
     const formsToSave = Array.from(this.unsavedForms.keys()).filter((formId) =>
-      this.unsavedForms.get(formId),
+      this.unsavedForms.get(formId)
     );
     this.log.info('💾 UnsavedWorkService: Guardando formularios:', formsToSave);
 

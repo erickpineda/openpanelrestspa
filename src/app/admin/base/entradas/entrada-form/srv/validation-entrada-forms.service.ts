@@ -1,10 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  UntypedFormBuilder,
-  UntypedFormGroup,
-  Validators,
-  UntypedFormArray,
-} from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, UntypedFormArray } from '@angular/forms';
 import { EstadoEntrada } from '../../../../../core/models/estado-entrada.model';
 import { TipoEntrada } from '../../../../../core/models/tipo-entrada.model';
 import { Categoria } from '../../../../../core/models/categoria.model';
@@ -65,16 +60,10 @@ export class ValidationEntradaFormsService {
           Validators.maxLength(this.formRules.tituloMax),
         ],
       ],
-      subtitulo: [
-        entrada?.subtitulo ?? '',
-        [Validators.maxLength(this.formRules.subtituloMax)],
-      ],
+      subtitulo: [entrada?.subtitulo ?? '', [Validators.maxLength(this.formRules.subtituloMax)]],
       contenido: [
         entrada?.contenido ?? '',
-        [
-          Validators.required,
-          Validators.minLength(this.formRules.contenidoMin),
-        ],
+        [Validators.required, Validators.minLength(this.formRules.contenidoMin)],
       ],
       notas: [entrada?.notas ?? null],
       tipoEntrada: [entrada?.tipoEntrada ?? null, [Validators.required]],
@@ -92,9 +81,7 @@ export class ValidationEntradaFormsService {
       votos: [entrada?.votos ?? 0],
       cantidadComentarios: [entrada?.cantidadComentarios ?? 0],
       categorias: this.fb.array(
-        entrada?.categorias
-          ? entrada.categorias.map((c: Categoria) => this.fb.control(c))
-          : [],
+        entrada?.categorias ? entrada.categorias.map((c: Categoria) => this.fb.control(c)) : []
       ),
       categoriasConComas: [entrada?.categoriasConComas ?? ''],
       etiquetas: [entrada?.etiquetas ?? []],

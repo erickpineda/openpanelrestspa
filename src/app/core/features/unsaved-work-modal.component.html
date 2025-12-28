@@ -21,10 +21,7 @@
       <div>
         <p>{{ sessionData?.message }}</p>
         <p class="text-danger">
-          <strong
-            >Tiene trabajo sin guardar que se perderá si cierra la
-            sesión.</strong
-          >
+          <strong>Tiene trabajo sin guardar que se perderá si cierra la sesión.</strong>
         </p>
       </div>
     }
@@ -52,11 +49,7 @@
         <i class="fas fa-save me-2"></i>
         Guardar y Cerrar Sesión
       </button>
-      <button
-        type="button"
-        class="btn btn-danger"
-        (click)="logoutWithoutSaving()"
-      >
+      <button type="button" class="btn btn-danger" (click)="logoutWithoutSaving()">
         <i class="fas fa-times me-2"></i>
         Cerrar Sin Guardar
       </button>

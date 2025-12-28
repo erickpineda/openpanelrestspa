@@ -57,9 +57,7 @@ describe('NavigationAnimationService', () => {
 
       const animationPromise = service.animate(mockElement, config);
 
-      expect(
-        mockElement.style.getPropertyValue('--nav-transition-duration'),
-      ).toBe('600ms');
+      expect(mockElement.style.getPropertyValue('--nav-transition-duration')).toBe('600ms');
 
       await new Promise((resolve) => setTimeout(resolve, 0));
       mockElement.dispatchEvent(new Event('animationend'));
@@ -223,18 +221,9 @@ describe('NavigationAnimationService', () => {
       const staggerPromise = service.animateStagger(elements, config, 100);
 
       // Simular eventos de animación escalonados
-      setTimeout(
-        () => elements[0].dispatchEvent(new Event('animationend')),
-        100,
-      );
-      setTimeout(
-        () => elements[1].dispatchEvent(new Event('animationend')),
-        200,
-      );
-      setTimeout(
-        () => elements[2].dispatchEvent(new Event('animationend')),
-        300,
-      );
+      setTimeout(() => elements[0].dispatchEvent(new Event('animationend')), 100);
+      setTimeout(() => elements[1].dispatchEvent(new Event('animationend')), 200);
+      setTimeout(() => elements[2].dispatchEvent(new Event('animationend')), 300);
 
       await staggerPromise;
 
@@ -300,10 +289,7 @@ describe('NavigationAnimationService', () => {
       expect(mockElement.classList.contains('fade-in-up')).toBe(true);
 
       // Simular fin de animación
-      setTimeout(
-        () => mockElement.dispatchEvent(new Event('animationend')),
-        50,
-      );
+      setTimeout(() => mockElement.dispatchEvent(new Event('animationend')), 50);
       await promise;
     });
 
@@ -313,10 +299,7 @@ describe('NavigationAnimationService', () => {
       expect(mockElement.classList.contains('fade-in-down')).toBe(true);
 
       // Simular fin de animación
-      setTimeout(
-        () => mockElement.dispatchEvent(new Event('animationend')),
-        50,
-      );
+      setTimeout(() => mockElement.dispatchEvent(new Event('animationend')), 50);
       await promise;
     });
 
@@ -326,10 +309,7 @@ describe('NavigationAnimationService', () => {
       expect(mockElement.classList.contains('bounce-in')).toBe(true);
 
       // Simular fin de animación
-      setTimeout(
-        () => mockElement.dispatchEvent(new Event('animationend')),
-        50,
-      );
+      setTimeout(() => mockElement.dispatchEvent(new Event('animationend')), 50);
       await promise;
     });
 
@@ -347,20 +327,14 @@ describe('NavigationAnimationService', () => {
       let promise = service.animateMobileSidebarOpen(mockElement);
       expect(mockElement.classList.contains('slide-in-left')).toBe(true);
 
-      setTimeout(
-        () => mockElement.dispatchEvent(new Event('animationend')),
-        50,
-      );
+      setTimeout(() => mockElement.dispatchEvent(new Event('animationend')), 50);
       await promise;
 
       // Test close
       promise = service.animateMobileSidebarClose(mockElement);
       expect(mockElement.classList.contains('slide-out-left')).toBe(true);
 
-      setTimeout(
-        () => mockElement.dispatchEvent(new Event('animationend')),
-        50,
-      );
+      setTimeout(() => mockElement.dispatchEvent(new Event('animationend')), 50);
       await promise;
     });
 
@@ -378,20 +352,14 @@ describe('NavigationAnimationService', () => {
       let promise = service.animateError(mockElement);
       expect(mockElement.classList.contains('shake')).toBe(true);
 
-      setTimeout(
-        () => mockElement.dispatchEvent(new Event('animationend')),
-        50,
-      );
+      setTimeout(() => mockElement.dispatchEvent(new Event('animationend')), 50);
       await promise;
 
       // Test success
       promise = service.animateSuccess(mockElement);
       expect(mockElement.classList.contains('glow')).toBe(true);
 
-      setTimeout(
-        () => mockElement.dispatchEvent(new Event('animationend')),
-        50,
-      );
+      setTimeout(() => mockElement.dispatchEvent(new Event('animationend')), 50);
       await promise;
     });
   });
@@ -405,15 +373,10 @@ describe('NavigationAnimationService', () => {
       const promise = service.animate(mockElement, config);
 
       // Simular fin de animación
-      setTimeout(
-        () => mockElement.dispatchEvent(new Event('animationend')),
-        50,
-      );
+      setTimeout(() => mockElement.dispatchEvent(new Event('animationend')), 50);
       await promise;
 
-      expect(
-        mockElement.style.getPropertyValue('--nav-transition-duration'),
-      ).toBe('');
+      expect(mockElement.style.getPropertyValue('--nav-transition-duration')).toBe('');
     });
 
     it('should handle multiple animations on same element', async () => {
@@ -430,10 +393,7 @@ describe('NavigationAnimationService', () => {
       expect(mockElement.classList.contains('fade-in-up')).toBe(false);
 
       // Simular fin de segunda animación
-      setTimeout(
-        () => mockElement.dispatchEvent(new Event('animationend')),
-        50,
-      );
+      setTimeout(() => mockElement.dispatchEvent(new Event('animationend')), 50);
       await promise2;
     });
 

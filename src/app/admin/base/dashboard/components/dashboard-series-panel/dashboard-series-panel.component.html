@@ -1,6 +1,4 @@
-<div
-  class="d-flex justify-content-between align-items-center dashboard-toolbar-container"
->
+<div class="d-flex justify-content-between align-items-center dashboard-toolbar-container">
   <h5 class="card-title mb-0">Resumen general</h5>
   <div
     class="btn-toolbar dashboard-toolbar gap-2 flex-wrap"
@@ -153,10 +151,7 @@
     <c-spinner></c-spinner>
   </div>
 }
-<div
-  class="chart-container mb-3"
-  [attr.aria-busy]="loadingSeries ? 'true' : null"
->
+<div class="chart-container mb-3" [attr.aria-busy]="loadingSeries ? 'true' : null">
   <app-dashboard-chart [data]="data" type="line"></app-dashboard-chart>
 </div>
 <c-row>

@@ -52,14 +52,12 @@ describe('GlobalErrorHandlerService', () => {
     originalOnUnhandledRejection = (window as any).onunhandledrejection;
     unhandledRejectionListener = undefined;
 
-    spyOn(window, 'addEventListener').and.callFake(
-      ((type: any, listener: any, options: any) => {
-        if (type === 'unhandledrejection') {
-          unhandledRejectionListener = listener;
-        }
-        return originalAddEventListener(type, listener, options);
-      }) as any,
-    );
+    spyOn(window, 'addEventListener').and.callFake(((type: any, listener: any, options: any) => {
+      if (type === 'unhandledrejection') {
+        unhandledRejectionListener = listener;
+      }
+      return originalAddEventListener(type, listener, options);
+    }) as any);
 
     service = TestBed.inject(GlobalErrorHandlerService);
   });
@@ -67,11 +65,7 @@ describe('GlobalErrorHandlerService', () => {
   afterEach(() => {
     try {
       if (unhandledRejectionListener) {
-        originalRemoveEventListener(
-          'unhandledrejection',
-          unhandledRejectionListener,
-          true,
-        );
+        originalRemoveEventListener('unhandledrejection', unhandledRejectionListener, true);
       }
     } catch {}
 
@@ -116,10 +110,7 @@ describe('GlobalErrorHandlerService', () => {
 
     service.handleError(backendError);
 
-    expect(toast.showError).toHaveBeenCalledWith(
-      'Campo requerido',
-      'Error de Validación',
-    );
+    expect(toast.showError).toHaveBeenCalledWith('Campo requerido', 'Error de Validación');
 
     const extracted = service.getValidationErrors(backendError);
     expect(extracted).toEqual(['entradaDTO : Campo requerido']);
@@ -149,8 +140,6 @@ describe('GlobalErrorHandlerService', () => {
     const normalized = (service as any).normalizePromiseRejection(rejection);
     expect(normalized instanceof HttpErrorResponse).toBeTrue();
     expect((normalized as HttpErrorResponse).status).toBe(400);
-    expect(
-      (service as any).isBackendErrorResponse(normalized),
-    ).toBeTrue();
+    expect((service as any).isBackendErrorResponse(normalized)).toBeTrue();
   });
 });

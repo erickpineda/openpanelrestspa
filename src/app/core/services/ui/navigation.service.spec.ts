@@ -57,7 +57,7 @@ describe('NavigationService', () => {
           relatedItems: [],
           suggestedActions: [],
         }),
-      },
+      }
     );
 
     TestBed.configureTestingModule({
@@ -72,10 +72,10 @@ describe('NavigationService', () => {
     service = TestBed.inject(NavigationService);
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     mockSidebarStateService = TestBed.inject(
-      SidebarStateService,
+      SidebarStateService
     ) as jasmine.SpyObj<SidebarStateService>;
     mockActiveSectionService = TestBed.inject(
-      ActiveSectionService,
+      ActiveSectionService
     ) as jasmine.SpyObj<ActiveSectionService>;
   });
 
@@ -162,9 +162,7 @@ describe('NavigationService', () => {
         .pipe(take(1))
         .subscribe((items) => {
           expect(items).toBeDefined();
-          expect(
-            items.some((item) => item.name === 'Admin Only Section'),
-          ).toBeFalse();
+          expect(items.some((item) => item.name === 'Admin Only Section')).toBeFalse();
           done();
         });
     });
@@ -195,13 +193,8 @@ describe('NavigationService', () => {
 
       service.toggleSection(sectionId);
 
-      expect(mockActiveSectionService.toggleSection).toHaveBeenCalledWith(
-        sectionId,
-      );
-      expect(mockSidebarStateService.toggleItem).toHaveBeenCalledWith(
-        sectionId,
-        true,
-      );
+      expect(mockActiveSectionService.toggleSection).toHaveBeenCalledWith(sectionId);
+      expect(mockSidebarStateService.toggleItem).toHaveBeenCalledWith(sectionId, true);
     });
   });
 
@@ -276,9 +269,7 @@ describe('NavigationService', () => {
       service.updateActiveSection(testUrl);
 
       expect(mockActiveSectionService.setNavigationItems).toHaveBeenCalled();
-      expect(mockActiveSectionService.updateActiveSection).toHaveBeenCalledWith(
-        testUrl,
-      );
+      expect(mockActiveSectionService.updateActiveSection).toHaveBeenCalledWith(testUrl);
       expect(mockSidebarStateService.updateNavItems).toHaveBeenCalled();
     });
   });
@@ -299,22 +290,14 @@ describe('NavigationService', () => {
         },
       ];
 
-      const filteredForLector = service.filterByPermissions(
-        items,
-        UserRole.LECTOR,
-      );
-      const filteredForAdmin = service.filterByPermissions(
-        items,
-        UserRole.ADMINISTRADOR,
-      );
+      const filteredForLector = service.filterByPermissions(items, UserRole.LECTOR);
+      const filteredForAdmin = service.filterByPermissions(items, UserRole.ADMINISTRADOR);
 
       expect(filteredForLector.length).toBe(1);
       expect(filteredForLector[0].name).toBe('Public Item');
 
       expect(filteredForAdmin.length).toBe(2);
-      expect(
-        filteredForAdmin.some((item) => item.name === 'Admin Item'),
-      ).toBeTrue();
+      expect(filteredForAdmin.some((item) => item.name === 'Admin Item')).toBeTrue();
     });
   });
 
@@ -392,19 +375,17 @@ describe('NavigationService', () => {
         .subscribe((items) => {
           // Verificar que los elementos están agrupados lógicamente
           const contentSectionIndex = items.findIndex(
-            (item) => item.name === 'Gestión de Contenido',
+            (item) => item.name === 'Gestión de Contenido'
           );
           const userSectionIndex = items.findIndex(
-            (item) => item.name === 'Administración de Usuarios',
+            (item) => item.name === 'Administración de Usuarios'
           );
 
           expect(contentSectionIndex).toBeGreaterThanOrEqual(0);
           expect(userSectionIndex).toBeGreaterThanOrEqual(0);
 
           // Verificar que los elementos de contenido aparecen después del título de la sección
-          const entriesIndex = items.findIndex(
-            (item) => item.name === 'Entradas',
-          );
+          const entriesIndex = items.findIndex((item) => item.name === 'Entradas');
           const pagesIndex = items.findIndex((item) => item.name === 'Páginas');
 
           expect(entriesIndex).toBeGreaterThan(contentSectionIndex);
@@ -434,9 +415,7 @@ describe('NavigationService', () => {
             title: 'Baja Prioridad',
             icon: 'cil-test',
             priority: 10,
-            items: [
-              { id: 'low', name: 'Low Item', url: '/low', icon: 'cil-test' },
-            ],
+            items: [{ id: 'low', name: 'Low Item', url: '/low', icon: 'cil-test' }],
             collapsible: true,
             defaultExpanded: false,
             requiredRoles: [],
@@ -446,9 +425,7 @@ describe('NavigationService', () => {
             title: 'Alta Prioridad',
             icon: 'cil-test',
             priority: 90,
-            items: [
-              { id: 'high', name: 'High Item', url: '/high', icon: 'cil-test' },
-            ],
+            items: [{ id: 'high', name: 'High Item', url: '/high', icon: 'cil-test' }],
             collapsible: true,
             defaultExpanded: false,
             requiredRoles: [],
@@ -486,15 +463,9 @@ describe('NavigationService', () => {
         .pipe(take(1))
         .subscribe((items) => {
           // Encontrar los índices de las secciones
-          const highIndex = items.findIndex(
-            (item) => item.name === 'Alta Prioridad',
-          );
-          const mediumIndex = items.findIndex(
-            (item) => item.name === 'Media Prioridad',
-          );
-          const lowIndex = items.findIndex(
-            (item) => item.name === 'Baja Prioridad',
-          );
+          const highIndex = items.findIndex((item) => item.name === 'Alta Prioridad');
+          const mediumIndex = items.findIndex((item) => item.name === 'Media Prioridad');
+          const lowIndex = items.findIndex((item) => item.name === 'Baja Prioridad');
 
           // Verificar que están ordenadas por prioridad (mayor prioridad primero)
           expect(highIndex).toBeLessThan(mediumIndex);
@@ -552,9 +523,7 @@ describe('NavigationService', () => {
       ];
 
       // Verificar que cada estado tiene un color distintivo
-      const badgeColors = testItems
-        .filter((item) => item.badge)
-        .map((item) => item.badge!.color);
+      const badgeColors = testItems.filter((item) => item.badge).map((item) => item.badge!.color);
 
       const uniqueColors = new Set(badgeColors);
 
@@ -562,16 +531,10 @@ describe('NavigationService', () => {
       expect(badgeColors.length).toBe(uniqueColors.size);
 
       // Verificar colores específicos para estados específicos
-      const publishedItem = testItems.find(
-        (item) => item.name === 'Entradas Publicadas',
-      );
+      const publishedItem = testItems.find((item) => item.name === 'Entradas Publicadas');
       const draftItem = testItems.find((item) => item.name === 'Borradores');
-      const pendingItem = testItems.find(
-        (item) => item.name === 'Comentarios Pendientes',
-      );
-      const activeItem = testItems.find(
-        (item) => item.name === 'Usuarios Activos',
-      );
+      const pendingItem = testItems.find((item) => item.name === 'Comentarios Pendientes');
+      const activeItem = testItems.find((item) => item.name === 'Usuarios Activos');
 
       expect(publishedItem?.badge?.color).toBe('success');
       expect(draftItem?.badge?.color).toBe('warning');
@@ -623,50 +586,26 @@ describe('NavigationService', () => {
       ];
 
       // Test para LECTOR - solo debe ver elementos públicos
-      const lectorItems = service.filterByPermissions(
-        testItems,
-        UserRole.LECTOR,
-      );
+      const lectorItems = service.filterByPermissions(testItems, UserRole.LECTOR);
       expect(lectorItems.length).toBe(1);
       expect(lectorItems[0].name).toBe('Dashboard Público');
 
       // Test para ADMINISTRADOR - debe ver dashboard y gestión de usuarios
-      const adminItems = service.filterByPermissions(
-        testItems,
-        UserRole.ADMINISTRADOR,
-      );
+      const adminItems = service.filterByPermissions(testItems, UserRole.ADMINISTRADOR);
       expect(adminItems.length).toBe(2);
-      expect(
-        adminItems.some((item) => item.name === 'Dashboard Público'),
-      ).toBeTrue();
-      expect(
-        adminItems.some((item) => item.name === 'Gestión de Usuarios'),
-      ).toBeTrue();
-      expect(
-        adminItems.some((item) => item.name === 'Configuración del Sistema'),
-      ).toBeFalse();
+      expect(adminItems.some((item) => item.name === 'Dashboard Público')).toBeTrue();
+      expect(adminItems.some((item) => item.name === 'Gestión de Usuarios')).toBeTrue();
+      expect(adminItems.some((item) => item.name === 'Configuración del Sistema')).toBeFalse();
 
       // Test para DESARROLLADOR - debe ver dashboard y herramientas de desarrollo
-      const devItems = service.filterByPermissions(
-        testItems,
-        UserRole.DESARROLLADOR,
-      );
+      const devItems = service.filterByPermissions(testItems, UserRole.DESARROLLADOR);
       expect(devItems.length).toBe(2);
-      expect(
-        devItems.some((item) => item.name === 'Dashboard Público'),
-      ).toBeTrue();
-      expect(
-        devItems.some((item) => item.name === 'Herramientas de Desarrollo'),
-      ).toBeTrue();
-      expect(
-        devItems.some((item) => item.name === 'Gestión de Usuarios'),
-      ).toBeFalse();
+      expect(devItems.some((item) => item.name === 'Dashboard Público')).toBeTrue();
+      expect(devItems.some((item) => item.name === 'Herramientas de Desarrollo')).toBeTrue();
+      expect(devItems.some((item) => item.name === 'Gestión de Usuarios')).toBeFalse();
 
       // Test para PROPIETARIO - debe ver todos los elementos
-      const ownerItems = service.filterByPermissions(
-        testItems,
-        UserRole.PROPIETARIO,
-      );
+      const ownerItems = service.filterByPermissions(testItems, UserRole.PROPIETARIO);
       expect(ownerItems.length).toBe(4);
 
       done();
@@ -704,9 +643,7 @@ describe('NavigationService', () => {
       const result = service.isItemActive(testItem);
 
       expect(result).toBe(true);
-      expect(mockActiveSectionService.isItemActive).toHaveBeenCalledWith(
-        testItem,
-      );
+      expect(mockActiveSectionService.isItemActive).toHaveBeenCalledWith(testItem);
     });
 
     it('should check if section is active using ActiveSectionService', () => {
@@ -720,16 +657,12 @@ describe('NavigationService', () => {
       const result = service.isSectionActive(testSection);
 
       expect(result).toBe(true);
-      expect(mockActiveSectionService.isSectionActive).toHaveBeenCalledWith(
-        testSection,
-      );
+      expect(mockActiveSectionService.isSectionActive).toHaveBeenCalledWith(testSection);
     });
 
     it('should get current breadcrumb from ActiveSectionService', () => {
       const mockBreadcrumb = ['Section', 'Item'];
-      mockActiveSectionService.getCurrentBreadcrumb.and.returnValue(
-        mockBreadcrumb,
-      );
+      mockActiveSectionService.getCurrentBreadcrumb.and.returnValue(mockBreadcrumb);
 
       const result = service.getCurrentBreadcrumb();
 
@@ -742,9 +675,7 @@ describe('NavigationService', () => {
 
       service.expandSection(sectionId);
 
-      expect(mockActiveSectionService.expandSection).toHaveBeenCalledWith(
-        sectionId,
-      );
+      expect(mockActiveSectionService.expandSection).toHaveBeenCalledWith(sectionId);
     });
 
     it('should collapse section using ActiveSectionService', () => {
@@ -752,9 +683,7 @@ describe('NavigationService', () => {
 
       service.collapseSection(sectionId);
 
-      expect(mockActiveSectionService.collapseSection).toHaveBeenCalledWith(
-        sectionId,
-      );
+      expect(mockActiveSectionService.collapseSection).toHaveBeenCalledWith(sectionId);
     });
 
     it('should clear expansion state using ActiveSectionService', () => {
@@ -771,9 +700,7 @@ describe('NavigationService', () => {
         breadcrumb: ['Test'],
       };
 
-      mockActiveSectionService.getCurrentActiveState.and.returnValue(
-        mockActiveState,
-      );
+      mockActiveSectionService.getCurrentActiveState.and.returnValue(mockActiveState);
 
       const result = service.getActiveSection();
 

@@ -29,11 +29,9 @@ export class AuthService {
     private http: HttpClient,
     private tokenStorage: TokenStorageService,
     private authSync: AuthSyncService,
-    private sessionManager: SessionManagerService,
+    private sessionManager: SessionManagerService
   ) {
-    this.userSubject = new BehaviorSubject<any | null>(
-      this.tokenStorage.getUser(),
-    );
+    this.userSubject = new BehaviorSubject<any | null>(this.tokenStorage.getUser());
     this.user$ = this.userSubject.asObservable();
   }
 
@@ -51,29 +49,26 @@ export class AuthService {
           this.tokenStorage.saveUser(data);
           this.userSubject.next(data);
           this.authSync.notifyLogin();
-        }),
+        })
       );
   }
 
   logout(): Observable<any> {
     return this.http
       .post(
-        this.urlBase +
-          this.urlUri +
-          this.urlAuth +
-          OPConstants.Methods.AUTH.LOGOUT,
+        this.urlBase + this.urlUri + this.urlAuth + OPConstants.Methods.AUTH.LOGOUT,
         {},
         {
           headers: new HttpHeaders({
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + this.tokenStorage.getToken(),
           }),
-        },
+        }
       )
       .pipe(
         tap(() => {
           this.performLogout();
-        }),
+        })
       );
   }
 

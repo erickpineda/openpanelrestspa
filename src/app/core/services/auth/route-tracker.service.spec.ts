@@ -41,9 +41,7 @@ describe('RouteTrackerService', () => {
     new RouteTrackerService(router, tokenStorage, log, postLoginRedirect);
     events$.next(new NavigationEnd(1, '/admin/a', '/admin/a'));
 
-    expect(postLoginRedirect.saveLastValidRoute).toHaveBeenCalledWith(
-      '/admin/a',
-    );
+    expect(postLoginRedirect.saveLastValidRoute).toHaveBeenCalledWith('/admin/a');
     expect(RouteTrackerService.getLastValidUrl()).toBe('/admin/a');
   });
 

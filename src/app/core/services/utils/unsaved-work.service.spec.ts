@@ -55,8 +55,6 @@ describe('UnsavedWorkService', () => {
   it('cleanupStorage elimina clave de formularios sin guardar', () => {
     localStorage.setItem(OPConstants.Storage.UNSAVED_FORMS_KEY, 'x');
     service.cleanupStorage();
-    expect(
-      localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY),
-    ).toBeNull();
+    expect(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY)).toBeNull();
   });
 });

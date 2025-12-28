@@ -26,7 +26,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
     private sessionManager: SessionManagerService,
     private tokenStorage: TokenStorageService,
     private routeTracker: RouteTrackerService,
-    private postLoginRedirect: PostLoginRedirectService,
+    private postLoginRedirect: PostLoginRedirectService
   ) {}
 
   ngOnInit(): void {
@@ -44,13 +44,11 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
     // Nos suscribimos al evento global de expiración de sesión para mostrar modal en cualquier sitio
     this.subs.add(
-      this.sessionManager.sessionExpired$.subscribe(
-        (data: SessionExpirationData) => {
-          // Guarda datos y muestra modal
-          this.sessionData = data;
-          this.showModal();
-        },
-      ),
+      this.sessionManager.sessionExpired$.subscribe((data: SessionExpirationData) => {
+        // Guarda datos y muestra modal
+        this.sessionData = data;
+        this.showModal();
+      })
     );
   }
 

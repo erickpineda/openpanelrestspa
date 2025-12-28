@@ -110,12 +110,7 @@ export class ToastService implements OnDestroy {
     if (this.preventExactDuplicates) {
       const exists = this._toasts$
         .getValue()
-        .find(
-          (t) =>
-            t.body === full.body &&
-            t.title === full.title &&
-            t.color === full.color,
-        );
+        .find((t) => t.body === full.body && t.title === full.title && t.color === full.color);
       if (exists) {
         if (exists.autohide) {
           // refrescar timer
@@ -177,10 +172,7 @@ export class ToastService implements OnDestroy {
 
     // calcular tiempo transcurrido
     const elapsed = this.now() - (rec.startAt ?? this.now());
-    const remaining = Math.max(
-      0,
-      (rec.remaining ?? this.defaultDelay) - elapsed,
-    );
+    const remaining = Math.max(0, (rec.remaining ?? this.defaultDelay) - elapsed);
 
     // limpiar timeout y actualizar registro
     clearTimeout(rec.timeoutId);

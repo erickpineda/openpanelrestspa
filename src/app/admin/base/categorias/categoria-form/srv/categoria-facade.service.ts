@@ -12,43 +12,41 @@ export class CategoriaFacadeService {
   constructor(
     private categoriaService: CategoriaService,
     private usuarioService: UsuarioService,
-    private entradaService: EntradaService,
+    private entradaService: EntradaService
   ) {}
 
   obtenerListaCategorias(): Observable<Categoria[]> {
     return this.categoriaService.listarPagina().pipe(
-      map((resp) =>
-        Array.isArray(resp.data?.elements) ? resp.data.elements : [],
-      ),
-      catchError(() => of([])),
+      map((resp) => (Array.isArray(resp.data?.elements) ? resp.data.elements : [])),
+      catchError(() => of([]))
     );
   }
 
   obtenerCategoriaPorId(id: number): Observable<Categoria | null> {
     return this.categoriaService.obtenerPorId(id).pipe(
       map((resp) => (resp.data ? resp.data : null)),
-      catchError(() => of(null)),
+      catchError(() => of(null))
     );
   }
 
   obtenerUsuarioActual(): Observable<PerfilResponse | null> {
     return this.usuarioService.obtenerDatosSesionActual().pipe(
       map((resp) => (resp.data ? resp.data : null)),
-      catchError(() => of(null)),
+      catchError(() => of(null))
     );
   }
 
   obtenerEntradaPorId(id: number): Observable<Entrada | null> {
     return this.entradaService.obtenerPorId(id).pipe(
       map((resp) => (resp.data ? resp.data : null)),
-      catchError(() => of(null)),
+      catchError(() => of(null))
     );
   }
 
   // Ejemplo de carga compuesta (categoría, usuario, entrada)
   cargarDatosParaEdicion(
     idCategoria: number,
-    idEntrada: number,
+    idEntrada: number
   ): Observable<{
     categoria: Categoria | null;
     usuario: PerfilResponse | null;

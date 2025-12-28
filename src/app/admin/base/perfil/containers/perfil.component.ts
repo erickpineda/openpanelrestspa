@@ -21,7 +21,7 @@ export class PerfilComponent implements OnInit {
     private usuarioService: UsuarioService,
     private toastService: ToastService,
     private fileStorageService: FileStorageService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +41,7 @@ export class PerfilComponent implements OnInit {
           try {
             this.cdr.detectChanges();
           } catch {}
-        }),
+        })
       )
       .subscribe({
         next: (res: PerfilResponse) => {
@@ -69,7 +69,7 @@ export class PerfilComponent implements OnInit {
           try {
             this.cdr.detectChanges();
           } catch {}
-        }),
+        })
       )
       .subscribe({
         next: () => {

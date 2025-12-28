@@ -27,9 +27,7 @@ describe('UsuariosListComponent', () => {
         .and.returnValue(of({ data: { elements: [], totalElements: 0 } })),
       crear: jasmine.createSpy('crear').and.returnValue(of({})),
       actualizar: jasmine.createSpy('actualizar').and.returnValue(of({})),
-      actualizarParcial: jasmine
-        .createSpy('actualizarParcial')
-        .and.returnValue(of({})),
+      actualizarParcial: jasmine.createSpy('actualizarParcial').and.returnValue(of({})),
       eliminar: jasmine.createSpy('eliminar').and.returnValue(of({})),
       borrar: jasmine.createSpy('borrar').and.returnValue(of({})),
     };
@@ -90,7 +88,7 @@ describe('UsuariosListComponent', () => {
     component.delete(ownerUser);
     expect(mockToastService.showWarning).toHaveBeenCalledWith(
       'No se puede eliminar al usuario Propietario',
-      'Acción no permitida',
+      'Acción no permitida'
     );
     expect(component.showDeleteModal).toBeFalse();
   });

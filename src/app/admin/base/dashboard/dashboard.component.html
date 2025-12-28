@@ -98,9 +98,7 @@
               <app-dashboard-estado-nominal-panel
                 [estadoNominalChartType]="estadoNominalChartType"
                 [estadoNominalStacked]="estadoNominalStacked"
-                [seriesEntriesSplitEstadoNombreData]="
-                  seriesEntriesSplitEstadoNombreData
-                "
+                [seriesEntriesSplitEstadoNombreData]="seriesEntriesSplitEstadoNombreData"
                 [estadoNominalChartOptions]="estadoNominalChartOptions"
                 [errorSplitEstadoNombre]="errorSplitEstadoNombre"
                 (setChartType)="setEstadoNominalChartType($event)"
@@ -109,10 +107,7 @@
                 (retry)="loadSeriesEntriesSplitEstadoNombre()"
               ></app-dashboard-estado-nominal-panel>
             </div>
-            <div
-              class="mt-3"
-              [attr.aria-busy]="loadingSplitEstado ? 'true' : null"
-            >
+            <div class="mt-3" [attr.aria-busy]="loadingSplitEstado ? 'true' : null">
               <app-dashboard-estado-split-panel
                 [loadingSplitEstado]="loadingSplitEstado"
                 [seriesEntriesSplitData]="seriesEntriesSplitData"

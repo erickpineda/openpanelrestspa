@@ -8,8 +8,7 @@ import { Component, EventEmitter, Output, Input } from '@angular/core';
 })
 export class DataRecoveryNotificationComponent {
   @Input() title = 'Datos recuperados';
-  @Input() message =
-    'Se han encontrado datos no guardados de una sesión anterior.';
+  @Input() message = 'Se han encontrado datos no guardados de una sesión anterior.';
   @Input() recoverText = 'Recuperar';
   @Input() ignoreText = 'Ignorar';
   @Input() discardText = 'Descartar';

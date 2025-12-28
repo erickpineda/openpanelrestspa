@@ -29,9 +29,7 @@ import { Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
-export class ListadoPaginasComponent
-  implements OnInit, OnDestroy, AfterViewInit
-{
+export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit {
   // #region Properties
 
   // Data
@@ -82,7 +80,7 @@ export class ListadoPaginasComponent
     private router: Router,
     private entradaCatalogService: EntradaCatalogService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone,
+    private zone: NgZone
   ) {}
 
   // #region Lifecycle Methods
@@ -91,7 +89,7 @@ export class ListadoPaginasComponent
     this.cargarDefinicionesBuscador();
     this.busquedaService.iniciarBusqueda(
       (term, page) => this.realizarBusquedaEntradas(term, page),
-      (response) => this.procesarResultadosBusqueda(response),
+      (response) => this.procesarResultadosBusqueda(response)
     );
   }
 
@@ -132,10 +130,10 @@ export class ListadoPaginasComponent
           this.errorBoundaryService.reportErrorToBoundary(
             this.boundaryId,
             error,
-            'CargarDefinicionesBuscador',
+            'CargarDefinicionesBuscador'
           );
           return throwError(() => error);
-        }),
+        })
       )
       .subscribe({
         next: (response) => {
@@ -153,32 +151,23 @@ export class ListadoPaginasComponent
   }
 
   private inicializarCamposBusqueda(): void {
-    const campos =
-      (this.definiciones.filterKeySegunClazzNamePermitido as string[]) || [];
+    const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]) || [];
 
     // Ordenar campos: 'titulo' primero, luego el resto alfabéticamente
     const camposOrdenados = [
       ...campos.filter((k) => k === 'titulo'),
-      ...campos
-        .filter((k) => k !== 'titulo')
-        .sort((a, b) => a.localeCompare(b)),
+      ...campos.filter((k) => k !== 'titulo').sort((a, b) => a.localeCompare(b)),
     ];
 
     this.campoSeleccionado = camposOrdenados[0] || '';
-    const operaciones =
-      this.definiciones.operationPermitido?.[this.campoSeleccionado];
-    this.operacionSeleccionada = Array.isArray(operaciones)
-      ? operaciones[0]
-      : '';
+    const operaciones = this.definiciones.operationPermitido?.[this.campoSeleccionado];
+    this.operacionSeleccionada = Array.isArray(operaciones) ? operaciones[0] : '';
     this.valorBusqueda = '';
     this.currentPage = 0;
 
     if (this.campoSeleccionado && this.operacionSeleccionada) {
       this.zone.run(() =>
-        setTimeout(
-          () => this.busquedaService.triggerBusqueda(this.valorBusqueda),
-          0,
-        ),
+        setTimeout(() => this.busquedaService.triggerBusqueda(this.valorBusqueda), 0)
       );
     }
   }
@@ -212,15 +201,13 @@ export class ListadoPaginasComponent
     };
 
     const pageToUse = page !== undefined ? page : this.currentPage;
-    return this.entradaService
-      .buscarSafe(searchRequest, pageToUse, this.pageSize)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.cargandoTabla = false;
-          this.cdr.detectChanges();
-        }),
-      );
+    return this.entradaService.buscarSafe(searchRequest, pageToUse, this.pageSize).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.cargandoTabla = false;
+        this.cdr.detectChanges();
+      })
+    );
   }
 
   private procesarResultadosBusqueda(response: any) {
@@ -238,30 +225,24 @@ export class ListadoPaginasComponent
     // Mapear categorías
     elementos = elementos.map((entrada: Entrada) => ({
       ...entrada,
-      categoriasConComas:
-        entrada.categorias?.map((e) => e.nombre).join(', ') || '',
+      categoriasConComas: entrada.categorias?.map((e) => e.nombre).join(', ') || '',
     }));
 
     const hasServerPaging =
-      typeof data?.totalPages === 'number' ||
-      typeof data?.totalElements === 'number';
+      typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
 
     if (hasServerPaging) {
       this.listaEntradas = elementos;
       this.totalElements = Number(data.totalElements || elementos.length || 0);
       this.totalPages = Number(
-        data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1,
+        data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1
       );
       this.numberOfElements = Number(data.numberOfElements ?? elementos.length);
       this.estaVacio = elementos.length === 0;
       this.allEntradas = []; // Limpiar caché cliente si es server paging
 
       // Boundary check
-      if (
-        elementos.length === 0 &&
-        this.currentPage > 0 &&
-        this.currentPage >= this.totalPages
-      ) {
+      if (elementos.length === 0 && this.currentPage > 0 && this.currentPage >= this.totalPages) {
         this.currentPage = Math.max(0, this.totalPages - 1);
         this.busquedaService.triggerBusqueda(this.valorBusqueda);
         return;
@@ -270,10 +251,7 @@ export class ListadoPaginasComponent
       // Fallback Client Paging
       this.allEntradas = elementos;
       this.totalElements = this.allEntradas.length;
-      this.totalPages = Math.max(
-        1,
-        Math.ceil(this.totalElements / this.pageSize),
-      );
+      this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
       this.estaVacio = this.totalElements === 0;
 
       if (this.currentPage >= this.totalPages) {
@@ -348,10 +326,7 @@ export class ListadoPaginasComponent
     // Forzar recarga
     if (this.allEntradas.length > 0) {
       // Si estamos en modo cliente, solo reaplicar paginación
-      this.totalPages = Math.max(
-        1,
-        Math.ceil(this.totalElements / this.pageSize),
-      );
+      this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
       this.applyPaging();
     } else {
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
@@ -389,9 +364,7 @@ export class ListadoPaginasComponent
     // Intentar obtener operación válida para título, por defecto CONTAINS
     const operaciones = this.definiciones?.operationPermitido?.['titulo'];
     this.operacionSeleccionada =
-      Array.isArray(operaciones) && operaciones.length > 0
-        ? operaciones[0]
-        : 'CONTAINS';
+      Array.isArray(operaciones) && operaciones.length > 0 ? operaciones[0] : 'CONTAINS';
 
     this.valorBusqueda = text;
     this.currentPage = 0;
@@ -440,7 +413,7 @@ export class ListadoPaginasComponent
             this.visible = false;
             this.toastService.showSuccess(
               'La página se ha eliminado correctamente.',
-              'Página eliminada',
+              'Página eliminada'
             );
             this.cdr.markForCheck();
           },
@@ -504,10 +477,7 @@ export class ListadoPaginasComponent
 
   onEditarDesdePreview(): void {
     if (this.previewEntrada && this.previewEntrada.idEntrada) {
-      this.router.navigate([
-        '/admin/control/paginas/editar',
-        this.previewEntrada.idEntrada,
-      ]);
+      this.router.navigate(['/admin/control/paginas/editar', this.previewEntrada.idEntrada]);
       this.closePreview();
     }
   }
@@ -516,7 +486,7 @@ export class ListadoPaginasComponent
     this.closePreview();
     this.toastService.showInfo(
       'Solicitud de publicación enviada (acción no implementada).',
-      'Publicar',
+      'Publicar'
     );
   }
 
@@ -526,11 +496,7 @@ export class ListadoPaginasComponent
 
   checkFechaPublicacion(fechaPublicacion: Date): string {
     return fechaPublicacion
-      ? this.commonFuncService.transformaFecha(
-          fechaPublicacion,
-          'dd-MM-yyyy',
-          false,
-        )
+      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', false)
       : 'No publicada';
   }
 
