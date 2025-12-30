@@ -16,7 +16,8 @@ export const POST_LOGIN_REDIRECT = OPConstants.Session.POST_LOGIN_REDIRECT;
 export class TokenStorageService {
   constructor(private log: LoggerService) {}
 
-  private readonly POST_LOGIN_TTL_MS = 24 * 60 * 60 * 1000;
+  private readonly POST_LOGIN_TTL_MS =
+    (OPConstants.Session.POST_LOGIN_MAX_AGE_DAYS || 1) * 24 * 60 * 60 * 1000;
   private postLoginMaintenanceTimer: any = null;
 
   public getOrCreateTabId(): string {
@@ -129,6 +130,32 @@ export class TokenStorageService {
           window.sessionStorage.removeItem(k);
         }
       });
+    } catch {}
+    try {
+      const localKeys: { key: string; ts: number }[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf(POST_LOGIN_PREFIX) === 0) {
+          const rest = k.substring(POST_LOGIN_PREFIX.length);
+          const tsStr = rest.split('-')[0] || '';
+          const tsNum = Number(tsStr);
+          localKeys.push({ key: k, ts: isNaN(tsNum) ? 0 : tsNum });
+        }
+      }
+      const now = Date.now();
+      localKeys.forEach(({ key, ts }) => {
+        if (ts > 0 && now - ts > this.POST_LOGIN_TTL_MS) {
+          localStorage.removeItem(key);
+        }
+      });
+      const max = OPConstants.Session.POST_LOGIN_MAX_ENTRIES || 50;
+      if (localKeys.length > max) {
+        const sorted = localKeys.sort((a, b) => b.ts - a.ts);
+        const toDelete = sorted.slice(max);
+        toDelete.forEach(({ key }) => {
+          localStorage.removeItem(key);
+        });
+      }
     } catch {}
   }
 

@@ -23,6 +23,15 @@ const setAuthStorage = async (page: any) => {
         'sync-auth-user',
         JSON.stringify({ id: 'e2e', roles: ['ADMIN'] })
       );
+
+      window.localStorage.setItem(
+        'op_ui_anomaly_monitor_config_v1',
+        JSON.stringify({
+          enabled: true,
+          scanIntervalMs: 250,
+          viewportCoverageThreshold: 0.8,
+        })
+      );
     } catch {}
   });
 };
@@ -71,4 +80,3 @@ test.describe('UI watchdog', () => {
     expect(hasSnapshot).toBe(true);
   });
 });
-

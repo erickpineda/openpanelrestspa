@@ -61,7 +61,7 @@ describe('AuthService', () => {
     httpMock.verify();
   });
 
-  it('login guarda token y notifica login', (done) => {
+  it('login guarda token y actualiza usuario', (done) => {
     const userData = { jwttoken: 'jwt', username: 'u' };
 
     service.user$.subscribe((user) => {
@@ -74,7 +74,6 @@ describe('AuthService', () => {
     service.login('u', 'p').subscribe(() => {
       expect(tokenStorage.saveToken).toHaveBeenCalledWith('jwt');
       expect(tokenStorage.saveUser).toHaveBeenCalledWith(userData as any);
-      expect(authSync.notifyLogin).toHaveBeenCalled();
     });
 
     const req = httpMock.expectOne((r) => r.url.includes('/login'));

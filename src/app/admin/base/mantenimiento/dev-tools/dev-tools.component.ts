@@ -1,8 +1,18 @@
 import { Component } from '@angular/core';
+import {
+  UiAnomalyMonitorConfig,
+  UiAnomalyMonitorService,
+} from '../../../../core/services/ui/ui-anomaly-monitor.service';
 
 type HarSummary = {
   total: number;
-  byStatus: { ok2xx: number; redir3xx: number; client4xx: number; server5xx: number; other: number };
+  byStatus: {
+    ok2xx: number;
+    redir3xx: number;
+    client4xx: number;
+    server5xx: number;
+    other: number;
+  };
   failed: {
     count: number;
     items: Array<{ method: string; status: number; url: string; mimeType?: string }>;
@@ -38,8 +48,27 @@ export class DevToolsComponent {
 
   uiSnapshotsRaw = '';
 
+  uiMonitorConfig: UiAnomalyMonitorConfig;
+
+  constructor(private uiMonitor: UiAnomalyMonitorService) {
+    this.uiMonitorConfig = this.uiMonitor.getConfig();
+  }
+
   toggle(feature: any): void {
     feature.enabled = !feature.enabled;
+  }
+
+  refreshUiMonitorConfig(): void {
+    this.uiMonitorConfig = this.uiMonitor.getConfig();
+  }
+
+  applyUiMonitorConfig(): void {
+    this.uiMonitor.setConfig(this.uiMonitorConfig);
+    this.refreshUiMonitorConfig();
+  }
+
+  scanUiNow(): void {
+    this.uiMonitor.scanAndRecover('manual');
   }
 
   analyzeHar(): void {
@@ -86,7 +115,9 @@ export class DevToolsComponent {
       const method = String(e?.request?.method || 'GET');
       const url = String(e?.request?.url || '');
       const status = Number(e?.response?.status ?? 0);
-      const mimeType = e?.response?.content?.mimeType ? String(e.response.content.mimeType) : undefined;
+      const mimeType = e?.response?.content?.mimeType
+        ? String(e.response.content.mimeType)
+        : undefined;
       const timeMs = Number(e?.time ?? 0);
 
       if (status >= 200 && status < 300) byStatus.ok2xx++;

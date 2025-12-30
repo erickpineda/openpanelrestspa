@@ -1,10 +1,24 @@
 import { Injectable, NgZone } from '@angular/core';
-import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
+import {
+  NavigationCancel,
+  NavigationEnd,
+  NavigationError,
+  NavigationStart,
+  Router,
+} from '@angular/router';
+import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 import { LoggerService } from '../logger.service';
 import { LoadingService } from './loading.service';
 
 type UiAnomalyTrigger = 'navigation' | 'interval' | 'manual';
+
+export type UiAnomalyMonitorConfig = {
+  enabled: boolean;
+  scanIntervalMs: number;
+  viewportCoverageThreshold: number;
+};
 
 export type UiBlockerKind =
   | 'modal-backdrop'
@@ -43,6 +57,11 @@ export interface UiAnomalySnapshot {
 export class UiAnomalyMonitorService {
   private started = false;
   private intervalId: any;
+  private routerSub: Subscription | null = null;
+  private resourceErrorHandler: ((ev: any) => void) | null = null;
+  private longTaskObserver: any | null = null;
+  private debugApiInstalled = false;
+  private configLoadedFromStorage = false;
 
   private longTaskCount = 0;
   private longTaskTotalMs = 0;
@@ -54,6 +73,13 @@ export class UiAnomalyMonitorService {
   private readonly storageKey = 'op_ui_anomaly_snapshots_v1';
   private readonly maxSnapshots = 20;
 
+  private readonly configStorageKey = 'op_ui_anomaly_monitor_config_v1';
+  private config: UiAnomalyMonitorConfig = {
+    enabled: !!environment.production,
+    scanIntervalMs: 1500,
+    viewportCoverageThreshold: 0.8,
+  };
+
   constructor(
     private router: Router,
     private zone: NgZone,
@@ -62,37 +88,21 @@ export class UiAnomalyMonitorService {
   ) {}
 
   start(): void {
-    if (this.started) return;
-    this.started = true;
-
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
-    try {
-      const w = window as any;
-      if (!w.OPDebug) w.OPDebug = {};
-      w.OPDebug.uiAnomaly = {
-        scan: () => this.scanAndRecover('manual'),
-        getSnapshots: () => {
-          try {
-            const raw = localStorage.getItem(this.storageKey);
-            return raw ? JSON.parse(raw) : [];
-          } catch {
-            return [];
-          }
-        },
-        clearSnapshots: () => {
-          try {
-            localStorage.removeItem(this.storageKey);
-          } catch {}
-        },
-      };
-    } catch {}
+    this.loadConfigFromStorage();
+    this.ensureDebugApi();
+
+    if (this.started) return;
+    if (!this.config.enabled) return;
+
+    this.started = true;
 
     this.installLongTaskObserver();
     this.installResourceErrorCapture();
 
     this.zone.runOutsideAngular(() => {
-      this.router.events
+      this.routerSub = this.router.events
         .pipe(
           filter(
             (e) =>
@@ -108,16 +118,72 @@ export class UiAnomalyMonitorService {
           }
         });
 
-      this.intervalId = setInterval(() => this.scanAndRecover('interval'), 1500);
+      this.intervalId = setInterval(
+        () => this.scanAndRecover('interval'),
+        this.config.scanIntervalMs
+      );
     });
   }
 
   stop(): void {
     if (!this.started) return;
     this.started = false;
+    if (this.routerSub) {
+      this.routerSub.unsubscribe();
+      this.routerSub = null;
+    }
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
+    }
+    if (this.resourceErrorHandler) {
+      try {
+        window.removeEventListener('error', this.resourceErrorHandler as any, true);
+      } catch {}
+      this.resourceErrorHandler = null;
+    }
+    if (this.longTaskObserver && typeof this.longTaskObserver.disconnect === 'function') {
+      try {
+        this.longTaskObserver.disconnect();
+      } catch {}
+      this.longTaskObserver = null;
+    }
+  }
+
+  getConfig(): UiAnomalyMonitorConfig {
+    return { ...this.config };
+  }
+
+  setConfig(partial: Partial<UiAnomalyMonitorConfig>, persist: boolean = true): void {
+    const next: UiAnomalyMonitorConfig = { ...this.config, ...partial };
+    next.scanIntervalMs = this.normalizeScanInterval(next.scanIntervalMs);
+    next.viewportCoverageThreshold = this.normalizeViewportCoverageThreshold(
+      next.viewportCoverageThreshold
+    );
+
+    const enabledChanged = next.enabled !== this.config.enabled;
+    const intervalChanged = next.scanIntervalMs !== this.config.scanIntervalMs;
+
+    this.config = next;
+    if (persist) this.persistConfigToStorage();
+    this.ensureDebugApi();
+
+    if (enabledChanged) {
+      if (this.config.enabled) this.start();
+      else this.stop();
+      return;
+    }
+
+    if (intervalChanged && this.started) {
+      try {
+        clearInterval(this.intervalId);
+      } catch {}
+      this.zone.runOutsideAngular(() => {
+        this.intervalId = setInterval(
+          () => this.scanAndRecover('interval'),
+          this.config.scanIntervalMs
+        );
+      });
     }
   }
 
@@ -127,18 +193,41 @@ export class UiAnomalyMonitorService {
     const blockers = this.findViewportBlockers();
     if (blockers.length === 0) return;
 
+    const loadingStats = (() => {
+      try {
+        return this.loading.getLoadingStats();
+      } catch {
+        return undefined;
+      }
+    })();
+
+    const kinds = new Set(blockers.map((b) => b.kind));
+    const hasOnlyMobileOverlay = kinds.size === 1 && kinds.has('mobile-overlay');
+    if (hasOnlyMobileOverlay) return;
+
+    const hasOnlyLoaderOverlay = kinds.size === 1 && kinds.has('loader-overlay');
+    if (hasOnlyLoaderOverlay && loadingStats?.isLoading !== false) return;
+
     const hasOpenDialog = this.hasOpenDialogOrOffcanvas();
     const shouldRecover = !hasOpenDialog;
     if (!shouldRecover) return;
 
-    const snapshot = this.captureSnapshot(trigger, blockers, hasOpenDialog);
+    const snapshot = this.captureSnapshot(trigger, blockers, hasOpenDialog, loadingStats);
     this.persistSnapshot(snapshot);
     try {
       (window as any).__OP_UI_ANOMALY__ = snapshot;
     } catch {}
     this.log.warn('UI: bloqueo de interacción detectado, aplicando recuperación', snapshot);
 
-    this.recoverFromBlockers();
+    const shouldRemoveLoaderOverlay =
+      kinds.has('loader-overlay') && loadingStats?.isLoading === false;
+    if (shouldRemoveLoaderOverlay) {
+      try {
+        this.loading.forceStopLoading();
+      } catch {}
+    }
+
+    this.recoverFromBlockers({ removeLoaderOverlay: shouldRemoveLoaderOverlay });
   }
 
   private installLongTaskObserver(): void {
@@ -146,7 +235,8 @@ export class UiAnomalyMonitorService {
       const w = window as any;
       if (!w.PerformanceObserver) return;
 
-      const obs = new w.PerformanceObserver((list: any) => {
+      if (this.longTaskObserver) return;
+      this.longTaskObserver = new w.PerformanceObserver((list: any) => {
         try {
           const entries = list.getEntries ? list.getEntries() : [];
           for (const e of entries) {
@@ -157,28 +247,26 @@ export class UiAnomalyMonitorService {
           }
         } catch {}
       });
-      obs.observe({ entryTypes: ['longtask'] });
+      this.longTaskObserver.observe({ entryTypes: ['longtask'] });
     } catch {}
   }
 
   private installResourceErrorCapture(): void {
     try {
-      window.addEventListener(
-        'error',
-        (ev: any) => {
-          try {
-            const isResourceError = ev && ev.target && ev.target !== window;
-            if (!isResourceError) return;
-            const target = ev.target as HTMLElement;
-            const src = (target as any).src || (target as any).href || '';
-            const tag = (target && target.tagName) || 'UNKNOWN';
-            const msg = `ResourceError ${tag} ${src}`.trim();
-            this.resourceErrors.unshift({ ts: new Date().toISOString(), message: msg });
-            this.resourceErrors = this.resourceErrors.slice(0, this.maxResourceErrors);
-          } catch {}
-        },
-        true
-      );
+      if (this.resourceErrorHandler) return;
+      this.resourceErrorHandler = (ev: any) => {
+        try {
+          const isResourceError = ev && ev.target && ev.target !== window;
+          if (!isResourceError) return;
+          const target = ev.target as HTMLElement;
+          const src = (target as any).src || (target as any).href || '';
+          const tag = (target && target.tagName) || 'UNKNOWN';
+          const msg = `ResourceError ${tag} ${src}`.trim();
+          this.resourceErrors.unshift({ ts: new Date().toISOString(), message: msg });
+          this.resourceErrors = this.resourceErrors.slice(0, this.maxResourceErrors);
+        } catch {}
+      };
+      window.addEventListener('error', this.resourceErrorHandler as any, true);
     } catch {}
   }
 
@@ -225,7 +313,8 @@ export class UiAnomalyMonitorService {
         const rect = el.getBoundingClientRect();
         const area = Math.max(0, rect.width) * Math.max(0, rect.height);
         const viewportArea = vw * vh;
-        const coversViewport = viewportArea > 0 ? area / viewportArea >= 0.8 : false;
+        const coversViewport =
+          viewportArea > 0 ? area / viewportArea >= this.config.viewportCoverageThreshold : false;
         if (!coversViewport) continue;
 
         const z = Number(cs.zIndex);
@@ -268,7 +357,8 @@ export class UiAnomalyMonitorService {
   private captureSnapshot(
     trigger: UiAnomalyTrigger,
     blockers: UiBlockerInfo[],
-    hasOpenDialog: boolean
+    hasOpenDialog: boolean,
+    loadingOverride?: { activeRequests: number; trackedRequests: number; isLoading: boolean }
   ): UiAnomalySnapshot {
     const ts = new Date().toISOString();
     const url = (() => {
@@ -298,13 +388,15 @@ export class UiAnomalyMonitorService {
       }
     })();
 
-    const loading = (() => {
-      try {
-        return this.loading.getLoadingStats();
-      } catch {
-        return undefined;
-      }
-    })();
+    const loading =
+      loadingOverride ||
+      (() => {
+        try {
+          return this.loading.getLoadingStats();
+        } catch {
+          return undefined;
+        }
+      })();
 
     const longTasks = {
       count: this.longTaskCount,
@@ -337,7 +429,69 @@ export class UiAnomalyMonitorService {
     } catch {}
   }
 
-  private recoverFromBlockers(): void {
+  private ensureDebugApi(): void {
+    if (typeof window === 'undefined') return;
+    try {
+      const w = window as any;
+      if (!w.OPDebug) w.OPDebug = {};
+      if (this.debugApiInstalled && w.OPDebug.uiAnomaly) return;
+      w.OPDebug.uiAnomaly = {
+        scan: () => this.scanAndRecover('manual'),
+        getConfig: () => this.getConfig(),
+        setConfig: (newConfig: Partial<UiAnomalyMonitorConfig>) => this.setConfig(newConfig),
+        getSnapshots: () => {
+          try {
+            const raw = localStorage.getItem(this.storageKey);
+            return raw ? JSON.parse(raw) : [];
+          } catch {
+            return [];
+          }
+        },
+        clearSnapshots: () => {
+          try {
+            localStorage.removeItem(this.storageKey);
+          } catch {}
+        },
+      };
+      this.debugApiInstalled = true;
+    } catch {}
+  }
+
+  private loadConfigFromStorage(): void {
+    if (this.configLoadedFromStorage) return;
+    this.configLoadedFromStorage = true;
+    try {
+      const raw = localStorage.getItem(this.configStorageKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as Partial<UiAnomalyMonitorConfig>;
+      const next: UiAnomalyMonitorConfig = { ...this.config, ...parsed };
+      next.scanIntervalMs = this.normalizeScanInterval(next.scanIntervalMs);
+      next.viewportCoverageThreshold = this.normalizeViewportCoverageThreshold(
+        next.viewportCoverageThreshold
+      );
+      this.config = next;
+    } catch {}
+  }
+
+  private persistConfigToStorage(): void {
+    try {
+      localStorage.setItem(this.configStorageKey, JSON.stringify(this.config));
+    } catch {}
+  }
+
+  private normalizeScanInterval(ms: number): number {
+    const n = Number(ms);
+    if (!Number.isFinite(n)) return 1500;
+    return Math.max(250, Math.round(n));
+  }
+
+  private normalizeViewportCoverageThreshold(v: number): number {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return 0.8;
+    return Math.min(1, Math.max(0.2, n));
+  }
+
+  private recoverFromBlockers(opts: { removeLoaderOverlay: boolean }): void {
     const doc = document;
     if (!doc) return;
 
@@ -348,11 +502,22 @@ export class UiAnomalyMonitorService {
       '.c-modal-backdrop',
       '.c-offcanvas-backdrop',
     ].join(',');
+    const loaderSelectors = '.loading-overlay.full-screen';
+
     const toRemove = Array.from(doc.querySelectorAll(selectors)) as HTMLElement[];
     for (const el of toRemove) {
       try {
         el.remove();
       } catch {}
+    }
+
+    if (opts.removeLoaderOverlay) {
+      const toRemoveLoader = Array.from(doc.querySelectorAll(loaderSelectors)) as HTMLElement[];
+      for (const el of toRemoveLoader) {
+        try {
+          el.remove();
+        } catch {}
+      }
     }
 
     try {

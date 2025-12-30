@@ -19,4 +19,7 @@ export const OPSessionConstants = {
   POST_LOGIN_HANDLED_PREFIX: 'post-login-handled-',
   // Ventana de protección anti-race (ms)
   IGNORE_WINDOW_MS: 1000,
+  // Límite y expiración de registros post-login en almacenamiento
+  POST_LOGIN_MAX_ENTRIES: 50,
+  POST_LOGIN_MAX_AGE_DAYS: 1,
 };

@@ -24,8 +24,10 @@ describe('PostLoginRedirectService', () => {
 
   it('getAndClearRedirectForTab lee y limpia storage', () => {
     sessionStorage.setItem('post-login-redirect-tab', '/admin/x');
+    localStorage.setItem('post-login-redirect-tab', '/admin/x');
     expect(service.getAndClearRedirectForTab()).toBe('/admin/x');
     expect(sessionStorage.getItem('post-login-redirect-tab')).toBeNull();
+    expect(localStorage.getItem('post-login-redirect-tab')).toBeNull();
   });
 
   it('getAndClearRedirectForTab cae a POST_LOGIN_REDIRECT y limpia clave base', () => {

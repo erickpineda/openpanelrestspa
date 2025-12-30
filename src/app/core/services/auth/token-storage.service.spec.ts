@@ -83,6 +83,16 @@ describe('TokenStorageService', () => {
     expect(localStorage.getItem(OPConstants.Session.SESSION_TIMESTAMP_KEY)).toBeNull();
   });
 
+  it('signOut NO elimina la clave post-login de la pestaña (se conserva para redirect)', () => {
+    sessionStorage.setItem(TAB_ID_KEY, 'tab');
+    const key = `${POST_LOGIN_PREFIX}tab`;
+    sessionStorage.setItem(key, '/x');
+    localStorage.setItem(key, '/y');
+    service.signOut();
+    expect(sessionStorage.getItem(key)).toBe('/x');
+    expect(localStorage.getItem(key)).toBe('/y');
+  });
+
   it('getPostLoginRedirectBase expira y limpia cuando supera TTL', () => {
     const now = Date.now();
     spyOn(Date, 'now').and.returnValue(now);
@@ -107,5 +117,17 @@ describe('TokenStorageService', () => {
     expect(sessionStorage.getItem(`${POST_LOGIN_PREFIX}a`)).toBeNull();
     expect(sessionStorage.getItem(`${POST_LOGIN_PREFIX}b`)).toBeNull();
     expect(localStorage.getItem(POST_LOGIN_REDIRECT)).toBeNull();
+  });
+
+  it('cleanExpiredPostLoginRedirects limpia claves con prefijo en localStorage por antigüedad en la clave', () => {
+    const now = Date.now();
+    spyOn(Date, 'now').and.returnValue(now);
+    const oldTs = now - 25 * 60 * 60 * 1000;
+    const recentTs = now - 2 * 60 * 60 * 1000;
+    localStorage.setItem(`${POST_LOGIN_PREFIX}${oldTs}-x`, '/old');
+    localStorage.setItem(`${POST_LOGIN_PREFIX}${recentTs}-y`, '/recent');
+    service.cleanExpiredPostLoginRedirects();
+    expect(localStorage.getItem(`${POST_LOGIN_PREFIX}${oldTs}-x`)).toBeNull();
+    expect(localStorage.getItem(`${POST_LOGIN_PREFIX}${recentTs}-y`)).toBe('/recent');
   });
 });

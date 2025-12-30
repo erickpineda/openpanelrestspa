@@ -58,6 +58,9 @@ export class PostLoginRedirectService {
       window.sessionStorage.removeItem(key);
     } catch {}
     try {
+      localStorage.removeItem(key);
+    } catch {}
+    try {
       localStorage.removeItem(OPConstants.Session.POST_LOGIN_REDIRECT);
     } catch {}
     return redirect;
