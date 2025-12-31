@@ -116,6 +116,9 @@ import {
   cilPaintBucket,
   cilEqualizer,
   cilStorage,
+  cilFilter,
+  cilFolderOpen,
+  cilGrid,
 } from '@coreui/icons';
 
 export const iconSubset = {
@@ -238,6 +241,9 @@ export const iconSubset = {
   cilPaintBucket,
   cilEqualizer,
   cilStorage,
+  cilFilter,
+  cilFolderOpen,
+  cilGrid,
 };
 
 export enum IconSubset {
@@ -359,4 +365,7 @@ export enum IconSubset {
   cilImage = 'cilImage',
   cilImagePlus = 'cilImagePlus',
   cilStorage = 'cilStorage',
+  cilFilter = 'cilFilter',
+  cilFolderOpen = 'cilFolderOpen',
+  cilGrid = 'cilGrid',
 }

@@ -1,336 +1,344 @@
-<c-card>
-  <c-card-header class="d-flex align-items-center">
-    <c-col [sm]="6">
-      <h6 cCardTitle>Listado de entradas</h6>
-    </c-col>
-    <c-col [sm]="6">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button cButton color="light" size="sm" aria-label="Imprimir listado">
-          <svg cIcon name="cilPrint" style="padding-right: 2px" size="sm" title="Imprimir"></svg>
-          Imprimir
-        </button>
-        <button cButton color="warning" size="sm">
-          <svg
-            cIcon
-            name="cilWarning"
-            style="padding-right: 2px"
-            size="sm"
-            title="Entradas sin revisar"
-          ></svg>
-          Sin revisar
-        </button>
-      </div>
-    </c-col>
-  </c-card-header>
-
-  <c-card-body>
-    <div class="d-flex justify-content-between align-items-end">
-      <h5 cCardTitle>Listado de entradas</h5>
-      <div class="hstack gap-3">
-        <button cButton color="success" size="sm" routerLink="crear">
-          <svg
-            cIcon
-            name="cilPencil"
-            style="padding-right: 2px"
-            size="sm"
-            title="Crear nueva entrada"
-          ></svg>
-          Crear nueva Entrada
-        </button>
-      </div>
-    </div>
-    <hr />
-
-    <!-- Buscador -->
-    <div class="mb-4">
-      <!-- Búsqueda Básica -->
-      <c-row class="align-items-center mb-3 g-2">
-        <c-col xs="12" md="4">
-          <div class="text-muted small">Total {{ totalElements }}</div>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-          <input
-            cFormControl
-            type="text"
-            [value]="basicSearchText"
-            (input)="onBasicSearchTextChange($any($event.target).value)"
-            placeholder="Buscar entrada..."
-            style="max-width: 280px"
-          />
-          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()">
-            Avanzado
-          </button>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-          <select
-            cSelect
-            [ngModel]="pageSize"
-            (ngModelChange)="onPageSizeChange($event)"
-            name="pageSizeSelect"
-            style="max-width: 120px"
-          >
-            <option [ngValue]="5">5</option>
-            <option [ngValue]="10">10</option>
-            <option [ngValue]="20">20</option>
-            <option [ngValue]="50">50</option>
-          </select>
-        </c-col>
-      </c-row>
-
-      <!-- Buscador Avanzado -->
-      @if (showAdvanced) {
+<c-container fluid class="px-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <!-- Encabezado Principal -->
+    <c-card-header class="bg-white p-4 border-bottom-0">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-          <!-- En listado-entradas.component.html -->
-          <app-error-boundary
-            context="listado-entradas"
-            fallbackMessage="No se pudieron cargar las entradas"
-            fallbackDescription="Verifique su conexión e intente nuevamente."
-            [autoRetry]="true"
-          >
-            <app-buscador-avanzado
-              [definiciones]="definiciones"
-              [autoTrigger]="true"
-              [debounceMs]="300"
-              [showButton]="false"
-              [showSearchButton]="true"
-              [showClearButton]="true"
-              [defaultField]="'titulo'"
-              [camposPrioritarios]="['titulo']"
-              [camposCatalogo]="[
-                'tipoEntrada.nombre',
-                'estadoEntrada.nombre',
-                'categoria.nombre',
-                'etiqueta.nombre',
-              ]"
-              [cargarCatalogosFn]="cargarCatalogosEntrada"
-              (filtroSeleccionado)="aplicarFiltro($event)"
-              (filtroChanged)="onFiltroChanged($event)"
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilList" class="text-primary"></svg>
+            Listado de Entradas
+          </h4>
+          <small class="text-body-secondary">
+            Administra, filtra y organiza todas las publicaciones del sitio
+          </small>
+        </div>
+        <div class="d-flex gap-2">
+          <button cButton color="secondary" variant="ghost" size="sm" aria-label="Imprimir listado">
+            <svg cIcon name="cilPrint" class="me-1"></svg>
+            Imprimir
+          </button>
+          <button cButton color="warning" variant="outline" size="sm">
+            <svg cIcon name="cilWarning" class="me-1"></svg>
+            Sin revisar
+          </button>
+          <button cButton color="primary" size="sm" routerLink="crear" class="shadow-sm">
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            Nueva Entrada
+          </button>
+        </div>
+      </div>
+    </c-card-header>
+
+    <c-card-body class="p-4">
+      <!-- Área de Filtros y Búsqueda -->
+      <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
+        <c-row class="align-items-center g-3">
+          <!-- Contador y Selección de Página -->
+          <c-col xs="12" md="3" class="d-flex align-items-center gap-3">
+            <div class="text-nowrap fw-semibold text-secondary">
+              {{ totalElements }} registros
+            </div>
+            <select
+              cSelect
+              size="sm"
+              [ngModel]="pageSize"
+              (ngModelChange)="onPageSizeChange($event)"
+              name="pageSizeSelect"
+              class="w-auto"
+              aria-label="Registros por página"
             >
-            </app-buscador-avanzado>
-            <!-- Tu tabla de entradas aquí -->
-          </app-error-boundary>
-        </div>
-      }
-    </div>
+              <option [ngValue]="5">5 por pág.</option>
+              <option [ngValue]="10">10 por pág.</option>
+              <option [ngValue]="20">20 por pág.</option>
+              <option [ngValue]="50">50 por pág.</option>
+            </select>
+          </c-col>
 
-    <!-- Tabla de Entradas con loader local -->
-    <div class="tabla-con-loader-wrapper position-relative">
-      <!-- Loader Overlay -->
-      @if (cargandoTabla) {
-        <div
-          class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
-        >
-          <div class="text-center">
-            <c-spinner [attr.aria-label]="'Cargando entradas'"></c-spinner>
-            <p class="mt-2 text-muted">Cargando entradas...</p>
+          <!-- Barra de Búsqueda Central -->
+          <c-col xs="12" md="6">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0 text-secondary">
+                <svg cIcon name="cilSearch"></svg>
+              </span>
+              <input
+                cFormControl
+                type="text"
+                [value]="basicSearchText"
+                (input)="onBasicSearchTextChange($any($event.target).value)"
+                placeholder="Buscar por título, contenido o autor..."
+                class="border-start-0 ps-0"
+              />
+              <button 
+                cButton 
+                color="secondary" 
+                variant="outline" 
+                (click)="toggleAdvanced()"
+                [active]="showAdvanced"
+              >
+                <svg cIcon name="cilFilter" class="me-1"></svg>
+                Filtros
+              </button>
+            </div>
+          </c-col>
+        </c-row>
+
+        <!-- Filtros Avanzados Expandibles -->
+        @if (showAdvanced) {
+          <div class="mt-3 pt-3 border-top">
+            <app-error-boundary
+              context="listado-entradas"
+              fallbackMessage="No se pudieron cargar los filtros"
+              [autoRetry]="true"
+            >
+              <app-buscador-avanzado
+                [definiciones]="definiciones"
+                [autoTrigger]="true"
+                [debounceMs]="300"
+                [showButton]="false"
+                [showSearchButton]="true"
+                [showClearButton]="true"
+                [defaultField]="'titulo'"
+                [camposPrioritarios]="['titulo']"
+                [camposCatalogo]="[
+                  'tipoEntrada.nombre',
+                  'estadoEntrada.nombre',
+                  'categoria.nombre',
+                  'etiqueta.nombre',
+                ]"
+                [cargarCatalogosFn]="cargarCatalogosEntrada"
+                (filtroSeleccionado)="aplicarFiltro($event)"
+                (filtroChanged)="onFiltroChanged($event)"
+              >
+              </app-buscador-avanzado>
+            </app-error-boundary>
           </div>
-        </div>
-      }
-
-      <div [class.opacity-50]="cargandoTabla" class="table-responsive">
-        <table
-          cTable
-          hover
-          striped
-          class="align-middle mb-0 border tabla-con-loader text-nowrap op-table"
-        >
-          <thead cTableColor="light">
-            <tr>
-              <th scope="col" style="min-width: 200px" class="text-start">Título</th>
-              <th scope="col" style="min-width: 100px" class="text-start">Autor</th>
-              <th scope="col" style="min-width: 100px" class="text-center">Publicación</th>
-              <th scope="col" style="min-width: 120px" class="text-start">Categorías</th>
-              <th scope="col" class="text-center" style="min-width: 60px">Estado</th>
-              <th scope="col" class="text-center" style="min-width: 100px">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (entrada of listaEntradas; track trackByEntradaId($index, entrada)) {
-              <tr>
-                <td>
-                  <div class="d-flex flex-column">
-                    <span
-                      class="fw-semibold text-truncate"
-                      style="max-width: 250px"
-                      [title]="entrada.titulo"
-                    >
-                      {{ entrada.titulo }}
-                    </span>
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <svg cIcon name="cilUser" size="sm" class="me-2 text-secondary"></svg>
-                    {{ entrada.usernameCreador }}
-                  </div>
-                </td>
-                <td>{{ checkFechaPublicacion(entrada.fechaPublicacion) }}</td>
-                <td>
-                  <span
-                    class="d-inline-block text-truncate"
-                    style="max-width: 150px"
-                    [title]="entrada.categoriasConComas"
-                  >
-                    {{ entrada.categoriasConComas || 'Sin categoría' }}
-                  </span>
-                </td>
-                <td class="text-center">
-                  @if (getEstadoInfo(entrada); as estado) {
-                    <div [cTooltip]="estado.tooltip">
-                      <svg cIcon [name]="estado.icon" [class]="estado.color" size="lg"></svg>
-                    </div>
-                  }
-                </td>
-                <td class="text-center">
-                  <div class="btn-group" role="group" aria-label="Acciones de entrada">
-                    <button
-                      cButton
-                      color="warning"
-                      size="sm"
-                      variant="ghost"
-                      [routerLink]="['/admin/control/entradas/editar', entrada.idEntrada]"
-                      [cTooltip]="'Editar entrada'"
-                      [attr.aria-label]="'Editar entrada ' + entrada.titulo"
-                    >
-                      <svg cIcon name="cilPen" size="sm"></svg>
-                    </button>
-                    <button
-                      cButton
-                      color="danger"
-                      size="sm"
-                      variant="ghost"
-                      (click)="borrarEntrada(entrada)"
-                      [cTooltip]="'Borrar entrada'"
-                      [attr.aria-label]="'Borrar entrada ' + entrada.titulo"
-                    >
-                      <svg cIcon name="cilTrash" size="sm"></svg>
-                    </button>
-                    <button
-                      cButton
-                      color="info"
-                      size="sm"
-                      variant="ghost"
-                      (click)="openPreview(entrada)"
-                      [cTooltip]="'Vista previa'"
-                      [attr.aria-label]="'Vista previa de ' + entrada.titulo"
-                    >
-                      <svg cIcon name="cilExternalLink" size="sm"></svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-
-            @if (listaEntradas.length === 0) {
-              <tr cAlign="middle">
-                <td colspan="6" class="text-center py-5">
-                  <div class="d-flex flex-column align-items-center justify-content-center">
-                    <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
-                    <h6 class="text-muted">No se han encontrado entradas</h6>
-                    <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-
-        <!-- Paginación -->
-        @if (listaEntradas.length > 0) {
-          <app-op-pagination
-            [align]="'center'"
-            [totalPages]="totalPages"
-            [currentPage]="currentPage"
-            (pageChange)="obtenerListaEntradas($event)"
-          >
-          </app-op-pagination>
-        }
-
-        <!-- Navegación Estilo Etiquetas -->
-        @if (listaEntradas.length > 0) {
-          <c-row class="mt-2">
-            <c-col class="d-flex justify-content-end align-items-center gap-2">
-              <button
-                cButton
-                color="light"
-                size="sm"
-                (click)="onPrev()"
-                [disabled]="currentPage <= 0"
-              >
-                Anterior
-              </button>
-              <button
-                cButton
-                color="light"
-                size="sm"
-                (click)="onNext()"
-                [disabled]="isNextDisabled()"
-              >
-                Siguiente
-              </button>
-              <div class="text-muted small ms-2">
-                Página {{ currentPage + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} ·
-                Mostrando {{ numberOfElements }}
-              </div>
-            </c-col>
-          </c-row>
         }
       </div>
-    </div>
 
-    <!-- Modal de Confirmación -->
-    <c-modal
-      #staticBackdropModal
-      backdrop="static"
-      id="staticBackdropModal"
-      [visible]="visible"
-      (visibleChange)="onVisibleModalChange($event)"
-    >
-      <c-modal-header>
-        <h5 cModalTitle>Confirmar eliminación</h5>
-        <button (click)="toggleModal()" cButtonClose aria-label="Cerrar modal"></button>
-      </c-modal-header>
-      <c-modal-body>
-        <p>¿Está seguro de que desea eliminar la siguiente entrada?</p>
-        <div class="alert alert-warning">
-          <strong>ID:</strong> {{ entradaABorrar?.idEntrada }}<br />
-          <strong>Título:</strong> {{ entradaABorrar?.titulo }}
+      <!-- Tabla de Datos -->
+      <div class="tabla-con-loader-wrapper position-relative rounded-3 overflow-hidden border">
+        <!-- Loader Overlay -->
+        @if (cargandoTabla) {
+          <div
+            class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75"
+            style="z-index: 10; min-height: 200px"
+          >
+            <div class="text-center text-primary">
+              <c-spinner size="sm"></c-spinner>
+              <p class="mt-2 small fw-semibold">Actualizando listado...</p>
+            </div>
+          </div>
+        }
+
+        <div class="table-responsive">
+          <table cTable hover class="mb-0 align-middle text-nowrap">
+            <thead class="bg-light text-secondary small text-uppercase fw-bold">
+              <tr>
+                <th scope="col" class="border-0 py-3 ps-4">Título</th>
+                <th scope="col" class="border-0 py-3">Autor</th>
+                <th scope="col" class="border-0 py-3 text-center">Fecha</th>
+                <th scope="col" class="border-0 py-3">Categorías</th>
+                <th scope="col" class="border-0 py-3 text-center">Estado</th>
+                <th scope="col" class="border-0 py-3 text-end pe-4">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="border-top-0">
+              @for (entrada of listaEntradas; track trackByEntradaId($index, entrada)) {
+                <tr class="align-middle">
+                  <td class="ps-4 py-3">
+                    <div class="d-flex flex-column">
+                      <span class="fw-bold text-primary text-truncate" style="max-width: 300px;" [title]="entrada.titulo">
+                        {{ entrada.titulo }}
+                      </span>
+                      <small class="text-body-secondary text-truncate" style="max-width: 300px;">
+                        {{ entrada.subtitulo }}
+                      </small>
+                    </div>
+                  </td>
+                  <td class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-light rounded-circle p-1 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                        <svg cIcon name="cilUser" size="sm" class="text-secondary"></svg>
+                      </div>
+                      <span class="small fw-semibold">{{ entrada.usernameCreador }}</span>
+                    </div>
+                  </td>
+                  <td class="text-center py-3">
+                    <div class="d-flex flex-column">
+                      @if (getFechaDate(entrada.fechaPublicacion); as fecha) {
+                        <span class="small fw-semibold">{{ fecha | date:'dd MMM yyyy' }}</span>
+                        <small class="text-body-secondary" style="font-size: 0.75rem;">
+                          {{ fecha | date:'HH:mm' }}
+                        </small>
+                      } @else {
+                        <span class="small fw-semibold text-secondary fst-italic">No publicada</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="py-3">
+                    @if (entrada.categoriasConComas) {
+                      <div class="d-flex gap-1 flex-wrap" style="max-width: 200px;">
+                        @for (cat of entrada.categoriasConComas.split(','); track $index) {
+                          <c-badge color="info" shape="rounded-pill" class="fw-normal bg-opacity-10 text-info-emphasis border border-info border-opacity-25">
+                            {{ cat.trim() }}
+                          </c-badge>
+                        }
+                      </div>
+                    } @else {
+                      <span class="text-body-secondary small fst-italic">Sin categoría</span>
+                    }
+                  </td>
+                  <td class="text-center py-3">
+                    @if (getEstadoInfo(entrada); as estado) {
+                      <c-badge 
+                        [color]="estado.color === 'text-success' ? 'success' : (estado.color === 'text-warning' ? 'warning' : 'secondary')" 
+                        shape="rounded-pill"
+                        class="px-3 py-2"
+                        [cTooltip]="estado.tooltip"
+                      >
+                        <svg cIcon [name]="estado.icon" size="sm" class="me-1"></svg>
+                        {{ estado.tooltip }}
+                      </c-badge>
+                    }
+                  </td>
+                  <td class="text-end pe-4 py-3">
+                    <c-button-group role="group">
+                      <button
+                        cButton
+                        color="info"
+                        variant="ghost"
+                        size="sm"
+                        (click)="openPreview(entrada)"
+                        cTooltip="Vista Previa"
+                        class="text-info-emphasis"
+                      >
+                        <svg cIcon name="cilMagnifyingGlass"></svg>
+                      </button>
+                      <button
+                        cButton
+                        color="primary"
+                        variant="ghost"
+                        size="sm"
+                        [routerLink]="['/admin/control/entradas/editar', entrada.idEntrada]"
+                        cTooltip="Editar"
+                        class="text-primary-emphasis"
+                      >
+                        <svg cIcon name="cilPen"></svg>
+                      </button>
+                      <button
+                        cButton
+                        color="danger"
+                        variant="ghost"
+                        size="sm"
+                        (click)="abrirModalEliminar(entrada)"
+                        cTooltip="Eliminar"
+                        class="text-danger-emphasis"
+                      >
+                        <svg cIcon name="cilTrash"></svg>
+                      </button>
+                    </c-button-group>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="text-center py-5">
+                    <div class="d-flex flex-column align-items-center text-secondary opacity-75">
+                      <svg cIcon name="cilFolderOpen" size="4xl" class="mb-3"></svg>
+                      <h5 class="fw-normal">No se encontraron entradas</h5>
+                      <p class="small mb-0">Intenta ajustar los filtros de búsqueda</p>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-        <p class="text-danger">Esta acción no se puede deshacer.</p>
-      </c-modal-body>
-      <c-modal-footer>
-        <button (click)="toggleModal()" cButton color="secondary">Cancelar</button>
-        <button cButton color="danger" (click)="confirmarBorrado()">Eliminar</button>
-      </c-modal-footer>
-    </c-modal>
+        
+        <!-- Paginación Footer -->
+        <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+          <small class="text-secondary">
+            Mostrando {{ listaEntradas.length }} de {{ totalElements }} resultados
+          </small>
+          <c-pagination class="mb-0" align="end" size="sm">
+            <li class="page-item" [class.disabled]="currentPage === 0">
+              <a class="page-link" (click)="onPrev()" style="cursor: pointer" aria-label="Anterior">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item disabled">
+              <a class="page-link">{{ currentPage + 1 }} / {{ totalPages }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="isNextDisabled()">
+              <a class="page-link" (click)="onNext()" style="cursor: pointer" aria-label="Siguiente">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </c-pagination>
+        </div>
+      </div>
+    </c-card-body>
+  </c-card>
+</c-container>
 
-    <!-- Modal de Vista Previa de Entrada -->
-    <c-modal
-      id="previewEntradaModal"
-      [visible]="previewVisible"
-      (visibleChange)="onPreviewVisibleChange($event)"
-    >
-      <c-modal-header>
-        <h5 cModalTitle>Vista previa</h5>
-        <button
-          #previewCloseBtn
-          (click)="closePreview()"
-          cButtonClose
-          aria-label="Cerrar preview"
-          title="Cerrar vista previa"
-        ></button>
-      </c-modal-header>
-      <c-modal-body>
-        <app-previa-entrada
-          [entrada]="previewEntrada"
-          [mostrarBotonesAccion]="true"
-          (cerrar)="closePreview()"
-          (editar)="onEditarDesdePreview()"
-          (publicar)="onPublicarDesdePreview($event)"
-        >
-        </app-previa-entrada>
-      </c-modal-body>
-    </c-modal>
-  </c-card-body>
-</c-card>
+<!-- Modal Borrar -->
+<c-modal [visible]="visible" (visibleChange)="onVisibleModalChange($event)" id="modalBorrar">
+  <c-modal-header>
+    <h5 cModalTitle>Confirmar eliminación</h5>
+    <button (click)="toggleModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    ¿Está seguro de que desea eliminar la entrada <strong>{{ entradaABorrar?.titulo }}</strong>?
+    <p class="text-danger small mt-2 mb-0">Esta acción no se puede deshacer.</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggleModal()" cButton color="secondary">Cancelar</button>
+    <button (click)="confirmarBorrado()" cButton color="danger">Eliminar</button>
+  </c-modal-footer>
+</c-modal>
+
+<!-- Modal Preview -->
+<c-modal [visible]="previewVisible" (visibleChange)="onPreviewVisibleChange($event)" size="xl" scrollable id="modalPreview">
+  <c-modal-header>
+    <h5 cModalTitle>Vista Previa: {{ previewEntrada?.titulo }}</h5>
+    <button #previewCloseBtn (click)="closePreview()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    @if (previewEntrada) {
+      <div class="mb-4">
+        @if (previewEntrada.imagenDestacada) {
+          <div class="text-center mb-4 bg-light p-2 rounded">
+            <img [src]="previewEntrada.imagenDestacada" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;" alt="Imagen destacada">
+          </div>
+        }
+        
+        <div class="d-flex align-items-center gap-3 mb-4 text-secondary border-bottom pb-3">
+          <div class="d-flex align-items-center">
+            <svg cIcon name="cilUser" size="sm" class="me-2"></svg>
+            {{ previewEntrada.usernameCreador }}
+          </div>
+          <div class="vr"></div>
+          <div class="d-flex align-items-center">
+            <svg cIcon name="cilCalendar" size="sm" class="me-2"></svg>
+            {{ checkFechaPublicacion(previewEntrada.fechaPublicacion) }}
+          </div>
+          @if (previewEntrada.categoriasConComas) {
+            <div class="vr"></div>
+            <div class="d-flex align-items-center">
+              <svg cIcon name="cilTags" size="sm" class="me-2"></svg>
+              {{ previewEntrada.categoriasConComas }}
+            </div>
+          }
+        </div>
+
+        <div class="entrada-contenido" [innerHTML]="previewEntrada.contenido"></div>
+      </div>
+    }
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="closePreview()" cButton color="secondary">Cerrar</button>
+    <button (click)="onEditarDesdePreview()" cButton color="primary">
+      <svg cIcon name="cilPen" class="me-1"></svg>
+      Editar
+    </button>
+  </c-modal-footer>
+</c-modal>

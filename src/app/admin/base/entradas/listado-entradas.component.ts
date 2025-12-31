@@ -381,6 +381,12 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   // #region CRUD Actions (Delete)
 
+  abrirModalEliminar(entrada: Entrada): void {
+    this.entradaABorrar = entrada;
+    this.visible = true;
+    this.cdr.markForCheck();
+  }
+
   borrarEntrada(entrada: Entrada): void {
     this.entradaABorrar = entrada;
     this.visible = true;
@@ -487,10 +493,44 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   // #region Helpers
 
-  checkFechaPublicacion(fechaPublicacion: Date): string {
-    return fechaPublicacion
-      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', false)
+  checkFechaPublicacion(fechaPublicacion: any): string {
+    const date = this.getFechaDate(fechaPublicacion);
+    return date
+      ? this.commonFuncService.transformaFecha(date, 'dd-MM-yyyy', false)
       : 'No publicada';
+  }
+
+  getFechaDate(fecha: any): Date | null {
+    if (!fecha) return null;
+    if (fecha instanceof Date) return fecha;
+    
+    // Si es string "dd-MM-yyyy HH:mm:ss" o "dd-MM-yyyy"
+    if (typeof fecha === 'string') {
+      // Intentar parsing directo primero (ISO)
+      let d = new Date(fecha);
+      if (!isNaN(d.getTime())) return d;
+
+      // Intentar formato español dd-MM-yyyy
+      const parts = fecha.split(' ');
+      const dateParts = parts[0].split('-');
+      if (dateParts.length === 3) {
+        const day = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10) - 1;
+        const year = parseInt(dateParts[2], 10);
+        
+        let hour = 0, min = 0, sec = 0;
+        if (parts.length > 1) {
+          const timeParts = parts[1].split(':');
+          hour = parseInt(timeParts[0], 10) || 0;
+          min = parseInt(timeParts[1], 10) || 0;
+          sec = parseInt(timeParts[2], 10) || 0;
+        }
+        
+        d = new Date(year, month, day, hour, min, sec);
+        if (!isNaN(d.getTime())) return d;
+      }
+    }
+    return null;
   }
 
   getEstadoInfo(entrada: Entrada): {
