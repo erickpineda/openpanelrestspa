@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { BaseRoutingModule } from './base-routing.module';
 import { BaseComponent } from './base.component';
+import { BaseIndexComponent } from './base-index.component';
 
 // Componentes específicos de Base
 // Entradas moved to lazy EntradasModule
@@ -33,6 +34,7 @@ import { SharedCoreUiModule } from '../../shared/shared-coreui.module';
   declarations: [
     // ✅ Solo componentes específicos de Base
     BaseComponent,
+    BaseIndexComponent,
     // Entradas components declared in EntradasModule (lazy)
     ListadoComentariosComponent,
     CrearComentarioComponent,

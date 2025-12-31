@@ -22,6 +22,22 @@ export const navItems: INavItemEnhanced[] = [
     attributes: { id: 'nav-dashboard' },
   },
 
+  {
+    name: 'Panel de Control',
+    url: '/admin/control',
+    iconComponent: { name: 'cil-grid' },
+    priority: 95,
+    requiredRoles: [
+      UserRole.AUTOR,
+      UserRole.EDITOR,
+      UserRole.ADMINISTRADOR,
+      UserRole.DESARROLLADOR,
+      UserRole.MANTENIMIENTO,
+      UserRole.PROPIETARIO,
+    ],
+    attributes: { id: 'nav-control-panel' },
+  },
+
   // Content Management Section
   {
     title: true,

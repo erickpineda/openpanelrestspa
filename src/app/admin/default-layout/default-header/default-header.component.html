@@ -30,6 +30,18 @@
       <c-nav-item>
         <a
           cNavLink
+          routerLink="/admin/control"
+          routerLinkActive="active"
+          #rlaControl="routerLinkActive"
+          [attr.aria-current]="rlaControl.isActive ? 'page' : null"
+          aria-label="Panel de Control"
+        >
+          Control
+        </a>
+      </c-nav-item>
+      <c-nav-item>
+        <a
+          cNavLink
           routerLink="/admin/gestion/usuarios"
           routerLinkActive="active"
           #rlaUsers="routerLinkActive"
@@ -76,8 +88,26 @@
   <c-header-divider></c-header-divider>
   <c-container [fluid]="true">
     <c-breadcrumb class="ms-2" aria-label="breadcrumb">
-      <li class="breadcrumb-item"><a routerLink="/admin">Inicio</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Página actual</li>
+      <li class="breadcrumb-item" [class.active]="breadcrumbs.length === 0">
+        @if (breadcrumbs.length > 0) {
+          <a routerLink="/admin">Inicio</a>
+        } @else {
+          <span>Inicio</span>
+        }
+      </li>
+      @for (breadcrumb of breadcrumbs; track $index; let last = $last) {
+    <li
+      class="breadcrumb-item"
+      [class.active]="last"
+      [attr.aria-current]="last ? 'page' : null"
+    >
+          @if (!last) {
+            <a [routerLink]="breadcrumb.url">{{ breadcrumb.label }}</a>
+          } @else {
+            <span>{{ breadcrumb.label }}</span>
+          }
+        </li>
+      }
     </c-breadcrumb>
   </c-container>
 </ng-container>

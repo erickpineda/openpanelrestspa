@@ -1,0 +1,112 @@
+<c-container fluid>
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <c-card-header class="bg-white p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h4 class="mb-1 text-primary">
+            <svg cIcon name="cilGrid" class="me-2"></svg>
+            Panel de Control
+          </h4>
+          <small class="text-body-secondary">
+            Centro de administración y acceso rápido a los módulos del sistema
+          </small>
+        </div>
+      </div>
+    </c-card-header>
+    <c-card-body class="p-4 bg-light bg-opacity-25">
+      <c-row>
+        <!-- Gestión de Contenido -->
+        <c-col md="6" xl="4" class="mb-4">
+          <c-card class="h-100 border-0 shadow-sm">
+            <c-card-header class="bg-primary bg-opacity-10 text-primary border-bottom-0 fw-bold">
+              <svg cIcon name="cilPencil" class="me-2"></svg>
+              Gestión de Contenido
+            </c-card-header>
+            <c-card-body>
+              <div class="d-grid gap-2">
+                <a routerLink="./entradas" cButton color="primary" variant="ghost" class="text-start text-decoration-none">
+                  <svg cIcon name="cilList" class="me-2"></svg> Entradas
+                </a>
+                <a routerLink="./paginas" cButton color="primary" variant="ghost" class="text-start text-decoration-none">
+                  <svg cIcon name="cilLibrary" class="me-2"></svg> Páginas
+                </a>
+                <a routerLink="./contenido" cButton color="primary" variant="ghost" class="text-start text-decoration-none">
+                  <svg cIcon name="cilImage" class="me-2"></svg> Multimedia
+                </a>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+
+        <!-- Gestión de Usuarios y Roles -->
+        <c-col md="6" xl="4" class="mb-4">
+          <c-card class="h-100 border-0 shadow-sm">
+            <c-card-header class="bg-success bg-opacity-10 text-success border-bottom-0 fw-bold">
+              <svg cIcon name="cilPeople" class="me-2"></svg>
+              Usuarios y Accesos
+            </c-card-header>
+            <c-card-body>
+              <div class="d-grid gap-2">
+                <a routerLink="./gestion/usuarios" cButton color="success" variant="ghost" class="text-start text-decoration-none">
+                  <svg cIcon name="cilUser" class="me-2"></svg> Usuarios
+                </a>
+                <a routerLink="./gestion/roles" cButton color="success" variant="ghost" class="text-start text-decoration-none">
+                  <svg cIcon name="cilShieldAlt" class="me-2"></svg> Roles
+                </a>
+                <a routerLink="./perfil" cButton color="success" variant="ghost" class="text-start text-decoration-none">
+                  <svg cIcon name="cilUser" class="me-2"></svg> Mi Perfil
+                </a>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+
+        <!-- Configuración y Sistema -->
+        <c-col md="6" xl="4" class="mb-4">
+          <c-card class="h-100 border-0 shadow-sm">
+            <c-card-header class="bg-warning bg-opacity-10 text-warning-emphasis border-bottom-0 fw-bold">
+              <svg cIcon name="cilSettings" class="me-2"></svg>
+              Sistema
+            </c-card-header>
+            <c-card-body>
+              <div class="d-grid gap-2">
+                <a routerLink="./configuracion/ajustes" cButton color="warning" variant="ghost" class="text-start text-decoration-none text-warning-emphasis">
+                  <svg cIcon name="cilSettings" class="me-2"></svg> Configuración General
+                </a>
+                <a routerLink="./configuracion/temas" cButton color="warning" variant="ghost" class="text-start text-decoration-none text-warning-emphasis">
+                  <svg cIcon name="cilPaintBucket" class="me-2"></svg> Apariencia
+                </a>
+                <a routerLink="./mantenimiento" cButton color="warning" variant="ghost" class="text-start text-decoration-none text-warning-emphasis">
+                  <svg cIcon name="cilSpeedometer" class="me-2"></svg> Mantenimiento
+                </a>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+
+        <!-- Interacción -->
+        <c-col md="6" xl="4" class="mb-4">
+          <c-card class="h-100 border-0 shadow-sm">
+            <c-card-header class="bg-info bg-opacity-10 text-info-emphasis border-bottom-0 fw-bold">
+              <svg cIcon name="cilCommentSquare" class="me-2"></svg>
+              Interacción
+            </c-card-header>
+            <c-card-body>
+              <div class="d-grid gap-2">
+                <a routerLink="./comentarios" cButton color="info" variant="ghost" class="text-start text-decoration-none text-info-emphasis">
+                  <svg cIcon name="cilCommentSquare" class="me-2"></svg> Comentarios
+                </a>
+                <a routerLink="./etiquetas" cButton color="info" variant="ghost" class="text-start text-decoration-none text-info-emphasis">
+                  <svg cIcon name="cilTags" class="me-2"></svg> Etiquetas
+                </a>
+                <a routerLink="./categorias" cButton color="info" variant="ghost" class="text-start text-decoration-none text-info-emphasis">
+                  <svg cIcon name="cilSpreadsheet" class="me-2"></svg> Categorías
+                </a>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+      </c-row>
+    </c-card-body>
+  </c-card>
+</c-container>

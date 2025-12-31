@@ -4,6 +4,7 @@ import { ListadoComentariosComponent } from './comentarios/listado-comentarios.c
 import { CrearComentarioComponent } from './comentarios/crear/crear-comentario.component';
 import { EditarComentarioComponent } from './comentarios/editar/editar-comentario.component';
 import { BaseComponent } from './base.component';
+import { BaseIndexComponent } from './base-index.component';
 import { CrearCategoriaComponent } from './categorias/crear/crear-categoria.component';
 import { EditarCategoriaComponent } from './categorias/editar/editar-categoria.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
@@ -14,6 +15,11 @@ const routes: Routes = [
     path: '',
     component: BaseComponent,
     children: [
+      {
+        path: '',
+        component: BaseIndexComponent,
+        data: { title: 'Panel Principal' },
+      },
       {
         path: 'entradas',
         loadChildren: () => import('./entradas/entradas.module').then((m) => m.EntradasModule),
