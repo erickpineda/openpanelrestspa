@@ -462,9 +462,16 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onEditarDesdePreview(): void {
-    if (this.previewEntrada && this.previewEntrada.idEntrada) {
-      this.router.navigate(['/admin/control/entradas/editar', this.previewEntrada.idEntrada]);
+    const idEntrada = this.previewEntrada?.idEntrada;
+    if (idEntrada) {
+      // 1. Cerrar el modal primero para iniciar la limpieza del backdrop
       this.closePreview();
+
+      // 2. Navegar con un pequeño retraso para asegurar que el modal se ha desmontado/cerrado correctamente
+      // Esto previene que el backdrop se quede "huérfano" si el componente se destruye muy rápido
+      setTimeout(() => {
+        this.router.navigate(['/admin/control/entradas/editar', idEntrada]);
+      }, 350);
     }
   }
 

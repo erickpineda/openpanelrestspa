@@ -75,7 +75,7 @@ export class UiAnomalyMonitorService {
 
   private readonly configStorageKey = 'op_ui_anomaly_monitor_config_v1';
   private config: UiAnomalyMonitorConfig = {
-    enabled: !!environment.production,
+    enabled: false,
     scanIntervalMs: 1500,
     viewportCoverageThreshold: 0.8,
   };
@@ -97,6 +97,7 @@ export class UiAnomalyMonitorService {
     if (!this.config.enabled) return;
 
     this.started = true;
+    this.log.info('UiAnomalyMonitorService: started');
 
     this.installLongTaskObserver();
     this.installResourceErrorCapture();
@@ -210,7 +211,13 @@ export class UiAnomalyMonitorService {
 
     const hasOpenDialog = this.hasOpenDialogOrOffcanvas();
     const shouldRecover = !hasOpenDialog;
-    if (!shouldRecover) return;
+    if (!shouldRecover) {
+      this.log.warn('UiAnomalyMonitor: blockers found but dialog is open/visible', {
+        blockers,
+        hasOpenDialog,
+      });
+      return;
+    }
 
     const snapshot = this.captureSnapshot(trigger, blockers, hasOpenDialog, loadingStats);
     this.persistSnapshot(snapshot);
@@ -274,12 +281,25 @@ export class UiAnomalyMonitorService {
     const doc = document;
     if (!doc) return false;
 
-    const anyDialog =
-      doc.querySelector('.modal.show') ||
-      doc.querySelector('.offcanvas.show') ||
-      doc.querySelector('[role="dialog"][aria-modal="true"]');
+    const candidates = Array.from(
+      doc.querySelectorAll(
+        '.modal.show, .offcanvas.show, [role="dialog"][aria-modal="true"]'
+      )
+    ) as HTMLElement[];
 
-    return !!anyDialog;
+    // Consider open only if it is actually visible in the layout
+    return candidates.some((el) => {
+      try {
+        const cs = window.getComputedStyle(el);
+        if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+        if (cs.opacity === '0') return false;
+
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      } catch {
+        return false;
+      }
+    });
   }
 
   private findViewportBlockers(): UiBlockerInfo[] {

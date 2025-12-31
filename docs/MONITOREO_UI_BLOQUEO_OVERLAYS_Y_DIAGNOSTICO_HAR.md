@@ -175,7 +175,7 @@ OPDebug.uiAnomaly.getSnapshots();
 
 Parámetros configurables (con valores por defecto):
 
-- `enabled` (`boolean`, por defecto `false`): activa/desactiva el escaneo automático.
+- `enabled` (`boolean`, por defecto `true`): activa/desactiva el escaneo automático.
 - `scanIntervalMs` (`number`, por defecto `1500`): intervalo del escaneo periódico.
 - `viewportCoverageThreshold` (`number`, por defecto `0.8`): umbral de cobertura del viewport para considerar un elemento como bloqueante.
 
@@ -395,3 +395,18 @@ OPDebug.uiAnomaly.getSnapshots();
 ```
 
 Copiar el primer elemento (más reciente) y adjuntarlo al ticket junto con el HAR.
+
+## 10) Casos Conocidos y Solucionados
+
+### 10.1 Navegación desde Modal de Previsualización (Listado Entradas)
+
+**Síntoma:** Al navegar desde la previsualización de una entrada hacia la edición (`onEditarDesdePreview`), la pantalla quedaba "seminegra" con un backdrop huérfano.
+
+**Causa Raíz:** Condición de carrera (race condition). La navegación ocurría y destruía el componente padre (`ListadoEntradasComponent`) antes de que el modal (`c-modal`) completara su ciclo de cierre y limpieza del DOM.
+
+**Solución Implementada:**
+- Se modificó `onEditarDesdePreview` para cerrar explícitamente el modal y esperar (`setTimeout` de 350ms) a que la animación/limpieza finalice antes de disparar `router.navigate`.
+- Esto asegura que el backdrop se elimina correctamente antes de cambiar de vista.
+
+**Referencia de Código:**
+`src/app/admin/base/entradas/listado-entradas.component.ts` -> `onEditarDesdePreview()`
