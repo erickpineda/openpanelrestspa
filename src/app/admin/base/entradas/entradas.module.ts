@@ -7,8 +7,6 @@ import { EntradasRoutingModule } from './entradas-routing.module';
 import { ListadoEntradasComponent } from './listado-entradas.component';
 import { CrearEntradaComponent } from './crear/crear-entrada.component';
 import { EditarEntradaComponent } from './editar/editar-entrada.component';
-import { EntradaFormComponent } from './entrada-form/entrada-form.component';
-import { PreviaEntradaComponent } from './previa/preview-entrada.component';
 
 // Módulos externos usados por entradas
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
