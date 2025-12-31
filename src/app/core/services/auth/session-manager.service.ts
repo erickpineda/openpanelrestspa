@@ -130,7 +130,7 @@ export class SessionManagerService {
     // tu lógica de selectors (igual que la tuya, con logs)
     const selectors = [
       'form.ng-dirty',
-      'form.ng-touched',
+      // 'form.ng-touched', // Removed to avoid false positives (touched != modified)
       '[data-unsaved="true"]',
       '.unsaved-work-modified',
     ];
@@ -157,6 +157,17 @@ export class SessionManagerService {
 
   public performLogout(data: SessionExpirationData & { originTabId?: string }): void {
     this.log.info('SessionManagerService: performLogout', data);
+
+    // 1. Limpieza de seguridad de UI (backdrops, modals)
+    try {
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach((backdrop) => backdrop.remove());
+    } catch (e) {
+      this.log.error('SessionManager: Error limpiando UI artifacts', e);
+    }
 
     try {
       const lastValid = RouteTrackerService.getLastValidUrl();

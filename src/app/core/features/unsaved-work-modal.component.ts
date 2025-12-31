@@ -41,9 +41,15 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
         this.log.info('🔍 Es logout con allowSave:', isLogoutWithSave);
 
         if (isLogoutWithSave) {
-          this.log.info('✅ Mostrando modal porque es LOGOUT con allowSave');
-          this.sessionData = data;
-          this.showModal();
+          // Validation: Check if there is ACTUAL unsaved work before showing the modal
+          if (this.unsavedWorkService.hasUnsavedWork()) {
+            this.log.info('✅ Mostrando modal porque es LOGOUT con allowSave y hay trabajo sin guardar');
+            this.sessionData = data;
+            this.showModal();
+          } else {
+            this.log.info('⚠️ LOGOUT con allowSave pero sin trabajo real detectado. Procediendo a logout...');
+            this.sessionManager.performLogout(data);
+          }
         } else {
           this.log.info('❌ No se muestra modal, redirigiendo...');
           this.sessionManager.performLogout(data);

@@ -52,7 +52,8 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(authReq).pipe(
       catchError((err: any) => {
         if (err instanceof HttpErrorResponse) {
-          if (err.status === 401 || err.status === 403) {
+          // Ignorar 401/403 si viene de un endpoint de auth (login) para permitir que el componente maneje "credenciales inválidas"
+          if ((err.status === 401 || err.status === 403) && !isAuthEndpoint) {
             try {
               this.tokenStorage.signOut();
               this.authSync.notifyLogout();

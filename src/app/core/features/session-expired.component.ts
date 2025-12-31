@@ -77,8 +77,25 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
   }
 
   goToLogin(): void {
-    this.hideModal();
-    // Guardar la última ruta válida (no la actual, que es session-expired)
+    // 1. Ocultar modal (esto debería eliminar el backdrop, pero a veces falla en navegaciones rápidas)
+    this.isVisible = false;
+    this.sessionData = null;
+
+    // 2. Forzar limpieza manual de backdrops huérfanos antes de navegar
+    setTimeout(() => {
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach((backdrop) => backdrop.remove());
+      
+      // 3. Navegar después de la limpieza
+      this.saveRedirectUrl();
+      this.router.navigate(['/login'], { replaceUrl: true });
+    }, 300); // Pequeño delay para permitir que la animación de cierre de CoreUI termine o se procese
+  }
+
+  private saveRedirectUrl(): void {
     try {
       let validUrl: string | null = null;
       try {
@@ -91,13 +108,20 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
         this.postLoginRedirect.saveLastValidRoute(validUrl);
       }
     } catch {}
-
-    // replaceUrl evita que el usuario vuelva con back a la pantalla de sesión finalizada
-    this.router.navigate(['/login'], { replaceUrl: true });
   }
 
   goToHome(): void {
-    this.hideModal();
-    this.router.navigate(['/'], { replaceUrl: true });
+    this.isVisible = false;
+    this.sessionData = null;
+    
+    setTimeout(() => {
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach((backdrop) => backdrop.remove());
+
+        this.router.navigate(['/'], { replaceUrl: true });
+    }, 300);
   }
 }

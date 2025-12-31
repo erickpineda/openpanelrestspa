@@ -47,5 +47,10 @@ export class AppComponent implements OnInit {
     });
 
     this.uiMonitor.start();
+
+    // Safety check: ensure no stale backdrops or overlays are blocking the UI on startup
+    setTimeout(() => {
+      this.uiMonitor.scanAndRecover('startup_safety');
+    }, 500);
   }
 }

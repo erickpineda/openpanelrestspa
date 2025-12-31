@@ -21,9 +21,10 @@ import { GlobalErrorHandlerService } from './errors/global-error/global-error-ha
 import { LoggerService } from './services/logger.service';
 import { TimeoutInterceptor } from './interceptor/timeout.interceptor';
 import { ErrorBoundaryService } from './errors/error-boundary/error-boundary.service';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   declarations: [],
   exports: [],
   providers: [

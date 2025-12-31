@@ -12,7 +12,7 @@ import { environment } from '../../../../environments/environment';
 import { LoggerService } from '../logger.service';
 import { LoadingService } from './loading.service';
 
-type UiAnomalyTrigger = 'navigation' | 'interval' | 'manual';
+type UiAnomalyTrigger = 'navigation' | 'interval' | 'manual' | 'startup_safety';
 
 export type UiAnomalyMonitorConfig = {
   enabled: boolean;
