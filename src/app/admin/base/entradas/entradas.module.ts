@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 import { EntradasRoutingModule } from './entradas-routing.module';
 import { ListadoEntradasComponent } from './listado-entradas.component';
@@ -20,6 +21,7 @@ import { EntradasSharedModule } from './entradas-shared.module';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     EntradasRoutingModule,
 
     // Shared y CKEditor sólo para este módulo
