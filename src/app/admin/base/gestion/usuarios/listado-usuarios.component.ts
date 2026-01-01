@@ -81,7 +81,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
     const handleError = (err: any) => {
       this.error = 'Error cargando usuarios';
-      this.log.error('usuarios listar', err);
+      this.log.error('usuarios listar', err || 'Error desconocido');
     };
 
     if (!hasFilters) {
@@ -334,5 +334,30 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   trackByRol(index: number, r: Rol): number | string {
     return r?.idRol ?? r?.codigo ?? index;
+  }
+
+  getRoleInfo(rolCodigo: string): { color: string; icon: string; label: string } {
+    if (!rolCodigo) {
+      return { color: 'secondary', icon: 'cilUser', label: 'Sin Rol' };
+    }
+    switch (rolCodigo) {
+      case OPConstants.Roles.PROPIETARIO:
+        return { color: 'danger', icon: 'cilShieldAlt', label: 'Propietario' };
+      case OPConstants.Roles.ADMINISTRADOR:
+        return { color: 'primary', icon: 'cilStar', label: 'Administrador' };
+      case OPConstants.Roles.EDITOR:
+        return { color: 'info', icon: 'cilPencil', label: 'Editor' };
+      case OPConstants.Roles.AUTOR:
+        return { color: 'success', icon: 'cilPen', label: 'Autor' };
+      case OPConstants.Roles.LECTOR:
+        // Usamos cilLibrary como fallback seguro para Lector
+        return { color: 'secondary', icon: 'cilLibrary', label: 'Lector' };
+      default:
+        return { color: 'secondary', icon: 'cilUser', label: rolCodigo };
+    }
+  }
+
+  getInitial(u: Usuario): string {
+    return (u?.username || '?').charAt(0).toUpperCase();
   }
 }

@@ -496,13 +496,17 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   checkFechaPublicacion(fechaPublicacion: any): string {
     const date = this.getFechaDate(fechaPublicacion);
     return date
-      ? this.commonFuncService.transformaFecha(date, 'dd-MM-yyyy', false)
+      ? this.commonFuncService.transformaFecha(date, 'dd-MM-yyyy', true)
       : 'No publicada';
   }
 
   getFechaDate(fecha: any): Date | null {
     if (!fecha) return null;
-    if (fecha instanceof Date) return fecha;
+    
+    // Si ya es un objeto Date, verificar que sea válido
+    if (fecha instanceof Date) {
+      return !isNaN(fecha.getTime()) ? fecha : null;
+    }
     
     // Si es string "dd-MM-yyyy HH:mm:ss" o "dd-MM-yyyy"
     if (typeof fecha === 'string') {

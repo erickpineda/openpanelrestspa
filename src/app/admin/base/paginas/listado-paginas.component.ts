@@ -496,7 +496,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
 
   checkFechaPublicacion(fechaPublicacion: Date): string {
     return fechaPublicacion
-      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', false)
+      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', true)
       : 'No publicada';
   }
 

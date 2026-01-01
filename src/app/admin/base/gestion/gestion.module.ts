@@ -7,6 +7,7 @@ import { PrivilegiosListComponent } from './privilegios/listado-privilegios.comp
 import { MiPerfilComponent } from './perfil/mi-perfil.component';
 import { ChangePasswordComponent } from './password/change-password.component';
 import { SharedOPModule } from '../../../shared/shared.module';
+import { SharedCoreUiModule } from '../../../shared/shared-coreui.module';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,6 @@ import { SharedOPModule } from '../../../shared/shared.module';
     MiPerfilComponent,
     ChangePasswordComponent,
   ],
-  imports: [CommonModule, GestionRoutingModule, SharedOPModule],
+  imports: [CommonModule, GestionRoutingModule, SharedOPModule, SharedCoreUiModule],
 })
 export class GestionModule {}
