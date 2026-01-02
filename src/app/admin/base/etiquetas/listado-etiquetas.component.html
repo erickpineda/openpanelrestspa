@@ -1,197 +1,228 @@
 <c-container class="container-fluid" data-testid="etiquetas-list">
-  <c-card>
-    <c-card-header class="d-flex justify-content-between align-items-center">
-      <span>Etiquetas</span>
-      <button
-        cButton
-        color="primary"
-        size="sm"
-        (click)="onCreate()"
-        [attr.aria-label]="'Crear nueva etiqueta'"
-        data-testid="btn-nueva-etiqueta"
-      >
-        <svg cIcon name="cilPlus" class="me-2"></svg> Nueva Etiqueta
-      </button>
-    </c-card-header>
-    <c-card-body [attr.aria-busy]="loading ? 'true' : null">
-      <c-row class="align-items-center mb-3 g-2">
-        <c-col xs="12" md="4">
-          <div class="text-muted small">Total {{ totalItems }}</div>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-          <input
-            cFormControl
-            type="text"
-            [value]="basicSearchText"
-            (input)="onBasicSearchTextChange($any($event.target).value)"
-            placeholder="Buscar etiqueta..."
-            style="max-width: 280px"
-            [disabled]="loading"
-          />
+  <c-card class="mb-4 shadow-sm border-0">
+    <c-card-header class="bg-white border-bottom py-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <div class="bg-primary bg-opacity-10 p-2 rounded">
+            <svg cIcon name="cilTag" size="lg" class="text-primary"></svg>
+          </div>
+          <div>
+            <h5 class="mb-0 text-primary fw-bold">Etiquetas</h5>
+            <small class="text-muted">Clasifica el contenido con etiquetas</small>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
           <button
             cButton
-            color="secondary"
-            variant="ghost"
-            size="sm"
+            color="primary"
+            class="text-white shadow-sm"
+            (click)="onCreate()"
+            [attr.aria-label]="'Crear nueva etiqueta'"
+            data-testid="btn-nueva-etiqueta"
+          >
+            <svg cIcon name="cilPlus" size="sm" class="me-2"></svg> Nueva Etiqueta
+          </button>
+        </div>
+      </div>
+    </c-card-header>
+
+    <c-card-body [attr.aria-busy]="loading ? 'true' : null">
+      
+      <!-- Toolbar: Buscador y Filtros -->
+      <div class="d-flex flex-wrap gap-3 mb-4 p-3 bg-light rounded align-items-end shadow-sm border-start border-4 border-primary">
+        <!-- Buscador Básico -->
+        <div class="flex-grow-1" style="min-width: 250px;">
+          <label class="form-label small text-muted fw-bold mb-1">Buscar</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <svg cIcon name="cilSearch" class="text-muted"></svg>
+            </span>
+            <input
+              cFormControl
+              type="text"
+              [value]="basicSearchText"
+              (input)="onBasicSearchTextChange($any($event.target).value)"
+              placeholder="Buscar etiqueta..."
+              class="border-start-0 ps-0"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+
+        <!-- Botón Filtros Avanzados -->
+        <div>
+          <button
+            cButton
+            [color]="showAdvanced ? 'primary' : 'secondary'"
+            variant="outline"
             (click)="toggleAdvanced()"
             [disabled]="loading"
+            class="d-flex align-items-center gap-2"
           >
-            Avanzado
+            <svg cIcon name="cilFilter" size="sm"></svg>
+            {{ showAdvanced ? 'Ocultar Filtros' : 'Filtros Avanzados' }}
           </button>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+        </div>
+
+        <!-- Selector de Registros por Página -->
+        <div>
+          <label class="form-label small text-muted fw-bold mb-1">Mostrar</label>
           <select
             cSelect
             [ngModel]="pageSize"
             (ngModelChange)="onPageSizeChange($event)"
             name="pageSizeSelect"
-            style="max-width: 120px"
+            style="width: 80px"
             [disabled]="loading"
           >
             <option [ngValue]="5">5</option>
             <option [ngValue]="10">10</option>
             <option [ngValue]="20">20</option>
+            <option [ngValue]="50">50</option>
           </select>
-        </c-col>
-      </c-row>
+        </div>
+      </div>
+
+      <!-- Buscador Avanzado (Expandible) -->
       @if (showAdvanced) {
-        <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="mb-4">
-          <div class="row">
-            <div class="col-md-4">
-              <label for="nombre" class="form-label">Nombre</label>
-              <input
-                type="text"
-                id="nombre"
-                cFormControl
-                formControlName="nombre"
-                placeholder="Buscar por nombre..."
-                [attr.aria-label]="'Buscar etiqueta por nombre'"
-                [disabled]="loading"
-              />
-            </div>
-            <div class="col-md-4">
-              <label for="descripcion" class="form-label">Descripción</label>
-              <input
-                type="text"
-                id="descripcion"
-                cFormControl
-                formControlName="descripcion"
-                placeholder="Buscar por descripción..."
-                [attr.aria-label]="'Buscar etiqueta por descripción'"
-                [disabled]="loading"
-              />
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-              <button
-                type="submit"
-                cButton
-                color="primary"
-                variant="outline"
-                class="me-2"
-                [attr.aria-label]="'Buscar etiquetas'"
-                data-testid="btn-buscar"
-                [disabled]="loading"
-              >
-                <svg cIcon name="cilSearch"></svg> Buscar
-              </button>
-              <button
-                type="button"
-                cButton
-                color="secondary"
-                variant="outline"
-                (click)="searchForm.reset(); onSearch()"
-                [attr.aria-label]="'Limpiar filtros de búsqueda'"
-                data-testid="btn-limpiar"
-                [disabled]="loading"
-              >
-                <svg cIcon name="cilReload"></svg> Limpiar
-              </button>
-            </div>
-          </div>
-        </form>
+        <div class="mb-4 p-3 bg-white rounded border shadow-sm">
+          <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+            <c-row class="g-3 align-items-end">
+              <c-col xs="12" md="4">
+                <label for="nombre" class="form-label small fw-bold text-muted">Nombre</label>
+                <input
+                  type="text"
+                  id="nombre"
+                  cFormControl
+                  formControlName="nombre"
+                  placeholder="Buscar por nombre..."
+                  [attr.aria-label]="'Buscar etiqueta por nombre'"
+                  [disabled]="loading"
+                />
+              </c-col>
+              <c-col xs="12" md="4">
+                <label for="descripcion" class="form-label small fw-bold text-muted">Descripción</label>
+                <input
+                  type="text"
+                  id="descripcion"
+                  cFormControl
+                  formControlName="descripcion"
+                  placeholder="Buscar por descripción..."
+                  [attr.aria-label]="'Buscar etiqueta por descripción'"
+                  [disabled]="loading"
+                />
+              </c-col>
+              <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2">
+                <button
+                  type="button"
+                  cButton
+                  color="secondary"
+                  variant="ghost"
+                  (click)="searchForm.reset(); onSearch()"
+                  [attr.aria-label]="'Limpiar filtros de búsqueda'"
+                  data-testid="btn-limpiar"
+                  [disabled]="loading"
+                >
+                  <svg cIcon name="cilReload" class="me-1"></svg> Limpiar
+                </button>
+                <button
+                  type="submit"
+                  cButton
+                  color="primary"
+                  variant="outline"
+                  [attr.aria-label]="'Buscar etiquetas'"
+                  data-testid="btn-buscar"
+                  [disabled]="loading"
+                >
+                  <svg cIcon name="cilSearch" class="me-1"></svg> Buscar
+                </button>
+              </c-col>
+            </c-row>
+          </form>
+        </div>
       }
 
-      <div class="tabla-con-loader-wrapper position-relative">
+      <!-- Tabla de Resultados -->
+      <div class="position-relative">
         @if (loading) {
-          <div
-            class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-            style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
-          >
+          <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3 rounded">
             <div class="text-center">
-              <c-spinner [attr.aria-label]="'Cargando etiquetas'"></c-spinner>
-              <p class="mt-2 text-muted">Cargando etiquetas...</p>
+              <c-spinner color="primary" [attr.aria-label]="'Cargando etiquetas'"></c-spinner>
+              <p class="mt-2 text-muted small fw-bold">Cargando...</p>
             </div>
           </div>
         }
 
-        <div [class.opacity-50]="loading" class="table-responsive">
+        <div class="table-responsive rounded border">
           <table
-            responsive
-            cAlign="top"
             cTable
             hover
-            class="align-middle mb-0 border tabla-con-loader"
+            striped
+            class="align-middle mb-0"
             role="table"
             aria-label="Tabla de etiquetas"
           >
-            <thead cTableColor="light">
+            <thead class="bg-light">
               <tr>
-                <th scope="col" style="min-width: 90px">Color</th>
-                <th scope="col" style="min-width: 200px">Nombre</th>
-                <th scope="col" style="min-width: 250px">Descripción</th>
-                <th scope="col" class="text-center" style="min-width: 100px">Acciones</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 90px">Color</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 200px">Nombre</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 250px">Descripción</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-center" style="min-width: 100px">Acciones</th>
               </tr>
             </thead>
             <tbody>
               @for (etiqueta of pagedEtiquetas; track trackByEtiqueta($index, etiqueta)) {
                 <tr role="row">
-                  <td>
+                  <td class="px-3">
                     <span
-                      class="badge"
+                      class="badge border shadow-sm"
                       [style.background-color]="etiqueta.colorHex"
                       [attr.aria-label]="'Color de etiqueta'"
-                      >&nbsp;&nbsp;&nbsp;</span
+                      style="width: 24px; height: 24px; display: inline-block; border-radius: 50%;"
+                      >&nbsp;</span
                     >
                   </td>
-                  <td>
-                    <span
-                      class="fw-semibold text-truncate d-inline-block"
-                      style="max-width: 240px"
-                      [title]="etiqueta.nombre"
-                      >{{ etiqueta.nombre }}</span
-                    >
+                  <td class="px-3">
+                    <div class="d-flex flex-column">
+                      <span
+                        class="fw-bold text-primary text-truncate d-inline-block"
+                        style="max-width: 240px"
+                        [title]="etiqueta.nombre"
+                        >{{ etiqueta.nombre }}</span
+                      >
+                      <small class="text-muted font-monospace">ID: {{ etiqueta.idEtiqueta }}</small>
+                    </div>
                   </td>
-                  <td>
+                  <td class="px-3">
                     <span
-                      class="d-inline-block text-truncate"
+                      class="d-inline-block text-truncate text-muted"
                       style="max-width: 320px"
                       [title]="etiqueta.descripcion || ''"
-                      >{{ etiqueta.descripcion || '-' }}</span
                     >
+                      {{ etiqueta.descripcion || 'Sin descripción' }}
+                    </span>
                   </td>
-                  <td class="text-center">
-                    <div class="btn-group" role="group" aria-label="Acciones">
+                  <td class="px-3 text-center">
+                    <div class="d-flex justify-content-center gap-2">
                       <button
                         cButton
-                        size="sm"
                         color="warning"
                         variant="ghost"
+                        size="sm"
                         (click)="onEdit(etiqueta)"
                         [attr.aria-label]="'Editar etiqueta ' + etiqueta.nombre"
-                        role="button"
-                        [attr.data-testid]="'btn-editar-etiqueta-' + etiqueta.idEtiqueta"
+                        cTooltip="Editar"
                       >
                         <svg cIcon name="cilPencil" size="sm"></svg>
                       </button>
                       <button
                         cButton
-                        size="sm"
                         color="danger"
                         variant="ghost"
+                        size="sm"
                         (click)="onDelete(etiqueta)"
                         [attr.aria-label]="'Eliminar etiqueta ' + etiqueta.nombre"
-                        role="button"
-                        [attr.data-testid]="'btn-eliminar-etiqueta-' + etiqueta.idEtiqueta"
+                        cTooltip="Eliminar"
                       >
                         <svg cIcon name="cilTrash" size="sm"></svg>
                       </button>
@@ -199,101 +230,90 @@
                   </td>
                 </tr>
               }
-
-              @if (pagedEtiquetas.length === 0) {
+              @if (pagedEtiquetas.length === 0 && !loading) {
                 <tr>
                   <td colspan="4" class="text-center py-5">
-                    <div class="d-flex flex-column align-items-center justify-content-center">
-                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
-                      <h6 class="text-muted">No se han encontrado etiquetas</h6>
-                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+                    <div class="d-flex flex-column align-items-center opacity-50">
+                      <svg cIcon name="cilTags" size="4xl" class="mb-3"></svg>
+                      <h6 class="fw-bold">No se encontraron etiquetas</h6>
+                      <p class="small text-muted mb-0">Intenta ajustar los filtros o crea una nueva etiqueta</p>
                     </div>
                   </td>
                 </tr>
               }
             </tbody>
           </table>
-
-          @if (pagedEtiquetas.length > 0) {
-            <app-op-pagination
-              [align]="'center'"
-              [totalPages]="getTotalPages()"
-              [currentPage]="pageNo"
-              (pageChange)="onPageChange($event)"
-            >
-            </app-op-pagination>
-          }
-
-          @if (pagedEtiquetas.length > 0) {
-            <c-row class="mt-2">
-              <c-col class="d-flex justify-content-end align-items-center gap-2">
-                <button cButton color="light" size="sm" (click)="onPrev()" [disabled]="pageNo <= 0">
-                  Anterior
-                </button>
-                <button
-                  cButton
-                  color="light"
-                  size="sm"
-                  (click)="onNext()"
-                  [disabled]="isNextDisabled()"
-                >
-                  Siguiente
-                </button>
-                <div class="text-muted small ms-2">
-                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalItems }} ·
-                  Mostrando {{ numberOfElements }}
-                </div>
-              </c-col>
-            </c-row>
-          }
         </div>
+
+        <!-- Paginación -->
+        @if (totalItems > 0) {
+          <div class="d-flex justify-content-between align-items-center mt-3 px-2">
+             <div class="small text-muted fw-semibold">
+                Mostrando {{ pagedEtiquetas.length }} de {{ totalItems }} registros
+             </div>
+             <c-pagination class="mb-0" aria-label="Navegación de páginas">
+                <li cPageItem [disabled]="pageNo === 0">
+                   <a cPageLink (click)="onPrev()" [attr.aria-label]="'Anterior'" style="cursor: pointer">
+                      <span aria-hidden="true">&laquo;</span>
+                   </a>
+                </li>
+                @for (p of [].constructor(getTotalPages()); track $index) {
+                   <li cPageItem [active]="pageNo === $index">
+                      <a cPageLink (click)="onPageChange($index)" style="cursor: pointer">
+                         {{ $index + 1 }}
+                      </a>
+                   </li>
+                }
+                <li cPageItem [disabled]="isNextDisabled()">
+                   <a cPageLink (click)="onNext()" [attr.aria-label]="'Siguiente'" style="cursor: pointer">
+                      <span aria-hidden="true">&raquo;</span>
+                   </a>
+                </li>
+             </c-pagination>
+          </div>
+        }
       </div>
     </c-card-body>
   </c-card>
 </c-container>
 
-<c-modal
-  [visible]="showCreateModal || showEditModal"
+<!-- Modal Crear/Editar Etiqueta -->
+<c-modal 
+  [visible]="showCreateModal || showEditModal" 
   (visibleChange)="onModalVisibleChange($event)"
-  [attr.data-testid]="showCreateModal ? 'crear-etiqueta-modal' : 'editar-etiqueta-modal'"
->
-  <c-modal-header
-    ><h5 cModalTitle>
-      {{ showCreateModal ? 'Crear Nueva Etiqueta' : 'Editar Etiqueta' }}
-    </h5></c-modal-header
-  >
-  <c-modal-body>
-    @if (showCreateModal || showEditModal) {
-      <app-etiqueta-form
-        [etiqueta]="selectedEtiqueta"
-        [isEdit]="showEditModal"
-        (save)="onModalSave()"
-        (cancel)="onModalClose()"
-      ></app-etiqueta-form>
-    }
-  </c-modal-body>
-  <c-modal-footer
-    ><button cButton color="secondary" (click)="onModalClose()">Cerrar</button></c-modal-footer
-  >
-</c-modal>
-
-<c-modal
-  [visible]="showDeleteModal"
-  (visibleChange)="showDeleteModal = $event"
-  alignment="center"
-  [attr.data-testid]="'eliminar-etiqueta-modal'"
+  backdrop="static"
 >
   <c-modal-header>
-    <h5 cModalTitle>Confirmar eliminación</h5>
+    <h5 cModalTitle>{{ showEditModal ? 'Editar Etiqueta' : 'Nueva Etiqueta' }}</h5>
+    <button (click)="onModalClose()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
-    <p>
-      ¿Desea eliminar la etiqueta <strong>{{ etiquetaToDelete?.nombre }}</strong
-      >? Esta acción no se puede deshacer.
-    </p>
+    <app-etiqueta-form
+      [etiqueta]="selectedEtiqueta"
+      [isEdit]="showEditModal"
+      (save)="onModalSave()"
+      (cancel)="onModalClose()"
+    ></app-etiqueta-form>
+  </c-modal-body>
+</c-modal>
+
+<!-- Modal Confirmación Borrado -->
+<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal = $event" backdrop="static">
+  <c-modal-header class="bg-danger text-white">
+    <h5 cModalTitle>Confirmar Eliminación</h5>
+    <button (click)="cancelDelete()" cButtonClose white></button>
+  </c-modal-header>
+  <c-modal-body>
+    <p>¿Estás seguro de que deseas eliminar la etiqueta <strong>{{ etiquetaToDelete?.nombre }}</strong>?</p>
+    <p class="text-danger small mb-0"><svg cIcon name="cilWarning" class="me-1"></svg> Esta acción no se puede deshacer.</p>
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
-    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
+    <button cButton color="danger" (click)="confirmDelete()" [disabled]="loading">
+      @if (loading) {
+        <c-spinner size="sm" class="me-1"></c-spinner>
+      }
+      Eliminar
+    </button>
   </c-modal-footer>
 </c-modal>

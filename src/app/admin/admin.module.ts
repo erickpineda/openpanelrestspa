@@ -8,28 +8,42 @@ import { DefaultFooterComponent, DefaultHeaderComponent } from './default-layout
 
 // Módulos externos
 import { NgScrollbarModule } from 'ngx-scrollbar';
+import { SidebarModule, GridModule, HeaderModule, NavModule, AvatarModule, BadgeModule, BreadcrumbModule, DropdownModule, ListGroupModule, FooterModule } from '@coreui/angular';
 // Dashboard moved to lazy DashboardModule (includes Chartjs)
 
 // Shared Module
-import { SharedCoreUiModule } from '../shared/shared-coreui.module';
-import { SharedWidgetsModule } from '../shared/shared-widgets.module';
+    import { SharedOPModule } from '../shared/shared.module';
+    import { SharedCoreUiModule } from '../shared/shared-coreui.module';
+    import { SharedWidgetsModule } from '../shared/shared-widgets.module';
 
-const APP_CONTAINERS = [DefaultFooterComponent, DefaultHeaderComponent, AdminComponent];
+    const APP_CONTAINERS = [DefaultFooterComponent, DefaultHeaderComponent, AdminComponent];
 
-@NgModule({
-  declarations: [...APP_CONTAINERS],
-  imports: [
-    CommonModule,
-    AdminRoutingModule,
-    ReactiveFormsModule,
+    @NgModule({
+      declarations: [...APP_CONTAINERS],
+      imports: [
+        CommonModule,
+        AdminRoutingModule,
+        ReactiveFormsModule,
 
-    // Solo los módulos CoreUI necesarios para el layout
-    SharedCoreUiModule,
-    // Widgets y notificaciones compartidas
-    SharedWidgetsModule,
+        // CoreUI Modules Explicit Import (to resolve linter errors)
+        SidebarModule,
+        GridModule,
+        HeaderModule,
+        NavModule,
+        AvatarModule,
+        BadgeModule,
+        BreadcrumbModule,
+        DropdownModule,
+        ListGroupModule,
+        FooterModule,
 
-    // Módulos específicos de Admin (Dashboard/Chartjs se cargan en su propio módulo)
-    NgScrollbarModule,
-  ],
-})
+        // Shared Modules
+        SharedOPModule,
+        SharedCoreUiModule,
+        SharedWidgetsModule,
+
+        // Módulos específicos de Admin (Dashboard/Chartjs se cargan en su propio módulo)
+        NgScrollbarModule,
+      ],
+    })
 export class AdminModule {}

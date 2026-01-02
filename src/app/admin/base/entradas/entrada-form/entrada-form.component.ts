@@ -19,7 +19,7 @@ import { LoggerService } from '../../../../core/services/logger.service';
 import { OPConstants } from '../../../../shared/constants/op-global.constants';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ViewChild } from '@angular/core';
 import { ImagenesComponent } from '../../contenido/imagenes/imagenes.component';
 
@@ -88,7 +88,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   // ✅ NUEVO: ID único para esta instancia de formulario
   private currentTemporaryEntryId: string | null = null;
 
-  public imagenPreviewUrl: string | null = null;
+  public imagenPreviewUrl: SafeUrl | string | null = null;
 
   constructor(
     private temporaryStorage: TemporaryStorageService,
@@ -133,10 +133,13 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   private cargarPreviewSegura(uuid: string): void {
     this.fileStorage.descargarFichero(uuid).subscribe({
       next: (blob) => {
-        if (this.imagenPreviewUrl) {
+        // Solo revocamos si es string, SafeUrl no se puede revocar así
+        if (typeof this.imagenPreviewUrl === 'string') {
           URL.revokeObjectURL(this.imagenPreviewUrl);
         }
-        this.imagenPreviewUrl = URL.createObjectURL(blob);
+        
+        const objectUrl = URL.createObjectURL(blob);
+        this.imagenPreviewUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
         this.cdRef.markForCheck();
       },
       error: (err) => console.error('Error cargando preview segura', err),
@@ -147,95 +150,58 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   onImagenSeleccionada(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Preview inmediata local
+      // Preview inmediata local y conversión a Base64 para el backend
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        if (this.imagenPreviewUrl) URL.revokeObjectURL(this.imagenPreviewUrl);
-        this.imagenPreviewUrl = e.target.result;
+        const base64 = e.target.result;
+        
+        // Revocar URL anterior si era un string (blob url)
+        if (typeof this.imagenPreviewUrl === 'string') {
+           URL.revokeObjectURL(this.imagenPreviewUrl);
+        }
+        
+        // Base64 es seguro para mostrar directamente (data:image/...)
+        // Opcionalmente podríamos sanitizarlo también, pero suele funcionar directo en src
+        this.imagenPreviewUrl = base64;
+        
+        // IMPORTANTE: El backend espera byte[] (Base64), no una URL.
+        // Asignamos el Base64 directamente al formulario.
+        this.form.patchValue({ imagenDestacada: base64 });
+        this.form.markAsDirty();
         this.cdRef.markForCheck();
       };
       reader.readAsDataURL(file);
 
-      this.log.info('Subiendo imagen destacada...', file.name);
+      this.log.info('Subiendo imagen destacada a librería...', file.name);
 
+      // Subimos a FileStorage solo para tenerla en la librería, pero no usamos la URL retornada para el form
       this.fileStorage.uploadFile(file).subscribe({
         next: (response: any) => {
-          // Intentar obtener URL directamente
-          let url = response?.data?.ruta || response?.ruta || response?.url;
-
-          if (url) {
-            this.handleUploadSuccess(url);
-            return;
-          }
-
-          // Si no hay URL directa, buscar UUID en el mensaje (caso trackingId)
-          // Comprobar response.message Y response.result.message
-          const message = response.message || response?.result?.message || '';
-
-          if (response?.result?.trackingId || message) {
-            // Regex para UUID estándar
-            const match = message.match(
-              /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
-            );
-
-            if (match) {
-              const uuid = match[0];
-              this.log.info('UUID extraído del mensaje de subida:', uuid);
-
-              this.fileStorage.obtenerDatosFichero(uuid).subscribe({
-                next: (fileData: any) => {
-                  // FileStorageService.obtenerDatosFichero ya hace un map(resp => resp?.data ?? resp)
-                  // Pero por seguridad verificamos varios campos
-                  const fileUrl = fileData?.ruta || fileData?.url || fileData?.data?.ruta;
-
-                  if (fileUrl) {
-                    this.handleUploadSuccess(fileUrl);
-                  } else {
-                    this.log.error(
-                      `No se pudo obtener URL del fichero con UUID: ${uuid}`,
-                      fileData
-                    );
-                    this.toastService.showError('No se pudo obtener la URL de la imagen', 'Error');
-                  }
-                },
-                error: (err) => {
-                  this.log.error('Error obteniendo datos del fichero', err);
-                  this.toastService.showError('Error al obtener datos de la imagen', 'Error');
-                },
-              });
-              return;
-            }
-          }
-
-          // Si llegamos aquí, no se pudo procesar la respuesta
-          this.log.error('Respuesta de subida irreconocible', response);
-          this.toastService.showError('No se pudo obtener la URL de la imagen', 'Error');
+           this.log.info('Imagen subida a librería correctamente', response);
+           // Refrescar librería si está cargada
+           if (this.imagenesComponent) {
+             this.imagenesComponent.load();
+           }
+           this.toastService.showSuccess('Imagen disponible en librería', 'Éxito');
         },
         error: (err) => {
-          this.log.error('Error subiendo imagen', err);
-          this.toastService.showError('Error al subir la imagen', 'Error');
+          this.log.error('Error subiendo imagen a librería', err);
+          // No mostramos error bloqueante porque ya tenemos la imagen en local para enviar
         },
       });
     }
   }
 
   private handleUploadSuccess(url: string) {
-    this.form.patchValue({ imagenDestacada: url });
-    this.form.markAsDirty();
-    this.cdRef.markForCheck();
-    this.toastService.showSuccess('Imagen subida correctamente', 'Éxito');
-
-    // Refrescar librería si está cargada
-    if (this.imagenesComponent) {
-      this.imagenesComponent.load();
-    }
+    // Deprecado para el valor del formulario, pero útil si quisiéramos usar URL
+    // this.form.patchValue({ imagenDestacada: url });
   }
 
   onQuitarImagen() {
     this.form.patchValue({ imagenDestacada: null });
     this.imagenPreviewUrl = null;
     this.form.markAsDirty();
-    // Limpiar el input file si es necesario (se puede hacer con ViewChild o simplemente dejarlo)
+    // Limpiar el input file si es necesario
     const fileInput = document.getElementById('selImagenDestacada') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
     this.cdRef.markForCheck();
@@ -599,49 +565,44 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   onMediaSelected(item: any): void {
     if (item) {
-      // Limpiar preview anterior
-      this.imagenPreviewUrl = null;
-
-      // Si hay UUID, intentar cargar preview segura
+      this.log.info('Media seleccionado de galería:', item);
+      
+      // Si tiene UUID, descargamos el blob
       if (item.uuid) {
-        this.cargarPreviewSegura(item.uuid);
-      } else if (item.url) {
-        // Si no hay UUID pero hay URL, asumimos pública
-        this.imagenPreviewUrl = item.url;
-      }
+        this.fileStorage.descargarFichero(item.uuid).subscribe({
+          next: (blob: Blob) => {
+            // Convertir a Base64 tanto para preview como para el formulario
+            // Esto asegura consistencia con la subida local que sí funciona
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+               const base64 = e.target.result;
+               
+               // Limpieza de URL anterior si era blob
+               if (typeof this.imagenPreviewUrl === 'string' && this.imagenPreviewUrl.startsWith('blob:')) {
+                 URL.revokeObjectURL(this.imagenPreviewUrl);
+               }
 
-      // Preferir URL directa si existe para guardar en form
-      if (item.url) {
-        this.form.patchValue({ imagenDestacada: item.url });
-      }
-      // Si no hay URL pero hay UUID, consultar datos del fichero para obtener URL
-      else if (item.uuid) {
-        this.fileStorage.obtenerDatosFichero(item.uuid).subscribe({
-          next: (fileData: any) => {
-            const fileUrl = fileData?.ruta || fileData?.url || fileData?.data?.ruta;
-            if (fileUrl) {
-              this.form.patchValue({ imagenDestacada: fileUrl });
-              this.form.markAsDirty();
-              this.cdRef.detectChanges();
-            } else {
-              this.log.error('MediaItem seleccionado tiene UUID pero no retorna URL:', item);
-              this.toastService.showError(
-                'No se pudo obtener la URL de la imagen seleccionada',
-                'Error'
-              );
-            }
+               // Usamos Base64 para la preview (igual que en onImagenSeleccionada)
+               this.imagenPreviewUrl = base64;
+               
+               // Y para el formulario
+               this.form.patchValue({ imagenDestacada: base64 });
+               this.form.markAsDirty();
+               this.cdRef.markForCheck();
+            };
+            reader.readAsDataURL(blob);
           },
           error: (err) => {
-            this.log.error('Error obteniendo datos del fichero seleccionado', err);
-            this.toastService.showError('Error al procesar la imagen seleccionada', 'Error');
-          },
+            this.log.error('Error descargando fichero de galería', err);
+            this.toastService.showError('No se pudo cargar la imagen seleccionada', 'Error');
+          }
         });
       }
-
-      // No necesitamos marcar dirty aquí si es asíncrono, se hace en el subscribe
-      if (this.imagenDestacadaUrl) {
-        this.form.markAsDirty();
-        this.cdRef.detectChanges();
+      // Si solo tiene URL (caso raro o legacy), intentamos usarla pero probablemente falle en backend si espera byte[]
+      else if (item.url) {
+        this.log.warn('Item de galería sin UUID, usando URL (puede fallar en backend)', item.url);
+        this.form.patchValue({ imagenDestacada: item.url });
+        this.imagenPreviewUrl = item.url;
       }
     }
     this.cerrarSelectorImagen();

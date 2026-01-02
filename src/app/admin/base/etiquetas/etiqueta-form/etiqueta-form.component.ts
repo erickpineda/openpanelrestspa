@@ -63,12 +63,20 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.isEdit && this.etiqueta) {
-      this.form.patchValue({
-        nombre: this.etiqueta.nombre,
-        descripcion: this.etiqueta.descripcion,
-        colorHex: this.etiqueta.colorHex || '#4ECDC4',
-      });
+    if (changes['etiqueta'] || changes['isEdit']) {
+      if (this.isEdit && this.etiqueta) {
+        this.form.patchValue({
+          nombre: this.etiqueta.nombre,
+          descripcion: this.etiqueta.descripcion,
+          colorHex: this.etiqueta.colorHex || '#4ECDC4',
+        });
+      } else {
+        this.form.reset({
+          nombre: '',
+          descripcion: '',
+          colorHex: '#4ECDC4',
+        });
+      }
     }
   }
 

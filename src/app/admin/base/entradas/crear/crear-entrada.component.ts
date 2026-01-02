@@ -46,7 +46,7 @@ export class CrearEntradaComponent implements OnInit {
     this.entradaForm.enable();
   }
 
-  async onGuardar(ent: any) {
+  async onGuardar(ent: Entrada) {
     this.submitted = true;
     if (this.entradaForm.invalid) return;
 

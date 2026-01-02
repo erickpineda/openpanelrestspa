@@ -1,6 +1,26 @@
-<div class="card">
-  <div class="card-header">Mi Perfil</div>
-  <div class="card-body">
-    <p class="text-muted">Sección de perfil en construcción.</p>
-  </div>
-</div>
+<c-card class="shadow-sm mb-4 border-0">
+  <c-card-header class="bg-white py-3 border-bottom">
+    <div class="d-flex align-items-center gap-2">
+      <div class="bg-primary bg-opacity-10 p-2 rounded-circle">
+        <svg cIcon name="cilUser" class="text-primary" size="lg"></svg>
+      </div>
+      <div>
+        <h5 class="mb-0 fw-bold text-gray-800">Mi Perfil</h5>
+        <small class="text-muted">Gestión de información personal</small>
+      </div>
+    </div>
+  </c-card-header>
+  <c-card-body>
+    <div class="text-center py-5 text-muted bg-light rounded border border-dashed">
+      <div class="mb-3">
+        <svg cIcon name="cilUser" size="3xl" class="text-secondary opacity-50"></svg>
+      </div>
+      <h6 class="fw-bold text-gray-700">Redirigiendo...</h6>
+      <p class="mb-3 small">Accede a tu perfil completo para gestionar tus datos.</p>
+      <a routerLink="/admin/base/perfil" cButton color="primary" class="px-4 rounded-pill shadow-sm">
+        <svg cIcon name="cilArrowRight" size="sm" class="me-2"></svg>
+        Ir a Mi Perfil Completo
+      </a>
+    </div>
+  </c-card-body>
+</c-card>

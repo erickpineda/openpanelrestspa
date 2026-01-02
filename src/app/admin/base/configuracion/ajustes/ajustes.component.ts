@@ -183,19 +183,6 @@ export class AjustesComponent implements OnInit, OnDestroy {
     this.search();
   }
 
-  prev(): void {
-    if (this.pageNo > 0) {
-      this.pageNo--;
-      this.updatePage();
-    }
-  }
-  next(): void {
-    if (this.pageNo < this.getTotalPages() - 1) {
-      this.pageNo++;
-      this.updatePage();
-    }
-  }
-
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
     const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));

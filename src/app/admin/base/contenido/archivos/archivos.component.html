@@ -1,9 +1,17 @@
 <c-container class="container-fluid">
-  <c-card aria-live="polite">
-    <c-card-header class="d-flex align-items-center justify-content-between">
-      <span>Archivos</span>
-      <div class="btn-toolbar gap-2">
-        <div class="btn-group" role="group" aria-label="Subida de archivos">
+  <c-card class="mb-4 shadow-sm border-0" aria-live="polite">
+    <c-card-header class="bg-white border-bottom py-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <div class="bg-primary bg-opacity-10 p-2 rounded">
+            <svg cIcon name="cilFolderOpen" size="lg" class="text-primary"></svg>
+          </div>
+          <div>
+            <h5 class="mb-0 text-primary fw-bold">Gestión de Archivos</h5>
+            <small class="text-muted">Administra los recursos y documentos del sistema</small>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
           <input
             type="file"
             #fileInput
@@ -14,239 +22,270 @@
           <button
             cButton
             color="primary"
-            size="sm"
+            class="text-white shadow-sm"
             (click)="openUpload(fileInput)"
             [disabled]="uploading"
           >
             <svg cIcon name="cilCloudUpload" class="me-2"></svg>
-            {{ uploading ? 'Subiendo...' : 'Subir' }}
+            {{ uploading ? 'Subiendo...' : 'Subir Archivo' }}
           </button>
         </div>
       </div>
     </c-card-header>
-    <c-card-body [attr.aria-busy]="loading ? 'true' : null">
+
+    <c-card-body class="p-4" [attr.aria-busy]="loading ? 'true' : null">
       @if (error) {
-        <div
-          class="alert alert-danger d-flex align-items-center justify-content-between my-2"
-          role="alert"
-        >
-          <span>{{ error }}</span>
-          <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
-        </div>
+        <c-alert color="danger" class="d-flex align-items-center justify-content-between mb-4 shadow-sm border-0">
+          <div class="d-flex align-items-center gap-2">
+            <svg cIcon name="cilWarning" class="flex-shrink-0"></svg>
+            <span>{{ error }}</span>
+          </div>
+          <button cButton color="danger" variant="outline" size="sm" (click)="load()">Reintentar</button>
+        </c-alert>
       }
 
-      <div>
-        <c-row class="align-items-center mb-3 g-2">
-          <c-col xs="12" md="4">
-            <div class="text-muted small">Total {{ totalElements }}</div>
-          </c-col>
-          <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-            <input
-              cFormControl
-              type="text"
-              [value]="basicSearchText"
-              (input)="onBasicSearchTextChange($any($event.target).value)"
-              placeholder="Buscar nombre..."
-              style="max-width: 280px"
-              [disabled]="loading"
-            />
-            <button
-              cButton
-              color="secondary"
-              variant="ghost"
-              size="sm"
-              (click)="toggleAdvanced()"
-              [disabled]="loading"
-            >
-              Avanzado
-            </button>
-          </c-col>
-          <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-            <select
-              cSelect
-              [ngModel]="pageSize"
-              (ngModelChange)="onPageSizeChange($event)"
-              name="pageSizeSelect"
-              style="max-width: 100px"
-              [disabled]="loading"
-            >
-              <option [ngValue]="5">5</option>
-              <option [ngValue]="10">10</option>
-              <option [ngValue]="20">20</option>
-            </select>
-          </c-col>
-        </c-row>
-
-        @if (showAdvanced) {
-          <div class="mb-3">
-            <c-row class="g-3 align-items-end">
-              <c-col xs="12" md="4">
-                <label class="form-label mb-1">Tipo MIME</label>
-                <select
-                  cSelect
-                  class="form-select-sm"
-                  [(ngModel)]="filtroMime"
-                  [disabled]="loading"
-                >
-                  <option value="">Todos</option>
-                  <option value="application/pdf">application/pdf</option>
-                  <option value="application/zip">application/zip</option>
-                  <option value="text/plain">text/plain</option>
-                </select>
-              </c-col>
-              <c-col xs="6" md="4">
-                <label class="form-label mb-1">Desde</label>
+      <div class="d-flex flex-column gap-4">
+        <!-- Toolbar y Filtros -->
+        <div class="bg-light p-3 rounded border">
+          <c-row class="g-3 align-items-center">
+            <c-col xs="12" md="4">
+              <div class="text-muted fw-medium small">
+                Total: <span class="text-primary fw-bold">{{ totalElements }}</span> archivos
+              </div>
+            </c-col>
+            <c-col xs="12" md="8" class="d-flex flex-wrap justify-content-md-end gap-2 align-items-center">
+              <div class="position-relative flex-grow-1 flex-md-grow-0" style="min-width: 250px;">
+                <svg cIcon name="cilSearch" class="text-muted position-absolute top-50 start-0 translate-middle-y ms-3" size="sm"></svg>
                 <input
                   cFormControl
-                  class="form-control-sm"
-                  type="date"
-                  [(ngModel)]="fechaDesde"
+                  type="text"
+                  [value]="basicSearchText"
+                  (input)="onBasicSearchTextChange($any($event.target).value)"
+                  placeholder="Buscar por nombre..."
+                  class="ps-5"
                   [disabled]="loading"
                 />
-              </c-col>
-              <c-col xs="6" md="4">
-                <label class="form-label mb-1">Hasta</label>
-                <input
-                  cFormControl
-                  class="form-control-sm"
-                  type="date"
-                  [(ngModel)]="fechaHasta"
-                  [disabled]="loading"
-                />
-              </c-col>
-              <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
-                <button
-                  cButton
-                  size="sm"
-                  color="primary"
-                  variant="outline"
-                  (click)="search()"
-                  [disabled]="loading"
-                >
-                  <svg cIcon name="cilSearch"></svg> Buscar
-                </button>
-                <button
-                  cButton
-                  size="sm"
-                  color="secondary"
-                  variant="outline"
-                  (click)="reset()"
-                  [disabled]="loading"
-                >
-                  <svg cIcon name="cilReload"></svg> Limpiar
-                </button>
-              </c-col>
-            </c-row>
-          </div>
-        }
+              </div>
+              <select
+                cSelect
+                [ngModel]="pageSize"
+                (ngModelChange)="onPageSizeChange($event)"
+                name="pageSizeSelect"
+                style="width: auto"
+                [disabled]="loading"
+              >
+                <option [ngValue]="5">5 filas</option>
+                <option [ngValue]="10">10 filas</option>
+                <option [ngValue]="20">20 filas</option>
+              </select>
+              <button
+                cButton
+                color="secondary"
+                variant="ghost"
+                (click)="toggleAdvanced()"
+                [active]="showAdvanced"
+                [disabled]="loading"
+                cTooltip="Filtros avanzados"
+              >
+                <svg cIcon name="cilFilter"></svg>
+              </button>
+            </c-col>
+          </c-row>
 
-        <div class="tabla-con-loader-wrapper position-relative">
+          @if (showAdvanced) {
+            <div class="mt-3 pt-3 border-top animate__animated animate__fadeIn">
+              <c-row class="g-3 align-items-end">
+                <c-col xs="12" md="4">
+                  <label class="form-label small text-muted fw-bold mb-1">Tipo MIME</label>
+                  <select
+                    cSelect
+                    class="form-select-sm"
+                    [(ngModel)]="filtroMime"
+                    [disabled]="loading"
+                  >
+                    <option value="">Todos los tipos</option>
+                    <option value="application/pdf">PDF</option>
+                    <option value="application/zip">ZIP/Archive</option>
+                    <option value="text/plain">Texto Plano</option>
+                  </select>
+                </c-col>
+                <c-col xs="6" md="3">
+                  <label class="form-label small text-muted fw-bold mb-1">Desde</label>
+                  <input
+                    cFormControl
+                    class="form-control-sm"
+                    type="date"
+                    [(ngModel)]="fechaDesde"
+                    [disabled]="loading"
+                  />
+                </c-col>
+                <c-col xs="6" md="3">
+                  <label class="form-label small text-muted fw-bold mb-1">Hasta</label>
+                  <input
+                    cFormControl
+                    class="form-control-sm"
+                    type="date"
+                    [(ngModel)]="fechaHasta"
+                    [disabled]="loading"
+                  />
+                </c-col>
+                <c-col xs="12" md="2" class="d-flex justify-content-end gap-2">
+                  <button
+                    cButton
+                    size="sm"
+                    color="primary"
+                    class="text-white"
+                    (click)="search()"
+                    [disabled]="loading"
+                  >
+                    Aplicar
+                  </button>
+                  <button
+                    cButton
+                    size="sm"
+                    color="secondary"
+                    variant="ghost"
+                    (click)="reset()"
+                    [disabled]="loading"
+                  >
+                    Limpiar
+                  </button>
+                </c-col>
+              </c-row>
+            </div>
+          }
+        </div>
+
+        <!-- Tabla -->
+        <div class="position-relative border rounded overflow-hidden">
           @if (loading) {
             <div
-              class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-              style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
+              class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-white bg-opacity-75"
+              style="z-index: 10;"
             >
-              <div class="text-center">
-                <c-spinner [attr.aria-label]="'Cargando archivos'"></c-spinner>
-                <p class="mt-2 text-muted">Cargando archivos...</p>
-              </div>
+              <c-spinner color="primary"></c-spinner>
+              <small class="text-primary mt-2 fw-medium">Cargando archivos...</small>
             </div>
           }
 
-          <div [class.opacity-50]="loading" class="table-responsive">
+          <div class="table-responsive">
             <table
-              responsive
-              cAlign="top"
               cTable
               hover
-              class="align-middle mb-0 border tabla-con-loader"
-              role="table"
+              striped
+              class="mb-0 align-middle"
               aria-label="Tabla de archivos"
             >
-              <thead cTableColor="light">
+              <thead class="bg-light">
                 <tr>
-                  <th scope="col" style="min-width: 200px">Nombre</th>
-                  <th scope="col" class="text-end" style="min-width: 120px">Tamaño</th>
-                  <th scope="col" class="text-center" style="min-width: 160px">Fecha</th>
-                  <th scope="col" class="text-center" style="min-width: 110px">Acciones</th>
+                  <th scope="col" class="border-0 py-3 ps-4 text-secondary small fw-bold text-uppercase" style="min-width: 200px">Nombre</th>
+                  <th scope="col" class="border-0 py-3 text-secondary small fw-bold text-uppercase text-end" style="min-width: 120px">Tamaño</th>
+                  <th scope="col" class="border-0 py-3 text-secondary small fw-bold text-uppercase text-center" style="min-width: 160px">Fecha</th>
+                  <th scope="col" class="border-0 py-3 pe-4 text-secondary small fw-bold text-uppercase text-center" style="min-width: 110px">Acciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="border-top-0">
                 @for (f of items; track trackByMediaItem($index, f)) {
                   <tr>
-                    <td>
-                      <span
-                        class="fw-semibold text-truncate d-inline-block"
-                        style="max-width: 320px"
-                        [title]="f.nombre"
-                        >{{ f.nombre }}</span
-                      >
+                    <td class="ps-4">
+                      <div class="d-flex align-items-center gap-2">
+                        <svg cIcon name="cilFile" class="text-secondary"></svg>
+                        <span
+                          class="fw-medium text-dark text-truncate d-inline-block"
+                          style="max-width: 320px"
+                          [title]="f.nombre"
+                          >{{ f.nombre }}</span
+                        >
+                      </div>
                     </td>
-                    <td class="text-end">{{ f.tamano | number }}</td>
-                    <td class="text-center">
-                      {{ f.fechaCreacion | date: 'dd-MM-yyyy HH:mm' }}
+                    <td class="text-end font-monospace small">{{ f.tamano | number }} B</td>
+                    <td class="text-center text-muted small">
+                      {{ f.fechaCreacion | date: 'dd/MM/yyyy HH:mm' }}
                     </td>
-                    <td class="text-center">
-                      <div class="btn-group" role="group" aria-label="Acciones de archivo">
+                    <td class="pe-4 text-center">
+                      <div class="d-flex justify-content-center gap-2">
                         <button
                           cButton
-                          color="secondary"
-                          size="sm"
+                          color="info"
                           variant="ghost"
+                          size="sm"
+                          class="btn-icon rounded-circle"
                           (click)="download(f)"
                           [disabled]="!f.uuid && !f.url"
-                          [attr.aria-label]="'Descargar ' + (f.nombre || '')"
+                          cTooltip="Descargar"
                         >
                           <svg cIcon name="cilCloudDownload" size="sm"></svg>
+                        </button>
+                        <button
+                          cButton
+                          color="danger"
+                          variant="ghost"
+                          size="sm"
+                          class="btn-icon rounded-circle"
+                          (click)="deleteItem(f)"
+                          cTooltip="Eliminar"
+                        >
+                          <svg cIcon name="cilTrash" size="sm"></svg>
                         </button>
                       </div>
                     </td>
                   </tr>
                 }
 
-                @if (items.length === 0) {
+                @if (items.length === 0 && !loading) {
                   <tr>
                     <td colspan="4" class="text-center py-5">
-                      <div class="d-flex flex-column align-items-center justify-content-center">
-                        <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
-                        <h6 class="text-muted">No se han encontrado archivos</h6>
-                        <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+                      <div class="d-flex flex-column align-items-center justify-content-center opacity-50">
+                        <svg cIcon name="cilFolderOpen" size="4xl" class="text-muted mb-3"></svg>
+                        <h6 class="text-muted fw-bold">No se encontraron archivos</h6>
+                        <p class="text-muted small mb-0">Intenta subir un archivo o ajustar los filtros</p>
                       </div>
                     </td>
                   </tr>
                 }
               </tbody>
             </table>
-
-            @if (totalElements > 0) {
-              <app-op-pagination
-                [align]="'center'"
-                [totalPages]="totalPages"
-                [currentPage]="pageNo"
-                (pageChange)="onPageChange($event)"
-              >
-              </app-op-pagination>
-            }
-
-            @if (totalElements > 0) {
-              <c-row class="mt-2">
-                <c-col class="d-flex justify-content-end align-items-center gap-2">
-                  <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">
-                    Anterior
-                  </button>
-                  <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">
-                    Siguiente
-                  </button>
-                  <div class="text-muted small ms-2">
-                    Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} ·
-                    Mostrando {{ numberOfElements }}
-                  </div>
-                </c-col>
-              </c-row>
-            }
           </div>
         </div>
+
       </div>
     </c-card-body>
+    @if (totalElements > 0) {
+      <c-card-footer class="bg-white border-top-0 py-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+          <div class="text-muted small order-2 order-md-1">
+            Mostrando {{ items.length }} de {{ totalElements }} archivos
+          </div>
+          <div class="order-1 order-md-2 w-100 w-md-auto d-flex justify-content-center">
+            <app-op-pagination
+              [totalPages]="totalPages"
+              [currentPage]="pageNo"
+              (pageChange)="onPageChange($event)"
+            >
+            </app-op-pagination>
+          </div>
+        </div>
+      </c-card-footer>
+    }
   </c-card>
 </c-container>
+
+<c-modal [visible]="confirmationModalVisible" (visibleChange)="confirmationModalVisible = $event" backdrop="static">
+  <c-modal-header class="bg-danger text-white">
+    <h5 cModalTitle>Confirmar eliminación</h5>
+    <button (click)="cancelDelete()" cButtonClose white></button>
+  </c-modal-header>
+  <c-modal-body>
+    ¿Estás seguro de que deseas eliminar el archivo <strong>{{ itemToDelete?.nombre }}</strong>?
+    <br>
+    <small class="text-muted">Esta acción no se puede deshacer.</small>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="cancelDelete()" cButton color="secondary">
+      Cancelar
+    </button>
+    <button (click)="confirmDelete()" cButton color="danger" class="text-white">
+      Eliminar
+    </button>
+  </c-modal-footer>
+</c-modal>

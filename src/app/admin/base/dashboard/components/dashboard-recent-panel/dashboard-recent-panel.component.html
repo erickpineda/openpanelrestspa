@@ -1,85 +1,91 @@
-<c-card>
-  <c-card-header>
-    <c-row>
-      <c-col lg="6">
-        <h6 class="mb-0">Actividad Reciente</h6>
-      </c-col>
-      <c-col lg="6">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <label class="form-label mb-0">T</label>
-          <select
-            cSelect
-            [ngModel]="recentSize"
-            (ngModelChange)="changeSize.emit($event)"
-            style="max-width: 100px"
-          >
-            <option [ngValue]="5">5</option>
-            <option [ngValue]="10">10</option>
-            <option [ngValue]="20">20</option>
-          </select>
-          <button
-            cButton
-            color="secondary"
-            size="sm"
-            (click)="downloadCsv.emit()"
-            title="Descargar actividad reciente en CSV"
-            [attr.aria-label]="'Descargar actividad reciente en CSV'"
-            data-testid="btn-csv-recent"
-          >
-            CSV
-          </button>
-        </div>
-      </c-col>
-    </c-row>
-  </c-card-header>
-  <c-card-body>
-    @if (errorRecent) {
-      <div
-        class="alert alert-danger d-flex align-items-center justify-content-between my-2"
-        role="alert"
-        aria-live="assertive"
-      >
-        <span>{{ errorRecent }}</span>
-        <button cButton color="danger" size="sm" class="retry-btn-recent" (click)="retry.emit()">
-          Reintentar
-        </button>
+<div class="d-flex flex-column h-100">
+  <div class="mb-3">
+    <div class="d-flex justify-content-end align-items-center gap-2 bg-light p-2 rounded border">
+      <div class="d-flex align-items-center gap-2">
+        <label class="form-label mb-0 small text-muted fw-bold text-uppercase">Mostrar:</label>
+        <select
+          cSelect
+          [ngModel]="recentSize"
+          (ngModelChange)="changeSize.emit($event)"
+          size="sm"
+          style="width: auto"
+          class="form-select-sm"
+        >
+          <option [ngValue]="5">5</option>
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+        </select>
       </div>
-    }
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <div class="small text-muted">Últimos items</div>
-      <app-op-pagination
-        [totalPages]="recentTotalPages"
-        [currentPage]="recentPage"
-        [align]="'end'"
-        (pageChange)="pageChange.emit($event)"
-      ></app-op-pagination>
+      <div class="vr mx-2"></div>
+      <button
+        cButton
+        color="secondary"
+        variant="ghost"
+        size="sm"
+        (click)="downloadCsv.emit()"
+        title="Descargar actividad reciente en CSV"
+        [attr.aria-label]="'Descargar actividad reciente en CSV'"
+        data-testid="btn-csv-recent"
+        class="text-dark"
+      >
+        <svg cIcon name="cilCloudDownload" size="sm" class="me-1"></svg>
+        CSV
+      </button>
     </div>
-    @if (loadingRecent) {
-      <div class="mb-2"><c-spinner></c-spinner></div>
-    }
-    <ul class="list-group list-group-flush">
-      @for (e of recentItems; track e.id ?? e.idEntrada ?? e.username ?? e.name ?? $index) {
-        <li class="list-group-item">
-          <div class="d-flex justify-content-between">
-            <div>
-              <strong>{{
-                e?.titulo || e?.contenidoCorto || e?.username || e?.name || 'Item'
-              }}</strong>
-              <div class="small text-muted">
-                {{ e?.fechaCreacion || e?.fechaRegistro || e?.date }}
-              </div>
+  </div>
+
+  @if (errorRecent) {
+    <c-alert color="danger" class="d-flex align-items-center justify-content-between my-2 py-2 shadow-sm border-0">
+      <div class="d-flex align-items-center gap-2">
+        <svg cIcon name="cilWarning" size="sm"></svg>
+        <span class="small">{{ errorRecent }}</span>
+      </div>
+      <button cButton color="danger" variant="ghost" size="sm" class="retry-btn-recent" (click)="retry.emit()">
+        Reintentar
+      </button>
+    </c-alert>
+  }
+
+  @if (loadingRecent) {
+    <div class="d-flex justify-content-center py-4">
+      <c-spinner color="primary"></c-spinner>
+    </div>
+  }
+
+  <ul class="list-group list-group-flush border rounded shadow-sm" aria-live="polite">
+    @for (e of recentItems; track e.id ?? e.idEntrada ?? e.username ?? e.name ?? $index) {
+      <li class="list-group-item list-group-item-action border-start-0 border-end-0 py-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-truncate pe-2">
+            <div class="fw-semibold text-dark text-truncate">
+              {{ e?.titulo || e?.contenidoCorto || e?.username || e?.name || 'Item' }}
             </div>
-            <div class="text-end">
-              @if (e?.estado) {
-                <c-badge color="secondary">{{ e?.estado }}</c-badge>
-              }
+            <div class="small text-muted d-flex align-items-center gap-1">
+              <svg cIcon name="cilClock" size="sm" class="text-secondary" style="width: 12px; height: 12px;"></svg>
+              {{ e?.fechaCreacion || e?.fechaRegistro || e?.date | date:'short' }}
             </div>
           </div>
-        </li>
-      }
-      @if (!recentItems || recentItems.length === 0) {
-        <li class="list-group-item text-muted">No hay actividad reciente</li>
-      }
-    </ul>
-  </c-card-body>
-</c-card>
+          <div class="flex-shrink-0">
+            @if (e?.estado) {
+              <c-badge color="light" class="text-secondary border">{{ e?.estado }}</c-badge>
+            }
+          </div>
+        </div>
+      </li>
+    }
+    @if (!recentItems || recentItems.length === 0) {
+      <li class="list-group-item text-center text-muted py-4">
+        <small>No hay actividad reciente</small>
+      </li>
+    }
+  </ul>
+
+  <div class="mt-3 d-flex justify-content-end">
+    <app-op-pagination
+      [totalPages]="recentTotalPages"
+      [currentPage]="recentPage"
+      [align]="'end'"
+      (pageChange)="pageChange.emit($event)"
+    ></app-op-pagination>
+  </div>
+</div>

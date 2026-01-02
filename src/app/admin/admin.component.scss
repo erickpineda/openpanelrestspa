@@ -12,4 +12,48 @@
   ::ng-deep c-sidebar > ng-scrollbar .ng-scrollbar {
     height: 100%;
   }
+
+  ::ng-deep .admin-shell .card {
+    border-top-width: 3px;
+    border-top-style: solid;
+    border-top-color: var(--cui-primary, #0d6efd);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  }
+  ::ng-deep .admin-shell .card-header {
+    background-color: #ffffff;
+    padding: 1rem;
+    border-bottom: 0;
+  }
+  ::ng-deep .admin-shell .table thead {
+    background-color: var(--cui-light, #f8f9fa);
+    color: var(--cui-secondary, #6c757d);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  ::ng-deep .admin-shell .badge.rounded-pill {
+    padding: 0.5rem 0.75rem;
+    font-weight: 400;
+  }
+  ::ng-deep .admin-shell .btn-group .btn {
+    border-radius: 999px;
+  }
+  ::ng-deep .admin-shell .tabla-con-loader-wrapper {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.075);
+    background-color: #ffffff;
+  }
+  ::ng-deep .admin-shell .input-group .input-group-text {
+    background-color: #ffffff;
+    border-right: 0;
+  }
+  ::ng-deep .admin-shell .input-group .form-control {
+    border-left: 0;
+  }
+  ::ng-deep .admin-shell .modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.075);
+  }
+  ::ng-deep .admin-shell .pagination .page-link {
+    border-radius: 999px;
+  }
 }

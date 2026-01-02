@@ -333,22 +333,6 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     }
   }
 
-  onPrev(): void {
-    if (this.currentPage > 0) {
-      this.obtenerListaEntradas(this.currentPage - 1);
-    }
-  }
-
-  onNext(): void {
-    if (this.currentPage < Math.max(0, this.totalPages - 1)) {
-      this.obtenerListaEntradas(this.currentPage + 1);
-    }
-  }
-
-  isNextDisabled(): boolean {
-    return this.currentPage >= Math.max(0, this.totalPages - 1);
-  }
-
   // #endregion
 
   // #region Filter & Search Actions

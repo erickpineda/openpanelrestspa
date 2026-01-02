@@ -1,38 +1,137 @@
 <c-row>
   <c-col xs="12">
-    <c-card>
-      <c-card-header>
-        <strong>Logs del Sistema</strong>
-      </c-card-header>
-      <c-card-body>
-        <div class="toolbar">
-          <input class="form-control" placeholder="Filtrar por texto" [(ngModel)]="filter" />
-          <button cButton color="primary" (click)="search()">Buscar</button>
-          <button cButton color="secondary" variant="outline" (click)="clear()">Limpiar</button>
-          <button cButton color="info" variant="outline" (click)="sample()">
-            Generar ejemplos
-          </button>
-        </div>
-        @if (loading) {
-          <div>
-            <c-spinner color="primary" size="sm"></c-spinner>
+    <c-card class="shadow-sm mb-4 border-0">
+      <c-card-header class="bg-white py-3 border-bottom">
+        <div class="d-flex align-items-center gap-2">
+          <div class="bg-primary bg-opacity-10 p-2 rounded">
+            <svg cIcon name="cilList" size="lg" class="text-primary"></svg>
           </div>
-        }
-        @if (!loading && filtered.length === 0) {
-          <div class="empty">No hay logs disponibles</div>
-        }
-        @if (!loading && filtered.length > 0) {
-          <ul class="list-group">
-            @for (e of filtered; track trackByLogEntry($index, e)) {
-              <li class="list-group-item">
-                <span class="badge bg-info me-2">{{ e.level }}</span>
-                <span class="text-muted me-2">{{ e.timestamp }}</span>
-                <span>{{ e.message }}</span>
-              </li>
-            }
-          </ul>
-        }
+          <div>
+            <h5 class="mb-0 text-primary fw-bold">Logs del Sistema</h5>
+            <small class="text-muted">Registro de eventos y actividad del sistema</small>
+          </div>
+        </div>
+      </c-card-header>
+      <c-card-body class="p-4">
+        <!-- Toolbar -->
+        <div class="bg-light p-3 rounded border mb-4">
+          <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+            <div class="d-flex flex-wrap gap-2 flex-grow-1 align-items-center">
+              <div class="position-relative flex-grow-1" style="max-width: 400px; min-width: 250px;">
+                <svg cIcon name="cilSearch" class="text-muted position-absolute top-50 start-0 translate-middle-y ms-3" size="sm"></svg>
+                <input
+                  cFormControl
+                  type="text"
+                  placeholder="Filtrar por mensaje..."
+                  [(ngModel)]="filter"
+                  (keyup.enter)="search()"
+                  class="ps-5 bg-white"
+                />
+              </div>
+              <select
+                cSelect
+                [ngModel]="pageSize"
+                (ngModelChange)="onPageSizeChange($event)"
+                name="pageSizeSelect"
+                style="width: auto"
+                [disabled]="loading"
+              >
+                <option [ngValue]="10">10 filas</option>
+                <option [ngValue]="20">20 filas</option>
+                <option [ngValue]="50">50 filas</option>
+                <option [ngValue]="100">100 filas</option>
+              </select>
+              <button cButton color="primary" (click)="search()" class="px-4 text-white">
+                Buscar
+              </button>
+              <button cButton color="secondary" variant="ghost" (click)="clear()" cTooltip="Limpiar Filtros">
+                <svg cIcon name="cilX" size="sm"></svg>
+              </button>
+            </div>
+            
+            <button cButton color="info" variant="outline" (click)="sample()" class="d-flex align-items-center gap-2">
+              <svg cIcon name="cilReload" size="sm"></svg>
+              Generar ejemplos
+            </button>
+          </div>
+        </div>
+
+        <div class="position-relative border rounded overflow-hidden">
+          @if (loading) {
+            <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex flex-column align-items-center justify-content-center" style="z-index: 5;">
+              <c-spinner color="primary"></c-spinner>
+              <small class="text-primary mt-2 fw-medium">Cargando logs...</small>
+            </div>
+          }
+
+          @if (!loading && filtered.length === 0) {
+            <div class="text-center py-5">
+              <div class="d-flex flex-column align-items-center justify-content-center opacity-50">
+                <svg cIcon name="cilList" size="4xl" class="text-muted mb-3"></svg>
+                <h6 class="text-muted fw-bold">No hay logs disponibles</h6>
+                <p class="text-muted small mb-0">No se encontraron registros con los criterios actuales</p>
+              </div>
+            </div>
+          }
+
+          @if (paginated.length > 0) {
+            <div class="table-responsive">
+              <table cTable hover striped class="mb-0 align-middle">
+                <thead class="bg-light border-bottom">
+                  <tr>
+                    <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase" style="width: 100px">Nivel</th>
+                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase" style="width: 180px">Fecha</th>
+                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">Mensaje</th>
+                  </tr>
+                </thead>
+                <tbody class="border-top-0">
+                  @for (e of paginated; track trackByLogEntry($index, e)) {
+                    <tr>
+                      <td class="ps-4">
+                        <c-badge
+                          [color]="
+                            e.level === 'error'
+                              ? 'danger'
+                              : e.level === 'warn'
+                                ? 'warning'
+                                : e.level === 'info'
+                                  ? 'info'
+                                  : 'secondary'
+                          "
+                          class="text-white px-2 py-1 rounded-pill"
+                          style="font-size: 0.75rem; min-width: 60px;"
+                        >
+                          {{ e.level | uppercase }}
+                        </c-badge>
+                      </td>
+                      <td class="text-muted small font-monospace">{{ e.timestamp | date: 'medium' }}</td>
+                      <td class="text-break">{{ e.message }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
       </c-card-body>
+      
+      @if (totalElements > 0) {
+        <c-card-footer class="bg-white border-top-0 py-3">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <div class="text-muted small order-2 order-md-1">
+              Mostrando {{ paginated.length }} de {{ totalElements }} registros
+            </div>
+            <div class="order-1 order-md-2 w-100 w-md-auto d-flex justify-content-center">
+              <app-op-pagination
+                [totalPages]="totalPages"
+                [currentPage]="pageNo"
+                (pageChange)="onPageChange($event)"
+              >
+              </app-op-pagination>
+            </div>
+          </div>
+        </c-card-footer>
+      }
     </c-card>
   </c-col>
 </c-row>

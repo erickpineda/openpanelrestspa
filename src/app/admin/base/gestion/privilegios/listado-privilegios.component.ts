@@ -138,22 +138,6 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     this.load();
   }
 
-  prev(): void {
-    if (this.pageNo > 0) {
-      this.pageNo--;
-      this.load();
-    }
-  }
-  next(): void {
-    const maxPage = this.totalElements
-      ? Math.ceil(this.totalElements / this.pageSize) - 1
-      : this.pageNo + 1;
-    if (this.pageNo < maxPage) {
-      this.pageNo++;
-      this.load();
-    }
-  }
-
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
     const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));

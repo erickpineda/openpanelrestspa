@@ -96,6 +96,7 @@ export class EditarEntradaComponent implements OnInit {
     if (this.entradaForm.invalid) return;
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuarioEditado = usuario?.idUsuario ?? null;
+
     this.facade.actualizarEntrada(this.idEntrada, ent).subscribe(() => {
       this.toastService.showSuccess(
         'La entrada se ha actualizado correctamente.',

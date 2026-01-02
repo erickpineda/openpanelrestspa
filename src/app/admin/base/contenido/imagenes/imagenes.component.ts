@@ -31,8 +31,6 @@ export class ImagenesComponent implements OnInit, OnDestroy {
   totalPages = 0;
   totalElements = 0;
   numberOfElements = 0;
-  canPrev = false;
-  canNext = false;
   private hasFilters = false;
   private destroy$ = new Subject<void>();
   filtroNombre = '';
@@ -41,6 +39,8 @@ export class ImagenesComponent implements OnInit, OnDestroy {
   fechaHasta = '';
   uploading = false;
   previewModalVisible = false;
+  confirmationModalVisible = false;
+  itemToDelete: MediaItem | null = null;
   previewItem: MediaItem | null = null;
   previewZoom = 1;
   private readonly minZoom = 0.5;
@@ -48,8 +48,8 @@ export class ImagenesComponent implements OnInit, OnDestroy {
   isDragging = false;
   private dragStartX = 0;
   private dragStartY = 0;
-  private dragScrollLeft = 0;
-  private dragScrollTop = 0;
+  dragScrollLeft = 0;
+  dragScrollTop = 0;
   private pinchActive = false;
   private pinchStartDist = 0;
   private pinchStartZoom = 1;
@@ -102,13 +102,47 @@ export class ImagenesComponent implements OnInit, OnDestroy {
           this.totalPages = totalPages;
           this.totalElements = filtered.length;
           this.numberOfElements = pageItems.length;
-          this.updateNavState();
           this.buildPreviews(pageItems);
         },
-        error: () => {
-          this.error = 'Error cargando imágenes';
+        error: (err) => {
+          this.error = 'Error al cargar imágenes';
+          this.toast.showError(this.error);
+          console.error(err);
         },
       });
+  }
+
+  deleteItem(media: MediaItem): void {
+    if (!media.uuid) return;
+    this.itemToDelete = media;
+    this.confirmationModalVisible = true;
+  }
+
+  confirmDelete(): void {
+    if (!this.itemToDelete || !this.itemToDelete.uuid) return;
+    
+    this.loading = true;
+    this.fileStorage.deleteMedia(this.itemToDelete.uuid)
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.itemToDelete = null;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: () => {
+          this.toast.showSuccess('Archivo eliminado correctamente');
+          this.load();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toast.showError('Error al eliminar el archivo');
+        }
+      });
+  }
+
+  cancelDelete(): void {
+    this.confirmationModalVisible = false;
+    this.itemToDelete = null;
   }
 
   search(): void {
@@ -123,18 +157,6 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     this.basicSearchText = '';
     this.pageNo = 0;
     this.load();
-  }
-  prev(): void {
-    if (this.canPrev) {
-      this.pageNo--;
-      this.load();
-    }
-  }
-  next(): void {
-    if (this.canNext) {
-      this.pageNo++;
-      this.load();
-    }
   }
 
   onPageChange(page: number): void {
@@ -157,11 +179,6 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     this.pageSize = Number(size) || this.pageSize;
     this.pageNo = 0;
     this.search();
-  }
-
-  private updateNavState(): void {
-    this.canPrev = this.pageNo > 0;
-    this.canNext = this.totalPages ? this.pageNo < this.totalPages - 1 : false;
   }
 
   download(item: MediaItem): void {

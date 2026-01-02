@@ -1,35 +1,48 @@
 <c-row class="align-items-center mb-3 g-2">
   <c-col xs="12" md="4">
-    <div class="text-muted small">Total {{ total }}</div>
+    <div class="text-muted small fw-semibold">
+      <span class="text-primary">{{ total }}</span> registros encontrados
+    </div>
   </c-col>
-  <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-    <input
-      cFormControl
-      type="text"
-      [value]="searchText"
-      (input)="searchTextChange.emit($any($event.target).value)"
-      placeholder="Buscar..."
-      [disabled]="disabled"
-      style="max-width: 280px"
-    />
-    <button
-      cButton
-      color="secondary"
-      variant="outline"
-      size="sm"
-      (click)="toggleAdvanced.emit()"
-      [disabled]="disabled"
-    >
-      Avanzado
-    </button>
+  
+  <c-col xs="12" md="4" class="d-flex justify-content-md-center">
+    <c-input-group class="w-100" style="max-width: 320px">
+      <span cInputGroupText class="bg-white border-end-0 text-muted">
+        <svg cIcon name="cilSearch" size="sm"></svg>
+      </span>
+      <input
+        cFormControl
+        type="text"
+        class="border-start-0 ps-0"
+        [value]="searchText"
+        (input)="searchTextChange.emit($any($event.target).value)"
+        placeholder="Buscar..."
+        [disabled]="disabled"
+      />
+      <button
+        cButton
+        color="light"
+        variant="ghost"
+        class="border border-start-0 text-secondary"
+        (click)="toggleAdvanced.emit()"
+        [disabled]="disabled"
+        cTooltip="Filtros Avanzados"
+      >
+        <svg cIcon name="cilFilter" size="sm"></svg>
+      </button>
+    </c-input-group>
   </c-col>
-  <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+  
+  <c-col xs="12" md="4" class="d-flex justify-content-md-end align-items-center gap-2">
+    <label class="small text-muted mb-0 d-none d-lg-block">Mostrar:</label>
     <select
       cSelect
       [ngModel]="pageSize"
       (ngModelChange)="pageSizeChange.emit($event)"
       name="pageSizeSelect"
-      style="max-width: 100px"
+      size="sm"
+      style="width: auto"
+      class="form-select-sm"
     >
       @for (s of sizeOptions; track s) {
         <option [value]="s">{{ s }}</option>

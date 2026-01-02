@@ -1,9 +1,17 @@
 <c-container class="container-fluid">
-  <c-card aria-live="polite">
-    <c-card-header class="d-flex align-items-center justify-content-between">
-      <span>Imágenes</span>
-      <div class="btn-toolbar gap-2">
-        <div class="btn-group" role="group" aria-label="Subida de imágenes">
+  <c-card class="mb-4 shadow-sm border-0" aria-live="polite">
+    <c-card-header class="bg-white border-bottom py-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <div class="bg-primary bg-opacity-10 p-2 rounded">
+            <svg cIcon name="cilImage" size="lg" class="text-primary"></svg>
+          </div>
+          <div>
+            <h5 class="mb-0 text-primary fw-bold">Galería de Imágenes</h5>
+            <small class="text-muted">Administra los recursos visuales del sitio</small>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
           <input
             type="file"
             accept="image/*"
@@ -15,101 +23,129 @@
           <button
             cButton
             color="primary"
-            size="sm"
+            class="text-white shadow-sm"
             (click)="openUpload(imageInput)"
             [disabled]="uploading"
           >
             <svg cIcon name="cilCloudUpload" class="me-2"></svg>
-            {{ uploading ? 'Subiendo...' : 'Subir' }}
+            {{ uploading ? 'Subiendo...' : 'Subir Imagen' }}
           </button>
         </div>
       </div>
     </c-card-header>
+
     <c-card-body [attr.aria-busy]="loading ? 'true' : null">
-      <c-row class="align-items-center mb-3 g-2">
-        <c-col xs="12" md="4">
-          <div class="text-muted small">Total {{ totalElements }}</div>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-          <input
-            cFormControl
-            type="text"
-            [value]="basicSearchText"
-            (input)="onBasicSearchTextChange($any($event.target).value)"
-            placeholder="Buscar nombre..."
-            style="max-width: 280px"
-            [disabled]="loading"
-          />
-          <button
-            cButton
-            color="secondary"
-            variant="ghost"
-            size="sm"
-            (click)="toggleAdvanced()"
-            [disabled]="loading"
-          >
-            Avanzado
-          </button>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
+      <!-- Buscador y Filtros -->
+      <div class="d-flex flex-column flex-md-row gap-3 mb-4 justify-content-between align-items-end bg-light p-3 rounded">
+        <div class="d-flex flex-column flex-md-row gap-3 flex-grow-1 w-100">
+          <div class="flex-grow-1" style="max-width: 400px;">
+            <label class="form-label text-muted small text-uppercase fw-bold">Buscar</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0 text-secondary">
+                <svg cIcon name="cilSearch" size="sm"></svg>
+              </span>
+              <input
+                cFormControl
+                type="text"
+                [value]="basicSearchText"
+                (input)="onBasicSearchTextChange($any($event.target).value)"
+                placeholder="Buscar por nombre..."
+                class="border-start-0 ps-0 shadow-none"
+                [disabled]="loading"
+              />
+            </div>
+          </div>
+          
+          <div class="d-flex align-items-end">
+            <button
+              cButton
+              [color]="showAdvanced ? 'primary' : 'secondary'"
+              variant="outline"
+              (click)="toggleAdvanced()"
+              [disabled]="loading"
+              class="d-flex align-items-center gap-2"
+            >
+              <svg cIcon name="cilFilter" size="sm"></svg>
+              <span>Filtros {{ showAdvanced ? 'Activos' : '' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-muted small text-nowrap fw-bold">Mostrar:</span>
           <select
             cSelect
+            size="sm"
             [ngModel]="pageSize"
             (ngModelChange)="onPageSizeChange($event)"
-            name="pageSizeSelect"
-            style="max-width: 100px"
+            style="width: 80px"
             [disabled]="loading"
+            class="shadow-sm"
           >
             <option [ngValue]="5">5</option>
             <option [ngValue]="10">10</option>
             <option [ngValue]="20">20</option>
           </select>
-        </c-col>
-      </c-row>
+        </div>
+      </div>
 
+      <!-- Filtros Avanzados -->
       @if (showAdvanced) {
-        <div class="mb-3">
+        <div class="mb-4 p-4 bg-white border rounded shadow-sm position-relative">
+           <button 
+            cButton 
+            color="light" 
+            size="sm" 
+            class="position-absolute top-0 end-0 m-2 btn-close-filters" 
+            (click)="toggleAdvanced()"
+            aria-label="Cerrar filtros"
+          >
+            <svg cIcon name="cilX" size="sm"></svg>
+          </button>
           <c-row class="g-3 align-items-end">
             <c-col xs="12" md="4">
-              <label class="form-label mb-1">Tipo MIME</label>
-              <select cSelect class="form-select-sm" [(ngModel)]="filtroMime" [disabled]="loading">
+              <label class="form-label mb-1 small fw-bold text-secondary">Tipo MIME</label>
+              <select cSelect size="sm" [(ngModel)]="filtroMime" [disabled]="loading" class="shadow-sm">
                 <option value="">Todos</option>
-                <option value="image/jpeg">image/jpeg</option>
-                <option value="image/png">image/png</option>
-                <option value="image/gif">image/gif</option>
-                <option value="image/webp">image/webp</option>
+                <option value="image/jpeg">JPEG</option>
+                <option value="image/png">PNG</option>
+                <option value="image/gif">GIF</option>
+                <option value="image/webp">WEBP</option>
               </select>
             </c-col>
-            <c-col xs="6" md="4">
-              <label class="form-label mb-1">Desde</label>
+            <c-col xs="6" md="3">
+              <label class="form-label mb-1 small fw-bold text-secondary">Desde</label>
               <input
                 cFormControl
-                class="form-control-sm"
+                size="sm"
                 type="date"
                 [(ngModel)]="fechaDesde"
                 [disabled]="loading"
+                class="shadow-sm"
               />
             </c-col>
-            <c-col xs="6" md="4">
-              <label class="form-label mb-1">Hasta</label>
+            <c-col xs="6" md="3">
+              <label class="form-label mb-1 small fw-bold text-secondary">Hasta</label>
               <input
                 cFormControl
-                class="form-control-sm"
+                size="sm"
                 type="date"
                 [(ngModel)]="fechaHasta"
                 [disabled]="loading"
+                class="shadow-sm"
               />
             </c-col>
-            <c-col xs="12" md="12" class="d-flex justify-content-md-end gap-2">
+            <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
               <button
                 cButton
                 size="sm"
                 color="primary"
-                variant="outline"
+                class="text-white shadow-sm"
                 (click)="search()"
                 [disabled]="loading"
+                cTooltip="Aplicar filtros"
               >
-                <svg cIcon name="cilSearch"></svg> Buscar
+                <svg cIcon name="cilSearch"></svg>
               </button>
               <button
                 cButton
@@ -118,251 +154,214 @@
                 variant="outline"
                 (click)="reset()"
                 [disabled]="loading"
+                cTooltip="Limpiar filtros"
               >
-                <svg cIcon name="cilReload"></svg> Limpiar
+                <svg cIcon name="cilReload"></svg>
               </button>
             </c-col>
           </c-row>
         </div>
       }
+
       @if (error) {
-        <div
-          class="alert alert-danger d-flex align-items-center justify-content-between my-2"
-          role="alert"
-        >
-          <span>{{ error }}</span>
-          <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
-        </div>
+        <c-alert color="danger" class="d-flex align-items-center justify-content-between mb-4 shadow-sm border-danger border-opacity-25">
+          <div class="d-flex align-items-center gap-2">
+            <svg cIcon name="cilWarning" class="text-danger"></svg>
+            <span>{{ error }}</span>
+          </div>
+          <button cButton color="danger" size="sm" variant="outline" (click)="load()">Reintentar</button>
+        </c-alert>
       }
 
-      <div class="tabla-con-loader-wrapper position-relative">
+      <!-- Tabla -->
+      <div class="position-relative table-responsive">
         @if (loading) {
-          <div
-            class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-            style="z-index: 10; background-color: rgba(255, 255, 255, 0.8); min-height: 200px"
-          >
+          <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3">
             <div class="text-center">
-              <c-spinner [attr.aria-label]="'Cargando imágenes'"></c-spinner>
-              <p class="mt-2 text-muted">Cargando imágenes...</p>
+              <c-spinner color="primary"></c-spinner>
+              <p class="mt-2 text-primary fw-semibold small">Cargando imágenes...</p>
             </div>
           </div>
         }
 
-        <div [class.opacity-50]="loading" class="table-responsive">
-          <table
-            responsive
-            cAlign="top"
-            cTable
-            hover
-            class="align-middle mb-0 border tabla-con-loader"
-            role="table"
-            aria-label="Tabla de imágenes"
-          >
-            <thead cTableColor="light">
+        <table cTable hover small class="align-middle mb-0 border">
+          <thead class="bg-light text-secondary text-uppercase small fw-bold border-bottom">
+            <tr>
+              <th scope="col" class="border-0 py-3 ps-3" style="min-width: 80px">Vista</th>
+              <th scope="col" class="border-0 py-3" style="min-width: 200px">Nombre</th>
+              <th scope="col" class="border-0 py-3 text-center" style="min-width: 160px">Fecha</th>
+              <th scope="col" class="border-0 py-3 text-end pe-3" style="min-width: 110px">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of items; track trackByMediaItem($index, m)) {
               <tr>
-                <th scope="col" style="min-width: 80px">Vista</th>
-                <th scope="col" style="min-width: 200px">Nombre</th>
-                <th scope="col" class="text-center" style="min-width: 160px">Fecha</th>
-                <th scope="col" class="text-center" style="min-width: 110px">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (m of items; track trackByMediaItem($index, m)) {
-                <tr>
-                  <td>
-                    @if (m.uuid && preview[m.uuid]) {
+                <td class="ps-3">
+                  @if (m.uuid && preview[m.uuid]) {
+                    <div class="rounded border d-inline-block overflow-hidden shadow-sm" style="width: 48px; height: 48px; cursor: pointer" (click)="openPreview(m)">
                       <img
                         [src]="preview[m.uuid]"
                         alt=""
-                        style="height: 32px; width: 32px; object-fit: cover; cursor: pointer"
-                        (click)="openPreview(m)"
+                        class="w-100 h-100 object-fit-cover"
                       />
-                    }
-                  </td>
-                  <td>
-                    <span
-                      class="fw-semibold text-truncate d-inline-block"
-                      style="max-width: 260px"
-                      [title]="m.nombre"
-                      >{{ m.nombre }}</span
-                    >
-                  </td>
-                  <td class="text-center">
-                    {{ parseFecha(m.fechaCreacion) | date: 'dd-MM-yyyy HH:mm' }}
-                  </td>
-                  <td class="text-center">
-                    <div class="btn-group" role="group" aria-label="Acciones de imagen">
-                      @if (mode === 'selector') {
-                        <button cButton color="primary" size="sm" (click)="onSelect(m)">
-                          Seleccionar
-                        </button>
-                      }
-                      <button
-                        cButton
-                        color="secondary"
-                        size="sm"
-                        variant="ghost"
-                        (click)="download(m)"
-                        [disabled]="!m.uuid && !m.url"
-                        [attr.aria-label]="'Descargar ' + (m.nombre || '')"
-                      >
-                        <svg cIcon name="cilCloudDownload" size="sm"></svg>
-                      </button>
                     </div>
-                  </td>
-                </tr>
-              }
-
-              @if (items.length === 0) {
+                  } @else {
+                    <div class="rounded border bg-light d-flex align-items-center justify-content-center text-secondary shadow-sm" style="width: 48px; height: 48px;">
+                      <svg cIcon name="cilImage" size="lg"></svg>
+                    </div>
+                  }
+                </td>
+                <td>
+                  <div class="d-flex flex-column">
+                    <span
+                      class="fw-semibold text-truncate d-inline-block text-primary"
+                      style="max-width: 260px; cursor: pointer;"
+                      [title]="m.nombre"
+                      (click)="openPreview(m)"
+                    >{{ m.nombre }}</span>
+                    <small class="text-muted">{{ m.mime || 'Desconocido' }}</small>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <div class="d-flex flex-column align-items-center">
+                    <span class="fw-medium">{{ m.fechaCreacion | date:'dd/MM/yyyy' }}</span>
+                    <small class="text-muted">{{ m.fechaCreacion | date:'HH:mm' }}</small>
+                  </div>
+                </td>
+                <td class="text-end pe-3">
+                  <div class="d-flex justify-content-end gap-2">
+                    <button
+                      cButton
+                      color="info"
+                      variant="ghost"
+                      size="sm"
+                      (click)="openPreview(m)"
+                      cTooltip="Ver detalle"
+                    >
+                      <svg cIcon name="cilZoom"></svg>
+                    </button>
+                    <button
+                      cButton
+                      color="primary"
+                      variant="ghost"
+                      size="sm"
+                      (click)="selectItem.emit(m)"
+                      *ngIf="mode === 'selector'"
+                      cTooltip="Seleccionar"
+                    >
+                      <svg cIcon name="cilCheckAlt"></svg>
+                    </button>
+                    <button
+                      cButton
+                      color="danger"
+                      variant="ghost"
+                      size="sm"
+                      (click)="deleteItem(m)"
+                      cTooltip="Eliminar"
+                    >
+                      <svg cIcon name="cilTrash"></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              @if (!loading) {
                 <tr>
                   <td colspan="4" class="text-center py-5">
-                    <div class="d-flex flex-column align-items-center justify-content-center">
-                      <svg cIcon name="cilSearch" size="3xl" class="text-muted mb-3"></svg>
-                      <h6 class="text-muted">No se han encontrado imágenes</h6>
-                      <p class="text-muted small">Intenta ajustar los filtros de búsqueda</p>
+                    <div class="d-flex flex-column align-items-center text-muted">
+                      <svg cIcon name="cilImage" size="4xl" class="mb-3 text-secondary opacity-25"></svg>
+                      <h6 class="fw-bold mb-1">No se encontraron imágenes</h6>
+                      <p class="small mb-0">Intenta subir una nueva imagen o ajustar los filtros</p>
                     </div>
                   </td>
                 </tr>
               }
-            </tbody>
-          </table>
-
-          @if (totalElements > 0) {
-            <app-op-pagination
-              [align]="'center'"
-              [totalPages]="totalPages"
-              [currentPage]="pageNo"
-              (pageChange)="onPageChange($event)"
-            >
-            </app-op-pagination>
-          }
-
-          @if (totalElements > 0) {
-            <c-row class="mt-2">
-              <c-col class="d-flex justify-content-end align-items-center gap-2">
-                <button cButton color="light" size="sm" (click)="prev()" [disabled]="!canPrev">
-                  Anterior
-                </button>
-                <button cButton color="light" size="sm" (click)="next()" [disabled]="!canNext">
-                  Siguiente
-                </button>
-                <div class="text-muted small ms-2">
-                  Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} ·
-                  Mostrando {{ numberOfElements }}
-                </div>
-              </c-col>
-            </c-row>
-          }
-        </div>
+            }
+          </tbody>
+        </table>
       </div>
     </c-card-body>
+    <c-card-footer class="bg-white border-top py-3">
+      <app-op-pagination
+        [currentPage]="pageNo + 1"
+        [totalPages]="totalPages"
+        (pageChange)="onPageChange($event - 1)"
+      ></app-op-pagination>
+    </c-card-footer>
   </c-card>
 </c-container>
 
-<c-modal
-  [visible]="previewModalVisible"
-  (visibleChange)="previewModalVisible = $event"
-  [size]="'xl'"
->
-  <c-modal-header>
-    <h5 cModalTitle>{{ previewItem?.nombre || 'Vista previa' }}</h5>
-    <div class="ms-auto btn-toolbar">
-      <div class="btn-group" role="group" aria-label="Zoom">
-        <button
-          cButton
-          color="secondary"
-          size="sm"
-          variant="outline"
-          (click)="zoomOut()"
-          [disabled]="!canZoomOut()"
-        >
-          <svg cIcon name="cilMinus"></svg>
-        </button>
-        <button
-          cButton
-          color="secondary"
-          size="sm"
-          variant="outline"
-          (click)="zoomIn()"
-          [disabled]="!canZoomIn()"
-        >
-          <svg cIcon name="cilPlus"></svg>
-        </button>
-        <c-badge color="secondary" class="ms-2">{{ zoomPercent() }}%</c-badge>
-      </div>
-      <div class="btn-group ms-2" role="group" aria-label="Ajuste">
-        <button
-          cButton
-          color="secondary"
-          size="sm"
-          variant="outline"
-          (click)="fitWidth()"
-          [disabled]="!getPreviewUrlForModal()"
-        >
-          <svg cIcon name="cilJustifyCenter" class="me-2"></svg> Ajustar ancho
-        </button>
-        <button
-          cButton
-          color="secondary"
-          size="sm"
-          variant="outline"
-          (click)="fitHeight()"
-          [disabled]="!getPreviewUrlForModal()"
-        >
-          Ajustar alto
-        </button>
-      </div>
-    </div>
+<!-- Modal Preview -->
+<c-modal [visible]="previewModalVisible" (visibleChange)="previewModalVisible = $event" size="xl" backdrop="static">
+  <c-modal-header class="bg-light border-bottom-0">
+    <h5 cModalTitle class="fw-bold text-primary">Vista Previa</h5>
+    <button (click)="previewModalVisible = false" cButtonClose></button>
   </c-modal-header>
-  <c-modal-body class="preview-body">
-    <div
-      #previewScroll
-      class="text-center"
-      [style.cursor]="getPreviewUrlForModal() ? (isDragging ? 'grabbing' : 'grab') : 'default'"
-      [style.userSelect]="isDragging ? 'none' : null"
-      [style.touchAction]="getPreviewUrlForModal() ? 'none' : 'auto'"
-      style="height: 100%; overflow: auto"
-      (wheel)="onPreviewWheel($event)"
-      (dblclick)="toggleZoom()"
-      (mousedown)="onPreviewMouseDown($event)"
-      (mousemove)="onPreviewMouseMove($event)"
-      (mouseup)="onPreviewMouseUp()"
-      (mouseleave)="onPreviewMouseLeave()"
-      (touchstart)="onPreviewTouchStart($event)"
-      (touchmove)="onPreviewTouchMove($event)"
-      (touchend)="onPreviewTouchEnd()"
-    >
-      @if (getPreviewUrlForModal(); as url) {
-        <div [style.width]="previewZoom * 100 + '%'" style="display: inline-block">
-          <img
-            #previewImg
-            [src]="url"
-            (load)="onPreviewImageLoad($event)"
-            alt=""
-            style="max-width: 100%; height: auto; border-radius: 4px"
+  <c-modal-body class="p-0 bg-dark position-relative d-flex justify-content-center align-items-center preview-body" style="min-height: 500px; overflow: hidden;">
+    @if (previewItem && previewItem.uuid && preview[previewItem.uuid]) {
+        <div class="w-100 h-100 d-flex justify-content-center align-items-center"
+             style="cursor: grab"
+             (mousedown)="onPreviewMouseDown($event)"
+             (mousemove)="onPreviewMouseMove($event)"
+             (mouseup)="onPreviewMouseUp()"
+             (mouseleave)="onPreviewMouseLeave()"
+             (touchstart)="onPreviewTouchStart($event)"
+             (touchmove)="onPreviewTouchMove($event)"
+             (touchend)="onPreviewTouchEnd()"
+        >
+           <img
+            [src]="preview[previewItem.uuid]"
+            [style.transform]="'scale(' + previewZoom + ') translate(' + dragScrollLeft + 'px, ' + dragScrollTop + 'px)'"
+            class="img-fluid transition-transform"
+            style="max-height: 90%; max-width: 90%; object-fit: contain; transition: transform 0.1s ease-out;"
+            alt="Preview"
+            draggable="false"
           />
-        </div>
-      }
-    </div>
+       </div>
+       
+       <!-- Controles de Zoom -->
+       <div class="position-absolute bottom-0 start-50 translate-middle-x mb-4 d-flex gap-2 bg-black bg-opacity-50 p-2 rounded-pill shadow-lg z-3">
+          <button cButton color="light" variant="ghost" size="sm" class="text-white rounded-circle" (click)="zoomOut()">
+             <svg cIcon name="cilMinus"></svg>
+          </button>
+          <span class="text-white align-self-center px-2 small fw-bold">{{ (previewZoom * 100) | number:'1.0-0' }}%</span>
+          <button cButton color="light" variant="ghost" size="sm" class="text-white rounded-circle" (click)="zoomIn()">
+             <svg cIcon name="cilPlus"></svg>
+          </button>
+          <div class="vr bg-white opacity-25 mx-1"></div>
+          <button cButton color="light" variant="ghost" size="sm" class="text-white rounded-circle" (click)="resetZoom()" cTooltip="Reset Zoom">
+             <svg cIcon name="cilFullscreen"></svg>
+          </button>
+       </div>
+    }
+  </c-modal-body>
+  <c-modal-footer class="bg-light border-top-0 justify-content-between">
+    <div *ngIf="previewItem" class="d-flex flex-column">
+        <small class="text-muted fw-bold">{{ previewItem.nombre }}</small>
+        <small class="text-secondary">{{ previewItem.mime }} - {{ ((previewItem.tamano || 0) / 1024) | number:'1.2-2' }} KB</small>
+      </div>
+    <button (click)="previewModalVisible = false" cButton color="secondary" variant="ghost">
+      Cerrar
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal [visible]="confirmationModalVisible" (visibleChange)="confirmationModalVisible = $event" backdrop="static">
+  <c-modal-header class="bg-danger text-white">
+    <h5 cModalTitle>Confirmar eliminación</h5>
+    <button (click)="cancelDelete()" cButtonClose white></button>
+  </c-modal-header>
+  <c-modal-body>
+    ¿Estás seguro de que deseas eliminar la imagen <strong>{{ itemToDelete?.nombre }}</strong>?
+    <br>
+    <small class="text-muted">Esta acción no se puede deshacer.</small>
   </c-modal-body>
   <c-modal-footer>
-    <button cButton color="secondary" (click)="closePreview()">Cerrar</button>
-    <button
-      cButton
-      color="secondary"
-      variant="outline"
-      (click)="resetZoom()"
-      [disabled]="!getPreviewUrlForModal()"
-    >
-      <svg cIcon name="cilReload" class="me-2"></svg> Reset
+    <button (click)="cancelDelete()" cButton color="secondary">
+      Cancelar
     </button>
-    <button
-      cButton
-      color="primary"
-      [disabled]="!previewItem"
-      (click)="previewItem && download(previewItem)"
-    >
-      <svg cIcon name="cilCloudDownload" class="me-2"></svg> Descargar
+    <button (click)="confirmDelete()" cButton color="danger" class="text-white">
+      Eliminar
     </button>
   </c-modal-footer>
 </c-modal>

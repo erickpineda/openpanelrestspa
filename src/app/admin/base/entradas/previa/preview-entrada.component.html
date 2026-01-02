@@ -1,47 +1,33 @@
-<c-card class="preview-entrada-card">
-  <c-card-header>
-    <div class="d-flex justify-content-between align-items-center w-100">
+<c-card class="mb-4 shadow-sm border-0 preview-entrada-card">
+  <c-card-header class="bg-white border-bottom py-3">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 w-100">
       <div>
-        <h3 class="h5 mb-0">{{ tituloMostrar || 'Sin título' }}</h3>
+        <h3 class="h5 mb-1 fw-bold text-gray-800">{{ tituloMostrar || 'Sin título' }}</h3>
         @if (categoriasMostrar.length) {
-          <small class="text-muted">
-            Categorías:
+          <div class="text-muted small d-flex align-items-center flex-wrap gap-1">
+            <svg cIcon name="cilFolderOpen" size="sm" class="text-secondary"></svg>
+            <span class="me-1">Categorías:</span>
             @for (c of categoriasMostrar; track c; let last = $last) {
-              <span>
+              <c-badge color="light" class="text-secondary border border-light-subtle">
                 {{ c.nombre || c }}
-                @if (!last) {
-                  <span>, </span>
-                }
-              </span>
+              </c-badge>
             }
-          </small>
+          </div>
         }
       </div>
 
       @if (mostrarBotonesAccion) {
-        <div class="d-flex gap-2">
-          <button cButton color="warning" size="sm" (click)="onEditar()">
-            <svg
-              cIcon
-              name="cilWarning"
-              style="padding-right: 2px"
-              size="sm"
-              title="Editar entrada"
-            ></svg>
+        <div class="d-flex flex-wrap gap-2">
+          <button cButton color="warning" variant="ghost" size="sm" (click)="onEditar()" class="d-flex align-items-center">
+            <svg cIcon name="cilPencil" size="sm" class="me-2"></svg>
             Editar
           </button>
-          <button cButton color="danger" size="sm" (click)="onCerrar()">
-            <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cerrar"></svg>
+          <button cButton color="danger" variant="ghost" size="sm" (click)="onCerrar()" class="d-flex align-items-center">
+            <svg cIcon name="cilX" size="sm" class="me-2"></svg>
             Cerrar
           </button>
-          <button cButton color="success" size="sm" (click)="onPublicar()">
-            <svg
-              cIcon
-              name="cilPaperPlane"
-              style="padding-right: 2px"
-              size="sm"
-              title="Publicar"
-            ></svg>
+          <button cButton color="success" size="sm" (click)="onPublicar()" class="d-flex align-items-center text-white shadow-sm">
+            <svg cIcon name="cilPaperPlane" size="sm" class="me-2"></svg>
             Publicar
           </button>
         </div>
@@ -49,7 +35,7 @@
     </div>
   </c-card-header>
 
-  <c-card-body>
-    <div class="preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
+  <c-card-body class="p-4 bg-light bg-opacity-10">
+    <div class="bg-white p-4 rounded shadow-sm border preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
   </c-card-body>
 </c-card>

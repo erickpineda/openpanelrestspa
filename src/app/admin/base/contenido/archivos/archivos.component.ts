@@ -20,8 +20,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   totalPages = 0;
   totalElements = 0;
   numberOfElements = 0;
-  canPrev = false;
-  canNext = false;
   private hasFilters = false;
   filtroNombre = '';
   filtroMime = '';
@@ -33,6 +31,9 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   // Patrón de toolbar/búsqueda
   showAdvanced: boolean = false;
   basicSearchText: string = '';
+  
+  confirmationModalVisible = false;
+  itemToDelete: MediaItem | null = null;
 
   constructor(
     private fileStorage: FileStorageService,
@@ -72,7 +73,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
           this.totalPages = totalPages;
           this.totalElements = filtered.length;
           this.numberOfElements = pageItems.length;
-          this.updateNavState();
         },
         error: () => {
           this.error = 'Error cargando archivos';
@@ -93,24 +93,45 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     this.pageNo = 0;
     this.load();
   }
-  prev(): void {
-    if (this.canPrev) {
-      this.pageNo--;
-      this.load();
-    }
-  }
-  next(): void {
-    if (this.canNext) {
-      this.pageNo++;
-      this.load();
-    }
-  }
 
   onPageChange(page: number): void {
     const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, this.totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
     this.load();
+  }
+
+  deleteItem(media: MediaItem): void {
+    if (!media.uuid) return;
+    this.itemToDelete = media;
+    this.confirmationModalVisible = true;
+  }
+
+  confirmDelete(): void {
+    if (!this.itemToDelete || !this.itemToDelete.uuid) return;
+    
+    this.loading = true;
+    this.fileStorage.deleteMedia(this.itemToDelete.uuid)
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.itemToDelete = null;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: () => {
+          this.toast.showSuccess('Archivo eliminado correctamente');
+          this.load();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toast.showError('Error al eliminar el archivo');
+        }
+      });
+  }
+
+  cancelDelete(): void {
+    this.confirmationModalVisible = false;
+    this.itemToDelete = null;
   }
 
   // Handlers toolbar
@@ -150,11 +171,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
         this.toast.showError('Error subiendo archivo', 'Archivos');
       },
     });
-  }
-
-  private updateNavState(): void {
-    this.canPrev = this.pageNo > 0;
-    this.canNext = this.totalPages ? this.pageNo < this.totalPages - 1 : false;
   }
 
   download(item: MediaItem): void {

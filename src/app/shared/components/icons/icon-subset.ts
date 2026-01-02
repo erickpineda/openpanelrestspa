@@ -56,6 +56,7 @@ import {
   cilEnvelopeOpen,
   cilExternalLink,
   cilFile,
+  cilFullscreen,
   cilHome,
   cilImage,
   cilImagePlus,
@@ -121,6 +122,12 @@ import {
   cilFilter,
   cilFolderOpen,
   cilGrid,
+  cilGraph,
+  cilChartLine,
+  cilBarChart,
+  cilClock,
+  cilCheckAlt,
+  cilZoom,
 } from '@coreui/icons';
 
 export const iconSubset = {
@@ -182,6 +189,7 @@ export const iconSubset = {
   cilEnvelopeOpen,
   cilExternalLink,
   cilFile,
+  cilFullscreen,
   cilHome,
   cilImage,
   cilImagePlus,
@@ -234,6 +242,7 @@ export const iconSubset = {
   cilUser,
   cilUserFemale,
   cilUserFollow,
+  cilUserPlus,
   cilUserUnfollow,
   cilWarning,
   cilX,
@@ -247,6 +256,12 @@ export const iconSubset = {
   cilFilter,
   cilFolderOpen,
   cilGrid,
+  cilGraph,
+  cilChartLine,
+  cilBarChart,
+  cilClock,
+  cilCheckAlt,
+  cilZoom,
 };
 
 export enum IconSubset {
@@ -309,6 +324,7 @@ export enum IconSubset {
   cilEnvelopeOpen = 'cilEnvelopeOpen',
   cilExternalLink = 'cilExternalLink',
   cilFile = 'cilFile',
+  cilFullscreen = 'cilFullscreen',
   cilHome = 'cilHome',
   cilInbox = 'cilInbox',
   cilIndentDecrease = 'cilIndentDecrease',
@@ -373,4 +389,10 @@ export enum IconSubset {
   cilFilter = 'cilFilter',
   cilFolderOpen = 'cilFolderOpen',
   cilGrid = 'cilGrid',
+  cilGraph = 'cilGraph',
+  cilChartLine = 'cilChartLine',
+  cilBarChart = 'cilBarChart',
+  cilClock = 'cilClock',
+  cilCheckAlt = 'cilCheckAlt',
+  cilZoom = 'cilZoom',
 }

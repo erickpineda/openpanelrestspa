@@ -182,18 +182,6 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     this.obtenerListaComentarios();
   }
 
-  prev(): void {
-    if (this.pageNo > 0) {
-      this.onPageChange(this.pageNo - 1);
-    }
-  }
-
-  next(): void {
-    if (this.pageNo < this.totalPages - 1) {
-      this.onPageChange(this.pageNo + 1);
-    }
-  }
-
   onPageChange(page: number): void {
     const totalPages = this.getTotalPages();
     const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));

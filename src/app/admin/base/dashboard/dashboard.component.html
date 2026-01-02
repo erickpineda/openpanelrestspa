@@ -1,8 +1,16 @@
-<c-card data-testid="dashboard-root">
-  <c-card-header>
+<c-card data-testid="dashboard-root" class="shadow-sm mb-4 border-0">
+  <c-card-header class="bg-white py-3 border-bottom">
     <c-row class="align-items-center g-2">
       <c-col xs="12" md="6">
-        <h6 cCardTitle class="mb-0">Dashboard de Estadísticas</h6>
+        <div class="d-flex align-items-center gap-2">
+          <div class="bg-primary bg-opacity-10 p-2 rounded">
+            <svg cIcon name="cilSpeedometer" size="lg" class="text-primary"></svg>
+          </div>
+          <div>
+            <h5 cCardTitle class="mb-0 fw-bold text-primary">Dashboard</h5>
+            <small class="text-muted">Resumen general y estadísticas del sistema</small>
+          </div>
+        </div>
       </c-col>
       <c-col xs="12" md="6">
         <app-dashboard-toolbar
@@ -18,14 +26,16 @@
     </c-row>
   </c-card-header>
   <c-card-body>
-    <div class="d-flex justify-content-between align-items-end">
-      <h5 cCardTitle>Estadísticas Rápidas</h5>
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <h5 cCardTitle class="fw-bold text-secondary mb-0">
+        <svg cIcon name="cilChartPie" class="me-2 text-info"></svg>Estadísticas Rápidas
+      </h5>
       <div class="hstack gap-3">
-        <button cButton color="success" size="sm" (click)="openSettings()">
+        <button cButton color="light" size="sm" class="text-primary shadow-sm" (click)="openSettings()">
           <svg
             cIcon
             name="cilSettings"
-            style="padding-right: 2px"
+            class="me-2"
             size="sm"
             title="Ajustar Parámetros"
           ></svg>
@@ -33,14 +43,15 @@
         </button>
       </div>
     </div>
-    <hr />
-    <c-row class="g-3">
+    
+    <c-row class="g-3 mb-4">
       <c-col lg="3">
         <app-kpi-card
           label="Usuarios Activos"
           [value]="cantidadUsuariosActivos"
           iconName="cilUser"
           color="primary"
+          class="h-100 shadow-sm"
         ></app-kpi-card>
       </c-col>
       <c-col lg="3">
@@ -49,6 +60,7 @@
           [value]="totalEntradas"
           iconName="cilNotes"
           color="info"
+          class="h-100 shadow-sm"
         ></app-kpi-card>
       </c-col>
       <c-col lg="3">
@@ -57,6 +69,7 @@
           [value]="kpiPublicadas"
           iconName="cilCheckCircle"
           color="success"
+          class="h-100 shadow-sm"
         ></app-kpi-card>
       </c-col>
       <c-col lg="3">
@@ -65,13 +78,21 @@
           [value]="kpiNoPublicadas"
           iconName="cilXCircle"
           color="warning"
+          class="h-100 shadow-sm"
         ></app-kpi-card>
       </c-col>
     </c-row>
-    <hr />
-    <c-row>
+    
+    <hr class="text-muted opacity-25 my-4" />
+    
+    <c-row class="g-4">
       <c-col lg="8">
-        <c-card>
+        <c-card class="shadow-sm h-100 border-0">
+          <c-card-header class="bg-white border-bottom py-3">
+            <h6 class="mb-0 fw-bold text-secondary">
+              <svg cIcon name="cilGraph" class="me-2 text-primary"></svg>Evolución y Series
+            </h6>
+          </c-card-header>
           <c-card-body>
             <app-dashboard-series-panel
               [seriesDays]="seriesDays"
@@ -94,7 +115,7 @@
               (toggleMetrics)="metricsToggle()"
               (copyPerf)="copyPerfToClipboard()"
             ></app-dashboard-series-panel>
-            <div class="mt-3">
+            <div class="mt-4 pt-3 border-top">
               <app-dashboard-estado-nominal-panel
                 [estadoNominalChartType]="estadoNominalChartType"
                 [estadoNominalStacked]="estadoNominalStacked"
@@ -107,7 +128,7 @@
                 (retry)="loadSeriesEntriesSplitEstadoNombre()"
               ></app-dashboard-estado-nominal-panel>
             </div>
-            <div class="mt-3" [attr.aria-busy]="loadingSplitEstado ? 'true' : null">
+            <div class="mt-4 pt-3 border-top" [attr.aria-busy]="loadingSplitEstado ? 'true' : null">
               <app-dashboard-estado-split-panel
                 [loadingSplitEstado]="loadingSplitEstado"
                 [seriesEntriesSplitData]="seriesEntriesSplitData"
@@ -120,32 +141,55 @@
         </c-card>
       </c-col>
       <c-col lg="4">
-        <app-dashboard-recent-panel
-          [recentItems]="recentItems"
-          [loadingRecent]="loadingRecent"
-          [errorRecent]="errorRecent"
-          [recentSize]="recentSize"
-          [recentTotalPages]="recentTotalPages"
-          [recentPage]="recentPage"
-          (changeSize)="onRecentSizeChange($event)"
-          (pageChange)="onRecentPageChange($event)"
-          (downloadCsv)="downloadCsvRecentActivity()"
-          (retry)="loadRecentActivity()"
-        ></app-dashboard-recent-panel>
-        <app-dashboard-storage-panel
-          [loadingStorage]="loadingStorage"
-          [storage]="storage"
-          [formatBytesFn]="formatBytes.bind(this)"
-          (downloadCsv)="downloadCsvStorage()"
-        ></app-dashboard-storage-panel>
+        <div class="d-flex flex-column gap-4 h-100">
+          <c-card class="shadow-sm border-0 flex-grow-1">
+             <c-card-header class="bg-white border-bottom py-3">
+              <h6 class="mb-0 fw-bold text-secondary">
+                <svg cIcon name="cilHistory" class="me-2 text-info"></svg>Actividad Reciente
+              </h6>
+            </c-card-header>
+            <c-card-body>
+              <app-dashboard-recent-panel
+                [recentItems]="recentItems"
+                [loadingRecent]="loadingRecent"
+                [errorRecent]="errorRecent"
+                [recentSize]="recentSize"
+                [recentTotalPages]="recentTotalPages"
+                [recentPage]="recentPage"
+                (changeSize)="onRecentSizeChange($event)"
+                (pageChange)="onRecentPageChange($event)"
+                (downloadCsv)="downloadCsvRecentActivity()"
+                (retry)="loadRecentActivity()"
+              ></app-dashboard-recent-panel>
+            </c-card-body>
+          </c-card>
+          
+          <c-card class="shadow-sm border-0">
+             <c-card-header class="bg-white border-bottom py-3">
+              <h6 class="mb-0 fw-bold text-secondary">
+                <svg cIcon name="cilStorage" class="me-2 text-warning"></svg>Almacenamiento
+              </h6>
+            </c-card-header>
+            <c-card-body>
+              <app-dashboard-storage-panel
+                [loadingStorage]="loadingStorage"
+                [storage]="storage"
+                [formatBytesFn]="formatBytes.bind(this)"
+                (downloadCsv)="downloadCsvStorage()"
+              ></app-dashboard-storage-panel>
+            </c-card-body>
+          </c-card>
+        </div>
       </c-col>
     </c-row>
-    <hr />
-    <c-row>
+    
+    <hr class="text-muted opacity-25 my-4" />
+    
+    <c-row class="g-4">
       <c-col lg="6">
         @if (errorTopUsers) {
           <div
-            class="alert alert-danger d-flex align-items-center justify-content-between my-2"
+            class="alert alert-danger d-flex align-items-center justify-content-between my-2 shadow-sm"
             role="alert"
             aria-live="assertive"
           >
@@ -161,78 +205,79 @@
             </button>
           </div>
         }
-        <app-dashboard-top-panel
-          title="Top Usuarios"
-          [items]="topUsers"
-          [loading]="loadingTopUsers"
-          [error]="errorTopUsers"
-          badgeColor="primary"
-          csvDataTestId="btn-csv-top-users"
-          [showPeriodControls]="true"
-          [topLimit]="topLimit"
-          [topPeriodDays]="topPeriodDays"
-          retryBtnClass="retry-btn-top-users"
-          (changeTopLimit)="onChangeTopLimit($event)"
-          (changePeriod)="topPeriodDays = $event; loadTopWidgets()"
-          (downloadCsv)="downloadCsvTopUsers()"
-          (retry)="loadTopWidgets()"
-        ></app-dashboard-top-panel>
+        <c-card class="shadow-sm border-0 h-100">
+          <c-card-header class="bg-white border-bottom py-3">
+             <h6 class="mb-0 fw-bold text-secondary">Top Usuarios</h6>
+          </c-card-header>
+          <c-card-body>
+            <app-dashboard-top-panel
+              title="Top Usuarios"
+              [items]="topUsers"
+              [loading]="loadingTopUsers"
+              [error]="errorTopUsers"
+              badgeColor="primary"
+              csvDataTestId="btn-csv-top-users"
+              [showPeriodControls]="true"
+              [topLimit]="topLimit"
+              [topPeriodDays]="topPeriodDays"
+              retryBtnClass="retry-btn-top-users"
+              (changeTopLimit)="onChangeTopLimit($event)"
+              (changePeriod)="topPeriodDays = $event; loadTopWidgets()"
+              (downloadCsv)="downloadCsvTopUsers()"
+              (retry)="loadTopWidgets()"
+            ></app-dashboard-top-panel>
+          </c-card-body>
+        </c-card>
       </c-col>
       <c-col lg="6">
-        <app-dashboard-top-panel
-          title="Top Categorías"
-          [items]="topCategories"
-          [loading]="loadingTopCategories"
-          [error]="errorTopCategories"
-          badgeColor="info"
-          csvDataTestId="btn-csv-top-categories"
-          retryBtnClass="retry-btn-top-categories"
-          (downloadCsv)="downloadCsvTopCategories()"
-          (retry)="loadTopWidgets()"
-        ></app-dashboard-top-panel>
+        <c-card class="shadow-sm border-0 h-100">
+          <c-card-header class="bg-white border-bottom py-3">
+             <h6 class="mb-0 fw-bold text-secondary">Top Categorías</h6>
+          </c-card-header>
+          <c-card-body>
+            <app-dashboard-top-panel
+              title="Top Categorías"
+              [items]="topCategories"
+              [loading]="loadingTopCategories"
+              [error]="errorTopCategories"
+              badgeColor="info"
+              csvDataTestId="btn-csv-top-categories"
+              retryBtnClass="retry-btn-top-categories"
+              (downloadCsv)="downloadCsvTopCategories()"
+              (retry)="loadTopWidgets()"
+            ></app-dashboard-top-panel>
+          </c-card-body>
+        </c-card>
       </c-col>
-      <c-col lg="6" class="mt-3">
-        <app-dashboard-top-panel
-          title="Top Tags"
-          [items]="topTags"
-          [loading]="loadingTopTags"
-          [error]="errorTopTags"
-          badgeColor="warning"
-          csvDataTestId="btn-csv-top-tags"
-          retryBtnClass="retry-btn-top-tags"
-          (downloadCsv)="downloadCsvTopTags()"
-          (retry)="loadTopWidgets()"
-        ></app-dashboard-top-panel>
-      </c-col>
-    </c-row>
-    <hr />
-    <c-row>
-      <c-col lg="12">
-        <app-dashboard-content-panel
-          [loadingContentStats]="loadingContentStats"
-          [errorContentStats]="errorContentStats"
-          [contentStats]="contentStats"
-          [contentStatsChartData]="contentStatsChartData"
-          [contentEstadoRows]="contentEstadoRows"
-          [kpiUsuariosTotalColor]="kpiUsuariosTotalColor"
-          [kpiEntradasTotalColor]="kpiEntradasTotalColor"
-          [kpiComentariosTotalColor]="kpiComentariosTotalColor"
-          [kpiFicherosTotalColor]="kpiFicherosTotalColor"
-          (downloadContentCsv)="downloadCsvContentStats()"
-          (downloadEstadosCsv)="downloadCsvContentStatsEstados()"
-          (retry)="loadContentStats()"
-        ></app-dashboard-content-panel>
+      <c-col lg="6" class="mt-4">
+        <c-card class="shadow-sm border-0 h-100">
+          <c-card-header class="bg-white border-bottom py-3">
+             <h6 class="mb-0 fw-bold text-secondary">Top Tags</h6>
+          </c-card-header>
+          <c-card-body>
+            <app-dashboard-top-panel
+              title="Top Tags"
+              [items]="topTags"
+              [loading]="loadingTopTags"
+              [error]="errorTopTags"
+              badgeColor="warning"
+              csvDataTestId="btn-csv-top-tags"
+              retryBtnClass="retry-btn-top-tags"
+              (downloadCsv)="downloadCsvTopTags()"
+              (retry)="loadTopWidgets()"
+            ></app-dashboard-top-panel>
+          </c-card-body>
+        </c-card>
       </c-col>
     </c-row>
   </c-card-body>
+  <app-dashboard-settings-modal
+    [visible]="showSettingsModal"
+    (visibleChange)="showSettingsModal = $event"
+    [settings]="settings"
+    [clearFeedback]="clearFeedback"
+    (apply)="applySettings()"
+    (reset)="resetSettings()"
+    (close)="closeSettings()"
+  ></app-dashboard-settings-modal>
 </c-card>
-
-<app-dashboard-settings-modal
-  [visible]="showSettingsModal"
-  (visibleChange)="showSettingsModal = $event"
-  [settings]="settings"
-  [clearFeedback]="clearFeedback"
-  (apply)="applySettings()"
-  (reset)="resetSettings()"
-  (close)="closeSettings()"
-></app-dashboard-settings-modal>

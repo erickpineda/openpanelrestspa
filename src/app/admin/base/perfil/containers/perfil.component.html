@@ -1,24 +1,31 @@
-<c-card aria-live="polite">
-  <c-card-header class="d-flex align-items-center justify-content-between">
-    <span>Mi Perfil</span>
+<c-card aria-live="polite" class="shadow-sm mb-4 border-0">
+  <c-card-header class="bg-white py-3 border-bottom">
+    <div class="d-flex align-items-center gap-2">
+      <div class="bg-primary bg-opacity-10 p-2 rounded">
+        <svg cIcon name="cilUser" size="lg" class="text-primary"></svg>
+      </div>
+      <div>
+        <h5 class="mb-0 text-primary fw-bold">Mi Perfil</h5>
+        <small class="text-muted">Gestiona tu información personal y preferencias</small>
+      </div>
+    </div>
   </c-card-header>
   <c-card-body [attr.aria-busy]="loading ? 'true' : null">
     @if (usuario && !loading) {
       <c-row>
         <c-col xs="12" md="4">
-          <c-card class="mb-4">
-            <c-card-header>Perfil</c-card-header>
-            <c-card-body class="text-center">
-              <div class="mb-3 position-relative d-inline-block">
+          <c-card class="mb-4 shadow-sm border-0 bg-light">
+            <c-card-body class="text-center py-5">
+              <div class="mb-4 position-relative d-inline-block">
                 <img
                   [src]="
                     usuario.imagen && usuario.imagen.length > 0
                       ? usuario.imagen[0]
                       : './assets/img/avatars/2.jpg'
                   "
-                  class="rounded-circle img-thumbnail"
-                  width="150"
-                  height="150"
+                  class="rounded-circle img-thumbnail shadow-sm"
+                  width="160"
+                  height="160"
                   alt="Avatar"
                   style="object-fit: cover"
                 />
@@ -26,11 +33,12 @@
                   cButton
                   color="primary"
                   size="sm"
-                  class="position-absolute bottom-0 end-0 rounded-circle"
+                  class="position-absolute bottom-0 end-0 rounded-circle shadow-sm"
                   (click)="triggerFileInput(fileInput)"
                   [disabled]="uploading"
+                  style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
                 >
-                  <svg cIcon name="cil-camera"></svg>
+                  <svg cIcon name="cilCamera" size="lg"></svg>
                 </button>
                 <input
                   #fileInput
@@ -40,40 +48,40 @@
                   hidden
                 />
               </div>
-              <h4>{{ usuario.nombre }} {{ usuario.apellido }}</h4>
-              <p class="text-muted">{{ usuario.email }}</p>
-              <c-badge color="info">{{ usuario.username }}</c-badge>
+              <h4 class="fw-bold mb-1">{{ usuario.nombre }} {{ usuario.apellido }}</h4>
+              <p class="text-muted mb-3">{{ usuario.email }}</p>
+              <c-badge color="info" shape="rounded-pill" class="px-3 py-2 text-white shadow-sm">{{ usuario.username }}</c-badge>
             </c-card-body>
           </c-card>
         </c-col>
         <c-col xs="12" md="8">
-          <c-card class="mb-4">
-            <c-card-header>
-              <strong>Configuración de Cuenta</strong>
+          <c-card class="mb-4 shadow-sm h-100 border-0">
+            <c-card-header class="bg-white py-3 border-bottom-0">
+              <h6 class="mb-0 fw-bold text-secondary text-uppercase small">Configuración de Cuenta</h6>
             </c-card-header>
             <c-card-body>
-              <c-nav variant="tabs">
-                <a [active]="true" [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="0" cNavLink
+              <c-nav variant="tabs" class="border-bottom-0 mb-3">
+                <a [active]="true" [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="0" cNavLink class="border-0 bg-transparent fw-semibold"
                   >Información Personal</a
                 >
-                <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="1" cNavLink
+                <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="1" cNavLink class="border-0 bg-transparent fw-semibold"
                   >Preferencias</a
                 >
-                <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="2" cNavLink
+                <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="2" cNavLink class="border-0 bg-transparent fw-semibold"
                   >Actividad Reciente</a
                 >
               </c-nav>
-              <c-tab-content #tabContent="cTabContent" [activeTabPaneIdx]="0">
-                <c-tab-pane class="p-3">
+              <c-tab-content #tabContent="cTabContent" [activeTabPaneIdx]="0" class="border rounded p-4 bg-light bg-opacity-10">
+                <c-tab-pane class="fade show active">
                   <app-perfil-form [usuario]="usuario" (save)="onSave($event)"></app-perfil-form>
                 </c-tab-pane>
-                <c-tab-pane class="p-3">
+                <c-tab-pane class="fade">
                   <app-perfil-preferences
                     [usuario]="usuario"
                     (save)="onSave($event)"
                   ></app-perfil-preferences>
                 </c-tab-pane>
-                <c-tab-pane class="p-3">
+                <c-tab-pane class="fade">
                   <app-perfil-activity [usuarioId]="usuario.idUsuario"></app-perfil-activity>
                 </c-tab-pane>
               </c-tab-content>
@@ -85,7 +93,10 @@
 
     @if (loading) {
       <div class="d-flex justify-content-center align-items-center" style="height: 50vh">
-        <c-spinner color="primary"></c-spinner>
+        <div class="text-center">
+          <c-spinner color="primary"></c-spinner>
+          <p class="mt-2 text-muted fw-semibold">Cargando perfil...</p>
+        </div>
       </div>
     }
   </c-card-body>

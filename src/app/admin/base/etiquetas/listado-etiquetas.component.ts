@@ -235,11 +235,6 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
     }
   }
 
-  getPaginationArray(): number[] {
-    const totalPages = this.getTotalPages();
-    return Array.from({ length: totalPages }, (_, i) => i);
-  }
-
   getTotalPages(): number {
     return Math.max(1, Number(this.totalPages || Math.ceil(this.totalItems / this.pageSize) || 1));
   }
