@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -7,6 +7,11 @@ import { CategoriaService } from '../../../core/services/data/categoria.service'
 import { SearchUtilService } from '../../../core/services/utils/search-util.service';
 import { LoggerService } from '../../../core/services/logger.service';
 import { PaginaResponse } from '../../../core/models/pagina-response.model';
+import { ToastService } from '../../../core/services/ui/toast.service';
+import { CategoriaFacadeService } from './categoria-form/srv/categoria-facade.service';
+import { CategoriaFormComponent } from './categoria-form/categoria-form.component';
+import { DashboardFacadeService } from '../dashboard/srv/dashboard-facade.service';
+import { TopItemDTO } from '../../../shared/models/dashboard.models';
 
 @Component({
   selector: 'app-listado-categorias',
@@ -36,21 +41,97 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   categoriaToDelete: Categoria | null = null;
 
+  // Modal Crear/Editar
+  visibleModalCrear = false;
+  visibleModalEditar = false;
+  categoriaSeleccionada?: Categoria;
+
+  // Stats
+  categoryStats: Map<string, number> = new Map();
+
+  // @ViewChild(CategoriaFormComponent) categoriaForm?: CategoriaFormComponent;
+
   constructor(
     private router: Router,
     private categoriaService: CategoriaService,
+    private facade: CategoriaFacadeService,
+    private dashboardFacade: DashboardFacadeService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
+    this.loadStats();
     this.obtenerListaCategorias();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  loadStats(): void {
+    // Intentamos obtener un número grande de top categorías para cubrir la mayoría
+    this.dashboardFacade.getTop('categories', 500, true).subscribe({
+      next: (items: TopItemDTO[]) => {
+        if (items && items.length > 0) {
+          this.categoryStats.clear();
+          items.forEach((item) => {
+            if (item.name) {
+              this.categoryStats.set(item.name.toLowerCase(), item.count || 0);
+            }
+          });
+          // Si ya tenemos categorías cargadas, aplicamos los stats
+          if (this.listaCategorias.length > 0) {
+            this.applyStats();
+          }
+        }
+      },
+      error: (err) => {
+        this.log.error('Error cargando stats de categorías', err);
+      },
+    });
+  }
+
+  applyStats(): void {
+    if (this.categoryStats.size === 0) return;
+
+    const updateList = (list: Categoria[]) => {
+      let changed = false;
+      const newList = list.map((cat) => {
+        const count = this.categoryStats.get((cat.nombre || '').toLowerCase());
+        if (count !== undefined && cat.cantidadEntradas !== count) {
+          changed = true;
+          return { ...cat, cantidadEntradas: count };
+        }
+        return cat;
+      });
+      return changed ? newList : list;
+    };
+
+    // Actualizamos listaCategorias y pagedCategorias
+    const newLista = updateList(this.listaCategorias);
+    if (newLista !== this.listaCategorias) {
+      this.listaCategorias = newLista;
+    }
+
+    const newPaged = updateList(this.pagedCategorias);
+    if (newPaged !== this.pagedCategorias) {
+      this.pagedCategorias = newPaged;
+    }
+    
+    // Actualizamos allCategorias si existe (paginación cliente)
+    if (this.allCategorias.length > 0) {
+      const newAll = updateList(this.allCategorias);
+      if (newAll !== this.allCategorias) {
+        this.allCategorias = newAll;
+      }
+    }
+
+    // Forzar detección de cambios si hubo cambios
+    this.cdr.detectChanges();
   }
 
   obtenerListaCategorias(): void {
@@ -130,6 +211,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
 
       this.applyPaging();
     }
+    this.applyStats();
     this.cdr.detectChanges();
   }
 
@@ -165,12 +247,40 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
   }
 
   crearCategoria(): void {
-    this.router.navigate(['/admin/control/categorias/crear']);
+    this.categoriaSeleccionada = undefined;
+    this.visibleModalCrear = true;
   }
 
   editarCategoria(id: number): void {
-    this.router.navigate(['/admin/control/categorias/editar', id]);
+    this.cargando = true;
+    this.facade.obtenerCategoriaPorId(id).subscribe({
+      next: (cat) => {
+        this.cargando = false;
+        if (cat) {
+          this.categoriaSeleccionada = cat;
+          this.visibleModalEditar = true;
+        } else {
+          this.toastService.showError('No se pudo cargar la categoría', 'Error');
+        }
+      },
+      error: (err) => {
+        this.cargando = false;
+        this.log.error('Error al cargar categoría para edición', err);
+        this.toastService.showError('Error al cargar la categoría', 'Error');
+      }
+    });
   }
+
+  cerrarModalCrear(): void {
+    this.visibleModalCrear = false;
+  }
+
+  cerrarModalEditar(): void {
+    this.visibleModalEditar = false;
+    this.categoriaSeleccionada = undefined;
+  }
+
+
 
   borrarCategoria(categ: Categoria): void {
     if (!categ?.idCategoria) return;

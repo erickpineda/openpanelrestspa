@@ -1,12 +1,14 @@
-<div class="editar-categoria-wrapper">
-  <app-categoria-form
-    [categoria]="categoria"
-    [listaCategorias]="listaCategorias"
-    [submitted]="submitted"
-    [disabled]="formDisabled"
-    (submitCategoria)="editar($event)"
-    (onReset)="onReset()"
-    (onValidate)="onValidate()"
-    (editarCategoria)="habilitarEdicion()"
-  ></app-categoria-form>
-</div>
+<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static" alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Editar Categoría</h5>
+    <button (click)="cerrarModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <app-categoria-form
+      [categoria]="categoria"
+      [listaCategorias]="listaCategorias"
+      (submitCategoria)="guardar($event)"
+      (onReset)="cerrarModal()"
+    ></app-categoria-form>
+  </c-modal-body>
+</c-modal>

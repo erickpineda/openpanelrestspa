@@ -277,43 +277,26 @@
   </c-card>
 </c-container>
 
-<!-- Modal Crear/Editar Etiqueta -->
-<c-modal 
-  [visible]="showCreateModal || showEditModal" 
-  (visibleChange)="onModalVisibleChange($event)"
-  backdrop="static"
->
-  <c-modal-header>
-    <h5 cModalTitle>{{ showEditModal ? 'Editar Etiqueta' : 'Nueva Etiqueta' }}</h5>
-    <button (click)="onModalClose()" cButtonClose></button>
-  </c-modal-header>
-  <c-modal-body>
-    <app-etiqueta-form
-      [etiqueta]="selectedEtiqueta"
-      [isEdit]="showEditModal"
-      (save)="onModalSave()"
-      (cancel)="onModalClose()"
-    ></app-etiqueta-form>
-  </c-modal-body>
-</c-modal>
+<!-- Modal Crear Etiqueta -->
+<app-crear-etiqueta
+  [visible]="showCreateModal"
+  (visibleChange)="showCreateModal = $event"
+  (onSuccess)="onModalSave()"
+></app-crear-etiqueta>
+
+<!-- Modal Editar Etiqueta -->
+<app-editar-etiqueta
+  [visible]="showEditModal"
+  (visibleChange)="showEditModal = $event"
+  [etiqueta]="selectedEtiqueta"
+  (onSuccess)="onModalSave()"
+></app-editar-etiqueta>
 
 <!-- Modal Confirmación Borrado -->
-<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal = $event" backdrop="static">
-  <c-modal-header class="bg-danger text-white">
-    <h5 cModalTitle>Confirmar Eliminación</h5>
-    <button (click)="cancelDelete()" cButtonClose white></button>
-  </c-modal-header>
-  <c-modal-body>
-    <p>¿Estás seguro de que deseas eliminar la etiqueta <strong>{{ etiquetaToDelete?.nombre }}</strong>?</p>
-    <p class="text-danger small mb-0"><svg cIcon name="cilWarning" class="me-1"></svg> Esta acción no se puede deshacer.</p>
-  </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
-    <button cButton color="danger" (click)="confirmDelete()" [disabled]="loading">
-      @if (loading) {
-        <c-spinner size="sm" class="me-1"></c-spinner>
-      }
-      Eliminar
-    </button>
-  </c-modal-footer>
-</c-modal>
+<app-eliminar-etiqueta
+  [visible]="showDeleteModal"
+  (visibleChange)="showDeleteModal = $event"
+  [etiqueta]="etiquetaToDelete"
+  [loading]="loading"
+  (onConfirm)="confirmDelete()"
+></app-eliminar-etiqueta>

@@ -13,9 +13,9 @@ import { CrearComentarioComponent } from './comentarios/crear/crear-comentario.c
 import { EditarComentarioComponent } from './comentarios/editar/editar-comentario.component';
 import { ComentarioFormComponent } from './comentarios/comentario-form/comentario-form.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
+import { CategoriaFormComponent } from './categorias/categoria-form/categoria-form.component';
 import { CrearCategoriaComponent } from './categorias/crear/crear-categoria.component';
 import { EditarCategoriaComponent } from './categorias/editar/editar-categoria.component';
-import { CategoriaFormComponent } from './categorias/categoria-form/categoria-form.component';
 // Entradas components are now lazy in EntradasModule; CKEditor moved there
 import { SharedOPModule } from '../../shared/shared.module';
 import { SharedCoreUiModule } from '../../shared/shared-coreui.module';

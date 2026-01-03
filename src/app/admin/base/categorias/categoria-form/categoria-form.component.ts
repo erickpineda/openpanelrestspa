@@ -52,7 +52,11 @@ export class CategoriaFormComponent implements OnChanges {
     }
     if (changes['listaCategorias']) {
       const list = Array.isArray(this.listaCategorias) ? this.listaCategorias : [];
-      this.displayListaCategorias = this.assignDummyCounts(list);
+      // Asignar lista directamente, asegurando que cantidadEntradas tenga un valor por defecto si viene nulo
+      this.displayListaCategorias = list.map(c => ({
+        ...c,
+        cantidadEntradas: c.cantidadEntradas ?? 0
+      }));
     }
   }
 
@@ -90,11 +94,5 @@ export class CategoriaFormComponent implements OnChanges {
     this.form.enable();
   }
 
-  private assignDummyCounts(list: Categoria[]): Categoria[] {
-    return list.map((c) => {
-      // Mantener valor real si existe; si no, asignar un número ficticio pequeño (1-5)
-      const cantidad = (c as any).cantidadEntradas ?? Math.floor(Math.random() * 5) + 1;
-      return { ...c, cantidadEntradas: cantidad } as Categoria;
-    });
-  }
+
 }

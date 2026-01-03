@@ -213,26 +213,11 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
       });
   }
 
-  cancelDelete(): void {
-    this.showDeleteModal = false;
-    this.etiquetaToDelete = null;
-  }
-
-  onModalClose(): void {
+  onModalSave(): void {
     this.showCreateModal = false;
     this.showEditModal = false;
     this.selectedEtiqueta = null;
-  }
-
-  onModalSave(): void {
-    this.onModalClose();
     this.onPageChange(0);
-  }
-
-  onModalVisibleChange(visible: boolean): void {
-    if (!visible) {
-      this.onModalClose();
-    }
   }
 
   getTotalPages(): number {

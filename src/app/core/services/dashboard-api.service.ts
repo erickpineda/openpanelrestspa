@@ -141,7 +141,7 @@ export class DashboardApiService {
     const t = type === 'categories' ? 'categories' : 'users';
     const tt = type === 'tags' ? 'tags' : t;
     const lRaw = Number(limit) || 10;
-    const l = Math.max(1, Math.min(200, lRaw));
+    const l = Math.max(1, Math.min(1000, lRaw));
     const key = `dashboard:top:type:${tt}:limit:${l}:start:${startDate || ''}:end:${endDate || ''}`;
     if (force) this.cache.delete(key);
     return this.getCached<TopItemDTO[]>(key, this.ttlTop, () => {

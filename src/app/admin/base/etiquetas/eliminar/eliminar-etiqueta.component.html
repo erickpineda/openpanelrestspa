@@ -1,0 +1,21 @@
+<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" backdrop="static">
+  <c-modal-header class="bg-danger text-white">
+    <h5 cModalTitle>Confirmar Eliminación</h5>
+    <button (click)="cerrarModal()" cButtonClose white></button>
+  </c-modal-header>
+  <c-modal-body>
+    <p>¿Estás seguro de que deseas eliminar la etiqueta <strong>{{ etiqueta?.nombre }}</strong>?</p>
+    <p class="text-danger small mb-0">
+      <svg cIcon name="cilWarning" class="me-1"></svg> Esta acción no se puede deshacer.
+    </p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cerrarModal()">Cancelar</button>
+    <button cButton color="danger" (click)="confirmar()" [disabled]="loading">
+      @if (loading) {
+        <c-spinner size="sm" class="me-1"></c-spinner>
+      }
+      Eliminar
+    </button>
+  </c-modal-footer>
+</c-modal>

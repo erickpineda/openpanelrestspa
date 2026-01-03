@@ -1,185 +1,117 @@
-<c-card>
-  <c-card-header>
-    <div class="d-flex justify-content-between align-items-end">
-      <h2 cCardTitle class="h5 mb-3 mb-lg-0">Categoria</h2>
-      @if (form.get('idCategoria')?.value) {
-        <div class="hstack gap-3">
-          <button
-            cButton
-            color="warning"
-            size="sm"
-            (click)="handleEditarCategoria()"
-            [disabled]="!form.disabled"
-          >
-            <svg
-              cIcon
-              name="cilWarning"
-              style="padding-right: 2px"
-              size="sm"
-              title="Editar categoria"
-            ></svg>
-            Editar categoria
-          </button>
-        </div>
-      }
-    </div>
-  </c-card-header>
-  <c-card-body>
-    <c-container fluid>
-      <form
-        cForm
-        [formGroup]="form"
-        novalidate
-        (ngSubmit)="guardar()"
-        class="needs-validation"
-        role="form"
-        aria-label="Formulario de categoría"
+<c-container fluid class="p-0">
+  <form
+    cForm
+    [formGroup]="form"
+    novalidate
+    (ngSubmit)="guardar()"
+    class="needs-validation"
+    role="form"
+    aria-label="Formulario de categoría"
+  >
+    <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mb-3">
+      <button
+        cButton
+        color="secondary"
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="reset()"
+        [tabindex]="'0'"
+        aria-label="Limpiar formulario"
       >
-        <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 gap-md-3">
-          <h2 cCardTitle class="h5 mb-3 mb-lg-0">Crear/Editar Categoria</h2>
-          <div class="d-flex flex-wrap gap-2 gap-md-3">
-            <button
-              cButton
-              color="danger"
-              size="sm"
-              type="reset"
-              (click)="reset()"
-              [tabindex]="'0'"
-              aria-label="Cancelar y volver a la lista"
-            >
-              <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cancelar"></svg>
-              Cancelar
-            </button>
-            <button
-              cButton
-              color="success"
-              size="sm"
-              type="submit"
-              [disabled]="form.disabled || form.pristine || form.invalid || enviando"
-              [tabindex]="'0'"
-              aria-label="Guardar categoría"
-            >
-              <svg cIcon name="cilSave" style="padding-right: 2px" size="sm" title="Guardar"></svg>
-              @if (!enviando) {
-                <span>Guardar</span>
-              }
-              @if (enviando) {
-                <span
-                  class="spinner-border spinner-border-sm ms-1"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
-              }
-            </button>
-            <button
-              cButton
-              color="info"
-              size="sm"
-              [disabled]="!form.valid"
-              (click)="onValidate.emit()"
-              [tabindex]="'0'"
-              aria-label="Vista previa de la categoría"
-            >
-              <svg
-                cIcon
-                name="cilExternalLink"
-                style="padding-right: 2px"
-                size="sm"
-                title="Previa"
-              ></svg>
-              Previa
-            </button>
-          </div>
-        </div>
-        <hr />
-        <c-row>
-          <c-col lg="8">
-            <c-card class="mb-4">
-              <c-card-body>
-                <h3 cCardTitle class="h6 mb-4">Información básica</h3>
-                <c-row>
-                  <c-col lg="12">
-                    <c-row>
-                      <label
-                        [sm]="3"
-                        cCol
-                        cLabel="col"
-                        for="nombre"
-                        required
-                        [ngClass]="{
-                          'is-invalid': (submitted || f['nombre'].touched) && f['nombre'].invalid,
-                        }"
-                      >
-                        Nombre
-                      </label>
-                      <c-col [sm]="10">
-                        <input
-                          cFormControl
-                          formControlName="nombre"
-                          id="nombre"
-                          type="text"
-                          aria-label="Nombre de la categoría"
-                          aria-describedby="nombreHelp"
-                          [ngClass]="{
-                            'is-invalid': (submitted || f['nombre'].touched) && f['nombre'].invalid,
-                            'is-valid': f['nombre'].valid && (submitted || f['nombre'].touched),
-                          }"
-                          (input)="mostrarFeedback = true"
-                        />
-                        <div id="nombreHelp" class="form-text">El nombre es obligatorio.</div>
-                        @if ((submitted || f['nombre'].touched) && f['nombre'].invalid) {
-                          <div class="invalid-feedback animated-fade">
-                            El nombre es obligatorio.
-                          </div>
-                        }
-                        @if (f['nombre'].valid && (submitted || f['nombre'].touched)) {
-                          <div class="valid-feedback animated-fade">¡Nombre válido!</div>
-                        }
-                      </c-col>
-                    </c-row>
-                    <c-row class="mt-3">
-                      <label [sm]="3" cCol cLabel="col" for="descripcion">Descripción</label>
-                      <c-col [sm]="10">
-                        <textarea
-                          aria-label="Descripción de la categoría"
-                          cFormControl
-                          formControlName="descripcion"
-                          id="descripcion"
-                          aria-describedby="descripcionHelp"
-                        ></textarea>
-                        <div id="descripcionHelp" class="form-text">
-                          Opcional: describe la categoría.
-                        </div>
-                      </c-col>
-                    </c-row>
-                  </c-col>
-                </c-row>
-              </c-card-body>
-            </c-card>
-          </c-col>
-          <c-col lg="4">
-            <c-card class="mb-4">
-              <c-card-body>
-                <h3 cCardTitle class="h6 mb-4">Categorias existentes</h3>
-                <div cListGroup>
-                  @for (categoria of displayListaCategorias; track categoria.nombre) {
-                    <button
-                      type="button"
-                      cListGroupItem
-                      class="d-flex justify-content-between align-items-center"
-                    >
-                      {{ categoria.nombre }}
-                      <c-badge color="primary" shape="rounded-pill">{{
-                        categoria.cantidadEntradas
-                      }}</c-badge>
-                    </button>
+        <svg cIcon name="cilReload" class="me-1" size="sm"></svg>
+        Limpiar
+      </button>
+      <button
+        cButton
+        color="primary"
+        size="sm"
+        type="submit"
+        [disabled]="form.disabled || form.pristine || form.invalid || enviando"
+        [tabindex]="'0'"
+        aria-label="Guardar categoría"
+      >
+        <svg cIcon name="cilSave" class="me-1" size="sm"></svg>
+        @if (!enviando) {
+          <span>Guardar</span>
+        }
+        @if (enviando) {
+          <span
+            class="spinner-border spinner-border-sm ms-1"
+            role="status"
+            aria-hidden="true"
+          ></span>
+        }
+      </button>
+    </div>
+
+    <c-row>
+      <c-col lg="8">
+        <c-card class="mb-4 shadow-none border">
+          <c-card-body>
+            <h3 cCardTitle class="h6 mb-4 text-secondary fw-bold">Información básica</h3>
+            <c-row>
+              <c-col lg="12">
+                <div class="mb-3">
+                  <label cLabel for="nombre" class="fw-semibold">Nombre <span class="text-danger">*</span></label>
+                  <input
+                    cFormControl
+                    formControlName="nombre"
+                    id="nombre"
+                    type="text"
+                    [ngClass]="{
+                      'is-invalid': (submitted || f['nombre'].touched) && f['nombre'].invalid,
+                      'is-valid': f['nombre'].valid && (submitted || f['nombre'].touched)
+                    }"
+                    (input)="mostrarFeedback = true"
+                  />
+                  @if ((submitted || f['nombre'].touched) && f['nombre'].invalid) {
+                    <div class="invalid-feedback">
+                      El nombre es obligatorio.
+                    </div>
                   }
                 </div>
-              </c-card-body>
-            </c-card>
-          </c-col>
-        </c-row>
-      </form>
-    </c-container>
-  </c-card-body>
-</c-card>
+
+                <div class="mb-3">
+                  <label cLabel for="descripcion" class="fw-semibold">Descripción</label>
+                  <textarea
+                    cFormControl
+                    formControlName="descripcion"
+                    id="descripcion"
+                    rows="4"
+                  ></textarea>
+                  <div class="form-text text-muted">
+                    Breve descripción de la categoría.
+                  </div>
+                </div>
+              </c-col>
+            </c-row>
+          </c-card-body>
+        </c-card>
+      </c-col>
+
+      <c-col lg="4">
+        <c-card class="mb-4 shadow-none border bg-light">
+          <c-card-body>
+            <h3 cCardTitle class="h6 mb-3 text-secondary fw-bold">Existentes</h3>
+            <div class="list-group list-group-flush bg-white rounded border">
+              @for (categoria of displayListaCategorias; track categoria.nombre) {
+                <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                  <span class="text-truncate" [title]="categoria.nombre" style="max-width: 150px;">
+                    {{ categoria.nombre }}
+                  </span>
+                  <span class="badge bg-light text-dark border">{{ categoria.cantidadEntradas }}</span>
+                </div>
+              }
+              @if (displayListaCategorias.length === 0) {
+                <div class="list-group-item text-center text-muted small py-3">
+                  No hay categorías para mostrar
+                </div>
+              }
+            </div>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+  </form>
+</c-container>

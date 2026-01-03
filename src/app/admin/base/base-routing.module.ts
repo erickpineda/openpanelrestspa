@@ -5,8 +5,6 @@ import { CrearComentarioComponent } from './comentarios/crear/crear-comentario.c
 import { EditarComentarioComponent } from './comentarios/editar/editar-comentario.component';
 import { BaseComponent } from './base.component';
 import { BaseIndexComponent } from './base-index.component';
-import { CrearCategoriaComponent } from './categorias/crear/crear-categoria.component';
-import { EditarCategoriaComponent } from './categorias/editar/editar-categoria.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
 // Entradas feature is lazy-loaded (EntradasModule)
 
@@ -64,11 +62,7 @@ const routes: Routes = [
       },
       {
         path: 'categorias',
-        children: [
-          { path: '', component: ListadoCategoriasComponent },
-          { path: 'crear', component: CrearCategoriaComponent },
-          { path: 'editar/:idCategoria', component: EditarCategoriaComponent },
-        ],
+        component: ListadoCategoriasComponent,
       },
       {
         path: 'comentarios',

@@ -1,69 +1,52 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { CategoriaFacadeService } from '../categoria-form/srv/categoria-facade.service';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Categoria } from '../../../../core/models/categoria.model';
-import { CommonFunctionalityService } from '../../../../shared/services/common-functionality.service';
+import { CategoriaFacadeService } from '../categoria-form/srv/categoria-facade.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
+import { CategoriaFormComponent } from '../categoria-form/categoria-form.component';
 
 @Component({
   selector: 'app-editar-categoria',
   templateUrl: './editar-categoria.component.html',
-  styleUrls: ['./editar-categoria.component.scss'],
-  standalone: false,
+  standalone: false
 })
-export class EditarCategoriaComponent implements OnInit {
-  categoria?: Categoria;
-  listaCategorias: Categoria[] = [];
-  submitted = false;
-  formDisabled = true;
+export class EditarCategoriaComponent {
+  @Input() visible = false;
+  @Input() categoria?: Categoria;
+  @Input() listaCategorias: Categoria[] = [];
+  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() onSuccess = new EventEmitter<void>();
+
+  @ViewChild(CategoriaFormComponent) formComponent!: CategoriaFormComponent;
 
   constructor(
-    private route: ActivatedRoute,
     private facade: CategoriaFacadeService,
-    private router: Router,
-    private commonFuncService: CommonFunctionalityService,
     private toastService: ToastService
   ) {}
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.params['idCategoria']);
-    this.facade.obtenerCategoriaPorId(id).subscribe((cat) => {
-      this.categoria = cat || undefined;
-      this.formDisabled = true;
-    });
-    this.facade.obtenerListaCategorias().subscribe((cats) => (this.listaCategorias = cats));
+  handleVisibleChange(event: boolean) {
+    this.visible = event;
+    this.visibleChange.emit(event);
   }
 
-  editar(cat: Categoria) {
+  cerrarModal() {
+    this.handleVisibleChange(false);
+  }
+
+  guardar(cat: Categoria) {
     if (!cat.idCategoria) return;
+    
     this.facade.actualizarCategoria(cat.idCategoria, cat).subscribe({
       next: () => {
-        this.toastService.showSuccess(
-          'La categoría se ha modificado correctamente.',
-          'Categoría modificada'
-        );
-        this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
+        this.toastService.showSuccess('La categoría se ha modificado correctamente.', 'Categoría modificada');
+        this.onSuccess.emit();
+        this.cerrarModal();
       },
       error: (err) => {
         console.error('Error al actualizar la categoría:', err);
-        // Emitir evento de error al componente hijo
-        const form = document.querySelector('app-categoria-form') as any;
-        form?.onError.emit();
-      },
+        if (this.formComponent) {
+          this.formComponent.onError.emit();
+        }
+      }
     });
-  }
-
-  onReset() {
-    this.submitted = false;
-    this.formDisabled = true;
-    this.router.navigate(['/admin/control/categorias']);
-  }
-
-  onValidate() {
-    this.submitted = true;
-  }
-
-  habilitarEdicion() {
-    this.formDisabled = false;
   }
 }

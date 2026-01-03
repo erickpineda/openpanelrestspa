@@ -1,13 +1,14 @@
 <c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static" alignment="center">
   <c-modal-header>
-    <h5 cModalTitle>Nueva Categoría</h5>
+    <h5 cModalTitle>Editar Etiqueta</h5>
     <button (click)="cerrarModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
-    <app-categoria-form
-      [listaCategorias]="listaCategorias"
-      (submitCategoria)="guardar($event)"
-      (onReset)="cerrarModal()"
-    ></app-categoria-form>
+    <app-etiqueta-form
+      [etiqueta]="etiqueta"
+      [isEdit]="true"
+      (save)="onGuardar()"
+      (cancel)="cerrarModal()"
+    ></app-etiqueta-form>
   </c-modal-body>
 </c-modal>
