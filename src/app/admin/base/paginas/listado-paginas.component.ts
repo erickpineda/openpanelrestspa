@@ -449,13 +449,11 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
 
   closePreview(): void {
     this.previewVisible = false;
-    this.previewEntrada = undefined;
     this.cdr.markForCheck();
   }
 
   onPreviewVisibleChange(visible: boolean): void {
     this.previewVisible = visible;
-    if (!visible) this.previewEntrada = undefined;
     this.cdr.markForCheck();
   }
 

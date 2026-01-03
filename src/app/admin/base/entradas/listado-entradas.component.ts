@@ -457,13 +457,11 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   closePreview(): void {
     this.previewVisible = false;
-    this.previewEntrada = undefined;
     this.cdr.markForCheck();
   }
 
   onPreviewVisibleChange(visible: boolean): void {
     this.previewVisible = visible;
-    if (!visible) this.previewEntrada = undefined;
     this.cdr.markForCheck();
   }
 
