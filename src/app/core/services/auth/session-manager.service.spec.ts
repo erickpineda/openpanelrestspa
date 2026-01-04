@@ -20,12 +20,15 @@ describe('SessionManagerService', () => {
     spyOn(document, 'querySelectorAll').and.returnValue({ length: 0 } as any);
     spyOn(RouteTrackerService, 'getLastValidUrl').and.returnValue('/admin/x');
 
+    const uiMonitor = jasmine.createSpyObj('UiAnomalyMonitorService', ['forceCleanupForLogout']);
+
     const service = new SessionManagerService(
       tokenStorage as any,
       unsavedWorkService as any,
       router as any,
       log as any,
-      postLoginRedirect as any
+      postLoginRedirect as any,
+      uiMonitor as any
     );
 
     service.handleLogoutFromSync({ timestamp: 123 });
@@ -53,12 +56,15 @@ describe('SessionManagerService', () => {
     spyOn(window, 'addEventListener').and.callFake(() => {});
     spyOn(document, 'querySelectorAll').and.returnValue({ length: 0 } as any);
 
+    const uiMonitor = jasmine.createSpyObj('UiAnomalyMonitorService', ['forceCleanupForLogout']);
+
     const service = new SessionManagerService(
       tokenStorage as any,
       unsavedWorkService as any,
       router as any,
       log as any,
-      postLoginRedirect as any
+      postLoginRedirect as any,
+      uiMonitor as any
     );
 
     service.sessionExpired$.subscribe((payload) => {
@@ -92,12 +98,15 @@ describe('SessionManagerService', () => {
     const dispatchSpy = spyOn(window, 'dispatchEvent').and.callThrough();
     spyOn(document, 'querySelectorAll').and.returnValue({ length: 0 } as any);
 
+    const uiMonitor = jasmine.createSpyObj('UiAnomalyMonitorService', ['forceCleanupForLogout']);
+
     const service = new SessionManagerService(
       tokenStorage as any,
       unsavedWorkService as any,
       router as any,
       log as any,
-      postLoginRedirect as any
+      postLoginRedirect as any,
+      uiMonitor as any
     );
 
     spyOn(service, 'performLogout');

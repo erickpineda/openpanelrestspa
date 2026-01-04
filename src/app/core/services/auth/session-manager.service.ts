@@ -8,6 +8,7 @@ import { LoggerService } from '../logger.service';
 import { RouteTrackerService } from './route-tracker.service';
 import { PostLoginRedirectService } from './post-login-redirect.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
+import { UiAnomalyMonitorService } from '../ui/ui-anomaly-monitor.service';
 
 export interface SessionExpirationData {
   type: 'LOGOUT' | 'SESSION_EXPIRED' | 'ANOTHER_DEVICE';
@@ -27,7 +28,8 @@ export class SessionManagerService {
     private unsavedWorkService: UnsavedWorkService,
     private router: Router,
     private log: LoggerService,
-    private postLoginRedirect: PostLoginRedirectService
+    private postLoginRedirect: PostLoginRedirectService,
+    private uiMonitor: UiAnomalyMonitorService
   ) {
     this.setupListeners();
   }
@@ -160,11 +162,7 @@ export class SessionManagerService {
 
     // 1. Limpieza de seguridad de UI (backdrops, modals)
     try {
-      document.body.classList.remove('modal-open');
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-      const backdrops = document.querySelectorAll('.modal-backdrop');
-      backdrops.forEach((backdrop) => backdrop.remove());
+      this.uiMonitor.forceCleanupForLogout();
     } catch (e) {
       this.log.error('SessionManager: Error limpiando UI artifacts', e);
     }

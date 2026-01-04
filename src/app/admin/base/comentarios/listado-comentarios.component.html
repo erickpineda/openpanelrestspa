@@ -260,3 +260,44 @@
     </c-card-footer>
   }
 </c-card>
+
+<!-- Modal de Confirmación de Eliminación -->
+<c-modal [visible]="showDeleteModal" (visibleChange)="$event ? null : cancelDelete()" id="deleteModal" backdrop="static">
+  <c-modal-header>
+    <h5 cModalTitle class="fw-bold text-danger">
+      <svg cIcon name="cilWarning" class="me-2"></svg>
+      Confirmar Eliminación
+    </h5>
+    <button (click)="cancelDelete()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <p>¿Estás seguro de que deseas eliminar este comentario permanentemente?</p>
+    
+    @if (comentarioToDelete) {
+      <div class="alert alert-light border rounded p-3 mb-0">
+        <div class="small text-muted mb-1">ID: {{ comentarioToDelete.idComentario }}</div>
+        <div class="fw-semibold fst-italic text-break">
+          "{{ truncateContent(comentarioToDelete.contenido || '') }}"
+        </div>
+      </div>
+    }
+    
+    <p class="small text-muted mt-3 mb-0">
+      Esta acción no se puede deshacer.
+    </p>
+  </c-modal-body>
+  <c-modal-footer class="border-top-0">
+    <button (click)="cancelDelete()" cButton color="secondary" variant="ghost">
+      Cancelar
+    </button>
+    <button (click)="confirmDelete()" cButton color="danger" [disabled]="cargando">
+      @if (cargando) {
+        <c-spinner size="sm" class="me-2"></c-spinner>
+      }
+      @else {
+        <svg cIcon name="cilTrash" size="sm" class="me-2"></svg>
+      }
+      Eliminar Comentario
+    </button>
+  </c-modal-footer>
+</c-modal>

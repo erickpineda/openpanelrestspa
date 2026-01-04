@@ -129,6 +129,8 @@ import {
   cilClock,
   cilCheckAlt,
   cilZoom,
+  cilResizeWidth,
+  cilCompress,
 } from '@coreui/icons';
 
 export const iconSubset = {
@@ -264,6 +266,8 @@ export const iconSubset = {
   cilClock,
   cilCheckAlt,
   cilZoom,
+  cilResizeWidth,
+  cilCompress,
 };
 
 export enum IconSubset {
@@ -398,4 +402,6 @@ export enum IconSubset {
   cilClock = 'cilClock',
   cilCheckAlt = 'cilCheckAlt',
   cilZoom = 'cilZoom',
+  cilResizeWidth = 'cilResizeWidth',
+  cilCompress = 'cilCompress',
 }

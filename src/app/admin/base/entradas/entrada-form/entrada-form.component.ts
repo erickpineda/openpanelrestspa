@@ -7,6 +7,7 @@ import {
   OnInit,
   OnChanges,
   ChangeDetectorRef,
+  HostListener
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { UntypedFormGroup, FormArray, FormControl } from '@angular/forms';
@@ -75,6 +76,9 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   public Editor: any = null;
   public editorLoading = false;
   public estaEditando = false;
+  public isFullWidth = false;
+  public isFullScreen = false;
+  public showBackToTop = false;
 
   // ✅ REVERTIMOS: Volvemos a notificación individual
   showRecoveryNotification = false;
@@ -231,6 +235,12 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       OPConstants.Events.SAVE_UNSAVED_WORK,
       this.saveBeforeLogout.bind(this)
     );
+    
+    // Limpiar listener interno si existe
+    const editorMain = document.querySelector('.ck-editor__main');
+    if (editorMain) {
+       editorMain.removeEventListener('scroll', this.onInternalScroll);
+    }
   }
 
   private checkNavigationState(): void {
@@ -416,6 +426,65 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   onPreview() {
     this.preview.emit(this.form.value as Entrada);
+  }
+
+  toggleFullWidth() {
+    this.isFullWidth = !this.isFullWidth;
+    this.setupEditorScrollListener();
+  }
+
+  toggleFullScreen() {
+    this.isFullScreen = !this.isFullScreen;
+    this.setupEditorScrollListener();
+  }
+
+  private setupEditorScrollListener() {
+    // Pequeño retraso para asegurar que el DOM se ha actualizado (clases aplicadas)
+    setTimeout(() => {
+        const editorMain = document.querySelector('.ck-editor__main');
+        if (!editorMain) return;
+
+        // Limpiar listener anterior para evitar duplicados
+        editorMain.removeEventListener('scroll', this.onInternalScroll);
+
+        // Si estamos en modo pantalla completa o ancho completo (donde el scroll es interno)
+        if (this.isFullScreen || this.isFullWidth) {
+           editorMain.addEventListener('scroll', this.onInternalScroll);
+           // Verificar estado inicial
+           this.showBackToTop = editorMain.scrollTop > 300;
+        } else {
+           // Volver al chequeo de ventana normal
+           this.onWindowScroll();
+        }
+        this.cdRef.detectChanges();
+    }, 200);
+  }
+  
+  // Arrow function para mantener el contexto 'this' automáticamente
+  private onInternalScroll = (event: any) => {
+     if (this.isFullScreen || this.isFullWidth) {
+         this.showBackToTop = event.target.scrollTop > 300;
+         this.cdRef.detectChanges();
+     }
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    // Si NO estamos en modo interno, usamos el scroll de la ventana
+    if (!this.isFullScreen && !this.isFullWidth) {
+       this.showBackToTop = window.scrollY > 300;
+    }
+  }
+
+  scrollToTop() {
+    if (this.isFullScreen || this.isFullWidth) {
+        const editorMain = document.querySelector('.ck-editor__main');
+        if (editorMain) {
+            editorMain.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   control(path: string) {

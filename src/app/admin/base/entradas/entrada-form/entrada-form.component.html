@@ -89,7 +89,7 @@
 
         <c-row class="g-4">
           <!-- Left Column (Main Content) -->
-          <c-col lg="8">
+          <c-col [lg]="isFullWidth ? 12 : 8">
             <!-- Basic Info -->
             <c-card class="mb-4 shadow-sm border-0">
               <c-card-body class="p-4">
@@ -134,8 +134,20 @@
 
             <!-- Editor -->
             <c-card class="mb-4 shadow-sm border-0">
-              <c-card-body class="p-4">
-                <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Contenido</h6>
+              <c-card-body class="p-4" [ngClass]="{'editor-fullscreen': isFullScreen, 'editor-expanded': isFullWidth && !isFullScreen}">
+                <div class="d-flex justify-content-between align-items-center mb-3" [class.fullscreen-toolbar]="isFullScreen">
+                  <h6 class="text-secondary fw-bold mb-0 text-uppercase small ls-1">Contenido</h6>
+                  <div class="d-flex gap-2">
+                    @if (!isFullScreen) {
+                      <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleFullWidth()" [active]="isFullWidth" cTooltip="Anchar editor">
+                        <svg cIcon name="cilResizeWidth"></svg>
+                      </button>
+                    }
+                    <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleFullScreen()" [active]="isFullScreen" cTooltip="Pantalla completa">
+                      <svg cIcon [name]="isFullScreen ? 'cilCompress' : 'cilFullscreen'"></svg>
+                    </button>
+                  </div>
+                </div>
                 
                 @if (Editor) {
                   <div class="editor-wrapper border rounded">
@@ -225,144 +237,156 @@
           </c-col>
 
           <!-- Right Column (Sidebar) -->
-          <c-col lg="4">
-             <!-- Publish Status -->
-             <c-card class="mb-4 shadow-sm border-0">
-               <c-card-body class="p-4">
-                 <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Publicación</h6>
-                 
-                 <div class="mb-3">
-                   <label cLabel class="fw-semibold small">Estado</label>
-                   <select cSelect cFormControl formControlName="estadoEntrada">
-                      <option [ngValue]="null" disabled>Seleccionar...</option>
-                      @for (ee of estadosEntr; track ee.nombre) {
-                        <option [ngValue]="ee">{{ ee.nombre }}</option>
-                      }
-                   </select>
-                 </div>
+          <c-col [lg]="isFullWidth ? 12 : 4">
+             <c-row [gutter]="4" [ngClass]="{'flex-column': !isFullWidth}">
+               <!-- Publish Status -->
+               <c-col [md]="isFullWidth ? 4 : 12">
+                 <c-card class="mb-4 shadow-sm border-0 h-100">
+                   <c-card-body class="p-4">
+                     <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Publicación</h6>
+                     
+                     <div class="mb-3">
+                       <label cLabel class="fw-semibold small">Estado</label>
+                       <select cSelect cFormControl formControlName="estadoEntrada">
+                          <option [ngValue]="null" disabled>Seleccionar...</option>
+                          @for (ee of estadosEntr; track ee.nombre) {
+                            <option [ngValue]="ee">{{ ee.nombre }}</option>
+                          }
+                       </select>
+                     </div>
 
-                 <div class="mb-3">
-                   <label cLabel class="fw-semibold small">Tipo de Entrada</label>
-                   <select cSelect cFormControl formControlName="tipoEntrada">
-                      <option [ngValue]="null" disabled>Seleccionar...</option>
-                      @for (te of tiposEntr; track te.nombre) {
-                        <option [ngValue]="te">{{ te.nombre }}</option>
-                      }
-                   </select>
-                 </div>
-               </c-card-body>
-             </c-card>
+                     <div class="mb-3">
+                       <label cLabel class="fw-semibold small">Tipo de Entrada</label>
+                       <select cSelect cFormControl formControlName="tipoEntrada">
+                          <option [ngValue]="null" disabled>Seleccionar...</option>
+                          @for (te of tiposEntr; track te.nombre) {
+                            <option [ngValue]="te">{{ te.nombre }}</option>
+                          }
+                       </select>
+                     </div>
+                   </c-card-body>
+                 </c-card>
+               </c-col>
 
-             <!-- Categories -->
-             <c-card class="mb-4 shadow-sm border-0">
-                <c-card-header class="bg-white border-bottom py-2 d-flex justify-content-between align-items-center">
-                   <h6 class="text-secondary fw-bold mb-0 text-uppercase small ls-1">Categorías</h6>
-                   <c-badge color="primary" shape="rounded-pill">{{ categoriasArray().length }}</c-badge>
-                </c-card-header>
-                <c-card-body class="p-3" style="max-height: 300px; overflow-y: auto;">
-                   @if (categorias.length > 0) {
-                      <div class="mb-2 pb-2 border-bottom">
-                         <c-form-check>
-                            <input cFormCheckInput type="checkbox" id="all-cats" 
-                                   [checked]="estanTodasCategoriasSeleccionadas()"
-                                   [indeterminate]="estanAlgunasCategoriasSeleccionadas()"
-                                   (change)="toggleTodasCategorias($event)"
-                                   [disabled]="!form.enabled">
-                            <label cFormCheckLabel for="all-cats" class="fw-semibold small">Seleccionar Todas</label>
-                         </c-form-check>
-                      </div>
-                      
-                      <div class="d-flex flex-column gap-2">
-                        @for (cat of categorias; track cat.idCategoria) {
-                           <c-form-check>
-                              <input cFormCheckInput type="checkbox" [id]="'cat-' + cat.idCategoria"
-                                     [checked]="isCategoriaSelected(cat)"
-                                     (change)="onCategoriaChange(cat, $event)"
-                                     [disabled]="!form.enabled">
-                              <label cFormCheckLabel [for]="'cat-' + cat.idCategoria" class="small">
-                                 {{ cat.nombre }}
-                              </label>
-                           </c-form-check>
-                        }
-                      </div>
-                   } @else {
-                      <div class="text-center text-muted small">No hay categorías disponibles</div>
-                   }
-                </c-card-body>
-             </c-card>
+               <!-- Categories -->
+               <c-col [md]="isFullWidth ? 4 : 12">
+                 <c-card class="mb-4 shadow-sm border-0 h-100">
+                    <c-card-header class="bg-white border-bottom py-2 d-flex justify-content-between align-items-center">
+                       <h6 class="text-secondary fw-bold mb-0 text-uppercase small ls-1">Categorías</h6>
+                       <c-badge color="primary" shape="rounded-pill">{{ categoriasArray().length }}</c-badge>
+                    </c-card-header>
+                    <c-card-body class="p-3" style="max-height: 300px; overflow-y: auto;">
+                       @if (categorias.length > 0) {
+                          <div class="mb-2 pb-2 border-bottom">
+                             <c-form-check>
+                                <input cFormCheckInput type="checkbox" id="all-cats" 
+                                       [checked]="estanTodasCategoriasSeleccionadas()"
+                                       [indeterminate]="estanAlgunasCategoriasSeleccionadas()"
+                                       (change)="toggleTodasCategorias($event)"
+                                       [disabled]="!form.enabled">
+                                <label cFormCheckLabel for="all-cats" class="fw-semibold small">Seleccionar Todas</label>
+                             </c-form-check>
+                          </div>
+                          
+                          <div class="d-flex flex-column gap-2">
+                            @for (cat of categorias; track cat.idCategoria) {
+                               <c-form-check>
+                                  <input cFormCheckInput type="checkbox" [id]="'cat-' + cat.idCategoria"
+                                         [checked]="isCategoriaSelected(cat)"
+                                         (change)="onCategoriaChange(cat, $event)"
+                                         [disabled]="!form.enabled">
+                                  <label cFormCheckLabel [for]="'cat-' + cat.idCategoria" class="small">
+                                     {{ cat.nombre }}
+                                  </label>
+                               </c-form-check>
+                            }
+                          </div>
+                       } @else {
+                          <div class="text-center text-muted small">No hay categorías disponibles</div>
+                       }
+                    </c-card-body>
+                 </c-card>
+               </c-col>
 
-             <!-- Settings -->
-             <c-card class="mb-4 shadow-sm border-0">
-                <c-card-body class="p-4">
-                   <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Configuración</h6>
-                   
-                   <ul class="list-group list-group-flush mx-n3">
-                      <li class="list-group-item d-flex justify-content-between align-items-center px-3 border-0">
-                         <div>
-                            <span class="fw-medium small d-block">Destacada</span>
-                            <small class="text-muted" style="font-size: 0.75rem;">Mostrar en sección destacada</small>
-                         </div>
-                         <c-form-check [switch]="true">
-                            <input cFormCheckInput type="checkbox" formControlName="publicada" />
-                         </c-form-check>
-                      </li>
-                      <li class="list-group-item d-flex justify-content-between align-items-center px-3 border-0">
-                         <div>
-                            <span class="fw-medium small d-block">Privada</span>
-                            <small class="text-muted" style="font-size: 0.75rem;">Solo visible para autores</small>
-                         </div>
-                         <c-form-check [switch]="true">
-                            <input cFormCheckInput type="checkbox" formControlName="privado" />
-                         </c-form-check>
-                      </li>
-                      <li class="list-group-item d-flex justify-content-between align-items-center px-3 border-0">
-                         <div>
-                            <span class="fw-medium small d-block">Comentarios</span>
-                            <small class="text-muted" style="font-size: 0.75rem;">Permitir comentarios</small>
-                         </div>
-                         <c-form-check [switch]="true">
-                            <input cFormCheckInput type="checkbox" formControlName="permitirComentario" />
-                         </c-form-check>
-                      </li>
-                   </ul>
-                </c-card-body>
-             </c-card>
-             
-             <!-- Summary -->
-             <c-card class="mb-4 shadow-sm border-0">
-                <c-card-body class="p-4">
-                   <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Resumen</h6>
-                   <textarea
-                      cFormControl
-                      rows="4"
-                      formControlName="resumen"
-                      placeholder="Un breve resumen para SEO y listados..."
-                      class="small"
-                   ></textarea>
-                </c-card-body>
-             </c-card>
-             
-             <!-- Password Protection -->
-             <c-card class="mb-4 shadow-sm border-0">
-                <c-card-body class="p-4">
-                   <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Protección</h6>
-                   <div class="input-group">
-                      <span class="input-group-text bg-white border-end-0">
-                         <svg cIcon name="cilLockLocked" size="sm"></svg>
-                      </span>
-                      <input
-                        cFormControl
-                        type="password"
-                        formControlName="password"
-                        placeholder="Contraseña (opcional)"
-                        class="border-start-0"
-                      />
-                   </div>
-                   <small class="text-muted mt-1 d-block" style="font-size: 0.75rem;">
-                      Deja vacío para acceso público
-                   </small>
-                </c-card-body>
-             </c-card>
+               <!-- Settings -->
+               <c-col [md]="isFullWidth ? 4 : 12">
+                 <c-card class="mb-4 shadow-sm border-0 h-100">
+                    <c-card-body class="p-4">
+                       <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Configuración</h6>
+                       
+                       <ul class="list-group list-group-flush mx-n3">
+                          <li class="list-group-item d-flex justify-content-between align-items-center px-3 border-0">
+                             <div>
+                                <span class="fw-medium small d-block">Destacada</span>
+                                <small class="text-muted" style="font-size: 0.75rem;">Mostrar en sección destacada</small>
+                             </div>
+                             <c-form-check [switch]="true">
+                                <input cFormCheckInput type="checkbox" formControlName="publicada" />
+                             </c-form-check>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between align-items-center px-3 border-0">
+                             <div>
+                                <span class="fw-medium small d-block">Privada</span>
+                                <small class="text-muted" style="font-size: 0.75rem;">Solo visible para autores</small>
+                             </div>
+                             <c-form-check [switch]="true">
+                                <input cFormCheckInput type="checkbox" formControlName="privado" />
+                             </c-form-check>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between align-items-center px-3 border-0">
+                             <div>
+                                <span class="fw-medium small d-block">Comentarios</span>
+                                <small class="text-muted" style="font-size: 0.75rem;">Permitir comentarios</small>
+                             </div>
+                             <c-form-check [switch]="true">
+                                <input cFormCheckInput type="checkbox" formControlName="permitirComentario" />
+                             </c-form-check>
+                          </li>
+                       </ul>
+                    </c-card-body>
+                 </c-card>
+               </c-col>
+               
+               <!-- Summary -->
+               <c-col [md]="isFullWidth ? 6 : 12">
+                 <c-card class="mb-4 shadow-sm border-0 h-100">
+                    <c-card-body class="p-4">
+                       <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Resumen</h6>
+                       <textarea
+                          cFormControl
+                          rows="4"
+                          formControlName="resumen"
+                          placeholder="Un breve resumen para SEO y listados..."
+                          class="small"
+                       ></textarea>
+                    </c-card-body>
+                 </c-card>
+               </c-col>
+               
+               <!-- Password Protection -->
+               <c-col [md]="isFullWidth ? 6 : 12">
+                 <c-card class="mb-4 shadow-sm border-0 h-100">
+                    <c-card-body class="p-4">
+                       <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Protección</h6>
+                       <div class="input-group">
+                          <span class="input-group-text bg-white border-end-0">
+                             <svg cIcon name="cilLockLocked" size="sm"></svg>
+                          </span>
+                          <input
+                            cFormControl
+                            type="password"
+                            formControlName="password"
+                            placeholder="Contraseña (opcional)"
+                            class="border-start-0"
+                          />
+                       </div>
+                       <small class="text-muted mt-1 d-block" style="font-size: 0.75rem;">
+                          Deja vacío para acceso público
+                       </small>
+                    </c-card-body>
+                 </c-card>
+               </c-col>
+             </c-row>
           </c-col>
         </c-row>
       </form>
@@ -385,3 +409,16 @@
     <app-imagenes [mode]="'selector'" (selectItem)="onMediaSelected($event)"></app-imagenes>
   </c-modal-body>
 </c-modal>
+
+<!-- Back to Top Button -->
+@if (showBackToTop) {
+  <button 
+    cButton 
+    color="primary" 
+    class="back-to-top text-white" 
+    (click)="scrollToTop()"
+    cTooltip="Ir arriba"
+  >
+    <svg cIcon name="cilArrowTop" size="lg"></svg>
+  </button>
+}

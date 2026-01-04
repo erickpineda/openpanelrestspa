@@ -237,6 +237,14 @@ export class UiAnomalyMonitorService {
     this.recoverFromBlockers({ removeLoaderOverlay: shouldRemoveLoaderOverlay });
   }
 
+  forceCleanupForLogout(): void {
+    this.log.info('UiAnomalyMonitor: Force cleanup for logout');
+    try {
+      this.loading.forceStopLoading();
+    } catch {}
+    this.recoverFromBlockers({ removeLoaderOverlay: true });
+  }
+
   private installLongTaskObserver(): void {
     try {
       const w = window as any;
@@ -521,6 +529,7 @@ export class UiAnomalyMonitorService {
       '.c-backdrop',
       '.c-modal-backdrop',
       '.c-offcanvas-backdrop',
+      '.mobile-overlay',
     ].join(',');
     const loaderSelectors = '.loading-overlay.full-screen';
 
