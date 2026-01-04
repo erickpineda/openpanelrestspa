@@ -25,6 +25,7 @@ import { OpPaginationComponent } from './components/op-pagination/op-pagination.
 import { GlobalErrorComponent } from './components/errors/global/global-error.component';
 import { ErrorBoundaryComponent } from './components/errors/error-boundary/error-boundary.component';
 import { SharedWidgetsModule } from './shared-widgets.module';
+import { TranslatePipe } from './pipes/translate.pipe';
 
 @NgModule({
   imports: [
@@ -54,6 +55,7 @@ import { SharedWidgetsModule } from './shared-widgets.module';
     ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
+    TranslatePipe,
   ],
   exports: [
     CommonModule,
@@ -79,6 +81,7 @@ import { SharedWidgetsModule } from './shared-widgets.module';
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
     SharedWidgetsModule,
+    TranslatePipe,
   ],
 })
 export class SharedOPModule {}

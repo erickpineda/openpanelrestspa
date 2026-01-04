@@ -1,0 +1,16 @@
+{
+  "HEADER": {
+    "HOME": "Home",
+    "ABOUT": "About",
+    "CONTACT": "Contact",
+    "ADMIN": "Admin",
+    "LOGIN": "Login",
+    "LOGOUT": "Logout",
+    "PROFILE": "Profile"
+  },
+  "COMMON": {
+    "LOADING": "Loading...",
+    "ERROR": "Error",
+    "SUCCESS": "Success"
+  }
+}

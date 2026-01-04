@@ -23,6 +23,11 @@ import { TimeoutInterceptor } from './interceptor/timeout.interceptor';
 import { ErrorBoundaryService } from './errors/error-boundary/error-boundary.service';
 import { RouterModule } from '@angular/router';
 
+import { LanguageInterceptor } from './interceptor/language.interceptor';
+import { LanguageService } from './services/language.service';
+
+import { TranslationService } from './services/translation.service';
+
 @NgModule({
   imports: [CommonModule, RouterModule],
   declarations: [],
@@ -41,6 +46,8 @@ import { RouterModule } from '@angular/router';
     EntradaService,
     UsuarioService,
     LoggerService,
+    LanguageService,
+    TranslationService,
 
     // Interceptors en orden de ejecución
     {
@@ -50,9 +57,15 @@ import { RouterModule } from '@angular/router';
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor, // 2º: Autenticación
+      useClass: LanguageInterceptor, // 2º: Idioma (antes de auth para que auth también pueda llevarlo si es necesario)
       multi: true,
     },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor, // 3º: Autenticación
+      multi: true,
+    },
+
     {
       provide: HTTP_INTERCEPTORS,
       useClass: NetworkInterceptor, // 3º: Loading y manejo de errores

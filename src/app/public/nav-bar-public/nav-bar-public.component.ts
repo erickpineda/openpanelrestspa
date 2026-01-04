@@ -6,6 +6,7 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { TokenStorageService } from '../../core/services/auth/token-storage.service';
 import { LoggerService } from '../../core/services/logger.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
+import { LanguageService, Language } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-nav-bar-public',
@@ -21,6 +22,7 @@ export class NavBarPublicComponent implements OnInit {
   username?: string;
   isShrink: boolean = false;
   isLoadingLogout = false;
+  currentLang: Language = 'es';
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -32,7 +34,8 @@ export class NavBarPublicComponent implements OnInit {
     private authService: AuthService,
     private authSync: AuthSyncService,
     private router: Router,
-    private log: LoggerService
+    private log: LoggerService,
+    public languageService: LanguageService
   ) {
     // Escuchar cambios de estado de autenticación
     window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, () => {
@@ -52,6 +55,14 @@ export class NavBarPublicComponent implements OnInit {
   ngOnInit(): void {
     this.checkAuthStatus();
     this.authSync.initializeAuthState(); // Sincronizar al iniciar
+    
+    this.languageService.currentLang$.subscribe((lang: Language) => {
+      this.currentLang = lang;
+    });
+  }
+
+  toggleLanguage(): void {
+    this.languageService.toggleLanguage();
   }
 
   private checkAuthStatus(): void {

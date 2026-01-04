@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { ClassToggleService, HeaderComponent } from '@coreui/angular';
+import { LanguageService, Language } from '../../../core/services/language.service';
 
 interface IBreadcrumb {
   label: string;
@@ -49,6 +50,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
   } | null = null;
 
   public userMenuOpen = false;
+  currentLang: Language = 'es';
 
   get messagesCount(): number {
     return this.userCounts?.messages ?? this.newMessages.length;
@@ -66,13 +68,18 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
   constructor(
     private classToggler: ClassToggleService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public languageService: LanguageService
   ) {
     super();
   }
 
   ngOnInit(): void {
     this.breadcrumbs = this.createBreadcrumbs(this.router.routerState.root);
+    
+    this.languageService.currentLang$.subscribe((lang: Language) => {
+      this.currentLang = lang;
+    });
     
     this.routerSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
@@ -87,6 +94,10 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     }
   }
 
+  toggleLanguage(): void {
+    this.languageService.toggleLanguage();
+  }
+
   private createBreadcrumbs(
     route: ActivatedRoute,
     url: string = '',
@@ -99,35 +110,18 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     }
 
     for (const child of children) {
-      if (child.outlet !== 'primary') {
-        continue;
-      }
-
       const routeURL: string = child.snapshot.url.map((segment) => segment.path).join('/');
       if (routeURL !== '') {
         url += `/${routeURL}`;
       }
 
-      let label = child.snapshot.data['title'];
-      
-      // Fallback: usar parte de la URL si no hay título
-      if (!label && routeURL !== '') {
-        label = this.formatLabel(routeURL);
-      }
-
-      // Omitir el breadcrumb de nivel raíz '/admin' ya que se muestra como "Inicio" fijo
-      if (label && url !== '/admin') {
+      const label = child.snapshot.data['title'];
+      if (label) {
         breadcrumbs.push({ label, url });
       }
 
       return this.createBreadcrumbs(child, url, breadcrumbs);
     }
     return breadcrumbs;
-  }
-
-  private formatLabel(text: string): string {
-    return text
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, (l) => l.toUpperCase());
   }
 }
