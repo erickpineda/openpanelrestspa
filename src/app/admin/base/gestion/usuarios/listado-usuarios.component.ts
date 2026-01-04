@@ -222,38 +222,9 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     this.editModalVisible = true;
   }
 
-  closeEdit(): void {
-    this.editModalVisible = false;
-    this.editUser = null;
-    this.originalUser = null;
-  }
-
-  isEmailValid(e?: string): boolean {
-    if (!e) return false;
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(e);
-  }
-
-  isUserFormValid(): boolean {
-    return !!(
-      this.editUser &&
-      this.editUser.username &&
-      this.isEmailValid(this.editUser.email) &&
-      this.editUser.rolCodigo
-    );
-  }
-
-  getUserErrors(): string[] {
-    const errs: string[] = [];
-    if (!this.editUser) return errs;
-    if (!this.editUser.username) errs.push('Usuario requerido');
-    if (!this.isEmailValid(this.editUser.email)) errs.push('Email inválido');
-    if (!this.editUser.rolCodigo) errs.push('Rol requerido');
-    return errs;
-  }
-
-  saveEdit(): void {
-    if (!this.editUser) return;
+  saveEdit(usuario: Usuario): void {
+    if (!usuario) return;
+    this.editUser = usuario;
     this.loading = true;
     const hasId = !!this.editUser.idUsuario && this.editUser.idUsuario > 0;
 
@@ -294,11 +265,6 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     }
     this.userToDelete = u;
     this.showDeleteModal = true;
-  }
-
-  cancelDelete(): void {
-    this.showDeleteModal = false;
-    this.userToDelete = null;
   }
 
   confirmDelete(): void {

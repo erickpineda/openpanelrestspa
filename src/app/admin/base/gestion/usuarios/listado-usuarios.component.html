@@ -319,176 +319,18 @@
 </c-container>
 
 <!-- Modal Editar/Crear Usuario -->
-<c-modal
+<app-usuario-form
   [visible]="editModalVisible"
+  [usuario]="editUser"
+  [roles]="roles"
   (visibleChange)="editModalVisible = $event"
-  id="editUserModal"
-  backdrop="static"
-  size="lg"
->
-  <c-modal-header>
-    <h5 cModalTitle class="d-flex align-items-center gap-2">
-      <svg cIcon [name]="editUser?.idUsuario ? 'cilPen' : 'cilUserPlus'" class="text-primary"></svg>
-      {{ editUser?.idUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}
-    </h5>
-    <button (click)="closeEdit()" cButtonClose></button>
-  </c-modal-header>
-  <c-modal-body class="p-4">
-    @if (editUser) {
-      <div class="row g-3">
-        <!-- Username & Email -->
-        <c-col md="6">
-          <label class="form-label fw-semibold">Usuario</label>
-          <div class="input-group">
-            <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilUser" size="sm"></svg></span>
-            <input
-              cFormControl
-              type="text"
-              [value]="editUser.username || ''"
-              (input)="editUser && (editUser.username = $any($event.target).value)"
-              [class.is-invalid]="!editUser.username"
-              [disabled]="!!editUser.idUsuario"
-              placeholder="Nombre de usuario"
-              class="border-start-0"
-            />
-          </div>
-          @if (!editUser.username) {
-            <div class="text-danger small mt-1">Usuario requerido</div>
-          }
-        </c-col>
-        
-        <c-col md="6">
-          <label class="form-label fw-semibold">Email</label>
-          <div class="input-group">
-            <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilEnvelopeClosed" size="sm"></svg></span>
-            <input
-              cFormControl
-              type="email"
-              [value]="editUser.email || ''"
-              (input)="editUser && (editUser.email = $any($event.target).value)"
-              [class.is-invalid]="!isEmailValid(editUser.email)"
-              placeholder="correo@ejemplo.com"
-              class="border-start-0"
-            />
-          </div>
-          @if (!isEmailValid(editUser.email)) {
-            <div class="text-danger small mt-1">Email inválido</div>
-          }
-        </c-col>
-
-        <!-- Names -->
-        <c-col md="6">
-          <label class="form-label fw-semibold">Nombre</label>
-          <input
-            cFormControl
-            type="text"
-            [value]="editUser.nombre || ''"
-            (input)="editUser && (editUser.nombre = $any($event.target).value)"
-            placeholder="Nombres"
-          />
-        </c-col>
-        <c-col md="6">
-          <label class="form-label fw-semibold">Apellido</label>
-          <input
-            cFormControl
-            type="text"
-            [value]="editUser.apellido || ''"
-            (input)="editUser && (editUser.apellido = $any($event.target).value)"
-            placeholder="Apellidos"
-          />
-        </c-col>
-
-        <c-col xs="12"><hr class="my-2 text-muted opacity-25"></c-col>
-
-        <!-- Role & Status -->
-        <c-col md="6">
-          <label class="form-label fw-semibold">Rol Asignado</label>
-          <select
-            cSelect
-            [(ngModel)]="editUser.rolCodigo"
-            [class.is-invalid]="!editUser.rolCodigo"
-            [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE"
-          >
-            <option value="">Seleccione rol</option>
-            @for (r of roles; track trackByRol($index, r)) {
-              @if (r.codigo !== PROPIETARIO_ROLE_CODE || editUser.rolCodigo === PROPIETARIO_ROLE_CODE) {
-                <option [value]="r.codigo">{{ r.nombre }}</option>
-              }
-            }
-          </select>
-          @if (!editUser.rolCodigo) {
-            <div class="text-danger small mt-1">Rol requerido</div>
-          }
-          @if (PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE) {
-            <div class="text-info small mt-1 d-flex align-items-center">
-              <svg cIcon name="cilLockLocked" size="sm" class="me-1"></svg>
-              Rol de Propietario inmutable.
-            </div>
-          }
-        </c-col>
-
-        <c-col md="6" class="d-flex align-items-center">
-          <div class="p-3 bg-light rounded w-100 border">
-            <c-form-check>
-              <input
-                cFormCheckInput
-                type="checkbox"
-                id="userEnabled"
-                [checked]="editUser.habilitado"
-                (change)="editUser && (editUser.habilitado = $any($event.target).checked)"
-                [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE"
-              />
-              <label cFormCheckLabel for="userEnabled" class="fw-semibold cursor-pointer select-none">
-                Usuario Habilitado
-              </label>
-            </c-form-check>
-            <div class="small text-muted ms-4">
-              Permite el acceso al sistema
-            </div>
-          </div>
-        </c-col>
-      </div>
-    }
-  </c-modal-body>
-  <c-modal-footer class="bg-light bg-opacity-10">
-    <button cButton color="secondary" variant="ghost" (click)="closeEdit()">Cancelar</button>
-    <button cButton color="primary" [disabled]="!isUserFormValid()" (click)="saveEdit()">
-      <svg cIcon name="cilSave" class="me-1"></svg>
-      Guardar Usuario
-    </button>
-  </c-modal-footer>
-</c-modal>
+  (onSave)="saveEdit($event)"
+></app-usuario-form>
 
 <!-- Modal Eliminar -->
-<c-modal
+<app-eliminar-usuario
   [visible]="showDeleteModal"
+  [usuario]="userToDelete"
   (visibleChange)="showDeleteModal = $event"
-  id="deleteUserModal"
-  backdrop="static"
->
-  <c-modal-header>
-    <h5 cModalTitle class="text-danger">
-      <svg cIcon name="cilWarning" class="me-2"></svg>
-      Confirmar eliminación
-    </h5>
-    <button (click)="cancelDelete()" cButtonClose></button>
-  </c-modal-header>
-  <c-modal-body>
-    <div class="text-center mb-3">
-      <c-avatar color="danger" textColor="white" size="xl" class="mb-3">
-        <svg cIcon name="cilTrash" size="lg"></svg>
-      </c-avatar>
-      <p class="lead mb-1">¿Estás seguro de eliminar este usuario?</p>
-      <div class="fw-bold text-primary">{{ userToDelete?.username }}</div>
-    </div>
-    <div class="alert alert-danger bg-danger bg-opacity-10 text-danger border-danger border-opacity-25 small mb-0">
-      Esta acción es irreversible y podría afectar al contenido creado por este usuario.
-    </div>
-  </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" variant="ghost" (click)="cancelDelete()">Cancelar</button>
-    <button cButton color="danger" (click)="confirmDelete()">
-      Eliminar Definitivamente
-    </button>
-  </c-modal-footer>
-</c-modal>
+  (onConfirm)="confirmDelete()"
+></app-eliminar-usuario>

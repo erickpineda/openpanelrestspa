@@ -1,0 +1,22 @@
+<c-modal
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  id="deletePrivilegioModal"
+  backdrop="static"
+>
+  <c-modal-header class="border-bottom-0">
+    <h5 cModalTitle class="fw-bold text-danger">Eliminar Privilegio</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="text-center py-3">
+      <svg cIcon name="cilTrash" size="4xl" class="text-danger mb-3 opacity-75"></svg>
+      <p class="mb-1">¿Estás seguro de que deseas eliminar el privilegio?</p>
+      <h4 class="fw-bold text-dark">{{ privilegio?.nombre }}</h4>
+      <p class="text-muted small mt-2">Esta acción no se puede deshacer.</p>
+    </div>
+  </c-modal-body>
+  <c-modal-footer class="border-top-0 justify-content-center pb-4">
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">Cancelar</button>
+    <button cButton color="danger" class="px-4" (click)="confirmar()">Sí, Eliminar</button>
+  </c-modal-footer>
+</c-modal>

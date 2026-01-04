@@ -1,0 +1,35 @@
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  id="deleteUserModal"
+  backdrop="static"
+>
+  <c-modal-header>
+    <h5 cModalTitle class="text-danger">
+      <svg cIcon name="cilWarning" class="me-2"></svg>
+      Confirmar eliminación
+    </h5>
+    <button (click)="cerrarModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="text-center mb-3">
+      <c-avatar color="danger" textColor="white" size="xl" class="mb-3">
+        <svg cIcon name="cilTrash" size="lg"></svg>
+      </c-avatar>
+      <p class="lead mb-1">¿Estás seguro de eliminar este usuario?</p>
+      <div class="fw-bold text-primary">{{ usuario?.username }}</div>
+    </div>
+    <div class="alert alert-danger bg-danger bg-opacity-10 text-danger border-danger border-opacity-25 small mb-0">
+      Esta acción es irreversible y podría afectar al contenido creado por este usuario.
+    </div>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">Cancelar</button>
+    <button cButton color="danger" (click)="confirmar()" [disabled]="loading">
+      @if (loading) {
+        <c-spinner size="sm" class="me-1"></c-spinner>
+      }
+      Eliminar Definitivamente
+    </button>
+  </c-modal-footer>
+</c-modal>

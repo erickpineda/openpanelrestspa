@@ -251,6 +251,36 @@
   }
 </c-card>
 
+<c-modal [visible]="visible" (visibleChange)="onVisibleModalChange($event)" id="modalBorrar">
+  <c-modal-header>
+    <h5 cModalTitle>Confirmar eliminación</h5>
+    <button (click)="toggleModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    ¿Está seguro de que desea eliminar la página <strong>{{ entradaABorrar?.titulo }}</strong>?
+    <p class="text-danger small mt-2 mb-0">Esta acción no se puede deshacer.</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggleModal()" cButton color="secondary">Cancelar</button>
+    <button (click)="confirmarBorrado()" cButton color="danger">Eliminar</button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal [visible]="visible" (visibleChange)="onVisibleModalChange($event)" id="modalBorrar">
+  <c-modal-header>
+    <h5 cModalTitle>Confirmar eliminación</h5>
+    <button (click)="toggleModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    ¿Está seguro de que desea eliminar la página <strong>{{ entradaABorrar?.titulo }}</strong>?
+    <p class="text-danger small mt-2 mb-0">Esta acción no se puede deshacer.</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggleModal()" cButton color="secondary">Cancelar</button>
+    <button (click)="confirmarBorrado()" cButton color="danger">Eliminar</button>
+  </c-modal-footer>
+</c-modal>
+
 <c-modal #previewModal id="previewModal" [visible]="previewVisible" (visibleChange)="onPreviewVisibleChange($event)" size="xl">
   <c-modal-header>
     <h5 cModalTitle>Vista Previa: {{ previewEntrada?.titulo }}</h5>

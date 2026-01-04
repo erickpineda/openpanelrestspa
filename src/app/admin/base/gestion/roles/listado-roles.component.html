@@ -213,151 +213,18 @@
   }
 </c-card>
 
-<c-modal
-  id="editRolModal"
+<app-rol-form
   [visible]="editModalVisible"
+  [rol]="editRol"
+  [isEditing]="isEditing"
+  [privilegios]="privilegios"
   (visibleChange)="editModalVisible = $event"
-  size="lg"
-  backdrop="static"
->
-  <c-modal-header class="border-bottom-0 pb-0">
-    <h5 cModalTitle class="fw-bold">{{ isEditing ? 'Editar Rol' : 'Nuevo Rol' }}</h5>
-  </c-modal-header>
-  <c-modal-body class="py-4">
-    @if (editRol) {
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label small fw-bold text-muted">Nombre del Rol</label>
-           <input
-            cFormControl
-            type="text"
-            [value]="editRol.nombre || ''"
-            (input)="onNombreInput($any($event.target).value)"
-            [class.is-invalid]="!editRol.nombre"
-            [disabled]="isProtectedRole(editRol)"
-            placeholder="Ej. Editor de Contenido"
-          />
-           @if (!editRol.nombre) {
-            <div class="invalid-feedback d-block">Nombre requerido</div>
-          }
-          @if (isProtectedRole(editRol)) {
-            <div class="form-text text-muted small">
-              <svg cIcon name="cilLockLocked" size="sm" class="me-1"></svg>
-              Nombre protegido
-            </div>
-          }
-        </div>
-        
-        <div class="col-md-6">
-          <label class="form-label small fw-bold text-muted">Código</label>
-          <input
-            cFormControl
-            type="text"
-            [value]="editRol.codigo || ''"
-            (input)="onCodigoInput($any($event.target).value)"
-            [disabled]="isEditing"
-            [class.is-invalid]="!editRol.codigo"
-            maxlength="5"
-            placeholder="Ej. EDIT"
-            class="text-uppercase"
-          />
-           @if (!editRol.codigo) {
-            <div class="invalid-feedback d-block">Código requerido (máx 5 caracteres)</div>
-          }
-          @if (!isEditing) {
-            <div class="form-text text-muted small">
-              Se genera automáticamente si se deja vacío.
-            </div>
-          }
-        </div>
+  (onSave)="saveEdit($event)"
+></app-rol-form>
 
-        <div class="col-12">
-          <label class="form-label small fw-bold text-muted">Descripción</label>
-          <textarea
-            cFormControl
-            rows="2"
-            [value]="editRol.descripcion || ''"
-            (input)="editRol && (editRol.descripcion = $any($event.target).value)"
-            placeholder="Descripción opcional del rol..."
-          ></textarea>
-        </div>
-
-        <div class="col-12 mt-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <label class="form-label fw-bold mb-0">Privilegios Asignados</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="selectAllPrivilegios"
-                [checked]="areAllPrivilegiosSelected()"
-                [indeterminate]="areSomePrivilegiosSelected()"
-                (change)="toggleAllPrivilegios($any($event.target).checked)"
-                [disabled]="privilegios.length === 0"
-              />
-              <label class="form-check-label small" for="selectAllPrivilegios">Seleccionar todos</label>
-            </div>
-          </div>
-          
-          <div class="card bg-light border-0">
-            <div class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
-               @if (privilegios.length === 0) {
-                <div class="text-center text-muted py-3">
-                  <small>No hay privilegios disponibles</small>
-                </div>
-              }
-              <div class="row g-2">
-                @for (p of privilegios; track trackByPrivilegio($index, p)) {
-                  <div class="col-md-6">
-                    <div class="form-check p-2 rounded bg-white border h-100 d-flex align-items-center hover-shadow-sm">
-                       <input
-                        class="form-check-input ms-0 me-2"
-                        type="checkbox"
-                        [id]="'privilegio-' + p.codigo"
-                        [checked]="hasPrivilegio(p)"
-                        (change)="togglePrivilegio(p, $any($event.target).checked)"
-                      />
-                      <label class="form-check-label w-100 cursor-pointer" [for]="'privilegio-' + p.codigo">
-                        <div class="d-flex flex-column">
-                          <span class="fw-medium text-dark small">{{ p.nombre }}</span>
-                          @if (p.descripcion) {
-                            <small class="text-muted" style="font-size: 0.75rem;">{{ p.descripcion }}</small>
-                          }
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    }
-  </c-modal-body>
-  <c-modal-footer class="border-top-0 pt-0 pb-4">
-    <button cButton color="secondary" variant="ghost" (click)="closeEdit()">Cancelar</button>
-    <button cButton color="primary" class="px-4" [disabled]="!isRolFormValid()" (click)="saveEdit()">
-      {{ isEditing ? 'Guardar Cambios' : 'Crear Rol' }}
-    </button>
-  </c-modal-footer>
-</c-modal>
-
-<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal = $event" id="deleteRolModal" backdrop="static">
-  <c-modal-header class="border-bottom-0">
-    <h5 cModalTitle class="fw-bold text-danger">Eliminar Rol</h5>
-  </c-modal-header>
-  <c-modal-body>
-    <div class="text-center py-3">
-      <svg cIcon name="cilTrash" size="4xl" class="text-danger mb-3 opacity-75"></svg>
-      <p class="mb-1">¿Estás seguro de que deseas eliminar el rol?</p>
-      <h4 class="fw-bold text-dark">{{ rolToDelete?.nombre }}</h4>
-      <p class="text-muted small mt-2">Esta acción no se puede deshacer y podría afectar a los usuarios asignados.</p>
-    </div>
-  </c-modal-body>
-  <c-modal-footer class="border-top-0 justify-content-center pb-4">
-    <button cButton color="secondary" variant="ghost" (click)="cancelDelete()">Cancelar</button>
-    <button cButton color="danger" class="px-4" (click)="confirmDelete()">Sí, Eliminar</button>
-  </c-modal-footer>
-</c-modal>
-
+<app-eliminar-rol
+  [visible]="showDeleteModal"
+  [rol]="rolToDelete"
+  (visibleChange)="showDeleteModal = $event"
+  (onConfirm)="confirmDelete()"
+></app-eliminar-rol>

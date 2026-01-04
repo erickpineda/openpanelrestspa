@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { finalize, takeUntil, switchMap } from 'rxjs/operators';
-import { Subject, of } from 'rxjs';
+import { finalize, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { PrivilegioService } from '../../../../core/services/data/privilegio.service';
 import { Privilegio } from '../../../../core/models/privilegio.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
@@ -30,8 +30,7 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
   editModalVisible = false;
   editPrivilegio: Privilegio | null = null;
   isEditing = false;
-  manualCodeEntry = false;
-
+  
   showDeleteModal = false;
   privilegioToDelete: Privilegio | null = null;
 
@@ -155,7 +154,6 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
   openCreate(): void {
     this.editPrivilegio = new Privilegio();
     this.isEditing = false;
-    this.manualCodeEntry = false;
     this.editModalVisible = true;
   }
 
@@ -165,49 +163,14 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     this.editModalVisible = true;
   }
 
-  closeEdit(): void {
-    this.editModalVisible = false;
-    this.editPrivilegio = null;
-  }
-
-  isFormValid(): boolean {
-    return !!(
-      this.editPrivilegio &&
-      this.editPrivilegio.nombre &&
-      this.editPrivilegio.nombre.trim().length > 0 &&
-      this.editPrivilegio.codigo &&
-      this.editPrivilegio.codigo.trim().length > 0
-    );
-  }
-
-  onNombreInput(value: string): void {
-    if (!this.editPrivilegio) return;
-    this.editPrivilegio.nombre = value;
-
-    if (!this.isEditing && !this.manualCodeEntry) {
-      this.generateCodeFromNombre(value);
-    }
-  }
-
-  onCodigoInput(value: string): void {
-    if (!this.editPrivilegio) return;
-    this.editPrivilegio.codigo = value.toUpperCase();
-    this.manualCodeEntry = true;
-  }
-
-  private generateCodeFromNombre(nombre: string): void {
-    if (!this.editPrivilegio) return;
-    let code = nombre.replace(/\s/g, '').substring(0, 10).toUpperCase();
-    this.editPrivilegio.codigo = code;
-  }
-
-  saveEdit(): void {
-    if (!this.editPrivilegio) return;
+  saveEdit(privilegio: Privilegio): void {
+    if (!privilegio) return;
     this.loading = true;
+    this.editPrivilegio = privilegio;
 
     const op$ = this.isEditing
-      ? this.privilegioService.actualizar(this.editPrivilegio.codigo, this.editPrivilegio)
-      : this.privilegioService.crear(this.editPrivilegio);
+      ? this.privilegioService.actualizar(privilegio.codigo, privilegio)
+      : this.privilegioService.crear(privilegio);
 
     op$.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
@@ -237,15 +200,10 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  cancelDelete(): void {
-    this.showDeleteModal = false;
-    this.privilegioToDelete = null;
-    this.cdr.detectChanges();
-  }
-
   confirmDelete(): void {
     if (!this.privilegioToDelete?.codigo) {
-      this.cancelDelete();
+      this.showDeleteModal = false;
+      this.privilegioToDelete = null;
       return;
     }
     this.loading = true;
@@ -256,14 +214,16 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
         next: () => {
           this.toast.showSuccess('Privilegio eliminado', 'Privilegios');
           this.loading = false;
-          this.cancelDelete();
+          this.showDeleteModal = false;
+          this.privilegioToDelete = null;
           this.load();
         },
         error: (err: any) => {
           this.toast.showError('Error eliminando privilegio', 'Privilegios');
           this.log.error('privilegios borrar', err);
           this.loading = false;
-          this.cancelDelete();
+          this.showDeleteModal = false;
+          this.privilegioToDelete = null;
         },
       });
   }

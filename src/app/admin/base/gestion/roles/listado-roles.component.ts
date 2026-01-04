@@ -390,18 +390,19 @@ export class RolesListComponent implements OnInit, OnDestroy {
     }
   }
 
-  saveEdit(): void {
-    if (!this.editRol) return;
+  saveEdit(rol: Rol): void {
+    if (!rol) return;
     this.loading = true;
+    this.editRol = rol; // Update local ref if needed for logic below, or just use 'rol' argument
 
     // RESTRICCION: Propietario siempre debe tener todos los privilegios (incluso los nuevos que no se hayan mostrado)
-    if (this.editRol.codigo === this.PROPIETARIO_ROLE_CODE) {
-      this.editRol.privilegios = JSON.parse(JSON.stringify(this.privilegios));
+    if (rol.codigo === this.PROPIETARIO_ROLE_CODE) {
+      rol.privilegios = JSON.parse(JSON.stringify(this.privilegios));
     }
 
     // RESTRICCION: Admin debe tener al menos un privilegio (o conjunto esencial)
-    if (this.editRol.codigo === this.ADMIN_ROLE_CODE) {
-      if (!this.editRol.privilegios || this.editRol.privilegios.length === 0) {
+    if (rol.codigo === this.ADMIN_ROLE_CODE) {
+      if (!rol.privilegios || rol.privilegios.length === 0) {
         this.toast.showWarning(
           'El rol de Administrador no puede quedar sin privilegios.',
           'Validación'
@@ -412,13 +413,13 @@ export class RolesListComponent implements OnInit, OnDestroy {
     }
 
     // Guardamos la referencia a los privilegios para enviarlos después
-    const privilegios = [...this.editRol.privilegios];
+    const privilegios = [...rol.privilegios];
     // Opcional: limpiar privilegios del objeto principal si el backend no los acepta
-    // this.editRol.privilegios = [];
+    // rol.privilegios = [];
 
     const op$ = this.isEditing
-      ? this.rolService.actualizar(this.editRol.codigo, this.editRol)
-      : this.rolService.crear(this.editRol);
+      ? this.rolService.actualizar(rol.codigo, rol)
+      : this.rolService.crear(rol);
 
     op$
       .pipe(
@@ -429,8 +430,8 @@ export class RolesListComponent implements OnInit, OnDestroy {
           // Asumimos que el backend devuelve el objeto creado o usamos el código que enviamos.
           // Si el backend devuelve el objeto, lo usamos.
           const rolCode = this.isEditing
-            ? this.editRol!.codigo
-            : res?.codigo || res?.data?.codigo || this.editRol!.codigo;
+            ? rol.codigo
+            : res?.codigo || res?.data?.codigo || rol.codigo;
 
           if (privilegios) {
             const codigos = privilegios.map((p) => p.codigo);
@@ -468,15 +469,10 @@ export class RolesListComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges(); // Forzar detección de cambios
   }
 
-  cancelDelete(): void {
-    this.showDeleteModal = false;
-    this.rolToDelete = null;
-    this.cdr.detectChanges(); // Forzar detección de cambios
-  }
-
   confirmDelete(): void {
     if (!this.rolToDelete?.codigo) {
-      this.cancelDelete();
+      this.showDeleteModal = false;
+      this.rolToDelete = null;
       return;
     }
     this.loading = true;
@@ -487,14 +483,16 @@ export class RolesListComponent implements OnInit, OnDestroy {
         next: () => {
           this.toast.showSuccess('Rol eliminado', 'Roles');
           this.loading = false;
-          this.cancelDelete();
+          this.showDeleteModal = false;
+          this.rolToDelete = null;
           this.load();
         },
         error: (err: any) => {
           this.toast.showError('Error eliminando rol', 'Roles');
           this.log.error('roles borrar', err);
           this.loading = false;
-          this.cancelDelete();
+          this.showDeleteModal = false;
+          this.rolToDelete = null;
         },
       });
   }
