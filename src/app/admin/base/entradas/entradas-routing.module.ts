@@ -9,9 +9,9 @@ import { TemporaryEntriesManagerComponent } from '../../../shared/components/tem
 
 const routes: Routes = [
   { path: '', component: ListadoEntradasComponent },
-  { path: 'crear', component: CrearEntradaComponent },
-  { path: 'editar/:idEntrada', component: EditarEntradaComponent },
-  { path: 'entradas-temporales', component: TemporaryEntriesManagerComponent },
+  { path: 'crear', component: CrearEntradaComponent, data: { title: 'MENU.CREATE_ENTRY' } },
+  { path: 'editar/:idEntrada', component: EditarEntradaComponent, data: { title: 'MENU.EDIT_ENTRY' } },
+  { path: 'entradas-temporales', component: TemporaryEntriesManagerComponent, data: { title: 'MENU.TEMP_ENTRIES' } },
 ];
 
 @NgModule({

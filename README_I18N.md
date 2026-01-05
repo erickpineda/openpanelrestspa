@@ -1,54 +1,81 @@
 # Sistema de Internacionalización (i18n)
 
-Este proyecto implementa un sistema de internacionalización personalizado que interactúa con el backend y permite la traducción de la interfaz de usuario.
+Este proyecto implementa un sistema de internacionalización robusto, escalable y modular.
 
 ## Características
 
-1.  **Gestión de Estado**: `LanguageService` gestiona el idioma actual ('es' o 'en') persistiendo la selección en `localStorage`.
-2.  **Integración Backend**: `LanguageInterceptor` intercepta todas las peticiones a `/api/` e inyecta el parámetro `lang=es` o `lang=en`.
-3.  **Traducciones Frontend**: `TranslationService` carga archivos JSON desde `assets/i18n/` y `TranslatePipe` permite usar estas traducciones en las plantillas.
-
-## Estructura
-
-*   `src/app/core/services/language.service.ts`: Servicio singleton para gestionar el idioma activo.
-*   `src/app/core/interceptor/language.interceptor.ts`: Interceptor HTTP.
-*   `src/app/core/services/translation.service.ts`: Servicio de carga de traducciones.
-*   `src/app/shared/pipes/translate.pipe.ts`: Pipe puro (false) para transformar claves en texto.
-*   `src/assets/i18n/*.json`: Archivos de traducción.
+*   **Gestión de Idioma**: Soporte para español (`es`) e inglés (`en`), extensible a más idiomas.
+*   **Persistencia**: El idioma seleccionado se guarda en `localStorage`.
+*   **Interceptor API**: Se añade automáticamente `?lang=es` (o el idioma actual) a todas las peticiones API.
+*   **Traducciones Dinámicas**: Carga lazy de archivos JSON (`assets/i18n/*.json`).
+*   **Interpolación**: Soporte para variables en textos (ej: `{{name}}`).
+*   **Fallback**: Si una traducción falta en el idioma actual, se busca en el idioma por defecto (`es`).
+*   **Anidamiento**: Soporte para claves anidadas (ej: `HOME.TITLE`).
+*   **Formatos**: Soporte para formatos de fecha y número (locales `es` y `en` registrados).
 
 ## Uso
 
-### Cambiar Idioma
-
-Inyectar `LanguageService` y usar `setLanguage(lang)` o `toggleLanguage()`.
-
-```typescript
-constructor(private languageService: LanguageService) {}
-
-cambiarIngles() {
-  this.languageService.setLanguage('en');
-}
-```
-
-### Usar Traducciones en HTML
+### 1. En Plantillas (HTML)
 
 Usar el pipe `translate`:
 
 ```html
-<p>{{ 'HEADER.HOME' | translate }}</p>
+<!-- Texto simple -->
+<h1>{{ 'HOME.TITLE' | translate }}</h1>
+
+<!-- Con interpolación -->
+<p>{{ 'WELCOME_MESSAGE' | translate: { name: user.name } }}</p>
+
+<!-- Formatos de fecha (pasar locale dinámicamente si se requiere) -->
+<p>{{ today | date:'fullDate':undefined:currentLang }}</p>
 ```
 
-### Añadir Nuevas Traducciones
+### 2. En Código (TypeScript)
 
-1.  Editar `src/assets/i18n/es.json` y `en.json`.
-2.  Mantener la misma estructura de claves en ambos archivos.
+Inyectar `TranslationService`:
 
-### Añadir Nuevo Idioma
+```typescript
+constructor(private translationService: TranslationService) {}
 
-1.  Crear `src/assets/i18n/fr.json` (ejemplo).
-2.  Actualizar el tipo `Language` en `language.service.ts`.
-3.  Actualizar los selectores de idioma en el Header.
+showMessage() {
+  const msg = this.translationService.translate('ALERTS.SUCCESS', { id: 123 });
+  console.log(msg);
+}
+```
 
-## Backend
+### 3. Añadir Traducciones
 
-El backend recibe automáticamente el parámetro `lang` en el query string. No es obligatorio procesarlo, pero está disponible para devolver mensajes de error o datos localizados.
+Editar `src/assets/i18n/es.json` y `src/assets/i18n/en.json`:
+
+```json
+{
+  "HOME": {
+    "TITLE": "Bienvenido"
+  },
+  "ALERTS": {
+    "SUCCESS": "Operación {{id}} exitosa"
+  }
+}
+```
+
+## Configuración
+
+### Añadir un nuevo idioma
+
+1.  Crear `src/assets/i18n/fr.json`.
+2.  Actualizar el tipo `Language` en `src/app/core/services/language.service.ts`.
+3.  Registrar el locale en `src/app/app.module.ts` si se requieren formatos específicos.
+
+### Estructura
+
+*   `TranslationService`: Gestiona la carga y lógica de traducción.
+*   `TranslatePipe`: Transforma claves en texto en la vista.
+*   `LanguageService`: Gestiona el estado del idioma activo.
+*   `LanguageInterceptor`: Propaga el idioma al backend.
+
+## Pruebas
+
+Ejecutar pruebas unitarias:
+```bash
+npm test
+```

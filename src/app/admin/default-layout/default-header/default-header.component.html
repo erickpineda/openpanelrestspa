@@ -103,15 +103,15 @@
         }
       </li>
       @for (breadcrumb of breadcrumbs; track $index; let last = $last) {
-    <li
-      class="breadcrumb-item"
-      [class.active]="last"
-      [attr.aria-current]="last ? 'page' : null"
-    >
+        <li
+          class="breadcrumb-item"
+          [class.active]="last"
+          [attr.aria-current]="last ? 'page' : null"
+        >
           @if (!last) {
-            <a [routerLink]="breadcrumb.url">{{ breadcrumb.label }}</a>
+            <a [routerLink]="breadcrumb.url">{{ breadcrumb.label | translate }}</a>
           } @else {
-            <span>{{ breadcrumb.label }}</span>
+            <span>{{ breadcrumb.label | translate }}</span>
           }
         </li>
       }

@@ -16,12 +16,12 @@ const routes: Routes = [
         path: 'dashboard',
         loadChildren: () =>
           import('./base/dashboard/dashboard.module').then((m) => m.DashboardModule),
-        data: { preload: true, delay: 1000 },
+        data: { preload: true, delay: 1000, title: 'MENU.DASHBOARD' },
       },
       {
         path: 'control',
         loadChildren: () => import('./base/base.module').then((m) => m.BaseModule),
-        data: { preload: true, delay: 1000 },
+        data: { preload: true, delay: 1000, title: 'MENU.CONTROL_PANEL' },
         canLoad: [AuthGuard], // evita la carga del módulo si no estamos autenticados
       },
       {

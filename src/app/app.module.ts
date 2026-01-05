@@ -9,6 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { CustomPreloadingStrategyService } from './core/preloading/custom-preloading-strategy.service';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
+import localeEn from '@angular/common/locales/en';
 import { ModalModule, ToastModule } from '@coreui/angular';
 import { UnsavedWorkDirective } from './core/directives/unsaved-work.directive';
 import { SessionExpiredComponent } from './core/features/session-expired.component';

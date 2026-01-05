@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { LanguageService, Language } from './language.service';
 import { LoggerService } from './logger.service';
 
@@ -11,6 +11,9 @@ import { LoggerService } from './logger.service';
 export class TranslationService {
   private translationsSubject = new BehaviorSubject<any>({});
   public translations$ = this.translationsSubject.asObservable();
+  
+  private defaultTranslations: any = {};
+  private readonly DEFAULT_LANG: Language = 'es';
 
   constructor(
     private http: HttpClient,
@@ -21,14 +24,25 @@ export class TranslationService {
   }
 
   private init(): void {
-    this.languageService.currentLang$.pipe(
-      switchMap(lang => this.loadTranslations(lang))
-    ).subscribe(translations => {
-      this.translationsSubject.next(translations);
+    // Cargar traducciones por defecto primero o en paralelo
+    this.loadLanguage(this.DEFAULT_LANG).subscribe(trans => {
+      this.defaultTranslations = trans;
+      
+      // Suscribirse a cambios de idioma
+      this.languageService.currentLang$.pipe(
+        switchMap(lang => {
+          if (lang === this.DEFAULT_LANG) {
+            return of(this.defaultTranslations);
+          }
+          return this.loadLanguage(lang);
+        })
+      ).subscribe(translations => {
+        this.translationsSubject.next(translations);
+      });
     });
   }
 
-  private loadTranslations(lang: Language): Observable<any> {
+  private loadLanguage(lang: Language): Observable<any> {
     return this.http.get(`assets/i18n/${lang}.json`).pipe(
       tap(() => this.logger.debug(`Traducciones cargadas para: ${lang}`)),
       catchError(err => {
@@ -38,22 +52,40 @@ export class TranslationService {
     );
   }
 
-  translate(key: string): string {
+  translate(key: string, params?: any): string {
+    const translation = this.getValue(this.translationsSubject.value, key) || 
+                        this.getValue(this.defaultTranslations, key) || 
+                        key;
+
+    if (params && typeof translation === 'string') {
+      return this.interpolate(translation, params);
+    }
+
+    return typeof translation === 'string' ? translation : key;
+  }
+
+  private getValue(source: any, key: string): string | null {
+    if (!source) return null;
     const keys = key.split('.');
-    let value = this.translationsSubject.value;
+    let value = source;
     
     for (const k of keys) {
       if (value && value[k]) {
         value = value[k];
       } else {
-        return key; // Return key if translation not found
+        return null;
       }
     }
-    
-    return typeof value === 'string' ? value : key;
+    return value;
+  }
+
+  private interpolate(text: string, params: any): string {
+    return text.replace(/\{\{([\w\.]+)\}\}/g, (match, key) => {
+      const value = params[key];
+      return value !== undefined ? value : match;
+    });
   }
   
-  // Método auxiliar para obtener valor instantáneo si se requiere (usar con cuidado)
   get instant(): any {
     return this.translationsSubject.value;
   }
