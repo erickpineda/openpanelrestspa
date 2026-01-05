@@ -1,7 +1,7 @@
 <c-card>
   <c-card-header>
     <div class="d-flex justify-content-between align-items-end">
-      <h2 cCardTitle class="h5 mb-3 mb-lg-0">Comentario</h2>
+      <h2 cCardTitle class="h5 mb-3 mb-lg-0">{{ 'AUTO.COMENTARIO' | translate }}</h2>
       @if (isEditMode) {
         <div class="hstack gap-3">
           <!-- Feature not implemented in original TS? -->
@@ -87,12 +87,12 @@
           <c-col lg="8">
             <c-card class="mb-4">
               <c-card-body>
-                <h3 cCardTitle class="h6 mb-4">Información básica</h3>
+                <h3 cCardTitle class="h6 mb-4">{{ 'AUTO.INFORMACI_N_B_SICA' | translate }}</h3>
                 <c-row>
                   <c-col lg="12">
                     <c-row>
                       <label [sm]="2" cCol cLabel="col" for="username"
-                        ><strong>Username</strong></label
+                        ><strong>{{ 'AUTO.USERNAME' | translate }}</strong></label
                       >
                       <c-col [sm]="4">
                         <input
@@ -104,7 +104,7 @@
                           type="text"
                       /></c-col>
 
-                      <label [sm]="2" cCol cLabel="col" for="email"><strong>Email</strong></label>
+                      <label [sm]="2" cCol cLabel="col" for="email"><strong>{{ 'AUTO.EMAIL' | translate }}</strong></label>
                       <c-col [sm]="4">
                         <input
                           cFormControl
@@ -116,7 +116,7 @@
                       /></c-col>
                     </c-row>
                     <c-row>
-                      <label [sm]="2" cCol cLabel="col" for="votos"><strong>Votos</strong></label>
+                      <label [sm]="2" cCol cLabel="col" for="votos"><strong>{{ 'AUTO.VOTOS' | translate }}</strong></label>
                       <c-col [sm]="10">
                         <input
                           cFormControl
@@ -129,7 +129,7 @@
                     </c-row>
                     <c-row>
                       <label [sm]="2" cCol cLabel="col" for="fechaCreacion"
-                        ><strong>F. Creación</strong></label
+                        ><strong>{{ 'AUTO.F_CREACI_N' | translate }}</strong></label
                       >
                       <c-col [sm]="4">
                         <input
@@ -142,7 +142,7 @@
                       /></c-col>
 
                       <label [sm]="2" cCol cLabel="col" for="fechaEdicion"
-                        ><strong>F. Edición</strong></label
+                        ><strong>{{ 'AUTO.F_EDICI_N' | translate }}</strong></label
                       >
                       <c-col [sm]="4">
                         <input
@@ -156,7 +156,7 @@
                     </c-row>
                     <c-row>
                       <label [sm]="2" cCol cLabel="col" for="tituloEntrada"
-                        ><strong>Título Entrada</strong></label
+                        ><strong>{{ 'AUTO.T_TULO_ENTRADA' | translate }}</strong></label
                       >
                       <c-col [sm]="10">
                         <input
@@ -185,8 +185,8 @@
                     aria-current="false"
                   >
                     <div class="ms-2 me-auto">
-                      <h6 class="mb-0">Aprobado</h6>
-                      <small>Comentario que ha sido aprobado</small>
+                      <h6 class="mb-0">{{ 'AUTO.APROBADO' | translate }}</h6>
+                      <small>{{ 'AUTO.COMENTARIO_QUE_HA_SIDO_APROBAD' | translate }}</small>
                     </div>
                     <c-form-check [switch]="true">
                       <input
@@ -203,8 +203,8 @@
                     aria-current="false"
                   >
                     <div class="ms-2 me-auto">
-                      <h6 class="mb-0">Cuarentena</h6>
-                      <small>Comentario que está en cuarentena</small>
+                      <h6 class="mb-0">{{ 'AUTO.CUARENTENA' | translate }}</h6>
+                      <small>{{ 'AUTO.COMENTARIO_QUE_EST_EN_CUARENTE' | translate }}</small>
                     </div>
                     <c-form-check [switch]="true">
                       <input
@@ -223,7 +223,7 @@
           <c-col lg="12">
             <c-card class="mb-4">
               <c-card-body>
-                <h3 cCardTitle class="h6 mb-4">Contenido del comentario sin censura</h3>
+                <h3 cCardTitle class="h6 mb-4">{{ 'AUTO.CONTENIDO_DEL_COMENTARIO_SIN_C' | translate }}</h3>
                 <textarea
                   aria-label="With textarea"
                   cFormControl
@@ -242,7 +242,7 @@
           <c-col lg="12">
             <c-card class="mb-4">
               <c-card-body>
-                <h3 cCardTitle class="h6 mb-4">Contenido del comentario censurado</h3>
+                <h3 cCardTitle class="h6 mb-4">{{ 'AUTO.CONTENIDO_DEL_COMENTARIO_CENSU' | translate }}</h3>
                 <textarea
                   aria-label="With textarea"
                   cFormControl

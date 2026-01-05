@@ -51,7 +51,7 @@
   @if (exportingZip) {
     <div class="d-inline-flex align-items-center ms-2" aria-live="polite" aria-busy="true">
       <c-spinner size="sm"></c-spinner>
-      <span class="small text-muted ms-2">Generando ZIP...</span>
+      <span class="small text-muted ms-2">{{ 'AUTO.GENERANDO_ZIP' | translate }}</span>
     </div>
   }
   @if (exportError) {

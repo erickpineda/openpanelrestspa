@@ -12,7 +12,7 @@
     @if (privilegio) {
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label small fw-bold text-muted">Nombre</label>
+          <label class="form-label small fw-bold text-muted">{{ 'AUTO.NOMBRE' | translate }}</label>
            <input
             cFormControl
             type="text"
@@ -22,12 +22,12 @@
             placeholder="Ej. Gestionar Usuarios"
           />
            @if (!privilegio.nombre) {
-            <div class="invalid-feedback d-block">Nombre requerido</div>
+            <div class="invalid-feedback d-block">{{ 'AUTO.NOMBRE_REQUERIDO' | translate }}</div>
           }
         </div>
 
         <div class="col-md-6">
-          <label class="form-label small fw-bold text-muted">Código</label>
+          <label class="form-label small fw-bold text-muted">{{ 'AUTO.C_DIGO' | translate }}</label>
           <input
             cFormControl
             type="text"
@@ -40,7 +40,7 @@
             class="text-uppercase"
           />
            @if (!privilegio.codigo) {
-            <div class="invalid-feedback d-block">Código requerido (máx 20 caracteres)</div>
+            <div class="invalid-feedback d-block">{{ 'AUTO.C_DIGO_REQUERIDO_M_X_20_CARACT' | translate }}</div>
           }
           @if (!isEditing) {
             <div class="form-text text-muted small">
@@ -50,7 +50,7 @@
         </div>
 
         <div class="col-12">
-          <label class="form-label small fw-bold text-muted">Descripción</label>
+          <label class="form-label small fw-bold text-muted">{{ 'AUTO.DESCRIPCI_N' | translate }}</label>
           <textarea
             cFormControl
             rows="2"
@@ -63,7 +63,7 @@
     }
   </c-modal-body>
   <c-modal-footer class="border-top-0 pt-0 pb-4">
-    <button cButton color="secondary" variant="ghost" (click)="close()">Cancelar</button>
+    <button cButton color="secondary" variant="ghost" (click)="close()">{{ 'AUTO.CANCELAR' | translate }}</button>
     <button cButton color="primary" class="px-4" [disabled]="!isFormValid()" (click)="save()">
       {{ isEditing ? 'Guardar Cambios' : 'Crear Privilegio' }}
     </button>

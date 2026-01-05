@@ -7,8 +7,8 @@
             <svg cIcon name="cilImage" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 class="mb-0 text-primary fw-bold">Galería de Imágenes</h5>
-            <small class="text-muted">Administra los recursos visuales del sitio</small>
+            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.GALER_A_DE_IM_GENES' | translate }}</h5>
+            <small class="text-muted">{{ 'AUTO.ADMINISTRA_LOS_RECURSOS_VISUAL' | translate }}</small>
           </div>
         </div>
         <div class="d-flex gap-2">
@@ -39,7 +39,7 @@
       <div class="d-flex flex-column flex-md-row gap-3 mb-4 justify-content-between align-items-end bg-light p-3 rounded">
         <div class="d-flex flex-column flex-md-row gap-3 flex-grow-1 w-100">
           <div class="flex-grow-1" style="max-width: 400px;">
-            <label class="form-label text-muted small text-uppercase fw-bold">Buscar</label>
+            <label class="form-label text-muted small text-uppercase fw-bold">{{ 'AUTO.BUSCAR' | translate }}</label>
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0 text-secondary">
                 <svg cIcon name="cilSearch" size="sm"></svg>
@@ -72,7 +72,7 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
-          <span class="text-muted small text-nowrap fw-bold">Mostrar:</span>
+          <span class="text-muted small text-nowrap fw-bold">{{ 'AUTO.MOSTRAR' | translate }}</span>
           <select
             cSelect
             size="sm"
@@ -83,8 +83,8 @@
             class="shadow-sm"
           >
             <option [ngValue]="5">5</option>
-            <option [ngValue]="10">10</option>
-            <option [ngValue]="20">20</option>
+            <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
+            <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
           </select>
         </div>
       </div>
@@ -104,17 +104,17 @@
           </button>
           <c-row class="g-3 align-items-end">
             <c-col xs="12" md="4">
-              <label class="form-label mb-1 small fw-bold text-secondary">Tipo MIME</label>
+              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'AUTO.TIPO_MIME' | translate }}</label>
               <select cSelect size="sm" [(ngModel)]="filtroMime" [disabled]="loading" class="shadow-sm">
-                <option value="">Todos</option>
-                <option value="image/jpeg">JPEG</option>
-                <option value="image/png">PNG</option>
-                <option value="image/gif">GIF</option>
-                <option value="image/webp">WEBP</option>
+                <option value="">{{ 'AUTO.TODOS' | translate }}</option>
+                <option value="image/jpeg">{{ 'AUTO.JPEG' | translate }}</option>
+                <option value="image/png">{{ 'AUTO.PNG' | translate }}</option>
+                <option value="image/gif">{{ 'AUTO.GIF' | translate }}</option>
+                <option value="image/webp">{{ 'AUTO.WEBP' | translate }}</option>
               </select>
             </c-col>
             <c-col xs="6" md="3">
-              <label class="form-label mb-1 small fw-bold text-secondary">Desde</label>
+              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'AUTO.DESDE' | translate }}</label>
               <input
                 cFormControl
                 size="sm"
@@ -125,7 +125,7 @@
               />
             </c-col>
             <c-col xs="6" md="3">
-              <label class="form-label mb-1 small fw-bold text-secondary">Hasta</label>
+              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'AUTO.HASTA' | translate }}</label>
               <input
                 cFormControl
                 size="sm"
@@ -169,7 +169,7 @@
             <svg cIcon name="cilWarning" class="text-danger"></svg>
             <span>{{ error }}</span>
           </div>
-          <button cButton color="danger" size="sm" variant="outline" (click)="load()">Reintentar</button>
+          <button cButton color="danger" size="sm" variant="outline" (click)="load()">{{ 'AUTO.REINTENTAR' | translate }}</button>
         </c-alert>
       }
 
@@ -179,7 +179,7 @@
           <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3">
             <div class="text-center">
               <c-spinner color="primary"></c-spinner>
-              <p class="mt-2 text-primary fw-semibold small">Cargando imágenes...</p>
+              <p class="mt-2 text-primary fw-semibold small">{{ 'AUTO.CARGANDO_IM_GENES' | translate }}</p>
             </div>
           </div>
         }
@@ -187,10 +187,10 @@
         <table cTable hover small class="align-middle mb-0 border">
           <thead class="bg-light text-secondary text-uppercase small fw-bold border-bottom">
             <tr>
-              <th scope="col" class="border-0 py-3 ps-3" style="min-width: 80px">Vista</th>
-              <th scope="col" class="border-0 py-3" style="min-width: 200px">Nombre</th>
-              <th scope="col" class="border-0 py-3 text-center" style="min-width: 160px">Fecha</th>
-              <th scope="col" class="border-0 py-3 text-end pe-3" style="min-width: 110px">Acciones</th>
+              <th scope="col" class="border-0 py-3 ps-3" style="min-width: 80px">{{ 'AUTO.VISTA' | translate }}</th>
+              <th scope="col" class="border-0 py-3" style="min-width: 200px">{{ 'AUTO.NOMBRE' | translate }}</th>
+              <th scope="col" class="border-0 py-3 text-center" style="min-width: 160px">{{ 'AUTO.FECHA' | translate }}</th>
+              <th scope="col" class="border-0 py-3 text-end pe-3" style="min-width: 110px">{{ 'AUTO.ACCIONES' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -270,8 +270,8 @@
                   <td colspan="4" class="text-center py-5">
                     <div class="d-flex flex-column align-items-center text-muted">
                       <svg cIcon name="cilImage" size="4xl" class="mb-3 text-secondary opacity-25"></svg>
-                      <h6 class="fw-bold mb-1">No se encontraron imágenes</h6>
-                      <p class="small mb-0">Intenta subir una nueva imagen o ajustar los filtros</p>
+                      <h6 class="fw-bold mb-1">{{ 'AUTO.NO_SE_ENCONTRARON_IM_GENES' | translate }}</h6>
+                      <p class="small mb-0">{{ 'AUTO.INTENTA_SUBIR_UNA_NUEVA_IMAGEN' | translate }}</p>
                     </div>
                   </td>
                 </tr>
@@ -294,7 +294,7 @@
 <!-- Modal Preview -->
 <c-modal [visible]="previewModalVisible" (visibleChange)="previewModalVisible = $event" size="xl" backdrop="static">
   <c-modal-header class="bg-light border-bottom-0">
-    <h5 cModalTitle class="fw-bold text-primary">Vista Previa</h5>
+    <h5 cModalTitle class="fw-bold text-primary">{{ 'AUTO.VISTA_PREVIA' | translate }}</h5>
     <button (click)="previewModalVisible = false" cButtonClose></button>
   </c-modal-header>
   <c-modal-body class="p-0 bg-dark position-relative d-flex justify-content-center align-items-center preview-body" style="min-height: 500px; overflow: hidden;">
@@ -348,13 +348,13 @@
 
 <c-modal [visible]="confirmationModalVisible" (visibleChange)="confirmationModalVisible = $event" backdrop="static">
   <c-modal-header class="bg-danger text-white">
-    <h5 cModalTitle>Confirmar eliminación</h5>
+    <h5 cModalTitle>{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
     <button (click)="cancelDelete()" cButtonClose white></button>
   </c-modal-header>
   <c-modal-body>
     ¿Estás seguro de que deseas eliminar la imagen <strong>{{ itemToDelete?.nombre }}</strong>?
     <br>
-    <small class="text-muted">Esta acción no se puede deshacer.</small>
+    <small class="text-muted">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</small>
   </c-modal-body>
   <c-modal-footer>
     <button (click)="cancelDelete()" cButton color="secondary">

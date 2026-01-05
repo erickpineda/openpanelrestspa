@@ -93,10 +93,10 @@
             <!-- Basic Info -->
             <c-card class="mb-4 shadow-sm border-0">
               <c-card-body class="p-4">
-                <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Información Básica</h6>
+                <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">{{ 'AUTO.INFORMACI_N_B_SICA' | translate }}</h6>
                 
                 <div class="mb-3">
-                  <label cLabel class="fw-semibold">Título de la Entrada</label>
+                  <label cLabel class="fw-semibold">{{ 'AUTO.T_TULO_DE_LA_ENTRADA' | translate }}</label>
                   <input
                     cFormControl
                     type="text"
@@ -121,7 +121,7 @@
                 </div>
 
                 <div class="mb-3">
-                  <label cLabel class="fw-semibold">Subtítulo</label>
+                  <label cLabel class="fw-semibold">{{ 'AUTO.SUBT_TULO' | translate }}</label>
                   <input 
                     cFormControl 
                     type="text" 
@@ -136,7 +136,7 @@
             <c-card class="mb-4 shadow-sm border-0">
               <c-card-body class="p-4" [ngClass]="{'editor-fullscreen': isFullScreen, 'editor-expanded': isFullWidth && !isFullScreen}">
                 <div class="d-flex justify-content-between align-items-center mb-3" [class.fullscreen-toolbar]="isFullScreen">
-                  <h6 class="text-secondary fw-bold mb-0 text-uppercase small ls-1">Contenido</h6>
+                  <h6 class="text-secondary fw-bold mb-0 text-uppercase small ls-1">{{ 'AUTO.CONTENIDO' | translate }}</h6>
                   <div class="d-flex gap-2">
                     @if (!isFullScreen) {
                       <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleFullWidth()" [active]="isFullWidth" cTooltip="Anchar editor">
@@ -175,7 +175,7 @@
             <!-- Imagen Destacada -->
             <c-card class="mb-4 shadow-sm border-0">
                <c-card-body class="p-4">
-                  <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Imagen Destacada</h6>
+                  <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">{{ 'AUTO.IMAGEN_DESTACADA' | translate }}</h6>
                   
                   @if (imagenDestacadaUrl || imagenPreviewUrl) {
                     <div class="mb-3 position-relative rounded overflow-hidden shadow-sm border bg-light d-flex justify-content-center align-items-center" style="min-height: 200px;">
@@ -199,7 +199,7 @@
                   } @else {
                     <div class="mb-3 py-5 text-center bg-light border border-dashed rounded text-muted">
                         <svg cIcon name="cilImage" size="3xl" class="mb-2 opacity-50"></svg>
-                        <p class="mb-0 small">No hay imagen seleccionada</p>
+                        <p class="mb-0 small">{{ 'AUTO.NO_HAY_IMAGEN_SELECCIONADA' | translate }}</p>
                     </div>
                   }
 
@@ -243,12 +243,12 @@
                <c-col [md]="isFullWidth ? 4 : 12">
                  <c-card class="mb-4 shadow-sm border-0 h-100">
                    <c-card-body class="p-4">
-                     <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Publicación</h6>
+                     <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">{{ 'AUTO.PUBLICACI_N' | translate }}</h6>
                      
                      <div class="mb-3">
-                       <label cLabel class="fw-semibold small">Estado</label>
+                       <label cLabel class="fw-semibold small">{{ 'AUTO.ESTADO' | translate }}</label>
                        <select cSelect cFormControl formControlName="estadoEntrada">
-                          <option [ngValue]="null" disabled>Seleccionar...</option>
+                          <option [ngValue]="null" disabled>{{ 'AUTO.SELECCIONAR' | translate }}</option>
                           @for (ee of estadosEntr; track ee.nombre) {
                             <option [ngValue]="ee">{{ ee.nombre }}</option>
                           }
@@ -256,9 +256,9 @@
                      </div>
 
                      <div class="mb-3">
-                       <label cLabel class="fw-semibold small">Tipo de Entrada</label>
+                       <label cLabel class="fw-semibold small">{{ 'AUTO.TIPO_DE_ENTRADA' | translate }}</label>
                        <select cSelect cFormControl formControlName="tipoEntrada">
-                          <option [ngValue]="null" disabled>Seleccionar...</option>
+                          <option [ngValue]="null" disabled>{{ 'AUTO.SELECCIONAR' | translate }}</option>
                           @for (te of tiposEntr; track te.nombre) {
                             <option [ngValue]="te">{{ te.nombre }}</option>
                           }
@@ -272,7 +272,7 @@
                <c-col [md]="isFullWidth ? 4 : 12">
                  <c-card class="mb-4 shadow-sm border-0 h-100">
                     <c-card-header class="bg-white border-bottom py-2 d-flex justify-content-between align-items-center">
-                       <h6 class="text-secondary fw-bold mb-0 text-uppercase small ls-1">Categorías</h6>
+                       <h6 class="text-secondary fw-bold mb-0 text-uppercase small ls-1">{{ 'AUTO.CATEGOR_AS' | translate }}</h6>
                        <c-badge color="primary" shape="rounded-pill">{{ categoriasArray().length }}</c-badge>
                     </c-card-header>
                     <c-card-body class="p-3" style="max-height: 300px; overflow-y: auto;">
@@ -284,7 +284,7 @@
                                        [indeterminate]="estanAlgunasCategoriasSeleccionadas()"
                                        (change)="toggleTodasCategorias($event)"
                                        [disabled]="!form.enabled">
-                                <label cFormCheckLabel for="all-cats" class="fw-semibold small">Seleccionar Todas</label>
+                                <label cFormCheckLabel for="all-cats" class="fw-semibold small">{{ 'AUTO.SELECCIONAR_TODAS' | translate }}</label>
                              </c-form-check>
                           </div>
                           
@@ -302,7 +302,7 @@
                             }
                           </div>
                        } @else {
-                          <div class="text-center text-muted small">No hay categorías disponibles</div>
+                          <div class="text-center text-muted small">{{ 'AUTO.NO_HAY_CATEGOR_AS_DISPONIBLES' | translate }}</div>
                        }
                     </c-card-body>
                  </c-card>
@@ -312,13 +312,13 @@
                <c-col [md]="isFullWidth ? 4 : 12">
                  <c-card class="mb-4 shadow-sm border-0 h-100">
                     <c-card-body class="p-4">
-                       <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Configuración</h6>
+                       <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">{{ 'AUTO.CONFIGURACI_N' | translate }}</h6>
                        
                        <ul class="list-group list-group-flush mx-n3">
                           <li class="list-group-item d-flex justify-content-between align-items-center px-3 border-0">
                              <div>
-                                <span class="fw-medium small d-block">Destacada</span>
-                                <small class="text-muted" style="font-size: 0.75rem;">Mostrar en sección destacada</small>
+                                <span class="fw-medium small d-block">{{ 'AUTO.DESTACADA' | translate }}</span>
+                                <small class="text-muted" style="font-size: 0.75rem;">{{ 'AUTO.MOSTRAR_EN_SECCI_N_DESTACADA' | translate }}</small>
                              </div>
                              <c-form-check [switch]="true">
                                 <input cFormCheckInput type="checkbox" formControlName="publicada" />
@@ -326,8 +326,8 @@
                           </li>
                           <li class="list-group-item d-flex justify-content-between align-items-center px-3 border-0">
                              <div>
-                                <span class="fw-medium small d-block">Privada</span>
-                                <small class="text-muted" style="font-size: 0.75rem;">Solo visible para autores</small>
+                                <span class="fw-medium small d-block">{{ 'AUTO.PRIVADA' | translate }}</span>
+                                <small class="text-muted" style="font-size: 0.75rem;">{{ 'AUTO.SOLO_VISIBLE_PARA_AUTORES' | translate }}</small>
                              </div>
                              <c-form-check [switch]="true">
                                 <input cFormCheckInput type="checkbox" formControlName="privado" />
@@ -335,8 +335,8 @@
                           </li>
                           <li class="list-group-item d-flex justify-content-between align-items-center px-3 border-0">
                              <div>
-                                <span class="fw-medium small d-block">Comentarios</span>
-                                <small class="text-muted" style="font-size: 0.75rem;">Permitir comentarios</small>
+                                <span class="fw-medium small d-block">{{ 'AUTO.COMENTARIOS' | translate }}</span>
+                                <small class="text-muted" style="font-size: 0.75rem;">{{ 'AUTO.PERMITIR_COMENTARIOS' | translate }}</small>
                              </div>
                              <c-form-check [switch]="true">
                                 <input cFormCheckInput type="checkbox" formControlName="permitirComentario" />
@@ -351,7 +351,7 @@
                <c-col [md]="isFullWidth ? 6 : 12">
                  <c-card class="mb-4 shadow-sm border-0 h-100">
                     <c-card-body class="p-4">
-                       <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Resumen</h6>
+                       <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">{{ 'AUTO.RESUMEN' | translate }}</h6>
                        <textarea
                           cFormControl
                           rows="4"
@@ -367,7 +367,7 @@
                <c-col [md]="isFullWidth ? 6 : 12">
                  <c-card class="mb-4 shadow-sm border-0 h-100">
                     <c-card-body class="p-4">
-                       <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">Protección</h6>
+                       <h6 class="text-secondary fw-bold mb-3 text-uppercase small ls-1">{{ 'AUTO.PROTECCI_N' | translate }}</h6>
                        <div class="input-group">
                           <span class="input-group-text bg-white border-end-0">
                              <svg cIcon name="cilLockLocked" size="sm"></svg>
@@ -402,7 +402,7 @@
   backdrop="static"
 >
   <c-modal-header class="bg-primary text-white">
-    <h5 cModalTitle class="fw-bold">Biblioteca Multimedia</h5>
+    <h5 cModalTitle class="fw-bold">{{ 'AUTO.BIBLIOTECA_MULTIMEDIA' | translate }}</h5>
     <button cButtonClose white (click)="cerrarSelectorImagen()"></button>
   </c-modal-header>
   <c-modal-body class="p-0">

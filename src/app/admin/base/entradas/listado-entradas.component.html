@@ -47,10 +47,10 @@
               class="w-auto"
               aria-label="Registros por página"
             >
-              <option [ngValue]="5">5 por pág.</option>
-              <option [ngValue]="10">10 por pág.</option>
-              <option [ngValue]="20">20 por pág.</option>
-              <option [ngValue]="50">50 por pág.</option>
+              <option [ngValue]="5">{{ 'AUTO.5_POR_P_G' | translate }}</option>
+              <option [ngValue]="10">{{ 'AUTO.10_POR_P_G' | translate }}</option>
+              <option [ngValue]="20">{{ 'AUTO.20_POR_P_G' | translate }}</option>
+              <option [ngValue]="50">{{ 'AUTO.50_POR_P_G' | translate }}</option>
             </select>
           </c-col>
 
@@ -125,7 +125,7 @@
           >
             <div class="text-center text-primary">
               <c-spinner size="sm"></c-spinner>
-              <p class="mt-2 small fw-semibold">Actualizando listado...</p>
+              <p class="mt-2 small fw-semibold">{{ 'AUTO.ACTUALIZANDO_LISTADO' | translate }}</p>
             </div>
           </div>
         }
@@ -134,12 +134,12 @@
           <table cTable hover class="mb-0 align-middle text-nowrap">
             <thead class="bg-light text-secondary small text-uppercase fw-bold">
               <tr>
-                <th scope="col" class="border-0 py-3 ps-4">Título</th>
-                <th scope="col" class="border-0 py-3">Autor</th>
-                <th scope="col" class="border-0 py-3 text-center">Fecha</th>
-                <th scope="col" class="border-0 py-3">Categorías</th>
-                <th scope="col" class="border-0 py-3 text-center">Estado</th>
-                <th scope="col" class="border-0 py-3 text-end pe-4">Acciones</th>
+                <th scope="col" class="border-0 py-3 ps-4">{{ 'AUTO.T_TULO' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'AUTO.AUTOR' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'AUTO.FECHA' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'AUTO.CATEGOR_AS' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'AUTO.ESTADO' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-end pe-4">{{ 'AUTO.ACCIONES' | translate }}</th>
               </tr>
             </thead>
             <tbody class="border-top-0">
@@ -171,7 +171,7 @@
                           {{ fecha | date:'HH:mm' }}
                         </small>
                       } @else {
-                        <span class="small fw-semibold text-secondary fst-italic">No publicada</span>
+                        <span class="small fw-semibold text-secondary fst-italic">{{ 'AUTO.NO_PUBLICADA' | translate }}</span>
                       }
                     </div>
                   </td>
@@ -185,7 +185,7 @@
                         }
                       </div>
                     } @else {
-                      <span class="text-body-secondary small fst-italic">Sin categoría</span>
+                      <span class="text-body-secondary small fst-italic">{{ 'AUTO.SIN_CATEGOR_A' | translate }}</span>
                     }
                   </td>
                   <td class="text-center py-3">
@@ -244,8 +244,8 @@
                   <td colspan="6" class="text-center py-5">
                     <div class="d-flex flex-column align-items-center text-secondary opacity-75">
                       <svg cIcon name="cilFolderOpen" size="4xl" class="mb-3"></svg>
-                      <h5 class="fw-normal">No se encontraron entradas</h5>
-                      <p class="small mb-0">Intenta ajustar los filtros de búsqueda</p>
+                      <h5 class="fw-normal">{{ 'AUTO.NO_SE_ENCONTRARON_ENTRADAS' | translate }}</h5>
+                      <p class="small mb-0">{{ 'AUTO.INTENTA_AJUSTAR_LOS_FILTROS_DE' | translate }}</p>
                     </div>
                   </td>
                 </tr>
@@ -262,7 +262,7 @@
           <c-pagination class="mb-0" align="end" size="sm">
             <li class="page-item" [class.disabled]="currentPage === 0">
               <a class="page-link" (click)="onPrev()" style="cursor: pointer" aria-label="Anterior">
-                <span aria-hidden="true">&laquo;</span>
+                <span aria-hidden="true">{{ 'AUTO.LAQUO' | translate }}</span>
               </a>
             </li>
             <li class="page-item disabled">
@@ -270,7 +270,7 @@
             </li>
             <li class="page-item" [class.disabled]="isNextDisabled()">
               <a class="page-link" (click)="onNext()" style="cursor: pointer" aria-label="Siguiente">
-                <span aria-hidden="true">&raquo;</span>
+                <span aria-hidden="true">{{ 'AUTO.RAQUO' | translate }}</span>
               </a>
             </li>
           </c-pagination>
@@ -283,16 +283,16 @@
 <!-- Modal Borrar -->
 <c-modal [visible]="visible" (visibleChange)="onVisibleModalChange($event)" id="modalBorrar">
   <c-modal-header>
-    <h5 cModalTitle>Confirmar eliminación</h5>
+    <h5 cModalTitle>{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
     <button (click)="toggleModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
     ¿Está seguro de que desea eliminar la entrada <strong>{{ entradaABorrar?.titulo }}</strong>?
-    <p class="text-danger small mt-2 mb-0">Esta acción no se puede deshacer.</p>
+    <p class="text-danger small mt-2 mb-0">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</p>
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="toggleModal()" cButton color="secondary">Cancelar</button>
-    <button (click)="confirmarBorrado()" cButton color="danger">Eliminar</button>
+    <button (click)="toggleModal()" cButton color="secondary">{{ 'AUTO.CANCELAR' | translate }}</button>
+    <button (click)="confirmarBorrado()" cButton color="danger">{{ 'AUTO.ELIMINAR' | translate }}</button>
   </c-modal-footer>
 </c-modal>
 
@@ -335,7 +335,7 @@
     }
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="closePreview()" cButton color="secondary">Cerrar</button>
+    <button (click)="closePreview()" cButton color="secondary">{{ 'AUTO.CERRAR' | translate }}</button>
     <button (click)="onEditarDesdePreview()" cButton color="primary">
       <svg cIcon name="cilPen" class="me-1"></svg>
       Editar

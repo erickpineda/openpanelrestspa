@@ -5,18 +5,18 @@
   backdrop="static"
 >
   <c-modal-header class="border-bottom-0">
-    <h5 cModalTitle class="fw-bold text-danger">Eliminar Privilegio</h5>
+    <h5 cModalTitle class="fw-bold text-danger">{{ 'AUTO.ELIMINAR_PRIVILEGIO' | translate }}</h5>
   </c-modal-header>
   <c-modal-body>
     <div class="text-center py-3">
       <svg cIcon name="cilTrash" size="4xl" class="text-danger mb-3 opacity-75"></svg>
-      <p class="mb-1">¿Estás seguro de que deseas eliminar el privilegio?</p>
+      <p class="mb-1">{{ 'AUTO.EST_S_SEGURO_DE_QUE_DESEAS_ELI' | translate }}</p>
       <h4 class="fw-bold text-dark">{{ privilegio?.nombre }}</h4>
-      <p class="text-muted small mt-2">Esta acción no se puede deshacer.</p>
+      <p class="text-muted small mt-2">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</p>
     </div>
   </c-modal-body>
   <c-modal-footer class="border-top-0 justify-content-center pb-4">
-    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">Cancelar</button>
-    <button cButton color="danger" class="px-4" (click)="confirmar()">Sí, Eliminar</button>
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'AUTO.CANCELAR' | translate }}</button>
+    <button cButton color="danger" class="px-4" (click)="confirmar()">{{ 'AUTO.S_ELIMINAR' | translate }}</button>
   </c-modal-footer>
 </c-modal>

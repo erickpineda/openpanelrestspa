@@ -36,7 +36,7 @@
             <svg cIcon name="cilWarning" class="me-2"></svg>
             <span>{{ error }}</span>
           </div>
-          <button cButton color="danger" size="sm" variant="outline" (click)="load()">Reintentar</button>
+          <button cButton color="danger" size="sm" variant="outline" (click)="load()">{{ 'AUTO.REINTENTAR' | translate }}</button>
         </c-alert>
       }
 
@@ -58,10 +58,10 @@
               aria-label="Usuarios por página"
               [disabled]="loading"
             >
-              <option [ngValue]="5">5 por pág.</option>
-              <option [ngValue]="10">10 por pág.</option>
-              <option [ngValue]="20">20 por pág.</option>
-              <option [ngValue]="50">50 por pág.</option>
+              <option [ngValue]="5">{{ 'AUTO.5_POR_P_G' | translate }}</option>
+              <option [ngValue]="10">{{ 'AUTO.10_POR_P_G' | translate }}</option>
+              <option [ngValue]="20">{{ 'AUTO.20_POR_P_G' | translate }}</option>
+              <option [ngValue]="50">{{ 'AUTO.50_POR_P_G' | translate }}</option>
             </select>
           </c-col>
 
@@ -100,7 +100,7 @@
           <div class="mt-3 pt-3 border-top">
             <c-row class="g-3 align-items-end">
               <c-col xs="12" md="4">
-                <label class="form-label mb-1 text-secondary small fw-semibold">Usuario</label>
+                <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'AUTO.USUARIO' | translate }}</label>
                 <input
                   cFormControl
                   size="sm"
@@ -112,21 +112,21 @@
                 />
               </c-col>
               <c-col xs="6" md="3">
-                <label class="form-label mb-1 text-secondary small fw-semibold">Rol</label>
+                <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'AUTO.ROL' | translate }}</label>
                 <select
                   cSelect
                   size="sm"
                   [(ngModel)]="filtroRolCodigo"
                   [disabled]="loading"
                 >
-                  <option [ngValue]="null">Todos los roles</option>
+                  <option [ngValue]="null">{{ 'AUTO.TODOS_LOS_ROLES' | translate }}</option>
                   @for (r of roles; track trackByRol($index, r)) {
                     <option [value]="r.codigo">{{ r.nombre }}</option>
                   }
                 </select>
               </c-col>
               <c-col xs="6" md="3">
-                <label class="form-label mb-1 text-secondary small fw-semibold">Email confirmado</label>
+                <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'AUTO.EMAIL_CONFIRMADO' | translate }}</label>
                 <select
                   cSelect
                   size="sm"
@@ -134,9 +134,9 @@
                   (change)="filtroEmailConfirmado = $any($event.target).value === '' ? null : $any($event.target).value === 'true'"
                   [disabled]="loading"
                 >
-                  <option value="">Todos</option>
-                  <option value="true">Sí</option>
-                  <option value="false">No</option>
+                  <option value="">{{ 'AUTO.TODOS' | translate }}</option>
+                  <option value="true">{{ 'AUTO.S' | translate }}</option>
+                  <option value="false">{{ 'AUTO.NO' | translate }}</option>
                 </select>
               </c-col>
               <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
@@ -176,7 +176,7 @@
           >
             <div class="text-center text-primary">
               <c-spinner size="sm"></c-spinner>
-              <p class="mt-2 small fw-semibold">Cargando usuarios...</p>
+              <p class="mt-2 small fw-semibold">{{ 'AUTO.CARGANDO_USUARIOS' | translate }}</p>
             </div>
           </div>
         }
@@ -185,12 +185,12 @@
           <table cTable hover class="mb-0 align-middle text-nowrap">
             <thead class="bg-light text-secondary small text-uppercase fw-bold">
               <tr>
-                <th scope="col" class="border-0 py-3 ps-4">Usuario</th>
-                <th scope="col" class="border-0 py-3">Nombre Completo</th>
-                <th scope="col" class="border-0 py-3">Email</th>
-                <th scope="col" class="border-0 py-3 text-center">Rol</th>
-                <th scope="col" class="border-0 py-3 text-center">Estado</th>
-                <th scope="col" class="border-0 py-3 text-end pe-4">Acciones</th>
+                <th scope="col" class="border-0 py-3 ps-4">{{ 'AUTO.USUARIO' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'AUTO.NOMBRE_COMPLETO' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'AUTO.EMAIL' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'AUTO.ROL' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'AUTO.ESTADO' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-end pe-4">{{ 'AUTO.ACCIONES' | translate }}</th>
               </tr>
             </thead>
             <tbody class="border-top-0">
@@ -244,9 +244,9 @@
                   </td>
                   <td class="text-center py-3">
                     @if (u.habilitado) {
-                      <c-badge color="success" shape="rounded-pill" class="fw-normal">Activo</c-badge>
+                      <c-badge color="success" shape="rounded-pill" class="fw-normal">{{ 'AUTO.ACTIVO' | translate }}</c-badge>
                     } @else {
-                      <c-badge color="secondary" shape="rounded-pill" class="fw-normal">Inactivo</c-badge>
+                      <c-badge color="secondary" shape="rounded-pill" class="fw-normal">{{ 'AUTO.INACTIVO' | translate }}</c-badge>
                     }
                   </td>
                   <td class="text-end pe-4 py-3">
@@ -282,8 +282,8 @@
                   <td colspan="6" class="text-center py-5">
                     <div class="d-flex flex-column align-items-center text-secondary opacity-75">
                       <svg cIcon name="cilSearch" size="4xl" class="mb-3"></svg>
-                      <h5 class="fw-normal">No se encontraron usuarios</h5>
-                      <p class="small mb-0">Intenta ajustar los filtros de búsqueda</p>
+                      <h5 class="fw-normal">{{ 'AUTO.NO_SE_ENCONTRARON_USUARIOS' | translate }}</h5>
+                      <p class="small mb-0">{{ 'AUTO.INTENTA_AJUSTAR_LOS_FILTROS_DE' | translate }}</p>
                     </div>
                   </td>
                 </tr>
@@ -300,7 +300,7 @@
           <c-pagination class="mb-0" align="end" size="sm">
             <li class="page-item" [class.disabled]="pageNo <= 0">
               <a class="page-link" (click)="prev()" style="cursor: pointer" aria-label="Anterior">
-                <span aria-hidden="true">&laquo;</span>
+                <span aria-hidden="true">{{ 'AUTO.LAQUO' | translate }}</span>
               </a>
             </li>
             <li class="page-item disabled">
@@ -308,7 +308,7 @@
             </li>
             <li class="page-item" [class.disabled]="pageNo >= getTotalPages() - 1">
               <a class="page-link" (click)="next()" style="cursor: pointer" aria-label="Siguiente">
-                <span aria-hidden="true">&raquo;</span>
+                <span aria-hidden="true">{{ 'AUTO.RAQUO' | translate }}</span>
               </a>
             </li>
           </c-pagination>

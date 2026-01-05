@@ -48,6 +48,7 @@ import { TranslatePipe } from './pipes/translate.pipe';
     IconModule,
     TooltipModule,
     SharedWidgetsModule,
+    TranslatePipe,
   ],
   declarations: [
     GlobalErrorComponent,
@@ -55,7 +56,6 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
-    TranslatePipe,
   ],
   exports: [
     CommonModule,

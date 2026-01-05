@@ -23,7 +23,7 @@
   (close)="onCerrarPreview()"
 >
   <c-modal-header>
-    <h5 cModalTitle>Previa de la entrada</h5>
+    <h5 cModalTitle>{{ 'AUTO.PREVIA_DE_LA_ENTRADA' | translate }}</h5>
   </c-modal-header>
 
   <c-modal-body>
@@ -37,6 +37,6 @@
   </c-modal-body>
 
   <c-modal-footer>
-    <button cButton color="secondary" (click)="onCerrarPreview()">Cerrar</button>
+    <button cButton color="secondary" (click)="onCerrarPreview()">{{ 'AUTO.CERRAR' | translate }}</button>
   </c-modal-footer>
 </c-modal>

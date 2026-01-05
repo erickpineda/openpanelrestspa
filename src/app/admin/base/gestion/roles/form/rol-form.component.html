@@ -13,7 +13,7 @@
     @if (editRol) {
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label small fw-bold text-muted">Nombre del Rol</label>
+          <label class="form-label small fw-bold text-muted">{{ 'AUTO.NOMBRE_DEL_ROL' | translate }}</label>
            <input
             cFormControl
             type="text"
@@ -24,7 +24,7 @@
             placeholder="Ej. Editor de Contenido"
           />
            @if (!editRol.nombre) {
-            <div class="invalid-feedback d-block">Nombre requerido</div>
+            <div class="invalid-feedback d-block">{{ 'AUTO.NOMBRE_REQUERIDO' | translate }}</div>
           }
           @if (isProtectedRole(editRol)) {
             <div class="form-text text-muted small">
@@ -35,7 +35,7 @@
         </div>
         
         <div class="col-md-6">
-          <label class="form-label small fw-bold text-muted">Código</label>
+          <label class="form-label small fw-bold text-muted">{{ 'AUTO.C_DIGO' | translate }}</label>
           <input
             cFormControl
             type="text"
@@ -48,7 +48,7 @@
             class="text-uppercase"
           />
            @if (!editRol.codigo) {
-            <div class="invalid-feedback d-block">Código requerido (máx 5 caracteres)</div>
+            <div class="invalid-feedback d-block">{{ 'AUTO.C_DIGO_REQUERIDO_M_X_5_CARACTE' | translate }}</div>
           }
           @if (!isEditing) {
             <div class="form-text text-muted small">
@@ -58,7 +58,7 @@
         </div>
 
         <div class="col-12">
-          <label class="form-label small fw-bold text-muted">Descripción</label>
+          <label class="form-label small fw-bold text-muted">{{ 'AUTO.DESCRIPCI_N' | translate }}</label>
           <textarea
             cFormControl
             rows="2"
@@ -70,7 +70,7 @@
 
         <div class="col-12 mt-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <label class="form-label fw-bold mb-0">Privilegios Asignados</label>
+            <label class="form-label fw-bold mb-0">{{ 'AUTO.PRIVILEGIOS_ASIGNADOS' | translate }}</label>
             <div class="form-check form-switch">
               <input
                 class="form-check-input"
@@ -81,7 +81,7 @@
                 (change)="toggleAllPrivilegios($any($event.target).checked)"
                 [disabled]="privilegios.length === 0"
               />
-              <label class="form-check-label small" for="selectAllPrivilegios">Seleccionar todos</label>
+              <label class="form-check-label small" for="selectAllPrivilegios">{{ 'AUTO.SELECCIONAR_TODOS' | translate }}</label>
             </div>
           </div>
           
@@ -89,7 +89,7 @@
             <div class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
                @if (privilegios.length === 0) {
                 <div class="text-center text-muted py-3">
-                  <small>No hay privilegios disponibles</small>
+                  <small>{{ 'AUTO.NO_HAY_PRIVILEGIOS_DISPONIBLES' | translate }}</small>
                 </div>
               }
               <div class="row g-2">
@@ -122,7 +122,7 @@
     }
   </c-modal-body>
   <c-modal-footer class="border-top-0 pt-0 pb-4">
-    <button cButton color="secondary" variant="ghost" (click)="close()">Cancelar</button>
+    <button cButton color="secondary" variant="ghost" (click)="close()">{{ 'AUTO.CANCELAR' | translate }}</button>
     <button cButton color="primary" class="px-4" [disabled]="!isRolFormValid()" (click)="save()">
       {{ isEditing ? 'Guardar Cambios' : 'Crear Rol' }}
     </button>

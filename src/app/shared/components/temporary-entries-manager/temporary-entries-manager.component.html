@@ -3,7 +3,7 @@
   <c-card-header>
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <h2 cCardTitle>Entradas Temporales No Guardadas</h2>
+        <h2 cCardTitle>{{ 'AUTO.ENTRADAS_TEMPORALES_NO_GUARDAD' | translate }}</h2>
         <p class="text-muted">
           Estas son las entradas que se guardaron temporalmente durante cierres de sesión.
         </p>
@@ -16,7 +16,7 @@
   <c-card-body>
     @if (entries.length === 0) {
       <div class="text-center py-4">
-        <p>No hay entradas temporales guardadas.</p>
+        <p>{{ 'AUTO.NO_HAY_ENTRADAS_TEMPORALES_GUA' | translate }}</p>
       </div>
     }
 
@@ -76,18 +76,18 @@
     @if (selectedEntry) {
       <div>
         <p>
-          <strong>Título:</strong>
+          <strong>{{ 'AUTO.T_TULO' | translate }}</strong>
           {{ selectedEntry.formData.titulo || 'Sin título' }}
         </p>
         <p>
-          <strong>Subtítulo:</strong>
+          <strong>{{ 'AUTO.SUBT_TULO' | translate }}</strong>
           {{ selectedEntry.formData.subtitulo || 'Sin subtítulo' }}
         </p>
         <p>
-          <strong>Resumen:</strong>
+          <strong>{{ 'AUTO.RESUMEN' | translate }}</strong>
           {{ selectedEntry.formData.resumen || 'Sin resumen' }}
         </p>
-        <p><strong>Contenido:</strong></p>
+        <p><strong>{{ 'AUTO.CONTENIDO' | translate }}</strong></p>
         <div
           class="border p-2 bg-light"
           [innerHTML]="selectedEntry.formData.contenido || 'Sin contenido'"
@@ -96,7 +96,7 @@
     }
   </c-modal-body>
   <c-modal-footer>
-    <button cButton color="secondary" (click)="viewModalVisible = false">Cerrar</button>
-    <button cButton color="primary" (click)="recoverSelectedEntry()">Recuperar</button>
+    <button cButton color="secondary" (click)="viewModalVisible = false">{{ 'AUTO.CERRAR' | translate }}</button>
+    <button cButton color="primary" (click)="recoverSelectedEntry()">{{ 'AUTO.RECUPERAR' | translate }}</button>
   </c-modal-footer>
 </c-modal>

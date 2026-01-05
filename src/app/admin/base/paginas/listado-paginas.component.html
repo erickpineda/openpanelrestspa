@@ -6,8 +6,8 @@
           <svg cIcon name="cilFile" size="lg" class="text-primary"></svg>
         </div>
         <div>
-          <h5 class="mb-0 text-primary fw-bold">Gestión de Páginas</h5>
-          <small class="text-muted">Administra el contenido estático del sitio</small>
+          <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.GESTI_N_DE_P_GINAS' | translate }}</h5>
+          <small class="text-muted">{{ 'AUTO.ADMINISTRA_EL_CONTENIDO_EST_TI' | translate }}</small>
         </div>
       </div>
       <div class="d-flex gap-2">
@@ -31,7 +31,7 @@
     <div class="d-flex flex-wrap gap-3 mb-4 p-3 bg-light rounded align-items-end shadow-sm border-start border-4 border-primary">
       <!-- Buscador Básico -->
       <div class="flex-grow-1" style="min-width: 250px;">
-        <label class="form-label small text-muted fw-bold mb-1">Buscar</label>
+        <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.BUSCAR' | translate }}</label>
         <div class="input-group">
           <span class="input-group-text bg-white border-end-0">
             <svg cIcon name="cilSearch" class="text-muted"></svg>
@@ -63,7 +63,7 @@
 
       <!-- Selector de Registros por Página -->
       <div>
-        <label class="form-label small text-muted fw-bold mb-1">Mostrar</label>
+        <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.MOSTRAR' | translate }}</label>
         <select
           cSelect
           [ngModel]="pageSize"
@@ -71,9 +71,9 @@
           style="width: 80px"
         >
           <option [ngValue]="5">5</option>
-          <option [ngValue]="10">10</option>
-          <option [ngValue]="20">20</option>
-          <option [ngValue]="50">50</option>
+          <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
+          <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
+          <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
         </select>
       </div>
     </div>
@@ -117,7 +117,7 @@
         <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3 rounded">
           <div class="text-center">
             <c-spinner color="primary"></c-spinner>
-            <p class="mt-2 text-muted small fw-bold">Cargando...</p>
+            <p class="mt-2 text-muted small fw-bold">{{ 'AUTO.CARGANDO' | translate }}</p>
           </div>
         </div>
       }
@@ -126,12 +126,12 @@
         <table cTable hover striped class="align-middle mb-0">
           <thead class="bg-light">
             <tr>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">Título</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">Autor</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">Publicación</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">Categorías</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-center">Estado</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-end">Acciones</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.T_TULO' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.AUTOR' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.PUBLICACI_N' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.CATEGOR_AS' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-center">{{ 'AUTO.ESTADO' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-end">{{ 'AUTO.ACCIONES' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -164,7 +164,7 @@
                         {{ entrada.categoriasConComas }}
                      </span>
                   } @else {
-                     <span class="text-muted fst-italic small">Sin categoría</span>
+                     <span class="text-muted fst-italic small">{{ 'AUTO.SIN_CATEGOR_A' | translate }}</span>
                   }
                 </td>
                 <td class="px-3 text-center">
@@ -219,8 +219,8 @@
                 <td colspan="6" class="text-center py-5 text-muted">
                   <div class="d-flex flex-column align-items-center">
                     <svg cIcon name="cilFile" size="xl" class="mb-3 text-secondary opacity-50"></svg>
-                    <span>No se encontraron páginas</span>
-                    <small class="text-muted mt-1">Intenta ajustar los filtros de búsqueda</small>
+                    <span>{{ 'AUTO.NO_SE_ENCONTRARON_P_GINAS' | translate }}</span>
+                    <small class="text-muted mt-1">{{ 'AUTO.INTENTA_AJUSTAR_LOS_FILTROS_DE' | translate }}</small>
                   </div>
                 </td>
               </tr>
@@ -253,31 +253,31 @@
 
 <c-modal [visible]="visible" (visibleChange)="onVisibleModalChange($event)" id="modalBorrar">
   <c-modal-header>
-    <h5 cModalTitle>Confirmar eliminación</h5>
+    <h5 cModalTitle>{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
     <button (click)="toggleModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
     ¿Está seguro de que desea eliminar la página <strong>{{ entradaABorrar?.titulo }}</strong>?
-    <p class="text-danger small mt-2 mb-0">Esta acción no se puede deshacer.</p>
+    <p class="text-danger small mt-2 mb-0">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</p>
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="toggleModal()" cButton color="secondary">Cancelar</button>
-    <button (click)="confirmarBorrado()" cButton color="danger">Eliminar</button>
+    <button (click)="toggleModal()" cButton color="secondary">{{ 'AUTO.CANCELAR' | translate }}</button>
+    <button (click)="confirmarBorrado()" cButton color="danger">{{ 'AUTO.ELIMINAR' | translate }}</button>
   </c-modal-footer>
 </c-modal>
 
 <c-modal [visible]="visible" (visibleChange)="onVisibleModalChange($event)" id="modalBorrar">
   <c-modal-header>
-    <h5 cModalTitle>Confirmar eliminación</h5>
+    <h5 cModalTitle>{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
     <button (click)="toggleModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
     ¿Está seguro de que desea eliminar la página <strong>{{ entradaABorrar?.titulo }}</strong>?
-    <p class="text-danger small mt-2 mb-0">Esta acción no se puede deshacer.</p>
+    <p class="text-danger small mt-2 mb-0">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</p>
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="toggleModal()" cButton color="secondary">Cancelar</button>
-    <button (click)="confirmarBorrado()" cButton color="danger">Eliminar</button>
+    <button (click)="toggleModal()" cButton color="secondary">{{ 'AUTO.CANCELAR' | translate }}</button>
+    <button (click)="confirmarBorrado()" cButton color="danger">{{ 'AUTO.ELIMINAR' | translate }}</button>
   </c-modal-footer>
 </c-modal>
 
@@ -297,6 +297,6 @@
     }
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="closePreview()" cButton color="secondary">Cerrar</button>
+    <button (click)="closePreview()" cButton color="secondary">{{ 'AUTO.CERRAR' | translate }}</button>
   </c-modal-footer>
 </c-modal>

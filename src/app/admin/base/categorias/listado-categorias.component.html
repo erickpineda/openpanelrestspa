@@ -6,8 +6,8 @@
           <svg cIcon name="cilTags" size="lg" class="text-primary"></svg>
         </div>
         <div>
-          <h5 class="mb-0 text-primary fw-bold">Categorías</h5>
-          <small class="text-muted">Organiza el contenido en secciones</small>
+          <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.CATEGOR_AS' | translate }}</h5>
+          <small class="text-muted">{{ 'AUTO.ORGANIZA_EL_CONTENIDO_EN_SECCI' | translate }}</small>
         </div>
       </div>
       <div class="d-flex gap-2">
@@ -26,7 +26,7 @@
            <svg cIcon name="cilWarning" class="text-danger"></svg>
            <span>{{ errorMsg }}</span>
         </div>
-        <button cButton color="danger" size="sm" (click)="refrescar()">Reintentar</button>
+        <button cButton color="danger" size="sm" (click)="refrescar()">{{ 'AUTO.REINTENTAR' | translate }}</button>
       </div>
     }
 
@@ -34,7 +34,7 @@
     <div class="d-flex flex-wrap gap-3 mb-4 p-3 bg-light rounded align-items-end shadow-sm border-start border-4 border-primary">
       <!-- Buscador Básico -->
       <div class="flex-grow-1" style="min-width: 250px;">
-        <label class="form-label small text-muted fw-bold mb-1">Buscar</label>
+        <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.BUSCAR' | translate }}</label>
         <div class="input-group">
           <span class="input-group-text bg-white border-end-0">
             <svg cIcon name="cilSearch" class="text-muted"></svg>
@@ -68,7 +68,7 @@
 
       <!-- Selector de Registros por Página -->
       <div>
-        <label class="form-label small text-muted fw-bold mb-1">Mostrar</label>
+        <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.MOSTRAR' | translate }}</label>
         <select
           cSelect
           [ngModel]="pageSize"
@@ -77,9 +77,9 @@
           [disabled]="cargando"
         >
           <option [ngValue]="5">5</option>
-          <option [ngValue]="10">10</option>
-          <option [ngValue]="20">20</option>
-          <option [ngValue]="50">50</option>
+          <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
+          <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
+          <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
         </select>
       </div>
     </div>
@@ -88,7 +88,7 @@
       <div class="mb-4 p-3 bg-white rounded border shadow-sm">
         <c-row class="g-3 align-items-end">
           <c-col xs="12" md="6">
-            <label class="form-label small fw-bold text-muted">Nombre</label>
+            <label class="form-label small fw-bold text-muted">{{ 'AUTO.NOMBRE' | translate }}</label>
             <input
               cFormControl
               size="sm"
@@ -131,7 +131,7 @@
         <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3 rounded">
           <div class="text-center">
             <c-spinner color="primary" [attr.aria-label]="'Cargando categorías'"></c-spinner>
-            <p class="mt-2 text-muted small fw-bold">Cargando...</p>
+            <p class="mt-2 text-muted small fw-bold">{{ 'AUTO.CARGANDO' | translate }}</p>
           </div>
         </div>
       }
@@ -147,9 +147,9 @@
         >
           <thead class="bg-light">
             <tr>
-              <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 200px">Nombre</th>
-              <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 250px">Descripción</th>
-              <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-center" style="min-width: 100px">Acciones</th>
+              <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 200px">{{ 'AUTO.NOMBRE' | translate }}</th>
+              <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 250px">{{ 'AUTO.DESCRIPCI_N' | translate }}</th>
+              <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-center" style="min-width: 100px">{{ 'AUTO.ACCIONES' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -209,8 +209,8 @@
                 <td colspan="3" class="text-center py-5 text-muted">
                   <div class="d-flex flex-column align-items-center justify-content-center">
                     <svg cIcon name="cilFolderOpen" size="xl" class="mb-3 text-secondary opacity-50"></svg>
-                    <span>No se han encontrado categorías</span>
-                    <small class="text-muted mt-1">Intenta ajustar los filtros de búsqueda</small>
+                    <span>{{ 'AUTO.NO_SE_HAN_ENCONTRADO_CATEGOR_A' | translate }}</span>
+                    <small class="text-muted mt-1">{{ 'AUTO.INTENTA_AJUSTAR_LOS_FILTROS_DE' | translate }}</small>
                   </div>
                 </td>
               </tr>

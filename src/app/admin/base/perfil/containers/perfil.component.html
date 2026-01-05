@@ -5,8 +5,8 @@
         <svg cIcon name="cilUser" size="lg" class="text-primary"></svg>
       </div>
       <div>
-        <h5 class="mb-0 text-primary fw-bold">Mi Perfil</h5>
-        <small class="text-muted">Gestiona tu información personal y preferencias</small>
+        <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.MI_PERFIL' | translate }}</h5>
+        <small class="text-muted">{{ 'AUTO.GESTIONA_TU_INFORMACI_N_PERSON' | translate }}</small>
       </div>
     </div>
   </c-card-header>
@@ -57,18 +57,18 @@
         <c-col xs="12" md="8">
           <c-card class="mb-4 shadow-sm h-100 border-0">
             <c-card-header class="bg-white py-3 border-bottom-0">
-              <h6 class="mb-0 fw-bold text-secondary text-uppercase small">Configuración de Cuenta</h6>
+              <h6 class="mb-0 fw-bold text-secondary text-uppercase small">{{ 'AUTO.CONFIGURACI_N_DE_CUENTA' | translate }}</h6>
             </c-card-header>
             <c-card-body>
               <c-nav variant="tabs" class="border-bottom-0 mb-3">
                 <a [active]="true" [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="0" cNavLink class="border-0 bg-transparent fw-semibold"
-                  >Información Personal</a
+                  >{{ 'AUTO.INFORMACI_N_PERSONAL' | translate }}</a
                 >
                 <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="1" cNavLink class="border-0 bg-transparent fw-semibold"
-                  >Preferencias</a
+                  >{{ 'AUTO.PREFERENCIAS' | translate }}</a
                 >
                 <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="2" cNavLink class="border-0 bg-transparent fw-semibold"
-                  >Actividad Reciente</a
+                  >{{ 'AUTO.ACTIVIDAD_RECIENTE' | translate }}</a
                 >
               </c-nav>
               <c-tab-content #tabContent="cTabContent" [activeTabPaneIdx]="0" class="border rounded p-4 bg-light bg-opacity-10">
@@ -95,7 +95,7 @@
       <div class="d-flex justify-content-center align-items-center" style="height: 50vh">
         <div class="text-center">
           <c-spinner color="primary"></c-spinner>
-          <p class="mt-2 text-muted fw-semibold">Cargando perfil...</p>
+          <p class="mt-2 text-muted fw-semibold">{{ 'AUTO.CARGANDO_PERFIL' | translate }}</p>
         </div>
       </div>
     }

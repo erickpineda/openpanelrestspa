@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-between align-items-center dashboard-toolbar-container mb-3 bg-light p-2 rounded border">
   <div class="d-flex align-items-center gap-2">
     <svg cIcon name="cilGraph" class="text-secondary"></svg>
-    <h6 class="card-title mb-0 fw-bold text-secondary text-uppercase small">Configuración</h6>
+    <h6 class="card-title mb-0 fw-bold text-secondary text-uppercase small">{{ 'AUTO.CONFIGURACI_N' | translate }}</h6>
   </div>
   <div
     class="btn-toolbar dashboard-toolbar gap-2 flex-wrap"
@@ -148,14 +148,14 @@
       Rendimiento (dev) — Actualizado: {{ perfUpdatedAt | date: 'HH:mm:ss' }}
     </div>
     <ul class="list-unstyled small mb-0 row g-2">
-      <li class="col-6 col-md-3">Summary: <span class="fw-bold">{{ perf['summary'] || 0 }} ms</span></li>
-      <li class="col-6 col-md-3">Series: <span class="fw-bold">{{ perf['series'] || 0 }} ms</span></li>
-      <li class="col-6 col-md-3">Top Usuarios: <span class="fw-bold">{{ perf['topUsers'] || 0 }} ms</span></li>
-      <li class="col-6 col-md-3">Top Categorías: <span class="fw-bold">{{ perf['topCategories'] || 0 }} ms</span></li>
-      <li class="col-6 col-md-3">Top Tags: <span class="fw-bold">{{ perf['topTags'] || 0 }} ms</span></li>
-      <li class="col-6 col-md-3">Storage: <span class="fw-bold">{{ perf['storage'] || 0 }} ms</span></li>
-      <li class="col-6 col-md-3">Contenido: <span class="fw-bold">{{ perf['contentStats'] || 0 }} ms</span></li>
-      <li class="col-6 col-md-3">Reciente: <span class="fw-bold">{{ perf['recent'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.SUMMARY' | translate }}<span class="fw-bold">{{ perf['summary'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.SERIES' | translate }}<span class="fw-bold">{{ perf['series'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.TOP_USUARIOS' | translate }}<span class="fw-bold">{{ perf['topUsers'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.TOP_CATEGOR_AS' | translate }}<span class="fw-bold">{{ perf['topCategories'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.TOP_TAGS' | translate }}<span class="fw-bold">{{ perf['topTags'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.STORAGE' | translate }}<span class="fw-bold">{{ perf['storage'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.CONTENIDO' | translate }}<span class="fw-bold">{{ perf['contentStats'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.RECIENTE' | translate }}<span class="fw-bold">{{ perf['recent'] || 0 }} ms</span></li>
     </ul>
   </div>
 }

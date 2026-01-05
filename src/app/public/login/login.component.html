@@ -12,8 +12,8 @@
                 #f="ngForm"
                 novalidate
               >
-                <h1>Login</h1>
-                <p class="text-medium-emphasis">Inicia sesión con tu cuenta</p>
+                <h1>{{ 'AUTO.LOGIN' | translate }}</h1>
+                <p class="text-medium-emphasis">{{ 'AUTO.INICIA_SESI_N_CON_TU_CUENTA' | translate }}</p>
                 <c-input-group class="mb-3">
                   <span cInputGroupText>
                     <svg [cIcon]="icons.cilUser" name="cilUser"></svg>
@@ -30,7 +30,7 @@
                   />
                 </c-input-group>
                 @if (username.errors && f.submitted) {
-                  <c-alert color="danger" fade>El nombre de usuario es obligatorio</c-alert>
+                  <c-alert color="danger" fade>{{ 'AUTO.EL_NOMBRE_DE_USUARIO_ES_OBLIGA' | translate }}</c-alert>
                 }
                 <c-input-group class="mb-4">
                   <span cInputGroupText>
@@ -52,17 +52,17 @@
                 @if (password.errors && f.submitted) {
                   <c-alert color="danger" fade>
                     @if (password.errors['required']) {
-                      <span>La contraseña es obligatoria</span>
+                      <span>{{ 'AUTO.LA_CONTRASE_A_ES_OBLIGATORIA' | translate }}</span>
                     }
                     @if (password.errors['minlength']) {
-                      <span>La contraseña debe tener 6 caracteres como mínimo</span>
+                      <span>{{ 'AUTO.LA_CONTRASE_A_DEBE_TENER_6_CAR' | translate }}</span>
                     }
                   </c-alert>
                 }
                 <c-row>
                   <c-col xs="6">
                     @if (!isLoading) {
-                      <button class="btn btn-primary" type="submit">Login</button>
+                      <button class="btn btn-primary" type="submit">{{ 'AUTO.LOGIN' | translate }}</button>
                     }
                     @if (isLoading) {
                       <button class="btn btn-primary" type="button" disabled>

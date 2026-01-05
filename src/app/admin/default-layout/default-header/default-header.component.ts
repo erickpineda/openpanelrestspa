@@ -117,7 +117,11 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
 
       const label = child.snapshot.data['title'];
       if (label) {
-        breadcrumbs.push({ label, url });
+        // Evitar duplicados consecutivos (mismo label)
+        const lastBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
+        if (!lastBreadcrumb || lastBreadcrumb.label !== label) {
+          breadcrumbs.push({ label, url });
+        }
       }
 
       return this.createBreadcrumbs(child, url, breadcrumbs);

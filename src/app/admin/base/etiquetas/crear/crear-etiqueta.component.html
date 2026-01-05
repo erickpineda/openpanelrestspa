@@ -1,6 +1,6 @@
 <c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static" alignment="center">
   <c-modal-header>
-    <h5 cModalTitle>Nueva Etiqueta</h5>
+    <h5 cModalTitle>{{ 'AUTO.NUEVA_ETIQUETA' | translate }}</h5>
     <button (click)="cerrarModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>

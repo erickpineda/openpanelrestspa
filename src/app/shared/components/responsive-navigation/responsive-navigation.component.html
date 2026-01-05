@@ -129,7 +129,7 @@
       <!-- Critical Functions Quick Access (Mobile Only) using CoreUI -->
       @if (state.isMobile && state.sidebarCollapsed) {
         <c-nav-group class="critical-functions-bar">
-          <c-nav-title>Acceso Rápido</c-nav-title>
+          <c-nav-title>{{ 'AUTO.ACCESO_R_PIDO' | translate }}</c-nav-title>
           @for (func of criticalFunctions.slice(0, 4); track func.url) {
             <c-nav-item>
               <c-nav-link

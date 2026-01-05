@@ -6,8 +6,8 @@
           <svg cIcon name="cilSpeech" size="lg" class="text-primary"></svg>
         </div>
         <div>
-          <h5 class="mb-0 text-primary fw-bold">Gestión de Comentarios</h5>
-          <small class="text-muted">Modera las interacciones de los usuarios</small>
+          <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.GESTI_N_DE_COMENTARIOS' | translate }}</h5>
+          <small class="text-muted">{{ 'AUTO.MODERA_LAS_INTERACCIONES_DE_LO' | translate }}</small>
         </div>
       </div>
       <div class="d-flex gap-2">
@@ -24,7 +24,7 @@
     <div class="d-flex flex-wrap gap-3 mb-4 p-3 bg-light rounded align-items-end shadow-sm border-start border-4 border-primary">
       <!-- Buscador Básico -->
       <div class="flex-grow-1" style="min-width: 250px;">
-        <label class="form-label small text-muted fw-bold mb-1">Buscar</label>
+        <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.BUSCAR' | translate }}</label>
         <div class="input-group">
           <span class="input-group-text bg-white border-end-0">
             <svg cIcon name="cilSearch" class="text-muted"></svg>
@@ -58,7 +58,7 @@
 
       <!-- Selector de Registros por Página -->
       <div>
-        <label class="form-label small text-muted fw-bold mb-1">Mostrar</label>
+        <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.MOSTRAR' | translate }}</label>
         <select
           cSelect
           [ngModel]="pageSize"
@@ -67,9 +67,9 @@
           [disabled]="cargando"
         >
           <option [ngValue]="5">5</option>
-          <option [ngValue]="10">10</option>
-          <option [ngValue]="20">20</option>
-          <option [ngValue]="50">50</option>
+          <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
+          <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
+          <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
         </select>
       </div>
     </div>
@@ -79,7 +79,7 @@
       <div class="mb-4 p-3 bg-white rounded border shadow-sm">
         <c-row class="g-3">
           <c-col xs="12" md="4">
-            <label class="form-label small fw-bold text-muted">Usuario</label>
+            <label class="form-label small fw-bold text-muted">{{ 'AUTO.USUARIO' | translate }}</label>
             <input
               cFormControl
               size="sm"
@@ -91,7 +91,7 @@
             />
           </c-col>
           <c-col xs="6" md="4">
-            <label class="form-label small fw-bold text-muted">Estado Aprobado</label>
+            <label class="form-label small fw-bold text-muted">{{ 'AUTO.ESTADO_APROBADO' | translate }}</label>
             <select
               cSelect
               size="sm"
@@ -99,13 +99,13 @@
               (change)="filtroAprobado = $any($event.target).value === '' ? null : $any($event.target).value === 'true'"
               [disabled]="cargando"
             >
-              <option value="">Todos</option>
-              <option value="true">Aprobados</option>
-              <option value="false">No Aprobados</option>
+              <option value="">{{ 'AUTO.TODOS' | translate }}</option>
+              <option value="true">{{ 'AUTO.APROBADOS' | translate }}</option>
+              <option value="false">{{ 'AUTO.NO_APROBADOS' | translate }}</option>
             </select>
           </c-col>
           <c-col xs="6" md="4">
-            <label class="form-label small fw-bold text-muted">En Cuarentena</label>
+            <label class="form-label small fw-bold text-muted">{{ 'AUTO.EN_CUARENTENA' | translate }}</label>
             <select
               cSelect
               size="sm"
@@ -113,9 +113,9 @@
               (change)="filtroCuarentena = $any($event.target).value === '' ? null : $any($event.target).value === 'true'"
               [disabled]="cargando"
             >
-              <option value="">Todos</option>
-              <option value="true">Sí</option>
-              <option value="false">No</option>
+              <option value="">{{ 'AUTO.TODOS' | translate }}</option>
+              <option value="true">{{ 'AUTO.S' | translate }}</option>
+              <option value="false">{{ 'AUTO.NO' | translate }}</option>
             </select>
           </c-col>
           <c-col xs="12" class="d-flex justify-content-end gap-2 mt-2">
@@ -138,7 +138,7 @@
         <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3 rounded">
           <div class="text-center">
             <c-spinner color="primary"></c-spinner>
-            <p class="mt-2 text-muted small fw-bold">Cargando...</p>
+            <p class="mt-2 text-muted small fw-bold">{{ 'AUTO.CARGANDO' | translate }}</p>
           </div>
         </div>
       }
@@ -147,12 +147,12 @@
         <table cTable hover striped class="align-middle mb-0">
           <thead class="bg-light">
             <tr>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">Contenido</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">Usuario</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">Entrada</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">Fecha</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-center">Estado</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-end">Acciones</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.CONTENIDO' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.USUARIO' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.ENTRADA' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.FECHA' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-center">{{ 'AUTO.ESTADO' | translate }}</th>
+              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-end">{{ 'AUTO.ACCIONES' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -192,11 +192,11 @@
                 </td>
                 <td class="px-3 text-center">
                   @if (coment.aprobado) {
-                    <c-badge color="success" shape="rounded-pill" class="shadow-sm px-3">Aprobado</c-badge>
+                    <c-badge color="success" shape="rounded-pill" class="shadow-sm px-3">{{ 'AUTO.APROBADO' | translate }}</c-badge>
                   } @else if (coment.cuarentena) {
-                    <c-badge color="danger" shape="rounded-pill" class="shadow-sm px-3">Cuarentena</c-badge>
+                    <c-badge color="danger" shape="rounded-pill" class="shadow-sm px-3">{{ 'AUTO.CUARENTENA' | translate }}</c-badge>
                   } @else {
-                    <c-badge color="warning" shape="rounded-pill" class="shadow-sm px-3">Pendiente</c-badge>
+                    <c-badge color="warning" shape="rounded-pill" class="shadow-sm px-3">{{ 'AUTO.PENDIENTE' | translate }}</c-badge>
                   }
                 </td>
                 <td class="px-3 text-end">
@@ -229,8 +229,8 @@
                 <td colspan="6" class="text-center py-5 text-muted">
                   <div class="d-flex flex-column align-items-center">
                     <svg cIcon name="cilSpeech" size="xl" class="mb-3 text-secondary opacity-50"></svg>
-                    <span>No se encontraron comentarios</span>
-                    <small class="text-muted mt-1">Intenta ajustar los filtros de búsqueda</small>
+                    <span>{{ 'AUTO.NO_SE_ENCONTRARON_COMENTARIOS' | translate }}</span>
+                    <small class="text-muted mt-1">{{ 'AUTO.INTENTA_AJUSTAR_LOS_FILTROS_DE' | translate }}</small>
                   </div>
                 </td>
               </tr>
@@ -271,7 +271,7 @@
     <button (click)="cancelDelete()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
-    <p>¿Estás seguro de que deseas eliminar este comentario permanentemente?</p>
+    <p>{{ 'AUTO.EST_S_SEGURO_DE_QUE_DESEAS_ELI' | translate }}</p>
     
     @if (comentarioToDelete) {
       <div class="alert alert-light border rounded p-3 mb-0">

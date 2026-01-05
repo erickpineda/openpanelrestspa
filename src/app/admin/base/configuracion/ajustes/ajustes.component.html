@@ -7,8 +7,8 @@
             <svg cIcon name="cilSettings" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 class="mb-0 text-primary fw-bold">Ajustes</h5>
-            <small class="text-muted">Configuración general del sistema</small>
+            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.AJUSTES' | translate }}</h5>
+            <small class="text-muted">{{ 'AUTO.CONFIGURACI_N_GENERAL_DEL_SIST' | translate }}</small>
           </div>
         </div>
         <div class="btn-group" role="group" aria-label="Acciones">
@@ -26,14 +26,14 @@
             <svg cIcon name="cilWarning" class="flex-shrink-0"></svg>
             <span>{{ error }}</span>
           </div>
-          <button cButton color="danger" variant="outline" size="sm" (click)="load()">Reintentar</button>
+          <button cButton color="danger" variant="outline" size="sm" (click)="load()">{{ 'AUTO.REINTENTAR' | translate }}</button>
         </c-alert>
       }
 
       <div class="d-flex flex-column flex-md-row gap-3 mb-4 justify-content-between align-items-end bg-light p-3 rounded">
         <div class="d-flex flex-column flex-md-row gap-3 flex-grow-1 w-100">
            <div class="flex-grow-1" style="max-width: 400px;">
-            <label class="form-label text-muted small text-uppercase fw-bold">Buscar</label>
+            <label class="form-label text-muted small text-uppercase fw-bold">{{ 'AUTO.BUSCAR' | translate }}</label>
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0 text-secondary">
                 <svg cIcon name="cilSearch" size="sm"></svg>
@@ -73,9 +73,9 @@
               style="width: auto"
               [disabled]="loading"
             >
-              <option value="5">5 registros</option>
-              <option value="10">10 registros</option>
-              <option value="20">20 registros</option>
+              <option value="5">{{ 'AUTO.5_REGISTROS' | translate }}</option>
+              <option value="10">{{ 'AUTO.10_REGISTROS' | translate }}</option>
+              <option value="20">{{ 'AUTO.20_REGISTROS' | translate }}</option>
             </select>
         </div>
       </div>
@@ -84,7 +84,7 @@
         <div class="mb-4 p-3 bg-light rounded border animate__animated animate__fadeIn">
           <c-row class="g-3 align-items-end">
             <c-col xs="12" md="4">
-              <label class="form-label small fw-bold text-muted">Categoría</label>
+              <label class="form-label small fw-bold text-muted">{{ 'AUTO.CATEGOR_A' | translate }}</label>
               <input
                 cFormControl
                 type="text"
@@ -95,7 +95,7 @@
               />
             </c-col>
             <c-col xs="12" md="4">
-              <label class="form-label small fw-bold text-muted">Clave</label>
+              <label class="form-label small fw-bold text-muted">{{ 'AUTO.CLAVE' | translate }}</label>
               <input
                 cFormControl
                 type="text"
@@ -136,7 +136,7 @@
           >
             <div class="text-center">
               <c-spinner color="primary"></c-spinner>
-              <p class="mt-2 text-muted small fw-bold">Cargando ajustes...</p>
+              <p class="mt-2 text-muted small fw-bold">{{ 'AUTO.CARGANDO_AJUSTES' | translate }}</p>
             </div>
           </div>
         }
@@ -150,10 +150,10 @@
           >
             <thead class="bg-light border-bottom">
               <tr>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold">Categoría</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold">Clave</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold">Valor</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-end">Acciones</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.CATEGOR_A' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.CLAVE' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.VALOR' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-end">{{ 'AUTO.ACCIONES' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -197,7 +197,7 @@
                   <td colspan="4" class="text-center py-5 text-muted">
                      <div class="d-flex flex-column align-items-center">
                        <svg cIcon name="cilSettings" size="xl" class="mb-3 text-secondary opacity-50"></svg>
-                       <span>No se han encontrado ajustes</span>
+                       <span>{{ 'AUTO.NO_SE_HAN_ENCONTRADO_AJUSTES' | translate }}</span>
                      </div>
                   </td>
                 </tr>
@@ -227,21 +227,21 @@
   <c-modal-body class="p-4">
     <form [formGroup]="form">
       <div class="mb-4">
-        <label class="form-label fw-bold text-secondary small">Categoría</label>
+        <label class="form-label fw-bold text-secondary small">{{ 'AUTO.CATEGOR_A' | translate }}</label>
         <input cFormControl type="text" formControlName="categoria" placeholder="Ej. General" />
       </div>
       <div class="mb-4">
-        <label class="form-label fw-bold text-secondary small">Clave</label>
+        <label class="form-label fw-bold text-secondary small">{{ 'AUTO.CLAVE' | translate }}</label>
         <input cFormControl type="text" formControlName="clave" placeholder="Ej. site_name" />
       </div>
       <div class="mb-4">
-        <label class="form-label fw-bold text-secondary small">Valor</label>
+        <label class="form-label fw-bold text-secondary small">{{ 'AUTO.VALOR' | translate }}</label>
         <textarea cFormControl formControlName="valor" rows="4" placeholder="Valor del ajuste..."></textarea>
       </div>
     </form>
   </c-modal-body>
   <c-modal-footer class="bg-light border-top-0">
-    <button cButton color="secondary" variant="ghost" (click)="closeModal()">Cancelar</button>
+    <button cButton color="secondary" variant="ghost" (click)="closeModal()">{{ 'AUTO.CANCELAR' | translate }}</button>
     <button cButton color="primary" [disabled]="form.invalid" (click)="save()">
       <svg cIcon name="cilSave" class="me-2"></svg>
       Guardar

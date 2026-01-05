@@ -8,7 +8,7 @@
   data-testid="etiqueta-form"
 >
   <div class="mb-3">
-    <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+    <label for="nombre" class="form-label">{{ 'AUTO.NOMBRE' | translate }}<span class="text-danger">*</span></label>
     <input
       type="text"
       id="nombre"
@@ -27,17 +27,17 @@
     @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
       <div id="nombre-error" class="invalid-feedback">
         @if (form.get('nombre')?.errors?.['required']) {
-          <span>El nombre es requerido</span>
+          <span>{{ 'AUTO.EL_NOMBRE_ES_REQUERIDO' | translate }}</span>
         }
         @if (form.get('nombre')?.errors?.['maxlength']) {
-          <span>El nombre no puede exceder 50 caracteres</span>
+          <span>{{ 'AUTO.EL_NOMBRE_NO_PUEDE_EXCEDER_50_' | translate }}</span>
         }
       </div>
     }
   </div>
 
   <div class="mb-3">
-    <label for="descripcion" class="form-label">Descripción</label>
+    <label for="descripcion" class="form-label">{{ 'AUTO.DESCRIPCI_N' | translate }}</label>
     <textarea
       id="descripcion"
       cFormControl
@@ -60,7 +60,7 @@
   </div>
 
   <div class="mb-4">
-    <label class="form-label">Color <span class="text-danger">*</span></label>
+    <label class="form-label">{{ 'AUTO.COLOR' | translate }}<span class="text-danger">*</span></label>
     <div class="d-flex flex-wrap gap-2">
       @for (colorOption of colores; track colorOption.value) {
         <div class="form-check form-check-inline">
@@ -88,7 +88,7 @@
       }
     </div>
     @if (form.get('colorHex')?.invalid && form.get('colorHex')?.touched) {
-      <div class="invalid-feedback d-block">Debe seleccionar un color</div>
+      <div class="invalid-feedback d-block">{{ 'AUTO.DEBE_SELECCIONAR_UN_COLOR' | translate }}</div>
     }
   </div>
 

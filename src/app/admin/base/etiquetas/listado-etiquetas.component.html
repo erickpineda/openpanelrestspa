@@ -7,8 +7,8 @@
             <svg cIcon name="cilTag" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 class="mb-0 text-primary fw-bold">Etiquetas</h5>
-            <small class="text-muted">Clasifica el contenido con etiquetas</small>
+            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.ETIQUETAS' | translate }}</h5>
+            <small class="text-muted">{{ 'AUTO.CLASIFICA_EL_CONTENIDO_CON_ETI' | translate }}</small>
           </div>
         </div>
         <div class="d-flex gap-2">
@@ -32,7 +32,7 @@
       <div class="d-flex flex-wrap gap-3 mb-4 p-3 bg-light rounded align-items-end shadow-sm border-start border-4 border-primary">
         <!-- Buscador Básico -->
         <div class="flex-grow-1" style="min-width: 250px;">
-          <label class="form-label small text-muted fw-bold mb-1">Buscar</label>
+          <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.BUSCAR' | translate }}</label>
           <div class="input-group">
             <span class="input-group-text bg-white border-end-0">
               <svg cIcon name="cilSearch" class="text-muted"></svg>
@@ -66,7 +66,7 @@
 
         <!-- Selector de Registros por Página -->
         <div>
-          <label class="form-label small text-muted fw-bold mb-1">Mostrar</label>
+          <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.MOSTRAR' | translate }}</label>
           <select
             cSelect
             [ngModel]="pageSize"
@@ -76,9 +76,9 @@
             [disabled]="loading"
           >
             <option [ngValue]="5">5</option>
-            <option [ngValue]="10">10</option>
-            <option [ngValue]="20">20</option>
-            <option [ngValue]="50">50</option>
+            <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
+            <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
+            <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
           </select>
         </div>
       </div>
@@ -89,7 +89,7 @@
           <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
             <c-row class="g-3 align-items-end">
               <c-col xs="12" md="4">
-                <label for="nombre" class="form-label small fw-bold text-muted">Nombre</label>
+                <label for="nombre" class="form-label small fw-bold text-muted">{{ 'AUTO.NOMBRE' | translate }}</label>
                 <input
                   type="text"
                   id="nombre"
@@ -101,7 +101,7 @@
                 />
               </c-col>
               <c-col xs="12" md="4">
-                <label for="descripcion" class="form-label small fw-bold text-muted">Descripción</label>
+                <label for="descripcion" class="form-label small fw-bold text-muted">{{ 'AUTO.DESCRIPCI_N' | translate }}</label>
                 <input
                   type="text"
                   id="descripcion"
@@ -148,7 +148,7 @@
           <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3 rounded">
             <div class="text-center">
               <c-spinner color="primary" [attr.aria-label]="'Cargando etiquetas'"></c-spinner>
-              <p class="mt-2 text-muted small fw-bold">Cargando...</p>
+              <p class="mt-2 text-muted small fw-bold">{{ 'AUTO.CARGANDO' | translate }}</p>
             </div>
           </div>
         }
@@ -164,10 +164,10 @@
           >
             <thead class="bg-light">
               <tr>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 90px">Color</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 200px">Nombre</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 250px">Descripción</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-center" style="min-width: 100px">Acciones</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 90px">{{ 'AUTO.COLOR' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 200px">{{ 'AUTO.NOMBRE' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 250px">{{ 'AUTO.DESCRIPCI_N' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-center" style="min-width: 100px">{{ 'AUTO.ACCIONES' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -179,7 +179,7 @@
                       [style.background-color]="etiqueta.colorHex"
                       [attr.aria-label]="'Color de etiqueta'"
                       style="width: 24px; height: 24px; display: inline-block; border-radius: 50%;"
-                      >&nbsp;</span
+                      >{{ 'AUTO.NBSP' | translate }}</span
                     >
                   </td>
                   <td class="px-3">
@@ -235,8 +235,8 @@
                   <td colspan="4" class="text-center py-5">
                     <div class="d-flex flex-column align-items-center opacity-50">
                       <svg cIcon name="cilTags" size="4xl" class="mb-3"></svg>
-                      <h6 class="fw-bold">No se encontraron etiquetas</h6>
-                      <p class="small text-muted mb-0">Intenta ajustar los filtros o crea una nueva etiqueta</p>
+                      <h6 class="fw-bold">{{ 'AUTO.NO_SE_ENCONTRARON_ETIQUETAS' | translate }}</h6>
+                      <p class="small text-muted mb-0">{{ 'AUTO.INTENTA_AJUSTAR_LOS_FILTROS_O_' | translate }}</p>
                     </div>
                   </td>
                 </tr>
@@ -254,7 +254,7 @@
              <c-pagination class="mb-0" aria-label="Navegación de páginas">
                 <li cPageItem [disabled]="pageNo === 0">
                    <a cPageLink (click)="onPrev()" [attr.aria-label]="'Anterior'" style="cursor: pointer">
-                      <span aria-hidden="true">&laquo;</span>
+                      <span aria-hidden="true">{{ 'AUTO.LAQUO' | translate }}</span>
                    </a>
                 </li>
                 @for (p of [].constructor(getTotalPages()); track $index) {
@@ -266,7 +266,7 @@
                 }
                 <li cPageItem [disabled]="isNextDisabled()">
                    <a cPageLink (click)="onNext()" [attr.aria-label]="'Siguiente'" style="cursor: pointer">
-                      <span aria-hidden="true">&raquo;</span>
+                      <span aria-hidden="true">{{ 'AUTO.RAQUO' | translate }}</span>
                    </a>
                 </li>
              </c-pagination>

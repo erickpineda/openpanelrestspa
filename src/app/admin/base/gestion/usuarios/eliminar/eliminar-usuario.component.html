@@ -16,7 +16,7 @@
       <c-avatar color="danger" textColor="white" size="xl" class="mb-3">
         <svg cIcon name="cilTrash" size="lg"></svg>
       </c-avatar>
-      <p class="lead mb-1">¿Estás seguro de eliminar este usuario?</p>
+      <p class="lead mb-1">{{ 'AUTO.EST_S_SEGURO_DE_ELIMINAR_ESTE_' | translate }}</p>
       <div class="fw-bold text-primary">{{ usuario?.username }}</div>
     </div>
     <div class="alert alert-danger bg-danger bg-opacity-10 text-danger border-danger border-opacity-25 small mb-0">
@@ -24,7 +24,7 @@
     </div>
   </c-modal-body>
   <c-modal-footer>
-    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">Cancelar</button>
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'AUTO.CANCELAR' | translate }}</button>
     <button cButton color="danger" (click)="confirmar()" [disabled]="loading">
       @if (loading) {
         <c-spinner size="sm" class="me-1"></c-spinner>

@@ -12,8 +12,21 @@ export class LanguageService {
   public currentLang$: Observable<Language>;
 
   constructor() {
+    let defaultLang: Language = 'es';
+    
+    // 1. Intentar leer de localStorage
     const savedLang = localStorage.getItem(this.LANG_KEY) as Language;
-    const defaultLang: Language = savedLang === 'en' || savedLang === 'es' ? savedLang : 'es';
+    
+    if (savedLang === 'en' || savedLang === 'es') {
+      defaultLang = savedLang;
+    } else {
+      // 2. Detectar idioma del navegador
+      const browserLang = navigator.language.split('-')[0]; // 'es-ES' -> 'es'
+      if (browserLang === 'en') {
+        defaultLang = 'en';
+      }
+      // Por defecto sigue siendo 'es' si no es 'en'
+    }
     
     this.currentLangSubject = new BehaviorSubject<Language>(defaultLang);
     this.currentLang$ = this.currentLangSubject.asObservable();

@@ -2,7 +2,7 @@
   <div class="d-flex justify-content-end mb-3 gap-2">
     @if (showPeriodControls) {
       <div class="d-flex align-items-center gap-1">
-        <label class="small text-muted mb-0">Top:</label>
+        <label class="small text-muted mb-0">{{ 'AUTO.TOP' | translate }}</label>
         <input
           cFormControl
           type="number"
@@ -85,7 +85,7 @@
     }
     @if (!items || items.length === 0) {
       <li class="list-group-item text-center text-muted py-4">
-        <small>Sin datos</small>
+        <small>{{ 'AUTO.SIN_DATOS' | translate }}</small>
       </li>
     }
   </ul>

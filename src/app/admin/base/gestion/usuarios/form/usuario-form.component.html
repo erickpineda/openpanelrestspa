@@ -17,7 +17,7 @@
       <div class="row g-3">
         <!-- Username & Email -->
         <c-col md="6">
-          <label class="form-label fw-semibold">Usuario</label>
+          <label class="form-label fw-semibold">{{ 'AUTO.USUARIO' | translate }}</label>
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilUser" size="sm"></svg></span>
             <input
@@ -32,12 +32,12 @@
             />
           </div>
           @if (!usuario.username) {
-            <div class="text-danger small mt-1">Usuario requerido</div>
+            <div class="text-danger small mt-1">{{ 'AUTO.USUARIO_REQUERIDO' | translate }}</div>
           }
         </c-col>
         
         <c-col md="6">
-          <label class="form-label fw-semibold">Email</label>
+          <label class="form-label fw-semibold">{{ 'AUTO.EMAIL' | translate }}</label>
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilEnvelopeClosed" size="sm"></svg></span>
             <input
@@ -51,13 +51,13 @@
             />
           </div>
           @if (!isEmailValid(usuario.email)) {
-            <div class="text-danger small mt-1">Email inválido</div>
+            <div class="text-danger small mt-1">{{ 'AUTO.EMAIL_INV_LIDO' | translate }}</div>
           }
         </c-col>
 
         <!-- Names -->
         <c-col md="6">
-          <label class="form-label fw-semibold">Nombre</label>
+          <label class="form-label fw-semibold">{{ 'AUTO.NOMBRE' | translate }}</label>
           <input
             cFormControl
             type="text"
@@ -67,7 +67,7 @@
           />
         </c-col>
         <c-col md="6">
-          <label class="form-label fw-semibold">Apellido</label>
+          <label class="form-label fw-semibold">{{ 'AUTO.APELLIDO' | translate }}</label>
           <input
             cFormControl
             type="text"
@@ -81,14 +81,14 @@
 
         <!-- Role & Status -->
         <c-col md="6">
-          <label class="form-label fw-semibold">Rol Asignado</label>
+          <label class="form-label fw-semibold">{{ 'AUTO.ROL_ASIGNADO' | translate }}</label>
           <select
             cSelect
             [(ngModel)]="usuario.rolCodigo"
             [class.is-invalid]="!usuario.rolCodigo"
             [disabled]="PROPIETARIO_ROLE_CODE && usuario.rolCodigo === PROPIETARIO_ROLE_CODE"
           >
-            <option value="">Seleccione rol</option>
+            <option value="">{{ 'AUTO.SELECCIONE_ROL' | translate }}</option>
             @for (r of roles; track r.codigo) {
               @if (r.codigo !== PROPIETARIO_ROLE_CODE || usuario.rolCodigo === PROPIETARIO_ROLE_CODE) {
                 <option [value]="r.codigo">{{ r.nombre }}</option>
@@ -96,7 +96,7 @@
             }
           </select>
           @if (!usuario.rolCodigo) {
-            <div class="text-danger small mt-1">Rol requerido</div>
+            <div class="text-danger small mt-1">{{ 'AUTO.ROL_REQUERIDO' | translate }}</div>
           }
           @if (PROPIETARIO_ROLE_CODE && usuario.rolCodigo === PROPIETARIO_ROLE_CODE) {
             <div class="text-info small mt-1 d-flex align-items-center">
@@ -130,7 +130,7 @@
     }
   </c-modal-body>
   <c-modal-footer class="bg-light bg-opacity-10">
-    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">Cancelar</button>
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'AUTO.CANCELAR' | translate }}</button>
     <button cButton color="primary" [disabled]="!isUserFormValid() || loading" (click)="guardar()">
       @if (loading) {
         <c-spinner size="sm" class="me-1"></c-spinner>

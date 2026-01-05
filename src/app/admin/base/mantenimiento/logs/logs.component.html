@@ -7,8 +7,8 @@
             <svg cIcon name="cilList" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 class="mb-0 text-primary fw-bold">Logs del Sistema</h5>
-            <small class="text-muted">Registro de eventos y actividad del sistema</small>
+            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.LOGS_DEL_SISTEMA' | translate }}</h5>
+            <small class="text-muted">{{ 'AUTO.REGISTRO_DE_EVENTOS_Y_ACTIVIDA' | translate }}</small>
           </div>
         </div>
       </c-card-header>
@@ -36,10 +36,10 @@
                 style="width: auto"
                 [disabled]="loading"
               >
-                <option [ngValue]="10">10 filas</option>
-                <option [ngValue]="20">20 filas</option>
-                <option [ngValue]="50">50 filas</option>
-                <option [ngValue]="100">100 filas</option>
+                <option [ngValue]="10">{{ 'AUTO.10_FILAS' | translate }}</option>
+                <option [ngValue]="20">{{ 'AUTO.20_FILAS' | translate }}</option>
+                <option [ngValue]="50">{{ 'AUTO.50_FILAS' | translate }}</option>
+                <option [ngValue]="100">{{ 'AUTO.100_FILAS' | translate }}</option>
               </select>
               <button cButton color="primary" (click)="search()" class="px-4 text-white">
                 Buscar
@@ -60,7 +60,7 @@
           @if (loading) {
             <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex flex-column align-items-center justify-content-center" style="z-index: 5;">
               <c-spinner color="primary"></c-spinner>
-              <small class="text-primary mt-2 fw-medium">Cargando logs...</small>
+              <small class="text-primary mt-2 fw-medium">{{ 'AUTO.CARGANDO_LOGS' | translate }}</small>
             </div>
           }
 
@@ -68,8 +68,8 @@
             <div class="text-center py-5">
               <div class="d-flex flex-column align-items-center justify-content-center opacity-50">
                 <svg cIcon name="cilList" size="4xl" class="text-muted mb-3"></svg>
-                <h6 class="text-muted fw-bold">No hay logs disponibles</h6>
-                <p class="text-muted small mb-0">No se encontraron registros con los criterios actuales</p>
+                <h6 class="text-muted fw-bold">{{ 'AUTO.NO_HAY_LOGS_DISPONIBLES' | translate }}</h6>
+                <p class="text-muted small mb-0">{{ 'AUTO.NO_SE_ENCONTRARON_REGISTROS_CO' | translate }}</p>
               </div>
             </div>
           }
@@ -79,9 +79,9 @@
               <table cTable hover striped class="mb-0 align-middle">
                 <thead class="bg-light border-bottom">
                   <tr>
-                    <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase" style="width: 100px">Nivel</th>
-                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase" style="width: 180px">Fecha</th>
-                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">Mensaje</th>
+                    <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase" style="width: 100px">{{ 'AUTO.NIVEL' | translate }}</th>
+                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase" style="width: 180px">{{ 'AUTO.FECHA' | translate }}</th>
+                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">{{ 'AUTO.MENSAJE' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody class="border-top-0">

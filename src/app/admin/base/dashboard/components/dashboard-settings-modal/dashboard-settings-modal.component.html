@@ -1,40 +1,40 @@
 <c-modal [visible]="visible" (visibleChange)="visibleChange.emit($event)" alignment="center">
   <c-modal-header>
-    <h5 cModalTitle>Parámetros del Dashboard</h5>
+    <h5 cModalTitle>{{ 'AUTO.PAR_METROS_DEL_DASHBOARD' | translate }}</h5>
   </c-modal-header>
   <c-modal-body>
     <c-row>
       <c-col lg="6">
-        <label class="form-label">Días de serie</label>
+        <label class="form-label">{{ 'AUTO.D_AS_DE_SERIE' | translate }}</label>
         <input cFormControl type="number" min="1" max="365" [(ngModel)]="settings.seriesDays" />
       </c-col>
       <c-col lg="6">
-        <label class="form-label">Granularidad</label>
+        <label class="form-label">{{ 'AUTO.GRANULARIDAD' | translate }}</label>
         <select cSelect [(ngModel)]="settings.seriesGranularity">
-          <option [ngValue]="'hour'">Hora</option>
-          <option [ngValue]="'day'">Día</option>
-          <option [ngValue]="'week'">Semana</option>
-          <option [ngValue]="'month'">Mes</option>
+          <option [ngValue]="'hour'">{{ 'AUTO.HORA' | translate }}</option>
+          <option [ngValue]="'day'">{{ 'AUTO.D_A' | translate }}</option>
+          <option [ngValue]="'week'">{{ 'AUTO.SEMANA' | translate }}</option>
+          <option [ngValue]="'month'">{{ 'AUTO.MES' | translate }}</option>
         </select>
       </c-col>
       <c-col lg="6">
-        <label class="form-label">Top límite</label>
+        <label class="form-label">{{ 'AUTO.TOP_L_MITE' | translate }}</label>
         <input cFormControl type="number" min="1" max="200" [(ngModel)]="settings.topLimit" />
       </c-col>
       <c-col lg="6">
-        <label class="form-label">Periodo Top (días)</label>
+        <label class="form-label">{{ 'AUTO.PERIODO_TOP_D_AS' | translate }}</label>
         <select cSelect [(ngModel)]="settings.topPeriodDays">
           <option [ngValue]="7">7</option>
-          <option [ngValue]="30">30</option>
-          <option [ngValue]="90">90</option>
+          <option [ngValue]="30">{{ 'AUTO.30' | translate }}</option>
+          <option [ngValue]="90">{{ 'AUTO.90' | translate }}</option>
         </select>
       </c-col>
       <c-col lg="12">
         <hr />
-        <div class="small text-muted mb-2">Rango exacto para Top (opcional)</div>
+        <div class="small text-muted mb-2">{{ 'AUTO.RANGO_EXACTO_PARA_TOP_OPCIONAL' | translate }}</div>
       </c-col>
       <c-col lg="6">
-        <label class="form-label" for="topStartDate">Fecha inicio</label>
+        <label class="form-label" for="topStartDate">{{ 'AUTO.FECHA_INICIO' | translate }}</label>
         <input
           id="topStartDate"
           cFormControl
@@ -44,7 +44,7 @@
         />
       </c-col>
       <c-col lg="6">
-        <label class="form-label" for="topEndDate">Fecha fin</label>
+        <label class="form-label" for="topEndDate">{{ 'AUTO.FECHA_FIN' | translate }}</label>
         <input
           id="topEndDate"
           cFormControl
@@ -66,7 +66,7 @@
     </c-row>
   </c-modal-body>
   <c-modal-footer>
-    <button cButton color="secondary" (click)="onClose()">Cancelar</button>
+    <button cButton color="secondary" (click)="onClose()">{{ 'AUTO.CANCELAR' | translate }}</button>
     <button
       cButton
       color="warning"
@@ -77,6 +77,6 @@
     >
       Limpiar
     </button>
-    <button cButton color="primary" (click)="onApply()">Aplicar</button>
+    <button cButton color="primary" (click)="onApply()">{{ 'AUTO.APLICAR' | translate }}</button>
   </c-modal-footer>
 </c-modal>

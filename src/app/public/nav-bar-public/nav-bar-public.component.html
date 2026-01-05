@@ -8,7 +8,7 @@
       <!-- Enlace Admin -->
       @if (isLoggedIn) {
         <c-nav-item>
-          <a cNavLink (click)="navigateToRoute('/admin')" style="cursor: pointer">Admin</a>
+          <a cNavLink (click)="navigateToRoute('/admin')" style="cursor: pointer">{{ 'AUTO.ADMIN' | translate }}</a>
         </c-nav-item>
       }
 
@@ -38,14 +38,14 @@
       <!-- Login/Logout -->
       @if (!isLoggedIn) {
         <c-nav-item>
-          <a cNavLink (click)="navigateToRoute('/login')" style="cursor: pointer">Login</a>
+          <a cNavLink (click)="navigateToRoute('/login')" style="cursor: pointer">{{ 'AUTO.LOGIN' | translate }}</a>
         </c-nav-item>
       }
       @if (isLoggedIn) {
         <c-nav-item>
           <a cNavLink (click)="logout()" style="cursor: pointer" [class.disabled]="isLoadingLogout">
             @if (!isLoadingLogout) {
-              <span>LogOut</span>
+              <span>{{ 'AUTO.LOGOUT' | translate }}</span>
             }
             @if (isLoadingLogout) {
               <span>

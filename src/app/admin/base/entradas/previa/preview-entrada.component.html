@@ -6,7 +6,7 @@
         @if (categoriasMostrar.length) {
           <div class="text-muted small d-flex align-items-center flex-wrap gap-1">
             <svg cIcon name="cilFolderOpen" size="sm" class="text-secondary"></svg>
-            <span class="me-1">Categorías:</span>
+            <span class="me-1">{{ 'AUTO.CATEGOR_AS' | translate }}</span>
             @for (c of categoriasMostrar; track c; let last = $last) {
               <c-badge color="light" class="text-secondary border border-light-subtle">
                 {{ c.nombre || c }}

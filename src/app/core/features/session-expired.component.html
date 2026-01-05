@@ -24,13 +24,13 @@
 
     @if (sessionData?.type === 'LOGOUT') {
       <div class="mb-2">
-        <p class="mb-0">La sesión se cerró desde otro dispositivo o pestaña.</p>
+        <p class="mb-0">{{ 'AUTO.LA_SESI_N_SE_CERR_DESDE_OTRO_D' | translate }}</p>
       </div>
     }
 
     @if (sessionData?.type === 'SESSION_EXPIRED') {
       <div class="mb-2">
-        <p class="mb-0">Su sesión ha caducado por inactividad.</p>
+        <p class="mb-0">{{ 'AUTO.SU_SESI_N_HA_CADUCADO_POR_INAC' | translate }}</p>
       </div>
     }
   </c-modal-body>

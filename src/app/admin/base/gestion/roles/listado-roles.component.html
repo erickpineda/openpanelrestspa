@@ -6,8 +6,8 @@
           <svg cIcon name="cilShieldAlt" class="text-primary" size="lg"></svg>
         </div>
         <div>
-          <h5 class="mb-0 fw-bold text-gray-800">Roles</h5>
-          <small class="text-muted">Gestión de roles y permisos</small>
+          <h5 class="mb-0 fw-bold text-gray-800">{{ 'AUTO.ROLES' | translate }}</h5>
+          <small class="text-muted">{{ 'AUTO.GESTI_N_DE_ROLES_Y_PERMISOS' | translate }}</small>
         </div>
       </div>
       <button cButton color="primary" class="d-flex align-items-center gap-2 px-3 rounded-pill" (click)="openCreate()">
@@ -58,10 +58,10 @@
             style="width: auto"
             [disabled]="loading"
           >
-            <option value="5">5 registros</option>
-            <option value="10">10 registros</option>
-            <option value="20">20 registros</option>
-            <option value="50">50 registros</option>
+            <option value="5">{{ 'AUTO.5_REGISTROS' | translate }}</option>
+            <option value="10">{{ 'AUTO.10_REGISTROS' | translate }}</option>
+            <option value="20">{{ 'AUTO.20_REGISTROS' | translate }}</option>
+            <option value="50">{{ 'AUTO.50_REGISTROS' | translate }}</option>
           </select>
           <button
             cButton
@@ -82,7 +82,7 @@
         <div class="mt-3 pt-3 border-top animate__animated animate__fadeIn">
           <c-row class="g-3">
              <c-col xs="12" md="4">
-              <label class="form-label small text-muted mb-1">Nombre</label>
+              <label class="form-label small text-muted mb-1">{{ 'AUTO.NOMBRE' | translate }}</label>
               <input
                 cFormControl
                 size="sm"
@@ -111,7 +111,7 @@
       @if (loading) {
         <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex flex-column align-items-center justify-content-center" style="z-index: 5;">
           <c-spinner color="primary"></c-spinner>
-          <small class="text-muted mt-2">Cargando roles...</small>
+          <small class="text-muted mt-2">{{ 'AUTO.CARGANDO_ROLES' | translate }}</small>
         </div>
       }
 
@@ -119,11 +119,11 @@
         <table cTable hover striped class="mb-0 align-middle">
           <thead class="bg-light border-bottom">
             <tr>
-              <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase" style="width: 100px;">Código</th>
-              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">Nombre</th>
-              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">Descripción</th>
-              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase text-center">Privilegios</th>
-              <th scope="col" class="py-3 pe-4 border-0 text-secondary small fw-bold text-uppercase text-end" style="width: 120px;">Acciones</th>
+              <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase" style="width: 100px;">{{ 'AUTO.C_DIGO' | translate }}</th>
+              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">{{ 'AUTO.NOMBRE' | translate }}</th>
+              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">{{ 'AUTO.DESCRIPCI_N' | translate }}</th>
+              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase text-center">{{ 'AUTO.PRIVILEGIOS' | translate }}</th>
+              <th scope="col" class="py-3 pe-4 border-0 text-secondary small fw-bold text-uppercase text-end" style="width: 120px;">{{ 'AUTO.ACCIONES' | translate }}</th>
             </tr>
           </thead>
           <tbody class="border-top-0">
@@ -133,10 +133,10 @@
                 <td>
                   <span class="fw-semibold text-gray-800">{{ r.nombre }}</span>
                   @if (r.codigo === PROPIETARIO_ROLE_CODE) {
-                    <c-badge color="warning" class="ms-2">Propietario</c-badge>
+                    <c-badge color="warning" class="ms-2">{{ 'AUTO.PROPIETARIO' | translate }}</c-badge>
                   }
                   @if (r.codigo === ADMIN_ROLE_CODE) {
-                    <c-badge color="info" class="ms-2">Admin</c-badge>
+                    <c-badge color="info" class="ms-2">{{ 'AUTO.ADMIN' | translate }}</c-badge>
                   }
                 </td>
                 <td class="text-muted small text-truncate" style="max-width: 300px;">
@@ -182,8 +182,8 @@
                 <td colspan="5" class="text-center py-5">
                   <div class="d-flex flex-column align-items-center justify-content-center opacity-50">
                     <svg cIcon name="cilFolderOpen" size="4xl" class="text-muted mb-3"></svg>
-                    <h5 class="text-muted">No se encontraron roles</h5>
-                    <p class="text-muted small mb-0">Intenta ajustar los criterios de búsqueda</p>
+                    <h5 class="text-muted">{{ 'AUTO.NO_SE_ENCONTRARON_ROLES' | translate }}</h5>
+                    <p class="text-muted small mb-0">{{ 'AUTO.INTENTA_AJUSTAR_LOS_CRITERIOS_' | translate }}</p>
                   </div>
                 </td>
               </tr>

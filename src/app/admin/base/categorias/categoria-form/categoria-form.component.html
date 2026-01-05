@@ -33,7 +33,7 @@
       >
         <svg cIcon name="cilSave" class="me-1" size="sm"></svg>
         @if (!enviando) {
-          <span>Guardar</span>
+          <span>{{ 'AUTO.GUARDAR' | translate }}</span>
         }
         @if (enviando) {
           <span
@@ -49,11 +49,11 @@
       <c-col lg="8">
         <c-card class="mb-4 shadow-none border">
           <c-card-body>
-            <h3 cCardTitle class="h6 mb-4 text-secondary fw-bold">Información básica</h3>
+            <h3 cCardTitle class="h6 mb-4 text-secondary fw-bold">{{ 'AUTO.INFORMACI_N_B_SICA' | translate }}</h3>
             <c-row>
               <c-col lg="12">
                 <div class="mb-3">
-                  <label cLabel for="nombre" class="fw-semibold">Nombre <span class="text-danger">*</span></label>
+                  <label cLabel for="nombre" class="fw-semibold">{{ 'AUTO.NOMBRE' | translate }}<span class="text-danger">*</span></label>
                   <input
                     cFormControl
                     formControlName="nombre"
@@ -73,7 +73,7 @@
                 </div>
 
                 <div class="mb-3">
-                  <label cLabel for="descripcion" class="fw-semibold">Descripción</label>
+                  <label cLabel for="descripcion" class="fw-semibold">{{ 'AUTO.DESCRIPCI_N' | translate }}</label>
                   <textarea
                     cFormControl
                     formControlName="descripcion"
@@ -93,7 +93,7 @@
       <c-col lg="4">
         <c-card class="mb-4 shadow-none border bg-light">
           <c-card-body>
-            <h3 cCardTitle class="h6 mb-3 text-secondary fw-bold">Existentes</h3>
+            <h3 cCardTitle class="h6 mb-3 text-secondary fw-bold">{{ 'AUTO.EXISTENTES' | translate }}</h3>
             <div class="list-group list-group-flush bg-white rounded border">
               @for (categoria of displayListaCategorias; track categoria.nombre) {
                 <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
