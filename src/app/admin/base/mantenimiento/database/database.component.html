@@ -7,14 +7,14 @@
             <svg cIcon name="cilStorage" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.MANTENIMIENTO_DE_BASE_DE_DATOS' | translate }}</h5>
-            <small class="text-muted">{{ 'AUTO.OPTIMIZACI_N_Y_COPIAS_DE_SEGUR' | translate }}</small>
+            <h5 class="mb-0 text-primary fw-bold">{{ 'ADMIN.DATABASE.TITLE' | translate }}</h5>
+            <small class="text-muted">{{ 'ADMIN.DATABASE.SUBTITLE' | translate }}</small>
           </div>
         </div>
       </c-card-header>
       <c-card-body class="p-4">
         <div class="d-flex align-items-center mb-4 p-3 bg-light rounded border">
-          <span class="me-2 text-secondary fw-semibold">{{ 'AUTO.ESTADO_ACTUAL' | translate }}</span>
+          <span class="me-2 text-secondary fw-semibold">{{ 'ADMIN.DATABASE.CURRENT_STATUS' | translate }}</span>
           <c-badge color="success" shape="rounded-pill" class="fs-6 px-3 py-2 shadow-sm">{{ status }}</c-badge>
         </div>
         
@@ -29,10 +29,10 @@
             <div class="d-flex align-items-center">
               @if (optimizeRunning) {
                 <c-spinner size="sm" class="me-2"></c-spinner>
-                <span>{{ 'AUTO.OPTIMIZANDO' | translate }}</span>
+                <span>{{ 'ADMIN.DATABASE.OPTIMIZING' | translate }}</span>
               } @else {
                 <svg cIcon name="cilSpeedometer" size="sm" class="me-2"></svg>
-                <span>{{ 'AUTO.OPTIMIZAR_BASE_DE_DATOS' | translate }}</span>
+                <span>{{ 'ADMIN.DATABASE.OPTIMIZE' | translate }}</span>
               }
             </div>
           </button>
@@ -48,10 +48,10 @@
             <div class="d-flex align-items-center">
               @if (backupRunning) {
                 <c-spinner size="sm" class="me-2"></c-spinner>
-                <span>{{ 'AUTO.GENERANDO_BACKUP' | translate }}</span>
+                <span>{{ 'ADMIN.DATABASE.BACKING_UP' | translate }}</span>
               } @else {
                 <svg cIcon name="cilSave" size="sm" class="me-2"></svg>
-                <span>{{ 'AUTO.REALIZAR_BACKUP' | translate }}</span>
+                <span>{{ 'ADMIN.DATABASE.BACKUP' | translate }}</span>
               }
             </div>
           </button>

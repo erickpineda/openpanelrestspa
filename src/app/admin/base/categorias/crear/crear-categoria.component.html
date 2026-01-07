@@ -1,13 +1,11 @@
-<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static" alignment="center">
+<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static"
+  alignment="center">
   <c-modal-header>
-    <h5 cModalTitle>{{ 'AUTO.NUEVA_CATEGOR_A' | translate }}</h5>
+    <h5 cModalTitle>{{ 'ADMIN.CATEGORIES.NEW_CATEGORY' | translate }}</h5>
     <button (click)="cerrarModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
-    <app-categoria-form
-      [listaCategorias]="listaCategorias"
-      (submitCategoria)="guardar($event)"
-      (onReset)="cerrarModal()"
-    ></app-categoria-form>
+    <app-categoria-form [listaCategorias]="listaCategorias" (submitCategoria)="guardar($event)"
+      (onReset)="cerrarModal()"></app-categoria-form>
   </c-modal-body>
 </c-modal>

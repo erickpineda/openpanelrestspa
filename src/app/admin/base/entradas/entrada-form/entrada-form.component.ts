@@ -23,6 +23,7 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ViewChild } from '@angular/core';
 import { ImagenesComponent } from '../../contenido/imagenes/imagenes.component';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-entrada-form',
@@ -101,8 +102,9 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     private log: LoggerService,
     private fileStorage: FileStorageService,
     private toastService: ToastService,
-    private sanitizer: DomSanitizer
-  ) {}
+    private sanitizer: DomSanitizer,
+    private translate: TranslationService
+  ) { }
 
   ngOnInit(): void {
     window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.saveBeforeLogout.bind(this));
@@ -141,7 +143,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
         if (typeof this.imagenPreviewUrl === 'string') {
           URL.revokeObjectURL(this.imagenPreviewUrl);
         }
-        
+
         const objectUrl = URL.createObjectURL(blob);
         this.imagenPreviewUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
         this.cdRef.markForCheck();
@@ -158,16 +160,16 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         const base64 = e.target.result;
-        
+
         // Revocar URL anterior si era un string (blob url)
         if (typeof this.imagenPreviewUrl === 'string') {
-           URL.revokeObjectURL(this.imagenPreviewUrl);
+          URL.revokeObjectURL(this.imagenPreviewUrl);
         }
-        
+
         // Base64 es seguro para mostrar directamente (data:image/...)
         // Opcionalmente podríamos sanitizarlo también, pero suele funcionar directo en src
         this.imagenPreviewUrl = base64;
-        
+
         // IMPORTANTE: El backend espera byte[] (Base64), no una URL.
         // Asignamos el Base64 directamente al formulario.
         this.form.patchValue({ imagenDestacada: base64 });
@@ -181,12 +183,12 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       // Subimos a FileStorage solo para tenerla en la librería, pero no usamos la URL retornada para el form
       this.fileStorage.uploadFile(file).subscribe({
         next: (response: any) => {
-           this.log.info('Imagen subida a librería correctamente', response);
-           // Refrescar librería si está cargada
-           if (this.imagenesComponent) {
-             this.imagenesComponent.load();
-           }
-           this.toastService.showSuccess('Imagen disponible en librería', 'Éxito');
+          this.log.info('Imagen subida a librería correctamente', response);
+          // Refrescar librería si está cargada
+          if (this.imagenesComponent) {
+            this.imagenesComponent.load();
+          }
+          this.toastService.showSuccess(this.translate.instant('ADMIN.ENTRIES.IMAGE_UPLOADED_SUCCESS'), this.translate.instant('COMMON.SUCCESS'));
         },
         error: (err) => {
           this.log.error('Error subiendo imagen a librería', err);
@@ -235,11 +237,11 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       OPConstants.Events.SAVE_UNSAVED_WORK,
       this.saveBeforeLogout.bind(this)
     );
-    
+
     // Limpiar listener interno si existe
     const editorMain = document.querySelector('.ck-editor__main');
     if (editorMain) {
-       editorMain.removeEventListener('scroll', this.onInternalScroll);
+      editorMain.removeEventListener('scroll', this.onInternalScroll);
     }
   }
 
@@ -372,8 +374,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
         formData: formData,
         timestamp: new Date().toISOString(),
         formType: 'entrada', // Tipo de formulario
-        title: formData.titulo || 'Entrada sin título', // Título para mostrar
-        description: `Creada: ${new Date().toLocaleString()}`, // Descripción
+        title: formData.titulo || this.translate.instant('ADMIN.ENTRIES.UNTITLED_ENTRY'), // Título para mostrar
+        description: `${this.translate.instant('COMMON.CREATED')}: ${new Date().toLocaleString()}`, // Descripción
       };
 
       // Si ya existe una entrada temporal para este formulario, actualizarla
@@ -441,49 +443,49 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   private setupEditorScrollListener() {
     // Pequeño retraso para asegurar que el DOM se ha actualizado (clases aplicadas)
     setTimeout(() => {
-        const editorMain = document.querySelector('.ck-editor__main');
-        if (!editorMain) return;
+      const editorMain = document.querySelector('.ck-editor__main');
+      if (!editorMain) return;
 
-        // Limpiar listener anterior para evitar duplicados
-        editorMain.removeEventListener('scroll', this.onInternalScroll);
+      // Limpiar listener anterior para evitar duplicados
+      editorMain.removeEventListener('scroll', this.onInternalScroll);
 
-        // Si estamos en modo pantalla completa o ancho completo (donde el scroll es interno)
-        if (this.isFullScreen || this.isFullWidth) {
-           editorMain.addEventListener('scroll', this.onInternalScroll);
-           // Verificar estado inicial
-           this.showBackToTop = editorMain.scrollTop > 300;
-        } else {
-           // Volver al chequeo de ventana normal
-           this.onWindowScroll();
-        }
-        this.cdRef.detectChanges();
+      // Si estamos en modo pantalla completa o ancho completo (donde el scroll es interno)
+      if (this.isFullScreen || this.isFullWidth) {
+        editorMain.addEventListener('scroll', this.onInternalScroll);
+        // Verificar estado inicial
+        this.showBackToTop = editorMain.scrollTop > 300;
+      } else {
+        // Volver al chequeo de ventana normal
+        this.onWindowScroll();
+      }
+      this.cdRef.detectChanges();
     }, 200);
   }
-  
+
   // Arrow function para mantener el contexto 'this' automáticamente
   private onInternalScroll = (event: any) => {
-     if (this.isFullScreen || this.isFullWidth) {
-         this.showBackToTop = event.target.scrollTop > 300;
-         this.cdRef.detectChanges();
-     }
+    if (this.isFullScreen || this.isFullWidth) {
+      this.showBackToTop = event.target.scrollTop > 300;
+      this.cdRef.detectChanges();
+    }
   }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
     // Si NO estamos en modo interno, usamos el scroll de la ventana
     if (!this.isFullScreen && !this.isFullWidth) {
-       this.showBackToTop = window.scrollY > 300;
+      this.showBackToTop = window.scrollY > 300;
     }
   }
 
   scrollToTop() {
     if (this.isFullScreen || this.isFullWidth) {
-        const editorMain = document.querySelector('.ck-editor__main');
-        if (editorMain) {
-            editorMain.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+      const editorMain = document.querySelector('.ck-editor__main');
+      if (editorMain) {
+        editorMain.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -635,7 +637,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   onMediaSelected(item: any): void {
     if (item) {
       this.log.info('Media seleccionado de galería:', item);
-      
+
       // Si tiene UUID, descargamos el blob
       if (item.uuid) {
         this.fileStorage.descargarFichero(item.uuid).subscribe({
@@ -644,26 +646,26 @@ export class EntradaFormComponent implements OnInit, OnChanges {
             // Esto asegura consistencia con la subida local que sí funciona
             const reader = new FileReader();
             reader.onload = (e: any) => {
-               const base64 = e.target.result;
-               
-               // Limpieza de URL anterior si era blob
-               if (typeof this.imagenPreviewUrl === 'string' && this.imagenPreviewUrl.startsWith('blob:')) {
-                 URL.revokeObjectURL(this.imagenPreviewUrl);
-               }
+              const base64 = e.target.result;
 
-               // Usamos Base64 para la preview (igual que en onImagenSeleccionada)
-               this.imagenPreviewUrl = base64;
-               
-               // Y para el formulario
-               this.form.patchValue({ imagenDestacada: base64 });
-               this.form.markAsDirty();
-               this.cdRef.markForCheck();
+              // Limpieza de URL anterior si era blob
+              if (typeof this.imagenPreviewUrl === 'string' && this.imagenPreviewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(this.imagenPreviewUrl);
+              }
+
+              // Usamos Base64 para la preview (igual que en onImagenSeleccionada)
+              this.imagenPreviewUrl = base64;
+
+              // Y para el formulario
+              this.form.patchValue({ imagenDestacada: base64 });
+              this.form.markAsDirty();
+              this.cdRef.markForCheck();
             };
             reader.readAsDataURL(blob);
           },
           error: (err) => {
             this.log.error('Error descargando fichero de galería', err);
-            this.toastService.showError('No se pudo cargar la imagen seleccionada', 'Error');
+            this.toastService.showError(this.translate.instant('ADMIN.ENTRIES.IMAGE_LOAD_ERROR'), this.translate.instant('COMMON.ERROR'));
           }
         });
       }

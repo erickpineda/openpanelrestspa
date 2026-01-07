@@ -1,122 +1,77 @@
-<form
-  [formGroup]="form"
-  (ngSubmit)="onSubmit()"
-  role="form"
-  [attr.aria-label]="
+<form [formGroup]="form" (ngSubmit)="onSubmit()" role="form" [attr.aria-label]="
     isEdit ? 'Formulario de edición de etiqueta' : 'Formulario de creación de etiqueta'
-  "
-  data-testid="etiqueta-form"
->
+  " data-testid="etiqueta-form">
   <div class="mb-3">
-    <label for="nombre" class="form-label">{{ 'AUTO.NOMBRE' | translate }}<span class="text-danger">*</span></label>
-    <input
-      type="text"
-      id="nombre"
-      cFormControl
-      formControlName="nombre"
+    <label for="nombre" class="form-label">{{ 'COMMON.NAME' | translate }}<span class="text-danger">*</span></label>
+    <input type="text" id="nombre" cFormControl formControlName="nombre"
       [class.is-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
-      [attr.aria-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
-      [attr.aria-describedby]="
+      [attr.aria-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched" [attr.aria-describedby]="
         form.get('nombre')?.invalid && form.get('nombre')?.touched ? 'nombre-error' : null
-      "
-      [attr.aria-label]="'Ingrese el nombre de la etiqueta'"
-      placeholder="Ingrese el nombre de la etiqueta"
-      maxlength="50"
-      data-testid="input-nombre"
-    />
+      " [attr.aria-label]="'ADMIN.TAGS.ENTER_NAME' | translate" [placeholder]="'ADMIN.TAGS.ENTER_NAME' | translate"
+      maxlength="50" data-testid="input-nombre" />
     @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
-      <div id="nombre-error" class="invalid-feedback">
-        @if (form.get('nombre')?.errors?.['required']) {
-          <span>{{ 'AUTO.EL_NOMBRE_ES_REQUERIDO' | translate }}</span>
-        }
-        @if (form.get('nombre')?.errors?.['maxlength']) {
-          <span>{{ 'AUTO.EL_NOMBRE_NO_PUEDE_EXCEDER_50_' | translate }}</span>
-        }
-      </div>
+    <div id="nombre-error" class="invalid-feedback">
+      @if (form.get('nombre')?.errors?.['required']) {
+      <span>{{ 'ADMIN.TAGS.NAME_REQUIRED' | translate }}</span>
+      }
+      @if (form.get('nombre')?.errors?.['maxlength']) {
+      <span>{{ 'ADMIN.TAGS.NAME_MAX_LENGTH' | translate }}</span>
+      }
+    </div>
     }
   </div>
 
   <div class="mb-3">
-    <label for="descripcion" class="form-label">{{ 'AUTO.DESCRIPCI_N' | translate }}</label>
-    <textarea
-      id="descripcion"
-      cFormControl
-      formControlName="descripcion"
+    <label for="descripcion" class="form-label">{{ 'COMMON.DESCRIPTION' | translate }}</label>
+    <textarea id="descripcion" cFormControl formControlName="descripcion"
       [class.is-invalid]="form.get('descripcion')?.invalid && form.get('descripcion')?.touched"
-      [attr.aria-label]="'Ingrese una descripción opcional para la etiqueta'"
-      rows="3"
-      placeholder="Ingrese una descripción opcional para la etiqueta"
-      maxlength="200"
-      data-testid="input-descripcion"
-    ></textarea>
+      [attr.aria-label]="'ADMIN.TAGS.ENTER_DESCRIPTION' | translate" rows="3"
+      [placeholder]="'ADMIN.TAGS.ENTER_DESCRIPTION' | translate" maxlength="200"
+      data-testid="input-descripcion"></textarea>
     <div class="form-text" data-testid="contador-descripcion">
-      {{ (form.get('descripcion')?.value ?? '').length }}/200 caracteres
+      {{ (form.get('descripcion')?.value ?? '').length }}/200 {{ 'COMMON.CHARACTERS' | translate }}
     </div>
     @if (form.get('descripcion')?.invalid && form.get('descripcion')?.touched) {
-      <div id="descripcion-error" class="invalid-feedback">
-        La descripción no puede exceder 200 caracteres
-      </div>
+    <div id="descripcion-error" class="invalid-feedback">
+      {{ 'ADMIN.TAGS.DESCRIPTION_MAX_LENGTH' | translate }}
+    </div>
     }
   </div>
 
   <div class="mb-4">
-    <label class="form-label">{{ 'AUTO.COLOR' | translate }}<span class="text-danger">*</span></label>
+    <label class="form-label">{{ 'COMMON.COLOR' | translate }}<span class="text-danger">*</span></label>
     <div class="d-flex flex-wrap gap-2">
       @for (colorOption of colores; track colorOption.value) {
-        <div class="form-check form-check-inline">
-          <input
-            class="form-check-input"
-            type="radio"
-            [id]="'color-' + colorOption.value"
-            formControlName="colorHex"
-            [value]="colorOption.value"
-            [checked]="form.get('colorHex')?.value === colorOption.value"
-            [attr.data-testid]="'color-' + colorOption.value"
-          />
-          <label
-            class="form-check-label d-flex align-items-center"
-            [for]="'color-' + colorOption.value"
-          >
-            <span
-              [style.background-color]="colorOption.value"
-              class="rounded-circle me-2"
-              style="width: 16px; height: 16px; display: inline-block"
-            ></span>
-            {{ colorOption.label }}
-          </label>
-        </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" [id]="'color-' + colorOption.value" formControlName="colorHex"
+          [value]="colorOption.value" [checked]="form.get('colorHex')?.value === colorOption.value"
+          [attr.data-testid]="'color-' + colorOption.value" />
+        <label class="form-check-label d-flex align-items-center" [for]="'color-' + colorOption.value">
+          <span [style.background-color]="colorOption.value" class="rounded-circle me-2"
+            style="width: 16px; height: 16px; display: inline-block"></span>
+          {{ colorOption.label }}
+        </label>
+      </div>
       }
     </div>
     @if (form.get('colorHex')?.invalid && form.get('colorHex')?.touched) {
-      <div class="invalid-feedback d-block">{{ 'AUTO.DEBE_SELECCIONAR_UN_COLOR' | translate }}</div>
+    <div class="invalid-feedback d-block">{{ 'ADMIN.TAGS.COLOR_REQUIRED' | translate }}</div>
     }
   </div>
 
   <div class="d-flex justify-content-end gap-2">
-    <button
-      type="button"
-      cButton
-      color="secondary"
-      (click)="onCancel()"
-      [disabled]="loading"
-      [attr.aria-label]="'Cancelar'"
-      data-testid="btn-cancelar"
-    >
-      Cancelar
+    <button type="button" cButton color="secondary" (click)="onCancel()" [disabled]="loading"
+      [attr.aria-label]="'COMMON.CANCEL' | translate" data-testid="btn-cancelar">
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
-    <button
-      type="submit"
-      cButton
-      color="primary"
-      [disabled]="form.invalid || loading"
-      [attr.aria-label]="isEdit ? 'Actualizar etiqueta' : 'Crear etiqueta'"
-      data-testid="btn-guardar"
-    >
+    <button type="submit" cButton color="primary" [disabled]="form.invalid || loading"
+      [attr.aria-label]="isEdit ? ('ADMIN.TAGS.EDIT_TAG' | translate) : ('ADMIN.TAGS.NEW_TAG' | translate)"
+      data-testid="btn-guardar">
       @if (loading) {
-        <span class="me-2"><c-spinner size="sm"></c-spinner></span>
+      <span class="me-2"><c-spinner size="sm"></c-spinner></span>
       }
       @if (!loading) {
-        <span>{{ isEdit ? 'Actualizar' : 'Crear' }}</span>
+      <span>{{ isEdit ? ('COMMON.UPDATE' | translate) : ('COMMON.CREATE' | translate) }}</span>
       }
     </button>
   </div>

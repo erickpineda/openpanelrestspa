@@ -1,7 +1,7 @@
 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
   <button cButton color="primary" size="sm" (click)="refresh.emit()">
-    <svg cIcon name="cilChart" style="padding-right: 2px" size="sm" title="Ver Gráfico"></svg>
-    Refrescar Gráficos
+    <svg cIcon name="cilChart" style="padding-right: 2px" size="sm" [title]="'ADMIN.DASHBOARD.TOOLBAR.VIEW_CHART' | translate"></svg>
+    {{ 'ADMIN.DASHBOARD.TOOLBAR.REFRESH_CHARTS' | translate }}
   </button>
   <button
     cButton
@@ -9,49 +9,49 @@
     size="sm"
     (click)="toggleForce.emit()"
     [active]="forceFromDb"
-    title="Forzar datos desde BD"
+    [title]="'ADMIN.DASHBOARD.TOOLBAR.FORCE_DB' | translate"
     [attr.aria-pressed]="forceFromDb ? 'true' : 'false'"
   >
-    Forzar BD: {{ forceFromDb ? 'On' : 'Off' }}
+    {{ 'ADMIN.DASHBOARD.TOOLBAR.FORCE_DB_LABEL' | translate }}: {{ forceFromDb ? ('COMMON.ON' | translate) : ('COMMON.OFF' | translate) }}
   </button>
   <button
     cButton
     color="info"
     size="sm"
     (click)="downloadData.emit()"
-    aria-label="Descargar datos"
-    title="Descargar datos en JSON"
+    [attr.aria-label]="'ADMIN.DASHBOARD.TOOLBAR.DOWNLOAD_DATA' | translate"
+    [title]="'ADMIN.DASHBOARD.TOOLBAR.DOWNLOAD_DATA_JSON' | translate"
   >
     <svg
       cIcon
       name="cilDataTransferDown"
       style="padding-right: 2px"
       size="sm"
-      title="Descargar Datos"
+      [title]="'ADMIN.DASHBOARD.TOOLBAR.DOWNLOAD_DATA' | translate"
     ></svg>
-    Descargar Datos
+    {{ 'ADMIN.DASHBOARD.TOOLBAR.DOWNLOAD_DATA' | translate }}
   </button>
   <button
     cButton
     color="secondary"
     size="sm"
     (click)="downloadZip.emit()"
-    aria-label="Exportar CSV en ZIP"
-    title="Exportar todos los CSV en ZIP"
+    [attr.aria-label]="'ADMIN.DASHBOARD.TOOLBAR.EXPORT_CSV_ZIP' | translate"
+    [title]="'ADMIN.DASHBOARD.TOOLBAR.EXPORT_ALL_CSV_ZIP' | translate"
   >
     <svg
       cIcon
       name="cilCloudDownload"
       style="padding-right: 2px"
       size="sm"
-      title="Exportar ZIP"
+      [title]="'ADMIN.DASHBOARD.TOOLBAR.EXPORT_ZIP' | translate"
     ></svg>
-    Exportar ZIP
+    {{ 'ADMIN.DASHBOARD.TOOLBAR.EXPORT_ZIP' | translate }}
   </button>
   @if (exportingZip) {
     <div class="d-inline-flex align-items-center ms-2" aria-live="polite" aria-busy="true">
       <c-spinner size="sm"></c-spinner>
-      <span class="small text-muted ms-2">{{ 'AUTO.GENERANDO_ZIP' | translate }}</span>
+      <span class="small text-muted ms-2">{{ 'ADMIN.DASHBOARD.TOOLBAR.GENERATING_ZIP' | translate }}</span>
     </div>
   }
   @if (exportError) {

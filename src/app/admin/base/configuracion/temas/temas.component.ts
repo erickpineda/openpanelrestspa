@@ -5,6 +5,7 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-temas',
@@ -17,9 +18,15 @@ export class TemasComponent implements OnInit, OnDestroy {
   error: string | null = null;
   temas: Tema[] = [];
   modalVisible = false;
+  showDeleteModal = false;
   editItem: Tema | null = null;
+  itemToDelete: Tema | null = null;
   form: FormGroup;
   private destroy$ = new Subject<void>();
+
+  get isEditing(): boolean {
+    return !!this.editItem;
+  }
 
   // Patrón de toolbar/búsqueda/paginación
   basicSearchText: string = '';
@@ -37,7 +44,8 @@ export class TemasComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private toast: ToastService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslationService
   ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
@@ -112,37 +120,55 @@ export class TemasComponent implements OnInit, OnDestroy {
     const op = this.editItem?.id
       ? this.temasService.actualizarSafe(this.editItem.id, payload)
       : this.temasService.crearSafe(payload);
-    op.subscribe({
+    op.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        this.toast.showSuccess('Tema guardado', 'Temas');
+        this.toast.showSuccess(
+          this.isEditing ? this.translate.instant('ADMIN.THEMES.SUCCESS.UPDATE') : this.translate.instant('ADMIN.THEMES.SUCCESS.CREATE'),
+          this.translate.instant('MENU.THEMES')
+        );
         this.loading = false;
         this.modalVisible = false;
         this.load();
       },
       error: (err) => {
-        this.toast.showError('Error guardando', 'Temas');
+        this.toast.showError(
+          this.isEditing ? this.translate.instant('ADMIN.THEMES.ERROR.UPDATE') : this.translate.instant('ADMIN.THEMES.ERROR.CREATE'),
+          this.translate.instant('MENU.THEMES')
+        );
         this.log.error('temas guardar', err);
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
 
   delete(item: Tema): void {
     if (!item.id) return;
-    if (!confirm('¿Eliminar tema?')) return;
+    this.itemToDelete = item;
+    this.showDeleteModal = true;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete(): void {
+    if (!this.itemToDelete || !this.itemToDelete.id) return;
     this.loading = true;
-    this.temasService.eliminarSafe(item.id).subscribe({
-      next: () => {
-        this.toast.showSuccess('Tema eliminado', 'Temas');
-        this.loading = false;
-        this.load();
-      },
-      error: (err) => {
-        this.toast.showError('Error eliminando', 'Temas');
-        this.log.error('temas eliminar', err);
-        this.loading = false;
-      },
-    });
+    this.temasService.eliminarSafe(this.itemToDelete.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toast.showSuccess(this.translate.instant('ADMIN.THEMES.SUCCESS.DELETE'), this.translate.instant('MENU.THEMES'));
+          this.loading = false;
+          this.showDeleteModal = false;
+          this.itemToDelete = null;
+          this.load();
+        },
+        error: (err) => {
+          this.toast.showError(this.translate.instant('ADMIN.THEMES.ERROR.DELETE'), this.translate.instant('MENU.THEMES'));
+          this.log.error('temas eliminar', err);
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   // ===== Toolbar / Búsqueda / Paginación =====

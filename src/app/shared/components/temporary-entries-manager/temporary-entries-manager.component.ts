@@ -1,6 +1,7 @@
 // temporary-entries-manager.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslationService } from '../../../core/services/translation.service';
 import {
   TemporaryEntry,
   TemporaryStorageService,
@@ -18,10 +19,18 @@ export class TemporaryEntriesManagerComponent implements OnInit {
   selectedEntry: TemporaryEntry | null = null;
   viewModalVisible = false;
 
+  // Confirmation Modal State
+  confirmationVisible = false;
+  confirmationTitle = '';
+  confirmationMessage = '';
+  confirmationType: 'danger' | 'warning' | 'info' = 'danger';
+  private pendingAction: (() => void) | null = null;
+
   constructor(
     private temporaryStorage: TemporaryStorageService,
     private router: Router,
-    private log: LoggerService
+    private log: LoggerService,
+    private translate: TranslationService
   ) {}
 
   ngOnInit(): void {
@@ -57,17 +66,38 @@ export class TemporaryEntriesManagerComponent implements OnInit {
   }
 
   deleteEntry(id: string): void {
-    if (confirm('¿Estás seguro de que quieres eliminar esta entrada temporal?')) {
+    this.confirmationTitle = this.translate.instant('ADMIN.TEMP_ENTRIES.DELETE_TITLE');
+    this.confirmationMessage = this.translate.instant('ADMIN.TEMP_ENTRIES.DELETE_CONFIRMATION');
+    this.confirmationType = 'danger';
+    this.pendingAction = () => {
       this.temporaryStorage.removeTemporaryEntry(id);
       this.loadEntries();
-    }
+    };
+    this.confirmationVisible = true;
   }
 
   clearAll(): void {
-    if (confirm('¿Estás seguro de que quieres eliminar TODAS las entradas temporales?')) {
+    this.confirmationTitle = this.translate.instant('ADMIN.TEMP_ENTRIES.CLEAR_ALL_TITLE');
+    this.confirmationMessage = this.translate.instant('ADMIN.TEMP_ENTRIES.CLEAR_ALL_CONFIRMATION');
+    this.confirmationType = 'danger';
+    this.pendingAction = () => {
       this.temporaryStorage.clearTemporaryEntriesByType('entrada');
       this.loadEntries();
+    };
+    this.confirmationVisible = true;
+  }
+
+  confirmAction(): void {
+    if (this.pendingAction) {
+      this.pendingAction();
     }
+    this.confirmationVisible = false;
+    this.pendingAction = null;
+  }
+
+  cancelAction(): void {
+    this.confirmationVisible = false;
+    this.pendingAction = null;
   }
 
   // ✅ NUEVO: Método para crear nueva entrada

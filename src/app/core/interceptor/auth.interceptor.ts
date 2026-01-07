@@ -20,7 +20,7 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private tokenStorage: TokenStorageService,
     private authSync: AuthSyncService
-  ) {}
+  ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.tokenStorage.getToken();
@@ -28,6 +28,12 @@ export class AuthInterceptor implements HttpInterceptor {
     const url = req.url || '';
     const isAuthEndpoint =
       url.includes('/login') || url.includes('/auth') || url.includes('/refresh');
+    const isAsset = url.includes('/assets/') || url.includes('.json');
+
+    // Skip authentication logic for assets
+    if (isAsset) {
+      return next.handle(req);
+    }
 
     // Si hay token pero está caducado: forzar logout y cancelar la petición
     if (token && isJwtExpired(token, 0)) {

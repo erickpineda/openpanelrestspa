@@ -7,8 +7,8 @@
             <svg cIcon name="cilList" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.LOGS_DEL_SISTEMA' | translate }}</h5>
-            <small class="text-muted">{{ 'AUTO.REGISTRO_DE_EVENTOS_Y_ACTIVIDA' | translate }}</small>
+            <h5 class="mb-0 text-primary fw-bold">{{ 'ADMIN.LOGS.TITLE' | translate }}</h5>
+            <small class="text-muted">{{ 'ADMIN.LOGS.SUBTITLE' | translate }}</small>
           </div>
         </div>
       </c-card-header>
@@ -22,7 +22,7 @@
                 <input
                   cFormControl
                   type="text"
-                  placeholder="Filtrar por mensaje..."
+                  [placeholder]="'ADMIN.LOGS.FILTER_PLACEHOLDER' | translate"
                   [(ngModel)]="filter"
                   (keyup.enter)="search()"
                   class="ps-5 bg-white"
@@ -36,13 +36,13 @@
                 style="width: auto"
                 [disabled]="loading"
               >
-                <option [ngValue]="10">{{ 'AUTO.10_FILAS' | translate }}</option>
-                <option [ngValue]="20">{{ 'AUTO.20_FILAS' | translate }}</option>
-                <option [ngValue]="50">{{ 'AUTO.50_FILAS' | translate }}</option>
-                <option [ngValue]="100">{{ 'AUTO.100_FILAS' | translate }}</option>
+                <option [ngValue]="10">{{ 'ADMIN.LOGS.ROWS_10' | translate }}</option>
+                <option [ngValue]="20">{{ 'ADMIN.LOGS.ROWS_20' | translate }}</option>
+                <option [ngValue]="50">{{ 'ADMIN.LOGS.ROWS_50' | translate }}</option>
+                <option [ngValue]="100">{{ 'ADMIN.LOGS.ROWS_100' | translate }}</option>
               </select>
               <button cButton color="primary" (click)="search()" class="px-4 text-white">
-                Buscar
+                {{ 'ADMIN.LOGS.SEARCH' | translate }}
               </button>
               <button cButton color="secondary" variant="ghost" (click)="clear()" cTooltip="Limpiar Filtros">
                 <svg cIcon name="cilX" size="sm"></svg>
@@ -51,7 +51,7 @@
             
             <button cButton color="info" variant="outline" (click)="sample()" class="d-flex align-items-center gap-2">
               <svg cIcon name="cilReload" size="sm"></svg>
-              Generar ejemplos
+              {{ 'ADMIN.LOGS.GENERATE_EXAMPLES' | translate }}
             </button>
           </div>
         </div>
@@ -60,7 +60,7 @@
           @if (loading) {
             <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex flex-column align-items-center justify-content-center" style="z-index: 5;">
               <c-spinner color="primary"></c-spinner>
-              <small class="text-primary mt-2 fw-medium">{{ 'AUTO.CARGANDO_LOGS' | translate }}</small>
+              <small class="text-primary mt-2 fw-medium">{{ 'ADMIN.LOGS.LOADING' | translate }}</small>
             </div>
           }
 
@@ -68,8 +68,8 @@
             <div class="text-center py-5">
               <div class="d-flex flex-column align-items-center justify-content-center opacity-50">
                 <svg cIcon name="cilList" size="4xl" class="text-muted mb-3"></svg>
-                <h6 class="text-muted fw-bold">{{ 'AUTO.NO_HAY_LOGS_DISPONIBLES' | translate }}</h6>
-                <p class="text-muted small mb-0">{{ 'AUTO.NO_SE_ENCONTRARON_REGISTROS_CO' | translate }}</p>
+                <h6 class="text-muted fw-bold">{{ 'ADMIN.LOGS.NO_LOGS' | translate }}</h6>
+                <p class="text-muted small mb-0">{{ 'ADMIN.LOGS.NO_RECORDS' | translate }}</p>
               </div>
             </div>
           }
@@ -79,9 +79,9 @@
               <table cTable hover striped class="mb-0 align-middle">
                 <thead class="bg-light border-bottom">
                   <tr>
-                    <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase" style="width: 100px">{{ 'AUTO.NIVEL' | translate }}</th>
-                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase" style="width: 180px">{{ 'AUTO.FECHA' | translate }}</th>
-                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">{{ 'AUTO.MENSAJE' | translate }}</th>
+                    <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase" style="width: 100px">{{ 'ADMIN.LOGS.LEVEL' | translate }}</th>
+                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase" style="width: 180px">{{ 'ADMIN.LOGS.DATE' | translate }}</th>
+                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">{{ 'ADMIN.LOGS.MESSAGE' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody class="border-top-0">
@@ -119,7 +119,7 @@
         <c-card-footer class="bg-white border-top-0 py-3">
           <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
             <div class="text-muted small order-2 order-md-1">
-              Mostrando {{ paginated.length }} de {{ totalElements }} registros
+              {{ 'ADMIN.LOGS.PAGINATION_INFO' | translate: { current: paginated.length, total: totalElements } }}
             </div>
             <div class="order-1 order-md-2 w-100 w-md-auto d-flex justify-content-center">
               <app-op-pagination

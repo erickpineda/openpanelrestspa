@@ -35,7 +35,7 @@ export class EditarPaginaComponent implements OnInit {
     private facade: EntradaFacadeService,
     private router: Router,
     private toastService: ToastService
-  ) {}
+  ) { }
 
   async ngOnInit() {
     this.entradaForm = this.vf.buildForm(this.entrada);

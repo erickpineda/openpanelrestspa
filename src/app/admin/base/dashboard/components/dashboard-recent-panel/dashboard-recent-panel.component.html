@@ -2,7 +2,7 @@
   <div class="mb-3">
     <div class="d-flex justify-content-end align-items-center gap-2 bg-light p-2 rounded border">
       <div class="d-flex align-items-center gap-2">
-        <label class="form-label mb-0 small text-muted fw-bold text-uppercase">{{ 'AUTO.MOSTRAR' | translate }}</label>
+        <label class="form-label mb-0 small text-muted fw-bold text-uppercase">{{ 'ADMIN.DASHBOARD.RECENT.SHOW' | translate }}</label>
         <select
           cSelect
           [ngModel]="recentSize"
@@ -12,8 +12,8 @@
           class="form-select-sm"
         >
           <option [ngValue]="5">5</option>
-          <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
-          <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
         </select>
       </div>
       <div class="vr mx-2"></div>
@@ -23,13 +23,13 @@
         variant="ghost"
         size="sm"
         (click)="downloadCsv.emit()"
-        title="Descargar actividad reciente en CSV"
-        [attr.aria-label]="'Descargar actividad reciente en CSV'"
+        [title]="'ADMIN.DASHBOARD.RECENT.DOWNLOAD_CSV' | translate"
+        [attr.aria-label]="'ADMIN.DASHBOARD.RECENT.DOWNLOAD_CSV' | translate"
         data-testid="btn-csv-recent"
         class="text-dark"
       >
         <svg cIcon name="cilCloudDownload" size="sm" class="me-1"></svg>
-        CSV
+        {{ 'COMMON.CSV' | translate }}
       </button>
     </div>
   </div>
@@ -41,7 +41,7 @@
         <span class="small">{{ errorRecent }}</span>
       </div>
       <button cButton color="danger" variant="ghost" size="sm" class="retry-btn-recent" (click)="retry.emit()">
-        Reintentar
+        {{ 'COMMON.RETRY' | translate }}
       </button>
     </c-alert>
   }
@@ -75,7 +75,7 @@
     }
     @if (!recentItems || recentItems.length === 0) {
       <li class="list-group-item text-center text-muted py-4">
-        <small>{{ 'AUTO.NO_HAY_ACTIVIDAD_RECIENTE' | translate }}</small>
+        <small>{{ 'ADMIN.DASHBOARD.RECENT.NO_ACTIVITY' | translate }}</small>
       </li>
     }
   </ul>

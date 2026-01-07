@@ -5,6 +5,7 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-ajustes',
@@ -17,9 +18,15 @@ export class AjustesComponent implements OnInit, OnDestroy {
   error: string | null = null;
   ajustes: Ajustes[] = [];
   modalVisible = false;
+  showDeleteModal = false;
   editItem: Ajustes | null = null;
+  itemToDelete: Ajustes | null = null;
   form: FormGroup;
   private destroy$ = new Subject<void>();
+
+  get isEditing(): boolean {
+    return !!this.editItem;
+  }
 
   // Patrón de toolbar/búsqueda/paginación
   basicSearchText: string = '';
@@ -37,7 +44,8 @@ export class AjustesComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private toast: ToastService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslationService
   ) {
     this.form = this.fb.group({
       categoria: ['', [Validators.required, Validators.maxLength(50)]],
@@ -108,35 +116,52 @@ export class AjustesComponent implements OnInit, OnDestroy {
     const op = this.editItem?.id
       ? this.ajustesService.actualizarSafe(this.editItem.id, payload)
       : this.ajustesService.crearSafe(payload);
-    op.subscribe({
+
+    op.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        this.toast.showSuccess('Ajuste guardado', 'Ajustes');
+        this.toast.showSuccess(
+          this.isEditing ? this.translate.instant('ADMIN.SETTINGS.SUCCESS.UPDATE') : this.translate.instant('ADMIN.SETTINGS.SUCCESS.CREATE'),
+          this.translate.instant('MENU.SETTINGS')
+        );
         this.loading = false;
         this.modalVisible = false;
         this.load();
       },
       error: (err) => {
-        this.toast.showError('Error guardando', 'Ajustes');
+        this.toast.showError(
+          this.isEditing ? this.translate.instant('ADMIN.SETTINGS.ERROR.UPDATE') : this.translate.instant('ADMIN.SETTINGS.ERROR.CREATE'),
+          this.translate.instant('MENU.SETTINGS')
+        );
         this.log.error('ajustes guardar', err);
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
 
   delete(item: Ajustes): void {
     if (!item.id) return;
-    if (!confirm('¿Eliminar ajuste?')) return;
+    this.itemToDelete = item;
+    this.showDeleteModal = true;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete(): void {
+    if (!this.itemToDelete || !this.itemToDelete.id) return;
     this.loading = true;
-    this.ajustesService.eliminarSafe(item.id).subscribe({
+    this.ajustesService.eliminarSafe(this.itemToDelete.id).subscribe({
       next: () => {
-        this.toast.showSuccess('Ajuste eliminado', 'Ajustes');
+        this.toast.showSuccess(this.translate.instant('ADMIN.SETTINGS.SUCCESS.DELETE'), this.translate.instant('MENU.SETTINGS'));
         this.loading = false;
+        this.showDeleteModal = false;
+        this.itemToDelete = null;
         this.load();
       },
       error: (err) => {
-        this.toast.showError('Error eliminando', 'Ajustes');
+        this.toast.showError(this.translate.instant('ADMIN.SETTINGS.ERROR.DELETE'), this.translate.instant('MENU.SETTINGS'));
         this.log.error('ajustes eliminar', err);
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }

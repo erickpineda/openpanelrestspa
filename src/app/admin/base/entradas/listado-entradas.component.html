@@ -6,24 +6,24 @@
         <div>
           <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
             <svg cIcon name="cilList" class="text-primary"></svg>
-            Listado de Entradas
+            {{ 'ADMIN.ENTRIES.TITLE' | translate }}
           </h4>
           <small class="text-body-secondary">
-            Administra, filtra y organiza todas las publicaciones del sitio
+            {{ 'ADMIN.ENTRIES.SUBTITLE' | translate }}
           </small>
         </div>
         <div class="d-flex gap-2">
           <button cButton color="secondary" variant="ghost" size="sm" aria-label="Imprimir listado">
             <svg cIcon name="cilPrint" class="me-1"></svg>
-            Imprimir
+            {{ 'ADMIN.ENTRIES.PRINT' | translate }}
           </button>
           <button cButton color="warning" variant="outline" size="sm">
             <svg cIcon name="cilWarning" class="me-1"></svg>
-            Sin revisar
+            {{ 'ADMIN.ENTRIES.UNREVIEWED' | translate }}
           </button>
           <button cButton color="primary" size="sm" routerLink="crear" class="shadow-sm">
             <svg cIcon name="cilPlus" class="me-1"></svg>
-            Nueva Entrada
+            {{ 'ADMIN.ENTRIES.NEW_ENTRY' | translate }}
           </button>
         </div>
       </div>
@@ -36,7 +36,7 @@
           <!-- Contador y Selección de Página -->
           <c-col xs="12" md="3" class="d-flex align-items-center gap-3">
             <div class="text-nowrap fw-semibold text-secondary">
-              {{ totalElements }} registros
+              {{ totalElements }} {{ 'COMMON.RECORDS' | translate }}
             </div>
             <select
               cSelect
@@ -65,7 +65,7 @@
                 type="text"
                 [value]="basicSearchText"
                 (input)="onBasicSearchTextChange($any($event.target).value)"
-                placeholder="Buscar por título, contenido o autor..."
+                [placeholder]="'ADMIN.ENTRIES.FILTER_PLACEHOLDER' | translate"
                 class="border-start-0 ps-0"
               />
               <button 
@@ -76,7 +76,7 @@
                 [active]="showAdvanced"
               >
                 <svg cIcon name="cilFilter" class="me-1"></svg>
-                Filtros
+                {{ 'ADMIN.ENTRIES.FILTERS' | translate }}
               </button>
             </div>
           </c-col>
@@ -87,7 +87,7 @@
           <div class="mt-3 pt-3 border-top">
             <app-error-boundary
               context="listado-entradas"
-              fallbackMessage="No se pudieron cargar los filtros"
+              [fallbackMessage]="'COMMON.ERROR' | translate"
               [autoRetry]="true"
             >
               <app-buscador-avanzado
@@ -134,12 +134,12 @@
           <table cTable hover class="mb-0 align-middle text-nowrap">
             <thead class="bg-light text-secondary small text-uppercase fw-bold">
               <tr>
-                <th scope="col" class="border-0 py-3 ps-4">{{ 'AUTO.T_TULO' | translate }}</th>
-                <th scope="col" class="border-0 py-3">{{ 'AUTO.AUTOR' | translate }}</th>
-                <th scope="col" class="border-0 py-3 text-center">{{ 'AUTO.FECHA' | translate }}</th>
-                <th scope="col" class="border-0 py-3">{{ 'AUTO.CATEGOR_AS' | translate }}</th>
-                <th scope="col" class="border-0 py-3 text-center">{{ 'AUTO.ESTADO' | translate }}</th>
-                <th scope="col" class="border-0 py-3 text-end pe-4">{{ 'AUTO.ACCIONES' | translate }}</th>
+                <th scope="col" class="border-0 py-3 ps-4">{{ 'COMMON.TITLE_LABEL' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'COMMON.AUTHOR' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'COMMON.DATE' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'COMMON.CATEGORY' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'COMMON.STATUS' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-end pe-4">{{ 'COMMON.ACTIONS' | translate }}</th>
               </tr>
             </thead>
             <tbody class="border-top-0">
@@ -209,7 +209,7 @@
                         variant="ghost"
                         size="sm"
                         (click)="openPreview(entrada)"
-                        cTooltip="Vista Previa"
+                        [cTooltip]="'ADMIN.ENTRIES.VIEW_PREVIEW' | translate"
                         class="text-info-emphasis"
                       >
                         <svg cIcon name="cilMagnifyingGlass"></svg>
@@ -220,7 +220,7 @@
                         variant="ghost"
                         size="sm"
                         [routerLink]="['/admin/control/entradas/editar', entrada.idEntrada]"
-                        cTooltip="Editar"
+                        [cTooltip]="'COMMON.EDIT' | translate"
                         class="text-primary-emphasis"
                       >
                         <svg cIcon name="cilPen"></svg>
@@ -231,7 +231,7 @@
                         variant="ghost"
                         size="sm"
                         (click)="abrirModalEliminar(entrada)"
-                        cTooltip="Eliminar"
+                        [cTooltip]="'COMMON.DELETE' | translate"
                         class="text-danger-emphasis"
                       >
                         <svg cIcon name="cilTrash"></svg>
@@ -257,7 +257,7 @@
         <!-- Paginación Footer -->
         <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
           <small class="text-secondary">
-            Mostrando {{ listaEntradas.length }} de {{ totalElements }} resultados
+            {{ 'COMMON.PAGINATION_INFO' | translate: { current: listaEntradas.length, total: totalElements } }}
           </small>
           <c-pagination class="mb-0" align="end" size="sm">
             <li class="page-item" [class.disabled]="currentPage === 0">
@@ -281,25 +281,30 @@
 </c-container>
 
 <!-- Modal Borrar -->
-<c-modal [visible]="visible" (visibleChange)="onVisibleModalChange($event)" id="modalBorrar">
-  <c-modal-header>
-    <h5 cModalTitle>{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
-    <button (click)="toggleModal()" cButtonClose></button>
+<c-modal [visible]="visible" (visibleChange)="onVisibleModalChange($event)" id="modalBorrar" backdrop="static">
+  <c-modal-header class="border-bottom-0">
+    <h5 cModalTitle class="fw-bold text-danger">{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
   </c-modal-header>
   <c-modal-body>
-    ¿Está seguro de que desea eliminar la entrada <strong>{{ entradaABorrar?.titulo }}</strong>?
-    <p class="text-danger small mt-2 mb-0">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</p>
+    <div class="text-center py-3">
+      <svg cIcon name="cilTrash" size="4xl" class="text-danger mb-3 opacity-75"></svg>
+      <p class="mb-1">{{ 'COMMON.VERIFY_DELETE' | translate }}</p>
+      <h4 class="fw-bold text-dark">{{ entradaABorrar?.titulo }}</h4>
+      <p class="text-muted small mt-2">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</p>
+    </div>
   </c-modal-body>
-  <c-modal-footer>
-    <button (click)="toggleModal()" cButton color="secondary">{{ 'AUTO.CANCELAR' | translate }}</button>
-    <button (click)="confirmarBorrado()" cButton color="danger">{{ 'AUTO.ELIMINAR' | translate }}</button>
+  <c-modal-footer class="border-top-0 justify-content-center pb-4">
+    <button cButton color="secondary" variant="ghost" (click)="toggleModal()">{{ 'AUTO.CANCELAR' | translate }}</button>
+    <button cButton color="danger" class="px-4" (click)="confirmarBorrado()">
+      {{ 'AUTO.ELIMINAR' | translate }}
+    </button>
   </c-modal-footer>
 </c-modal>
 
 <!-- Modal Preview -->
 <c-modal [visible]="previewVisible" (visibleChange)="onPreviewVisibleChange($event)" size="xl" scrollable id="modalPreview">
   <c-modal-header>
-    <h5 cModalTitle>Vista Previa: {{ previewEntrada?.titulo }}</h5>
+    <h5 cModalTitle>{{ 'ADMIN.ENTRIES.VIEW_PREVIEW' | translate }}: {{ previewEntrada?.titulo }}</h5>
     <button #previewCloseBtn (click)="closePreview()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
@@ -338,7 +343,7 @@
     <button (click)="closePreview()" cButton color="secondary">{{ 'AUTO.CERRAR' | translate }}</button>
     <button (click)="onEditarDesdePreview()" cButton color="primary">
       <svg cIcon name="cilPen" class="me-1"></svg>
-      Editar
+      {{ 'COMMON.EDIT' | translate }}
     </button>
   </c-modal-footer>
 </c-modal>

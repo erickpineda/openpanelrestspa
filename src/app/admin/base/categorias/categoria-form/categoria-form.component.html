@@ -1,46 +1,21 @@
 <c-container fluid class="p-0">
-  <form
-    cForm
-    [formGroup]="form"
-    novalidate
-    (ngSubmit)="guardar()"
-    class="needs-validation"
-    role="form"
-    aria-label="Formulario de categoría"
-  >
+  <form cForm [formGroup]="form" novalidate (ngSubmit)="guardar()" class="needs-validation" role="form"
+    aria-label="Formulario de categoría">
     <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mb-3">
-      <button
-        cButton
-        color="secondary"
-        variant="ghost"
-        size="sm"
-        type="button"
-        (click)="reset()"
-        [tabindex]="'0'"
-        aria-label="Limpiar formulario"
-      >
+      <button cButton color="secondary" variant="ghost" size="sm" type="button" (click)="reset()" [tabindex]="'0'"
+        aria-label="Limpiar formulario">
         <svg cIcon name="cilReload" class="me-1" size="sm"></svg>
-        Limpiar
+        {{ 'COMMON.CLEAN' | translate }}
       </button>
-      <button
-        cButton
-        color="primary"
-        size="sm"
-        type="submit"
-        [disabled]="form.disabled || form.pristine || form.invalid || enviando"
-        [tabindex]="'0'"
-        aria-label="Guardar categoría"
-      >
+      <button cButton color="primary" size="sm" type="submit"
+        [disabled]="form.disabled || form.pristine || form.invalid || enviando" [tabindex]="'0'"
+        aria-label="Guardar categoría">
         <svg cIcon name="cilSave" class="me-1" size="sm"></svg>
         @if (!enviando) {
-          <span>{{ 'AUTO.GUARDAR' | translate }}</span>
+        <span>{{ 'COMMON.SAVE' | translate }}</span>
         }
         @if (enviando) {
-          <span
-            class="spinner-border spinner-border-sm ms-1"
-            role="status"
-            aria-hidden="true"
-          ></span>
+        <span class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true"></span>
         }
       </button>
     </div>
@@ -49,39 +24,28 @@
       <c-col lg="8">
         <c-card class="mb-4 shadow-none border">
           <c-card-body>
-            <h3 cCardTitle class="h6 mb-4 text-secondary fw-bold">{{ 'AUTO.INFORMACI_N_B_SICA' | translate }}</h3>
+            <h3 cCardTitle class="h6 mb-4 text-secondary fw-bold">{{ 'COMMON.BASIC_INFO' | translate }}</h3>
             <c-row>
               <c-col lg="12">
                 <div class="mb-3">
-                  <label cLabel for="nombre" class="fw-semibold">{{ 'AUTO.NOMBRE' | translate }}<span class="text-danger">*</span></label>
-                  <input
-                    cFormControl
-                    formControlName="nombre"
-                    id="nombre"
-                    type="text"
-                    [ngClass]="{
+                  <label cLabel for="nombre" class="fw-semibold">{{ 'COMMON.NAME' | translate }}<span
+                      class="text-danger">*</span></label>
+                  <input cFormControl formControlName="nombre" id="nombre" type="text" [ngClass]="{
                       'is-invalid': (submitted || f['nombre'].touched) && f['nombre'].invalid,
                       'is-valid': f['nombre'].valid && (submitted || f['nombre'].touched)
-                    }"
-                    (input)="mostrarFeedback = true"
-                  />
+                    }" (input)="mostrarFeedback = true" />
                   @if ((submitted || f['nombre'].touched) && f['nombre'].invalid) {
-                    <div class="invalid-feedback">
-                      El nombre es obligatorio.
-                    </div>
+                  <div class="invalid-feedback">
+                    {{ 'ADMIN.CATEGORIES.NAME_REQUIRED' | translate }}
+                  </div>
                   }
                 </div>
 
                 <div class="mb-3">
-                  <label cLabel for="descripcion" class="fw-semibold">{{ 'AUTO.DESCRIPCI_N' | translate }}</label>
-                  <textarea
-                    cFormControl
-                    formControlName="descripcion"
-                    id="descripcion"
-                    rows="4"
-                  ></textarea>
+                  <label cLabel for="descripcion" class="fw-semibold">{{ 'COMMON.DESCRIPTION' | translate }}</label>
+                  <textarea cFormControl formControlName="descripcion" id="descripcion" rows="4"></textarea>
                   <div class="form-text text-muted">
-                    Breve descripción de la categoría.
+                    {{ 'ADMIN.CATEGORIES.DESCRIPTION_HELP' | translate }}
                   </div>
                 </div>
               </c-col>
@@ -93,20 +57,20 @@
       <c-col lg="4">
         <c-card class="mb-4 shadow-none border bg-light">
           <c-card-body>
-            <h3 cCardTitle class="h6 mb-3 text-secondary fw-bold">{{ 'AUTO.EXISTENTES' | translate }}</h3>
+            <h3 cCardTitle class="h6 mb-3 text-secondary fw-bold">{{ 'COMMON.EXISTING' | translate }}</h3>
             <div class="list-group list-group-flush bg-white rounded border">
               @for (categoria of displayListaCategorias; track categoria.nombre) {
-                <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
-                  <span class="text-truncate" [title]="categoria.nombre" style="max-width: 150px;">
-                    {{ categoria.nombre }}
-                  </span>
-                  <span class="badge bg-light text-dark border">{{ categoria.cantidadEntradas }}</span>
-                </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                <span class="text-truncate" [title]="categoria.nombre" style="max-width: 150px;">
+                  {{ categoria.nombre }}
+                </span>
+                <span class="badge bg-light text-dark border">{{ categoria.cantidadEntradas }}</span>
+              </div>
               }
               @if (displayListaCategorias.length === 0) {
-                <div class="list-group-item text-center text-muted small py-3">
-                  No hay categorías para mostrar
-                </div>
+              <div class="list-group-item text-center text-muted small py-3">
+                {{ 'ADMIN.CATEGORIES.NO_CATEGORIES' | translate }}
+              </div>
               }
             </div>
           </c-card-body>

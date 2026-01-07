@@ -1,8 +1,21 @@
-<c-widget-stat-f [value]="value" [title]="label" padding="true" [color]="resolvedColor">
-  <ng-template cTemplateId="widgetIconTemplate">
-    <svg cIcon [name]="resolvedIcon" size="lg"></svg>
-  </ng-template>
-</c-widget-stat-f>
-@if (subtitle) {
-  <small class="text-muted d-block mt-1">{{ subtitle }}</small>
-}
+<div class="kpi-card h-100" [class.p-0]="variant === 'simple'" #kpiBody>
+  @if (variant === 'simple') {
+    <c-widget-stat-b
+      class="mb-0 h-100"
+      [value]="value.toString()"
+      [title]="label"
+      [color]="resolvedColor"
+      [inverse]="false"
+    >
+    </c-widget-stat-b>
+  } @else {
+    <c-widget-stat-f [value]="value" [title]="label" padding="true" [color]="resolvedColor">
+      <ng-template cTemplateId="widgetIconTemplate">
+        <svg cIcon [name]="resolvedIcon" size="lg"></svg>
+      </ng-template>
+    </c-widget-stat-f>
+    @if (subtitle) {
+      <small class="d-block mt-1">{{ subtitle }}</small>
+    }
+  }
+</div>

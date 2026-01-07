@@ -1,26 +1,36 @@
-<c-modal [visible]="visible" (visibleChange)="onClose()" class="confirmation-modal">
-  <c-modal-header>
-    <h5 cModalTitle [class]="'text-' + getHeaderColor()">
-      @if (type === 'warning') {
-        <c-icon name="cil-warning" class="me-2"></c-icon>
-      }
-      @if (type === 'danger') {
-        <c-icon name="cil-warning" class="me-2"></c-icon>
-      }
-      @if (type === 'info') {
-        <c-icon name="cil-info" class="me-2"></c-icon>
-      }
-      {{ title }}
-    </h5>
+<c-modal [visible]="visible" (visibleChange)="onVisibleChange($event)" class="confirmation-modal" backdrop="static">
+  <c-modal-header class="border-bottom-0">
+    <h5 cModalTitle [class]="'fw-bold text-' + getHeaderColor()">{{ title }}</h5>
   </c-modal-header>
+  
   <c-modal-body>
-    <p>{{ message }}</p>
+    <div class="text-center py-3">
+      @if (type === 'danger') {
+        <svg cIcon name="cilTrash" size="4xl" class="text-danger mb-3 opacity-75"></svg>
+      } @else if (type === 'warning') {
+        <svg cIcon name="cilWarning" size="4xl" class="text-warning mb-3 opacity-75"></svg>
+      } @else {
+        <svg cIcon name="cilInfo" size="4xl" class="text-primary mb-3 opacity-75"></svg>
+      }
+      
+      <p class="mb-1" [class.fs-5]="!itemName">{{ message }}</p>
+
+      @if (itemName) {
+        <h4 class="fw-bold text-dark">{{ itemName }}</h4>
+      }
+      
+      @if (warningText) {
+        <p class="text-muted small mt-2">{{ warningText }}</p>
+      }
+    </div>
   </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" (click)="onCancel()">
-      {{ cancelText }}
-    </button>
-    <button cButton [color]="getHeaderColor()" (click)="onConfirm()" class="ms-2">
+
+  <c-modal-footer class="border-top-0 justify-content-center pb-4">
+    <button cButton color="secondary" variant="ghost" (click)="onCancel()">{{ cancelText }}</button>
+    <button cButton [color]="getHeaderColor()" class="px-4" (click)="onConfirm()" [disabled]="loading">
+      @if (loading) {
+      <c-spinner size="sm" class="me-2"></c-spinner>
+      }
       {{ confirmText }}
     </button>
   </c-modal-footer>

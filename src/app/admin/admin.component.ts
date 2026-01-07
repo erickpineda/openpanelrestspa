@@ -9,6 +9,8 @@ import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { IconSetService } from '@coreui/icons-angular';
 import { DashboardApiService } from '../core/services/dashboard-api.service';
+import { TranslationService } from '../core/services/translation.service';
+import { LanguageService } from '../core/services/language.service';
 
 import { iconSubset } from '../shared/components/icons/icon-subset';
 import { navItems } from './default-layout/_nav';
@@ -62,7 +64,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private tokenStorage: TokenStorageService,
     private authService: AuthService,
-    private sidebarState: SidebarStateService
+    private sidebarState: SidebarStateService,
+    private translationService: TranslationService,
+    private languageService: LanguageService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
@@ -92,8 +96,14 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.ready = true;
     this.checkForTemporaryData();
     this.cargaFinalizada = true;
-    const locale = navigator && navigator.language ? navigator.language : 'es-ES';
-    this.setHeaderLabels(locale);
+
+    // Suscribirse a cambios en las traducciones (se dispara cuando se carga el idioma o cambia)
+    this.translationService.translations$.subscribe(() => {
+      this.updateTranslations();
+      this.updateNavItems();
+      this.cdr.markForCheck();
+    });
+
     const isDashboardRoute = this.router.url.includes('/admin/base/dashboard');
     if (isDashboardRoute) {
       this.dashboardApi.getContentStats().subscribe((stats) => {
@@ -162,20 +172,53 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.log.info('🗑️ Usuario descartó todos los datos temporales');
   }
 
-  private setHeaderLabels(locale: string): void {
-    this.labelDashboard = 'Escritorio';
-    this.labelUsers = 'Usuarios';
-    this.labelGoHome = 'Ir a inicio';
-    this.labelAccount = 'Cuenta';
-    this.labelUpdates = 'Actualizaciones';
-    this.labelMessages = 'Mensajes';
-    this.labelTasks = 'Tareas';
-    this.labelComments = 'Comentarios';
-    this.labelSettings = 'Ajustes';
-    this.labelProfile = 'Perfil';
-    // eliminado: etiqueta de pagos
-    this.labelProjects = 'Proyectos';
-    this.labelLockAccount = 'Bloquear cuenta';
+  private updateTranslations(): void {
+    this.labelDashboard = this.translationService.translate('MENU.DASHBOARD');
+    this.labelUsers = this.translationService.translate('MENU.USERS');
+    this.labelGoHome = this.translationService.translate('MENU.VIEW_WEBSITE');
+    this.labelAccount = this.translationService.translate('MENU.MY_ACCOUNT');
+    this.labelUpdates = this.translationService.translate('MENU.UPDATES');
+    this.labelMessages = this.translationService.translate('MENU.MESSAGES');
+    this.labelTasks = this.translationService.translate('MENU.TASKS');
+    this.labelComments = this.translationService.translate('MENU.COMMENTS');
+    this.labelSettings = this.translationService.translate('MENU.SETTINGS');
+    this.labelProfile = this.translationService.translate('MENU.MY_PROFILE');
+    this.labelProjects = this.translationService.translate('MENU.PROJECTS');
+    this.labelLockAccount = this.translationService.translate('MENU.LOCK_ACCOUNT');
+  }
+
+  private updateNavItems(): void {
+    // Usar spread para crear copias superficiales y evitar perder funciones (como en contextualActions)
+    // JSON.stringify eliminaba las funciones, rompiendo la UI si se esperaban
+    this.navItems = this.translateItems(navItems);
+    this.sidebarState.updateNavItems(this.navItems, this.router.url);
+  }
+
+  private translateItems(items: any[]): any[] {
+    return items.map((originalItem) => {
+      // Copia superficial para no mutar el objeto original
+      const item = { ...originalItem };
+
+      if (item.name) {
+        item.name = this.translationService.translate(item.name);
+      }
+      if (item.badge && item.badge.text) {
+        // Clonar badge para no mutar el original
+        item.badge = { ...item.badge };
+        
+        // Traducir badge si es una clave de traducción (contiene MENU. o similar) o es texto fijo
+        // Asumiremos que si empieza por MENU. es clave, si no, intentamos traducir igual por si acaso
+        if (item.badge.text === 'Pend' || item.badge.text === 'MENU.BADGE_PENDING') {
+             item.badge.text = this.translationService.translate('MENU.BADGE_PENDING');
+        } else {
+             item.badge.text = this.translationService.translate(item.badge.text);
+        }
+      }
+      if (item.children) {
+        item.children = this.translateItems(item.children);
+      }
+      return item;
+    });
   }
 
   private readSidebarNarrowFromStorage(): boolean {

@@ -7,8 +7,8 @@
             <svg cIcon name="cilCode" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.HERRAMIENTAS_DE_DESARROLLO' | translate }}</h5>
-            <small class="text-muted">{{ 'AUTO.UTILIDADES_PARA_DEPURACI_N_Y_D' | translate }}</small>
+            <h5 class="mb-0 text-primary fw-bold">{{ 'ADMIN.DEV_TOOLS.TITLE' | translate }}</h5>
+            <small class="text-muted">{{ 'ADMIN.DEV_TOOLS.SUBTITLE' | translate }}</small>
           </div>
         </div>
       </c-card-header>
@@ -16,17 +16,17 @@
         <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
           <svg cIcon name="cilInfo" class="flex-shrink-0 me-2"></svg>
           <div>
-            Estas herramientas están destinadas únicamente para propósitos de desarrollo y depuración. Úselas con precaución en entornos de producción.
+            {{ 'ADMIN.DEV_TOOLS.WARNING' | translate }}
           </div>
         </div>
 
-        <h6 class="text-uppercase text-secondary fw-bold small mb-3">{{ 'AUTO.CARACTER_STICAS_EXPERIMENTALES' | translate }}</h6>
+        <h6 class="text-uppercase text-secondary fw-bold small mb-3">{{ 'ADMIN.DEV_TOOLS.EXPERIMENTAL_FEATURES' | translate }}</h6>
         <ul class="list-group shadow-sm">
           @for (f of features; track trackByFeature($index, f)) {
             <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-start-0 border-end-0">
               <div class="d-flex flex-column">
                 <span class="fw-medium">{{ f.name }}</span>
-                <small class="text-muted">{{ 'AUTO.HABILITAR_O_DESHABILITAR_ESTA_' | translate }}</small>
+                <small class="text-muted">{{ 'ADMIN.DEV_TOOLS.TOGGLE_FEATURE_HELP' | translate }}</small>
               </div>
               <div class="form-check form-switch">
                 <input 
@@ -38,7 +38,7 @@
                   (change)="toggle(f)"
                 >
                 <label class="form-check-label visually-hidden" [for]="'switch-' + f.name">
-                  {{ f.enabled ? 'Activado' : 'Desactivado' }}
+                  {{ f.enabled ? ('ADMIN.DEV_TOOLS.ENABLED' | translate) : ('ADMIN.DEV_TOOLS.DISABLED' | translate) }}
                 </label>
               </div>
             </li>
@@ -47,26 +47,25 @@
 
         <hr />
 
-        <h6 class="mb-2">{{ 'AUTO.AN_LISIS_DE_HAR_RED' | translate }}</h6>
+        <h6 class="mb-2">{{ 'ADMIN.DEV_TOOLS.HAR_ANALYSIS' | translate }}</h6>
         <div class="mb-2 text-muted small">
-          Pega aquí el HAR exportado desde el navegador para identificar fallos de recursos y
-          latencias anómalas.
+          {{ 'ADMIN.DEV_TOOLS.HAR_HELP' | translate }}
         </div>
         <textarea
           cFormControl
           rows="8"
           [(ngModel)]="harText"
-          placeholder="Pega el JSON del HAR aquí..."
+          [placeholder]="'ADMIN.DEV_TOOLS.HAR_PLACEHOLDER' | translate"
         ></textarea>
         <div class="d-flex gap-2 mt-2">
-          <button cButton color="primary" (click)="analyzeHar()">{{ 'AUTO.ANALIZAR_HAR' | translate }}</button>
+          <button cButton color="primary" (click)="analyzeHar()">{{ 'ADMIN.DEV_TOOLS.ANALYZE_HAR' | translate }}</button>
           <button
             cButton
             color="secondary"
             variant="outline"
             (click)="harText = ''; harSummary = undefined; harError = ''"
           >
-            Limpiar
+            {{ 'COMMON.CLEAN' | translate }}
           </button>
         </div>
 
@@ -79,164 +78,45 @@
             <div class="row g-2">
               <div class="col-md-3">
                 <div class="border rounded p-2">
-                  <div class="text-muted small">{{ 'AUTO.TOTAL' | translate }}</div>
+                  <div class="text-muted small">{{ 'ADMIN.DEV_TOOLS.TOTAL_REQUESTS' | translate }}</div>
                   <div class="fs-5">{{ s.total }}</div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="border rounded p-2">
-                  <div class="text-muted small">{{ 'AUTO.FALLOS_STATUS_0_4XX_5XX' | translate }}</div>
+                  <div class="text-muted small">{{ 'ADMIN.DEV_TOOLS.FAILED_REQUESTS' | translate }}</div>
                   <div class="fs-5">{{ s.failed.count }}</div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="border rounded p-2">
-                  <div class="text-muted small">Lentos (≥ {{ s.slow.thresholdMs }}ms)</div>
+                  <div class="text-muted small">{{ 'ADMIN.DEV_TOOLS.SLOW_REQUESTS' | translate: { threshold: s.slow.thresholdMs } }}</div>
                   <div class="fs-5">{{ s.slow.count }}</div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="border rounded p-2">
-                  <div class="text-muted small">{{ 'AUTO.ASSETS_CR_TICOS_FALLIDOS' | translate }}</div>
-                  <div class="small">
-                    JS: {{ s.assetIssues.scriptsFailed }} · CSS: {{ s.assetIssues.stylesFailed }} ·
-                    Fonts:
-                    {{ s.assetIssues.fontsFailed }}
-                  </div>
+                  <div class="text-muted small">{{ 'ADMIN.DEV_TOOLS.CRITICAL_ASSETS_FAILED' | translate }}</div>
+                  <div class="fs-5">{{ s.assetIssues.scriptsFailed + s.assetIssues.stylesFailed + s.assetIssues.fontsFailed }}</div>
                 </div>
-              </div>
-            </div>
-
-            <div class="mt-3">
-              <div class="text-muted small mb-1">{{ 'AUTO.ESTADOS' | translate }}</div>
-              <div class="small">
-                2xx: {{ s.byStatus.ok2xx }} · 3xx: {{ s.byStatus.redir3xx }} · 4xx:
-                {{ s.byStatus.client4xx }} · 5xx: {{ s.byStatus.server5xx }} · otros:
-                {{ s.byStatus.other }}
               </div>
             </div>
 
             @if (s.failed.count > 0) {
               <div class="mt-3">
-                <div class="text-muted small mb-1">{{ 'AUTO.FALLOS_TOP_30' | translate }}</div>
-                <div class="table-responsive">
-                  <table class="table table-sm">
-                    <thead>
-                      <tr>
-                        <th>{{ 'AUTO.STATUS' | translate }}</th>
-                        <th>{{ 'AUTO.M_TODO' | translate }}</th>
-                        <th>{{ 'AUTO.TIPO' | translate }}</th>
-                        <th>{{ 'AUTO.URL' | translate }}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for (f of s.failed.items; track $index) {
-                        <tr>
-                          <td>{{ f.status }}</td>
-                          <td>{{ f.method }}</td>
-                          <td>{{ f.mimeType || '-' }}</td>
-                          <td class="text-truncate" style="max-width: 520px">{{ f.url }}</td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            }
-
-            @if (s.slow.count > 0) {
-              <div class="mt-3">
-                <div class="text-muted small mb-1">{{ 'AUTO.LENTOS_TOP_30' | translate }}</div>
-                <div class="table-responsive">
-                  <table class="table table-sm">
-                    <thead>
-                      <tr>
-                        <th>{{ 'AUTO.MS' | translate }}</th>
-                        <th>{{ 'AUTO.STATUS' | translate }}</th>
-                        <th>{{ 'AUTO.TIPO' | translate }}</th>
-                        <th>{{ 'AUTO.URL' | translate }}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for (r of s.slow.items; track $index) {
-                        <tr>
-                          <td>{{ r.timeMs }}</td>
-                          <td>{{ r.status }}</td>
-                          <td>{{ r.mimeType || '-' }}</td>
-                          <td class="text-truncate" style="max-width: 520px">{{ r.url }}</td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
-                </div>
+                <h6 class="text-danger small fw-bold">Fallos ({{ s.failed.count }})</h6>
+                <ul class="list-group list-group-flush small">
+                  @for (req of s.failed.items; track req.url) {
+                    <li class="list-group-item px-0 py-1 text-break">
+                      <span class="badge bg-danger me-2">{{ req.status }}</span>
+                      {{ req.url }}
+                    </li>
+                  }
+                </ul>
               </div>
             }
           </div>
         }
-
-        <hr />
-
-        <h6 class="mb-2">{{ 'AUTO.MONITOR_DE_BLOQUEO_UI' | translate }}</h6>
-        <div class="mb-2 text-muted small">
-          Configura el watchdog que detecta overlays/backdrops huérfanos. Los cambios se guardan en
-          el navegador.
-        </div>
-        <div class="row g-2 align-items-end">
-          <div class="col-md-3">
-            <label class="form-label">{{ 'AUTO.ESTADO' | translate }}</label>
-            <select
-              class="form-select"
-              [(ngModel)]="uiMonitorConfig.enabled"
-              name="uiMonitorEnabled"
-            >
-              <option [ngValue]="true">{{ 'AUTO.ACTIVADO' | translate }}</option>
-              <option [ngValue]="false">{{ 'AUTO.DESACTIVADO' | translate }}</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">{{ 'AUTO.INTERVALO_MS' | translate }}</label>
-            <input
-              class="form-control"
-              type="number"
-              min="250"
-              step="50"
-              [(ngModel)]="uiMonitorConfig.scanIntervalMs"
-              name="uiMonitorInterval"
-            />
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">{{ 'AUTO.COBERTURA_VIEWPORT_0_2_1' | translate }}</label>
-            <input
-              class="form-control"
-              type="number"
-              min="0.2"
-              max="1"
-              step="0.05"
-              [(ngModel)]="uiMonitorConfig.viewportCoverageThreshold"
-              name="uiMonitorCoverage"
-            />
-          </div>
-        </div>
-        <div class="d-flex gap-2 mt-2">
-          <button cButton color="primary" (click)="applyUiMonitorConfig()">{{ 'AUTO.APLICAR' | translate }}</button>
-          <button cButton color="secondary" variant="outline" (click)="refreshUiMonitorConfig()">
-            Recargar
-          </button>
-          <button cButton color="dark" variant="outline" (click)="scanUiNow()">
-            Escanear ahora
-          </button>
-        </div>
-
-        <hr class="my-4 text-muted opacity-25" />
-
-        <h6 class="mb-2 fw-bold">{{ 'AUTO.CAPTURAS_DE_BLOQUEO_UI' | translate }}</h6>
-        <div class="d-flex gap-2 mb-2">
-          <button cButton color="primary" (click)="loadUiSnapshots()">{{ 'AUTO.CARGAR_CAPTURAS' | translate }}</button>
-          <button cButton color="danger" variant="outline" (click)="clearUiSnapshots()">
-            Borrar capturas
-          </button>
-        </div>
-        <textarea class="form-control" rows="6" [value]="uiSnapshotsRaw" readonly></textarea>
       </c-card-body>
     </c-card>
   </c-col>

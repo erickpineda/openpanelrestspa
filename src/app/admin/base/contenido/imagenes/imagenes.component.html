@@ -7,8 +7,8 @@
             <svg cIcon name="cilImage" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.GALER_A_DE_IM_GENES' | translate }}</h5>
-            <small class="text-muted">{{ 'AUTO.ADMINISTRA_LOS_RECURSOS_VISUAL' | translate }}</small>
+            <h5 class="mb-0 text-primary fw-bold">{{ 'ADMIN.MEDIA.TITLE' | translate }}</h5>
+            <small class="text-muted">{{ 'ADMIN.MEDIA.SUBTITLE' | translate }}</small>
           </div>
         </div>
         <div class="d-flex gap-2">
@@ -28,7 +28,7 @@
             [disabled]="uploading"
           >
             <svg cIcon name="cilCloudUpload" class="me-2"></svg>
-            {{ uploading ? 'Subiendo...' : 'Subir Imagen' }}
+            {{ uploading ? ('ADMIN.MEDIA.UPLOADING' | translate) : ('ADMIN.MEDIA.UPLOAD' | translate) }}
           </button>
         </div>
       </div>
@@ -39,7 +39,7 @@
       <div class="d-flex flex-column flex-md-row gap-3 mb-4 justify-content-between align-items-end bg-light p-3 rounded">
         <div class="d-flex flex-column flex-md-row gap-3 flex-grow-1 w-100">
           <div class="flex-grow-1" style="max-width: 400px;">
-            <label class="form-label text-muted small text-uppercase fw-bold">{{ 'AUTO.BUSCAR' | translate }}</label>
+            <label class="form-label text-muted small text-uppercase fw-bold">{{ 'COMMON.SEARCH' | translate }}</label>
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0 text-secondary">
                 <svg cIcon name="cilSearch" size="sm"></svg>
@@ -49,7 +49,7 @@
                 type="text"
                 [value]="basicSearchText"
                 (input)="onBasicSearchTextChange($any($event.target).value)"
-                placeholder="Buscar por nombre..."
+                [placeholder]="'ADMIN.MEDIA.SEARCH_PLACEHOLDER' | translate"
                 class="border-start-0 ps-0 shadow-none"
                 [disabled]="loading"
               />
@@ -66,13 +66,13 @@
               class="d-flex align-items-center gap-2"
             >
               <svg cIcon name="cilFilter" size="sm"></svg>
-              <span>Filtros {{ showAdvanced ? 'Activos' : '' }}</span>
+              <span>{{ 'ADMIN.ENTRIES.FILTERS' | translate }} {{ showAdvanced ? 'Activos' : '' }}</span>
             </button>
           </div>
         </div>
 
         <div class="d-flex align-items-center gap-2">
-          <span class="text-muted small text-nowrap fw-bold">{{ 'AUTO.MOSTRAR' | translate }}</span>
+          <span class="text-muted small text-nowrap fw-bold">{{ 'COMMON.SHOW' | translate }}</span>
           <select
             cSelect
             size="sm"
@@ -83,8 +83,8 @@
             class="shadow-sm"
           >
             <option [ngValue]="5">5</option>
-            <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
-            <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
           </select>
         </div>
       </div>
@@ -104,17 +104,17 @@
           </button>
           <c-row class="g-3 align-items-end">
             <c-col xs="12" md="4">
-              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'AUTO.TIPO_MIME' | translate }}</label>
+              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'ADMIN.MEDIA.MIME_TYPE' | translate }}</label>
               <select cSelect size="sm" [(ngModel)]="filtroMime" [disabled]="loading" class="shadow-sm">
-                <option value="">{{ 'AUTO.TODOS' | translate }}</option>
-                <option value="image/jpeg">{{ 'AUTO.JPEG' | translate }}</option>
-                <option value="image/png">{{ 'AUTO.PNG' | translate }}</option>
-                <option value="image/gif">{{ 'AUTO.GIF' | translate }}</option>
-                <option value="image/webp">{{ 'AUTO.WEBP' | translate }}</option>
+                <option value="">{{ 'COMMON.ALL' | translate }}</option>
+                <option value="image/jpeg">{{ 'ADMIN.MEDIA.JPEG' | translate }}</option>
+                <option value="image/png">{{ 'ADMIN.MEDIA.PNG' | translate }}</option>
+                <option value="image/gif">{{ 'ADMIN.MEDIA.GIF' | translate }}</option>
+                <option value="image/webp">{{ 'ADMIN.MEDIA.WEBP' | translate }}</option>
               </select>
             </c-col>
             <c-col xs="6" md="3">
-              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'AUTO.DESDE' | translate }}</label>
+              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'ADMIN.MEDIA.FROM' | translate }}</label>
               <input
                 cFormControl
                 size="sm"
@@ -125,7 +125,7 @@
               />
             </c-col>
             <c-col xs="6" md="3">
-              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'AUTO.HASTA' | translate }}</label>
+              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'ADMIN.MEDIA.TO' | translate }}</label>
               <input
                 cFormControl
                 size="sm"
@@ -143,7 +143,7 @@
                 class="text-white shadow-sm"
                 (click)="search()"
                 [disabled]="loading"
-                cTooltip="Aplicar filtros"
+                [cTooltip]="'COMMON.APPLY' | translate"
               >
                 <svg cIcon name="cilSearch"></svg>
               </button>
@@ -154,7 +154,7 @@
                 variant="outline"
                 (click)="reset()"
                 [disabled]="loading"
-                cTooltip="Limpiar filtros"
+                [cTooltip]="'COMMON.CLEAN' | translate"
               >
                 <svg cIcon name="cilReload"></svg>
               </button>
@@ -169,7 +169,7 @@
             <svg cIcon name="cilWarning" class="text-danger"></svg>
             <span>{{ error }}</span>
           </div>
-          <button cButton color="danger" size="sm" variant="outline" (click)="load()">{{ 'AUTO.REINTENTAR' | translate }}</button>
+          <button cButton color="danger" size="sm" variant="outline" (click)="load()">{{ 'COMMON.RETRY' | translate }}</button>
         </c-alert>
       }
 
@@ -179,7 +179,7 @@
           <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3">
             <div class="text-center">
               <c-spinner color="primary"></c-spinner>
-              <p class="mt-2 text-primary fw-semibold small">{{ 'AUTO.CARGANDO_IM_GENES' | translate }}</p>
+              <p class="mt-2 text-primary fw-semibold small">{{ 'COMMON.LOADING' | translate }}</p>
             </div>
           </div>
         }
@@ -187,10 +187,10 @@
         <table cTable hover small class="align-middle mb-0 border">
           <thead class="bg-light text-secondary text-uppercase small fw-bold border-bottom">
             <tr>
-              <th scope="col" class="border-0 py-3 ps-3" style="min-width: 80px">{{ 'AUTO.VISTA' | translate }}</th>
-              <th scope="col" class="border-0 py-3" style="min-width: 200px">{{ 'AUTO.NOMBRE' | translate }}</th>
-              <th scope="col" class="border-0 py-3 text-center" style="min-width: 160px">{{ 'AUTO.FECHA' | translate }}</th>
-              <th scope="col" class="border-0 py-3 text-end pe-3" style="min-width: 110px">{{ 'AUTO.ACCIONES' | translate }}</th>
+              <th scope="col" class="border-0 py-3 ps-3" style="min-width: 80px">{{ 'ADMIN.MEDIA.VIEW' | translate }}</th>
+              <th scope="col" class="border-0 py-3" style="min-width: 200px">{{ 'COMMON.NAME' | translate }}</th>
+              <th scope="col" class="border-0 py-3 text-center" style="min-width: 160px">{{ 'ADMIN.MEDIA.DATE' | translate }}</th>
+              <th scope="col" class="border-0 py-3 text-end pe-3" style="min-width: 110px">{{ 'COMMON.ACTIONS' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -257,7 +257,7 @@
                       variant="ghost"
                       size="sm"
                       (click)="deleteItem(m)"
-                      cTooltip="Eliminar"
+                      [cTooltip]="'COMMON.DELETE' | translate"
                     >
                       <svg cIcon name="cilTrash"></svg>
                     </button>
@@ -270,8 +270,8 @@
                   <td colspan="4" class="text-center py-5">
                     <div class="d-flex flex-column align-items-center text-muted">
                       <svg cIcon name="cilImage" size="4xl" class="mb-3 text-secondary opacity-25"></svg>
-                      <h6 class="fw-bold mb-1">{{ 'AUTO.NO_SE_ENCONTRARON_IM_GENES' | translate }}</h6>
-                      <p class="small mb-0">{{ 'AUTO.INTENTA_SUBIR_UNA_NUEVA_IMAGEN' | translate }}</p>
+                      <h6 class="fw-bold mb-1">{{ 'ADMIN.MEDIA.NO_IMAGES_FOUND' | translate }}</h6>
+                      <p class="small mb-0">{{ 'ADMIN.MEDIA.UPLOAD_NEW' | translate }}</p>
                     </div>
                   </td>
                 </tr>
@@ -294,7 +294,7 @@
 <!-- Modal Preview -->
 <c-modal [visible]="previewModalVisible" (visibleChange)="previewModalVisible = $event" size="xl" backdrop="static">
   <c-modal-header class="bg-light border-bottom-0">
-    <h5 cModalTitle class="fw-bold text-primary">{{ 'AUTO.VISTA_PREVIA' | translate }}</h5>
+    <h5 cModalTitle class="fw-bold text-primary">{{ 'ADMIN.MEDIA.PREVIEW' | translate }}</h5>
     <button (click)="previewModalVisible = false" cButtonClose></button>
   </c-modal-header>
   <c-modal-body class="p-0 bg-dark position-relative d-flex justify-content-center align-items-center preview-body" style="min-height: 500px; overflow: hidden;">
@@ -341,27 +341,20 @@
         <small class="text-secondary">{{ previewItem.mime }} - {{ ((previewItem.tamano || 0) / 1024) | number:'1.2-2' }} KB</small>
       </div>
     <button (click)="previewModalVisible = false" cButton color="secondary" variant="ghost">
-      Cerrar
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
   </c-modal-footer>
 </c-modal>
 
-<c-modal [visible]="confirmationModalVisible" (visibleChange)="confirmationModalVisible = $event" backdrop="static">
-  <c-modal-header class="bg-danger text-white">
-    <h5 cModalTitle>{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
-    <button (click)="cancelDelete()" cButtonClose white></button>
-  </c-modal-header>
-  <c-modal-body>
-    ¿Estás seguro de que deseas eliminar la imagen <strong>{{ itemToDelete?.nombre }}</strong>?
-    <br>
-    <small class="text-muted">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</small>
-  </c-modal-body>
-  <c-modal-footer>
-    <button (click)="cancelDelete()" cButton color="secondary">
-      Cancelar
-    </button>
-    <button (click)="confirmDelete()" cButton color="danger" class="text-white">
-      Eliminar
-    </button>
-  </c-modal-footer>
-</c-modal>
+<app-confirmation-modal
+  [visible]="confirmationModalVisible"
+  [title]="'COMMON.CONFIRM_DELETE' | translate"
+  [message]="('COMMON.VERIFY_DELETE' | translate) + (itemToDelete ? ' (' + itemToDelete.nombre + ')' : '')"
+  [confirmText]="'COMMON.DELETE' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'danger'"
+  [loading]="loading"
+  (visibleChange)="confirmationModalVisible = $event"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-confirmation-modal>

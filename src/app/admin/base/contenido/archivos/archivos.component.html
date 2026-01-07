@@ -271,21 +271,24 @@
 </c-container>
 
 <c-modal [visible]="confirmationModalVisible" (visibleChange)="confirmationModalVisible = $event" backdrop="static">
-  <c-modal-header class="bg-danger text-white">
-    <h5 cModalTitle>{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
-    <button (click)="cancelDelete()" cButtonClose white></button>
+  <c-modal-header class="border-bottom-0">
+    <h5 cModalTitle class="fw-bold text-danger">{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
   </c-modal-header>
   <c-modal-body>
-    ¿Estás seguro de que deseas eliminar el archivo <strong>{{ itemToDelete?.nombre }}</strong>?
-    <br>
-    <small class="text-muted">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</small>
+    <div class="text-center py-3">
+      <svg cIcon name="cilTrash" size="4xl" class="text-danger mb-3 opacity-75"></svg>
+      <p class="mb-1">{{ 'COMMON.VERIFY_DELETE' | translate }}</p>
+      <h4 class="fw-bold text-dark">{{ itemToDelete?.nombre }}</h4>
+      <p class="text-muted small mt-2">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</p>
+    </div>
   </c-modal-body>
-  <c-modal-footer>
-    <button (click)="cancelDelete()" cButton color="secondary">
-      Cancelar
-    </button>
-    <button (click)="confirmDelete()" cButton color="danger" class="text-white">
-      Eliminar
+  <c-modal-footer class="border-top-0 justify-content-center pb-4">
+    <button cButton color="secondary" variant="ghost" (click)="cancelDelete()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button cButton color="danger" class="px-4" (click)="confirmDelete()" [disabled]="loading">
+      @if (loading) {
+      <c-spinner size="sm" class="me-2"></c-spinner>
+      }
+      {{ 'COMMON.DELETE' | translate }}
     </button>
   </c-modal-footer>
 </c-modal>

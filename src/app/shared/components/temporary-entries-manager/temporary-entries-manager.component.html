@@ -3,20 +3,20 @@
   <c-card-header>
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <h2 cCardTitle>{{ 'AUTO.ENTRADAS_TEMPORALES_NO_GUARDAD' | translate }}</h2>
+        <h2 cCardTitle>{{ 'ADMIN.TEMP_ENTRIES.TITLE' | translate }}</h2>
         <p class="text-muted">
-          Estas son las entradas que se guardaron temporalmente durante cierres de sesión.
+          {{ 'ADMIN.TEMP_ENTRIES.SUBTITLE' | translate }}
         </p>
       </div>
       <button cButton color="primary" (click)="createNewEntry()">
-        <i class="cil-plus me-1"></i> Nueva Entrada
+        <i class="cil-plus me-1"></i> {{ 'ADMIN.TEMP_ENTRIES.NEW_ENTRY' | translate }}
       </button>
     </div>
   </c-card-header>
   <c-card-body>
     @if (entries.length === 0) {
       <div class="text-center py-4">
-        <p>{{ 'AUTO.NO_HAY_ENTRADAS_TEMPORALES_GUA' | translate }}</p>
+        <p>{{ 'ADMIN.TEMP_ENTRIES.NO_ENTRIES' | translate }}</p>
       </div>
     }
 
@@ -26,24 +26,24 @@
           <c-col lg="6">
             <c-card class="mb-3">
               <c-card-body>
-                <h5 class="card-title">{{ entry.title || 'Sin título' }}</h5>
+                <h5 class="card-title">{{ entry.title || ('ADMIN.TEMP_ENTRIES.NO_TITLE' | translate) }}</h5>
                 <p class="card-text text-muted small">
-                  {{ entry.description || 'Entrada sin descripción' }}
+                  {{ entry.description || ('ADMIN.TEMP_ENTRIES.NO_SUMMARY' | translate) }}
                 </p>
                 <p class="card-text">
                   <small class="text-muted">
-                    Guardado: {{ entry.timestamp | date: 'medium' }}
+                    {{ 'ADMIN.TEMP_ENTRIES.SAVED_AT' | translate }} {{ entry.timestamp | date: 'medium' }}
                   </small>
                 </p>
                 <div class="btn-group">
                   <button cButton color="success" size="sm" (click)="recoverEntry(entry)">
-                    <i class="cil-download me-1"></i> Recuperar
+                    <i class="cil-download me-1"></i> {{ 'ADMIN.TEMP_ENTRIES.RECOVER' | translate }}
                   </button>
                   <button cButton color="secondary" size="sm" (click)="viewEntry(entry)">
-                    <i class="cil-file me-1"></i> Ver
+                    <i class="cil-file me-1"></i> {{ 'ADMIN.TEMP_ENTRIES.VIEW' | translate }}
                   </button>
                   <button cButton color="danger" size="sm" (click)="deleteEntry(entry.id)">
-                    <i class="cil-trash me-1"></i> Eliminar
+                    <i class="cil-trash me-1"></i> {{ 'ADMIN.TEMP_ENTRIES.DELETE' | translate }}
                   </button>
                 </div>
               </c-card-body>
@@ -56,7 +56,7 @@
     @if (entries.length > 0) {
       <div class="text-center mt-3">
         <button cButton color="outline-danger" (click)="clearAll()">
-          <i class="cil-broom me-1"></i> Limpiar Todas
+          <i class="cil-broom me-1"></i> {{ 'ADMIN.TEMP_ENTRIES.CLEAR_ALL' | translate }}
         </button>
       </div>
     }
@@ -70,33 +70,46 @@
   (visibleChange)="viewModalVisible = $event"
 >
   <c-modal-header>
-    <h5 cModalTitle>Vista Previa: {{ selectedEntry?.title }}</h5>
+    <h5 cModalTitle>{{ 'ADMIN.TEMP_ENTRIES.PREVIEW_TITLE' | translate }}: {{ selectedEntry?.title }}</h5>
   </c-modal-header>
   <c-modal-body>
     @if (selectedEntry) {
       <div>
         <p>
-          <strong>{{ 'AUTO.T_TULO' | translate }}</strong>
-          {{ selectedEntry.formData.titulo || 'Sin título' }}
+          <strong>{{ 'ADMIN.TEMP_ENTRIES.TITLE_FIELD' | translate }}</strong>
+          {{ selectedEntry.formData.titulo || ('ADMIN.TEMP_ENTRIES.NO_TITLE' | translate) }}
         </p>
         <p>
-          <strong>{{ 'AUTO.SUBT_TULO' | translate }}</strong>
-          {{ selectedEntry.formData.subtitulo || 'Sin subtítulo' }}
+          <strong>{{ 'ADMIN.TEMP_ENTRIES.SUBTITLE_FIELD' | translate }}</strong>
+          {{ selectedEntry.formData.subtitulo || ('ADMIN.TEMP_ENTRIES.NO_SUBTITLE' | translate) }}
         </p>
         <p>
-          <strong>{{ 'AUTO.RESUMEN' | translate }}</strong>
-          {{ selectedEntry.formData.resumen || 'Sin resumen' }}
+          <strong>{{ 'ADMIN.TEMP_ENTRIES.SUMMARY_FIELD' | translate }}</strong>
+          {{ selectedEntry.formData.resumen || ('ADMIN.TEMP_ENTRIES.NO_SUMMARY' | translate) }}
         </p>
-        <p><strong>{{ 'AUTO.CONTENIDO' | translate }}</strong></p>
+        <p><strong>{{ 'ADMIN.TEMP_ENTRIES.CONTENT_FIELD' | translate }}</strong></p>
         <div
           class="border p-2 bg-light"
-          [innerHTML]="selectedEntry.formData.contenido || 'Sin contenido'"
+          [innerHTML]="selectedEntry.formData.contenido || ('ADMIN.TEMP_ENTRIES.NO_CONTENT' | translate)"
         ></div>
       </div>
     }
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="viewModalVisible = false">{{ 'AUTO.CERRAR' | translate }}</button>
-    <button cButton color="primary" (click)="recoverSelectedEntry()">{{ 'AUTO.RECUPERAR' | translate }}</button>
+    <button cButton color="primary" (click)="recoverSelectedEntry()">{{ 'ADMIN.TEMP_ENTRIES.RECOVER' | translate }}</button>
   </c-modal-footer>
 </c-modal>
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [visible]="confirmationVisible"
+  [title]="confirmationTitle"
+  [message]="confirmationMessage"
+  [type]="confirmationType"
+  [confirmText]="'COMMON.YES_DELETE' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  (visibleChange)="confirmationVisible = $event"
+  (confirm)="confirmAction()"
+  (cancel)="cancelAction()"
+></app-confirmation-modal>

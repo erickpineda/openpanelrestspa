@@ -13,6 +13,8 @@ import { UsuarioService } from '../../../core/services/data/usuario.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
 import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
 import { LoggerService } from '../../../core/services/logger.service';
+import { TranslationService } from '../../../core/services/translation.service';
+import { ToastService } from '../../../core/services/ui/toast.service';
 
 @Component({
   selector: 'app-listado-comentarios',
@@ -52,8 +54,10 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     private entradaService: EntradaService,
     private commonFuncService: CommonFunctionalityService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private translate: TranslationService,
+    private toast: ToastService
+  ) { }
 
   ngOnInit(): void {
     this.initList();
@@ -302,14 +306,11 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(): void {
-    if (!this.comentarioToDelete?.idComentario) {
-      this.showDeleteModal = false;
-      return;
-    }
+    if (!this.comentarioToDelete?.idComentario) return;
 
     this.cargando = true;
     this.comentarioService
-      .borrar(this.comentarioToDelete.idComentario!)
+      .borrar(this.comentarioToDelete.idComentario)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
@@ -319,12 +320,14 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: () => {
+          this.toast.showSuccess(this.translate.instant('ADMIN.COMMENTS.SUCCESS.DELETE'), this.translate.instant('MENU.COMMENTS'));
           this.showDeleteModal = false;
           this.comentarioToDelete = null;
-          this.search();
+          this.obtenerListaComentarios();
         },
-        error: (err) => {
-          this.log.error('comentarios borrar', err);
+        error: (err: any) => {
+          this.log.error('comentario eliminar', err || 'Error desconocido');
+          this.toast.showError(this.translate.instant('ADMIN.COMMENTS.ERROR.DELETE'), this.translate.instant('MENU.COMMENTS'));
           this.showDeleteModal = false;
           this.comentarioToDelete = null;
         },

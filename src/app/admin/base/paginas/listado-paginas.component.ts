@@ -21,6 +21,7 @@ import { ErrorBoundaryService } from '../../../core/errors/error-boundary/error-
 import { ErrorBoundaryComponent } from '../../../shared/components/errors/error-boundary/error-boundary.component';
 import { LoggerService } from '../../../core/services/logger.service';
 import { Router } from '@angular/router';
+import { TranslationService } from '../../../core/services/translation.service';
 
 @Component({
   selector: 'app-listado-paginas',
@@ -80,8 +81,9 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     private router: Router,
     private entradaCatalogService: EntradaCatalogService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
-  ) {}
+    private zone: NgZone,
+    private translate: TranslationService
+  ) { }
 
   // #region Lifecycle Methods
 
@@ -96,7 +98,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
   ngAfterViewInit(): void {
     try {
       this.cdr.detectChanges();
-    } catch {}
+    } catch { }
   }
 
   ngOnDestroy(): void {
@@ -262,7 +264,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     this.cdr.markForCheck();
     try {
       this.cdr.detectChanges();
-    } catch {}
+    } catch { }
   }
 
   obtenerListaEntradas(page: number): void {
@@ -317,7 +319,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     this.cdr.markForCheck();
     try {
       this.cdr.detectChanges();
-    } catch {}
+    } catch { }
   }
 
   public onPageSizeChange(size: number): void {
@@ -396,16 +398,18 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
             this.entradaABorrar = null;
             this.visible = false;
             this.toastService.showSuccess(
-              'La página se ha eliminado correctamente.',
-              'Página eliminada'
+              this.translate.instant('ADMIN.PAGES.SUCCESS.DELETE'),
+              this.translate.instant('MENU.PAGES')
             );
             this.cdr.markForCheck();
+            this.cdr.detectChanges();
           },
           error: (error) => {
             this.log.error('Error al eliminar la página:', error);
             this.visible = false;
-            this.mostrarError('Error al eliminar la página: ' + error.message);
+            this.mostrarError(this.translate.instant('ADMIN.PAGES.ERROR.DELETE'));
             this.cdr.markForCheck();
+            this.cdr.detectChanges();
           },
         });
     }
@@ -427,7 +431,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     this.cdr.markForCheck();
     try {
       this.cdr.detectChanges();
-    } catch {}
+    } catch { }
   }
 
   // #endregion
@@ -479,7 +483,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
   checkFechaPublicacion(fechaPublicacion: Date): string {
     return fechaPublicacion
       ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', true)
-      : 'No publicada';
+      : this.translate.instant('ADMIN.PAGES.TABLE.NOT_PUBLISHED');
   }
 
   getEstadoInfo(entrada: Entrada): {

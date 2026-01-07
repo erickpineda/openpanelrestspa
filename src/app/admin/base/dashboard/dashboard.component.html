@@ -7,8 +7,8 @@
             <svg cIcon name="cilSpeedometer" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 cCardTitle class="mb-0 fw-bold text-primary">{{ 'AUTO.DASHBOARD' | translate }}</h5>
-            <small class="text-muted">{{ 'AUTO.RESUMEN_GENERAL_Y_ESTAD_STICAS' | translate }}</small>
+            <h5 cCardTitle class="mb-0 fw-bold text-primary">{{ 'ADMIN.DASHBOARD.WELCOME_TITLE' | translate }}</h5>
+            <small class="text-muted">{{ 'ADMIN.DASHBOARD.WELCOME_SUBTITLE' | translate }}</small>
           </div>
         </div>
       </c-col>
@@ -28,7 +28,7 @@
   <c-card-body>
     <div class="d-flex justify-content-between align-items-end mb-4">
       <h5 cCardTitle class="fw-bold text-secondary mb-0">
-        <svg cIcon name="cilChartPie" class="me-2 text-info"></svg>Estadísticas Rápidas
+        <svg cIcon name="cilChartPie" class="me-2 text-info"></svg>{{ 'ADMIN.DASHBOARD.QUICK_STATS' | translate }}
       </h5>
       <div class="hstack gap-3">
         <button cButton color="light" size="sm" class="text-primary shadow-sm" (click)="openSettings()">
@@ -37,9 +37,9 @@
             name="cilSettings"
             class="me-2"
             size="sm"
-            title="Ajustar Parámetros"
+            [title]="'ADMIN.DASHBOARD.ADJUST_SETTINGS' | translate"
           ></svg>
-          Ajustar Parámetros
+          {{ 'ADMIN.DASHBOARD.ADJUST_SETTINGS' | translate }}
         </button>
       </div>
     </div>
@@ -47,7 +47,7 @@
     <c-row class="g-3 mb-4">
       <c-col lg="3">
         <app-kpi-card
-          label="Usuarios Activos"
+          [label]="'ADMIN.DASHBOARD.ACTIVE_USERS' | translate"
           [value]="cantidadUsuariosActivos"
           iconName="cilUser"
           color="primary"
@@ -56,7 +56,7 @@
       </c-col>
       <c-col lg="3">
         <app-kpi-card
-          label="Total Entradas"
+          [label]="'ADMIN.DASHBOARD.TOTAL_ENTRIES' | translate"
           [value]="totalEntradas"
           iconName="cilNotes"
           color="info"
@@ -65,7 +65,7 @@
       </c-col>
       <c-col lg="3">
         <app-kpi-card
-          label="Publicadas ({{ seriesDays }}d)"
+          [label]="'ADMIN.DASHBOARD.PUBLISHED_LAST_DAYS' | translate: { days: seriesDays }"
           [value]="kpiPublicadas"
           iconName="cilCheckCircle"
           color="success"
@@ -74,7 +74,7 @@
       </c-col>
       <c-col lg="3">
         <app-kpi-card
-          label="No publicadas ({{ seriesDays }}d)"
+          [label]="'ADMIN.DASHBOARD.UNPUBLISHED_LAST_DAYS' | translate: { days: seriesDays }"
           [value]="kpiNoPublicadas"
           iconName="cilXCircle"
           color="warning"
@@ -90,7 +90,7 @@
         <c-card class="shadow-sm h-100 border-0">
           <c-card-header class="bg-white border-bottom py-3">
             <h6 class="mb-0 fw-bold text-secondary">
-              <svg cIcon name="cilGraph" class="me-2 text-primary"></svg>Evolución y Series
+              <svg cIcon name="cilGraph" class="me-2 text-primary"></svg>{{ 'ADMIN.DASHBOARD.EVOLUTION_SERIES' | translate }}
             </h6>
           </c-card-header>
           <c-card-body>
@@ -201,17 +201,17 @@
               class="retry-btn-top-users"
               (click)="loadTopWidgets()"
             >
-              Reintentar
+              {{ 'COMMON.RETRY' | translate }}
             </button>
           </div>
         }
         <c-card class="shadow-sm border-0 h-100">
           <c-card-header class="bg-white border-bottom py-3">
-             <h6 class="mb-0 fw-bold text-secondary">{{ 'AUTO.TOP_USUARIOS' | translate }}</h6>
+             <h6 class="mb-0 fw-bold text-secondary">{{ 'ADMIN.DASHBOARD.TOP_USERS' | translate }}</h6>
           </c-card-header>
           <c-card-body>
             <app-dashboard-top-panel
-              title="Top Usuarios"
+              [title]="'ADMIN.DASHBOARD.TOP_USERS' | translate"
               [items]="topUsers"
               [loading]="loadingTopUsers"
               [error]="errorTopUsers"
@@ -232,11 +232,11 @@
       <c-col lg="6">
         <c-card class="shadow-sm border-0 h-100">
           <c-card-header class="bg-white border-bottom py-3">
-             <h6 class="mb-0 fw-bold text-secondary">{{ 'AUTO.TOP_CATEGOR_AS' | translate }}</h6>
+             <h6 class="mb-0 fw-bold text-secondary">{{ 'ADMIN.DASHBOARD.TOP_CATEGORIES' | translate }}</h6>
           </c-card-header>
           <c-card-body>
             <app-dashboard-top-panel
-              title="Top Categorías"
+              [title]="'ADMIN.DASHBOARD.TOP_CATEGORIES' | translate"
               [items]="topCategories"
               [loading]="loadingTopCategories"
               [error]="errorTopCategories"
@@ -252,11 +252,11 @@
       <c-col lg="6" class="mt-4">
         <c-card class="shadow-sm border-0 h-100">
           <c-card-header class="bg-white border-bottom py-3">
-             <h6 class="mb-0 fw-bold text-secondary">{{ 'AUTO.TOP_TAGS' | translate }}</h6>
+             <h6 class="mb-0 fw-bold text-secondary">{{ 'ADMIN.DASHBOARD.TOP_TAGS' | translate }}</h6>
           </c-card-header>
           <c-card-body>
             <app-dashboard-top-panel
-              title="Top Tags"
+              [title]="'ADMIN.DASHBOARD.TOP_TAGS' | translate"
               [items]="topTags"
               [loading]="loadingTopTags"
               [error]="errorTopTags"

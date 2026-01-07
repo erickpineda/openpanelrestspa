@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Privilegio } from '../../../../../core/models/privilegio.model';
+import { TranslationService } from '../../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-privilegio-form',
@@ -12,6 +13,8 @@ export class PrivilegioFormComponent {
   @Input() isEditing = false;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() onSave = new EventEmitter<Privilegio>();
+
+  constructor(private translate: TranslationService) { }
 
   manualCodeEntry = false;
 

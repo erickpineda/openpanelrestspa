@@ -7,200 +7,148 @@
             <svg cIcon name="cilSettings" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.AJUSTES' | translate }}</h5>
-            <small class="text-muted">{{ 'AUTO.CONFIGURACI_N_GENERAL_DEL_SIST' | translate }}</small>
+            <h5 class="mb-0 fw-bold text-gray-800">{{ 'ADMIN.SETTINGS.TITLE' | translate }}</h5>
+            <small class="text-muted">{{ 'ADMIN.SETTINGS.SUBTITLE' | translate }}</small>
           </div>
         </div>
         <div class="btn-group" role="group" aria-label="Acciones">
           <button cButton color="primary" class="text-white shadow-sm" (click)="openNew()">
             <svg cIcon name="cilPlus" class="me-2"></svg>
-            Nuevo Ajuste
+            {{ 'ADMIN.SETTINGS.NEW_SETTING' | translate }}
           </button>
         </div>
       </div>
     </c-card-header>
     <c-card-body [attr.aria-busy]="loading ? 'true' : null">
       @if (error) {
-        <c-alert color="danger" class="d-flex align-items-center justify-content-between mb-4 rounded-3 shadow-sm border-0">
-          <div class="d-flex align-items-center gap-2">
-            <svg cIcon name="cilWarning" class="flex-shrink-0"></svg>
-            <span>{{ error }}</span>
-          </div>
-          <button cButton color="danger" variant="outline" size="sm" (click)="load()">{{ 'AUTO.REINTENTAR' | translate }}</button>
-        </c-alert>
+      <c-alert color="danger"
+        class="d-flex align-items-center justify-content-between mb-4 rounded-3 shadow-sm border-0">
+        <div class="d-flex align-items-center gap-2">
+          <svg cIcon name="cilWarning" class="flex-shrink-0"></svg>
+          <span>{{ error }}</span>
+        </div>
+        <button cButton color="danger" variant="outline" size="sm" (click)="load()">{{ 'COMMON.RETRY' | translate
+          }}</button>
+      </c-alert>
       }
 
-      <div class="d-flex flex-column flex-md-row gap-3 mb-4 justify-content-between align-items-end bg-light p-3 rounded">
+      <div
+        class="d-flex flex-column flex-md-row gap-3 mb-4 justify-content-between align-items-end bg-light p-3 rounded">
         <div class="d-flex flex-column flex-md-row gap-3 flex-grow-1 w-100">
-           <div class="flex-grow-1" style="max-width: 400px;">
-            <label class="form-label text-muted small text-uppercase fw-bold">{{ 'AUTO.BUSCAR' | translate }}</label>
+          <div class="flex-grow-1" style="max-width: 400px;">
+            <label class="form-label text-muted small text-uppercase fw-bold">{{ 'COMMON.SEARCH' | translate }}</label>
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0 text-secondary">
                 <svg cIcon name="cilSearch" size="sm"></svg>
               </span>
-              <input
-                cFormControl
-                type="text"
-                [value]="basicSearchText"
+              <input cFormControl type="text" [value]="basicSearchText"
                 (input)="onBasicSearchTextChange($any($event.target).value)"
-                placeholder="Buscar ajuste..."
-                class="border-start-0 ps-0 shadow-none"
-                [disabled]="loading"
-              />
+                [placeholder]="'ADMIN.SETTINGS.SEARCH_PLACEHOLDER' | translate" class="border-start-0 ps-0 shadow-none"
+                [disabled]="loading" />
             </div>
           </div>
           <div class="d-flex align-items-end">
-            <button
-              cButton
-              [color]="showAdvanced ? 'primary' : 'secondary'"
-              variant="outline"
-              (click)="toggleAdvanced()"
-              [disabled]="loading"
-              class="d-flex align-items-center gap-2"
-            >
+            <button cButton [color]="showAdvanced ? 'primary' : 'secondary'" variant="outline"
+              (click)="toggleAdvanced()" [disabled]="loading" class="d-flex align-items-center gap-2">
               <svg cIcon name="cilFilter" size="sm"></svg>
-              <span>Filtros {{ showAdvanced ? 'Activos' : '' }}</span>
+              <span>{{ 'COMMON.FILTERS' | translate }} {{ showAdvanced ? ('COMMON.ACTIVE' | translate) : '' }}</span>
             </button>
           </div>
         </div>
-         <div class="d-flex align-items-end">
-            <select
-              cSelect
-              [ngModel]="pageSize"
-              (ngModelChange)="onPageSizeChange($event)"
-              name="pageSizeSelect"
-              class="form-select-sm"
-              style="width: auto"
-              [disabled]="loading"
-            >
-              <option value="5">{{ 'AUTO.5_REGISTROS' | translate }}</option>
-              <option value="10">{{ 'AUTO.10_REGISTROS' | translate }}</option>
-              <option value="20">{{ 'AUTO.20_REGISTROS' | translate }}</option>
-            </select>
+        <div class="d-flex align-items-end">
+          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect"
+            class="form-select-sm" style="width: auto" [disabled]="loading">
+            <option value="5">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 5 } }}</option>
+            <option value="10">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 10 } }}</option>
+            <option value="20">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 20 } }}</option>
+            <option value="50">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 50 } }}</option>
+          </select>
         </div>
       </div>
 
       @if (showAdvanced) {
-        <div class="mb-4 p-3 bg-light rounded border animate__animated animate__fadeIn">
-          <c-row class="g-3 align-items-end">
-            <c-col xs="12" md="4">
-              <label class="form-label small fw-bold text-muted">{{ 'AUTO.CATEGOR_A' | translate }}</label>
-              <input
-                cFormControl
-                type="text"
-                placeholder="Buscar por categoría..."
-                [value]="filtroCategoria"
-                (input)="filtroCategoria = $any($event.target).value"
-                [disabled]="loading"
-              />
-            </c-col>
-            <c-col xs="12" md="4">
-              <label class="form-label small fw-bold text-muted">{{ 'AUTO.CLAVE' | translate }}</label>
-              <input
-                cFormControl
-                type="text"
-                placeholder="Buscar por clave..."
-                [value]="filtroClave"
-                (input)="filtroClave = $any($event.target).value"
-                [disabled]="loading"
-              />
-            </c-col>
-            <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2">
-              <button
-                cButton
-                color="secondary"
-                variant="ghost"
-                (click)="reset()"
-                [disabled]="loading"
-              >
-                Limpiar
-              </button>
-              <button
-                cButton
-                color="primary"
-                (click)="search()"
-                [disabled]="loading"
-              >
-                Aplicar Filtros
-              </button>
-            </c-col>
-          </c-row>
-        </div>
+      <div class="mb-4 p-3 bg-light rounded border animate__animated animate__fadeIn">
+        <c-row class="g-3 align-items-end">
+          <c-col xs="12" md="4">
+            <label class="form-label small fw-bold text-muted">{{ 'ADMIN.SETTINGS.TABLE.CATEGORY' | translate }}</label>
+            <input cFormControl type="text" [placeholder]="'ADMIN.SETTINGS.FILTER_BY_CATEGORY' | translate"
+              [value]="filtroCategoria" (input)="filtroCategoria = $any($event.target).value" [disabled]="loading" />
+          </c-col>
+          <c-col xs="12" md="4">
+            <label class="form-label small fw-bold text-muted">{{ 'ADMIN.SETTINGS.TABLE.KEY' | translate }}</label>
+            <input cFormControl type="text" [placeholder]="'ADMIN.SETTINGS.FILTER_BY_KEY' | translate"
+              [value]="filtroClave" (input)="filtroClave = $any($event.target).value" [disabled]="loading" />
+          </c-col>
+          <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2">
+            <button cButton color="secondary" variant="ghost" (click)="reset()" [disabled]="loading">
+              {{ 'COMMON.CLEAR_FILTERS' | translate }}
+            </button>
+            <button cButton color="primary" (click)="search()" [disabled]="loading">
+              {{ 'COMMON.APPLY_FILTERS' | translate }}
+            </button>
+          </c-col>
+        </c-row>
+      </div>
       }
 
       <div class="position-relative">
         @if (loading) {
-          <div
-            class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75"
-            style="z-index: 10;"
-          >
-            <div class="text-center">
-              <c-spinner color="primary"></c-spinner>
-              <p class="mt-2 text-muted small fw-bold">{{ 'AUTO.CARGANDO_AJUSTES' | translate }}</p>
-            </div>
+        <div
+          class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75"
+          style="z-index: 10;">
+          <div class="text-center">
+            <c-spinner color="primary"></c-spinner>
+            <p class="mt-2 text-muted small fw-bold">{{ 'COMMON.LOADING' | translate }}</p>
           </div>
+        </div>
         }
 
         <div class="table-responsive">
-          <table
-            cTable
-            hover
-            striped
-            class="align-middle mb-0 border-start border-end"
-          >
+          <table cTable hover striped class="align-middle mb-0 border-start border-end">
             <thead class="bg-light border-bottom">
               <tr>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.CATEGOR_A' | translate }}</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.CLAVE' | translate }}</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'AUTO.VALOR' | translate }}</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-end">{{ 'AUTO.ACCIONES' | translate }}</th>
+                <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase"
+                  style="width: 250px;">{{ 'ADMIN.SETTINGS.TABLE.CATEGORY' | translate }}</th>
+                <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">{{
+                  'ADMIN.SETTINGS.TABLE.KEY' | translate }}</th>
+                <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">{{
+                  'ADMIN.SETTINGS.TABLE.VALUE' | translate }}</th>
+                <th scope="col" class="py-3 pe-4 border-0 text-secondary small fw-bold text-uppercase text-end"
+                  style="width: 120px;">{{ 'ADMIN.SETTINGS.TABLE.ACTIONS' | translate }}</th>
               </tr>
             </thead>
             <tbody>
               @for (a of pagedAjustes; track trackByAjuste($index, a)) {
-                <tr>
-                  <td class="px-3">
-                    <c-badge color="info" shape="rounded-pill" class="fw-normal">
-                      {{ a.categoria }}
-                    </c-badge>
-                  </td>
-                  <td class="px-3 fw-medium text-dark">{{ a.clave }}</td>
-                  <td class="px-3 text-muted text-truncate" style="max-width: 300px" [title]="a.valor">
-                    {{ a.valor }}
-                  </td>
-                  <td class="px-3 text-end">
-                    <button
-                      cButton
-                      color="info"
-                      variant="ghost"
-                      size="sm"
-                      (click)="openEdit(a)"
-                      cTooltip="Editar"
-                      class="me-1"
-                    >
-                      <svg cIcon name="cilPen" size="sm"></svg>
-                    </button>
-                    <button
-                      cButton
-                      color="danger"
-                      variant="ghost"
-                      size="sm"
-                      (click)="delete(a)"
-                      cTooltip="Eliminar"
-                    >
-                      <svg cIcon name="cilTrash" size="sm"></svg>
-                    </button>
-                  </td>
-                </tr>
+              <tr>
+                <td class="px-3">
+                  <c-badge color="info" shape="rounded-pill" class="fw-normal">
+                    {{ a.categoria }}
+                  </c-badge>
+                </td>
+                <td class="px-3 fw-medium text-dark">{{ a.clave }}</td>
+                <td class="px-3 text-muted text-truncate" style="max-width: 300px" [title]="a.valor">
+                  {{ a.valor }}
+                </td>
+                <td class="px-3 text-end">
+                  <button cButton color="info" variant="ghost" size="sm" (click)="openEdit(a)"
+                    [cTooltip]="'COMMON.EDIT' | translate" class="me-1">
+                    <svg cIcon name="cilPen" size="sm"></svg>
+                  </button>
+                  <button cButton color="danger" variant="ghost" size="sm" (click)="delete(a)"
+                    [cTooltip]="'COMMON.DELETE' | translate">
+                    <svg cIcon name="cilTrash" size="sm"></svg>
+                  </button>
+                </td>
+              </tr>
               } @empty {
-                <tr>
-                  <td colspan="4" class="text-center py-5 text-muted">
-                     <div class="d-flex flex-column align-items-center">
-                       <svg cIcon name="cilSettings" size="xl" class="mb-3 text-secondary opacity-50"></svg>
-                       <span>{{ 'AUTO.NO_SE_HAN_ENCONTRADO_AJUSTES' | translate }}</span>
-                     </div>
-                  </td>
-                </tr>
+              <tr>
+                <td colspan="4" class="text-center py-5 text-muted">
+                  <div class="d-flex flex-column align-items-center">
+                    <svg cIcon name="cilSettings" size="xl" class="mb-3 text-secondary opacity-50"></svg>
+                    <span>{{ 'ADMIN.SETTINGS.NO_SETTINGS_FOUND' | translate }}</span>
+                  </div>
+                </td>
+              </tr>
               }
             </tbody>
           </table>
@@ -208,43 +156,52 @@
       </div>
     </c-card-body>
     <c-card-footer class="bg-white border-top py-3">
-        <app-op-pagination
-          [align]="'end'"
-          [totalPages]="getTotalPages()"
-          [currentPage]="pageNo"
-          (pageChange)="onPageChange($event)"
-        >
-        </app-op-pagination>
+      <app-op-pagination [align]="'end'" [totalPages]="getTotalPages()" [currentPage]="pageNo"
+        (pageChange)="onPageChange($event)">
+      </app-op-pagination>
     </c-card-footer>
   </c-card>
 </c-container>
 
 <c-modal [visible]="modalVisible" (visibleChange)="modalVisible = $event" backdrop="static" size="lg">
   <c-modal-header class="bg-primary text-white">
-    <h5 cModalTitle class="fw-bold">{{ editItem ? 'Editar Ajuste' : 'Nuevo Ajuste' }}</h5>
+    <h5 cModalTitle class="fw-bold">{{ editItem ? ('ADMIN.SETTINGS.EDIT_SETTING' | translate) :
+      ('ADMIN.SETTINGS.NEW_SETTING' | translate) }}</h5>
     <button cButtonClose white (click)="closeModal()"></button>
   </c-modal-header>
   <c-modal-body class="p-4">
     <form [formGroup]="form">
       <div class="mb-4">
-        <label class="form-label fw-bold text-secondary small">{{ 'AUTO.CATEGOR_A' | translate }}</label>
-        <input cFormControl type="text" formControlName="categoria" placeholder="Ej. General" />
+        <label class="form-label fw-bold text-secondary small">{{ 'ADMIN.SETTINGS.TABLE.CATEGORY' | translate }}</label>
+        <input cFormControl type="text" formControlName="categoria"
+          [placeholder]="'ADMIN.SETTINGS.CATEGORY_PLACEHOLDER' | translate" />
       </div>
       <div class="mb-4">
-        <label class="form-label fw-bold text-secondary small">{{ 'AUTO.CLAVE' | translate }}</label>
-        <input cFormControl type="text" formControlName="clave" placeholder="Ej. site_name" />
+        <label class="form-label fw-bold text-secondary small">{{ 'ADMIN.SETTINGS.TABLE.KEY' | translate }}</label>
+        <input cFormControl type="text" formControlName="clave"
+          [placeholder]="'ADMIN.SETTINGS.KEY_PLACEHOLDER' | translate" />
       </div>
       <div class="mb-4">
-        <label class="form-label fw-bold text-secondary small">{{ 'AUTO.VALOR' | translate }}</label>
-        <textarea cFormControl formControlName="valor" rows="4" placeholder="Valor del ajuste..."></textarea>
+        <label class="form-label fw-bold text-secondary small">{{ 'ADMIN.SETTINGS.TABLE.VALUE' | translate }}</label>
+        <textarea cFormControl formControlName="valor" rows="4"
+          [placeholder]="'ADMIN.SETTINGS.VALUE_PLACEHOLDER' | translate"></textarea>
+      </div>
+      <div class="col-12">
+        <label class="form-label small fw-bold text-muted">{{ 'ADMIN.SETTINGS.TABLE.DESCRIPTION' | translate }}</label>
+        <textarea cFormControl rows="2" formControlName="descripcion"
+          [placeholder]="'ADMIN.SETTINGS.DESCRIPTION_PLACEHOLDER' | translate"></textarea>
       </div>
     </form>
   </c-modal-body>
   <c-modal-footer class="bg-light border-top-0">
-    <button cButton color="secondary" variant="ghost" (click)="closeModal()">{{ 'AUTO.CANCELAR' | translate }}</button>
+    <button cButton color="secondary" variant="ghost" (click)="closeModal()">{{ 'COMMON.CANCEL' | translate }}</button>
     <button cButton color="primary" [disabled]="form.invalid" (click)="save()">
       <svg cIcon name="cilSave" class="me-2"></svg>
-      Guardar
+      {{ 'COMMON.SAVE' | translate }}
     </button>
   </c-modal-footer>
 </c-modal>
+<app-confirmation-modal [visible]="showDeleteModal" [title]="'ADMIN.SETTINGS.DELETE_SETTING' | translate"
+  [message]="('ADMIN.SETTINGS.CONFIRM_DELETE_MSG' | translate) + (itemToDelete ? ': ' + itemToDelete.clave : '') + '?'"
+  [confirmText]="'COMMON.DELETE' | translate" [cancelText]="'COMMON.CANCEL' | translate" [type]="'danger'"
+  [loading]="loading" (visibleChange)="showDeleteModal = $event" (confirm)="confirmDelete()"></app-confirmation-modal>

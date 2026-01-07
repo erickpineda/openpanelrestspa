@@ -84,4 +84,4 @@ import { TranslatePipe } from './pipes/translate.pipe';
     TranslatePipe,
   ],
 })
-export class SharedOPModule {}
+export class SharedOPModule { }

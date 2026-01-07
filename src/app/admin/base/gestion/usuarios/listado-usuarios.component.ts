@@ -9,6 +9,7 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
 import { OPConstants } from '../../../../shared/constants/op-global.constants';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-usuarios-list',
@@ -49,8 +50,9 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private log: LoggerService,
     private searchUtil: SearchUtilService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private translate: TranslationService
+  ) { }
 
   ngOnInit(): void {
     this.loadRoles();
@@ -80,7 +82,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     };
 
     const handleError = (err: any) => {
-      this.error = 'Error cargando usuarios';
+      this.error = this.translate.instant('ADMIN.USERS.ERROR_LOADING');
       this.log.error('usuarios listar', err || 'Error desconocido');
     };
 
@@ -147,7 +149,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
           this.roles = roles;
         },
-        error: () => {},
+        error: () => { },
       });
   }
 
@@ -243,15 +245,16 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
     op$.subscribe({
       next: () => {
-        this.toast.showSuccess(hasId ? 'Usuario actualizado' : 'Usuario creado', 'Usuarios');
+        this.toast.showSuccess(hasId ? this.translate.instant('ADMIN.USERS.SUCCESS.UPDATE') : this.translate.instant('ADMIN.USERS.SUCCESS.CREATE'), this.translate.instant('MENU.USERS'));
         this.loading = false;
         this.editModalVisible = false;
         this.load();
       },
       error: (err: any) => {
-        this.toast.showError(hasId ? 'Error actualizando' : 'Error creando', 'Usuarios');
+        this.toast.showError(hasId ? this.translate.instant('ADMIN.USERS.ERROR.UPDATE') : this.translate.instant('ADMIN.USERS.ERROR.CREATE'), this.translate.instant('MENU.USERS'));
         this.log.error(hasId ? 'usuarios actualizar' : 'usuarios crear', err);
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -260,7 +263,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     if (!u.idUsuario) return;
     // Protección para evitar borrar al propietario
     if (this.PROPIETARIO_ROLE_CODE && u.rolCodigo === this.PROPIETARIO_ROLE_CODE) {
-      this.toast.showWarning('No se puede eliminar al usuario Propietario', 'Acción no permitida');
+      this.toast.showWarning(this.translate.instant('ADMIN.USERS.OWNER_DELETE_ERROR'), this.translate.instant('ADMIN.USERS.ACTION_NOT_ALLOWED'));
       return;
     }
     this.userToDelete = u;
@@ -278,18 +281,19 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.toast.showSuccess('Usuario eliminado', 'Usuarios');
+          this.toast.showSuccess(this.translate.instant('ADMIN.USERS.SUCCESS.DELETE'), this.translate.instant('MENU.USERS'));
           this.loading = false;
           this.showDeleteModal = false;
           this.userToDelete = null;
           this.load();
         },
         error: (err: any) => {
-          this.toast.showError('Error eliminando usuario', 'Usuarios');
+          this.toast.showError(this.translate.instant('ADMIN.USERS.ERROR.DELETE'), this.translate.instant('MENU.USERS'));
           this.log.error('usuarios borrar', err);
           this.loading = false;
           this.showDeleteModal = false;
           this.userToDelete = null;
+          this.cdr.detectChanges();
         },
       });
   }
@@ -304,20 +308,20 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   getRoleInfo(rolCodigo: string): { color: string; icon: string; label: string } {
     if (!rolCodigo) {
-      return { color: 'secondary', icon: 'cilUser', label: 'Sin Rol' };
+      return { color: 'secondary', icon: 'cilUser', label: 'ADMIN.USERS.ROLES.SIN_ROL' };
     }
     switch (rolCodigo) {
       case OPConstants.Roles.PROPIETARIO:
-        return { color: 'danger', icon: 'cilShieldAlt', label: 'Propietario' };
+        return { color: 'danger', icon: 'cilShieldAlt', label: 'ADMIN.USERS.ROLES.PROPIETARIO' };
       case OPConstants.Roles.ADMINISTRADOR:
-        return { color: 'primary', icon: 'cilStar', label: 'Administrador' };
+        return { color: 'primary', icon: 'cilStar', label: 'ADMIN.USERS.ROLES.ADMINISTRADOR' };
       case OPConstants.Roles.EDITOR:
-        return { color: 'info', icon: 'cilPencil', label: 'Editor' };
+        return { color: 'info', icon: 'cilPencil', label: 'ADMIN.USERS.ROLES.EDITOR' };
       case OPConstants.Roles.AUTOR:
-        return { color: 'success', icon: 'cilPen', label: 'Autor' };
+        return { color: 'success', icon: 'cilPen', label: 'ADMIN.USERS.ROLES.AUTOR' };
       case OPConstants.Roles.LECTOR:
         // Usamos cilLibrary como fallback seguro para Lector
-        return { color: 'secondary', icon: 'cilLibrary', label: 'Lector' };
+        return { color: 'secondary', icon: 'cilLibrary', label: 'ADMIN.USERS.ROLES.LECTOR' };
       default:
         return { color: 'secondary', icon: 'cilUser', label: rolCodigo };
     }

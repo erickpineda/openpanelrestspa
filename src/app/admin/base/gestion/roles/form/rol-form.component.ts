@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { Rol } from '../../../../../core/models/rol.model';
 import { Privilegio } from '../../../../../core/models/privilegio.model';
+import { TranslationService } from '../../../../../core/services/translation.service';
 import { OPConstants } from '../../../../../shared/constants/op-global.constants';
 
 @Component({
@@ -13,15 +14,17 @@ export class RolFormComponent implements OnChanges {
   @Input() rol: Rol | null = null;
   @Input() isEditing = false;
   @Input() privilegios: Privilegio[] = [];
-  
+
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() onSave = new EventEmitter<Rol>();
+
+  constructor(private translate: TranslationService) { }
 
   readonly PROPIETARIO_ROLE_CODE = OPConstants.Roles.PROPIETARIO_CODE;
   readonly ADMIN_ROLE_CODE = OPConstants.Roles.ADMIN_CODE;
 
   manualCodeEntry = false;
-  
+
   // Clone for editing
   editRol: Rol | null = null;
 

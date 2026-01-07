@@ -2,7 +2,7 @@
   <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 bg-light p-2 rounded border">
     <div class="d-flex align-items-center gap-2">
       <svg cIcon name="cilBarChart" class="text-secondary"></svg>
-      <h6 class="mb-0 fw-bold text-secondary text-uppercase small">{{ 'AUTO.SERIE_POR_ESTADO_NOMINAL' | translate }}</h6>
+      <h6 class="mb-0 fw-bold text-secondary text-uppercase small">{{ 'ADMIN.DASHBOARD.NOMINAL.SERIES_BY_STATUS_NOMINAL' | translate }}</h6>
     </div>
     <div class="d-flex flex-wrap gap-2" aria-label="Tipo">
       <div class="btn-group shadow-sm" role="group">
@@ -14,7 +14,7 @@
           [active]="estadoNominalChartType === 'line'"
           (click)="setChartType.emit('line')"
         >
-          Línea
+          {{ 'ADMIN.DASHBOARD.NOMINAL.LINE' | translate }}
         </button>
         <button
           cButton
@@ -24,7 +24,7 @@
           [active]="estadoNominalChartType === 'bar'"
           (click)="setChartType.emit('bar')"
         >
-          Barras
+          {{ 'ADMIN.DASHBOARD.NOMINAL.BAR' | translate }}
         </button>
       </div>
       
@@ -37,7 +37,7 @@
         [disabled]="estadoNominalChartType !== 'bar'"
         (click)="toggleStacked.emit()"
       >
-        {{ estadoNominalStacked ? 'Apiladas' : 'No apiladas' }}
+        {{ estadoNominalStacked ? ('ADMIN.DASHBOARD.NOMINAL.STACKED' | translate) : ('ADMIN.DASHBOARD.NOMINAL.NOT_STACKED' | translate) }}
       </button>
       <button
         cButton
@@ -46,8 +46,8 @@
         size="sm"
         class="shadow-sm"
         (click)="downloadCsv.emit()"
-        title="Descargar CSV"
-        [attr.aria-label]="'Descargar CSV'"
+        [title]="'COMMON.DOWNLOAD_CSV' | translate"
+        [attr.aria-label]="'COMMON.DOWNLOAD_CSV' | translate"
         data-testid="btn-csv-split-estado-nombre"
       >
         <svg cIcon name="cilCloudDownload" size="sm" class="text-secondary"></svg>
@@ -69,7 +69,7 @@
         class="retry-btn-split-nominal"
         (click)="retry.emit()"
       >
-        Reintentar
+        {{ 'COMMON.RETRY' | translate }}
       </button>
     </c-alert>
   }
@@ -87,7 +87,7 @@
     <div class="text-center text-muted py-5 bg-white rounded border border-dashed">
       <div class="d-flex flex-column align-items-center justify-content-center opacity-50">
         <svg cIcon name="cilChartLine" size="4xl" class="text-muted mb-3"></svg>
-        <small class="fw-bold">{{ 'AUTO.SIN_DATOS_DISPONIBLES' | translate }}</small>
+        <small class="fw-bold">{{ 'ADMIN.DASHBOARD.NO_DATA_AVAILABLE' | translate }}</small>
       </div>
     </div>
   }

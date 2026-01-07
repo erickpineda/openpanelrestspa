@@ -2,7 +2,7 @@
   <c-card-header class="bg-white py-3 border-bottom-0">
     <c-row class="align-items-center g-2">
       <c-col lg="6">
-        <h6 class="mb-0 fw-bold">{{ 'AUTO.ESTAD_STICAS_DE_CONTENIDO' | translate }}</h6>
+        <h6 class="mb-0 fw-bold">{{ 'ADMIN.DASHBOARD.CONTENT_STATS' | translate }}</h6>
       </c-col>
       <c-col lg="6">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -11,22 +11,22 @@
             color="secondary"
             size="sm"
             (click)="downloadContentCsv.emit()"
-            title="Descargar métricas de contenido en CSV"
-            [attr.aria-label]="'Descargar métricas de contenido en CSV'"
+            [title]="'ADMIN.DASHBOARD.DOWNLOAD_CONTENT_STATS_CSV' | translate"
+            [attr.aria-label]="'ADMIN.DASHBOARD.DOWNLOAD_CONTENT_STATS_CSV' | translate"
             data-testid="btn-csv-content-stats"
           >
-            CSV
+            {{ 'COMMON.CSV' | translate }}
           </button>
           <button
             cButton
             color="secondary"
             size="sm"
             (click)="downloadEstadosCsv.emit()"
-            title="Descargar estados en CSV"
-            [attr.aria-label]="'Descargar estados en CSV'"
+            [title]="'ADMIN.DASHBOARD.DOWNLOAD_STATUS_CSV' | translate"
+            [attr.aria-label]="'ADMIN.DASHBOARD.DOWNLOAD_STATUS_CSV' | translate"
             data-testid="btn-csv-content-stats-estados"
           >
-            CSV estados
+            {{ 'ADMIN.DASHBOARD.CSV_STATUS' | translate }}
           </button>
         </div>
       </c-col>
@@ -41,7 +41,7 @@
       >
         <span>{{ errorContentStats }}</span>
         <button cButton color="danger" size="sm" class="retry-btn-content" (click)="retry.emit()">
-          Reintentar
+          {{ 'COMMON.RETRY' | translate }}
         </button>
       </div>
     }
@@ -51,7 +51,7 @@
     <c-row>
       <c-col lg="3">
         <app-kpi-card
-          label="Usuarios"
+          [label]="'ADMIN.DASHBOARD.ACTIVE_USERS' | translate"
           [value]="contentStats?.totalUsuarios || 0"
           [color]="kpiUsuariosTotalColor"
           iconName="cilUser"
@@ -59,7 +59,7 @@
       </c-col>
       <c-col lg="3">
         <app-kpi-card
-          label="Entradas"
+          [label]="'ADMIN.DASHBOARD.TOTAL_ENTRIES' | translate"
           [value]="contentStats?.totalEntradas || 0"
           [color]="kpiEntradasTotalColor"
           iconName="cilNotes"
@@ -67,7 +67,7 @@
       </c-col>
       <c-col lg="3">
         <app-kpi-card
-          label="Comentarios"
+          [label]="'ADMIN.DASHBOARD.COMMENTS' | translate"
           [value]="contentStats?.totalComentarios || 0"
           [color]="kpiComentariosTotalColor"
           iconName="cilCommentSquare"
@@ -75,7 +75,7 @@
       </c-col>
       <c-col lg="3">
         <app-kpi-card
-          label="Ficheros"
+          [label]="'ADMIN.DASHBOARD.FILES' | translate"
           [value]="contentStats?.totalFicheros || 0"
           [color]="kpiFicherosTotalColor"
           iconName="cilFile"
@@ -83,7 +83,7 @@
       </c-col>
     </c-row>
     <div class="mt-3">
-      <h6 class="text-muted">{{ 'AUTO.ENTRADAS_POR_ESTADO' | translate }}</h6>
+      <h6 class="text-muted">{{ 'ADMIN.DASHBOARD.ENTRIES_BY_STATUS' | translate }}</h6>
       <c-row>
         <c-col lg="6">
           @if (contentStatsChartData) {
@@ -93,7 +93,7 @@
             ></app-dashboard-chart>
           }
           @if (!contentStatsChartData) {
-            <div class="text-muted small">{{ 'AUTO.SIN_DATOS' | translate }}</div>
+            <div class="text-muted small">{{ 'ADMIN.DASHBOARD.NO_DATA' | translate }}</div>
           }
         </c-col>
       </c-row>
@@ -101,8 +101,8 @@
         <table cTable hover small class="align-middle mb-0">
           <thead class="bg-light">
             <tr>
-              <th class="border-0 text-secondary fw-semibold">{{ 'AUTO.ESTADO' | translate }}</th>
-              <th class="border-0 text-secondary fw-semibold text-end">{{ 'AUTO.TOTAL' | translate }}</th>
+              <th class="border-0 text-secondary fw-semibold">{{ 'ADMIN.DASHBOARD.STATUS' | translate }}</th>
+              <th class="border-0 text-secondary fw-semibold text-end">{{ 'ADMIN.DASHBOARD.TOTAL' | translate }}</th>
               <th class="border-0 text-secondary fw-semibold text-end">%</th>
             </tr>
           </thead>
@@ -121,7 +121,7 @@
             @if (!contentEstadoRows || contentEstadoRows.length === 0) {
               <tr>
                 <td colspan="3" class="text-center text-muted py-3">
-                  <small>{{ 'AUTO.SIN_DATOS_DISPONIBLES' | translate }}</small>
+                  <small>{{ 'ADMIN.DASHBOARD.NO_DATA_AVAILABLE' | translate }}</small>
                 </td>
               </tr>
             }

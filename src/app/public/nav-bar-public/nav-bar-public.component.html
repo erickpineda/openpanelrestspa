@@ -7,29 +7,29 @@
     <c-header-nav class="ms-auto">
       <!-- Enlace Admin -->
       @if (isLoggedIn) {
-        <c-nav-item>
-          <a cNavLink (click)="navigateToRoute('/admin')" style="cursor: pointer">{{ 'AUTO.ADMIN' | translate }}</a>
-        </c-nav-item>
+      <c-nav-item>
+        <a cNavLink (click)="navigateToRoute('/admin')" style="cursor: pointer">{{ 'HEADER.ADMIN' | translate }}</a>
+      </c-nav-item>
       }
 
       <!-- Secciones de la página principal -->
       <c-nav-item>
-        <a cNavLink id="home" (click)="navigateToRoute('/home')" style="cursor: pointer">{{ 'HEADER.HOME' | translate }}</a>
+        <a cNavLink id="home" (click)="navigateToRoute('/home')" style="cursor: pointer">{{ 'HEADER.HOME' | translate
+          }}</a>
       </c-nav-item>
       <c-nav-item>
-        <a cNavLink id="about" (click)="navigateToRoute('/about')" style="cursor: pointer"
-          >{{ 'HEADER.ABOUT' | translate }}</a
-        >
+        <a cNavLink id="about" (click)="navigateToRoute('/about')" style="cursor: pointer">{{ 'HEADER.ABOUT' | translate
+          }}</a>
       </c-nav-item>
       <c-nav-item>
-        <a cNavLink id="contact" (click)="navigateToRoute('/contact')" style="cursor: pointer"
-          >{{ 'HEADER.CONTACT' | translate }}</a
-        >
+        <a cNavLink id="contact" (click)="navigateToRoute('/contact')" style="cursor: pointer">{{ 'HEADER.CONTACT' |
+          translate }}</a>
       </c-nav-item>
 
       <!-- Selector de Idioma -->
       <c-nav-item>
-        <a cNavLink (click)="toggleLanguage()" style="cursor: pointer" [attr.aria-label]="currentLang === 'es' ? 'Cambiar a Inglés' : 'Switch to Spanish'">
+        <a cNavLink (click)="toggleLanguage()" style="cursor: pointer"
+          [attr.aria-label]="currentLang === 'es' ? 'Cambiar a Inglés' : 'Switch to Spanish'">
           <span class="fi" [ngClass]="currentLang === 'es' ? 'fi-es' : 'fi-gb'"></span>
           {{ currentLang === 'es' ? 'EN' : 'ES' }}
         </a>
@@ -37,24 +37,24 @@
 
       <!-- Login/Logout -->
       @if (!isLoggedIn) {
-        <c-nav-item>
-          <a cNavLink (click)="navigateToRoute('/login')" style="cursor: pointer">{{ 'AUTO.LOGIN' | translate }}</a>
-        </c-nav-item>
+      <c-nav-item>
+        <a cNavLink (click)="navigateToRoute('/login')" style="cursor: pointer">{{ 'HEADER.LOGIN' | translate }}</a>
+      </c-nav-item>
       }
       @if (isLoggedIn) {
-        <c-nav-item>
-          <a cNavLink (click)="logout()" style="cursor: pointer" [class.disabled]="isLoadingLogout">
-            @if (!isLoadingLogout) {
-              <span>{{ 'AUTO.LOGOUT' | translate }}</span>
-            }
-            @if (isLoadingLogout) {
-              <span>
-                Cerrando...
-                <span class="spinner-border spinner-border-sm" role="status"></span>
-              </span>
-            }
-          </a>
-        </c-nav-item>
+      <c-nav-item>
+        <a cNavLink (click)="logout()" style="cursor: pointer" [class.disabled]="isLoadingLogout">
+          @if (!isLoadingLogout) {
+          <span>{{ 'HEADER.LOGOUT' | translate }}</span>
+          }
+          @if (isLoadingLogout) {
+          <span>
+            {{ 'COMMON.CLOSING_SESSION' | translate }}
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+          </span>
+          }
+        </a>
+      </c-nav-item>
       }
     </c-header-nav>
   </c-container>

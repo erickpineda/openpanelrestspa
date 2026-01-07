@@ -11,7 +11,7 @@ import { LoggerService } from './logger.service';
 export class TranslationService {
   private translationsSubject = new BehaviorSubject<any>({});
   public translations$ = this.translationsSubject.asObservable();
-  
+
   private defaultTranslations: any = {};
   private readonly DEFAULT_LANG: Language = 'es';
 
@@ -27,7 +27,7 @@ export class TranslationService {
     // Cargar traducciones por defecto primero o en paralelo
     this.loadLanguage(this.DEFAULT_LANG).subscribe(trans => {
       this.defaultTranslations = trans;
-      
+
       // Suscribirse a cambios de idioma
       this.languageService.currentLang$.pipe(
         switchMap(lang => {
@@ -53,9 +53,9 @@ export class TranslationService {
   }
 
   translate(key: string, params?: any): string {
-    const translation = this.getValue(this.translationsSubject.value, key) || 
-                        this.getValue(this.defaultTranslations, key) || 
-                        key;
+    const translation = this.getValue(this.translationsSubject.value, key) ||
+      this.getValue(this.defaultTranslations, key) ||
+      key;
 
     if (params && typeof translation === 'string') {
       return this.interpolate(translation, params);
@@ -68,7 +68,7 @@ export class TranslationService {
     if (!source) return null;
     const keys = key.split('.');
     let value = source;
-    
+
     for (const k of keys) {
       if (value && value[k]) {
         value = value[k];
@@ -80,13 +80,18 @@ export class TranslationService {
   }
 
   private interpolate(text: string, params: any): string {
-    return text.replace(/\{\{([\w\.]+)\}\}/g, (match, key) => {
+    return text.replace(/\{\{\s*([\w\.]+)\s*\}\}/g, (match, key) => {
       const value = params[key];
       return value !== undefined ? value : match;
     });
   }
-  
-  get instant(): any {
-    return this.translationsSubject.value;
+
+  /**
+   * Obtiene la traducción instantánea de una clave.
+   * Si no se proporciona clave, devuelve todo el objeto de traducciones.
+   */
+  instant(key?: string, params?: any): any {
+    if (!key) return this.translationsSubject.value;
+    return this.translate(key, params);
   }
 }

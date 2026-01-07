@@ -5,8 +5,8 @@
         <svg cIcon name="cilUser" class="text-primary" size="lg"></svg>
       </div>
       <div>
-        <h5 class="mb-0 fw-bold text-gray-800">{{ 'AUTO.MI_PERFIL' | translate }}</h5>
-        <small class="text-muted">{{ 'AUTO.GESTI_N_DE_INFORMACI_N_PERSONA' | translate }}</small>
+        <h5 class="mb-0 fw-bold text-gray-800">{{ 'MENU.MY_PROFILE' | translate }}</h5>
+        <small class="text-muted">{{ 'ADMIN.PROFILE.MANAGE_INFO' | translate }}</small>
       </div>
     </div>
   </c-card-header>
@@ -15,11 +15,11 @@
       <div class="mb-3">
         <svg cIcon name="cilUser" size="3xl" class="text-secondary opacity-50"></svg>
       </div>
-      <h6 class="fw-bold text-gray-700">{{ 'AUTO.REDIRIGIENDO' | translate }}</h6>
-      <p class="mb-3 small">{{ 'AUTO.ACCEDE_A_TU_PERFIL_COMPLETO_PA' | translate }}</p>
+      <h6 class="fw-bold text-gray-700">{{ 'ADMIN.PROFILE.REDIRECTING' | translate }}</h6>
+      <p class="mb-3 small">{{ 'ADMIN.PROFILE.ACCESS_FULL_PROFILE_DESC' | translate }}</p>
       <a routerLink="/admin/base/perfil" cButton color="primary" class="px-4 rounded-pill shadow-sm">
         <svg cIcon name="cilArrowRight" size="sm" class="me-2"></svg>
-        Ir a Mi Perfil Completo
+        {{ 'ADMIN.PROFILE.GO_TO_FULL_PROFILE' | translate }}
       </a>
     </div>
   </c-card-body>

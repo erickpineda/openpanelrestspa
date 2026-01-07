@@ -60,7 +60,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     private searchUtil: SearchUtilService,
     private cdr: ChangeDetectorRef,
     private toastService: ToastService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadStats();
@@ -121,7 +121,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     if (newPaged !== this.pagedCategorias) {
       this.pagedCategorias = newPaged;
     }
-    
+
     // Actualizamos allCategorias si existe (paginación cliente)
     if (this.allCategorias.length > 0) {
       const newAll = updateList(this.allCategorias);
@@ -286,6 +286,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     if (!categ?.idCategoria) return;
     this.categoriaToDelete = categ;
     this.showDeleteModal = true;
+    this.cdr.detectChanges();
   }
 
   confirmDelete(): void {

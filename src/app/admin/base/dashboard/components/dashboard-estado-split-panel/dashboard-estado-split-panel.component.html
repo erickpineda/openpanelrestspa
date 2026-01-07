@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3 gap-2 bg-light p-2 rounded border">
       <div class="d-flex align-items-center gap-2">
         <svg cIcon name="cilChartPie" class="text-secondary"></svg>
-        <h6 class="mb-0 fw-bold text-secondary text-uppercase small">{{ 'AUTO.SERIE_POR_ESTADO' | translate }}</h6>
+        <h6 class="mb-0 fw-bold text-secondary text-uppercase small">{{ 'ADMIN.DASHBOARD.SPLIT.SERIES_BY_STATUS' | translate }}</h6>
       </div>
       <div class="d-flex flex-wrap gap-2" aria-label="Acciones">
         <button
@@ -12,13 +12,13 @@
           variant="ghost"
           size="sm"
           (click)="downloadCsv.emit()"
-          title="Descargar serie por estado en CSV"
-          [attr.aria-label]="'Descargar serie por estado en CSV'"
+          [title]="'ADMIN.DASHBOARD.SPLIT.DOWNLOAD_CSV' | translate"
+          [attr.aria-label]="'ADMIN.DASHBOARD.SPLIT.DOWNLOAD_CSV' | translate"
           data-testid="btn-csv-split-estado"
           class="text-dark"
         >
           <svg cIcon name="cilCloudDownload" size="sm" class="me-1"></svg>
-          CSV
+          {{ 'COMMON.CSV' | translate }}
         </button>
       </div>
     </div>
@@ -38,7 +38,7 @@
           class="retry-btn-split-estado"
           (click)="retry.emit()"
         >
-          Reintentar
+          {{ 'COMMON.RETRY' | translate }}
         </button>
       </div>
     }
@@ -53,7 +53,7 @@
       </div>
     }
     @if (!seriesEntriesSplitData) {
-      <div class="text-muted small">{{ 'AUTO.SIN_DATOS' | translate }}</div>
+      <div class="text-muted small">{{ 'ADMIN.DASHBOARD.NO_DATA' | translate }}</div>
     }
   </c-card-body>
 </c-card>

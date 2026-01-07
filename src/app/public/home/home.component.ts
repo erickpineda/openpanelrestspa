@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { TranslationService } from '../../core/services/translation.service';
 import { Entrada } from '../../core/models/entrada.model';
 import { Categoria } from '../../core/models/categoria.model';
 import { EntradaService } from '../../core/services/data/entrada.service';
@@ -13,7 +14,7 @@ import { LoggerService } from '../../core/services/logger.service';
 })
 export class HomeComponent implements OnInit {
   cargaFinalizada: boolean = false;
-  noHayEntradas: boolean = true;
+  hasEntries: boolean = false;
   errorMsg: string = '';
   entradas: Entrada[] = [];
   categorias: Categoria[] = [];
@@ -24,8 +25,9 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private entradaService: EntradaService,
-    private log: LoggerService
-  ) {}
+    private log: LoggerService,
+    private translate: TranslationService
+  ) { }
 
   ngOnInit(): void {
     this.obtenerListaEntradas()
@@ -37,8 +39,9 @@ export class HomeComponent implements OnInit {
       })
       .catch((error) => {
         this.log.error('Error al obtener lista de entradas:', error.message);
-        this.errorMsg = 'No se pudieron cargar las entradas, intenta nuevamente más tarde.';
+        this.errorMsg = 'PUBLIC.HOME.LOAD_ERROR';
         this.log.error(this.errorMsg);
+        this.cargaFinalizada = true; // Ensure UI renders even on error
       });
   }
 
@@ -49,17 +52,19 @@ export class HomeComponent implements OnInit {
           const entradas: Entrada[] = Array.isArray(response.data?.elements)
             ? response.data.elements
             : [];
-          if (entradas.length < 1) {
-            this.noHayEntradas = false;
-          } else {
+
+          if (entradas.length > 0) {
+            this.hasEntries = true;
             this.entradas = entradas;
             this.categorias = this.entradas.flatMap((e) => e.categorias);
-            this.cargaFinalizada = true;
+          } else {
+            this.hasEntries = false;
           }
-          resolve(this.entradas);
+          this.cargaFinalizada = true;
+          resolve(entradas);
         },
         error: (error) => {
-          this.noHayEntradas = false;
+          this.hasEntries = false;
           this.cargaFinalizada = true;
           reject(error);
         },
