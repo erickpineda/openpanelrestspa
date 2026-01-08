@@ -175,6 +175,8 @@
       [label]="'ADMIN.DASHBOARD.LATEST_ENTRIES' | translate"
       [color]="kpiUltimasEntradasColor"
       class="h-100 d-block shadow-sm border-0"
+      [route]="['/admin/entradas']"
+      tooltip="Ver listado de entradas"
     ></app-kpi-card>
   </c-col>
   <c-col lg="4">
@@ -184,6 +186,8 @@
       [label]="'ADMIN.DASHBOARD.COMMENTS_LAST_DAYS' | translate: { days: seriesDays }"
       [color]="kpiComentariosColor"
       class="h-100 d-block shadow-sm border-0"
+      [route]="['/admin/comentarios']"
+      tooltip="Ver comentarios recientes"
     ></app-kpi-card>
   </c-col>
   <c-col lg="4">
@@ -193,6 +197,8 @@
       [label]="'ADMIN.DASHBOARD.NEW_USERS_LAST_DAYS' | translate: { days: seriesDays }"
       [color]="kpiNuevosUsuariosColor"
       class="h-100 d-block shadow-sm border-0"
+      [route]="['/admin/usuarios']"
+      tooltip="Ver nuevos usuarios"
     ></app-kpi-card>
   </c-col>
 </c-row>

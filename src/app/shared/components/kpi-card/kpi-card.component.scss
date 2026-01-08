@@ -1,6 +1,18 @@
 .kpi-card {
   padding: 0.5rem;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
+  transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.2s ease;
+
+  &.cursor-pointer {
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-3px);
+      
+      ::ng-deep .card {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+      }
+    }
+  }
 
   ::ng-deep .text-body-secondary,
   ::ng-deep .text-muted,

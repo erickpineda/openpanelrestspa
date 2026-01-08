@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, AfterViewInit, ElementRef, ViewChild, Renderer2, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, AfterViewInit, ElementRef, ViewChild, Renderer2, OnChanges, OnDestroy, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-kpi-card',
@@ -14,8 +14,13 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() iconName?: string;
   @Input() color?: string;
   @Input() variant: 'flat' | 'simple' = 'flat';
+  @Input() route?: string | any[];
+  @Input() tooltip?: string;
+  
   @ViewChild('kpiBody', { static: false }) kpiBody?: ElementRef<HTMLElement>;
 
+  displayValue: string | number = '';
+  private animationFrameId?: number;
   private observer?: MutationObserver;
 
   get resolvedIcon(): string {
@@ -49,7 +54,7 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
     dark: '#4f5d73',
   };
 
-  constructor(private renderer: Renderer2) {}
+  constructor(private renderer: Renderer2, private cdr: ChangeDetectorRef) {}
 
   ngAfterViewInit(): void {
     // Slight delay to allow CoreUI to render inner structure
@@ -63,12 +68,54 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
     if (changes['color'] || changes['label']) {
       setTimeout(() => this.applyAdaptiveText(), 0);
     }
+    if (changes['value']) {
+      this.animateValue();
+    }
   }
 
   ngOnDestroy(): void {
     if (this.observer) {
       this.observer.disconnect();
     }
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+  }
+
+  private animateValue() {
+    const end = parseFloat(this.value.toString().replace(/,/g, ''));
+    if (isNaN(end)) {
+      this.displayValue = this.value;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const start = 0;
+    const duration = 1000;
+    const startTime = performance.now();
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      const ease = 1 - Math.pow(1 - progress, 4);
+      
+      const current = Math.floor(start + (end - start) * ease);
+      this.displayValue = current;
+      this.cdr.markForCheck();
+
+      if (progress < 1) {
+        this.animationFrameId = requestAnimationFrame(animate);
+      } else {
+        this.displayValue = this.value;
+        this.cdr.markForCheck();
+      }
+    };
+
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+    this.animationFrameId = requestAnimationFrame(animate);
   }
 
   private setupObserver() {

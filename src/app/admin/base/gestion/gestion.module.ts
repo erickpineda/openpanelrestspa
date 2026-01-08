@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GestionRoutingModule } from './gestion-routing.module';
 import { UsuariosListComponent } from './usuarios/listado-usuarios.component';
 import { UsuarioFormComponent } from './usuarios/form/usuario-form.component';
@@ -13,6 +14,19 @@ import { MiPerfilComponent } from './perfil/mi-perfil.component';
 import { ChangePasswordComponent } from './password/change-password.component';
 import { SharedOPModule } from '../../../shared/shared.module';
 import { SharedCoreUiModule } from '../../../shared/shared-coreui.module';
+import {
+  CardModule,
+  GridModule,
+  ButtonModule,
+  FormModule,
+  TableModule,
+  BadgeModule,
+  SpinnerModule,
+  AlertModule,
+  ModalModule,
+  TooltipModule
+} from '@coreui/angular';
+import { IconModule } from '@coreui/icons-angular';
 
 @NgModule({
   declarations: [
@@ -27,6 +41,24 @@ import { SharedCoreUiModule } from '../../../shared/shared-coreui.module';
     MiPerfilComponent,
     ChangePasswordComponent,
   ],
-  imports: [CommonModule, GestionRoutingModule, SharedOPModule, SharedCoreUiModule],
+  imports: [
+    CommonModule,
+    GestionRoutingModule,
+    SharedOPModule,
+    SharedCoreUiModule,
+    FormsModule,
+    ReactiveFormsModule,
+    CardModule,
+    GridModule,
+    ButtonModule,
+    FormModule,
+    TableModule,
+    BadgeModule,
+    SpinnerModule,
+    AlertModule,
+    ModalModule,
+    TooltipModule,
+    IconModule
+  ],
 })
 export class GestionModule { }
