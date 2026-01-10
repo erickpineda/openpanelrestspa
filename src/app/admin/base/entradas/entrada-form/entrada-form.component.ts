@@ -441,51 +441,41 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   }
 
   private setupEditorScrollListener() {
-    // Pequeño retraso para asegurar que el DOM se ha actualizado (clases aplicadas)
+    // Pequeño retraso para asegurar que el DOM se ha actualizado
     setTimeout(() => {
       const editorMain = document.querySelector('.ck-editor__main');
       if (!editorMain) return;
 
-      // Limpiar listener anterior para evitar duplicados
+      // Limpiar listener anterior
       editorMain.removeEventListener('scroll', this.onInternalScroll);
 
-      // Si estamos en modo pantalla completa o ancho completo (donde el scroll es interno)
-      if (this.isFullScreen || this.isFullWidth) {
-        editorMain.addEventListener('scroll', this.onInternalScroll);
-        // Verificar estado inicial
-        this.showBackToTop = editorMain.scrollTop > 300;
-      } else {
-        // Volver al chequeo de ventana normal
-        this.onWindowScroll();
-      }
+      // SIEMPRE usar scroll interno (ahora que CSS lo fuerza en todos los modos)
+      editorMain.addEventListener('scroll', this.onInternalScroll);
+      
+      // Verificar estado inicial
+      this.showBackToTop = editorMain.scrollTop > 300;
+      
       this.cdRef.detectChanges();
     }, 200);
   }
 
   // Arrow function para mantener el contexto 'this' automáticamente
   private onInternalScroll = (event: any) => {
-    if (this.isFullScreen || this.isFullWidth) {
-      this.showBackToTop = event.target.scrollTop > 300;
-      this.cdRef.detectChanges();
-    }
+    // El scroll siempre es interno ahora
+    this.showBackToTop = event.target.scrollTop > 300;
+    this.cdRef.detectChanges();
   }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    // Si NO estamos en modo interno, usamos el scroll de la ventana
-    if (!this.isFullScreen && !this.isFullWidth) {
-      this.showBackToTop = window.scrollY > 300;
-    }
+    // Método vacío o para otra lógica global, pero el editor ya no depende de esto
   }
 
   scrollToTop() {
-    if (this.isFullScreen || this.isFullWidth) {
-      const editorMain = document.querySelector('.ck-editor__main');
-      if (editorMain) {
-        editorMain.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Siempre usar scroll interno del editor
+    const editorMain = document.querySelector('.ck-editor__main');
+    if (editorMain) {
+      editorMain.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 

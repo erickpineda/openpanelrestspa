@@ -138,6 +138,85 @@ input[type='checkbox']:indeterminate {
   }
 }
 
+/* Estilos base para el wrapper del editor con scroll interno - UNIFICADO */
+.editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Contener todo dentro del wrapper */
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  background: white;
+  transition: height 0.3s ease, width 0.3s ease; /* Transición suave */
+  
+  /* Altura por defecto para modo NORMAL (para activar scroll interno) */
+  height: 60vh; 
+
+  /* FIX: Asegurar que el componente host de Angular ocupe el 100% */
+  ckeditor {
+    display: block;
+    height: 100%;
+  }
+
+  /* Estilos internos de CKEditor para soportar flex y scroll - IDÉNTICO A FULLSCREEN */
+  ::ng-deep .ck-editor {
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+    
+    .ck-editor__top {
+      flex-shrink: 0;
+      z-index: 2;
+      border-bottom: 1px solid #ccced1;
+      background: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    
+    .ck-editor__main {
+      flex-grow: 1;
+      overflow-y: auto !important; /* Scroll interno obligatorio */
+      display: block;
+      height: 100%; /* Importante para que el scroll funcione */
+      min-height: 0;
+      position: relative;
+      
+      /* Soporte para scroll suave y táctil */
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      
+      /* Scrollbar personalizado */
+      &::-webkit-scrollbar {
+        width: 10px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-left: 1px solid #dee2e6;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 5px;
+        border: 2px solid #f1f1f1;
+      }
+      
+      &::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
+    }
+
+    .ck-editor__editable_inline {
+       min-height: 100% !important;
+       height: auto !important;
+       overflow: visible !important;
+       border: none !important;
+       padding: 2rem !important;
+       padding-bottom: 5rem !important;
+    }
+  }
+}
+
 /* Estilos para pantalla completa del editor */
 .editor-fullscreen {
   position: fixed;
@@ -147,84 +226,19 @@ input[type='checkbox']:indeterminate {
   height: 100vh;
   z-index: 9999;
   background: white;
-  padding: 0; /* Eliminamos padding del contenedor principal para usar todo el espacio */
+  padding: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 
   .editor-wrapper {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
     height: 100%; /* Forzamos altura completa */
-    padding: 2rem; /* Movemos el padding aquí */
+    border: none;
+    border-radius: 0;
+    padding: 2rem;
     padding-top: 0;
-    
-    /* FIX: Asegurar que el componente host de Angular ocupe el 100% */
-    ckeditor {
-      display: block;
-      height: 100%;
-    }
-
-    ::ng-deep .ck-editor {
-      display: flex;
-      flex-direction: column;
-      height: 100% !important;
-      width: 100%;
-      overflow: hidden; /* Importante para contener el scroll */
-      
-      .ck-editor__top {
-        flex-shrink: 0;
-        z-index: 2;
-        border-bottom: 1px solid #ccced1;
-        background: white;
-        /* position: sticky;  No es necesario sticky si el scroll es interno en main */
-        /* top: 0; */
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Indicador visual superior */
-      }
-
-      .ck-editor__main {
-        flex-grow: 1;
-        overflow-y: auto !important; /* El scroll lo maneja el contenedor principal */
-        display: block; /* Flex a veces causa problemas con el scroll interno de CKEditor */
-        height: 100%; /* Asegurar altura */
-        min-height: 0;
-        
-        /* Soporte para scroll suave y táctil */
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-        
-        /* Scrollbar personalizado aplicado al contenedor */
-        &::-webkit-scrollbar {
-          width: 10px;
-        }
-        
-        &::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-left: 1px solid #dee2e6;
-        }
-        
-        &::-webkit-scrollbar-thumb {
-          background: #c1c1c1;
-          border-radius: 5px;
-          border: 2px solid #f1f1f1; 
-        }
-        
-        &::-webkit-scrollbar-thumb:hover {
-          background: #a8a8a8;
-        }
-      }
-
-      .ck-editor__editable_inline {
-         min-height: 100% !important; /* Asegura que ocupe al menos todo el espacio */
-         height: auto !important; /* Permite crecer según el contenido */
-         overflow: visible !important; /* No scroll aquí */
-         border: none !important;
-         padding: 2rem !important; 
-         padding-bottom: 5rem !important; /* Espacio extra al final */
-      }
-    }
+    /* Hereda toda la lógica interna de .editor-wrapper base */
   }
 
   .fullscreen-toolbar {
@@ -241,67 +255,13 @@ input[type='checkbox']:indeterminate {
 
 /* Estilos para modo expandido (Anchar Editor) */
 .editor-expanded {
-  /* Asegurar que el contenedor no permita desbordamiento visual fuera de sus límites */
   overflow: hidden;
   display: flex;
   flex-direction: column;
 
   .editor-wrapper {
-    height: 70vh; /* Altura controlada */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Contener todo dentro del wrapper */
-    border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-
-    ::ng-deep .ck-editor {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      width: 100%;
-      
-      .ck-editor__top {
-        flex-shrink: 0;
-        z-index: 2;
-        border-bottom: 1px solid #ccced1;
-        background: white;
-      }
-      
-      .ck-editor__main {
-        flex-grow: 1;
-        overflow-y: auto !important; /* Scroll interno obligatorio */
-        display: block;
-        height: 100%;
-        min-height: 0;
-        
-        /* Scrollbar personalizado */
-        &::-webkit-scrollbar {
-          width: 8px;
-        }
-        
-        &::-webkit-scrollbar-track {
-          background: #f1f1f1;
-        }
-        
-        &::-webkit-scrollbar-thumb {
-          background: #c1c1c1;
-          border-radius: 4px;
-        }
-        
-        &::-webkit-scrollbar-thumb:hover {
-          background: #a8a8a8;
-        }
-      }
-
-      .ck-editor__editable_inline {
-         min-height: 100% !important;
-         height: auto !important;
-         overflow: visible !important;
-         border: none !important;
-         padding: 1.5rem !important;
-      }
-    }
+    height: 75vh; /* Altura mayor para modo expandido */
+    /* Hereda toda la lógica interna de .editor-wrapper base */
   }
 }
 
