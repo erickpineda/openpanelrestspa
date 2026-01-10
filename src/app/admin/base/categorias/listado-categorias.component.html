@@ -184,11 +184,11 @@
 
 <!-- Modal Crear Categoría -->
 <app-crear-categoria [visible]="visibleModalCrear" (visibleChange)="visibleModalCrear = $event"
-  [listaCategorias]="listaCategorias" (onSuccess)="refrescar()"></app-crear-categoria>
+  (onSuccess)="refrescar()"></app-crear-categoria>
 
 <!-- Modal Editar Categoría -->
 <app-editar-categoria [visible]="visibleModalEditar" (visibleChange)="visibleModalEditar = $event"
-  [categoria]="categoriaSeleccionada" [listaCategorias]="listaCategorias"
+  [categoria]="categoriaSeleccionada"
   (onSuccess)="refrescar()"></app-editar-categoria>
 
 <!-- Modal Eliminar / Confirmar -->

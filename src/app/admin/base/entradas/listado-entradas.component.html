@@ -17,10 +17,7 @@
             <svg cIcon name="cilPrint" class="me-1"></svg>
             {{ 'ADMIN.ENTRIES.PRINT' | translate }}
           </button>
-          <button cButton color="warning" variant="outline" size="sm">
-            <svg cIcon name="cilWarning" class="me-1"></svg>
-            {{ 'ADMIN.ENTRIES.UNREVIEWED' | translate }}
-          </button>
+          <app-entradas-pendientes></app-entradas-pendientes>
           <button cButton color="primary" size="sm" routerLink="crear" class="shadow-sm">
             <svg cIcon name="cilPlus" class="me-1"></svg>
             {{ 'ADMIN.ENTRIES.NEW_ENTRY' | translate }}

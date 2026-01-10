@@ -10,7 +10,6 @@ import { Categoria } from '../../../../core/models/categoria.model';
 })
 export class CategoriaFormComponent implements OnChanges {
   @Input() categoria?: Categoria;
-  @Input() listaCategorias: Categoria[] = [];
   @Input() submitted = false;
   @Input() disabled = false;
   @Output() submitCategoria = new EventEmitter<Categoria>();
@@ -22,8 +21,6 @@ export class CategoriaFormComponent implements OnChanges {
   form: FormGroup;
   enviando = false;
   mostrarFeedback = false;
-  // Lista usada en la vista con un conteo ficticio de entradas cuando no existe
-  displayListaCategorias: Categoria[] = [];
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -49,14 +46,6 @@ export class CategoriaFormComponent implements OnChanges {
       } else {
         this.form.enable();
       }
-    }
-    if (changes['listaCategorias']) {
-      const list = Array.isArray(this.listaCategorias) ? this.listaCategorias : [];
-      // Asignar lista directamente, asegurando que cantidadEntradas tenga un valor por defecto si viene nulo
-      this.displayListaCategorias = list.map(c => ({
-        ...c,
-        cantidadEntradas: c.cantidadEntradas ?? 0
-      }));
     }
   }
 

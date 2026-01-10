@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Categoria } from '../../../../core/models/categoria.model';
 import { CategoriaFacadeService } from '../categoria-form/srv/categoria-facade.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
@@ -9,19 +9,26 @@ import { CategoriaFormComponent } from '../categoria-form/categoria-form.compone
   templateUrl: './editar-categoria.component.html',
   standalone: false
 })
-export class EditarCategoriaComponent {
+export class EditarCategoriaComponent implements OnChanges {
   @Input() visible = false;
   @Input() categoria?: Categoria;
-  @Input() listaCategorias: Categoria[] = [];
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() onSuccess = new EventEmitter<void>();
 
   @ViewChild(CategoriaFormComponent) formComponent!: CategoriaFormComponent;
 
+  disabled = true;
+
   constructor(
     private facade: CategoriaFacadeService,
     private toastService: ToastService
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['visible'] && this.visible) {
+      this.disabled = true;
+    }
+  }
 
   handleVisibleChange(event: boolean) {
     this.visible = event;
@@ -48,5 +55,13 @@ export class EditarCategoriaComponent {
         }
       }
     });
+  }
+
+  onEditarCategoria() {
+    this.disabled = false;
+  }
+
+  onGuardarClick() {
+    this.formComponent.guardar();
   }
 }

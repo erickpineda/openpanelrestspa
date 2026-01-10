@@ -11,7 +11,6 @@ import { CategoriaFormComponent } from '../categoria-form/categoria-form.compone
 })
 export class CrearCategoriaComponent {
   @Input() visible = false;
-  @Input() listaCategorias: Categoria[] = [];
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() onSuccess = new EventEmitter<void>();
 
@@ -45,5 +44,9 @@ export class CrearCategoriaComponent {
         }
       }
     });
+  }
+
+  onGuardarClick() {
+    this.formComponent.guardar();
   }
 }

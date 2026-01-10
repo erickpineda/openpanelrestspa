@@ -312,6 +312,9 @@
       "SEARCH_PLACEHOLDER": "Buscar categoría...",
       "ADVANCED_FILTERS": "Filtros Avanzados",
       "HIDE_FILTERS": "Ocultar Filtros",
+      "TABLE": {
+        "ENTRIES_COUNT": "Nº Entradas"
+      },
       "NAME_REQUIRED": "El nombre es obligatorio.",
       "DESCRIPTION_HELP": "Breve descripción de la categoría.",
       "NO_CATEGORIES": "No hay categorías para mostrar",
@@ -695,6 +698,7 @@
       "SUBTITLE": "Administra, filtra y organiza todas las publicaciones del sitio",
       "PRINT": "Imprimir",
       "UNREVIEWED": "Sin revisar",
+      "NO_UNREVIEWED": "No hay entradas pendientes de revisión",
       "NEW_ENTRY": "Nueva Entrada",
       "CREATE_ENTRY_TITLE": "Crear Nueva Entrada",
       "EDIT_ENTRY_TITLE": "Editar Entrada",

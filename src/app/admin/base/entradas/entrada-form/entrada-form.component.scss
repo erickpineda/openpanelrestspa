@@ -241,23 +241,65 @@ input[type='checkbox']:indeterminate {
 
 /* Estilos para modo expandido (Anchar Editor) */
 .editor-expanded {
+  /* Asegurar que el contenedor no permita desbordamiento visual fuera de sus límites */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
   .editor-wrapper {
-    height: 75vh; /* Altura fija para evitar scroll de página excesivo */
+    height: 70vh; /* Altura controlada */
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* Contener todo dentro del wrapper */
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
 
     ::ng-deep .ck-editor {
       height: 100%;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      
+      .ck-editor__top {
+        flex-shrink: 0;
+        z-index: 2;
+        border-bottom: 1px solid #ccced1;
+        background: white;
+      }
       
       .ck-editor__main {
-        flex: 1;
-        overflow-y: auto;
+        flex-grow: 1;
+        overflow-y: auto !important; /* Scroll interno obligatorio */
+        display: block;
+        height: 100%;
+        min-height: 0;
+        
+        /* Scrollbar personalizado */
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 4px;
+        }
+        
+        &::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
+        }
       }
 
       .ck-editor__editable_inline {
          min-height: 100% !important;
+         height: auto !important;
+         overflow: visible !important;
+         border: none !important;
+         padding: 1.5rem !important;
       }
     }
   }
