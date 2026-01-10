@@ -50,6 +50,7 @@
     "ROLE": "Rol",
     "EMAIL": "Email",
     "APPLY": "Aplicar",
+    "ENABLE_EDIT": "Habilitar Edición",
     "LAST_NAME": "Apellido",
     "SELECT_ROLE": "Seleccione rol",
     "CLOSING_SESSION": "Cerrando...",

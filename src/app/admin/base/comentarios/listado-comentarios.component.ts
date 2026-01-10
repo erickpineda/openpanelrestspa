@@ -43,6 +43,11 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   comentarioToDelete: Comentario | null = null;
 
+  // Modales
+  visibleModalCrear = false;
+  visibleModalEditar = false;
+  comentarioSeleccionado?: Comentario;
+
   estaVacio: boolean = false;
   cargando: boolean = false;
   private destroy$ = new Subject<void>();
@@ -74,10 +79,6 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     } catch (error) {
       this.log.error('Error initializing list:', error);
     }
-  }
-
-  navigate(urlToNavigate: string) {
-    this.router.navigate([urlToNavigate]);
   }
 
   private async obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
@@ -288,15 +289,18 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  // Métodos antiguos de paginación por números eliminados en favor de Anterior/Siguiente
-
   public refrescarPagina(): void {
     window.location.reload();
   }
 
   openEdit(coment: Comentario): void {
     if (!coment?.idComentario) return;
-    this.navigate('/admin/control/comentarios/editar/' + coment.idComentario);
+    this.comentarioSeleccionado = coment;
+    this.visibleModalEditar = true;
+  }
+
+  onSuccessSave() {
+    this.obtenerListaComentarios();
   }
 
   deleteComentario(coment: Comentario): void {

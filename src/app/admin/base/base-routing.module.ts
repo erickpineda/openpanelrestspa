@@ -68,16 +68,8 @@ const routes: Routes = [
       },
       {
         path: 'comentarios',
+        component: ListadoComentariosComponent,
         data: { title: 'MENU.COMMENTS' },
-        children: [
-          { path: '', component: ListadoComentariosComponent },
-          { path: 'crear', component: CrearComentarioComponent, data: { title: 'MENU.CREATE_COMMENT' } },
-          {
-            path: 'editar/:idComentario',
-            component: EditarComentarioComponent,
-            data: { title: 'MENU.EDIT_COMMENT' }
-          },
-        ],
       },
     ],
   },

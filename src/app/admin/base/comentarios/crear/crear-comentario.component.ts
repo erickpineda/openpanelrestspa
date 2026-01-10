@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Comentario } from '../../../../core/models/comentario.model';
-import { ComentarioService } from '../../../../core/services/data/comentario.service';
+import { ComentarioFacadeService } from '../comentario-form/srv/comentario-facade.service';
 import { TokenStorageService } from '../../../../core/services/auth/token-storage.service';
-import { CommonFunctionalityService } from '../../../../shared/services/common-functionality.service';
-import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-response.model';
+import { ToastService } from '../../../../core/services/ui/toast.service';
+import { ComentarioFormComponent } from '../comentario-form/comentario-form.component';
 
 @Component({
   selector: 'app-crear-comentario',
@@ -12,28 +11,57 @@ import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-resp
   styleUrls: ['./crear-comentario.component.scss'],
   standalone: false,
 })
-export class CrearComentarioComponent {
+export class CrearComentarioComponent implements OnInit {
+  @Input() visible = false;
+  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() onSuccess = new EventEmitter<void>();
+
+  @ViewChild(ComentarioFormComponent) formComponent!: ComentarioFormComponent;
+
   comentario: Comentario = new Comentario();
-  submitted = false;
+  nombreUsuario = '';
+  emailUsuario = '';
 
   constructor(
-    private comentarioService: ComentarioService,
-    private router: Router,
+    private facade: ComentarioFacadeService,
     private tokenStorageService: TokenStorageService,
-    private commonFuncService: CommonFunctionalityService
+    private toastService: ToastService
   ) {}
 
-  onSubmit(comentario: Comentario) {
-    this.submitted = true;
-    // Assign current user as author
-    comentario.idUsuario = this.tokenStorageService.getUser().id;
-
-    this.comentarioService.crear(comentario).subscribe((response: OpenpanelApiResponse<any>) => {
-      this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
+  ngOnInit() {
+    this.facade.obtenerUsuarioActual().subscribe((user) => {
+      if (user) {
+        this.nombreUsuario = user.username;
+        this.emailUsuario = user.email;
+        this.comentario.idUsuario = user.idUsuario;
+      }
     });
   }
 
-  onCancel() {
-    this.router.navigate(['/admin/control/comentarios']);
+  handleVisibleChange(event: boolean) {
+    this.visible = event;
+    this.visibleChange.emit(event);
+  }
+
+  cerrarModal() {
+    this.handleVisibleChange(false);
+  }
+
+  guardar(comentario: Comentario) {
+    this.facade.crearComentario(comentario).subscribe({
+      next: () => {
+        this.toastService.showSuccess('El comentario se ha creado correctamente.', 'Comentario creado');
+        this.onSuccess.emit();
+        this.cerrarModal();
+      },
+      error: (err) => {
+        console.error('Error al crear comentario:', err);
+        this.toastService.showError('Error al crear el comentario.', 'Error');
+      }
+    });
+  }
+
+  onGuardarClick() {
+    this.formComponent.guardar();
   }
 }

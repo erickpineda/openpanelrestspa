@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="d-flex gap-2">
-        <button cButton color="primary" class="text-white shadow-sm" routerLink="crear">
+        <button cButton color="primary" class="text-white shadow-sm" (click)="visibleModalCrear = true">
           <svg cIcon name="cilPlus" size="sm" class="me-2"></svg>
           {{ 'ADMIN.COMMENTS.NEW_COMMENT' | translate }}
         </button>
@@ -228,6 +228,14 @@
   </c-card-footer>
   }
 </c-card>
+
+<!-- Modal Crear Comentario -->
+<app-crear-comentario [visible]="visibleModalCrear" (visibleChange)="visibleModalCrear = $event"
+  (onSuccess)="onSuccessSave()"></app-crear-comentario>
+
+<!-- Modal Editar Comentario -->
+<app-editar-comentario [visible]="visibleModalEditar" [comentario]="comentarioSeleccionado"
+  (visibleChange)="visibleModalEditar = $event" (onSuccess)="onSuccessSave()"></app-editar-comentario>
 
 <!-- Modal de Confirmación de Eliminación -->
 <app-confirmation-modal [visible]="showDeleteModal" [title]="'ADMIN.COMMENTS.DELETE_COMMENT' | translate"
