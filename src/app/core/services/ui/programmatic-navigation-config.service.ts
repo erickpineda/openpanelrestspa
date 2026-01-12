@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { 
-  INavItemEnhanced, 
-  IContextualAction, 
+import {
+  INavItemEnhanced,
+  IContextualAction,
   UserRole,
   NavigationConfig,
   NavigationSection,
-  NavigationItem
+  NavigationItem,
 } from '../../../shared/types/navigation.types';
 
 /**
@@ -47,36 +47,36 @@ export interface NavigationCustomizationAPI {
   // Configuración de elementos
   configureElement(config: DynamicElementConfig): void;
   removeElement(itemId: string): void;
-  
+
   // Configuración de grupos
   createGroup(config: DynamicGroupConfig): void;
   updateGroup(groupId: string, config: Partial<DynamicGroupConfig>): void;
   removeGroup(groupId: string): void;
-  
+
   // Configuración de acciones contextuales
   addContextualAction(itemId: string, action: IContextualAction): void;
   removeContextualAction(itemId: string, actionName: string): void;
-  
+
   // Configuración de badges
   setBadge(itemId: string, badge: DynamicElementConfig['badge']): void;
   removeBadge(itemId: string): void;
-  
+
   // Configuración de iconos
   setIcon(itemId: string, icon: string): void;
-  
+
   // Configuración de visibilidad
   setVisibility(itemId: string, visible: boolean): void;
-  
+
   // Configuración de prioridad
   setPriority(itemId: string, priority: number): void;
-  
+
   // Configuración de roles
   setRequiredRoles(itemId: string, roles: UserRole[]): void;
-  
+
   // Obtener configuración actual
   getElementConfig(itemId: string): DynamicElementConfig | null;
   getAllConfigurations(): Map<string, DynamicElementConfig>;
-  
+
   // Observables para cambios
   getConfigurationChanges(): Observable<Map<string, DynamicElementConfig>>;
   getGroupChanges(): Observable<Map<string, DynamicGroupConfig>>;
@@ -86,13 +86,12 @@ export interface NavigationCustomizationAPI {
  * Servicio para configuración programática de elementos de navegación
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProgrammaticNavigationConfigService implements NavigationCustomizationAPI {
-  
   private elementConfigsSubject = new BehaviorSubject<Map<string, DynamicElementConfig>>(new Map());
   private groupConfigsSubject = new BehaviorSubject<Map<string, DynamicGroupConfig>>(new Map());
-  
+
   constructor() {}
 
   /**
@@ -101,11 +100,11 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   configureElement(config: DynamicElementConfig): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const newConfigs = new Map(currentConfigs);
-    
+
     // Merge con configuración existente si existe
     const existingConfig = newConfigs.get(config.itemId);
     const mergedConfig = existingConfig ? { ...existingConfig, ...config } : config;
-    
+
     newConfigs.set(config.itemId, mergedConfig);
     this.elementConfigsSubject.next(newConfigs);
   }
@@ -116,7 +115,7 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   removeElement(itemId: string): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const newConfigs = new Map(currentConfigs);
-    
+
     // Marcar como no visible en lugar de eliminar completamente
     const existingConfig = newConfigs.get(itemId);
     if (existingConfig) {
@@ -124,7 +123,7 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
     } else {
       newConfigs.set(itemId, { itemId, visible: false });
     }
-    
+
     this.elementConfigsSubject.next(newConfigs);
   }
 
@@ -134,7 +133,7 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   createGroup(config: DynamicGroupConfig): void {
     const currentGroups = this.groupConfigsSubject.value;
     const newGroups = new Map(currentGroups);
-    
+
     newGroups.set(config.groupId, config);
     this.groupConfigsSubject.next(newGroups);
   }
@@ -145,7 +144,7 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   updateGroup(groupId: string, config: Partial<DynamicGroupConfig>): void {
     const currentGroups = this.groupConfigsSubject.value;
     const existingGroup = currentGroups.get(groupId);
-    
+
     if (existingGroup) {
       const newGroups = new Map(currentGroups);
       newGroups.set(groupId, { ...existingGroup, ...config });
@@ -159,7 +158,7 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   removeGroup(groupId: string): void {
     const currentGroups = this.groupConfigsSubject.value;
     const newGroups = new Map(currentGroups);
-    
+
     newGroups.delete(groupId);
     this.groupConfigsSubject.next(newGroups);
   }
@@ -170,13 +169,13 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   addContextualAction(itemId: string, action: IContextualAction): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const existingConfig = currentConfigs.get(itemId) || { itemId };
-    
+
     const existingActions = existingConfig.contextualActions || [];
     const newActions = [...existingActions, action];
-    
+
     this.configureElement({
       ...existingConfig,
-      contextualActions: newActions
+      contextualActions: newActions,
     });
   }
 
@@ -186,15 +185,15 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   removeContextualAction(itemId: string, actionName: string): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const existingConfig = currentConfigs.get(itemId);
-    
+
     if (existingConfig && existingConfig.contextualActions) {
       const filteredActions = existingConfig.contextualActions.filter(
-        action => action.name !== actionName
+        (action) => action.name !== actionName
       );
-      
+
       this.configureElement({
         ...existingConfig,
-        contextualActions: filteredActions
+        contextualActions: filteredActions,
       });
     }
   }
@@ -205,10 +204,10 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   setBadge(itemId: string, badge: DynamicElementConfig['badge']): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const existingConfig = currentConfigs.get(itemId) || { itemId };
-    
+
     this.configureElement({
       ...existingConfig,
-      badge
+      badge,
     });
   }
 
@@ -218,7 +217,7 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   removeBadge(itemId: string): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const existingConfig = currentConfigs.get(itemId);
-    
+
     if (existingConfig) {
       const { badge, ...configWithoutBadge } = existingConfig;
       const newConfigs = new Map(currentConfigs);
@@ -233,10 +232,10 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   setIcon(itemId: string, icon: string): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const existingConfig = currentConfigs.get(itemId) || { itemId };
-    
+
     this.configureElement({
       ...existingConfig,
-      icon
+      icon,
     });
   }
 
@@ -246,10 +245,10 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   setVisibility(itemId: string, visible: boolean): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const existingConfig = currentConfigs.get(itemId) || { itemId };
-    
+
     this.configureElement({
       ...existingConfig,
-      visible
+      visible,
     });
   }
 
@@ -259,10 +258,10 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   setPriority(itemId: string, priority: number): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const existingConfig = currentConfigs.get(itemId) || { itemId };
-    
+
     this.configureElement({
       ...existingConfig,
-      priority
+      priority,
     });
   }
 
@@ -272,10 +271,10 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   setRequiredRoles(itemId: string, roles: UserRole[]): void {
     const currentConfigs = this.elementConfigsSubject.value;
     const existingConfig = currentConfigs.get(itemId) || { itemId };
-    
+
     this.configureElement({
       ...existingConfig,
-      requiredRoles: roles
+      requiredRoles: roles,
     });
   }
 
@@ -312,9 +311,10 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
    */
   applyDynamicConfigurations(items: INavItemEnhanced[]): INavItemEnhanced[] {
     const configs = this.elementConfigsSubject.value;
-    
-    return items.map(item => this.applyConfigToItem(item, configs))
-      .filter(item => {
+
+    return items
+      .map((item) => this.applyConfigToItem(item, configs))
+      .filter((item) => {
         // Filtrar elementos marcados como no visibles
         const itemId = this.generateItemId(item);
         const config = configs.get(itemId);
@@ -326,10 +326,10 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
         const bId = this.generateItemId(b);
         const aConfig = configs.get(aId);
         const bConfig = configs.get(bId);
-        
+
         const aPriority = aConfig?.priority ?? a.priority ?? 0;
         const bPriority = bConfig?.priority ?? b.priority ?? 0;
-        
+
         return bPriority - aPriority; // Mayor prioridad primero
       });
   }
@@ -337,10 +337,13 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   /**
    * Aplica configuración dinámica a un elemento individual
    */
-  private applyConfigToItem(item: INavItemEnhanced, configs: Map<string, DynamicElementConfig>): INavItemEnhanced {
+  private applyConfigToItem(
+    item: INavItemEnhanced,
+    configs: Map<string, DynamicElementConfig>
+  ): INavItemEnhanced {
     const itemId = this.generateItemId(item);
     const config = configs.get(itemId);
-    
+
     if (!config) {
       return item;
     }
@@ -356,7 +359,7 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
     if (config.badge) {
       updatedItem.badge = {
         color: config.badge.color,
-        text: config.badge.text
+        text: config.badge.text,
       };
     }
 
@@ -377,9 +380,7 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
 
     // Aplicar configuración a children recursivamente
     if (item.children && item.children.length > 0) {
-      updatedItem.children = item.children.map(child => 
-        this.applyConfigToItem(child, configs)
-      );
+      updatedItem.children = item.children.map((child) => this.applyConfigToItem(child, configs));
     }
 
     return updatedItem;
@@ -392,7 +393,13 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
     if (item.url) {
       return Array.isArray(item.url) ? item.url.join('-') : item.url;
     }
-    return item.name?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() || 'unknown';
+    return (
+      item.name
+        ?.normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]/g, '-')
+        .toLowerCase() || 'unknown'
+    );
   }
 
   /**
@@ -401,47 +408,55 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   generateNavigationWithDynamicGroups(baseConfig: NavigationConfig): NavigationConfig {
     const dynamicGroups = this.groupConfigsSubject.value;
     const elementConfigs = this.elementConfigsSubject.value;
-    
+
     // Crear secciones adicionales basadas en grupos dinámicos
-    const dynamicSections: NavigationSection[] = Array.from(dynamicGroups.values()).map(group => ({
-      id: group.groupId,
-      title: group.title,
-      icon: group.icon || 'cil-folder',
-      priority: group.priority,
-      items: this.createItemsFromGroup(group, elementConfigs),
-      collapsible: group.collapsible ?? true,
-      defaultExpanded: group.defaultExpanded ?? false,
-      requiredRoles: group.requiredRoles || []
-    }));
+    const dynamicSections: NavigationSection[] = Array.from(dynamicGroups.values()).map(
+      (group) => ({
+        id: group.groupId,
+        title: group.title,
+        icon: group.icon || 'cil-folder',
+        priority: group.priority,
+        items: this.createItemsFromGroup(group, elementConfigs),
+        collapsible: group.collapsible ?? true,
+        defaultExpanded: group.defaultExpanded ?? false,
+        requiredRoles: group.requiredRoles || [],
+      })
+    );
 
     // Combinar secciones base con secciones dinámicas
-    const allSections = [...baseConfig.sections, ...dynamicSections]
-      .sort((a, b) => b.priority - a.priority);
+    const allSections = [...baseConfig.sections, ...dynamicSections].sort(
+      (a, b) => b.priority - a.priority
+    );
 
     return {
       ...baseConfig,
-      sections: allSections
+      sections: allSections,
     };
   }
 
   /**
    * Crea elementos de navegación a partir de un grupo dinámico
    */
-  private createItemsFromGroup(group: DynamicGroupConfig, elementConfigs: Map<string, DynamicElementConfig>): NavigationItem[] {
-    return group.items.map(itemId => {
+  private createItemsFromGroup(
+    group: DynamicGroupConfig,
+    elementConfigs: Map<string, DynamicElementConfig>
+  ): NavigationItem[] {
+    return group.items.map((itemId) => {
       const config = elementConfigs.get(itemId);
-      
+
       return {
         id: itemId,
         name: config?.itemId || itemId,
         url: `/${itemId}`,
         icon: config?.icon || 'cil-circle',
         priority: config?.priority || 0,
-        badge: config?.badge ? {
-          type: config.badge.dynamic ? 'dynamic' : 'static',
-          color: config.badge.color,
-          text: config.badge.text
-        } : undefined
+        badge: config?.badge
+          ? {
+              type: config.badge.dynamic ? 'dynamic' : 'static',
+              color: config.badge.color,
+              text: config.badge.text,
+            }
+          : undefined,
       };
     });
   }
@@ -457,15 +472,15 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   /**
    * Exporta configuraciones actuales para persistencia
    */
-  exportConfigurations(): { elements: any[], groups: any[] } {
+  exportConfigurations(): { elements: any[]; groups: any[] } {
     const elements = Array.from(this.elementConfigsSubject.value.entries()).map(([id, config]) => ({
       id,
-      ...config
+      ...config,
     }));
-    
+
     const groups = Array.from(this.groupConfigsSubject.value.entries()).map(([id, config]) => ({
       id,
-      ...config
+      ...config,
     }));
 
     return { elements, groups };
@@ -474,17 +489,17 @@ export class ProgrammaticNavigationConfigService implements NavigationCustomizat
   /**
    * Importa configuraciones desde datos persistidos
    */
-  importConfigurations(data: { elements: any[], groups: any[] }): void {
+  importConfigurations(data: { elements: any[]; groups: any[] }): void {
     // Importar configuraciones de elementos
     const elementConfigs = new Map<string, DynamicElementConfig>();
-    data.elements.forEach(element => {
+    data.elements.forEach((element) => {
       const { id, ...config } = element;
       elementConfigs.set(id, { itemId: id, ...config });
     });
-    
+
     // Importar configuraciones de grupos
     const groupConfigs = new Map<string, DynamicGroupConfig>();
-    data.groups.forEach(group => {
+    data.groups.forEach((group) => {
       const { id, ...config } = group;
       groupConfigs.set(id, { groupId: id, ...config });
     });

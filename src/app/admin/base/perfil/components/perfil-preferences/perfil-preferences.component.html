@@ -1,28 +1,28 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <div class="mb-3">
-    <label cLabel for="theme">Tema</label>
+    <label cLabel for="theme">{{ 'AUTO.TEMA' | translate }}</label>
     <select cSelect id="theme" formControlName="theme">
-      <option value="light">Claro</option>
-      <option value="dark">Oscuro</option>
+      <option value="light">{{ 'AUTO.CLARO' | translate }}</option>
+      <option value="dark">{{ 'AUTO.OSCURO' | translate }}</option>
     </select>
   </div>
 
   <div class="mb-3">
-    <label cLabel for="language">Idioma</label>
+    <label cLabel for="language">{{ 'AUTO.IDIOMA' | translate }}</label>
     <select cSelect id="language" formControlName="language">
-      <option value="es">Español</option>
-      <option value="en">Inglés</option>
+      <option value="es">{{ 'AUTO.ESPA_OL' | translate }}</option>
+      <option value="en">{{ 'AUTO.INGL_S' | translate }}</option>
     </select>
   </div>
 
   <div class="mb-3">
     <c-form-check>
       <input cFormCheckInput type="checkbox" id="notifications" formControlName="notifications" />
-      <label cFormCheckLabel for="notifications">Recibir notificaciones por correo</label>
+      <label cFormCheckLabel for="notifications">{{ 'AUTO.RECIBIR_NOTIFICACIONES_POR_COR' | translate }}</label>
     </c-form-check>
   </div>
 
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button cButton color="primary" type="submit">Guardar Preferencias</button>
+    <button cButton color="primary" type="submit">{{ 'AUTO.GUARDAR_PREFERENCIAS' | translate }}</button>
   </div>
 </form>

@@ -1,34 +1,73 @@
-<c-card class="preview-entrada-card">
-  <c-card-header>
-    <div class="d-flex justify-content-between align-items-center w-100">
-      <div>
-        <h3 class="h5 mb-0">{{ tituloMostrar || 'Sin título' }}</h3>
-        <small *ngIf="categoriasMostrar?.length" class="text-muted">
-          Categorías:
-          <span *ngFor="let c of categoriasMostrar; let last = last">
-            {{ c.nombre || c }}<span *ngIf="!last">, </span>
-          </span>
-        </small>
-      </div>
-
-      <div class="d-flex gap-2" *ngIf="mostrarBotonesAccion">
-        <button cButton color="warning" size="sm" (click)="onEditar()">
-          <svg cIcon name="cilWarning" style="padding-right: 2px" size="sm" title="Editar entrada"></svg>
-          Editar
-        </button>
-        <button cButton color="danger" size="sm" (click)="onCerrar()">
-          <svg cIcon name="cilX" style="padding-right: 2px" size="sm" title="Cerrar"></svg>
-          Cerrar
-        </button>
-        <button cButton color="success" size="sm" (click)="onPublicar()">
-          <svg cIcon name="cilPaperPlane" style="padding-right: 2px" size="sm" title="Publicar"></svg>
-          Publicar
-        </button>
-      </div>
+<div class="preview-entrada-container">
+  <!-- Imagen Destacada -->
+  @if (imagenMostrar) {
+    <div class="text-center mb-4 bg-light p-2 rounded">
+      <img [src]="imagenMostrar" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;" alt="Imagen destacada">
     </div>
-  </c-card-header>
+  }
 
-  <c-card-body>
-    <div class="preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
-  </c-card-body>
-</c-card>
+  <!-- Header: Título y Metadatos -->
+  <div class="mb-4">
+    @if (mostrarTitulo && tituloMostrar) {
+      <h3 class="h2 mb-3 fw-bold text-dark">{{ tituloMostrar }}</h3>
+    }
+    
+    <div class="d-flex align-items-center flex-wrap gap-3 text-secondary border-bottom pb-3">
+      @if (usernameMostrar) {
+        <div class="d-flex align-items-center">
+          <svg cIcon name="cilUser" size="sm" class="me-2"></svg>
+          {{ usernameMostrar }}
+        </div>
+      }
+
+      @if (usernameMostrar && (fechaMostrar || categoriasMostrar.length)) {
+        <div class="vr d-none d-sm-block"></div>
+      }
+
+      @if (fechaMostrar) {
+        <div class="d-flex align-items-center">
+          <svg cIcon name="cilCalendar" size="sm" class="me-2"></svg>
+          {{ fechaMostrar | date:'dd-MM-yyyy' }}
+        </div>
+      }
+
+      @if (fechaMostrar && categoriasMostrar.length) {
+        <div class="vr d-none d-sm-block"></div>
+      }
+
+      @if (categoriasMostrar.length) {
+        <div class="d-flex align-items-center">
+          <svg cIcon name="cilTags" size="sm" class="me-2"></svg>
+          <div class="d-flex flex-wrap gap-1 ms-2">
+             @for (c of categoriasMostrar; track c) {
+               <c-badge color="light" class="text-secondary border border-light-subtle">
+                 {{ c.nombre || c }}
+               </c-badge>
+             }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
+
+  <!-- Botones de Acción -->
+  @if (mostrarBotonesAccion) {
+    <div class="d-flex gap-2 mt-4 pt-3 border-top justify-content-end">
+      <button cButton color="danger" variant="ghost" (click)="onCerrar()">
+        <svg cIcon name="cilX" class="me-2"></svg>
+        Cerrar
+      </button>
+      <button cButton color="warning" variant="ghost" (click)="onEditar()">
+        <svg cIcon name="cilPencil" class="me-2"></svg>
+        Editar
+      </button>
+      <button cButton color="success" (click)="onPublicar()" class="text-white">
+        <svg cIcon name="cilPaperPlane" class="me-2"></svg>
+        Publicar
+      </button>
+    </div>
+  }
+</div>

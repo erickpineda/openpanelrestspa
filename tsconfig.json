@@ -15,28 +15,17 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "lib": [
-      "ES2022",
-      "dom"
-    ],
     "esModuleInterop": true,
-    "types": [
-      "ckeditor__ckeditor5-core",
-      "ckeditor__ckeditor5-utils",
-      "node"
-    ],
-    "typeRoots": [
-      "node_modules/@types"
-    ]
+    "types": ["ckeditor__ckeditor5-core", "ckeditor__ckeditor5-utils", "node"],
+    "typeRoots": ["node_modules/@types"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
@@ -47,6 +36,6 @@
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.spec.json" },
+    { "path": "./tsconfig.spec.json" }
   ]
 }

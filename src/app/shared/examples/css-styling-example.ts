@@ -1,32 +1,32 @@
 /**
  * Ejemplos de uso de los estilos CSS optimizados para navegación
- * 
+ *
  * Este archivo demuestra cómo utilizar las nuevas clases CSS y animaciones
  * implementadas en la Tarea 12 del proyecto de optimización del sidebar.
  */
 
 /**
  * CLASES CSS PRINCIPALES IMPLEMENTADAS:
- * 
+ *
  * 1. CONTENEDOR PRINCIPAL:
  *    - .optimized-navigation: Contenedor principal con animaciones
  *    - .optimized-navigation.entering: Animación de entrada
  *    - .optimized-navigation.exiting: Animación de salida
- * 
+ *
  * 2. SECCIONES DE NAVEGACIÓN:
  *    - .nav-section: Contenedor de sección con espaciado
  *    - .nav-section-title: Título de sección con estilos mejorados
  *    - .nav-section-content: Contenido colapsable de sección
  *    - .nav-section-content.collapsed: Estado colapsado
  *    - .nav-section-content.expanded: Estado expandido
- * 
+ *
  * 3. ELEMENTOS DE NAVEGACIÓN:
  *    - .nav-item-enhanced: Elemento de navegación mejorado
  *    - .nav-link: Link de navegación con efectos hover
  *    - .nav-link.active: Estado activo con indicador visual
  *    - .nav-icon: Icono con transformaciones en hover
  *    - .nav-text: Texto con transiciones suaves
- * 
+ *
  * 4. BADGES DINÁMICOS:
  *    - .nav-badge: Badge base con gradientes
  *    - .nav-badge.badge-primary: Badge primario
@@ -38,21 +38,21 @@
  *    - .nav-badge.updating: Badge con animación de actualización
  *    - .nav-badge.new-badge: Badge nuevo con animación de entrada
  *    - .nav-badge.zero-count: Badge oculto para contadores cero
- * 
+ *
  * 5. ACCIONES CONTEXTUALES:
  *    - .nav-contextual-actions: Contenedor de acciones
  *    - .action-button: Botón de acción contextual
- * 
+ *
  * 6. LAZY LOADING:
  *    - .nav-chunk: Contenedor de chunk
  *    - .nav-chunk.loading: Estado de carga con shimmer
  *    - .nav-chunk.loaded: Estado cargado con animación
- * 
+ *
  * 7. RESPONSIVE:
  *    - Breakpoints automáticos para móvil, tablet y desktop
  *    - .critical-functions-bar: Barra de funciones críticas móvil
  *    - .critical-function: Función crítica individual
- * 
+ *
  * 8. ANIMACIONES:
  *    - .nav-animate: Clase base para animaciones
  *    - .slide-in-left, .slide-out-left: Animaciones de deslizamiento
@@ -63,11 +63,11 @@
  *    - .shake: Animación de temblor
  *    - .glow: Animación de brillo
  *    - .shimmer: Animación de shimmer para carga
- * 
+ *
  * 9. ESTADOS DE ERROR:
  *    - .nav-error-state: Estado de error con botón de reintento
  *    - .nav-loading-skeleton: Esqueleto de carga
- * 
+ *
  * 10. ACCESIBILIDAD:
  *     - Soporte para prefers-reduced-motion
  *     - Soporte para prefers-contrast: high
@@ -76,7 +76,6 @@
  */
 
 export class CSSStyleExamples {
-  
   /**
    * Ejemplo 1: Aplicar estilos básicos de navegación
    */
@@ -408,7 +407,7 @@ export class CSSStyleExamples {
 
 /**
  * VARIABLES CSS DISPONIBLES PARA PERSONALIZACIÓN:
- * 
+ *
  * --nav-transition-duration: Duración de transiciones (default: 0.3s)
  * --nav-transition-easing: Función de easing (default: cubic-bezier(0.4, 0, 0.2, 1))
  * --nav-section-spacing: Espaciado entre secciones (default: 1.5rem)
@@ -427,23 +426,23 @@ export class CSSStyleExamples {
 
 /**
  * BREAKPOINTS RESPONSIVOS:
- * 
+ *
  * Móvil: max-width: 575.98px
  * - Navegación de ancho completo
  * - Elementos táctiles más grandes
  * - Barra de funciones críticas visible
  * - Acciones contextuales ocultas
- * 
+ *
  * Tablet: 576px - 767.98px
  * - Elementos optimizados para touch
  * - Navegación colapsable
  * - Barra de funciones críticas visible
- * 
+ *
  * Tablet Grande: 768px - 991.98px
  * - Navegación compacta
  * - Sin barra de funciones críticas
  * - Hover effects habilitados
- * 
+ *
  * Desktop: 992px+
  * - Navegación completa
  * - Todos los efectos visuales

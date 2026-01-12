@@ -1,4 +1,4 @@
-import { base } from "./environment-base";
+import { base } from './environment-base';
 
 base.i18n = 'es';
 

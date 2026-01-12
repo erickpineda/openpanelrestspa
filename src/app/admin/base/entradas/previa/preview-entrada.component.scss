@@ -1,9 +1,29 @@
 .preview-entrada-card {
   .preview-entrada-contenido {
-    p { margin-bottom: 1rem; line-height: 1.6; }
-    img { max-width: 100%; height: auto; display: block; margin: 0.5rem 0; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-    th, td { border: 1px solid #ddd; padding: 0.5rem; }
-    pre { background: #f8f9fa; padding: 1rem; overflow: auto; }
+    p {
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0.5rem 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+    }
+    pre {
+      background: #f8f9fa;
+      padding: 1rem;
+      overflow: auto;
+    }
   }
 }

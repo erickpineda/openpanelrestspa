@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 @Component({
   selector: 'app-dashboard-estado-split-panel',
   templateUrl: './dashboard-estado-split-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardEstadoSplitPanelComponent {
   @Input() loadingSplitEstado: boolean = false;
@@ -13,4 +14,3 @@ export class DashboardEstadoSplitPanelComponent {
   @Output() downloadCsv = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
 }
-

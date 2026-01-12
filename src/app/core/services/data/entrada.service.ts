@@ -24,7 +24,7 @@ interface BuscarResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EntradaService extends CrudService<Entrada, number> {
   protected endpoint = '/entradas';
@@ -41,13 +41,11 @@ export class EntradaService extends CrudService<Entrada, number> {
       undefined,
       undefined,
       'entradas.tiposEntradas'
-    ).pipe(
-      map(response => response.tiposEntradas)
-    );
+    ).pipe(map((response) => response.tiposEntradas));
   }
 
   /**
-   * Obtiene estados de entrada de forma segura  
+   * Obtiene estados de entrada de forma segura
    */
   listarEstadosEntradasSafe(): Observable<EstadoEntrada[]> {
     return this.safeGetData<EstadosEntradasResponse>(
@@ -56,9 +54,7 @@ export class EntradaService extends CrudService<Entrada, number> {
       undefined,
       undefined,
       'entradas.estadosEntradas'
-    ).pipe(
-      map(response => response.estadosEntradas)
-    );
+    ).pipe(map((response) => response.estadosEntradas));
   }
 
   /**

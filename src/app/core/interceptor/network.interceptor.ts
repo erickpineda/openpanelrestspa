@@ -4,7 +4,7 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-  HttpErrorResponse
+  HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, finalize, timeout } from 'rxjs/operators';
@@ -21,13 +21,13 @@ export class NetworkInterceptor implements HttpInterceptor {
     'i18n/',
     'sockjs-node/',
     '/api/v1/auth/refreshToken', // No mostrar loading para refresh token
-    '/api/v1/usuarios/perfil/yo'  // Peticiones rápidas de perfil
+    '/api/v1/usuarios/perfil/yo', // Peticiones rápidas de perfil
   ];
 
   // URLs que son consideradas "silenciosas" (no muestran errores)
   private silentUrls = [
     '/api/v1/auth/refreshToken',
-    '/api/v1/prueba' // Ejemplo: notificaciones en background
+    '/api/v1/prueba', // Ejemplo: notificaciones en background
   ];
 
   // Timeout por defecto (30 segundos)
@@ -71,21 +71,21 @@ export class NetworkInterceptor implements HttpInterceptor {
     return next.handle(modifiedRequest).pipe(
       // Timeout global
       timeout(this.defaultTimeout),
-      
+
       // Manejo de errores
       catchError((error: HttpErrorResponse) => {
         this.handleError(error, request, isSilentRequest);
         return throwError(() => error);
       }),
-      
+
       // Finalización
       finalize(() => {
         this.activeRequests.delete(requestKey);
-        
+
         if (!shouldSkipLoading) {
           this.loadingService.setGlobalLoading(false);
         }
-        
+
         this.logRequestCompletion(request);
       })
     );
@@ -100,11 +100,11 @@ export class NetworkInterceptor implements HttpInterceptor {
   private shouldSkipLoading(request: HttpRequest<unknown>): boolean {
     const skipByContext = request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER) === true;
     if (skipByContext) return true;
-    return this.excludedUrls.some(url => request.url.includes(url));
+    return this.excludedUrls.some((url) => request.url.includes(url));
   }
 
   private isSilentRequest(request: HttpRequest<unknown>): boolean {
-    return this.silentUrls.some(url => request.url.includes(url));
+    return this.silentUrls.some((url) => request.url.includes(url));
   }
 
   private addAuthHeaders(request: HttpRequest<unknown>): HttpRequest<unknown> {
@@ -127,7 +127,11 @@ export class NetworkInterceptor implements HttpInterceptor {
       isApi &&
       !isFormData &&
       !request.headers.has('Content-Type') &&
-      (request.method === 'GET' || request.method === 'DELETE' || request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH')
+      (request.method === 'GET' ||
+        request.method === 'DELETE' ||
+        request.method === 'POST' ||
+        request.method === 'PUT' ||
+        request.method === 'PATCH')
     ) {
       headersToSet['Content-Type'] = 'application/json';
     }
@@ -139,13 +143,17 @@ export class NetworkInterceptor implements HttpInterceptor {
     return request;
   }
 
-  private handleError(error: HttpErrorResponse, request: HttpRequest<unknown>, isSilent: boolean): void {
+  private handleError(
+    error: HttpErrorResponse,
+    request: HttpRequest<unknown>,
+    isSilent: boolean
+  ): void {
     const errorContext = {
       url: request.url,
       method: request.method,
       status: error.status,
       message: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     // Log del error - Usar warn para errores 4xx (cliente) para no ensuciar la consola con errores esperados
@@ -163,38 +171,44 @@ export class NetworkInterceptor implements HttpInterceptor {
     switch (error.status) {
       case 0:
         // Error de conexión
-        this.notificationService.error('No se pudo conectar con el servidor. Verifica tu conexión a internet.');
+        this.notificationService.error(
+          'No se pudo conectar con el servidor. Verifica tu conexión a internet.'
+        );
         break;
-      
+
       case 401:
         // No autorizado - manejado por AuthInterceptor
         break;
-      
+
       case 403:
         this.notificationService.error('No tienes permisos para realizar esta acción.');
         break;
-      
+
       case 404:
         this.notificationService.warning('El recurso solicitado no fue encontrado.');
         break;
-      
+
       case 429:
         this.notificationService.warning('Demasiadas peticiones. Por favor, espera un momento.');
         break;
-      
+
       case 500:
         this.notificationService.error('Error interno del servidor. Por favor, intenta más tarde.');
         break;
-      
+
       case 502:
       case 503:
       case 504:
-        this.notificationService.error('El servidor no está disponible en este momento. Por favor, intenta más tarde.');
+        this.notificationService.error(
+          'El servidor no está disponible en este momento. Por favor, intenta más tarde.'
+        );
         break;
-      
+
       default:
         if (error.status >= 400 && error.status < 500) {
-          this.notificationService.error('Error en la petición. Verifica los datos e intenta nuevamente.');
+          this.notificationService.error(
+            'Error en la petición. Verifica los datos e intenta nuevamente.'
+          );
         } else if (error.status >= 500) {
           this.notificationService.error('Error del servidor. Por favor, intenta más tarde.');
         }

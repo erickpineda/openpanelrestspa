@@ -1,18 +1,23 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Comentario } from '../../../../core/models/comentario.model';
+import { ComentarioFacadeService } from './srv/comentario-facade.service';
+import { Entrada } from '../../../../core/models/entrada.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-comentario-form',
   templateUrl: './comentario-form.component.html',
-  styleUrls: ['./comentario-form.component.scss']
+  styleUrls: ['./comentario-form.component.scss'],
+  standalone: false,
 })
 export class ComentarioFormComponent implements OnChanges {
   @Input() comentario?: Comentario;
   @Input() nombreUsuario?: string;
   @Input() emailUsuario?: string;
   @Input() tituloEntrada?: string;
-  
+
   @Input() submitted = false;
   @Input() disabled = false; // Para modo ver/editar
   @Input() isEditMode = false; // Para saber si estamos en modo edición (vs crear)
@@ -22,14 +27,19 @@ export class ComentarioFormComponent implements OnChanges {
   @Output() editarComentario = new EventEmitter<void>(); // Solicitud de habilitar edición
 
   form: FormGroup;
+  searchResults: Entrada[] = [];
+  private searchSubject = new Subject<string>();
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private facade: ComentarioFacadeService
+  ) {
     this.form = this.fb.group({
       idComentario: [null],
-      idEntrada: [null],
+      idEntrada: [null, Validators.required],
       idUsuario: [null],
       username: [null], // Readonly display
-      tituloEntrada: [null], // Readonly display
+      tituloEntrada: [null], // Searchable in create
       email: [null], // Readonly display
       aprobado: [false],
       cuarentena: [false],
@@ -37,7 +47,15 @@ export class ComentarioFormComponent implements OnChanges {
       fechaCreacion: [null],
       fechaEdicion: [null],
       contenido: [null, Validators.required],
-      contenidoCensurado: [null]
+      contenidoCensurado: [null],
+    });
+
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((term) => this.facade.buscarEntradas(term))
+    ).subscribe((results) => {
+      this.searchResults = results;
     });
   }
 
@@ -45,7 +63,7 @@ export class ComentarioFormComponent implements OnChanges {
     if (changes['comentario'] && this.comentario) {
       this.form.patchValue(this.comentario);
     }
-    
+
     if (changes['nombreUsuario'] && this.nombreUsuario) {
       this.form.get('username')?.setValue(this.nombreUsuario);
     }
@@ -71,16 +89,52 @@ export class ComentarioFormComponent implements OnChanges {
     }
   }
 
+  onSearchInput(event: any) {
+    if (this.isEditMode) return;
+    
+    // Al escribir, invalidamos la selección anterior
+    this.form.patchValue({ idEntrada: null }, { emitEvent: false });
+
+    const term = event.target.value;
+    if (term.length > 2) {
+      this.searchSubject.next(term);
+    } else {
+      this.searchResults = [];
+    }
+  }
+
+  seleccionarEntrada(entrada: Entrada) {
+    this.form.patchValue({
+      idEntrada: entrada.idEntrada,
+      tituloEntrada: entrada.titulo
+    });
+    this.searchResults = [];
+  }
+
   private disableReadonlyFields() {
-    const readonlyFields = ['username', 'email', 'tituloEntrada', 'votos', 'fechaCreacion', 'fechaEdicion', 'idComentario', 'idEntrada', 'idUsuario'];
-    readonlyFields.forEach(field => {
+    const readonlyFields = [
+      'username',
+      'email',
+      // 'tituloEntrada', // Allow in create
+      'votos',
+      'fechaCreacion',
+      'fechaEdicion',
+      'idComentario',
+      // 'idEntrada', // Need to set it
+      'idUsuario',
+    ];
+    readonlyFields.forEach((field) => {
       this.form.get(field)?.disable();
     });
-    // En CrearEditarComentario: this.comentarioForm.controls['contenidoCensurado'].disable();
-    // Al editar se deshabilita contenidoCensurado?
-    // "this.comentarioForm.controls['contenidoCensurado'].disable();" estaba en editarComentario()
+    
+    // Always disable contenidoCensurado
+    this.form.get('contenidoCensurado')?.disable();
+
     if (this.isEditMode) {
-       this.form.get('contenidoCensurado')?.disable();
+      this.form.get('tituloEntrada')?.disable();
+      this.form.get('idEntrada')?.disable();
+    } else {
+       this.form.get('tituloEntrada')?.enable();
     }
   }
 
@@ -95,7 +149,7 @@ export class ComentarioFormComponent implements OnChanges {
       const formValue = this.form.getRawValue();
       this.submitComentario.emit(formValue);
     } else {
-        this.form.markAllAsTouched();
+      this.form.markAllAsTouched();
     }
   }
 

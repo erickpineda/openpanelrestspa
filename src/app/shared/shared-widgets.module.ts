@@ -11,9 +11,12 @@ import { DataRecoveryNotificationComponent } from './components/data-recovery-no
 import { TemporaryEntriesManagerComponent } from './components/temporary-entries-manager/temporary-entries-manager.component';
 import { KpiCardComponent } from './components/kpi-card/kpi-card.component';
 import { DashboardChartComponent } from './components/dashboard-chart/dashboard-chart.component';
+import { TranslatePipe } from './pipes/translate.pipe';
+import { RouterModule } from '@angular/router';
+import { TooltipModule, WidgetModule } from '@coreui/angular';
 
 @NgModule({
-  imports: [CommonModule, IconModule, SharedCoreUiModule, ChartjsModule],
+  imports: [CommonModule, IconModule, SharedCoreUiModule, ChartjsModule, TranslatePipe, RouterModule, TooltipModule, WidgetModule],
   declarations: [
     OpLoaderComponent,
     InlineLoaderComponent,

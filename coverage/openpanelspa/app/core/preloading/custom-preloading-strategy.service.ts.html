@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">84.61% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>11/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
@@ -88,64 +88,73 @@
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core';
-import { Observable, of, timer  } from 'rxjs';
-import { mergeMap } from 'rxjs/operators'
- 
+import { Observable, of, timer } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 import { PreloadingStrategy, Route } from '@angular/router';
- 
+import { TokenStorageService } from '../services/auth/token-storage.service';
+&nbsp;
 @Injectable()
 export class CustomPreloadingStrategyService implements PreloadingStrategy {
- 
-    preload(route: Route, loadMe: () =&gt; Observable&lt;any&gt;): Observable&lt;any&gt; {
-    
-    if (route.data &amp;&amp; route.data['preload']) {
-      var delay:number=route.data['delay']
-      //console.log('preload called on '+route.path+' delay is '+delay);
-      return timer(delay).pipe(
-        mergeMap( (res) =&gt; { 
-          //console.log("Loading now "+ route.path);
-          return loadMe() ;
-        }));
-    } else {
-      console.log('no preload for the path '+ route.path);
+  constructor(private tokenStorage: TokenStorageService) {}
+&nbsp;
+  preload(route: Route, loadMe: () =&gt; Observable&lt;any&gt;): Observable&lt;any&gt; {
+    const preload = !!route.data &amp;&amp; !!route.data['preload'];
+    if (!preload) {
       return of(null);
     }
+&nbsp;
+    const isProtected =
+      (Array.isArray(route.canLoad) &amp;&amp; route.canLoad.length &gt; 0) ||
+      (Array.isArray(route.canMatch) &amp;&amp; <span class="branch-3 cbranch-no" title="branch not covered" >route.canMatch.length &gt; 0)</span>;
+    const loggedIn = this.tokenStorage.isLoggedIn();
+    if (isProtected &amp;&amp; !loggedIn) {
+      return of(null);
+    }
+&nbsp;
+    const delay = (route.data &amp;&amp; (route.data['delay'] as number)) || <span class="branch-2 cbranch-no" title="branch not covered" >0;</span>
+    return timer(delay).pipe(mergeMap(() =&gt; loadMe()));
   }
- 
-} </pre></td></tr></table></pre>
+}
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-02T11:04:19.920Z
+                at 2025-12-31T07:59:30.392Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

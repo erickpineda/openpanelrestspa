@@ -1,142 +1,172 @@
 <!-- CoreUI Responsive Navigation Component -->
-<div class="responsive-navigation-container" 
-     *ngIf="responsiveState$ | async as state"
-     [ngClass]="getNavigationClasses(state)">
-  
-  <!-- CoreUI Toggle Button for Mobile/Tablet -->
-  <c-button *ngIf="shouldShowToggleButton(state)"
-            variant="ghost"
-            class="sidebar-toggle-btn"
-            [class.mobile]="state.isMobile"
-            [class.tablet]="state.isTablet"
-            [attr.aria-label]="getToggleButtonText(state)"
-            (click)="toggleSidebar()">
-    <svg cIcon 
-         [name]="state.sidebarCollapsed ? 'cilMenu' : 'cilX'" 
-         size="lg"></svg>
-    <span class="toggle-text" *ngIf="!state.isMobile">
-      {{ getToggleButtonText(state) }}
-    </span>
-  </c-button>
-
-  <!-- CoreUI Navigation Menu -->
-  <c-sidebar-nav class="navigation-menu" 
-                 [class.collapsed]="state.sidebarCollapsed"
-                 [class.mobile-menu]="state.isMobile"
-                 [class.tablet-menu]="state.isTablet"
-                 [class.desktop-menu]="state.isDesktop"
-                 [perfectScrollbar]="true">
-    
-    <!-- Mobile Overlay -->
-    <div *ngIf="state.isMobile && !state.sidebarCollapsed" 
-         class="mobile-overlay"
-         (click)="collapseSidebar()"></div>
-
-    <!-- CoreUI Navigation Items -->
-    <ng-container *ngFor="let item of adaptedNavigationItems; trackBy: trackByNavItem">
-      <ng-container *ngIf="shouldShowItem(item, state)">
-        
-        <!-- Section Title using CoreUI -->
-        <c-nav-title *ngIf="item.title" 
-                     class="nav-section-title"
-                     [class.mobile-hidden]="state.isMobile">
-          {{ item.name }}
-        </c-nav-title>
-
-        <!-- Navigation Item using CoreUI -->
-        <c-nav-item *ngIf="!item.title">
-          <c-nav-link [routerLink]="item.url"
-                      routerLinkActive="active"
-                      [routerLinkActiveOptions]="{ exact: false }"
-                      class="nav-link"
-                      [class.touch-target]="state.touchEnabled"
-                      [attr.aria-label]="item.name"
-                      [attr.data-testid]="toTestId(item.name || '')"
-                      (click)="onNavigationItemClick(item)">
-            
-            <!-- CoreUI Icon -->
-            <svg *ngIf="item.iconComponent?.name" 
-                 cIcon 
-                 [name]="item.iconComponent.name" 
-                 class="nav-icon"></svg>
-            <svg *ngIf="item.icon && !item.iconComponent" 
-                 cIcon 
-                 [name]="item.icon" 
-                 class="nav-icon"></svg>
-
-            <!-- Text -->
-            <ng-container *ngIf="!state.sidebarCollapsed || state.isMobile">
+@if (responsiveState$ | async; as state) {
+  <div class="responsive-navigation-container" [ngClass]="getNavigationClasses(state)">
+    <!-- CoreUI Toggle Button for Mobile/Tablet -->
+    @if (shouldShowToggleButton(state)) {
+      <c-button
+        variant="ghost"
+        class="sidebar-toggle-btn"
+        [class.mobile]="state.isMobile"
+        [class.tablet]="state.isTablet"
+        [attr.aria-label]="getToggleButtonText(state)"
+        (click)="toggleSidebar()"
+      >
+        <svg cIcon [name]="state.sidebarCollapsed ? 'cilMenu' : 'cilX'" size="lg"></svg>
+        @if (!state.isMobile) {
+          <span class="toggle-text">
+            {{ getToggleButtonText(state) }}
+          </span>
+        }
+      </c-button>
+    }
+    <!-- CoreUI Navigation Menu -->
+    <c-sidebar-nav
+      class="navigation-menu"
+      [class.collapsed]="state.sidebarCollapsed"
+      [class.mobile-menu]="state.isMobile"
+      [class.tablet-menu]="state.isTablet"
+      [class.desktop-menu]="state.isDesktop"
+      [perfectScrollbar]="true"
+    >
+      <!-- Mobile Overlay -->
+      @if (state.isMobile && !state.sidebarCollapsed) {
+        <div class="mobile-overlay" (click)="collapseSidebar()"></div>
+      }
+      <!-- CoreUI Navigation Items -->
+      @for (item of adaptedNavigationItems; track trackByNavItem($index, item)) {
+        @if (shouldShowItem(item, state)) {
+          <!-- Section Title using CoreUI -->
+          @if (item.title) {
+            <c-nav-title class="nav-section-title" [class.mobile-hidden]="state.isMobile">
               {{ item.name }}
-            </ng-container>
-
-            <!-- CoreUI Badge -->
-            <c-badge *ngIf="item.badge" 
-                     [color]="item.badge.color"
-                     class="ms-auto nav-badge"
-                     [ngClass]="['badge-' + (item.badge?.color || 'info'), {'zero-count': item.badge?.text === '0'}]">
-              {{ item.badge.text }}
-            </c-badge>
-
-            <!-- Dynamic Badge using CoreUI -->
-            <c-badge *ngIf="item.dynamicBadge" 
-                     [color]="item.badge?.color || 'info'"
-                     class="ms-auto dynamic-badge nav-badge"
-                     [ngClass]="['badge-' + (item.badge?.color || 'info')]">
-              <span class="badge-counter">0</span>
-            </c-badge>
-          </c-nav-link>
-
-          <!-- CoreUI Submenu -->
-          <c-nav-group *ngIf="item.children && item.children.length > 0 && !state.isMobile"
-                       [compact]="state.sidebarCollapsed">
-            <div class="nav-section-content">
-              <ng-container *ngFor="let child of item.children; trackBy: trackByNavItem">
-                <c-nav-item>
-                  <c-nav-link [routerLink]="child.url"
-                              routerLinkActive="active"
-                              class="nav-sublink"
-                              [class.touch-target]="state.touchEnabled"
-                              [attr.aria-label]="child.name"
-                              [attr.data-testid]="toTestId(child.name || '')"
-                              (click)="onNavigationItemClick(child)">
-                    
-                    <svg *ngIf="child.icon" 
-                         cIcon 
-                         [name]="child.icon" 
-                         class="nav-subicon"></svg>
-                    
-                    <ng-container *ngIf="!state.sidebarCollapsed">
-                      {{ child.name }}
-                    </ng-container>
- 
-                    <c-badge *ngIf="child.badge" 
-                             [color]="child.badge.color"
-                             class="ms-auto nav-subbadge"
-                             [ngClass]="['badge-' + child.badge.color]">
-                      {{ child.badge.text }}
-                    </c-badge>
-                  </c-nav-link>
-                </c-nav-item>
-              </ng-container>
-            </div>
-          </c-nav-group>
-        </c-nav-item>
-      </ng-container>
-    </ng-container>
-
-    <!-- Critical Functions Quick Access (Mobile Only) using CoreUI -->
-    <c-nav-group *ngIf="state.isMobile && state.sidebarCollapsed" 
-                 class="critical-functions-bar">
-      <c-nav-title>Acceso Rápido</c-nav-title>
-      <c-nav-item *ngFor="let func of criticalFunctions.slice(0, 4)">
-        <c-nav-link [routerLink]="func.url"
-                    class="critical-function-btn"
-                    [attr.aria-label]="func.name"
-                    (click)="onNavigationItemClick({ name: func.name, url: func.url, iconComponent: { name: func.icon } })">
-          <svg cIcon [name]="func.icon"></svg>
-          {{ func.name }}
-        </c-nav-link>
-      </c-nav-item>
-    </c-nav-group>
-  </c-sidebar-nav>
-</div>
+            </c-nav-title>
+          }
+          <!-- Navigation Item using CoreUI -->
+          @if (!item.title) {
+            <c-nav-item>
+              <c-nav-link
+                [routerLink]="item.url"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: false }"
+                class="nav-link"
+                [class.touch-target]="state.touchEnabled"
+                [attr.aria-label]="item.name"
+                [attr.data-testid]="toTestId(item.name || '')"
+                (click)="onNavigationItemClick(item)"
+              >
+                <!-- CoreUI Icon -->
+                @if (item.iconComponent?.name) {
+                  <svg cIcon [name]="item.iconComponent.name" class="nav-icon"></svg>
+                }
+                @if (item.icon && !item.iconComponent) {
+                  <svg cIcon [name]="item.icon" class="nav-icon"></svg>
+                }
+                <!-- Text -->
+                @if (!state.sidebarCollapsed || state.isMobile) {
+                  {{ item.name }}
+                }
+                <!-- CoreUI Badge -->
+                @if (item.badge) {
+                  <c-badge
+                    [color]="item.badge.color"
+                    class="ms-auto nav-badge"
+                    [ngClass]="getBadgeClasses(item.badge)"
+                  >
+                    {{ item.badge.text }}
+                  </c-badge>
+                }
+                <!-- Dynamic Badge using CoreUI -->
+                @if (item.dynamicBadge) {
+                  <c-badge
+                    [color]="item.badge?.color || 'info'"
+                    class="ms-auto dynamic-badge nav-badge"
+                    [ngClass]="['badge-' + (item.badge?.color || 'info')]"
+                  >
+                    <span class="badge-counter">0</span>
+                  </c-badge>
+                }
+              </c-nav-link>
+              <!-- CoreUI Submenu -->
+              @if (item.children && item.children.length > 0 && !state.isMobile) {
+                <c-nav-group [compact]="state.sidebarCollapsed">
+                  <div class="nav-section-content">
+                    @for (child of item.children; track trackByNavItem($index, child)) {
+                      <c-nav-item>
+                        <c-nav-link
+                          [routerLink]="child.url"
+                          routerLinkActive="active"
+                          class="nav-sublink"
+                          [class.touch-target]="state.touchEnabled"
+                          [attr.aria-label]="child.name"
+                          [attr.data-testid]="toTestId(child.name || '')"
+                          (click)="onNavigationItemClick(child)"
+                        >
+                          @if (child.icon) {
+                            <svg cIcon [name]="child.icon" class="nav-subicon"></svg>
+                          }
+                          @if (!state.sidebarCollapsed) {
+                            {{ child.name }}
+                          }
+                          @if (child.badge) {
+                            <c-badge
+                              [color]="child.badge.color"
+                              class="ms-auto nav-subbadge"
+                              [ngClass]="['badge-' + child.badge.color]"
+                            >
+                              {{ child.badge.text }}
+                            </c-badge>
+                          }
+                        </c-nav-link>
+                      </c-nav-item>
+                    }
+                  </div>
+                </c-nav-group>
+              }
+            </c-nav-item>
+          }
+        }
+      }
+      <!-- Critical Functions Quick Access (Mobile Only) using CoreUI -->
+      @if (state.isMobile && state.sidebarCollapsed) {
+        <c-nav-group class="critical-functions-bar">
+          <c-nav-title>{{ 'AUTO.ACCESO_R_PIDO' | translate }}</c-nav-title>
+          @for (func of criticalFunctions.slice(0, 4); track func.url) {
+            <c-nav-item>
+              <c-nav-link
+                [routerLink]="func.url"
+                class="critical-function-btn"
+                [attr.aria-label]="func.name"
+                (click)="
+                  onNavigationItemClick({
+                    name: func.name,
+                    url: func.url,
+                    iconComponent: { name: func.icon },
+                  })
+                "
+              >
+                <svg cIcon [name]="func.icon"></svg>
+                {{ func.name }}
+              </c-nav-link>
+            </c-nav-item>
+          }
+        </c-nav-group>
+      }
+    </c-sidebar-nav>
+    <!-- Bottom toggle control -->
+    <div
+      class="sidebar-bottom-toggle"
+      role="button"
+      tabindex="0"
+      [attr.aria-label]="state.sidebarCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'"
+      [attr.aria-pressed]="!state.sidebarCollapsed"
+      (click)="toggleSidebar()"
+      (keydown)="onBottomToggleKeydown($event)"
+    >
+      <svg
+        cIcon
+        [name]="state.sidebarCollapsed ? 'cilArrowRight' : 'cilArrowLeft'"
+        class="bottom-toggle-icon"
+      ></svg>
+    </div>
+  </div>
+}

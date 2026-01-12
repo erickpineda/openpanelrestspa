@@ -11,7 +11,7 @@ import { isJwtExpired } from '../../_utils/jwt.utils';
 import { SessionManagerService } from './session-manager.service';
 
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
 };
 
 @Injectable({ providedIn: 'root' })
@@ -36,44 +36,55 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post(this.urlBase + this.urlLogin, {
-      username,
-      password
-    }).pipe(
-      tap((data: any) => {
-        this.tokenStorage.cleanExpiredPostLoginRedirects();
-        this.tokenStorage.startPostLoginRedirectMaintenance(60 * 60 * 1000);
-        this.tokenStorage.saveToken(data.jwttoken);
-        this.tokenStorage.saveUser(data);
-        this.userSubject.next(data);
-        this.authSync.notifyLogin();
+    return this.http
+      .post(this.urlBase + this.urlLogin, {
+        username,
+        password,
       })
-    );
+      .pipe(
+        tap((data: any) => {
+          this.tokenStorage.cleanExpiredPostLoginRedirects();
+          this.tokenStorage.startPostLoginRedirectMaintenance(60 * 60 * 1000);
+          this.tokenStorage.saveToken(data.jwttoken);
+          this.tokenStorage.saveUser(data);
+          this.userSubject.next(data);
+        })
+      );
   }
 
   logout(): Observable<any> {
-    return this.http.post(
-      this.urlBase + this.urlUri + this.urlAuth + OPConstants.Methods.AUTH.LOGOUT,
-      {},
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.tokenStorage.getToken()
+    return this.http
+      .post(
+        this.urlBase + this.urlUri + this.urlAuth + OPConstants.Methods.AUTH.LOGOUT,
+        {},
+        {
+          headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + this.tokenStorage.getToken(),
+          }),
+        }
+      )
+      .pipe(
+        tap(() => {
+          this.performLogout();
         })
-      }
-    ).pipe(
-      tap(() => {
-        this.performLogout();
-      })
-    );
+      );
   }
 
   public performLogout(): void {
     this.tokenStorage.cleanExpiredPostLoginRedirects();
     // Delegamos: sessionManager guardará el redirect para esta pestaña y luego borrará tokens
-    this.sessionManager.performLogout({ type: 'LOGOUT', message: 'Logout local', allowSave: true, timestamp: Date.now(), originTabId: this.tokenStorage.getOrCreateTabId() });
+    this.sessionManager.performLogout({
+      type: 'LOGOUT',
+      message: 'Logout local',
+      allowSave: true,
+      timestamp: Date.now(),
+      originTabId: this.tokenStorage.getOrCreateTabId(),
+    });
     // Notificaremos a las otras pestañas
-    this.authSync.notifyLogout({ originTabId: this.tokenStorage.getOrCreateTabId() });
+    this.authSync.notifyLogout({
+      originTabId: this.tokenStorage.getOrCreateTabId(),
+    });
     // actualizamos estado local observable
     this.userSubject.next(null);
   }

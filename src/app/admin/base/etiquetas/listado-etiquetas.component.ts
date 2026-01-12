@@ -12,7 +12,8 @@ import { SearchUtilService } from '../../../core/services/utils/search-util.serv
 @Component({
   selector: 'app-etiquetas-list',
   templateUrl: './listado-etiquetas.component.html',
-  styleUrls: ['./listado-etiquetas.component.scss']
+  styleUrls: ['./listado-etiquetas.component.scss'],
+  standalone: false,
 })
 export class EtiquetasListComponent implements OnInit, OnDestroy {
   etiquetas: Etiqueta[] = [];
@@ -28,12 +29,12 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   etiquetaToDelete: Etiqueta | null = null;
   showAdvanced = false;
   basicSearchText = '';
-  
+
   searchForm: FormGroup;
   showCreateModal = false;
   showEditModal = false;
   selectedEtiqueta: Etiqueta | null = null;
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -46,7 +47,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   ) {
     this.searchForm = this.fb.group({
       nombre: [''],
-      descripcion: ['']
+      descripcion: [''],
     });
   }
 
@@ -65,31 +66,60 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
     const descripcion = (this.searchForm.get('descripcion')?.value || '').trim();
     const hasFilters = !!(this.basicSearchText || nombre || descripcion);
     if (!hasFilters) {
-      this.etiquetasService.listarPaginaSinGlobalLoader(this.pageNo, this.pageSize)
-      .pipe(takeUntil(this.destroy$), finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
-      .subscribe({
-        next: (response: any) => {
-          const data = response?.data ?? response;
-          this.setPageData(data as PaginaResponse);
-          this.cdr.detectChanges();
-        },
-        error: (error: any) => {
-          this.toast.showError('Error cargando etiquetas', 'Etiquetas');
-          this.log.error('etiquetas listar', error);
-          this.cdr.detectChanges();
-        }
-      });
+      this.etiquetasService
+        .listarPaginaSinGlobalLoader(this.pageNo, this.pageSize)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          })
+        )
+        .subscribe({
+          next: (response: any) => {
+            const data = response?.data ?? response;
+            this.setPageData(data as PaginaResponse);
+            this.cdr.detectChanges();
+          },
+          error: (error: any) => {
+            this.toast.showError('Error cargando etiquetas', 'Etiquetas');
+            this.log.error('etiquetas listar', error);
+            this.cdr.detectChanges();
+          },
+        });
       return;
     }
 
     const criteria: { filterKey: string; value: any; operation: string }[] = [];
-    if (this.basicSearchText) criteria.push({ filterKey: 'nombre', value: this.basicSearchText, operation: 'CONTAINS' });
-    if (nombre) criteria.push({ filterKey: 'nombre', value: nombre, operation: 'CONTAINS' });
-    if (descripcion) criteria.push({ filterKey: 'descripcion', value: descripcion, operation: 'CONTAINS' });
+    if (this.basicSearchText)
+      criteria.push({
+        filterKey: 'nombre',
+        value: this.basicSearchText,
+        operation: 'CONTAINS',
+      });
+    if (nombre)
+      criteria.push({
+        filterKey: 'nombre',
+        value: nombre,
+        operation: 'CONTAINS',
+      });
+    if (descripcion)
+      criteria.push({
+        filterKey: 'descripcion',
+        value: descripcion,
+        operation: 'CONTAINS',
+      });
     const searchRequest = this.searchUtil.buildRequest('Etiqueta', criteria, 'AND');
 
-    this.etiquetasService.buscarSinGlobalLoader(searchRequest, this.pageNo, this.pageSize)
-      .pipe(takeUntil(this.destroy$), finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+    this.etiquetasService
+      .buscarSinGlobalLoader(searchRequest, this.pageNo, this.pageSize)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: (response: any) => {
           const data = response?.data ?? response;
@@ -100,7 +130,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
           this.toast.showError('Error cargando etiquetas', 'Etiquetas');
           this.log.error('etiquetas listar', error);
           this.cdr.detectChanges();
-        }
+        },
       });
   }
 
@@ -162,7 +192,8 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
       return;
     }
     this.loading = true;
-    this.etiquetasService.borrar(this.etiquetaToDelete.idEtiqueta!)
+    this.etiquetasService
+      .borrar(this.etiquetaToDelete.idEtiqueta!)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -178,33 +209,15 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
           this.loading = false;
           this.showDeleteModal = false;
           this.etiquetaToDelete = null;
-        }
+        },
       });
   }
 
-  cancelDelete(): void {
-    this.showDeleteModal = false;
-    this.etiquetaToDelete = null;
-  }
-
-  onModalClose(): void {
+  onModalSave(): void {
     this.showCreateModal = false;
     this.showEditModal = false;
     this.selectedEtiqueta = null;
-  }
-
-  onModalSave(): void {
-    this.onModalClose();
     this.onPageChange(0);
-  }
-
-  onModalVisibleChange(visible: boolean): void {
-    if (!visible) { this.onModalClose(); }
-  }
-
-  getPaginationArray(): number[] {
-    const totalPages = this.getTotalPages();
-    return Array.from({ length: totalPages }, (_, i) => i);
   }
 
   getTotalPages(): number {
@@ -217,20 +230,26 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
 
   private setPageData(data: PaginaResponse): void {
     const raw = (data?.elements ?? (data as any)?.items ?? (data as any)?.content ?? []) as any[];
-    const mapped = Array.isArray(raw) ? raw.map((e: any) => ({
-      idEtiqueta: e?.idEtiqueta ?? e?.id ?? e?.id_tag ?? e?.idLabel,
-      nombre: e?.nombre ?? e?.name,
-      frecuencia: e?.frecuencia ?? 0,
-      descripcion: e?.descripcion ?? e?.description,
-      colorHex: e?.colorHex ?? e?.color ?? '#4ECDC4'
-    })) as Etiqueta[] : [];
+    const mapped = Array.isArray(raw)
+      ? (raw.map((e: any) => ({
+          idEtiqueta: e?.idEtiqueta ?? e?.id ?? e?.id_tag ?? e?.idLabel,
+          nombre: e?.nombre ?? e?.name,
+          frecuencia: e?.frecuencia ?? 0,
+          descripcion: e?.descripcion ?? e?.description,
+          colorHex: e?.colorHex ?? e?.color ?? '#4ECDC4',
+        })) as Etiqueta[])
+      : [];
 
-    const hasServerPaging = typeof (data as any)?.totalPages === 'number' || typeof (data as any)?.totalElements === 'number';
+    const hasServerPaging =
+      typeof (data as any)?.totalPages === 'number' ||
+      typeof (data as any)?.totalElements === 'number';
 
     if (hasServerPaging) {
       this.etiquetas = mapped;
       this.totalItems = Number((data as any)?.totalElements ?? mapped.length ?? 0);
-      this.totalPages = Number((data as any)?.totalPages ?? Math.ceil(this.totalItems / this.pageSize) ?? 1);
+      this.totalPages = Number(
+        (data as any)?.totalPages ?? Math.ceil(this.totalItems / this.pageSize) ?? 1
+      );
       this.numberOfElements = Number((data as any)?.numberOfElements ?? mapped.length);
       this.pagedEtiquetas = mapped;
       if (mapped.length === 0 && this.pageNo > 0 && this.pageNo >= this.totalPages) {
@@ -253,7 +272,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   }
 
   private applyPaging(): void {
-    const total = (this.allEtiquetas?.length ?? 0);
+    const total = this.allEtiquetas?.length ?? 0;
     if (total > 0) {
       this.totalItems = total;
       this.totalPages = Math.max(1, Math.ceil(total / this.pageSize));
@@ -264,5 +283,9 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
       this.numberOfElements = this.pagedEtiquetas.length;
       this.cdr.detectChanges();
     }
+  }
+
+  trackByEtiqueta(index: number, e: Etiqueta): number | string {
+    return e?.idEtiqueta ?? e?.nombre ?? index;
   }
 }

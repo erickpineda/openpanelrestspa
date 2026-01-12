@@ -1,17 +1,14 @@
-import { Privilegio } from "./privilegio.model";
+import { Privilegio } from './privilegio.model';
 
 export class Rol {
   idRol: number = 0;
-  codigo: string = "";
-  nombre: string = "";
-  descripcion: string = "";
+  codigo: string = '';
+  nombre: string = '';
+  descripcion: string = '';
   privilegios: Privilegio[] = [];
-  
-  constructor() {
 
-  }
+  constructor() {}
 }
-
 
 export interface Rol {
   idRol: number;

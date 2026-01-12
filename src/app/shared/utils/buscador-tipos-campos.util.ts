@@ -11,39 +11,39 @@ export interface MapeoTiposCampos {
 
 export const TIPOS_CAMPOS_POR_ENTIDAD: MapeoTiposCampos = {
   Entrada: {
-    'titulo': 'string',
-    'contenido': 'string',
-    'resumen': 'string',
-    'notas': 'string',
-    'slug': 'string',
-    'subtitulo': 'string',
-    'idEntrada': 'number',
-    'idUsuario': 'number',
-    'idUsuarioEditado': 'number',
-    'votos': 'number',
-    'cantidadComentarios': 'number',
-    'fechaEdicion': 'date',
-    'fechaPublicacion': 'date',
-    'fechaPublicacionProgramada': 'date',
-    'auditFechaCreacion': 'date',
-    'auditFechaModif': 'date',
-    'auditFechaCancel': 'date',
-    'borrador': 'boolean',
-    'publicada': 'boolean',
-    'privado': 'boolean',
-    'permitirComentario': 'boolean',
+    titulo: 'string',
+    contenido: 'string',
+    resumen: 'string',
+    notas: 'string',
+    slug: 'string',
+    subtitulo: 'string',
+    idEntrada: 'number',
+    idUsuario: 'number',
+    idUsuarioEditado: 'number',
+    votos: 'number',
+    cantidadComentarios: 'number',
+    fechaEdicion: 'date',
+    fechaPublicacion: 'date',
+    fechaPublicacionProgramada: 'date',
+    auditFechaCreacion: 'date',
+    auditFechaModif: 'date',
+    auditFechaCancel: 'date',
+    borrador: 'boolean',
+    publicada: 'boolean',
+    privado: 'boolean',
+    permitirComentario: 'boolean',
     'estadoEntrada.nombre': 'select',
     'tipoEntrada.nombre': 'select',
     'categoria.nombre': 'select',
     'etiqueta.nombre': 'select',
     'usuario.username': 'string',
     'usuario.nombre': 'string',
-    'usernameCreador': 'string',
-    'usernameModificador': 'string',
-    'auditUsuCreacion': 'string',
-    'auditUsuModif': 'string',
-    'auditUsuCancel': 'string',
-  }
+    usernameCreador: 'string',
+    usernameModificador: 'string',
+    auditUsuCreacion: 'string',
+    auditUsuModif: 'string',
+    auditUsuCancel: 'string',
+  },
   // Otras entidades aquí...
 };
 
@@ -51,7 +51,10 @@ export const TIPOS_CAMPOS_POR_ENTIDAD: MapeoTiposCampos = {
  * Devuelve el tipo de campo para una clave y lista de entidades candidatas.
  * Si no se encuentra, retorna 'string' por defecto.
  */
-export function obtenerTipoCampoBuscador(key: string, clazzCandidates?: string[] | null): TipoCampoBuscador {
+export function obtenerTipoCampoBuscador(
+  key: string,
+  clazzCandidates?: string[] | null
+): TipoCampoBuscador {
   if (!key) return 'string';
   if (Array.isArray(clazzCandidates)) {
     for (const clazz of clazzCandidates) {

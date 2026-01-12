@@ -11,7 +11,7 @@ interface BuscarResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BusquedaService {
   private searchSubject = new Subject<string>();
@@ -35,18 +35,20 @@ export class BusquedaService {
     this.limpiarBusqueda();
     this.searchFunction = searchFunction;
 
-    this.currentSubscription = this.searchSubject.pipe(
-      debounceTime(delay),
-      switchMap(term =>
-        // use stored function; when invoked by the subject we rely on the component
-        // to manage currentPage internally (searchFunction may use component state)
-        this.searchFunction ? this.searchFunction(term) : of({ elements: [], totalPages: 0 })
+    this.currentSubscription = this.searchSubject
+      .pipe(
+        debounceTime(delay),
+        switchMap((term) =>
+          // use stored function; when invoked by the subject we rely on the component
+          // to manage currentPage internally (searchFunction may use component state)
+          this.searchFunction ? this.searchFunction(term) : of({ elements: [], totalPages: 0 })
+        )
       )
-    ).subscribe(response => {
-      if (response?.elements) {
-        callback(response);
-      }
-    });
+      .subscribe((response) => {
+        if (response?.elements) {
+          callback(response);
+        }
+      });
   }
 
   triggerBusqueda(term: string): void {

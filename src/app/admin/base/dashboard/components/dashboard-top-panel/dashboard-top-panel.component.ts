@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 @Component({
   selector: 'app-dashboard-top-panel',
   templateUrl: './dashboard-top-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardTopPanelComponent {
   @Input() title: string = '';
@@ -22,4 +23,3 @@ export class DashboardTopPanelComponent {
   @Output() downloadCsv = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
 }
-

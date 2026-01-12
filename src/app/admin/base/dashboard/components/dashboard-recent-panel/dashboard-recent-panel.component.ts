@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 @Component({
   selector: 'app-dashboard-recent-panel',
   templateUrl: './dashboard-recent-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardRecentPanelComponent {
   @Input() recentItems: any[] = [];
@@ -18,4 +19,3 @@ export class DashboardRecentPanelComponent {
   @Output() downloadCsv = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
 }
-

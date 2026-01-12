@@ -1,10 +1,10 @@
-import { Injectable } from "@angular/core";
-import { Etiqueta } from "../../models/etiqueta.model";
-import { CrudService } from "../../_utils/crud.service";
-import { Observable } from "rxjs";
+import { Injectable } from '@angular/core';
+import { Etiqueta } from '../../models/etiqueta.model';
+import { CrudService } from '../../_utils/crud.service';
+import { Observable } from 'rxjs';
 import { HttpContext } from '@angular/common/http';
 import { NetworkInterceptor } from '../../interceptor/network.interceptor';
-import { OPConstants } from "src/app/shared/constants/op-global.constants";
+import { OPConstants } from 'src/app/shared/constants/op-global.constants';
 
 export interface AsociacionEtiquetaDTO {
   etiquetaId: number;
@@ -13,7 +13,7 @@ export interface AsociacionEtiquetaDTO {
 }
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root',
 })
 export class EtiquetaService extends CrudService<Etiqueta, number> {
   protected endpoint = '/etiquetas';
@@ -58,12 +58,20 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
   }
 
   asociarConEntrada(etiquetaId: number, entradaId: number): Observable<any> {
-    const asociacion: AsociacionEtiquetaDTO = { etiquetaId, entidadId: entradaId, tipoEntidad: 'ENTRADA' };
+    const asociacion: AsociacionEtiquetaDTO = {
+      etiquetaId,
+      entidadId: entradaId,
+      tipoEntidad: 'ENTRADA',
+    };
     return this.post<any>(`${this.endpoint}/asociar`, asociacion);
   }
 
   asociarConCategoria(etiquetaId: number, categoriaId: number): Observable<any> {
-    const asociacion: AsociacionEtiquetaDTO = { etiquetaId, entidadId: categoriaId, tipoEntidad: 'CATEGORIA' };
+    const asociacion: AsociacionEtiquetaDTO = {
+      etiquetaId,
+      entidadId: categoriaId,
+      tipoEntidad: 'CATEGORIA',
+    };
     return this.post<any>(`${this.endpoint}/asociar`, asociacion);
   }
 

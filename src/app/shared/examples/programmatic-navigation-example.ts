@@ -4,15 +4,14 @@ import { UserRole } from '../types/navigation.types';
 
 /**
  * Ejemplo de uso de la API de configuración programática de navegación
- * 
+ *
  * Este servicio demuestra cómo usar la API para personalizar dinámicamente
  * la navegación del sidebar de administración.
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProgrammaticNavigationExample {
-
   constructor(private navigationService: NavigationService) {}
 
   /**
@@ -25,7 +24,7 @@ export class ProgrammaticNavigationExample {
     // Agregar badge de notificación a comentarios
     this.navigationService.setElementBadge('/admin/control/comentarios', {
       color: 'danger',
-      text: 'Nuevo'
+      text: 'Nuevo',
     });
 
     // Aumentar la prioridad de "Nueva Entrada"
@@ -44,9 +43,9 @@ export class ProgrammaticNavigationExample {
         // Para autores, destacar las funciones de contenido
         this.navigationService.setElementBadge('/admin/control/entradas', {
           color: 'success',
-          text: 'Principal'
+          text: 'Principal',
         });
-        
+
         // Ocultar gestión de usuarios
         this.navigationService.setElementVisibility('/admin/control/gestion/usuarios', false);
         break;
@@ -55,7 +54,7 @@ export class ProgrammaticNavigationExample {
         // Para editores, destacar moderación
         this.navigationService.setElementBadge('/admin/control/comentarios', {
           color: 'warning',
-          text: 'Moderar'
+          text: 'Moderar',
         });
         break;
 
@@ -63,7 +62,7 @@ export class ProgrammaticNavigationExample {
         // Para administradores, destacar gestión de usuarios
         this.navigationService.setElementBadge('/admin/control/gestion/usuarios', {
           color: 'info',
-          text: 'Gestión'
+          text: 'Gestión',
         });
         break;
 
@@ -85,11 +84,11 @@ export class ProgrammaticNavigationExample {
       items: [
         '/admin/control/mantenimiento/logs',
         '/admin/control/mantenimiento/database',
-        '/admin/control/mantenimiento/dev-tools'
+        '/admin/control/mantenimiento/dev-tools',
       ],
       collapsible: true,
       defaultExpanded: false,
-      requiredRoles: [UserRole.DESARROLLADOR, UserRole.PROPIETARIO]
+      requiredRoles: [UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
     });
   }
 
@@ -105,7 +104,7 @@ export class ProgrammaticNavigationExample {
         // Lógica para crear entrada rápida
         console.log('Creando entrada rápida...');
       },
-      tooltip: 'Crear nueva entrada rápidamente'
+      tooltip: 'Crear nueva entrada rápidamente',
     });
 
     // Agregar acción para exportar usuarios
@@ -116,7 +115,7 @@ export class ProgrammaticNavigationExample {
         // Lógica para exportar usuarios
         console.log('Exportando usuarios...');
       },
-      tooltip: 'Exportar lista de usuarios'
+      tooltip: 'Exportar lista de usuarios',
     });
 
     // Agregar acción para limpiar logs
@@ -127,7 +126,7 @@ export class ProgrammaticNavigationExample {
         // Lógica para limpiar logs
         console.log('Limpiando logs...');
       },
-      tooltip: 'Limpiar logs del sistema'
+      tooltip: 'Limpiar logs del sistema',
     });
   }
 
@@ -144,21 +143,21 @@ export class ProgrammaticNavigationExample {
     if (systemState.hasUnmoderatedComments) {
       this.navigationService.setElementBadge('/admin/control/comentarios', {
         color: 'danger',
-        text: 'Pendientes'
+        text: 'Pendientes',
       });
     }
 
     if (systemState.hasDraftEntries) {
       this.navigationService.setElementBadge('/admin/control/entradas/entradas-temporales', {
         color: 'warning',
-        text: 'Borradores'
+        text: 'Borradores',
       });
     }
 
     if (systemState.hasSystemAlerts) {
       this.navigationService.setElementBadge('/admin/control/mantenimiento/logs', {
         color: 'danger',
-        text: 'Alertas'
+        text: 'Alertas',
       });
     }
 
@@ -167,7 +166,7 @@ export class ProgrammaticNavigationExample {
       this.navigationService.setElementPriority('/admin/control/mantenimiento', 95);
       this.navigationService.setElementBadge('/admin/control/mantenimiento', {
         color: 'warning',
-        text: 'Activo'
+        text: 'Activo',
       });
     }
   }
@@ -182,7 +181,7 @@ export class ProgrammaticNavigationExample {
     // Aplicar configuración temporal
     this.navigationService.setElementBadge('/admin/dashboard', {
       color: 'success',
-      text: 'Temporal'
+      text: 'Temporal',
     });
 
     this.navigationService.setElementPriority('/admin/control/configuracion', 100);
@@ -202,7 +201,7 @@ export class ProgrammaticNavigationExample {
       icon: 'cil-pencil',
       badge: {
         color: 'success',
-        text: 'Activo'
+        text: 'Activo',
       },
       priority: 90,
       visible: true,
@@ -212,15 +211,15 @@ export class ProgrammaticNavigationExample {
           name: 'Nueva',
           icon: 'cil-plus',
           action: () => console.log('Nueva entrada'),
-          tooltip: 'Crear nueva entrada'
+          tooltip: 'Crear nueva entrada',
         },
         {
           name: 'Importar',
           icon: 'cil-cloud-upload',
           action: () => console.log('Importar entradas'),
-          tooltip: 'Importar entradas desde archivo'
-        }
-      ]
+          tooltip: 'Importar entradas desde archivo',
+        },
+      ],
     });
   }
 
@@ -232,9 +231,9 @@ export class ProgrammaticNavigationExample {
     const api = this.navigationService.getProgrammaticAPI();
 
     // Suscribirse a cambios de configuración
-    api.getConfigurationChanges().subscribe(configs => {
+    api.getConfigurationChanges().subscribe((configs) => {
       console.log('Configuraciones actualizadas:', configs.size);
-      
+
       // Aplicar lógica adicional cuando cambian las configuraciones
       configs.forEach((config, itemId) => {
         if (config.badge && config.badge.color === 'danger') {
@@ -244,7 +243,7 @@ export class ProgrammaticNavigationExample {
     });
 
     // Suscribirse a cambios de grupos
-    api.getGroupChanges().subscribe(groups => {
+    api.getGroupChanges().subscribe((groups) => {
       console.log('Grupos actualizados:', groups.size);
     });
   }
@@ -268,11 +267,11 @@ export class ProgrammaticNavigationExample {
         // Configurar badges coloridos
         this.navigationService.setElementBadge('/admin/control/entradas', {
           color: 'primary',
-          text: '✨'
+          text: '✨',
         });
         this.navigationService.setElementBadge('/admin/control/comentarios', {
           color: 'success',
-          text: '💬'
+          text: '💬',
         });
         break;
     }
@@ -290,7 +289,7 @@ export class ProgrammaticNavigationExample {
       // Usar badges de alto contraste
       this.navigationService.setElementBadge('/admin/control/comentarios', {
         color: 'danger',
-        text: 'IMPORTANTE'
+        text: 'IMPORTANTE',
       });
     }
 
@@ -300,7 +299,7 @@ export class ProgrammaticNavigationExample {
         name: 'Ayuda',
         icon: 'cil-info',
         action: () => console.log('Mostrar ayuda'),
-        tooltip: 'Mostrar información de ayuda detallada para el dashboard principal'
+        tooltip: 'Mostrar información de ayuda detallada para el dashboard principal',
       });
     }
 
@@ -318,7 +317,6 @@ export class ProgrammaticNavigationExample {
  * Ejemplo de uso en un componente
  */
 export class NavigationConfigurationUsageExample {
-  
   constructor(
     private navigationService: NavigationService,
     private exampleService: ProgrammaticNavigationExample
@@ -340,7 +338,7 @@ export class NavigationConfigurationUsageExample {
       hasUnmoderatedComments: true,
       hasDraftEntries: false,
       hasSystemAlerts: true,
-      maintenanceMode: false
+      maintenanceMode: false,
     });
 
     // Configurar observables reactivos
@@ -357,7 +355,7 @@ export class NavigationConfigurationUsageExample {
 
   onTemporaryMode(): void {
     const restore = this.exampleService.applyTemporaryConfiguration();
-    
+
     // Restaurar después de 5 segundos
     setTimeout(restore, 5000);
   }

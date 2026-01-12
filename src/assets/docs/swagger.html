@@ -10,7 +10,7 @@
     <div id="swagger-ui"></div>
     <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
     <script>
-      window.onload = async function() {
+      window.onload = async function () {
         const preferBackend = '/api/v1/swagger.yaml';
         const fallbackAssets = '/assets/swagger.yaml';
         let url = preferBackend;
@@ -24,7 +24,7 @@
           url,
           dom_id: '#swagger-ui',
           presets: [SwaggerUIBundle.presets.apis],
-          layout: 'BaseLayout'
+          layout: 'BaseLayout',
         });
       };
     </script>

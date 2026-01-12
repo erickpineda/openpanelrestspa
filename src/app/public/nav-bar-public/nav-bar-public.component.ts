@@ -6,14 +6,15 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { TokenStorageService } from '../../core/services/auth/token-storage.service';
 import { LoggerService } from '../../core/services/logger.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
+import { LanguageService, Language } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-nav-bar-public',
   templateUrl: './nav-bar-public.component.html',
-  styleUrls: ['./nav-bar-public.component.scss']
+  styleUrls: ['./nav-bar-public.component.scss'],
+  standalone: false,
 })
 export class NavBarPublicComponent implements OnInit {
-
   private roles: string[] = [];
   isLoggedIn = false;
   showAdminBoard = false;
@@ -21,6 +22,7 @@ export class NavBarPublicComponent implements OnInit {
   username?: string;
   isShrink: boolean = false;
   isLoadingLogout = false;
+  currentLang: Language = 'es';
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -32,7 +34,8 @@ export class NavBarPublicComponent implements OnInit {
     private authService: AuthService,
     private authSync: AuthSyncService,
     private router: Router,
-    private log: LoggerService
+    private log: LoggerService,
+    public languageService: LanguageService
   ) {
     // Escuchar cambios de estado de autenticación
     window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, () => {
@@ -52,12 +55,20 @@ export class NavBarPublicComponent implements OnInit {
   ngOnInit(): void {
     this.checkAuthStatus();
     this.authSync.initializeAuthState(); // Sincronizar al iniciar
+    
+    this.languageService.currentLang$.subscribe((lang: Language) => {
+      this.currentLang = lang;
+    });
+  }
+
+  toggleLanguage(): void {
+    this.languageService.toggleLanguage();
   }
 
   private checkAuthStatus(): void {
     this.isLoggedIn = this.tokenStorageService.isLoggedIn();
     this.log.info('🔐 NavBar - Estado de autenticación:', this.isLoggedIn);
-    
+
     if (this.isLoggedIn) {
       const user = this.tokenStorageService.getUser();
       this.roles = user.roles;
@@ -78,9 +89,9 @@ export class NavBarPublicComponent implements OnInit {
 
   logout(): void {
     if (this.isLoadingLogout) return;
-    
+
     this.isLoadingLogout = true;
-    
+
     this.authService.logout().subscribe({
       next: () => {
         this.isLoadingLogout = false;
@@ -93,7 +104,7 @@ export class NavBarPublicComponent implements OnInit {
         this.isLoadingLogout = false;
         this.checkAuthStatus();
         this.router.navigate(['/']);
-      }
+      },
     });
   }
 }

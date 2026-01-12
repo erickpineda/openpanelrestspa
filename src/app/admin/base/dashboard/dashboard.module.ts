@@ -15,7 +15,18 @@ import { SharedOPModule } from '../../../shared/shared.module';
 import { ChartjsModule } from '@coreui/angular-chartjs';
 
 @NgModule({
-  declarations: [DashboardComponent, DashboardToolbarComponent, DashboardSeriesPanelComponent, DashboardTopPanelComponent, DashboardRecentPanelComponent, DashboardStoragePanelComponent, DashboardContentPanelComponent, DashboardEstadoNominalPanelComponent, DashboardEstadoSplitPanelComponent, DashboardSettingsModalComponent],
-  imports: [CommonModule, DashboardRoutingModule, SharedOPModule, ChartjsModule]
+  declarations: [
+    DashboardComponent,
+    DashboardToolbarComponent,
+    DashboardSeriesPanelComponent,
+    DashboardTopPanelComponent,
+    DashboardRecentPanelComponent,
+    DashboardStoragePanelComponent,
+    DashboardContentPanelComponent,
+    DashboardEstadoNominalPanelComponent,
+    DashboardEstadoSplitPanelComponent,
+    DashboardSettingsModalComponent,
+  ],
+  imports: [CommonModule, DashboardRoutingModule, SharedOPModule, ChartjsModule],
 })
-export class DashboardModule { }
+export class DashboardModule {}

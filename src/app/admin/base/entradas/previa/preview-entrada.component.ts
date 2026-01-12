@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { UntypedFormGroup } from '@angular/forms';
 import { Entrada } from '../../../../core/models/entrada.model';
@@ -8,13 +16,15 @@ import { Categoria } from '../../../../core/models/categoria.model';
   selector: 'app-previa-entrada',
   templateUrl: './preview-entrada.component.html',
   styleUrls: ['./preview-entrada.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class PreviaEntradaComponent implements OnChanges {
   @Input() form?: UntypedFormGroup;
   @Input() entrada?: Entrada;
   @Input() categoriasMeta?: Categoria[] = [];
   @Input() mostrarBotonesAccion = true;
+  @Input() mostrarTitulo = true;
 
   @Output() cerrar = new EventEmitter<void>();
   @Output() editar = new EventEmitter<void>();
@@ -23,11 +33,14 @@ export class PreviaEntradaComponent implements OnChanges {
   tituloMostrar = '';
   contenidoSeguro: SafeHtml = '';
   categoriasMostrar: { idCategoria?: number; nombre?: string }[] = [];
+  imagenMostrar: string | null = null;
+  usernameMostrar: string = '';
+  fechaMostrar: Date | string | null = null;
 
   constructor(private sanitizer: DomSanitizer) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['form'] || changes['entrada'] || changes['categoriasMeta']){
+    if (changes['form'] || changes['entrada'] || changes['categoriasMeta']) {
       this.refreshPreview();
     }
   }
@@ -42,10 +55,38 @@ export class PreviaEntradaComponent implements OnChanges {
       this.tituloMostrar = '';
     }
 
+    // IMAGEN
+    if (this.form && this.form.get('imagenDestacada')) {
+      const val = this.form.get('imagenDestacada')?.value;
+      this.imagenMostrar = typeof val === 'string' ? val : null;
+    } else if (this.entrada && this.entrada.imagenDestacada) {
+      this.imagenMostrar = this.entrada.imagenDestacada;
+    } else {
+      this.imagenMostrar = null;
+    }
+
+    // AUTOR
+    if (this.entrada && this.entrada.usernameCreador) {
+      this.usernameMostrar = this.entrada.usernameCreador;
+    } else {
+      this.usernameMostrar = '';
+    }
+
+    // FECHA
+    if (this.entrada && this.entrada.fechaPublicacion) {
+      this.fechaMostrar = this.entrada.fechaPublicacion;
+    } else {
+      // Si no hay fecha (creación), mostramos fecha actual como preview
+      this.fechaMostrar = new Date();
+    }
+
     // CONTENIDO
-    const contenidoRaw = this.form && this.form.get('contenido')
-      ? this.form.get('contenido')?.value
-      : (this.entrada ? this.entrada.contenido : '');
+    const contenidoRaw =
+      this.form && this.form.get('contenido')
+        ? this.form.get('contenido')?.value
+        : this.entrada
+          ? this.entrada.contenido
+          : '';
 
     this.contenidoSeguro = this.sanitizeHtml(contenidoRaw);
 
@@ -71,7 +112,7 @@ export class PreviaEntradaComponent implements OnChanges {
       // si son ids (números o strings)
       if (this.categoriasMeta && this.categoriasMeta.length) {
         const ids = formCats.map((x: any) => Number(x));
-        return this.categoriasMeta.filter(c => ids.includes(Number(c.idCategoria)));
+        return this.categoriasMeta.filter((c) => ids.includes(Number(c.idCategoria)));
       }
     }
 
@@ -93,7 +134,10 @@ export class PreviaEntradaComponent implements OnChanges {
 
   onPublicar(): void {
     // opcional: emitimos objeto combinado (por si falta información en form)
-    const payload: Entrada = { ...(this.entrada || {}), ...(this.form ? this.form.value : {}) } as Entrada;
+    const payload: Entrada = {
+      ...(this.entrada || {}),
+      ...(this.form ? this.form.value : {}),
+    } as Entrada;
     this.publicar.emit(payload);
   }
 }

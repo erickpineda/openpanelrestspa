@@ -20,7 +20,7 @@ export class RouteTrackerService {
     private postLoginRedirect: PostLoginRedirectService
   ) {
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         try {
           const url = event.urlAfterRedirects || event.url;

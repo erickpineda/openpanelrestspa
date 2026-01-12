@@ -10,7 +10,10 @@ import { NetworkInterceptor } from '../interceptor/network.interceptor';
 export class FileStorageService {
   private base = `${environment.backend.host}${environment.backend.uri}`;
 
-  constructor(private http: HttpClient, private tokenStorage?: TokenStorageService) {}
+  constructor(
+    private http: HttpClient,
+    private tokenStorage?: TokenStorageService
+  ) {}
 
   uploadFile(file: File, folder?: string): Observable<any> {
     const form = new FormData();
@@ -27,37 +30,45 @@ export class FileStorageService {
   }
 
   listarFicheros(skipLoader: boolean = false): Observable<MediaItem[]> {
-    const context = skipLoader ? new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true) : undefined;
+    const context = skipLoader
+      ? new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true)
+      : undefined;
     return this.http.get<any>(`${this.base}/fileStorage/ficheros`, { context }).pipe(
-      map(resp => {
+      map((resp) => {
         const data = resp?.data ?? resp;
-        const arr = Array.isArray(data) ? data : (Array.isArray(data?.content) ? data.content : []);
+        const arr = Array.isArray(data) ? data : Array.isArray(data?.content) ? data.content : [];
         return arr.map((f: any) => ({
           uuid: f?.uuidFileStorage,
           nombre: f?.nombre,
-          tipo: (f?.tipo && String(f.tipo).startsWith('image/')) ? 'image' : 'file',
+          tipo: f?.tipo && String(f.tipo).startsWith('image/') ? 'image' : 'file',
           mime: f?.tipo,
           url: f?.ruta,
           tamano: f?.size,
-          fechaCreacion: f?.fechaCreacion
+          fechaCreacion: f?.fechaCreacion,
         })) as MediaItem[];
       })
     );
   }
 
   obtenerDatosFichero(uuid: string, skipLoader: boolean = false): Observable<any> {
-    const context = skipLoader ? new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true) : undefined;
-    return this.http.get<any>(`${this.base}/fileStorage/ficheros/obtenerDatos/${encodeURIComponent(uuid)}`, { context }).pipe(
-      map(resp => resp?.data ?? resp)
-    );
+    const context = skipLoader
+      ? new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true)
+      : undefined;
+    return this.http
+      .get<any>(`${this.base}/fileStorage/ficheros/obtenerDatos/${encodeURIComponent(uuid)}`, {
+        context,
+      })
+      .pipe(map((resp) => resp?.data ?? resp));
   }
 
-
   descargarFichero(uuid: string, accept?: string): Observable<Blob> {
-    let headers = new HttpHeaders({ 'Accept': '*/*' }); // ✅ Aceptar cualquier tipo de respuesta binaria
+    let headers = new HttpHeaders({ Accept: '*/*' }); // ✅ Aceptar cualquier tipo de respuesta binaria
     const token = this.tokenStorage?.getToken && this.tokenStorage.getToken();
     if (token) headers = headers.set('Authorization', `Bearer ${token}`);
-    return this.http.get(`${this.base}/fileStorage/ficheros/descargar/${encodeURIComponent(uuid)}`, { responseType: 'blob', headers });
+    return this.http.get(
+      `${this.base}/fileStorage/ficheros/descargar/${encodeURIComponent(uuid)}`,
+      { responseType: 'blob', headers }
+    );
   }
 
   deleteMedia(id: string): Observable<any> {

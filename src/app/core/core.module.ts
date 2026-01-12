@@ -21,9 +21,15 @@ import { GlobalErrorHandlerService } from './errors/global-error/global-error-ha
 import { LoggerService } from './services/logger.service';
 import { TimeoutInterceptor } from './interceptor/timeout.interceptor';
 import { ErrorBoundaryService } from './errors/error-boundary/error-boundary.service';
+import { RouterModule } from '@angular/router';
+
+import { LanguageInterceptor } from './interceptor/language.interceptor';
+import { LanguageService } from './services/language.service';
+
+import { TranslationService } from './services/translation.service';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   declarations: [],
   exports: [],
   providers: [
@@ -40,18 +46,26 @@ import { ErrorBoundaryService } from './errors/error-boundary/error-boundary.ser
     EntradaService,
     UsuarioService,
     LoggerService,
+    LanguageService,
+    TranslationService,
 
     // Interceptors en orden de ejecución
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: TimeoutInterceptor,   // 1º: Timeouts específicos
+      useClass: TimeoutInterceptor, // 1º: Timeouts específicos
       multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,     // 2º: Autenticación
+      useClass: LanguageInterceptor, // 2º: Idioma (antes de auth para que auth también pueda llevarlo si es necesario)
       multi: true,
     },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor, // 3º: Autenticación
+      multi: true,
+    },
+
     {
       provide: HTTP_INTERCEPTORS,
       useClass: NetworkInterceptor, // 3º: Loading y manejo de errores
@@ -59,7 +73,7 @@ import { ErrorBoundaryService } from './errors/error-boundary/error-boundary.ser
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: ErrorInterceptor,  // 4º: Manejo global de errores
+      useClass: ErrorInterceptor, // 4º: Manejo global de errores
       multi: true,
     },
   ],

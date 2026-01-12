@@ -14,9 +14,10 @@ export const POST_LOGIN_REDIRECT = OPConstants.Session.POST_LOGIN_REDIRECT;
 
 @Injectable({ providedIn: 'root' })
 export class TokenStorageService {
-  constructor(private log: LoggerService) { }
+  constructor(private log: LoggerService) {}
 
-  private readonly POST_LOGIN_TTL_MS = 24 * 60 * 60 * 1000;
+  private readonly POST_LOGIN_TTL_MS =
+    (OPConstants.Session.POST_LOGIN_MAX_AGE_DAYS || 1) * 24 * 60 * 60 * 1000;
   private postLoginMaintenanceTimer: any = null;
 
   public getOrCreateTabId(): string {
@@ -41,7 +42,9 @@ export class TokenStorageService {
   }
 
   public savePostLoginRedirectBase(value: string): void {
-    try { localStorage.setItem(POST_LOGIN_REDIRECT, `${value}|${new Date().toISOString()}`); } catch {}
+    try {
+      localStorage.setItem(POST_LOGIN_REDIRECT, `${value}|${new Date().toISOString()}`);
+    } catch {}
   }
 
   public getPostLoginRedirectBase(): string | null {
@@ -57,16 +60,22 @@ export class TokenStorageService {
         return null;
       }
       return val || null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   }
 
   public removePostLoginRedirectBase(): void {
-    try { localStorage.removeItem(POST_LOGIN_REDIRECT); } catch {}
+    try {
+      localStorage.removeItem(POST_LOGIN_REDIRECT);
+    } catch {}
   }
 
   public savePostLoginRedirectForTab(value: string): void {
     const key = this.getPostLoginKeyForThisTab();
-    try { window.sessionStorage.setItem(key, `${value}|${new Date().toISOString()}`); } catch {}
+    try {
+      window.sessionStorage.setItem(key, `${value}|${new Date().toISOString()}`);
+    } catch {}
   }
 
   public getPostLoginRedirectForTab(): string | null {
@@ -83,12 +92,16 @@ export class TokenStorageService {
         return null;
       }
       return val || null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   }
 
   public removePostLoginRedirectForTab(): void {
     const key = this.getPostLoginKeyForThisTab();
-    try { window.sessionStorage.removeItem(key); } catch {}
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch {}
   }
 
   public cleanExpiredPostLoginRedirects(): void {
@@ -103,22 +116,55 @@ export class TokenStorageService {
       }
     } catch {}
     try {
+      const keys: string[] = [];
       for (let i = 0; i < window.sessionStorage.length; i++) {
         const k = window.sessionStorage.key(i);
-        if (!k || k.indexOf(POST_LOGIN_PREFIX) !== 0) continue;
+        if (k && k.indexOf(POST_LOGIN_PREFIX) === 0) keys.push(k);
+      }
+
+      keys.forEach((k) => {
         const raw = window.sessionStorage.getItem(k) || '';
         const iso = raw.split('|')[1] || '';
         const ts = Date.parse(iso);
         if (!isNaN(ts) && Date.now() - ts > this.POST_LOGIN_TTL_MS) {
           window.sessionStorage.removeItem(k);
         }
+      });
+    } catch {}
+    try {
+      const localKeys: { key: string; ts: number }[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf(POST_LOGIN_PREFIX) === 0) {
+          const rest = k.substring(POST_LOGIN_PREFIX.length);
+          const tsStr = rest.split('-')[0] || '';
+          const tsNum = Number(tsStr);
+          localKeys.push({ key: k, ts: isNaN(tsNum) ? 0 : tsNum });
+        }
+      }
+      const now = Date.now();
+      localKeys.forEach(({ key, ts }) => {
+        if (ts > 0 && now - ts > this.POST_LOGIN_TTL_MS) {
+          localStorage.removeItem(key);
+        }
+      });
+      const max = OPConstants.Session.POST_LOGIN_MAX_ENTRIES || 50;
+      if (localKeys.length > max) {
+        const sorted = localKeys.sort((a, b) => b.ts - a.ts);
+        const toDelete = sorted.slice(max);
+        toDelete.forEach(({ key }) => {
+          localStorage.removeItem(key);
+        });
       }
     } catch {}
   }
 
   public startPostLoginRedirectMaintenance(intervalMs = 15 * 60 * 1000): void {
     if (this.postLoginMaintenanceTimer) return;
-    this.postLoginMaintenanceTimer = setInterval(() => this.cleanExpiredPostLoginRedirects(), intervalMs);
+    this.postLoginMaintenanceTimer = setInterval(
+      () => this.cleanExpiredPostLoginRedirects(),
+      intervalMs
+    );
   }
 
   public stopPostLoginRedirectMaintenance(): void {

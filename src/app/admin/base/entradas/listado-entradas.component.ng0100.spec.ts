@@ -14,21 +14,52 @@ import { EntradaCatalogService } from '../../../core/services/data/entrada-catal
 class MockBusquedaService {
   iniciarBusqueda(fnSearch: any, fnResults: any) {}
   triggerBusqueda() {}
-  searchNow() { return of({ elements: [], totalPages: 0 }); }
+  searchNow() {
+    return of({ elements: [], totalPages: 0 });
+  }
   limpiarBusqueda() {}
 }
 
 class MockEntradaService {
-  obtenerDefinicionesBuscadorSafe() { return of({ filterKeySegunClazzNamePermitido: ['titulo'], operationPermitido: { titulo: ['EQUALS'] } }); }
-  buscarSafe() { return of({ elements: [{ idEntrada: 1, categorias: [] }], totalPages: 1 }); }
-  borrar() { return of({}); }
+  obtenerDefinicionesBuscadorSafe() {
+    return of({
+      filterKeySegunClazzNamePermitido: ['titulo'],
+      operationPermitido: { titulo: ['EQUALS'] },
+    });
+  }
+  buscarSafe() {
+    return of({ elements: [{ idEntrada: 1, categorias: [] }], totalPages: 1 });
+  }
+  borrar() {
+    return of({});
+  }
 }
 
-class MockCommonFuncService { transformaFecha(date: Date, fmt: string) { return '2020-01-01'; } }
-class MockToastService { showSuccess(){} showError(){} showInfo(){} }
-class MockErrorBoundaryService { registerBoundary(){} unregisterBoundary(){} reportErrorToBoundary(){} }
-class MockLoggerService { error(){} warn(){} info(){} }
-class MockEntradaCatalogService { obtenerCatalogosEntrada(){ return of({}); } }
+class MockCommonFuncService {
+  transformaFecha(date: Date, fmt: string) {
+    return '2020-01-01';
+  }
+}
+class MockToastService {
+  showSuccess() {}
+  showError() {}
+  showInfo() {}
+}
+class MockErrorBoundaryService {
+  registerBoundary() {}
+  unregisterBoundary() {}
+  reportErrorToBoundary() {}
+}
+class MockLoggerService {
+  error() {}
+  warn() {}
+  info() {}
+}
+class MockEntradaCatalogService {
+  obtenerCatalogosEntrada() {
+    return of({});
+  }
+}
 
 describe('ListadoEntradasComponent NG0100 mitigation', () => {
   let component: ListadoEntradasComponent;
@@ -41,13 +72,16 @@ describe('ListadoEntradasComponent NG0100 mitigation', () => {
       providers: [
         { provide: BusquedaService, useClass: MockBusquedaService },
         { provide: EntradaService, useClass: MockEntradaService },
-        { provide: CommonFunctionalityService, useClass: MockCommonFuncService },
+        {
+          provide: CommonFunctionalityService,
+          useClass: MockCommonFuncService,
+        },
         { provide: ToastService, useClass: MockToastService },
         { provide: ErrorBoundaryService, useClass: MockErrorBoundaryService },
         { provide: LoggerService, useClass: MockLoggerService },
         { provide: EntradaCatalogService, useClass: MockEntradaCatalogService },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     TestBed.overrideTemplate(ListadoEntradasComponent, '<div></div>');
@@ -58,7 +92,10 @@ describe('ListadoEntradasComponent NG0100 mitigation', () => {
 
   it('no lanza NG0100 al procesar resultados y al cambiar visibilidad del modal', fakeAsync(() => {
     expect(() => fixture.detectChanges()).not.toThrow();
-    (component as any).procesarResultadosBusqueda({ elements: [{ idEntrada: 1, categorias: [] }], totalPages: 1 });
+    (component as any).procesarResultadosBusqueda({
+      elements: [{ idEntrada: 1, categorias: [] }],
+      totalPages: 1,
+    });
     tick(0);
     expect(() => fixture.detectChanges()).not.toThrow();
     component.onVisibleModalChange(true);

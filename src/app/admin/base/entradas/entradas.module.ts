@@ -1,13 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 import { EntradasRoutingModule } from './entradas-routing.module';
 import { ListadoEntradasComponent } from './listado-entradas.component';
 import { CrearEntradaComponent } from './crear/crear-entrada.component';
 import { EditarEntradaComponent } from './editar/editar-entrada.component';
-import { EntradaFormComponent } from './entrada-form/entrada-form.component';
-import { PreviaEntradaComponent } from './previa/preview-entrada.component';
+import { EntradasPendientesComponent } from './pendientes/entradas-pendientes.component';
+import { EntradasTableComponent } from './components/entradas-table/entradas-table.component';
+import { EntradasFilterComponent } from './components/entradas-filter/entradas-filter.component';
 
 // Módulos externos usados por entradas
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
@@ -20,6 +22,7 @@ import { EntradasSharedModule } from './entradas-shared.module';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     EntradasRoutingModule,
 
     // Shared y CKEditor sólo para este módulo
@@ -27,12 +30,13 @@ import { EntradasSharedModule } from './entradas-shared.module';
     CKEditorModule,
     SharedCoreUiModule,
     MediaSharedModule,
-    EntradasSharedModule
+    EntradasSharedModule,
   ],
   declarations: [
     ListadoEntradasComponent,
     CrearEntradaComponent,
     EditarEntradaComponent,
-  ]
+    EntradasPendientesComponent,
+  ],
 })
 export class EntradasModule {}

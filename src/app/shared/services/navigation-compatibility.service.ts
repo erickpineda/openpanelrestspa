@@ -9,10 +9,9 @@ import { INavItemEnhanced } from '../types/navigation.types';
  * that expect the legacy INavData format while using the new enhanced structure
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NavigationCompatibilityService {
-
   constructor(private router: Router) {}
 
   /**
@@ -21,7 +20,7 @@ export class NavigationCompatibilityService {
    * @returns Array of legacy navigation items
    */
   convertToLegacyFormat(enhancedItems: INavItemEnhanced[]): INavData[] {
-    return enhancedItems.map(item => this.convertSingleItemToLegacy(item));
+    return enhancedItems.map((item) => this.convertSingleItemToLegacy(item));
   }
 
   /**
@@ -41,12 +40,12 @@ export class NavigationCompatibilityService {
       class: enhancedItem.class,
       variant: enhancedItem.variant,
       attributes: enhancedItem.attributes,
-      linkProps: enhancedItem.linkProps
+      linkProps: enhancedItem.linkProps,
     };
 
     // Convert children if they exist
     if (enhancedItem.children && enhancedItem.children.length > 0) {
-      legacyItem.children = enhancedItem.children.map(child => 
+      legacyItem.children = enhancedItem.children.map((child) =>
         this.convertSingleItemToLegacy(child)
       );
     }
@@ -60,14 +59,14 @@ export class NavigationCompatibilityService {
    * @returns Observable of legacy navigation items
    */
   getLegacyNavigation(enhancedNavigation$: Observable<INavItemEnhanced[]>): Observable<INavData[]> {
-    return new Observable(subscriber => {
+    return new Observable((subscriber) => {
       enhancedNavigation$.subscribe({
         next: (enhancedItems) => {
           const legacyItems = this.convertToLegacyFormat(enhancedItems);
           subscriber.next(legacyItems);
         },
         error: (error) => subscriber.error(error),
-        complete: () => subscriber.complete()
+        complete: () => subscriber.complete(),
       });
     });
   }
@@ -85,7 +84,7 @@ export class NavigationCompatibilityService {
       ['/admin/perfil', '/admin/control/gestion/miperfil'],
       ['/admin/comentarios', '/admin/control/comentarios'],
       ['/admin/paginas', '/admin/control/paginas'],
-      ['/admin/multimedia', '/admin/control/contenido']
+      ['/admin/multimedia', '/admin/control/contenido'],
     ]);
 
     return routeMap.get(legacyUrl) || null;
@@ -98,12 +97,12 @@ export class NavigationCompatibilityService {
    */
   async redirectLegacyRoute(legacyUrl: string): Promise<boolean> {
     const newUrl = this.handleLegacyRouteRedirect(legacyUrl);
-    
+
     if (newUrl) {
       console.log(`Redirecting legacy route: ${legacyUrl} -> ${newUrl}`);
       return this.router.navigateByUrl(newUrl);
     }
-    
+
     return false;
   }
 
@@ -114,7 +113,7 @@ export class NavigationCompatibilityService {
    * @returns Adapted navigation items
    */
   adaptForLegacyComponent(
-    enhancedItems: INavItemEnhanced[], 
+    enhancedItems: INavItemEnhanced[],
     legacyExpectations: LegacyComponentExpectations
   ): INavData[] {
     let adaptedItems = this.convertToLegacyFormat(enhancedItems);
@@ -159,7 +158,7 @@ export class NavigationCompatibilityService {
           const childItem = {
             ...child,
             name: `  ${child.name}`, // Indent child items
-            class: `${child.class || ''} nav-child-item`.trim()
+            class: `${child.class || ''} nav-child-item`.trim(),
           };
           flattened.push(childItem);
         }
@@ -175,7 +174,7 @@ export class NavigationCompatibilityService {
    * @returns Items without badges
    */
   private removeBadgesFromItems(items: INavData[]): INavData[] {
-    return items.map(item => {
+    return items.map((item) => {
       const itemWithoutBadge = { ...item };
       delete itemWithoutBadge.badge;
 
@@ -193,7 +192,7 @@ export class NavigationCompatibilityService {
    * @returns Items with simplified icon references
    */
   private simplifyIconReferences(items: INavData[]): INavData[] {
-    return items.map(item => {
+    return items.map((item) => {
       const simplifiedItem = { ...item };
 
       // Convert iconComponent to simple icon string if needed
@@ -217,7 +216,7 @@ export class NavigationCompatibilityService {
    * @returns Filtered navigation items
    */
   private filterItemsByUrls(items: INavData[], allowedUrls: string[]): INavData[] {
-    return items.filter(item => {
+    return items.filter((item) => {
       // Include title items (section headers)
       if (item.title) {
         return true;
@@ -248,8 +247,10 @@ export class NavigationCompatibilityService {
    */
   logMigrationWarnings(componentName: string, deprecatedFeatures: string[]): void {
     if (deprecatedFeatures.length > 0) {
-      console.warn(`[NavigationCompatibility] Component "${componentName}" is using deprecated features:`);
-      deprecatedFeatures.forEach(feature => {
+      console.warn(
+        `[NavigationCompatibility] Component "${componentName}" is using deprecated features:`
+      );
+      deprecatedFeatures.forEach((feature) => {
         console.warn(`  - ${feature}`);
       });
       console.warn('Consider migrating to the new enhanced navigation structure.');
@@ -269,7 +270,7 @@ export class NavigationCompatibilityService {
     // Check for legacy INavData usage
     if (Array.isArray(navigationConfig) && navigationConfig.length > 0) {
       const firstItem = navigationConfig[0];
-      
+
       if (!firstItem.priority && !firstItem.requiredRoles) {
         warnings.push('Navigation items are using legacy INavData format');
         suggestions.push('Consider migrating to INavItemEnhanced for better functionality');
@@ -282,7 +283,9 @@ export class NavigationCompatibilityService {
         }
 
         if (item.roles && !item.requiredRoles) {
-          warnings.push(`Item ${index} uses deprecated 'roles' property, use 'requiredRoles' instead`);
+          warnings.push(
+            `Item ${index} uses deprecated 'roles' property, use 'requiredRoles' instead`
+          );
         }
       });
     }
@@ -291,7 +294,7 @@ export class NavigationCompatibilityService {
       isCompatible: issues.length === 0,
       issues,
       warnings,
-      suggestions
+      suggestions,
     };
   }
 }

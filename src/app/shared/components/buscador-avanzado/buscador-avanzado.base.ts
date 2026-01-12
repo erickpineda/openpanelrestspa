@@ -81,7 +81,7 @@ export abstract class BuscadorAvanzadoBase {
     this.filtroSeleccionado.emit({
       campo: this.campoSeleccionado,
       operacion: this.operacionSeleccionada,
-      valor: this.valorBusqueda
+      valor: this.valorBusqueda,
     });
   }
 }

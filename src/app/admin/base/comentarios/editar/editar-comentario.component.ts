@@ -1,101 +1,101 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Comentario } from '../../../../core/models/comentario.model';
-import { Entrada } from '../../../../core/models/entrada.model';
-import { Usuario } from '../../../../core/models/usuario.model';
-import { ComentarioService } from '../../../../core/services/data/comentario.service';
-import { EntradaService } from '../../../../core/services/data/entrada.service';
-import { UsuarioService } from '../../../../core/services/data/usuario.service';
-import { CommonFunctionalityService } from '../../../../shared/services/common-functionality.service';
-import { LoggerService } from '../../../../core/services/logger.service';
-import { OpenpanelApiResponse } from '../../../../core/models/openpanel-api-response.model';
+import { ComentarioFacadeService } from '../comentario-form/srv/comentario-facade.service';
+import { ToastService } from '../../../../core/services/ui/toast.service';
+import { ComentarioFormComponent } from '../comentario-form/comentario-form.component';
 
 @Component({
   selector: 'app-editar-comentario',
   templateUrl: './editar-comentario.component.html',
-  styleUrls: ['./editar-comentario.component.scss']
+  styleUrls: ['./editar-comentario.component.scss'],
+  standalone: false,
 })
-export class EditarComentarioComponent implements OnInit {
-  comentario?: Comentario;
+export class EditarComentarioComponent implements OnChanges {
+  @Input() visible = false;
+  @Input() comentario?: Comentario;
+  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() onSuccess = new EventEmitter<void>();
+
+  @ViewChild(ComentarioFormComponent) formComponent!: ComentarioFormComponent;
+
   nombreUsuario?: string;
   emailUsuario?: string;
   tituloEntrada?: string;
-  
   submitted = false;
   disabled = true;
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private comentarioService: ComentarioService,
-    private usuarioService: UsuarioService,
-    private entradaService: EntradaService,
-    private commonFuncService: CommonFunctionalityService,
-    private log: LoggerService,
-    private cdr: ChangeDetectorRef
+    private facade: ComentarioFacadeService,
+    private toastService: ToastService
   ) {}
 
-  ngOnInit(): void {
-    const id = this.route.snapshot.params['idComentario'];
-    if (id) {
-      this.obtenerDatos(id);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['visible'] && this.visible) {
+      // Reset state when modal opens
+      this.disabled = true;
+      this.submitted = false;
+    }
+    
+    if (changes['comentario'] && this.comentario) {
+      this.cargarDatosAdicionales();
     }
   }
 
-  private obtenerDatos(id: any) {
-      this.comentarioService.obtenerPorId(id).subscribe({
-          next: (response: OpenpanelApiResponse<any>) => {
-            this.comentario = response.data;
-            if (this.comentario) {
-                this.obtenerDatosUsuario(this.comentario.idUsuario);
-                this.obtenerDatosEntrada(this.comentario.idEntrada);
-            }
-            this.cdr.detectChanges();
-          },
-          error: (err) => {
-              this.log.error("Error al obtener comentario", err);
-          }
+  cargarDatosAdicionales() {
+    this.nombreUsuario = '';
+    this.emailUsuario = '';
+    this.tituloEntrada = '';
+
+    if (!this.comentario) return;
+
+    if (this.comentario.idUsuario) {
+      this.facade.obtenerUsuarioPorId(this.comentario.idUsuario).subscribe((usuario) => {
+        if (usuario) {
+          this.nombreUsuario = usuario.username;
+          this.emailUsuario = usuario.email;
+        }
       });
+    }
+
+    if (this.comentario.idEntrada) {
+      this.facade.obtenerEntradaPorId(this.comentario.idEntrada).subscribe((entrada) => {
+        if (entrada) {
+          this.tituloEntrada = entrada.titulo;
+        }
+      });
+    }
   }
 
-  private obtenerDatosUsuario(idUsuario: number) {
-      this.usuarioService.obtenerPorId(idUsuario).subscribe({
-          next: (response: OpenpanelApiResponse<any>) => {
-              const usuario: Usuario = response.data;
-              if (usuario) {
-                  this.nombreUsuario = usuario.username;
-                  this.emailUsuario = usuario.email;
-                  this.cdr.detectChanges();
-              }
-          }
-      });
+  handleVisibleChange(event: boolean) {
+    this.visible = event;
+    this.visibleChange.emit(event);
   }
 
-  private obtenerDatosEntrada(idEntrada: number) {
-      this.entradaService.obtenerPorId(idEntrada).subscribe({
-          next: (response: OpenpanelApiResponse<any>) => {
-              const entrada: Entrada = response.data;
-              if (entrada) {
-                  this.tituloEntrada = entrada.titulo;
-                  this.cdr.detectChanges();
-              }
-          }
-      });
+  cerrarModal() {
+    this.handleVisibleChange(false);
   }
 
-  onSubmit(comentario: Comentario) {
+  guardar(comentario: Comentario) {
+    if (!comentario.idComentario) return;
+
     this.submitted = true;
-    this.comentarioService.actualizar(comentario.idComentario, comentario).subscribe((response: OpenpanelApiResponse<any>) => {
-        this.log.info('Se ha actualizado el comentario ' + comentario.idComentario);
-        this.commonFuncService.reloadComponent(false, '/admin/control/comentarios');
+    this.facade.actualizarComentario(comentario.idComentario, comentario).subscribe({
+      next: () => {
+        this.toastService.showSuccess('El comentario se ha actualizado correctamente.', 'Comentario actualizado');
+        this.onSuccess.emit();
+        this.cerrarModal();
+      },
+      error: (err) => {
+        console.error('Error al actualizar comentario:', err);
+      }
     });
   }
-
-  onCancel() {
-    this.router.navigate(['/admin/control/comentarios']);
-  }
-
+  
   onEditarComentario() {
       this.disabled = false;
+  }
+
+  onGuardarClick() {
+    this.formComponent.guardar();
   }
 }

@@ -5,7 +5,7 @@ import { TipoEntrada } from '../../../../../core/models/tipo-entrada.model';
 import { Categoria } from '../../../../../core/models/categoria.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ValidationEntradaFormsService {
   // Reglas que ya tenías en tu servicio original
@@ -24,7 +24,7 @@ export class ValidationEntradaFormsService {
     titulo: {
       required: 'El título es obligatorio',
       minlength: `El título debe tener al menos ${this.formRules.tituloMin} caracteres`,
-      maxlength: `El título no puede exceder ${this.formRules.tituloMax} caracteres`
+      maxlength: `El título no puede exceder ${this.formRules.tituloMax} caracteres`,
     },
     subtitulo: {
       maxLength: `El subtítulo ha de tener máximo ${this.formRules.subtituloMax} caracteres`,
@@ -34,14 +34,14 @@ export class ValidationEntradaFormsService {
       minLength: `Escribe algo no seas vago`,
     },
     contenido: {
-      required: 'Escribe algo en la entrada'
-    }
+      required: 'Escribe algo en la entrada',
+    },
   };
 
   formErrors = {
     titulo: '',
     subtitulo: '',
-    textoContenidoEntrada: ''
+    textoContenidoEntrada: '',
   };
 
   constructor(private fb: UntypedFormBuilder) {}
@@ -52,18 +52,19 @@ export class ValidationEntradaFormsService {
       idEntrada: [entrada?.idEntrada ?? null],
       idUsuario: [entrada?.idUsuario ?? null],
       idUsuarioEditado: [entrada?.idUsuarioEditado ?? null],
-      titulo: [entrada?.titulo ?? '', [
-        Validators.required,
-        Validators.minLength(this.formRules.tituloMin),
-        Validators.maxLength(this.formRules.tituloMax)
-      ]],
-      subtitulo: [entrada?.subtitulo ?? '', [
-        Validators.maxLength(this.formRules.subtituloMax)
-      ]],
-      contenido: [entrada?.contenido ?? '', [
-        Validators.required,
-        Validators.minLength(this.formRules.contenidoMin)
-      ]],
+      titulo: [
+        entrada?.titulo ?? '',
+        [
+          Validators.required,
+          Validators.minLength(this.formRules.tituloMin),
+          Validators.maxLength(this.formRules.tituloMax),
+        ],
+      ],
+      subtitulo: [entrada?.subtitulo ?? '', [Validators.maxLength(this.formRules.subtituloMax)]],
+      contenido: [
+        entrada?.contenido ?? '',
+        [Validators.required, Validators.minLength(this.formRules.contenidoMin)],
+      ],
       notas: [entrada?.notas ?? null],
       tipoEntrada: [entrada?.tipoEntrada ?? null, [Validators.required]],
       resumen: [entrada?.resumen ?? null],
@@ -79,10 +80,11 @@ export class ValidationEntradaFormsService {
       imagenDestacada: [entrada?.imagenDestacada ?? null],
       votos: [entrada?.votos ?? 0],
       cantidadComentarios: [entrada?.cantidadComentarios ?? 0],
-      categorias: this.fb.array(entrada?.categorias ? entrada.categorias.map((c: Categoria) => this.fb.control(c)) : []),
+      categorias: this.fb.array(
+        entrada?.categorias ? entrada.categorias.map((c: Categoria) => this.fb.control(c)) : []
+      ),
       categoriasConComas: [entrada?.categoriasConComas ?? ''],
       etiquetas: [entrada?.etiquetas ?? []],
     });
   }
-
 }

@@ -6,11 +6,7 @@ import { ImagenesComponent } from './imagenes/imagenes.component';
 
 @NgModule({
   declarations: [ImagenesComponent],
-  imports: [
-    CommonModule,
-    FormsModule,
-    SharedOPModule
-  ],
-  exports: [ImagenesComponent]
+  imports: [CommonModule, FormsModule, SharedOPModule],
+  exports: [ImagenesComponent],
 })
 export class MediaSharedModule {}

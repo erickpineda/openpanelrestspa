@@ -1,7 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AlertModule, BadgeModule, ButtonModule, CardModule, GridModule, ListGroupModule, PaginationModule, FormModule, DropdownModule, NavModule, HeaderModule, ModalModule, SpinnerModule, TooltipModule } from '@coreui/angular';
+import {
+  AlertModule,
+  BadgeModule,
+  ButtonModule,
+  CardModule,
+  GridModule,
+  ListGroupModule,
+  PaginationModule,
+  FormModule,
+  DropdownModule,
+  NavModule,
+  HeaderModule,
+  ModalModule,
+  SpinnerModule,
+  TooltipModule,
+} from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
 
 import { NotFoundComponent } from './components/not-found/not-found.component';
@@ -10,6 +25,7 @@ import { OpPaginationComponent } from './components/op-pagination/op-pagination.
 import { GlobalErrorComponent } from './components/errors/global/global-error.component';
 import { ErrorBoundaryComponent } from './components/errors/error-boundary/error-boundary.component';
 import { SharedWidgetsModule } from './shared-widgets.module';
+import { TranslatePipe } from './pipes/translate.pipe';
 
 @NgModule({
   imports: [
@@ -31,14 +47,15 @@ import { SharedWidgetsModule } from './shared-widgets.module';
     FormModule,
     IconModule,
     TooltipModule,
-    SharedWidgetsModule
+    SharedWidgetsModule,
+    TranslatePipe,
   ],
   declarations: [
     GlobalErrorComponent,
     NotFoundComponent,
     ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
-    OpPaginationComponent
+    OpPaginationComponent,
   ],
   exports: [
     CommonModule,
@@ -63,7 +80,8 @@ import { SharedWidgetsModule } from './shared-widgets.module';
     ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
-    SharedWidgetsModule
-  ]
+    SharedWidgetsModule,
+    TranslatePipe,
+  ],
 })
-export class SharedOPModule {}
+export class SharedOPModule { }

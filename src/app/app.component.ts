@@ -6,11 +6,14 @@ import { LoggerService } from './core/services/logger.service';
 import { AuthService } from './core/services/auth/auth.service'; // inyectado para comprobar token
 import { RouteTrackerService } from './core/services/auth/route-tracker.service';
 import { OPConstants } from './shared/constants/op-global.constants';
+import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
+import { UiAnomalyMonitorService } from './core/services/ui/ui-anomaly-monitor.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   title = 'openpanelspa';
@@ -21,8 +24,10 @@ export class AppComponent implements OnInit {
     private log: LoggerService,
     private authService: AuthService,
     private routeTracker: RouteTrackerService, // sólo para activar el tracking
-    private tokenStorage: TokenStorageService
-  ){ }
+    private tokenStorage: TokenStorageService,
+    private globalErrorHandler: GlobalErrorHandlerService,
+    private uiMonitor: UiAnomalyMonitorService
+  ) {}
 
   ngOnInit(): void {
     // Inicializar sincronización entre pestañas
@@ -40,5 +45,12 @@ export class AppComponent implements OnInit {
       this.log.info('🔄 Estado de autenticación cambiado, actualizando interfaz...');
       // Aquí podrías forzar la actualización de componentes si es necesario
     });
+
+    this.uiMonitor.start();
+
+    // Safety check: ensure no stale backdrops or overlays are blocking the UI on startup
+    setTimeout(() => {
+      this.uiMonitor.scanAndRecover('startup_safety');
+    }, 500);
   }
 }

@@ -1,399 +1,397 @@
 {
-    "authRequest": [
+  "authRequest": [
+    {
+      "username": "optimusprime",
+      "password": "Op2023dev!"
+    }
+  ],
+  "authResponse": [
+    {
+      "jwttoken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvcHRpbXVzcHJpbWUiLCJyb2xlcyI6IlJPTEVfQURNSU5JU1RSQURPUiIsImV4cCI6MTcwMTc4ODg4MCwiaWF0IjoxNzAxNzcwODgwfQ.DcHrhN76FbCxwf9Ns0ygEwtJGmGjAnPGLcIRlMjInpkau0vrj_WzJ94JPzmfLP6-Gzmi0QTXtrYmWOMQOXWFqw",
+      "type": "Bearer",
+      "refreshToken": "01de924d-15c0-401b-ae3f-d32578cfabac",
+      "id": 2,
+      "username": "optimusprime",
+      "email": null,
+      "roles": ["ROLE_ADMINISTRADOR"]
+    }
+  ],
+  "usuarios": [
+    {
+      "idUsuario": 1,
+      "idRol": 1,
+      "username": "openpanel",
+      "nombre": "Maestro",
+      "apellido": null,
+      "fechaNacimiento": null,
+      "email": "openpanel@openpanel.net",
+      "genero": null,
+      "telefono": null,
+      "emailConfirmado": true,
+      "fechaEmailConfirmado": null,
+      "website": null,
+      "imagen": null,
+      "infouser": null,
+      "tokenExpirationDate": null,
+      "verifyToken": null,
+      "refreshToken": [],
+      "deviceMetadata": []
+    },
+    {
+      "idUsuario": 2,
+      "idRol": 2,
+      "username": "optimusprime",
+      "nombre": "Admin",
+      "apellido": null,
+      "fechaNacimiento": null,
+      "email": "administrador@openpanel.net",
+      "genero": null,
+      "telefono": null,
+      "emailConfirmado": true,
+      "fechaEmailConfirmado": null,
+      "website": null,
+      "imagen": null,
+      "infouser": null,
+      "tokenExpirationDate": null,
+      "verifyToken": null,
+      "refreshToken": [
         {
-            "username": "optimusprime",
-            "password": "Op2023dev!"
+          "idRefreshToken": 1,
+          "idUsuario": 2,
+          "username": "optimusprime",
+          "refreshToken": "01de924d-15c0-401b-ae3f-d32578cfabac",
+          "expiryDate": "06-12-2023 11:08:00"
         }
-    ],
-    "authResponse": [
+      ],
+      "deviceMetadata": [
         {
-            "jwttoken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvcHRpbXVzcHJpbWUiLCJyb2xlcyI6IlJPTEVfQURNSU5JU1RSQURPUiIsImV4cCI6MTcwMTc4ODg4MCwiaWF0IjoxNzAxNzcwODgwfQ.DcHrhN76FbCxwf9Ns0ygEwtJGmGjAnPGLcIRlMjInpkau0vrj_WzJ94JPzmfLP6-Gzmi0QTXtrYmWOMQOXWFqw",
-            "type": "Bearer",
-            "refreshToken": "01de924d-15c0-401b-ae3f-d32578cfabac",
-            "id": 2,
-            "username": "optimusprime",
-            "email": null,
-            "roles": [
-                "ROLE_ADMINISTRADOR"
-            ]
+          "idDeviceMetadata": 1,
+          "idUsuario": 2,
+          "deviceDetails": "Other 113.0 - Windows 10.null",
+          "location": "Alicante",
+          "lastLoggedIn": "05-12-2023 11:08:01"
         }
-    ],
-    "usuarios": [
+      ]
+    },
+    {
+      "idUsuario": 3,
+      "idRol": 3,
+      "username": "mantenimientoprueba",
+      "nombre": "mantenimientoprueba",
+      "apellido": null,
+      "fechaNacimiento": null,
+      "email": "mantenimientoprueba@openpanel.net",
+      "genero": null,
+      "telefono": null,
+      "emailConfirmado": true,
+      "fechaEmailConfirmado": null,
+      "website": null,
+      "imagen": null,
+      "infouser": null,
+      "tokenExpirationDate": null,
+      "verifyToken": null,
+      "refreshToken": [],
+      "deviceMetadata": []
+    },
+    {
+      "idUsuario": 4,
+      "idRol": 4,
+      "username": "editorprueba",
+      "nombre": "editorprueba",
+      "apellido": null,
+      "fechaNacimiento": null,
+      "email": "editorprueba@openpanel.net",
+      "genero": null,
+      "telefono": null,
+      "emailConfirmado": true,
+      "fechaEmailConfirmado": null,
+      "website": null,
+      "imagen": null,
+      "infouser": null,
+      "tokenExpirationDate": null,
+      "verifyToken": null,
+      "refreshToken": [],
+      "deviceMetadata": []
+    },
+    {
+      "idUsuario": 5,
+      "idRol": 5,
+      "username": "autorprueba",
+      "nombre": "autorprueba",
+      "apellido": null,
+      "fechaNacimiento": null,
+      "email": "autorprueba@openpanel.net",
+      "genero": null,
+      "telefono": null,
+      "emailConfirmado": true,
+      "fechaEmailConfirmado": null,
+      "website": null,
+      "imagen": null,
+      "infouser": null,
+      "tokenExpirationDate": null,
+      "verifyToken": null,
+      "refreshToken": [],
+      "deviceMetadata": []
+    },
+    {
+      "idUsuario": 6,
+      "idRol": 6,
+      "username": "lectorprueba",
+      "nombre": "lectorprueba",
+      "apellido": null,
+      "fechaNacimiento": null,
+      "email": "lectorprueba@openpanel.net",
+      "genero": null,
+      "telefono": null,
+      "emailConfirmado": true,
+      "fechaEmailConfirmado": null,
+      "website": null,
+      "imagen": null,
+      "infouser": null,
+      "tokenExpirationDate": null,
+      "verifyToken": null,
+      "refreshToken": [],
+      "deviceMetadata": []
+    }
+  ],
+  "roles": [
+    {
+      "idRol": 1,
+      "nombre": "PROPIETARIO",
+      "descripcion": "Usuario propietario (es único) de la app, tiene funciones especiales"
+    },
+    {
+      "idRol": 2,
+      "nombre": "ADMINISTRADOR",
+      "descripcion": "Administrador, tiene acceso a toda la app"
+    },
+    {
+      "idRol": 3,
+      "nombre": "MANTENIMIENTO",
+      "descripcion": "Mantenimiento, es usado para labores de mantenimiento en la app"
+    },
+    {
+      "idRol": 4,
+      "nombre": "EDITOR",
+      "descripcion": "Editor, puede editar entradas de otros, revisarlas y aprobarlas, al igual que puede crear entradas"
+    },
+    {
+      "idRol": 5,
+      "nombre": "AUTOR",
+      "descripcion": "Autor, puede crear y editar sus propias entradas"
+    },
+    {
+      "idRol": 6,
+      "nombre": "LECTOR",
+      "descripcion": "Lector, usuarios simples que pueden comentar en entradas"
+    }
+  ],
+  "categorias": [
+    {
+      "idCategoria": 1,
+      "nombre": "Sin categoria",
+      "descripcion": "Categoria por defecto"
+    }
+  ],
+  "entradas": [
+    {
+      "idEntrada": 1,
+      "titulo": "Entrada inicial",
+      "subtitulo": null,
+      "contenido": "Este es mi contenido de entrada inicial.",
+      "notas": "Mi primera nota",
+      "tipoEntrada": {
+        "idTipoEntrada": 1,
+        "nombre": "Entrada",
+        "descripcion": "Entrada normal"
+      },
+      "resumen": "Mi resumen de entrada",
+      "fechaPublicacion": null,
+      "fechaEdicion": null,
+      "borrador": null,
+      "publicada": null,
+      "password": null,
+      "privado": null,
+      "estadoEntrada": {
+        "idEstadoEntrada": 2,
+        "nombre": "NO PUBLICADA",
+        "descripcion": "Entrada/Página sin publicar"
+      },
+      "fechaPublicacionProgramada": null,
+      "permitirComentario": true,
+      "imagenDestacada": null,
+      "votos": null,
+      "cantidadComentarios": null,
+      "idUsuario": 2,
+      "idUsuarioEditado": null,
+      "categorias": [
         {
-            "idUsuario": 1,
-            "idRol": 1,
-            "username": "openpanel",
-            "nombre": "Maestro",
-            "apellido": null,
-            "fechaNacimiento": null,
-            "email": "openpanel@openpanel.net",
-            "genero": null,
-            "telefono": null,
-            "emailConfirmado": true,
-            "fechaEmailConfirmado": null,
-            "website": null,
-            "imagen": null,
-            "infouser": null,
-            "tokenExpirationDate": null,
-            "verifyToken": null,
-            "refreshToken": [],
-            "deviceMetadata": []
-        },
-        {
-            "idUsuario": 2,
-            "idRol": 2,
-            "username": "optimusprime",
-            "nombre": "Admin",
-            "apellido": null,
-            "fechaNacimiento": null,
-            "email": "administrador@openpanel.net",
-            "genero": null,
-            "telefono": null,
-            "emailConfirmado": true,
-            "fechaEmailConfirmado": null,
-            "website": null,
-            "imagen": null,
-            "infouser": null,
-            "tokenExpirationDate": null,
-            "verifyToken": null,
-            "refreshToken": [
-                {
-                    "idRefreshToken": 1,
-                    "idUsuario": 2,
-                    "username": "optimusprime",
-                    "refreshToken": "01de924d-15c0-401b-ae3f-d32578cfabac",
-                    "expiryDate": "06-12-2023 11:08:00"
-                }
-            ],
-            "deviceMetadata": [
-                {
-                    "idDeviceMetadata": 1,
-                    "idUsuario": 2,
-                    "deviceDetails": "Other 113.0 - Windows 10.null",
-                    "location": "Alicante",
-                    "lastLoggedIn": "05-12-2023 11:08:01"
-                }
-            ]
-        },
-        {
-            "idUsuario": 3,
-            "idRol": 3,
-            "username": "mantenimientoprueba",
-            "nombre": "mantenimientoprueba",
-            "apellido": null,
-            "fechaNacimiento": null,
-            "email": "mantenimientoprueba@openpanel.net",
-            "genero": null,
-            "telefono": null,
-            "emailConfirmado": true,
-            "fechaEmailConfirmado": null,
-            "website": null,
-            "imagen": null,
-            "infouser": null,
-            "tokenExpirationDate": null,
-            "verifyToken": null,
-            "refreshToken": [],
-            "deviceMetadata": []
-        },
-        {
-            "idUsuario": 4,
-            "idRol": 4,
-            "username": "editorprueba",
-            "nombre": "editorprueba",
-            "apellido": null,
-            "fechaNacimiento": null,
-            "email": "editorprueba@openpanel.net",
-            "genero": null,
-            "telefono": null,
-            "emailConfirmado": true,
-            "fechaEmailConfirmado": null,
-            "website": null,
-            "imagen": null,
-            "infouser": null,
-            "tokenExpirationDate": null,
-            "verifyToken": null,
-            "refreshToken": [],
-            "deviceMetadata": []
-        },
-        {
-            "idUsuario": 5,
-            "idRol": 5,
-            "username": "autorprueba",
-            "nombre": "autorprueba",
-            "apellido": null,
-            "fechaNacimiento": null,
-            "email": "autorprueba@openpanel.net",
-            "genero": null,
-            "telefono": null,
-            "emailConfirmado": true,
-            "fechaEmailConfirmado": null,
-            "website": null,
-            "imagen": null,
-            "infouser": null,
-            "tokenExpirationDate": null,
-            "verifyToken": null,
-            "refreshToken": [],
-            "deviceMetadata": []
-        },
-        {
-            "idUsuario": 6,
-            "idRol": 6,
-            "username": "lectorprueba",
-            "nombre": "lectorprueba",
-            "apellido": null,
-            "fechaNacimiento": null,
-            "email": "lectorprueba@openpanel.net",
-            "genero": null,
-            "telefono": null,
-            "emailConfirmado": true,
-            "fechaEmailConfirmado": null,
-            "website": null,
-            "imagen": null,
-            "infouser": null,
-            "tokenExpirationDate": null,
-            "verifyToken": null,
-            "refreshToken": [],
-            "deviceMetadata": []
+          "nombre": "Sin categoria"
         }
-    ],
-    "roles": [
-        {
-            "idRol": 1,
-            "nombre": "PROPIETARIO",
-            "descripcion": "Usuario propietario (es único) de la app, tiene funciones especiales"
-        },
-        {
-            "idRol": 2,
-            "nombre": "ADMINISTRADOR",
-            "descripcion": "Administrador, tiene acceso a toda la app"
-        },
-        {
-            "idRol": 3,
-            "nombre": "MANTENIMIENTO",
-            "descripcion": "Mantenimiento, es usado para labores de mantenimiento en la app"
-        },
-        {
-            "idRol": 4,
-            "nombre": "EDITOR",
-            "descripcion": "Editor, puede editar entradas de otros, revisarlas y aprobarlas, al igual que puede crear entradas"
-        },
-        {
-            "idRol": 5,
-            "nombre": "AUTOR",
-            "descripcion": "Autor, puede crear y editar sus propias entradas"
-        },
-        {
-            "idRol": 6,
-            "nombre": "LECTOR",
-            "descripcion": "Lector, usuarios simples que pueden comentar en entradas"
-        }
-    ],
-    "categorias": [
-        {
-            "idCategoria": 1,
-            "nombre": "Sin categoria",
-            "descripcion": "Categoria por defecto"
-        }
-    ],
-    "entradas": [
-        {
-            "idEntrada": 1,
-            "titulo": "Entrada inicial",
-            "subtitulo": null,
-            "contenido": "Este es mi contenido de entrada inicial.",
-            "notas": "Mi primera nota",
-            "tipoEntrada": {
-                "idTipoEntrada": 1,
-                "nombre": "Entrada",
-                "descripcion": "Entrada normal"
-            },
-            "resumen": "Mi resumen de entrada",
-            "fechaPublicacion": null,
-            "fechaEdicion": null,
-            "borrador": null,
-            "publicada": null,
-            "password": null,
-            "privado": null,
-            "estadoEntrada": {
-                "idEstadoEntrada": 2,
-                "nombre": "NO PUBLICADA",
-                "descripcion": "Entrada/Página sin publicar"
-            },
-            "fechaPublicacionProgramada": null,
-            "permitirComentario": true,
-            "imagenDestacada": null,
-            "votos": null,
-            "cantidadComentarios": null,
-            "idUsuario": 2,
-            "idUsuarioEditado": null,
-            "categorias": [
-                {
-                    "nombre": "Sin categoria"
-                }
-            ],
-            "etiquetas": []
-        }
-    ],
-    "comentarios": [
-        {
-            "idComentario": 1,
-            "idUsuario": 2,
-            "idEntrada": 1,
-            "fechaCreacion": "05-12-2023 11:06:51",
-            "fechaEdicion": null,
-            "contenido": "Soy un comentario",
-            "contenidoCensurado": null,
-            "votos": null,
-            "aprobado": null,
-            "cuarentena": null
-        }
-    ],
-    "tiposEntradas": [
-        {
-            "idTipoEntrada": 1,
-            "nombre": "Entrada",
-            "descripcion": "Entrada normal"
-        },
-        {
-            "idTipoEntrada": 2,
-            "nombre": "Entrada Extendida",
-            "descripcion": "Entradas sin laterales"
-        },
-        {
-            "idTipoEntrada": 3,
-            "nombre": "Página",
-            "descripcion": "Página normal"
-        },
-        {
-            "idTipoEntrada": 4,
-            "nombre": "Página Extendida",
-            "descripcion": "Página sin laterales"
-        },
-        {
-            "idTipoEntrada": 5,
-            "nombre": "E.E. Sin Imagen",
-            "descripcion": "Entrada extendida sin imagen destacada"
-        },
-        {
-            "idTipoEntrada": 6,
-            "nombre": "P.E. Sin Imagen",
-            "descripcion": "Página extendida sin imagen destacada"
-        },
-        {
-            "idTipoEntrada": 7,
-            "nombre": "Entrada Sin Imagen",
-            "descripcion": "Entrada normal sin imagen destacada"
-        },
-        {
-            "idTipoEntrada": 8,
-            "nombre": "Página Sin Imagen",
-            "descripcion": "Página normal sin imagen destacada"
-        }
-    ],
-    "estados": [
-        {
-            "idEstadoEntrada": 1,
-            "nombre": "PUBLICADA",
-            "descripcion": "Entrada/Página en estado publicada"
-        },
-        {
-            "idEstadoEntrada": 2,
-            "nombre": "NO PUBLICADA",
-            "descripcion": "Entrada/Página sin publicar"
-        },
-        {
-            "idEstadoEntrada": 3,
-            "nombre": "GUARDADA",
-            "descripcion": "Entrada/Página que ha sido guardada o puesta en borrador"
-        },
-        {
-            "idEstadoEntrada": 4,
-            "nombre": "PENDIENTE REVISION",
-            "descripcion": "Entrada/Página que está pendiente de revisión, bien sea por parte de un Editor"
-        },
-        {
-            "idEstadoEntrada": 5,
-            "nombre": "EN REVISION",
-            "descripcion": "Entrada/Página que está siendo revisada"
-        },
-        {
-            "idEstadoEntrada": 6,
-            "nombre": "REVISADA",
-            "descripcion": "Entrada/Página que ha sido revisada"
-        },
-        {
-            "idEstadoEntrada": 7,
-            "nombre": "HISTORICA",
-            "descripcion": "Entrada/Página historica y no activa"
-        },
-        {
-            "idEstadoEntrada": 8,
-            "nombre": "PROGRAMADA",
-            "descripcion": "Entrada/Página que ha sido programada, para que sea publicada a cierta fecha y hora"
-        }
-    ],
-    "ficheros": [
-        {
-            "uuidFileStorage": "e8d59d83-471f-458f-89fe-65c7fa610a88",
-            "nombre": "plantillaUsuarioConfirmado.html",
-            "tipo": "text/html",
-            "fechaCreacion": "05-12-2023 11:06:52",
-            "rutaInterna": "/fileStorage/ficheros/obtenerDatos/",
-            "ruta": "http://localhost:8080/api/v1/fileStorage/ficheros/descargar/e8d59d83-471f-458f-89fe-65c7fa610a88",
-            "size": 15308,
-            "data": null
-        },
-        {
-            "uuidFileStorage": "24cb7f0e-a2ba-4f57-a51b-32e703bd8524",
-            "nombre": "plantillaWelcome.html",
-            "tipo": "text/html",
-            "fechaCreacion": "05-12-2023 11:06:52",
-            "rutaInterna": "/fileStorage/ficheros/obtenerDatos/",
-            "ruta": "http://localhost:8080/api/v1/fileStorage/ficheros/descargar/24cb7f0e-a2ba-4f57-a51b-32e703bd8524",
-            "size": 15479,
-            "data": null
-        }
-    ],
-    "etiquetas": [
-        {
-            "idEtiqueta": 1,
-            "nombre": "Evento",
-            "frecuencia": null,
-            "descripcion": "Etiquetas para eventos"
-        }
-    ],
-    "herramientas": [
-        {
-            "idHerramientAuxiliar": null,
-            "codigo": "plantillaWelcome.html",
-            "clave": "product_name",
-            "valor": "Openpanel",
-            "orden": null,
-            "descripcion": "Nombre del producto o app"
-        },
-        {
-            "idHerramientAuxiliar": null,
-            "codigo": "plantillaWelcome.html",
-            "clave": "support_email",
-            "valor": "soportetecnico@openpanel.net",
-            "orden": null,
-            "descripcion": "Email del servicio técnico de la app"
-        },
-        {
-            "idHerramientAuxiliar": null,
-            "codigo": "plantillaWelcome.html",
-            "clave": "product_name",
-            "valor": "Openpanel",
-            "orden": null,
-            "descripcion": "Nombre del producto o app"
-        },
-        {
-            "idHerramientAuxiliar": null,
-            "codigo": "plantillaUsuarioConfirmado.html",
-            "clave": "support_email",
-            "valor": "soportetecnico@openpanel.net",
-            "orden": null,
-            "descripcion": "Email del servicio técnico de la app"
-        }
-    ]
+      ],
+      "etiquetas": []
+    }
+  ],
+  "comentarios": [
+    {
+      "idComentario": 1,
+      "idUsuario": 2,
+      "idEntrada": 1,
+      "fechaCreacion": "05-12-2023 11:06:51",
+      "fechaEdicion": null,
+      "contenido": "Soy un comentario",
+      "contenidoCensurado": null,
+      "votos": null,
+      "aprobado": null,
+      "cuarentena": null
+    }
+  ],
+  "tiposEntradas": [
+    {
+      "idTipoEntrada": 1,
+      "nombre": "Entrada",
+      "descripcion": "Entrada normal"
+    },
+    {
+      "idTipoEntrada": 2,
+      "nombre": "Entrada Extendida",
+      "descripcion": "Entradas sin laterales"
+    },
+    {
+      "idTipoEntrada": 3,
+      "nombre": "Página",
+      "descripcion": "Página normal"
+    },
+    {
+      "idTipoEntrada": 4,
+      "nombre": "Página Extendida",
+      "descripcion": "Página sin laterales"
+    },
+    {
+      "idTipoEntrada": 5,
+      "nombre": "E.E. Sin Imagen",
+      "descripcion": "Entrada extendida sin imagen destacada"
+    },
+    {
+      "idTipoEntrada": 6,
+      "nombre": "P.E. Sin Imagen",
+      "descripcion": "Página extendida sin imagen destacada"
+    },
+    {
+      "idTipoEntrada": 7,
+      "nombre": "Entrada Sin Imagen",
+      "descripcion": "Entrada normal sin imagen destacada"
+    },
+    {
+      "idTipoEntrada": 8,
+      "nombre": "Página Sin Imagen",
+      "descripcion": "Página normal sin imagen destacada"
+    }
+  ],
+  "estados": [
+    {
+      "idEstadoEntrada": 1,
+      "nombre": "PUBLICADA",
+      "descripcion": "Entrada/Página en estado publicada"
+    },
+    {
+      "idEstadoEntrada": 2,
+      "nombre": "NO PUBLICADA",
+      "descripcion": "Entrada/Página sin publicar"
+    },
+    {
+      "idEstadoEntrada": 3,
+      "nombre": "GUARDADA",
+      "descripcion": "Entrada/Página que ha sido guardada o puesta en borrador"
+    },
+    {
+      "idEstadoEntrada": 4,
+      "nombre": "PENDIENTE REVISION",
+      "descripcion": "Entrada/Página que está pendiente de revisión, bien sea por parte de un Editor"
+    },
+    {
+      "idEstadoEntrada": 5,
+      "nombre": "EN REVISION",
+      "descripcion": "Entrada/Página que está siendo revisada"
+    },
+    {
+      "idEstadoEntrada": 6,
+      "nombre": "REVISADA",
+      "descripcion": "Entrada/Página que ha sido revisada"
+    },
+    {
+      "idEstadoEntrada": 7,
+      "nombre": "HISTORICA",
+      "descripcion": "Entrada/Página historica y no activa"
+    },
+    {
+      "idEstadoEntrada": 8,
+      "nombre": "PROGRAMADA",
+      "descripcion": "Entrada/Página que ha sido programada, para que sea publicada a cierta fecha y hora"
+    }
+  ],
+  "ficheros": [
+    {
+      "uuidFileStorage": "e8d59d83-471f-458f-89fe-65c7fa610a88",
+      "nombre": "plantillaUsuarioConfirmado.html",
+      "tipo": "text/html",
+      "fechaCreacion": "05-12-2023 11:06:52",
+      "rutaInterna": "/fileStorage/ficheros/obtenerDatos/",
+      "ruta": "http://localhost:8080/api/v1/fileStorage/ficheros/descargar/e8d59d83-471f-458f-89fe-65c7fa610a88",
+      "size": 15308,
+      "data": null
+    },
+    {
+      "uuidFileStorage": "24cb7f0e-a2ba-4f57-a51b-32e703bd8524",
+      "nombre": "plantillaWelcome.html",
+      "tipo": "text/html",
+      "fechaCreacion": "05-12-2023 11:06:52",
+      "rutaInterna": "/fileStorage/ficheros/obtenerDatos/",
+      "ruta": "http://localhost:8080/api/v1/fileStorage/ficheros/descargar/24cb7f0e-a2ba-4f57-a51b-32e703bd8524",
+      "size": 15479,
+      "data": null
+    }
+  ],
+  "etiquetas": [
+    {
+      "idEtiqueta": 1,
+      "nombre": "Evento",
+      "frecuencia": null,
+      "descripcion": "Etiquetas para eventos"
+    }
+  ],
+  "herramientas": [
+    {
+      "idHerramientAuxiliar": null,
+      "codigo": "plantillaWelcome.html",
+      "clave": "product_name",
+      "valor": "Openpanel",
+      "orden": null,
+      "descripcion": "Nombre del producto o app"
+    },
+    {
+      "idHerramientAuxiliar": null,
+      "codigo": "plantillaWelcome.html",
+      "clave": "support_email",
+      "valor": "soportetecnico@openpanel.net",
+      "orden": null,
+      "descripcion": "Email del servicio técnico de la app"
+    },
+    {
+      "idHerramientAuxiliar": null,
+      "codigo": "plantillaWelcome.html",
+      "clave": "product_name",
+      "valor": "Openpanel",
+      "orden": null,
+      "descripcion": "Nombre del producto o app"
+    },
+    {
+      "idHerramientAuxiliar": null,
+      "codigo": "plantillaUsuarioConfirmado.html",
+      "clave": "support_email",
+      "valor": "soportetecnico@openpanel.net",
+      "orden": null,
+      "descripcion": "Email del servicio técnico de la app"
+    }
+  ]
 }

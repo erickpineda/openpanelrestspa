@@ -1,6 +1,6 @@
 /**
  * Ejemplos de uso del sistema de optimización de rendimiento para navegación
- * 
+ *
  * Este archivo demuestra cómo utilizar las funcionalidades de optimización
  * implementadas en la Tarea 11 del proyecto de optimización del sidebar.
  */
@@ -12,10 +12,9 @@ import { NavigationPerformanceService } from '../../core/services/ui/navigation-
 import { INavItemEnhanced, UserRole } from '../types/navigation.types';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PerformanceOptimizationExampleService {
-
   constructor(
     private navigationService: NavigationService,
     private performanceService: NavigationPerformanceService
@@ -26,13 +25,13 @@ export class PerformanceOptimizationExampleService {
    */
   configureBasicPerformanceOptimizations(): void {
     this.navigationService.configurePerformanceOptions({
-      lazyLoadThreshold: 25,        // Activar lazy loading con más de 25 elementos
-      chunkSize: 8,                 // Chunks de 8 elementos
-      permissionCacheSize: 300,     // Cache para 300 verificaciones
-      permissionCacheTTL: 180000,   // 3 minutos de TTL
-      badgeUpdateDebounce: 250,     // 250ms de debounce para badges
-      badgeUpdateBatchSize: 8,      // Procesar badges en lotes de 8
-      renderDebounce: 100           // 100ms de debounce para renders
+      lazyLoadThreshold: 25, // Activar lazy loading con más de 25 elementos
+      chunkSize: 8, // Chunks de 8 elementos
+      permissionCacheSize: 300, // Cache para 300 verificaciones
+      permissionCacheTTL: 180000, // 3 minutos de TTL
+      badgeUpdateDebounce: 250, // 250ms de debounce para badges
+      badgeUpdateBatchSize: 8, // Procesar badges en lotes de 8
+      renderDebounce: 100, // 100ms de debounce para renders
     });
   }
 
@@ -41,13 +40,13 @@ export class PerformanceOptimizationExampleService {
    */
   configureHighVolumeOptimizations(): void {
     this.navigationService.configurePerformanceOptions({
-      lazyLoadThreshold: 15,        // Lazy loading más agresivo
-      chunkSize: 5,                 // Chunks más pequeños
-      permissionCacheSize: 1000,    // Cache más grande
-      permissionCacheTTL: 600000,   // 10 minutos de TTL
-      badgeUpdateDebounce: 500,     // Debounce más largo
-      badgeUpdateBatchSize: 15,     // Lotes más grandes
-      renderDebounce: 200           // Render debounce más conservador
+      lazyLoadThreshold: 15, // Lazy loading más agresivo
+      chunkSize: 5, // Chunks más pequeños
+      permissionCacheSize: 1000, // Cache más grande
+      permissionCacheTTL: 600000, // 10 minutos de TTL
+      badgeUpdateDebounce: 500, // Debounce más largo
+      badgeUpdateBatchSize: 15, // Lotes más grandes
+      renderDebounce: 200, // Render debounce más conservador
     });
   }
 
@@ -56,13 +55,13 @@ export class PerformanceOptimizationExampleService {
    */
   configureMobileOptimizations(): void {
     this.navigationService.configurePerformanceOptions({
-      lazyLoadThreshold: 10,        // Lazy loading muy agresivo
-      chunkSize: 3,                 // Chunks muy pequeños
-      permissionCacheSize: 150,     // Cache reducido para memoria limitada
-      permissionCacheTTL: 120000,   // 2 minutos de TTL
-      badgeUpdateDebounce: 300,     // Debounce moderado
-      badgeUpdateBatchSize: 3,      // Lotes pequeños
-      renderDebounce: 150           // Render debounce moderado
+      lazyLoadThreshold: 10, // Lazy loading muy agresivo
+      chunkSize: 3, // Chunks muy pequeños
+      permissionCacheSize: 150, // Cache reducido para memoria limitada
+      permissionCacheTTL: 120000, // 2 minutos de TTL
+      badgeUpdateDebounce: 300, // Debounce moderado
+      badgeUpdateBatchSize: 3, // Lotes pequeños
+      renderDebounce: 150, // Render debounce moderado
     });
   }
 
@@ -104,12 +103,12 @@ export class PerformanceOptimizationExampleService {
     // Obtener estadísticas cada 30 segundos
     setInterval(() => {
       const stats = this.navigationService.getPerformanceStatistics();
-      
+
       console.log('Performance Stats:', {
         cacheHitRate: stats.cacheEfficiency.hitRate,
         averageRenderTime: stats.performance.averageRenderTime,
         memoryUsage: stats.performance.memoryUsage,
-        serviceHealth: stats.health
+        serviceHealth: stats.health,
       });
 
       // Alertar si el rendimiento se degrada
@@ -129,7 +128,7 @@ export class PerformanceOptimizationExampleService {
   performManualOptimization(): void {
     // Limpiar cache si está muy lleno
     const stats = this.navigationService.getPerformanceStatistics();
-    
+
     if (stats.performance.memoryUsage.cacheSize > 800) {
       this.navigationService.clearPermissionCache();
       console.log('Permission cache cleared due to high memory usage');
@@ -146,7 +145,7 @@ export class PerformanceOptimizationExampleService {
     // Detectar capacidades del dispositivo
     const isLowEndDevice = this.detectLowEndDevice();
     const isMobile = window.innerWidth < 768;
-    
+
     if (isLowEndDevice || isMobile) {
       this.configureMobileOptimizations();
     } else if (this.isHighEndDevice()) {
@@ -161,14 +160,14 @@ export class PerformanceOptimizationExampleService {
    */
   handlePerformanceErrors(): void {
     const stats = this.navigationService.getPerformanceStatistics();
-    
+
     // Verificar salud del servicio
     if (!stats.health.healthy) {
       console.error('Navigation service is unhealthy:', stats.health);
-      
+
       // Intentar recuperación automática
       this.navigationService.optimizePerformance();
-      
+
       // Si sigue fallando, usar configuración conservadora
       setTimeout(() => {
         const newStats = this.navigationService.getPerformanceStatistics();
@@ -185,19 +184,19 @@ export class PerformanceOptimizationExampleService {
   benchmarkPerformance(items: INavItemEnhanced[], userRole: UserRole): Promise<any> {
     return new Promise((resolve) => {
       const startTime = performance.now();
-      
-      this.navigationService.getNavigationItems(userRole).subscribe(result => {
+
+      this.navigationService.getNavigationItems(userRole).subscribe((result) => {
         const endTime = performance.now();
         const processingTime = endTime - startTime;
-        
+
         const benchmark = {
           processingTime,
           itemCount: items.length,
           resultCount: result.length,
           itemsPerMs: result.length / processingTime,
-          performanceStats: this.navigationService.getPerformanceStatistics()
+          performanceStats: this.navigationService.getPerformanceStatistics(),
         };
-        
+
         console.log('Performance Benchmark:', benchmark);
         resolve(benchmark);
       });
@@ -210,14 +209,14 @@ export class PerformanceOptimizationExampleService {
     // Heurística simple para detectar dispositivos de gama baja
     const memory = (navigator as any).deviceMemory;
     const cores = navigator.hardwareConcurrency;
-    
-    return memory && memory < 4 || cores && cores < 4;
+
+    return (memory && memory < 4) || (cores && cores < 4);
   }
 
   private isHighEndDevice(): boolean {
     const memory = (navigator as any).deviceMemory;
     const cores = navigator.hardwareConcurrency;
-    
+
     return memory && memory >= 8 && cores && cores >= 8;
   }
 }
@@ -259,24 +258,24 @@ export class OptimizedNavigationComponent implements OnInit {
 
 /**
  * Configuraciones recomendadas por tipo de aplicación:
- * 
+ *
  * 1. Aplicación pequeña (< 20 elementos de navegación):
  *    - lazyLoadThreshold: 50 (desactivado efectivamente)
  *    - permissionCacheSize: 100
  *    - badgeUpdateDebounce: 200
- * 
+ *
  * 2. Aplicación mediana (20-100 elementos):
  *    - lazyLoadThreshold: 30
  *    - chunkSize: 8
  *    - permissionCacheSize: 300
  *    - badgeUpdateDebounce: 300
- * 
+ *
  * 3. Aplicación grande (> 100 elementos):
  *    - lazyLoadThreshold: 15
  *    - chunkSize: 5
  *    - permissionCacheSize: 1000
  *    - badgeUpdateDebounce: 500
- * 
+ *
  * 4. Aplicación móvil:
  *    - lazyLoadThreshold: 10
  *    - chunkSize: 3

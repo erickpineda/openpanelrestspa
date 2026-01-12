@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { TranslationService } from '../../core/services/translation.service';
 import { Entrada } from '../../core/models/entrada.model';
 import { Categoria } from '../../core/models/categoria.model';
 import { EntradaService } from '../../core/services/data/entrada.service';
@@ -8,11 +9,12 @@ import { LoggerService } from '../../core/services/logger.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
+  standalone: false,
 })
 export class HomeComponent implements OnInit {
   cargaFinalizada: boolean = false;
-  noHayEntradas: boolean = true;
+  hasEntries: boolean = false;
   errorMsg: string = '';
   entradas: Entrada[] = [];
   categorias: Categoria[] = [];
@@ -23,45 +25,50 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private entradaService: EntradaService,
-    private log: LoggerService
-  ) {}
+    private log: LoggerService,
+    private translate: TranslationService
+  ) { }
 
   ngOnInit(): void {
     this.obtenerListaEntradas()
       .then((listaRes: Entrada[]) => {
         listaRes.forEach((entradaRes) => {
-          entradaRes.categoriasConComas = entradaRes.categorias.map(e => e.nombre).join(', ');
+          entradaRes.categoriasConComas = entradaRes.categorias.map((e) => e.nombre).join(', ');
         });
         this.refreshEntradas(); // Refrescar las entradas después de obtener la lista
       })
       .catch((error) => {
         this.log.error('Error al obtener lista de entradas:', error.message);
-        this.errorMsg = 'No se pudieron cargar las entradas, intenta nuevamente más tarde.';
+        this.errorMsg = 'PUBLIC.HOME.LOAD_ERROR';
         this.log.error(this.errorMsg);
+        this.cargaFinalizada = true; // Ensure UI renders even on error
       });
   }
 
   obtenerListaEntradas(): Promise<Entrada[]> {
     return new Promise((resolve, reject) => {
-      this.entradaService.listarPagina()
-        .subscribe({
-          next: (response) => {
-            const entradas: Entrada[] = Array.isArray(response.data?.elements) ? response.data.elements : [];
-            if (entradas.length < 1) {
-              this.noHayEntradas = false;
-            } else {
-              this.entradas = entradas;
-              this.categorias = this.entradas.flatMap(e => e.categorias);
-              this.cargaFinalizada = true;
-            }
-            resolve(this.entradas);
-          },
-          error: (error) => {
-            this.noHayEntradas = false;
-            this.cargaFinalizada = true;
-            reject(error);
+      this.entradaService.listarPagina().subscribe({
+        next: (response) => {
+          const entradas: Entrada[] = Array.isArray(response.data?.elements)
+            ? response.data.elements
+            : [];
+
+          if (entradas.length > 0) {
+            this.hasEntries = true;
+            this.entradas = entradas;
+            this.categorias = this.entradas.flatMap((e) => e.categorias);
+          } else {
+            this.hasEntries = false;
           }
-        });
+          this.cargaFinalizada = true;
+          resolve(entradas);
+        },
+        error: (error) => {
+          this.hasEntries = false;
+          this.cargaFinalizada = true;
+          reject(error);
+        },
+      });
     });
   }
 
@@ -88,5 +95,13 @@ export class HomeComponent implements OnInit {
 
   public refrescarPagina(): void {
     window.location.reload();
+  }
+
+  trackByCategoria(index: number, c: Categoria): number | string {
+    return c?.idCategoria ?? c?.nombre ?? index;
+  }
+
+  trackByEntrada(index: number, e: Entrada): number {
+    return e?.idEntrada ?? index;
   }
 }

@@ -7,13 +7,13 @@ const routes: Routes = [
     path: '',
     component: PerfilComponent,
     data: {
-      title: 'Perfil de Usuario'
-    }
-  }
+      title: 'Perfil de Usuario',
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class PerfilRoutingModule { }
+export class PerfilRoutingModule {}

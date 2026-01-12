@@ -9,7 +9,8 @@ import { finalize, take } from 'rxjs/operators';
 @Component({
   selector: 'app-perfil',
   templateUrl: './perfil.component.html',
-  styleUrls: ['./perfil.component.scss']
+  styleUrls: ['./perfil.component.scss'],
+  standalone: false,
 })
 export class PerfilComponent implements OnInit {
   usuario: PerfilResponse | null = null;
@@ -30,13 +31,16 @@ export class PerfilComponent implements OnInit {
   cargarPerfil() {
     this.loading = true;
     this.cdr.markForCheck();
-    this.usuarioService.obtenerDatosSesionActualSafe()
+    this.usuarioService
+      .obtenerDatosSesionActualSafe()
       .pipe(
         take(1),
-        finalize(() => { 
-          this.loading = false; 
-          this.cdr.markForCheck(); 
-          try { this.cdr.detectChanges(); } catch {} 
+        finalize(() => {
+          this.loading = false;
+          this.cdr.markForCheck();
+          try {
+            this.cdr.detectChanges();
+          } catch {}
         })
       )
       .subscribe({
@@ -47,21 +51,26 @@ export class PerfilComponent implements OnInit {
         error: () => {
           this.toastService.showError('Error al cargar perfil', 'Error');
           this.cdr.markForCheck();
-        }
+        },
       });
   }
 
   onSave(usuarioModificado: Partial<Usuario>) {
-     if (!this.usuario) return;
-     this.loading = true;
-     this.cdr.markForCheck();
-     // Cast to Usuario or compatible type if needed
-     this.usuarioService.actualizarParcial(this.usuario.idUsuario, usuarioModificado as Usuario)
-      .pipe(finalize(() => { 
-        this.loading = false; 
-        this.cdr.markForCheck(); 
-        try { this.cdr.detectChanges(); } catch {} 
-      }))
+    if (!this.usuario) return;
+    this.loading = true;
+    this.cdr.markForCheck();
+    // Cast to Usuario or compatible type if needed
+    this.usuarioService
+      .actualizarParcial(this.usuario.idUsuario, usuarioModificado as Usuario)
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.markForCheck();
+          try {
+            this.cdr.detectChanges();
+          } catch {}
+        })
+      )
       .subscribe({
         next: () => {
           this.toastService.showSuccess('Perfil actualizado', 'Éxito');
@@ -71,7 +80,7 @@ export class PerfilComponent implements OnInit {
         error: () => {
           this.toastService.showError('Error al actualizar', 'Error');
           this.cdr.markForCheck();
-        }
+        },
       });
   }
 
@@ -85,25 +94,25 @@ export class PerfilComponent implements OnInit {
       this.uploading = true;
       this.fileStorageService.uploadFile(file, 'perfil').subscribe({
         next: (response) => {
-           // Asumimos que la respuesta contiene la URL o path de la imagen
-           // y actualizamos el perfil
-           const imageUrl = response.ruta || response.url; // Adaptar según respuesta del backend
-           
-           if(imageUrl && this.usuario) {
-               this.onSave({ imagen: [imageUrl] } as unknown as Usuario);
-           } else {
-             this.toastService.showSuccess('Imagen subida', 'Éxito');
-             // Si el backend no devuelve URL directa, recargamos o esperamos que el usuario guarde
-             // Pero idealmente actualizamos el usuario con la nueva imagen
-           }
-           this.uploading = false;
-           this.cdr.markForCheck();
+          // Asumimos que la respuesta contiene la URL o path de la imagen
+          // y actualizamos el perfil
+          const imageUrl = response.ruta || response.url; // Adaptar según respuesta del backend
+
+          if (imageUrl && this.usuario) {
+            this.onSave({ imagen: [imageUrl] } as unknown as Usuario);
+          } else {
+            this.toastService.showSuccess('Imagen subida', 'Éxito');
+            // Si el backend no devuelve URL directa, recargamos o esperamos que el usuario guarde
+            // Pero idealmente actualizamos el usuario con la nueva imagen
+          }
+          this.uploading = false;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.toastService.showError('Error al subir imagen', 'Error');
           this.uploading = false;
           this.cdr.markForCheck();
-        }
+        },
       });
     }
   }

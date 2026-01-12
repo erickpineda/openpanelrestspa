@@ -34,7 +34,11 @@ export class ComentarioService extends CrudService<Comentario, number> {
     );
   }
 
-  buscarSinGlobalLoader(searchRequest: any, page: number, size: number): Observable<PaginaResponse> {
+  buscarSinGlobalLoader(
+    searchRequest: any,
+    page: number,
+    size: number
+  ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = page.toString();
     params[this.pageSizeParam] = size.toString();

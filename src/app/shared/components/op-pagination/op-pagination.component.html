@@ -1,17 +1,19 @@
 <c-pagination [align]="align" aria-label="Paginación" size="sm">
   <li cPageItem [disabled]="currentPage === 0">
     <a cPageLink (click)="cambiarPagina(-1)" aria-label="Anterior">
-      <span aria-hidden="true">&laquo;</span>
+      <span aria-hidden="true">{{ 'AUTO.LAQUO' | translate }}</span>
     </a>
   </li>
-  <li cPageItem [active]="pageNumber === currentPage" *ngFor="let pageNumber of paginasVisibles">
-    <a cPageLink (click)="pageChange.emit(pageNumber)">
-      {{ pageNumber + 1 }}
-    </a>
-  </li>
+  @for (pageNumber of paginasVisibles; track pageNumber) {
+    <li cPageItem [active]="pageNumber === currentPage">
+      <a cPageLink (click)="pageChange.emit(pageNumber)">
+        {{ pageNumber + 1 }}
+      </a>
+    </li>
+  }
   <li cPageItem [disabled]="currentPage >= totalPages - 1">
     <a cPageLink (click)="cambiarPagina(1)" aria-label="Siguiente">
-      <span aria-hidden="true">&raquo;</span>
+      <span aria-hidden="true">{{ 'AUTO.RAQUO' | translate }}</span>
     </a>
   </li>
 </c-pagination>

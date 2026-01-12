@@ -8,7 +8,7 @@ import { OPRolesConstants } from './op-roles.constants';
 
 /**
  * OPConstants
- * 
+ *
  * Agrupador global de constantes de la aplicación.
  * Las constantes específicas se han extraído a archivos separados (op-*.constants.ts)
  * para mejorar la mantenibilidad y modularidad.
@@ -21,5 +21,5 @@ export const OPConstants = {
   Events: OPEventsConstants,
   Sync: OPSyncConstants,
   Pagination: OPPaginationConstants,
-  Roles: OPRolesConstants
+  Roles: OPRolesConstants,
 } as const;

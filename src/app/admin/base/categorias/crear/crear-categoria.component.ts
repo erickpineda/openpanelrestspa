@@ -1,51 +1,52 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Categoria } from '../../../../core/models/categoria.model';
-import { CommonFunctionalityService } from '../../../../shared/services/common-functionality.service';
 import { CategoriaFacadeService } from '../categoria-form/srv/categoria-facade.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
+import { CategoriaFormComponent } from '../categoria-form/categoria-form.component';
 
 @Component({
   selector: 'app-crear-categoria',
   templateUrl: './crear-categoria.component.html',
-  styleUrls: ['./crear-categoria.component.scss']
+  standalone: false
 })
-export class CrearCategoriaComponent implements OnInit {
-  listaCategorias: Categoria[] = [];
-  submitted = false;
+export class CrearCategoriaComponent {
+  @Input() visible = false;
+  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() onSuccess = new EventEmitter<void>();
+
+  @ViewChild(CategoriaFormComponent) formComponent!: CategoriaFormComponent;
 
   constructor(
     private facade: CategoriaFacadeService,
-    private router: Router,
-    private commonFuncService: CommonFunctionalityService,
     private toastService: ToastService
   ) {}
 
-  ngOnInit(): void {
-    this.facade.obtenerListaCategorias().subscribe(cats => this.listaCategorias = cats);
+  handleVisibleChange(event: boolean) {
+    this.visible = event;
+    this.visibleChange.emit(event);
   }
 
-  crear(cat: Categoria) {
+  cerrarModal() {
+    this.handleVisibleChange(false);
+  }
+
+  guardar(cat: Categoria) {
     this.facade.crearCategoria(cat).subscribe({
       next: () => {
         this.toastService.showSuccess('La categoría se ha creado correctamente.', 'Categoría creada');
-        this.commonFuncService.reloadComponent(false, '/admin/control/categorias');
+        this.onSuccess.emit();
+        this.cerrarModal();
       },
       error: (err) => {
         console.error('Error al crear la categoría:', err);
-        // Emitir evento de error al componente hijo
-        const form = document.querySelector('app-categoria-form') as any;
-        form?.onError.emit();
+        if (this.formComponent) {
+          this.formComponent.onError.emit();
+        }
       }
     });
   }
 
-  onReset() {
-    this.submitted = false;
-    this.router.navigate(['/admin/control/categorias']);
-  }
-
-  onValidate() {
-    this.submitted = true;
+  onGuardarClick() {
+    this.formComponent.guardar();
   }
 }

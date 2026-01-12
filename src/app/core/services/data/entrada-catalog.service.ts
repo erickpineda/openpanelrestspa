@@ -6,7 +6,7 @@ import { CategoriaService } from './categoria.service';
 import { EtiquetaService } from './etiqueta.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EntradaCatalogService {
   private cache: { [key: string]: string[] } | null = null;
@@ -35,7 +35,7 @@ export class EntradaCatalogService {
           'tipoEntrada.nombre': Array.isArray(tipos) ? tipos.map((t: any) => t.nombre) : [],
           'estadoEntrada.nombre': Array.isArray(estados) ? estados.map((e: any) => e.nombre) : [],
           'categoria.nombre': Array.isArray(categorias) ? categorias.map((c: any) => c.nombre) : [],
-          'etiqueta.nombre': Array.isArray(etiquetas) ? etiquetas.map((t: any) => t.nombre) : []
+          'etiqueta.nombre': Array.isArray(etiquetas) ? etiquetas.map((t: any) => t.nombre) : [],
         };
         this.cache = mapped;
         return mapped;

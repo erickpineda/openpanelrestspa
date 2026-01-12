@@ -13,6 +13,7 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
   selector: 'app-editar-pagina',
   templateUrl: './editar-pagina.component.html',
   styleUrls: ['./editar-pagina.component.scss'],
+  standalone: false,
 })
 export class EditarPaginaComponent implements OnInit {
   entradaForm!: UntypedFormGroup;
@@ -34,39 +35,39 @@ export class EditarPaginaComponent implements OnInit {
     private facade: EntradaFacadeService,
     private router: Router,
     private toastService: ToastService
-  ) {}
+  ) { }
 
   async ngOnInit() {
     this.entradaForm = this.vf.buildForm(this.entrada);
     this.entradaForm.disable(); // Deshabilitar por defecto
     this.idEntrada = this.route.snapshot.params['idEntrada'];
-    
+
     const data = await this.facade.loadInitData();
     this.estadosEntr = data.estados;
     this.categorias = data.categorias;
-    
+
     // Filtrar solo el tipo 'Página' para el selector, aunque al editar ya vendrá con su tipo
-    const tipoPagina = data.tipos.find(t => t.nombre === 'Página');
+    const tipoPagina = data.tipos.find((t) => t.nombre === 'Página');
     this.tiposEntr = tipoPagina ? [tipoPagina] : data.tipos;
 
     // Cargar entrada
     this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: Entrada) => {
       if (!ent) return;
       this.entrada = ent;
-      
+
       // Busca los objetos reales por referencia
       const estadoCorrecto = this.estadosEntr.find(
-        e => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada
+        (e) => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada
       );
       // Usamos la lista filtrada o la completa si no encontramos 'Página'
-      const tipoCorrecto = this.tiposEntr.find(
-        t => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada
-      ) || data.tipos.find(t => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada);
+      const tipoCorrecto =
+        this.tiposEntr.find((t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada) ||
+        data.tipos.find((t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada);
 
       this.entradaForm.patchValue({
         ...ent,
         estadoEntrada: estadoCorrecto ?? null,
-        tipoEntrada: tipoCorrecto ?? null
+        tipoEntrada: tipoCorrecto ?? null,
       });
 
       // Rellenar categorías igual que antes
@@ -100,13 +101,19 @@ export class EditarPaginaComponent implements OnInit {
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuarioEditado = usuario?.idUsuario ?? null;
     this.facade.actualizarEntrada(this.idEntrada, ent).subscribe(() => {
-      this.toastService.showSuccess('La página se ha actualizado correctamente.', 'Página actualizada');
+      this.toastService.showSuccess(
+        'La página se ha actualizado correctamente.',
+        'Página actualizada'
+      );
       this.router.navigateByUrl('/admin/control/paginas');
     });
   }
 
   onPreviewEmit(payload: Partial<Entrada>) {
-    this.entradaParaPrevia = { ...(this.entradaParaPrevia || {}), ...(payload as Entrada) } as Entrada;
+    this.entradaParaPrevia = {
+      ...(this.entradaParaPrevia || {}),
+      ...(payload as Entrada),
+    } as Entrada;
     this.modalPreviaVisible = true;
   }
 

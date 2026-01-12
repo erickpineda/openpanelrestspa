@@ -4,7 +4,8 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
   selector: 'app-dashboard-chart',
   templateUrl: './dashboard-chart.component.html',
   styleUrls: ['./dashboard-chart.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardChartComponent {
   @Input() data: any = { labels: [], datasets: [] };

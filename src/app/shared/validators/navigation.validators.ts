@@ -1,9 +1,9 @@
-import { 
-  INavItemEnhanced, 
-  NavigationConfig, 
-  NavigationSection, 
+import {
+  INavItemEnhanced,
+  NavigationConfig,
+  NavigationSection,
   UserRole,
-  NavigationErrorCodes 
+  NavigationErrorCodes,
 } from '../types/navigation.types';
 import { NavigationConstants } from '../constants/navigation.constants';
 
@@ -39,7 +39,6 @@ export interface ValidationWarning {
  * Validadores para estructura de navegación
  */
 export class NavigationValidators {
-
   /**
    * Valida una configuración completa de navegación
    */
@@ -47,22 +46,25 @@ export class NavigationValidators {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     // Validar secciones
     if (!config.sections || config.sections.length === 0) {
       result.errors.push({
         code: NavigationErrorCodes.INVALID_STRUCTURE,
-        message: 'La configuración debe tener al menos una sección'
+        message: 'La configuración debe tener al menos una sección',
       });
       result.isValid = false;
     }
 
     // Validar límite de secciones
-    if (config.sections && config.sections.length > NavigationConstants.STRUCTURE_LIMITS.MAX_SECTIONS) {
+    if (
+      config.sections &&
+      config.sections.length > NavigationConstants.STRUCTURE_LIMITS.MAX_SECTIONS
+    ) {
       result.warnings.push({
-        message: `Se recomienda no exceder ${NavigationConstants.STRUCTURE_LIMITS.MAX_SECTIONS} secciones`
+        message: `Se recomienda no exceder ${NavigationConstants.STRUCTURE_LIMITS.MAX_SECTIONS} secciones`,
       });
     }
 
@@ -72,7 +74,7 @@ export class NavigationValidators {
         const sectionResult = this.validateNavigationSection(section);
         result.errors.push(...sectionResult.errors);
         result.warnings.push(...sectionResult.warnings);
-        
+
         if (!sectionResult.isValid) {
           result.isValid = false;
         }
@@ -89,7 +91,7 @@ export class NavigationValidators {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     // Validar campos requeridos
@@ -97,7 +99,7 @@ export class NavigationValidators {
       result.errors.push({
         code: NavigationErrorCodes.INVALID_STRUCTURE,
         message: 'La sección debe tener un ID válido',
-        section
+        section,
       });
       result.isValid = false;
     }
@@ -106,16 +108,19 @@ export class NavigationValidators {
       result.errors.push({
         code: NavigationErrorCodes.INVALID_STRUCTURE,
         message: 'La sección debe tener un título válido',
-        section
+        section,
       });
       result.isValid = false;
     }
 
     // Validar límite de elementos por sección
-    if (section.items && section.items.length > NavigationConstants.STRUCTURE_LIMITS.MAX_ITEMS_PER_SECTION) {
+    if (
+      section.items &&
+      section.items.length > NavigationConstants.STRUCTURE_LIMITS.MAX_ITEMS_PER_SECTION
+    ) {
       result.warnings.push({
         message: `La sección '${section.title}' tiene demasiados elementos (${section.items.length}). Se recomienda no exceder ${NavigationConstants.STRUCTURE_LIMITS.MAX_ITEMS_PER_SECTION}`,
-        section
+        section,
       });
     }
 
@@ -123,7 +128,7 @@ export class NavigationValidators {
     if (section.requiredRoles && section.requiredRoles.length === 0) {
       result.warnings.push({
         message: `La sección '${section.title}' no tiene roles definidos, será accesible para todos`,
-        section
+        section,
       });
     }
 
@@ -137,7 +142,7 @@ export class NavigationValidators {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     const seenUrls = new Set<string>();
@@ -147,7 +152,7 @@ export class NavigationValidators {
       const itemResult = this.validateNavigationItem(item, 0);
       result.errors.push(...itemResult.errors);
       result.warnings.push(...itemResult.warnings);
-      
+
       if (!itemResult.isValid) {
         result.isValid = false;
       }
@@ -156,7 +161,7 @@ export class NavigationValidators {
       if (item.url && typeof item.url === 'string' && seenUrls.has(item.url)) {
         result.warnings.push({
           message: `URL duplicada encontrada: ${item.url}`,
-          item
+          item,
         });
       } else if (item.url && typeof item.url === 'string') {
         seenUrls.add(item.url);
@@ -167,7 +172,7 @@ export class NavigationValidators {
       if (seenIds.has(itemId)) {
         result.warnings.push({
           message: `ID duplicado encontrado: ${itemId}`,
-          item
+          item,
         });
       } else {
         seenIds.add(itemId);
@@ -184,7 +189,7 @@ export class NavigationValidators {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     // Validar profundidad máxima (contando desde 0: 0=raíz, 1=primer nivel, 2=segundo nivel)
@@ -192,7 +197,7 @@ export class NavigationValidators {
       result.errors.push({
         code: NavigationErrorCodes.INVALID_STRUCTURE,
         message: `El elemento '${item.name}' excede la profundidad máxima permitida (${NavigationConstants.STRUCTURE_LIMITS.MAX_DEPTH} niveles)`,
-        item
+        item,
       });
       result.isValid = false;
     }
@@ -202,7 +207,7 @@ export class NavigationValidators {
       result.errors.push({
         code: NavigationErrorCodes.INVALID_STRUCTURE,
         message: 'El elemento debe tener un nombre válido',
-        item
+        item,
       });
       result.isValid = false;
     }
@@ -211,7 +216,7 @@ export class NavigationValidators {
     if (!item.title && (!item.url || (typeof item.url === 'string' && item.url.trim() === ''))) {
       result.warnings.push({
         message: `El elemento '${item.name}' no tiene URL definida`,
-        item
+        item,
       });
     }
 
@@ -221,7 +226,7 @@ export class NavigationValidators {
         result.errors.push({
           code: NavigationErrorCodes.CONFIGURATION_INVALID,
           message: `Badge dinámico mal configurado en '${item.name}': falta servicio o método`,
-          item
+          item,
         });
         result.isValid = false;
       }
@@ -231,7 +236,7 @@ export class NavigationValidators {
     if (item.requiredRoles && item.minRole) {
       result.warnings.push({
         message: `El elemento '${item.name}' tiene tanto requiredRoles como minRole definidos. Se usará requiredRoles`,
-        item
+        item,
       });
     }
 
@@ -241,7 +246,7 @@ export class NavigationValidators {
         const childResult = this.validateNavigationItem(child, depth + 1);
         result.errors.push(...childResult.errors);
         result.warnings.push(...childResult.warnings);
-        
+
         if (!childResult.isValid) {
           result.isValid = false;
         }
@@ -258,17 +263,17 @@ export class NavigationValidators {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     const urlMap = new Map<string, INavItemEnhanced[]>();
-    
+
     this.collectUrls(items, urlMap);
 
     for (const [url, itemsWithUrl] of urlMap.entries()) {
       if (itemsWithUrl.length > 1) {
         result.warnings.push({
-          message: `URL duplicada encontrada: ${url} (${itemsWithUrl.length} elementos)`
+          message: `URL duplicada encontrada: ${url} (${itemsWithUrl.length} elementos)`,
         });
       }
     }
@@ -283,7 +288,7 @@ export class NavigationValidators {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     for (const item of items) {
@@ -299,7 +304,10 @@ export class NavigationValidators {
   /**
    * Recolecta todas las URLs de los elementos de navegación
    */
-  private static collectUrls(items: INavItemEnhanced[], urlMap: Map<string, INavItemEnhanced[]>): void {
+  private static collectUrls(
+    items: INavItemEnhanced[],
+    urlMap: Map<string, INavItemEnhanced[]>
+  ): void {
     for (const item of items) {
       if (item.url && typeof item.url === 'string') {
         if (!urlMap.has(item.url)) {
@@ -318,21 +326,21 @@ export class NavigationValidators {
    * Valida la consistencia de roles entre padre e hijos
    */
   private static validateParentChildRoles(
-    parent: INavItemEnhanced, 
-    children: INavItemEnhanced[], 
+    parent: INavItemEnhanced,
+    children: INavItemEnhanced[],
     result: ValidationResult
   ): void {
     for (const child of children) {
       // Si el padre tiene roles específicos, los hijos deberían ser igual o más restrictivos
       if (parent.requiredRoles && child.requiredRoles) {
-        const parentHasMorePermissiveRoles = parent.requiredRoles.some(role => 
-          !child.requiredRoles!.includes(role)
+        const parentHasMorePermissiveRoles = parent.requiredRoles.some(
+          (role) => !child.requiredRoles!.includes(role)
         );
-        
+
         if (parentHasMorePermissiveRoles) {
           result.warnings.push({
             message: `El elemento hijo '${child.name}' tiene permisos más restrictivos que su padre '${parent.name}'`,
-            item: child
+            item: child,
           });
         }
       }
@@ -351,11 +359,11 @@ export class NavigationValidators {
     if (item.url && typeof item.url === 'string') {
       return item.url.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
     }
-    
+
     if (item.name && typeof item.name === 'string') {
       return item.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
     }
-    
+
     return `nav-item-${Math.random().toString(36).substr(2, 9)}`;
   }
 }

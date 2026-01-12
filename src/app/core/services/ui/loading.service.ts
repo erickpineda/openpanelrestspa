@@ -16,17 +16,17 @@ export interface LoadingErrorState {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoadingService {
   private stateSubject = new BehaviorSubject<LoadingState>({
     global: false,
-    requests: new Map()
+    requests: new Map(),
   });
-  
+
   public state$ = this.stateSubject.asObservable();
   public globalLoading$: Observable<boolean> = this.state$.pipe(
-    map(state => state.global),
+    map((state) => state.global),
     distinctUntilChanged()
   );
 
@@ -37,17 +37,22 @@ export class LoadingService {
   private maxWaitMs = 30000;
   private maxWaitTimer: any;
 
-  private errorSubject = new BehaviorSubject<LoadingErrorState>({ active: false });
+  private errorSubject = new BehaviorSubject<LoadingErrorState>({
+    active: false,
+  });
   public error$ = this.errorSubject.asObservable();
 
   private retryHandler?: () => void;
 
-  constructor(private logger: LoggerService, private notifications: NotificationService) {}
+  constructor(
+    private logger: LoggerService,
+    private notifications: NotificationService
+  ) {}
 
   setGlobalLoading(loading: boolean, requestId?: string): void {
     if (loading) {
       this.httpRequestCount++;
-      
+
       if (this.httpRequestCount === 1) {
         this.loadingStartTime = Date.now();
         this.updateGlobalState(true);
@@ -63,7 +68,7 @@ export class LoadingService {
       }
     } else {
       this.httpRequestCount = Math.max(0, this.httpRequestCount - 1);
-      
+
       // Remove individual request tracking
       if (requestId) {
         this.trackRequest(requestId, false);
@@ -80,12 +85,12 @@ export class LoadingService {
   private scheduleLoadingStop(): void {
     const elapsed = Date.now() - this.loadingStartTime;
     const remaining = Math.max(0, this.minimumDisplayTime - elapsed);
-    
+
     // Clear existing timeout
     if (this.loadingTimeout) {
       clearTimeout(this.loadingTimeout);
     }
-    
+
     this.loadingTimeout = setTimeout(() => {
       // Double-check that no new requests came in during the wait
       if (this.httpRequestCount === 0) {
@@ -121,23 +126,23 @@ export class LoadingService {
     const currentState = this.stateSubject.value;
     this.stateSubject.next({
       ...currentState,
-      global
+      global,
     });
   }
 
   private trackRequest(requestId: string, loading: boolean): void {
     const currentState = this.stateSubject.value;
     const newRequests = new Map(currentState.requests);
-    
+
     if (loading) {
       newRequests.set(requestId, true);
     } else {
       newRequests.delete(requestId);
     }
-    
+
     this.stateSubject.next({
       ...currentState,
-      requests: newRequests
+      requests: newRequests,
     });
   }
 
@@ -191,7 +196,7 @@ export class LoadingService {
     return {
       activeRequests: this.httpRequestCount,
       trackedRequests: this.stateSubject.value.requests.size,
-      isLoading: this.httpRequestCount > 0
+      isLoading: this.httpRequestCount > 0,
     };
   }
 }

@@ -5,7 +5,8 @@ import { PerfilResponse } from '../../../../../core/models/perfil-response.model
 @Component({
   selector: 'app-perfil-preferences',
   templateUrl: './perfil-preferences.component.html',
-  styleUrls: ['./perfil-preferences.component.scss']
+  styleUrls: ['./perfil-preferences.component.scss'],
+  standalone: false,
 })
 export class PerfilPreferencesComponent implements OnInit {
   @Input() usuario: PerfilResponse | null = null;
@@ -17,7 +18,7 @@ export class PerfilPreferencesComponent implements OnInit {
     this.form = this.fb.group({
       theme: ['light'],
       language: ['es'],
-      notifications: [true]
+      notifications: [true],
     });
   }
 

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { of, take, throwError } from 'rxjs';
 import { BadgeCounterService } from './badge-counter.service';
 import { ComentarioService } from '../data/comentario.service';
 import { EntradaService } from '../data/entrada.service';
@@ -26,8 +26,8 @@ describe('BadgeCounterService', () => {
         BadgeCounterService,
         { provide: ComentarioService, useValue: comentarioSpy },
         { provide: EntradaService, useValue: entradaSpy },
-        { provide: UsuarioService, useValue: usuarioSpy }
-      ]
+        { provide: UsuarioService, useValue: usuarioSpy },
+      ],
     });
 
     service = TestBed.inject(BadgeCounterService);
@@ -38,8 +38,12 @@ describe('BadgeCounterService', () => {
     service.configureFallbacks({
       retryDelayMs: 10,
       maxRetries: 0,
-      enableLogging: false
+      enableLogging: false,
     });
+  });
+
+  afterEach(() => {
+    service.ngOnDestroy();
   });
 
   it('should be created', () => {
@@ -52,12 +56,12 @@ describe('BadgeCounterService', () => {
         { id: 1, estado: 'PENDIENTE', texto: 'Comment 1' },
         { id: 2, estado: 'APROBADO', texto: 'Comment 2' },
         { id: 3, estado: 'REPORTADO', texto: 'Comment 3' },
-        { id: 4, estado: 'PENDIENTE', texto: 'Comment 4' }
+        { id: 4, estado: 'PENDIENTE', texto: 'Comment 4' },
       ];
 
       mockComentarioService.listarSafe.and.returnValue(of(mockComentarios as any));
 
-      service.getUnmoderatedCommentsCount().subscribe(count => {
+      service.getUnmoderatedCommentsCount().subscribe((count) => {
         expect(count).toBe(3); // 2 PENDIENTE + 1 REPORTADO
         done();
       });
@@ -66,7 +70,7 @@ describe('BadgeCounterService', () => {
     it('should return 0 when service fails', (done) => {
       mockComentarioService.listarSafe.and.returnValue(throwError('Service error'));
 
-      service.getUnmoderatedCommentsCount().subscribe(count => {
+      service.getUnmoderatedCommentsCount().subscribe((count) => {
         expect(count).toBe(0);
         done();
       });
@@ -78,12 +82,12 @@ describe('BadgeCounterService', () => {
       const mockEntradas = [
         { id: 1, estado: 'BORRADOR', titulo: 'Entry 1' },
         { id: 2, estado: 'PUBLICADO', titulo: 'Entry 2' },
-        { id: 3, estado: 'TEMPORAL', titulo: 'Entry 3' }
+        { id: 3, estado: 'TEMPORAL', titulo: 'Entry 3' },
       ];
 
       mockEntradaService.listarSafe.and.returnValue(of(mockEntradas as any));
 
-      service.getDraftEntriesCount().subscribe(count => {
+      service.getDraftEntriesCount().subscribe((count) => {
         expect(count).toBe(2); // 1 BORRADOR + 1 TEMPORAL
         done();
       });
@@ -92,7 +96,7 @@ describe('BadgeCounterService', () => {
     it('should return 0 when service fails', (done) => {
       mockEntradaService.listarSafe.and.returnValue(throwError('Service error'));
 
-      service.getDraftEntriesCount().subscribe(count => {
+      service.getDraftEntriesCount().subscribe((count) => {
         expect(count).toBe(0);
         done();
       });
@@ -104,12 +108,12 @@ describe('BadgeCounterService', () => {
       const mockUsuarios = [
         { id: 1, estado: 'PENDIENTE', username: 'user1' },
         { id: 2, estado: 'ACTIVO', username: 'user2' },
-        { id: 3, estado: 'INACTIVO', username: 'user3' }
+        { id: 3, estado: 'INACTIVO', username: 'user3' },
       ];
 
       mockUsuarioService.listarSafe.and.returnValue(of(mockUsuarios as any));
 
-      service.getPendingUsersCount().subscribe(count => {
+      service.getPendingUsersCount().subscribe((count) => {
         expect(count).toBe(2); // 1 PENDIENTE + 1 INACTIVO
         done();
       });
@@ -118,7 +122,7 @@ describe('BadgeCounterService', () => {
     it('should return 0 when service fails', (done) => {
       mockUsuarioService.listarSafe.and.returnValue(throwError('Service error'));
 
-      service.getPendingUsersCount().subscribe(count => {
+      service.getPendingUsersCount().subscribe((count) => {
         expect(count).toBe(0);
         done();
       });
@@ -128,17 +132,23 @@ describe('BadgeCounterService', () => {
   describe('getSystemAlertsCount', () => {
     it('should calculate system alerts based on thresholds', (done) => {
       // Mock services to return high counts
-      mockComentarioService.listarSafe.and.returnValue(of(
-        Array(15).fill({ estado: 'PENDIENTE' }) as any // 15 pending comments > 10 threshold
-      ));
-      mockEntradaService.listarSafe.and.returnValue(of(
-        Array(25).fill({ estado: 'BORRADOR' }) as any // 25 drafts > 20 threshold
-      ));
-      mockUsuarioService.listarSafe.and.returnValue(of(
-        Array(8).fill({ estado: 'PENDIENTE' }) as any // 8 pending users > 5 threshold
-      ));
+      mockComentarioService.listarSafe.and.returnValue(
+        of(
+          Array(15).fill({ estado: 'PENDIENTE' }) as any // 15 pending comments > 10 threshold
+        )
+      );
+      mockEntradaService.listarSafe.and.returnValue(
+        of(
+          Array(25).fill({ estado: 'BORRADOR' }) as any // 25 drafts > 20 threshold
+        )
+      );
+      mockUsuarioService.listarSafe.and.returnValue(
+        of(
+          Array(8).fill({ estado: 'PENDIENTE' }) as any // 8 pending users > 5 threshold
+        )
+      );
 
-      service.getSystemAlertsCount().subscribe(count => {
+      service.getSystemAlertsCount().subscribe((count) => {
         expect(count).toBe(3); // All three thresholds exceeded
         done();
       });
@@ -146,17 +156,23 @@ describe('BadgeCounterService', () => {
 
     it('should return 0 alerts when counts are below thresholds', (done) => {
       // Mock services to return low counts
-      mockComentarioService.listarSafe.and.returnValue(of(
-        Array(5).fill({ estado: 'PENDIENTE' }) as any // 5 < 10 threshold
-      ));
-      mockEntradaService.listarSafe.and.returnValue(of(
-        Array(10).fill({ estado: 'BORRADOR' }) as any // 10 < 20 threshold
-      ));
-      mockUsuarioService.listarSafe.and.returnValue(of(
-        Array(3).fill({ estado: 'PENDIENTE' }) as any // 3 < 5 threshold
-      ));
+      mockComentarioService.listarSafe.and.returnValue(
+        of(
+          Array(5).fill({ estado: 'PENDIENTE' }) as any // 5 < 10 threshold
+        )
+      );
+      mockEntradaService.listarSafe.and.returnValue(
+        of(
+          Array(10).fill({ estado: 'BORRADOR' }) as any // 10 < 20 threshold
+        )
+      );
+      mockUsuarioService.listarSafe.and.returnValue(
+        of(
+          Array(3).fill({ estado: 'PENDIENTE' }) as any // 3 < 5 threshold
+        )
+      );
 
-      service.getSystemAlertsCount().subscribe(count => {
+      service.getSystemAlertsCount().subscribe((count) => {
         expect(count).toBe(0); // No thresholds exceeded
         done();
       });
@@ -170,7 +186,7 @@ describe('BadgeCounterService', () => {
 
       service.setCounterValue(counterId, value);
 
-      service.getCounterById(counterId).subscribe(count => {
+      service.getCounterById(counterId).subscribe((count) => {
         expect(count).toBe(value);
         done();
       });
@@ -184,7 +200,7 @@ describe('BadgeCounterService', () => {
       service.setCounterValue(counterId, initialValue);
       service.incrementCounter(counterId, increment);
 
-      service.getCounterById(counterId).subscribe(count => {
+      service.getCounterById(counterId).subscribe((count) => {
         expect(count).toBe(initialValue + increment);
         done();
       });
@@ -198,7 +214,7 @@ describe('BadgeCounterService', () => {
       service.setCounterValue(counterId, initialValue);
       service.decrementCounter(counterId, decrement);
 
-      service.getCounterById(counterId).subscribe(count => {
+      service.getCounterById(counterId).subscribe((count) => {
         expect(count).toBe(initialValue - decrement);
         done();
       });
@@ -212,7 +228,7 @@ describe('BadgeCounterService', () => {
       service.setCounterValue(counterId, initialValue);
       service.decrementCounter(counterId, decrement);
 
-      service.getCounterById(counterId).subscribe(count => {
+      service.getCounterById(counterId).subscribe((count) => {
         expect(count).toBe(0); // Should not go below 0
         done();
       });
@@ -225,7 +241,7 @@ describe('BadgeCounterService', () => {
       service.setCounterValue(counterId, initialValue);
       service.resetCounter(counterId);
 
-      service.getCounterById(counterId).subscribe(count => {
+      service.getCounterById(counterId).subscribe((count) => {
         expect(count).toBe(0);
         done();
       });
@@ -261,7 +277,7 @@ describe('BadgeCounterService', () => {
       const mockObservable = of(5);
 
       service.setupAutoRefreshCounter(counterId, mockObservable, 1000);
-      
+
       expect(() => {
         service.stopAutoRefresh(counterId);
       }).not.toThrow();
@@ -287,30 +303,30 @@ describe('BadgeCounterService', () => {
       const expectedEntries = 3;
       const expectedUsers = 2;
 
-      service.getUnmoderatedCommentsCount().subscribe(count1 => {
+      service.getUnmoderatedCommentsCount().subscribe((count1) => {
         expect(count1).toBe(expectedComments);
-        
-        service.getUnmoderatedCommentsCount().subscribe(count2 => {
+
+        service.getUnmoderatedCommentsCount().subscribe((count2) => {
           expect(count2).toBe(expectedComments);
           expect(count1).toBe(count2);
           callCount++;
-          
+
           if (callCount === 1) {
             // Test entries consistency
-            service.getDraftEntriesCount().subscribe(entries1 => {
+            service.getDraftEntriesCount().subscribe((entries1) => {
               expect(entries1).toBe(expectedEntries);
-              
-              service.getDraftEntriesCount().subscribe(entries2 => {
+
+              service.getDraftEntriesCount().subscribe((entries2) => {
                 expect(entries2).toBe(expectedEntries);
                 expect(entries1).toBe(entries2);
                 callCount++;
-                
+
                 if (callCount === 2) {
                   // Test users consistency
-                  service.getPendingUsersCount().subscribe(users1 => {
+                  service.getPendingUsersCount().subscribe((users1) => {
                     expect(users1).toBe(expectedUsers);
-                    
-                    service.getPendingUsersCount().subscribe(users2 => {
+
+                    service.getPendingUsersCount().subscribe((users2) => {
                       expect(users2).toBe(expectedUsers);
                       expect(users1).toBe(users2);
                       done();
@@ -331,15 +347,15 @@ describe('BadgeCounterService', () => {
 
       // Act: First call with initial data
       mockComentarioService.listarSafe.and.returnValue(of(initialComentarios as any));
-      
-      service.getUnmoderatedCommentsCount().subscribe(initialCount => {
+
+      service.getUnmoderatedCommentsCount().subscribe((initialCount) => {
         expect(initialCount).toBe(3);
-        
+
         // Update mock to return new data
         mockComentarioService.listarSafe.and.returnValue(of(updatedComentarios as any));
-        
+
         // Second call should reflect updated data
-        service.getUnmoderatedCommentsCount().subscribe(updatedCount => {
+        service.getUnmoderatedCommentsCount().subscribe((updatedCount) => {
           expect(updatedCount).toBe(7);
           expect(updatedCount).not.toBe(initialCount);
           done();
@@ -349,7 +365,9 @@ describe('BadgeCounterService', () => {
 
     it('should provide consistent fallback behavior on service failures', (done) => {
       // Arrange: Mock service failures
-      mockComentarioService.listarSafe.and.returnValue(throwError(() => new Error('Service error')));
+      mockComentarioService.listarSafe.and.returnValue(
+        throwError(() => new Error('Service error'))
+      );
       mockEntradaService.listarSafe.and.returnValue(throwError(() => new Error('Service error')));
       mockUsuarioService.listarSafe.and.returnValue(throwError(() => new Error('Service error')));
 
@@ -357,25 +375,25 @@ describe('BadgeCounterService', () => {
       const expectedCalls = 4;
 
       // Act & Assert: All badge counters should consistently return 0 on failure
-      service.getUnmoderatedCommentsCount().subscribe(count => {
+      service.getUnmoderatedCommentsCount().subscribe((count) => {
         expect(count).toBe(0);
         completedCalls++;
         if (completedCalls === expectedCalls) done();
       });
 
-      service.getDraftEntriesCount().subscribe(count => {
+      service.getDraftEntriesCount().subscribe((count) => {
         expect(count).toBe(0);
         completedCalls++;
         if (completedCalls === expectedCalls) done();
       });
 
-      service.getPendingUsersCount().subscribe(count => {
+      service.getPendingUsersCount().subscribe((count) => {
         expect(count).toBe(0);
         completedCalls++;
         if (completedCalls === expectedCalls) done();
       });
 
-      service.getSystemAlertsCount().subscribe(count => {
+      service.getSystemAlertsCount().subscribe((count) => {
         expect(count).toBe(0);
         completedCalls++;
         if (completedCalls === expectedCalls) done();
@@ -383,38 +401,45 @@ describe('BadgeCounterService', () => {
     });
 
     it('should maintain badge state consistency during manual counter operations', (done) => {
-      // Arrange
       const counterId = 'test-badge';
       const initialValue = 10;
-      
-      // Act: Set initial value
+
       service.setCounterValue(counterId, initialValue);
-      
-      service.getCounterById(counterId).subscribe(value1 => {
-        expect(value1).toBe(initialValue);
-        
-        // Increment and verify consistency
-        service.incrementCounter(counterId, 5);
-        
-        service.getCounterById(counterId).subscribe(value2 => {
-          expect(value2).toBe(15);
-          
-          // Decrement and verify consistency
-          service.decrementCounter(counterId, 3);
-          
-          service.getCounterById(counterId).subscribe(value3 => {
-            expect(value3).toBe(12);
-            
-            // Reset and verify consistency
-            service.resetCounter(counterId);
-            
-            service.getCounterById(counterId).subscribe(value4 => {
-              expect(value4).toBe(0);
-              done();
+
+      service
+        .getCounterById(counterId)
+        .pipe(take(1))
+        .subscribe((value1) => {
+          expect(value1).toBe(initialValue);
+
+          service.incrementCounter(counterId, 5);
+
+          service
+            .getCounterById(counterId)
+            .pipe(take(1))
+            .subscribe((value2) => {
+              expect(value2).toBe(15);
+
+              service.decrementCounter(counterId, 3);
+
+              service
+                .getCounterById(counterId)
+                .pipe(take(1))
+                .subscribe((value3) => {
+                  expect(value3).toBe(12);
+
+                  service.resetCounter(counterId);
+
+                  service
+                    .getCounterById(counterId)
+                    .pipe(take(1))
+                    .subscribe((value4) => {
+                      expect(value4).toBe(0);
+                      done();
+                    });
+                });
             });
-          });
         });
-      });
     });
 
     it('should ensure system alerts badge reflects accurate threshold-based calculations', (done) => {
@@ -428,11 +453,11 @@ describe('BadgeCounterService', () => {
       mockUsuarioService.listarSafe.and.returnValue(of(usersAboveThreshold as any));
 
       // Act & Assert: Should have exactly 2 alerts (comments + users, but not entries)
-      service.getSystemAlertsCount().subscribe(alertCount => {
+      service.getSystemAlertsCount().subscribe((alertCount) => {
         expect(alertCount).toBe(2);
-        
+
         // Verify consistency with multiple calls
-        service.getSystemAlertsCount().subscribe(alertCount2 => {
+        service.getSystemAlertsCount().subscribe((alertCount2) => {
           expect(alertCount2).toBe(2);
           expect(alertCount).toBe(alertCount2);
           done();

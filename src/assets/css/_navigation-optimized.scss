@@ -22,7 +22,7 @@
 }
 
 // Tema oscuro
-[data-coreui-theme="dark"] {
+[data-coreui-theme='dark'] {
   --nav-hover-bg: rgba(255, 255, 255, 0.1);
   --nav-active-bg: rgba(255, 255, 255, 0.15);
   --nav-section-title-color: #adb5bd;
@@ -35,12 +35,12 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-  
+
   // Animación de entrada
   &.entering {
     animation: slideInLeft var(--nav-transition-duration) var(--nav-transition-easing);
   }
-  
+
   &.exiting {
     animation: slideOutLeft var(--nav-transition-duration) var(--nav-transition-easing);
   }
@@ -50,7 +50,7 @@
 .nav-section {
   margin-bottom: var(--nav-section-spacing);
   position: relative;
-  
+
   // Título de sección mejorado
   &-title {
     display: flex;
@@ -64,48 +64,49 @@
     color: var(--nav-section-title-color);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     position: relative;
-    
+
     // Icono de sección
     .section-icon {
       margin-right: 0.5rem;
       font-size: 1rem;
       opacity: 0.7;
     }
-    
+
     // Indicador de colapso
     .collapse-indicator {
       margin-left: auto;
       transition: transform var(--nav-transition-duration) var(--nav-transition-easing);
-      
+
       &.collapsed {
         transform: rotate(-90deg);
       }
     }
-    
+
     // Hover effect
     &:hover {
       background-color: var(--nav-hover-bg);
       cursor: pointer;
     }
   }
-  
+
   // Contenedor de elementos de sección
   &-content {
     overflow: hidden;
-    transition: max-height var(--nav-transition-duration) var(--nav-transition-easing),
-                opacity var(--nav-transition-duration) var(--nav-transition-easing);
-    
+    transition:
+      max-height var(--nav-transition-duration) var(--nav-transition-easing),
+      opacity var(--nav-transition-duration) var(--nav-transition-easing);
+
     &.collapsed {
       max-height: 0;
       opacity: 0;
     }
-    
+
     &.expanded {
       max-height: 1000px; // Valor alto para permitir expansión completa
       opacity: 1;
     }
   }
-  
+
   // Separador visual entre secciones
   &:not(:last-child)::after {
     content: '';
@@ -122,7 +123,7 @@
 .nav-item-enhanced {
   position: relative;
   margin-bottom: 0.25rem;
-  
+
   // Link principal
   .nav-link {
     display: flex;
@@ -135,7 +136,7 @@
     transition: all var(--nav-transition-duration) var(--nav-transition-easing);
     position: relative;
     overflow: hidden;
-    
+
     // Icono del elemento
     .nav-icon {
       margin-right: 0.75rem;
@@ -145,7 +146,7 @@
       flex-shrink: 0;
       transition: transform var(--nav-transition-duration) var(--nav-transition-easing);
     }
-    
+
     // Texto del elemento
     .nav-text {
       flex: 1;
@@ -154,25 +155,25 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    
+
     // Estados de hover y activo
     &:hover {
       background-color: var(--nav-hover-bg);
       color: var(--nav-item-hover-color);
       transform: translateX(2px);
       box-shadow: var(--nav-shadow-light);
-      
+
       .nav-icon {
         transform: scale(1.1);
       }
     }
-    
+
     &.active {
       background-color: var(--nav-active-bg);
       color: var(--nav-item-hover-color);
       font-weight: 600;
       box-shadow: var(--nav-shadow-medium);
-      
+
       // Indicador de elemento activo
       &::before {
         content: '';
@@ -185,7 +186,7 @@
         border-radius: 0 2px 2px 0;
       }
     }
-    
+
     // Efecto de ondas al hacer clic
     &::after {
       content: '';
@@ -197,29 +198,31 @@
       background: rgba(0, 123, 255, 0.3);
       border-radius: 50%;
       transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
+      transition:
+        width 0.6s,
+        height 0.6s;
     }
-    
+
     &:active::after {
       width: 300px;
       height: 300px;
     }
   }
-  
+
   // Elementos hijos (submenu)
   .nav-children {
     margin-left: 2rem;
     padding-left: 1rem;
     border-left: 2px solid rgba(0, 123, 255, 0.2);
     margin-top: 0.25rem;
-    
+
     .nav-item-enhanced {
       margin-bottom: 0.125rem;
-      
+
       .nav-link {
         padding: 0.5rem 0.75rem;
         font-size: 0.875rem;
-        
+
         .nav-icon {
           font-size: 1rem;
           margin-right: 0.5rem;
@@ -244,49 +247,49 @@
   margin-left: auto;
   flex-shrink: 0;
   transition: all var(--nav-transition-duration) var(--nav-transition-easing);
-  
+
   // Variantes de color
   &.badge-primary {
     background-color: #007bff;
     color: white;
   }
-  
+
   &.badge-secondary {
     background-color: #6c757d;
     color: white;
   }
-  
+
   &.badge-success {
     background-color: #28a745;
     color: white;
   }
-  
+
   &.badge-warning {
     background-color: #ffc107;
     color: #212529;
   }
-  
+
   &.badge-danger {
     background-color: #dc3545;
     color: white;
   }
-  
+
   &.badge-info {
     background-color: #17a2b8;
     color: white;
   }
-  
+
   // Animación de actualización
   &.updating {
     animation: pulse 1s infinite;
   }
-  
+
   // Badge con contador cero (oculto)
   &.zero-count {
     opacity: 0;
     transform: scale(0.8);
   }
-  
+
   // Badge nuevo (animación de entrada)
   &.new-badge {
     animation: bounceIn 0.6s var(--nav-transition-easing);
@@ -303,11 +306,11 @@
   gap: 0.25rem;
   opacity: 0;
   transition: opacity var(--nav-transition-duration) var(--nav-transition-easing);
-  
+
   .nav-item-enhanced:hover & {
     opacity: 1;
   }
-  
+
   .action-button {
     display: flex;
     align-items: center;
@@ -320,12 +323,12 @@
     border-radius: 0.25rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    
+
     &:hover {
       background: rgba(0, 123, 255, 0.2);
       transform: scale(1.1);
     }
-    
+
     &:active {
       transform: scale(0.95);
     }
@@ -337,7 +340,7 @@
   &.loading {
     position: relative;
     opacity: 0.6;
-    
+
     &::after {
       content: '';
       position: absolute;
@@ -349,7 +352,7 @@
       animation: shimmer 1.5s infinite;
     }
   }
-  
+
   &.loaded {
     animation: fadeInUp 0.4s var(--nav-transition-easing);
   }
@@ -368,16 +371,16 @@
   z-index: 1050;
   opacity: 0;
   transition: opacity 0.3s ease;
-  
+
   &.visible {
     opacity: 1;
   }
-  
+
   .perf-metric {
     display: flex;
     justify-content: space-between;
     margin-bottom: 0.25rem;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
@@ -392,28 +395,28 @@
       padding: 1rem;
       font-size: 1rem;
     }
-    
+
     .nav-item-enhanced .nav-link {
       padding: 1rem;
       margin: 0;
       border-radius: 0;
-      
+
       .nav-icon {
         margin-right: 1rem;
         font-size: 1.25rem;
       }
-      
+
       .nav-text {
         font-size: 1rem;
       }
     }
-    
+
     .nav-badge {
       min-width: 1.5rem;
       height: 1.5rem;
       font-size: 0.875rem;
     }
-    
+
     // Ocultar acciones contextuales en móvil
     .nav-contextual-actions {
       display: none;
@@ -426,12 +429,12 @@
     // Tablet: elementos más grandes para touch
     .nav-item-enhanced .nav-link {
       padding: 0.875rem 1rem;
-      
+
       .nav-icon {
         font-size: 1.2rem;
       }
     }
-    
+
     .nav-badge {
       min-width: 1.375rem;
       height: 1.375rem;
@@ -445,7 +448,7 @@
     .nav-section-title {
       padding: 0.625rem 1rem;
     }
-    
+
     .nav-item-enhanced .nav-link {
       padding: 0.625rem 1rem;
     }
@@ -460,7 +463,7 @@
         transform: translateX(4px);
       }
     }
-    
+
     // Mostrar tooltips en desktop
     .nav-tooltip {
       position: absolute;
@@ -479,7 +482,7 @@
       transition: opacity 0.3s ease;
       z-index: 1000;
     }
-    
+
     .nav-item-enhanced:hover .nav-tooltip {
       opacity: 1;
     }
@@ -564,13 +567,13 @@
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
-    
+
     .nav-text {
       background: #e0e0e0;
       color: transparent;
       border-radius: 0.25rem;
     }
-    
+
     .nav-icon {
       background: #e0e0e0;
       color: transparent;
@@ -584,17 +587,17 @@
   padding: 1rem;
   text-align: center;
   color: #dc3545;
-  
+
   .error-icon {
     font-size: 2rem;
     margin-bottom: 0.5rem;
   }
-  
+
   .error-message {
     font-size: 0.875rem;
     margin-bottom: 1rem;
   }
-  
+
   .retry-button {
     padding: 0.5rem 1rem;
     background: #dc3545;
@@ -603,7 +606,7 @@
     border-radius: 0.25rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    
+
     &:hover {
       background: #c82333;
     }
@@ -623,14 +626,14 @@
 @media (prefers-contrast: high) {
   .nav-item-enhanced .nav-link {
     border: 1px solid currentColor;
-    
+
     &:hover,
     &.active {
       background: currentColor;
       color: white;
     }
   }
-  
+
   .nav-badge {
     border: 2px solid currentColor;
   }

@@ -25,9 +25,9 @@ export class EntradaFacadeService {
   ) {}
 
   // Carga inicial: tipos, estados, categorias en paralelo
-  async loadInitData(): Promise<{ 
-    tipos: TipoEntrada[]; 
-    estados: EstadoEntrada[]; 
+  async loadInitData(): Promise<{
+    tipos: TipoEntrada[];
+    estados: EstadoEntrada[];
     categorias: Categoria[];
     usuarioActual: string;
   }> {
@@ -35,14 +35,14 @@ export class EntradaFacadeService {
       firstValueFrom(this.entradaService.listarTiposEntradasSafe()),
       firstValueFrom(this.entradaService.listarEstadosEntradasSafe()),
       firstValueFrom(this.categoriaService.listarSafe()),
-      this.usuarioService.getUsernameActual() // ✅ Ahora es seguro
+      this.usuarioService.getUsernameActual(), // ✅ Ahora es seguro
     ]);
 
     return {
       tipos,
-      estados, 
+      estados,
       categorias,
-      usuarioActual: usuario
+      usuarioActual: usuario,
     };
   }
 
@@ -61,9 +61,7 @@ export class EntradaFacadeService {
 
   async getUsuarioSesion(): Promise<PerfilResponse> {
     if (this.usuarioSesion) return this.usuarioSesion;
-    const resp = await firstValueFrom(
-      this.usuarioService.obtenerDatosSesionActualSafe()
-    );
+    const resp = await firstValueFrom(this.usuarioService.obtenerDatosSesionActualSafe());
     this.usuarioSesion = resp ?? null;
     return this.usuarioSesion;
   }

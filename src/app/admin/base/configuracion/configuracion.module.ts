@@ -8,6 +8,12 @@ import { SharedOPModule } from '../../../shared/shared.module';
 
 @NgModule({
   declarations: [TemasComponent, AjustesComponent],
-  imports: [CommonModule, ConfiguracionRoutingModule, FormsModule, ReactiveFormsModule, SharedOPModule]
+  imports: [
+    CommonModule,
+    ConfiguracionRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    SharedOPModule,
+  ],
 })
 export class ConfiguracionModule {}

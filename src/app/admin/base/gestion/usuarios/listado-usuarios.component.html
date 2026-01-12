@@ -1,178 +1,254 @@
-<c-card aria-live="polite">
-  <c-card-header class="d-flex align-items-center justify-content-between">
-    <span>Usuarios</span>
-    <div class="btn-toolbar gap-2">
-      <div class="btn-group" role="group" aria-label="Acciones">
-        <button cButton color="primary" size="sm" (click)="openCreate()">
-          <svg cIcon name="cilPlus" class="me-2"></svg>
-          Nuevo
-        </button>
+<c-container fluid class="px-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <!-- Encabezado Principal -->
+    <c-card-header class="bg-white p-4 border-bottom">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilPeople" class="text-primary"></svg>
+            {{ 'ADMIN.USERS.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.USERS.SUBTITLE' | translate }}
+          </small>
+        </div>
+        <div class="d-flex gap-2">
+          <button cButton color="secondary" variant="ghost" size="sm" aria-label="Imprimir listado">
+            <svg cIcon name="cilPrint" class="me-1"></svg>
+            {{ 'ADMIN.USERS.PRINT' | translate }}
+          </button>
+          <button cButton color="warning" variant="outline" size="sm">
+            <svg cIcon name="cilWarning" class="me-1"></svg>
+            {{ 'ADMIN.USERS.UNVERIFIED' | translate }}
+          </button>
+          <button cButton color="primary" size="sm" (click)="openCreate()" class="shadow-sm">
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            {{ 'ADMIN.USERS.NEW_USER' | translate }}
+          </button>
+        </div>
       </div>
-    </div>
-  </c-card-header>
-  <c-card-body [attr.aria-busy]="loading ? 'true' : null">
-    <div *ngIf="error" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
-      <span>{{ error }}</span>
-      <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
-    </div>
-    <!-- <div *ngIf="loading"><c-spinner></c-spinner></div> -->
-    <div *ngIf="!loading; else loadingTemplate">
-      <c-row class="align-items-center mb-3 g-2">
-        <c-col xs="12" md="4">
-          <div class="text-muted small">Total {{ totalElements }}</div>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar usuario..." [disabled]="loading" style="max-width: 280px;" />
-          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </select>
-        </c-col>
-      </c-row>
-      <div *ngIf="showAdvanced" class="mb-3">
-        <c-row class="g-3 align-items-end">
-          <c-col xs="12" md="4">
-            <label class="form-label mb-1">Usuario</label>
-            <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por usuario..." [value]="filtroUsuario" (input)="filtroUsuario=$any($event.target).value" />
-          </c-col>
-          <c-col xs="6" md="3">
-            <label class="form-label mb-1">Rol</label>
-            <select cSelect class="form-select-sm" [(ngModel)]="filtroRolCodigo">
-              <option [ngValue]="null">Seleccione rol</option>
-              <option *ngFor="let r of roles" [value]="r.codigo">{{ r.nombre }}</option>
+    </c-card-header>
+
+    <c-card-body class="p-4">
+      @if (error) {
+      <c-alert color="danger" class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+          <svg cIcon name="cilWarning" class="me-2"></svg>
+          <span>{{ error }}</span>
+        </div>
+        <button cButton color="danger" size="sm" variant="outline" (click)="load()">{{ 'COMMON.RETRY' | translate
+          }}</button>
+      </c-alert>
+      }
+
+      <!-- Área de Filtros y Búsqueda -->
+      <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
+        <c-row class="align-items-center g-3">
+          <!-- Contador y Selección de Página -->
+          <c-col xs="12" md="3" class="d-flex align-items-center gap-3">
+            <div class="text-nowrap fw-semibold text-secondary">
+              {{ totalElements }} {{ 'ADMIN.USERS.USERS_LABEL' | translate }}
+            </div>
+            <select cSelect size="sm" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)"
+              name="pageSizeSelect" class="w-auto" aria-label="Usuarios por página" [disabled]="loading">
+              <option [ngValue]="5">{{ 'ADMIN.USERS.X_RECORDS' | translate: { count: 5 } }}</option>
+              <option [ngValue]="10">{{ 'ADMIN.USERS.X_RECORDS' | translate: { count: 10 } }}</option>
+              <option [ngValue]="20">{{ 'ADMIN.USERS.X_RECORDS' | translate: { count: 20 } }}</option>
+              <option [ngValue]="50">{{ 'ADMIN.USERS.X_RECORDS' | translate: { count: 50 } }}</option>
             </select>
           </c-col>
-          <c-col xs="6" md="3">
-            <label class="form-label mb-1">Email confirmado</label>
-            <select cSelect class="form-select-sm" [value]="filtroEmailConfirmado === null ? '' : (filtroEmailConfirmado ? 'true' : 'false')"
-                    (change)="filtroEmailConfirmado = ($any($event.target).value==='') ? null : ($any($event.target).value==='true')">
-              <option value="">Seleccione estado</option>
-              <option value="true">Sí</option>
-              <option value="false">No</option>
-            </select>
-          </c-col>
-          <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
-            <button cButton size="sm" color="primary" variant="outline" (click)="search()">
-              <svg cIcon name="cilSearch"></svg> Buscar
-            </button>
-            <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
-              <svg cIcon name="cilReload"></svg> Limpiar
-            </button>
+
+          <!-- Barra de Búsqueda Central -->
+          <c-col xs="12" md="6">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0 text-secondary">
+                <svg cIcon name="cilSearch"></svg>
+              </span>
+              <input cFormControl type="text" [value]="basicSearchText"
+                (input)="onBasicSearchTextChange($any($event.target).value)"
+                [placeholder]="'ADMIN.USERS.FILTER_PLACEHOLDER' | translate" class="border-start-0 ps-0"
+                [disabled]="loading" />
+              <button cButton color="secondary" variant="outline" (click)="toggleAdvanced()" [active]="showAdvanced"
+                [disabled]="loading">
+                <svg cIcon name="cilFilter" class="me-1"></svg>
+                {{ 'ADMIN.USERS.FILTERS' | translate }}
+              </button>
+            </div>
           </c-col>
         </c-row>
+
+        <!-- Filtros Avanzados Expandibles -->
+        @if (showAdvanced) {
+        <div class="mt-3 pt-3 border-top">
+          <c-row class="g-3 align-items-end">
+            <c-col xs="12" md="4">
+              <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'COMMON.USER' | translate }}</label>
+              <input cFormControl size="sm" type="text" [placeholder]="'ADMIN.USERS.FILTER_USERNAME' | translate"
+                [value]="filtroUsuario" (input)="filtroUsuario = $any($event.target).value" [disabled]="loading" />
+            </c-col>
+            <c-col xs="6" md="3">
+              <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'COMMON.ROLE' | translate }}</label>
+              <select cSelect size="sm" [(ngModel)]="filtroRolCodigo" [disabled]="loading">
+                <option [ngValue]="null">{{ 'ADMIN.USERS.ALL_ROLES' | translate }}</option>
+                @for (r of roles; track r.idRol ?? $index) {
+                <option [value]="r.codigo">{{ r.nombre }}</option>
+                }
+              </select>
+            </c-col>
+            <c-col xs="6" md="3">
+              <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'ADMIN.USERS.EMAIL_CONFIRMED' |
+                translate }}</label>
+              <select cSelect size="sm"
+                [value]="filtroEmailConfirmado === null ? '' : filtroEmailConfirmado ? 'true' : 'false'"
+                (change)="filtroEmailConfirmado = $any($event.target).value === '' ? null : $any($event.target).value === 'true'"
+                [disabled]="loading">
+                <option value="">{{ 'COMMON.ALL' | translate }}</option>
+                <option value="true">{{ 'COMMON.YES' | translate }}</option>
+                <option value="false">{{ 'COMMON.NO' | translate }}</option>
+              </select>
+            </c-col>
+            <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
+              <button cButton size="sm" color="primary" (click)="search()" [disabled]="loading" class="text-white">
+                {{ 'COMMON.APPLY' | translate }}
+              </button>
+              <button cButton size="sm" color="secondary" variant="ghost" (click)="reset()" [disabled]="loading">
+                {{ 'COMMON.CLEAN' | translate }}
+              </button>
+            </c-col>
+          </c-row>
+        </div>
+        }
       </div>
-      <div class="table-responsive">
-      <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de usuarios">
-        <thead cTableColor="light">
-          <tr>
-            <th scope="col" class="text-start" style="min-width: 200px;">Usuario</th>
-            <th scope="col" class="text-start">Nombre</th>
-            <th scope="col" class="text-start" style="min-width: 250px;">Email</th>
-            <th scope="col" class="text-start">Rol</th>
-            <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let u of usuarios" [class.table-row-disabled]="!u.habilitado">
-            <td class="text-truncate" style="max-width: 200px;" [title]="u.username">{{ u.username }}</td>
-            <td>{{ u.nombre }} {{ u.apellido }}</td>
-            <td class="text-truncate text-start" style="max-width: 240px;" [title]="u.email">{{ u.email }}</td>
-            <td>{{ u.rolCodigo }}</td>
-            <td class="text-center">
-              <div class="btn-group">
-                <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(u)"><svg cIcon name="cilPencil"></svg></button>
-                <button cButton color="danger" size="sm" variant="outline" (click)="delete(u)" [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE"><svg cIcon name="cilTrash"></svg></button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+
+      <!-- Tabla de Datos -->
+      <div class="tabla-con-loader-wrapper position-relative rounded-3 overflow-hidden border">
+        <!-- Loader Overlay -->
+        @if (loading) {
+        <div
+          class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75"
+          style="z-index: 10; min-height: 200px">
+          <div class="text-center text-primary">
+            <c-spinner size="sm"></c-spinner>
+            <p class="mt-2 small fw-semibold">{{ 'COMMON.LOADING' | translate }}</p>
+          </div>
+        </div>
+        }
+
+        <div class="table-responsive">
+          <table cTable hover class="mb-0 align-middle text-nowrap">
+            <thead class="bg-light text-secondary small text-uppercase fw-bold">
+              <tr>
+                <th scope="col" class="border-0 py-3 ps-4">{{ 'COMMON.USER' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'ADMIN.USERS.FULL_NAME' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'COMMON.EMAIL' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'COMMON.ROLE' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'COMMON.STATUS' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-end pe-4">{{ 'COMMON.ACTIONS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="border-top-0">
+              @for (u of usuarios; track u.idUsuario ?? $index) {
+              <tr class="align-middle" [class.bg-light]="!u.habilitado" [class.text-muted]="!u.habilitado">
+                <td class="ps-4 py-3">
+                  <div class="d-flex align-items-center">
+                    <c-avatar color="primary" textColor="white" shape="rounded-circle" size="md" class="me-3">
+                      {{ getInitial(u) }}
+                    </c-avatar>
+                    <div class="d-flex flex-column">
+                      <span class="fw-bold text-primary-emphasis text-truncate" style="max-width: 200px;"
+                        [title]="u.username">
+                        {{ u.username }}
+                      </span>
+                      <small class="text-body-secondary" style="font-size: 0.75rem;">ID: {{ u.idUsuario }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3">
+                  <span class="d-inline-block text-truncate fw-semibold" style="max-width: 200px;"
+                    [title]="(u.nombre + ' ' + u.apellido).trim()">
+                    {{ u.nombre }} {{ u.apellido }}
+                  </span>
+                </td>
+                <td class="py-3">
+                  <div class="d-flex align-items-center">
+                    <span class="text-truncate" style="max-width: 240px;" [title]="u.email">{{ u.email }}</span>
+                    @if (u.emailConfirmado) {
+                    <svg cIcon name="cilCheckCircle" class="text-success ms-2" size="sm"
+                      cTooltip="Email verificado"></svg>
+                    } @else {
+                    <svg cIcon name="cilWarning" class="text-warning ms-2" size="sm"
+                      cTooltip="Email no verificado"></svg>
+                    }
+                  </div>
+                </td>
+                <td class="text-center py-3">
+                  @if (getRoleInfo(u.rolCodigo); as roleInfo) {
+                  <c-badge [color]="roleInfo.color" shape="rounded-pill"
+                    class="px-3 py-2 bg-opacity-10 text-{{roleInfo.color}}-emphasis border border-{{roleInfo.color}} border-opacity-25">
+                    <svg cIcon [name]="roleInfo.icon" size="sm" class="me-1"></svg>
+                    {{ roleInfo.label | translate }}
+                  </c-badge>
+                  }
+                </td>
+                <td class="text-center py-3">
+                  @if (u.habilitado) {
+                  <c-badge color="success" shape="rounded-pill" class="fw-normal">{{ 'COMMON.ACTIVE' | translate
+                    }}</c-badge>
+                  } @else {
+                  <c-badge color="secondary" shape="rounded-pill" class="fw-normal">{{ 'COMMON.INACTIVE' | translate
+                    }}</c-badge>
+                  }
+                </td>
+                <td class="text-end pe-4 py-3">
+                  <c-button-group role="group">
+                    <button cButton color="primary" variant="ghost" size="sm" (click)="openEdit(u)"
+                      [cTooltip]="'COMMON.EDIT' | translate">
+                      <svg cIcon name="cilPen"></svg>
+                    </button>
+                    <button cButton color="danger" variant="ghost" size="sm" (click)="delete(u)"
+                      [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE"
+                      [cTooltip]="'COMMON.DELETE' | translate">
+                      <svg cIcon name="cilTrash"></svg>
+                    </button>
+                  </c-button-group>
+                </td>
+              </tr>
+              } @empty {
+              <tr>
+                <td colspan="6" class="text-center py-5">
+                  <div class="d-flex flex-column align-items-center text-secondary opacity-75">
+                    <svg cIcon name="cilSearch" size="4xl" class="mb-3"></svg>
+                    <h5 class="fw-normal">{{ 'AUTO.NO_SE_ENCONTRARON_USUARIOS' | translate }}</h5>
+                    <p class="small mb-0">{{ 'AUTO.INTENTA_AJUSTAR_LOS_FILTROS_DE' | translate }}</p>
+                  </div>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación Footer -->
+        <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+          <small class="text-secondary">
+            {{ 'COMMON.PAGINATION_INFO' | translate: { current: numberOfElements, total: totalElements } }}
+          </small>
+          <app-op-pagination [totalPages]="getTotalPages()" [currentPage]="pageNo" (pageChange)="onPageChange($event)" size="sm" class="mb-0">
+          </app-op-pagination>
+        </div>
       </div>
-      <div *ngIf="usuarios.length === 0" class="text-muted">Sin usuarios</div>
-      <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
-        <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
-        <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-        <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
-      </div>
-    </div>
-    <ng-template #loadingTemplate>
-      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando usuarios'"></c-spinner><p class="mt-2 text-muted">Cargando usuarios...</p></div>
-    </ng-template>
-  </c-card-body>
+    </c-card-body>
   </c-card>
+</c-container>
 
-<c-modal id="editUserModal" [visible]="editModalVisible" (visibleChange)="editModalVisible = $event">
-  <c-modal-header class="d-flex justify-content-between align-items-center">
-    <h5 cModalTitle>{{ editUser?.idUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}</h5>
-    <c-badge color="danger" *ngIf="getUserErrors().length">{{ getUserErrors().length }}</c-badge>
-  </c-modal-header>
-  <c-modal-body>
-    <div *ngIf="editUser">
-      <div class="mb-3">
-        <label class="form-label">Usuario</label>
-        <input cFormControl type="text" [value]="editUser.username || ''" (input)="editUser && (editUser.username=$any($event.target).value)" [class.is-invalid]="!editUser.username" [disabled]="!!editUser.idUsuario" />
-        <div class="invalid-feedback d-block" *ngIf="!editUser.username">Usuario requerido</div>
-        <div class="text-muted small mt-1" *ngIf="!!editUser.idUsuario">El nombre de usuario no se puede modificar aquí.</div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Nombre</label>
-        <input cFormControl type="text" [value]="editUser.nombre || ''" (input)="editUser && (editUser.nombre=$any($event.target).value)" />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Apellido</label>
-        <input cFormControl type="text" [value]="editUser.apellido || ''" (input)="editUser && (editUser.apellido=$any($event.target).value)" />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input cFormControl type="email" [value]="editUser.email || ''" (input)="editUser && (editUser.email=$any($event.target).value)" [class.is-invalid]="!isEmailValid(editUser.email)" />
-        <div class="invalid-feedback d-block" *ngIf="!isEmailValid(editUser.email)">Email inválido</div>
-      </div>
-      <div class="mb-3">
-        <c-form-check>
-          <input cFormCheckInput type="checkbox" id="userEnabled" [checked]="editUser.habilitado" (change)="editUser && (editUser.habilitado = $any($event.target).checked)" [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE" />
-          <label cFormCheckLabel for="userEnabled">Habilitar Usuario</label>
-        </c-form-check>
-        <div class="text-info small mt-1" *ngIf="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
-          <svg cIcon name="cilLockLocked" size="sm"></svg>El rol de Propietario no se puede deshabilitar.
-        </div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Rol</label>
-        <select cSelect [(ngModel)]="editUser.rolCodigo" [class.is-invalid]="!editUser.rolCodigo" [disabled]="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
-          <option value="">Seleccione rol</option>
-          <ng-container *ngFor="let r of roles">
-            <option [value]="r.codigo" *ngIf="r.codigo !== PROPIETARIO_ROLE_CODE || editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
-              {{ r.nombre }}
-            </option>
-          </ng-container>
-        </select>
-        <div class="invalid-feedback d-block" *ngIf="!editUser.rolCodigo">Rol requerido</div>
-        <div class="text-info small mt-1" *ngIf="PROPIETARIO_ROLE_CODE && editUser.rolCodigo === PROPIETARIO_ROLE_CODE">
-          <svg cIcon name="cilLockLocked" size="sm"></svg> El rol de Propietario no se puede modificar.
-        </div>
-      </div>
-    </div>
-  </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" (click)="closeEdit()">Cerrar</button>
-    <button cButton color="primary" [disabled]="!isUserFormValid()" (click)="saveEdit()">Guardar</button>
-  </c-modal-footer>
-</c-modal>
+<!-- Modal Editar/Crear Usuario -->
+<app-usuario-form [visible]="editModalVisible" [usuario]="editUser" [roles]="roles"
+  (visibleChange)="editModalVisible = $event" (onSave)="saveEdit($event)"></app-usuario-form>
 
-<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal = $event" id="deleteUserModal">
-  <c-modal-header>
-    <h5 cModalTitle>Confirmar eliminación</h5>
-  </c-modal-header>
-  <c-modal-body>
-    ¿Estás seguro de que deseas eliminar el usuario <strong>{{ userToDelete?.username }}</strong>?
-    <br>Esta acción no se puede deshacer.
-  </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
-    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
-  </c-modal-footer>
-</c-modal>
+<!-- Modal Eliminar -->
+<app-confirmation-modal [visible]="showDeleteModal" [title]="'COMMON.DELETE' | translate"
+  [message]="'COMMON.VERIFY_DELETE' | translate" [itemName]="userToDelete?.username"
+  [warningText]="'ADMIN.USERS.DELETE_WARNING' | translate"
+  [confirmText]="'ADMIN.USERS.DELETE_PERMANENTLY' | translate" [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'danger'" [loading]="loading" (visibleChange)="showDeleteModal = $event"
+  (confirm)="confirmDelete()"></app-confirmation-modal>

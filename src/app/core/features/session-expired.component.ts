@@ -1,7 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { SessionManagerService, SessionExpirationData } from '../../core/services/auth/session-manager.service';
+import {
+  SessionManagerService,
+  SessionExpirationData,
+} from '../../core/services/auth/session-manager.service';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { RouteTrackerService } from '../../core/services/auth/route-tracker.service';
 import { PostLoginRedirectService } from '../services/auth/post-login-redirect.service';
@@ -9,7 +12,8 @@ import { PostLoginRedirectService } from '../services/auth/post-login-redirect.s
 @Component({
   selector: 'app-session-expired-modal',
   templateUrl: './session-expired.component.html',
-  styleUrls: ['./session-expired.component.scss']
+  styleUrls: ['./session-expired.component.scss'],
+  standalone: false,
 })
 export class SessionExpiredComponent implements OnInit, OnDestroy {
   private subs = new Subscription();
@@ -27,7 +31,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Si la navegación actual trae sessionData (fallback)
-    const navigation = this.router.getCurrentNavigation();
+    const navigation = this.router.currentNavigation();
     this.sessionData =
       navigation?.extras?.state?.['sessionData'] ||
       (window.history && (window.history.state as any)?.sessionData) ||
@@ -73,8 +77,25 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
   }
 
   goToLogin(): void {
-    this.hideModal();
-    // Guardar la última ruta válida (no la actual, que es session-expired)
+    // 1. Ocultar modal (esto debería eliminar el backdrop, pero a veces falla en navegaciones rápidas)
+    this.isVisible = false;
+    this.sessionData = null;
+
+    // 2. Forzar limpieza manual de backdrops huérfanos antes de navegar
+    setTimeout(() => {
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach((backdrop) => backdrop.remove());
+      
+      // 3. Navegar después de la limpieza
+      this.saveRedirectUrl();
+      this.router.navigate(['/login'], { replaceUrl: true });
+    }, 300); // Pequeño delay para permitir que la animación de cierre de CoreUI termine o se procese
+  }
+
+  private saveRedirectUrl(): void {
     try {
       let validUrl: string | null = null;
       try {
@@ -87,13 +108,20 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
         this.postLoginRedirect.saveLastValidRoute(validUrl);
       }
     } catch {}
-
-    // replaceUrl evita que el usuario vuelva con back a la pantalla de sesión finalizada
-    this.router.navigate(['/login'], { replaceUrl: true });
   }
 
   goToHome(): void {
-    this.hideModal();
-    this.router.navigate(['/'], { replaceUrl: true });
+    this.isVisible = false;
+    this.sessionData = null;
+    
+    setTimeout(() => {
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach((backdrop) => backdrop.remove());
+
+        this.router.navigate(['/'], { replaceUrl: true });
+    }, 300);
   }
 }

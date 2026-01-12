@@ -9,15 +9,13 @@ export default defineConfig({
     viewport: { width: 1280, height: 800 },
     headless: true,
     screenshot: 'only-on-failure',
-    trace: 'retain-on-failure'
+    trace: 'retain-on-failure',
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } }
-  ],
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
     command: 'npm run start:mem -- --port 4201',
     url: 'http://localhost:4201/',
     reuseExistingServer: true,
-    timeout: 120000
-  }
+    timeout: 120000,
+  },
 });

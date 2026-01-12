@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { INavData } from '@coreui/angular';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SidebarStateService {
   private readonly STORAGE_KEY = 'sidebar_expanded_items';
@@ -60,7 +60,10 @@ export class SidebarStateService {
 
     for (const item of items) {
       // Verificar si este item es el activo o tiene un hijo activo
-      const isItemActive = this.isRouteActive(typeof item.url === 'string' ? item.url : undefined, currentUrl);
+      const isItemActive = this.isRouteActive(
+        typeof item.url === 'string' ? item.url : undefined,
+        currentUrl
+      );
       let childActive = false;
 
       if (item.children && item.children.length > 0) {
@@ -69,8 +72,8 @@ export class SidebarStateService {
 
       if (isItemActive || childActive) {
         if (item.children && item.children.length > 0 && item.name) {
-           this.expandedItems.add(item.name);
-           this.expandChildGroups(item);
+          this.expandedItems.add(item.name);
+          this.expandChildGroups(item);
         }
         hasActiveChild = true;
       }

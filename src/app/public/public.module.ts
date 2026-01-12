@@ -17,21 +17,9 @@ import { IconModule } from '@coreui/icons-angular';
 import { SharedOPModule } from '../shared/shared.module';
 import { SharedCoreUiModule } from '../shared/shared-coreui.module';
 import { CoreModule } from '../core/core.module';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 @NgModule({
-  imports: [
-    HttpClientModule,
-    PublicRoutingModule,
-
-    CoreModule,
-    // ✅ Shared Module
-    SharedOPModule,
-    SharedCoreUiModule,
-
-    // Módulos específicos de Public
-    IconModule,
-  ],
   declarations: [
     // ✅ Solo componentes específicos de Public
     PublicComponent,
@@ -43,5 +31,15 @@ import { HttpClientModule } from '@angular/common/http';
     ContactComponent,
     NavBarPublicComponent,
   ],
+  imports: [
+    PublicRoutingModule,
+    CoreModule,
+    // ✅ Shared Module
+    SharedOPModule,
+    SharedCoreUiModule,
+    // Módulos específicos de Public
+    IconModule,
+  ],
+  providers: [provideHttpClient(withInterceptorsFromDi())],
 })
 export class PublicModule {}

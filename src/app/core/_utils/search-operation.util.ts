@@ -17,11 +17,24 @@ export enum SearchOperation {
   ALL = 'all',
   AND = 'and',
   OR = 'or',
-  BOOLEAN = 'boolean'
+  BOOLEAN = 'boolean',
 }
 
 const SIMPLE_OPERATION_SET: string[] = [
-  'cn', 'nc', 'eq', 'ne', 'bw', 'bn', 'ew', 'en', 'nu', 'nn', 'gt', 'ge', 'lt', 'le'
+  'cn',
+  'nc',
+  'eq',
+  'ne',
+  'bw',
+  'bn',
+  'ew',
+  'en',
+  'nu',
+  'nn',
+  'gt',
+  'ge',
+  'lt',
+  'le',
 ];
 
 const DATA_OPTION_SET: string[] = ['all', 'and', 'any', 'or'];
@@ -40,7 +53,7 @@ function createOperationMap(): Map<string, SearchOperation> {
 
 function createDataOptionMap(): Map<string, SearchOperation> {
   const map = new Map<string, SearchOperation>();
-  DATA_OPTION_SET.forEach(option => {
+  DATA_OPTION_SET.forEach((option) => {
     if (option === 'all' || option === 'and') {
       map.set(option, SearchOperation.ALL);
     } else if (option === 'any' || option === 'or') {

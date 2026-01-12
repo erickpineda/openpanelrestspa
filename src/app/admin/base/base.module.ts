@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { BaseRoutingModule } from './base-routing.module';
 import { BaseComponent } from './base.component';
+import { BaseIndexComponent } from './base-index.component';
 
 // Componentes específicos de Base
 // Entradas moved to lazy EntradasModule
@@ -11,13 +12,16 @@ import { ListadoComentariosComponent } from './comentarios/listado-comentarios.c
 import { CrearComentarioComponent } from './comentarios/crear/crear-comentario.component';
 import { EditarComentarioComponent } from './comentarios/editar/editar-comentario.component';
 import { ComentarioFormComponent } from './comentarios/comentario-form/comentario-form.component';
+import { ComentariosFilterComponent } from './comentarios/components/comentarios-filter/comentarios-filter.component';
+import { ComentariosTableComponent } from './comentarios/components/comentarios-table/comentarios-table.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
+import { CategoriaFormComponent } from './categorias/categoria-form/categoria-form.component';
 import { CrearCategoriaComponent } from './categorias/crear/crear-categoria.component';
 import { EditarCategoriaComponent } from './categorias/editar/editar-categoria.component';
-import { CategoriaFormComponent } from './categorias/categoria-form/categoria-form.component';
 // Entradas components are now lazy in EntradasModule; CKEditor moved there
 import { SharedOPModule } from '../../shared/shared.module';
 import { SharedCoreUiModule } from '../../shared/shared-coreui.module';
+import { SharedWidgetsModule } from '../../shared/shared-widgets.module';
 
 @NgModule({
   imports: [
@@ -29,20 +33,23 @@ import { SharedCoreUiModule } from '../../shared/shared-coreui.module';
     // ✅ Shared Module (contiene componentes compartidos)
     SharedOPModule,
     SharedCoreUiModule,
+    SharedWidgetsModule,
   ],
   declarations: [
     // ✅ Solo componentes específicos de Base
     BaseComponent,
+    BaseIndexComponent,
     // Entradas components declared in EntradasModule (lazy)
     ListadoComentariosComponent,
     CrearComentarioComponent,
     EditarComentarioComponent,
     ComentarioFormComponent,
+    ComentariosFilterComponent,
+    ComentariosTableComponent,
     ListadoCategoriasComponent,
     CrearCategoriaComponent,
     EditarCategoriaComponent,
     CategoriaFormComponent,
-    
   ],
 })
 export class BaseModule {}

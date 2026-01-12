@@ -14,6 +14,7 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
   selector: 'app-editar-entrada',
   templateUrl: './editar-entrada.component.html',
   styleUrls: ['./editar-entrada.component.scss'],
+  standalone: false,
 })
 export class EditarEntradaComponent implements OnInit {
   entradaForm!: UntypedFormGroup;
@@ -35,9 +36,7 @@ export class EditarEntradaComponent implements OnInit {
     private facade: EntradaFacadeService,
     private router: Router,
     private toastService: ToastService
-  ) {
-    
-  }
+  ) {}
 
   async ngOnInit() {
     this.entradaForm = this.vf.buildForm(this.entrada);
@@ -52,19 +51,19 @@ export class EditarEntradaComponent implements OnInit {
     this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: Entrada) => {
       if (!ent) return;
       this.entrada = ent;
-      
+
       // Busca los objetos reales por referencia
       const estadoCorrecto = this.estadosEntr.find(
-        e => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada
+        (e) => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada
       );
       const tipoCorrecto = this.tiposEntr.find(
-        t => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada
+        (t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada
       );
 
       this.entradaForm.patchValue({
         ...ent,
         estadoEntrada: estadoCorrecto ?? null,
-        tipoEntrada: tipoCorrecto ?? null
+        tipoEntrada: tipoCorrecto ?? null,
       });
 
       // Rellenar categorías igual que antes
@@ -97,14 +96,21 @@ export class EditarEntradaComponent implements OnInit {
     if (this.entradaForm.invalid) return;
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuarioEditado = usuario?.idUsuario ?? null;
+
     this.facade.actualizarEntrada(this.idEntrada, ent).subscribe(() => {
-      this.toastService.showSuccess('La entrada se ha actualizado correctamente.', 'Entrada actualizada');
+      this.toastService.showSuccess(
+        'La entrada se ha actualizado correctamente.',
+        'Entrada actualizada'
+      );
       this.router.navigateByUrl('/admin/control/entradas');
     });
   }
 
   onPreviewEmit(payload: Partial<Entrada>) {
-    this.entradaParaPrevia = { ...(this.entradaParaPrevia || {}), ...(payload as Entrada) } as Entrada;
+    this.entradaParaPrevia = {
+      ...(this.entradaParaPrevia || {}),
+      ...(payload as Entrada),
+    } as Entrada;
     this.modalPreviaVisible = true;
   }
 
@@ -117,6 +123,13 @@ export class EditarEntradaComponent implements OnInit {
 
   onCerrarPreview() {
     this.modalPreviaVisible = false;
+  }
+
+  onPublicarDesdePreview() {
+    this.modalPreviaVisible = false;
+    if (this.entradaParaPrevia) {
+      this.onGuardar(this.entradaParaPrevia);
+    }
   }
 
   onCancelar() {

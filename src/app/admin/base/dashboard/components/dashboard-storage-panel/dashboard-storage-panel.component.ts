@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 @Component({
   selector: 'app-dashboard-storage-panel',
   templateUrl: './dashboard-storage-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardStoragePanelComponent {
   @Input() loadingStorage: boolean = false;

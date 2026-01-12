@@ -1,13 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { NavigationService } from './navigation.service';
 import { SidebarStateService } from './sidebar-state.service';
 import { ActiveSectionService } from './active-section.service';
-import { 
-  UserRole, 
-  NavigationConfig, 
-  INavItemEnhanced 
+import {
+  UserRole,
+  NavigationConfig,
+  INavItemEnhanced,
 } from '../../../shared/types/navigation.types';
 import { NavigationConstants } from '../../../shared/constants/navigation.constants';
 
@@ -20,44 +21,62 @@ describe('NavigationService', () => {
   beforeEach(() => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate'], {
       events: of({}),
-      url: '/admin/dashboard'
+      url: '/admin/dashboard',
     });
     const sidebarStateSpy = jasmine.createSpyObj('SidebarStateService', [
-      'toggleItem', 
-      'updateNavItems'
+      'toggleItem',
+      'updateNavItems',
     ]);
 
-    const activeSectionSpy = jasmine.createSpyObj('ActiveSectionService', [
-      'toggleSection',
-      'expandSection',
-      'collapseSection',
-      'isSectionExpanded',
-      'setNavigationItems',
-      'updateActiveSection',
-      'getCurrentActiveState',
-      'getCurrentBreadcrumb',
-      'isItemActive',
-      'isSectionActive',
-      'clearExpansionState'
-    ], {
-      activeSection$: of({ activeUrl: '', activeSectionId: null, activeItemId: null, breadcrumb: [] }),
-      menuExpansion$: of({}),
-      navigationContext$: of({ currentSection: null, parentSection: null, relatedItems: [], suggestedActions: [] })
-    });
+    const activeSectionSpy = jasmine.createSpyObj(
+      'ActiveSectionService',
+      [
+        'toggleSection',
+        'expandSection',
+        'collapseSection',
+        'isSectionExpanded',
+        'setNavigationItems',
+        'updateActiveSection',
+        'getCurrentActiveState',
+        'getCurrentBreadcrumb',
+        'isItemActive',
+        'isSectionActive',
+        'clearExpansionState',
+      ],
+      {
+        activeSection$: of({
+          activeUrl: '',
+          activeSectionId: null,
+          activeItemId: null,
+          breadcrumb: [],
+        }),
+        menuExpansion$: of({}),
+        navigationContext$: of({
+          currentSection: null,
+          parentSection: null,
+          relatedItems: [],
+          suggestedActions: [],
+        }),
+      }
+    );
 
     TestBed.configureTestingModule({
       providers: [
         NavigationService,
         { provide: Router, useValue: routerSpy },
         { provide: SidebarStateService, useValue: sidebarStateSpy },
-        { provide: ActiveSectionService, useValue: activeSectionSpy }
-      ]
+        { provide: ActiveSectionService, useValue: activeSectionSpy },
+      ],
     });
 
     service = TestBed.inject(NavigationService);
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    mockSidebarStateService = TestBed.inject(SidebarStateService) as jasmine.SpyObj<SidebarStateService>;
-    mockActiveSectionService = TestBed.inject(ActiveSectionService) as jasmine.SpyObj<ActiveSectionService>;
+    mockSidebarStateService = TestBed.inject(
+      SidebarStateService
+    ) as jasmine.SpyObj<SidebarStateService>;
+    mockActiveSectionService = TestBed.inject(
+      ActiveSectionService
+    ) as jasmine.SpyObj<ActiveSectionService>;
   });
 
   it('should be created', () => {
@@ -78,30 +97,33 @@ describe('NavigationService', () => {
                 id: 'main-dashboard',
                 name: 'Escritorio Principal',
                 url: '/admin/dashboard',
-                icon: 'cil-speedometer'
-              }
+                icon: 'cil-speedometer',
+              },
             ],
             collapsible: false,
             defaultExpanded: true,
-            requiredRoles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO]
-          }
+            requiredRoles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO],
+          },
         ],
         theme: NavigationConstants.DEFAULT_THEME,
         userPreferences: {
           expandedSections: [],
           collapsedSections: [],
-          favoriteItems: []
-        }
+          favoriteItems: [],
+        },
       };
 
       service.loadNavigationConfig(testConfig);
 
-      service.getNavigationItems(UserRole.ADMINISTRADOR).subscribe(items => {
-        expect(items).toBeDefined();
-        expect(items.length).toBeGreaterThan(0);
-        expect(items.some(item => item.name === 'Dashboard')).toBeTrue();
-        done();
-      });
+      service
+        .getNavigationItems(UserRole.ADMINISTRADOR)
+        .pipe(take(1))
+        .subscribe((items) => {
+          expect(items).toBeDefined();
+          expect(items.length).toBeGreaterThan(0);
+          expect(items.some((item) => item.name === 'Dashboard')).toBeTrue();
+          done();
+        });
     });
 
     it('should filter out items for unauthorized roles', (done) => {
@@ -117,30 +139,32 @@ describe('NavigationService', () => {
                 id: 'admin-item',
                 name: 'Admin Item',
                 url: '/admin/restricted',
-                icon: 'cil-shield'
-              }
+                icon: 'cil-shield',
+              },
             ],
             collapsible: false,
             defaultExpanded: true,
-            requiredRoles: [UserRole.PROPIETARIO]
-          }
+            requiredRoles: [UserRole.PROPIETARIO],
+          },
         ],
         theme: NavigationConstants.DEFAULT_THEME,
         userPreferences: {
           expandedSections: [],
           collapsedSections: [],
-          favoriteItems: []
-        }
+          favoriteItems: [],
+        },
       };
 
       service.loadNavigationConfig(testConfig);
 
-      service.getNavigationItems(UserRole.LECTOR).subscribe(items => {
-        expect(items).toBeDefined();
-        // Should not contain admin-only items for LECTOR role
-        expect(items.some(item => item.name === 'Admin Only Section')).toBeFalse();
-        done();
-      });
+      service
+        .getNavigationItems(UserRole.LECTOR)
+        .pipe(take(1))
+        .subscribe((items) => {
+          expect(items).toBeDefined();
+          expect(items.some((item) => item.name === 'Admin Only Section')).toBeFalse();
+          done();
+        });
     });
   });
 
@@ -152,11 +176,13 @@ describe('NavigationService', () => {
       service.updateBadgeCount(itemId, count);
 
       // Verify the badge count was updated by checking if it affects navigation items
-      service.getNavigationItems(UserRole.ADMINISTRADOR).subscribe(items => {
-        // The badge count should be stored internally
-        expect(service).toBeTruthy(); // Basic check that service is working
-        done();
-      });
+      service
+        .getNavigationItems(UserRole.ADMINISTRADOR)
+        .pipe(take(1))
+        .subscribe(() => {
+          expect(service).toBeTruthy();
+          done();
+        });
     });
   });
 
@@ -164,9 +190,9 @@ describe('NavigationService', () => {
     it('should delegate to ActiveSectionService and SidebarStateService', () => {
       const sectionId = 'test-section';
       mockActiveSectionService.isSectionExpanded.and.returnValue(true);
-      
+
       service.toggleSection(sectionId);
-      
+
       expect(mockActiveSectionService.toggleSection).toHaveBeenCalledWith(sectionId);
       expect(mockSidebarStateService.toggleItem).toHaveBeenCalledWith(sectionId, true);
     });
@@ -180,8 +206,8 @@ describe('NavigationService', () => {
           name: 'Edit',
           icon: 'cil-pencil',
           action: () => {},
-          tooltip: 'Edit item'
-        }
+          tooltip: 'Edit item',
+        },
       ];
 
       expect(() => {
@@ -202,15 +228,15 @@ describe('NavigationService', () => {
             items: [],
             collapsible: true,
             defaultExpanded: false,
-            requiredRoles: []
-          }
+            requiredRoles: [],
+          },
         ],
         theme: NavigationConstants.DEFAULT_THEME,
         userPreferences: {
           expandedSections: [],
           collapsedSections: [],
-          favoriteItems: []
-        }
+          favoriteItems: [],
+        },
       };
 
       expect(() => {
@@ -225,13 +251,13 @@ describe('NavigationService', () => {
         userPreferences: {
           expandedSections: [],
           collapsedSections: [],
-          favoriteItems: []
-        }
+          favoriteItems: [],
+        },
       };
 
       spyOn(console, 'error');
       service.loadNavigationConfig(invalidConfig);
-      
+
       expect(console.error).toHaveBeenCalled();
     });
   });
@@ -239,9 +265,9 @@ describe('NavigationService', () => {
   describe('updateActiveSection', () => {
     it('should update active section using ActiveSectionService', () => {
       const testUrl = '/admin/dashboard';
-      
+
       service.updateActiveSection(testUrl);
-      
+
       expect(mockActiveSectionService.setNavigationItems).toHaveBeenCalled();
       expect(mockActiveSectionService.updateActiveSection).toHaveBeenCalledWith(testUrl);
       expect(mockSidebarStateService.updateNavItems).toHaveBeenCalled();
@@ -254,14 +280,14 @@ describe('NavigationService', () => {
         {
           name: 'Public Item',
           url: '/public',
-          iconComponent: { name: 'cil-home' }
+          iconComponent: { name: 'cil-home' },
         },
         {
           name: 'Admin Item',
           url: '/admin',
           iconComponent: { name: 'cil-shield' },
-          requiredRoles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO]
-        }
+          requiredRoles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO],
+        },
       ];
 
       const filteredForLector = service.filterByPermissions(items, UserRole.LECTOR);
@@ -271,17 +297,16 @@ describe('NavigationService', () => {
       expect(filteredForLector[0].name).toBe('Public Item');
 
       expect(filteredForAdmin.length).toBe(2);
-      expect(filteredForAdmin.some(item => item.name === 'Admin Item')).toBeTrue();
+      expect(filteredForAdmin.some((item) => item.name === 'Admin Item')).toBeTrue();
     });
   });
 
   describe('Property-Based Tests', () => {
-    
     /**
      * **Feature: admin-sidebar-optimization, Property 1: Agrupación lógica de navegación**
      * **Valida: Requisitos 1.1, 1.2, 2.2, 4.4, 4.5**
-     * 
-     * Para cualquier configuración de navegación, todos los elementos deben estar agrupados bajo secciones 
+     *
+     * Para cualquier configuración de navegación, todos los elementos deben estar agrupados bajo secciones
      * que correspondan a su funcionalidad principal, sin elementos duplicados por URL o identificador
      */
     it('should group navigation items logically without duplicates', (done) => {
@@ -297,18 +322,18 @@ describe('NavigationService', () => {
                 id: 'entries',
                 name: 'Entradas',
                 url: '/admin/entries',
-                icon: 'cil-pencil'
+                icon: 'cil-pencil',
               },
               {
                 id: 'pages',
                 name: 'Páginas',
                 url: '/admin/pages',
-                icon: 'cil-library'
-              }
+                icon: 'cil-library',
+              },
             ],
             collapsible: true,
             defaultExpanded: true,
-            requiredRoles: []
+            requiredRoles: [],
           },
           {
             id: 'user-management',
@@ -320,55 +345,62 @@ describe('NavigationService', () => {
                 id: 'users',
                 name: 'Usuarios',
                 url: '/admin/users',
-                icon: 'cil-people'
+                icon: 'cil-people',
               },
               {
                 id: 'roles',
                 name: 'Roles',
                 url: '/admin/roles',
-                icon: 'cil-shield'
-              }
+                icon: 'cil-shield',
+              },
             ],
             collapsible: true,
             defaultExpanded: false,
-            requiredRoles: []
-          }
+            requiredRoles: [],
+          },
         ],
         theme: NavigationConstants.DEFAULT_THEME,
         userPreferences: {
           expandedSections: [],
           collapsedSections: [],
-          favoriteItems: []
-        }
+          favoriteItems: [],
+        },
       };
 
       service.loadNavigationConfig(testConfig);
 
-      service.getNavigationItems(UserRole.ADMINISTRADOR).subscribe(items => {
-        // Verificar que los elementos están agrupados lógicamente
-        const contentSectionIndex = items.findIndex(item => item.name === 'Gestión de Contenido');
-        const userSectionIndex = items.findIndex(item => item.name === 'Administración de Usuarios');
-        
-        expect(contentSectionIndex).toBeGreaterThanOrEqual(0);
-        expect(userSectionIndex).toBeGreaterThanOrEqual(0);
-        
-        // Verificar que los elementos de contenido aparecen después del título de la sección
-        const entriesIndex = items.findIndex(item => item.name === 'Entradas');
-        const pagesIndex = items.findIndex(item => item.name === 'Páginas');
-        
-        expect(entriesIndex).toBeGreaterThan(contentSectionIndex);
-        expect(pagesIndex).toBeGreaterThan(contentSectionIndex);
-        
-        // Verificar que no hay URLs duplicadas
-        const urls = items
-          .filter(item => item.url && typeof item.url === 'string')
-          .map(item => item.url as string);
-        const uniqueUrls = new Set(urls);
-        
-        expect(urls.length).toBe(uniqueUrls.size); // No duplicados
-        
-        done();
-      });
+      service
+        .getNavigationItems(UserRole.ADMINISTRADOR)
+        .pipe(take(1))
+        .subscribe((items) => {
+          // Verificar que los elementos están agrupados lógicamente
+          const contentSectionIndex = items.findIndex(
+            (item) => item.name === 'Gestión de Contenido'
+          );
+          const userSectionIndex = items.findIndex(
+            (item) => item.name === 'Administración de Usuarios'
+          );
+
+          expect(contentSectionIndex).toBeGreaterThanOrEqual(0);
+          expect(userSectionIndex).toBeGreaterThanOrEqual(0);
+
+          // Verificar que los elementos de contenido aparecen después del título de la sección
+          const entriesIndex = items.findIndex((item) => item.name === 'Entradas');
+          const pagesIndex = items.findIndex((item) => item.name === 'Páginas');
+
+          expect(entriesIndex).toBeGreaterThan(contentSectionIndex);
+          expect(pagesIndex).toBeGreaterThan(contentSectionIndex);
+
+          // Verificar que no hay URLs duplicadas
+          const urls = items
+            .filter((item) => item.url && typeof item.url === 'string')
+            .map((item) => item.url as string);
+          const uniqueUrls = new Set(urls);
+
+          expect(urls.length).toBe(uniqueUrls.size); // No duplicados
+
+          done();
+        });
     });
 
     /**
@@ -386,7 +418,7 @@ describe('NavigationService', () => {
             items: [{ id: 'low', name: 'Low Item', url: '/low', icon: 'cil-test' }],
             collapsible: true,
             defaultExpanded: false,
-            requiredRoles: []
+            requiredRoles: [],
           },
           {
             id: 'high-priority',
@@ -396,48 +428,58 @@ describe('NavigationService', () => {
             items: [{ id: 'high', name: 'High Item', url: '/high', icon: 'cil-test' }],
             collapsible: true,
             defaultExpanded: false,
-            requiredRoles: []
+            requiredRoles: [],
           },
           {
             id: 'medium-priority',
             title: 'Media Prioridad',
             icon: 'cil-test',
             priority: 50,
-            items: [{ id: 'medium', name: 'Medium Item', url: '/medium', icon: 'cil-test' }],
+            items: [
+              {
+                id: 'medium',
+                name: 'Medium Item',
+                url: '/medium',
+                icon: 'cil-test',
+              },
+            ],
             collapsible: true,
             defaultExpanded: false,
-            requiredRoles: []
-          }
+            requiredRoles: [],
+          },
         ],
         theme: NavigationConstants.DEFAULT_THEME,
         userPreferences: {
           expandedSections: [],
           collapsedSections: [],
-          favoriteItems: []
-        }
+          favoriteItems: [],
+        },
       };
 
       service.loadNavigationConfig(testConfig);
 
-      service.getNavigationItems(UserRole.ADMINISTRADOR).subscribe(items => {
-        // Encontrar los índices de las secciones
-        const highIndex = items.findIndex(item => item.name === 'Alta Prioridad');
-        const mediumIndex = items.findIndex(item => item.name === 'Media Prioridad');
-        const lowIndex = items.findIndex(item => item.name === 'Baja Prioridad');
-        
-        // Verificar que están ordenadas por prioridad (mayor prioridad primero)
-        expect(highIndex).toBeLessThan(mediumIndex);
-        expect(mediumIndex).toBeLessThan(lowIndex);
-        
-        done();
-      });
+      service
+        .getNavigationItems(UserRole.ADMINISTRADOR)
+        .pipe(take(1))
+        .subscribe((items) => {
+          // Encontrar los índices de las secciones
+          const highIndex = items.findIndex((item) => item.name === 'Alta Prioridad');
+          const mediumIndex = items.findIndex((item) => item.name === 'Media Prioridad');
+          const lowIndex = items.findIndex((item) => item.name === 'Baja Prioridad');
+
+          // Verificar que están ordenadas por prioridad (mayor prioridad primero)
+          expect(highIndex).toBeLessThan(mediumIndex);
+          expect(mediumIndex).toBeLessThan(lowIndex);
+
+          done();
+        });
     });
 
     /**
      * **Feature: admin-sidebar-optimization, Property 5: Indicadores visuales por estado**
      * **Valida: Requisitos 2.4, 2.5**
-     * 
-     * Para cualquier elemento de navegación, elementos con diferentes estados (publicado, borrador, pendiente) 
+     *
+     * Para cualquier elemento de navegación, elementos con diferentes estados (publicado, borrador, pendiente)
      * deben tener configuraciones de badge visualmente distintivas
      */
     it('should provide distinctive visual indicators for different states', (done) => {
@@ -448,8 +490,8 @@ describe('NavigationService', () => {
           iconComponent: { name: 'cil-pencil' },
           badge: {
             color: 'success',
-            text: 'Publicado'
-          }
+            text: 'Publicado',
+          },
         },
         {
           name: 'Borradores',
@@ -457,8 +499,8 @@ describe('NavigationService', () => {
           iconComponent: { name: 'cil-history' },
           badge: {
             color: 'warning',
-            text: 'Borrador'
-          }
+            text: 'Borrador',
+          },
         },
         {
           name: 'Comentarios Pendientes',
@@ -466,8 +508,8 @@ describe('NavigationService', () => {
           iconComponent: { name: 'cil-comment-square' },
           badge: {
             color: 'danger',
-            text: 'Pendiente'
-          }
+            text: 'Pendiente',
+          },
         },
         {
           name: 'Usuarios Activos',
@@ -475,26 +517,24 @@ describe('NavigationService', () => {
           iconComponent: { name: 'cil-people' },
           badge: {
             color: 'info',
-            text: 'Activo'
-          }
-        }
+            text: 'Activo',
+          },
+        },
       ];
 
       // Verificar que cada estado tiene un color distintivo
-      const badgeColors = testItems
-        .filter(item => item.badge)
-        .map(item => item.badge!.color);
+      const badgeColors = testItems.filter((item) => item.badge).map((item) => item.badge!.color);
 
       const uniqueColors = new Set(badgeColors);
-      
+
       // Cada estado debe tener un color único
       expect(badgeColors.length).toBe(uniqueColors.size);
-      
+
       // Verificar colores específicos para estados específicos
-      const publishedItem = testItems.find(item => item.name === 'Entradas Publicadas');
-      const draftItem = testItems.find(item => item.name === 'Borradores');
-      const pendingItem = testItems.find(item => item.name === 'Comentarios Pendientes');
-      const activeItem = testItems.find(item => item.name === 'Usuarios Activos');
+      const publishedItem = testItems.find((item) => item.name === 'Entradas Publicadas');
+      const draftItem = testItems.find((item) => item.name === 'Borradores');
+      const pendingItem = testItems.find((item) => item.name === 'Comentarios Pendientes');
+      const activeItem = testItems.find((item) => item.name === 'Usuarios Activos');
 
       expect(publishedItem?.badge?.color).toBe('success');
       expect(draftItem?.badge?.color).toBe('warning');
@@ -513,8 +553,8 @@ describe('NavigationService', () => {
     /**
      * **Feature: admin-sidebar-optimization, Property 9: Control de acceso por roles**
      * **Valida: Requisitos 6.2**
-     * 
-     * Para cualquier configuración de usuario y roles, solo deben mostrarse elementos de navegación 
+     *
+     * Para cualquier configuración de usuario y roles, solo deben mostrarse elementos de navegación
      * para los cuales el usuario tiene permisos apropiados
      */
     it('should enforce role-based access control consistently', (done) => {
@@ -522,27 +562,27 @@ describe('NavigationService', () => {
         {
           name: 'Dashboard Público',
           url: '/admin/dashboard',
-          iconComponent: { name: 'cil-speedometer' }
+          iconComponent: { name: 'cil-speedometer' },
           // Sin requiredRoles = accesible para todos
         },
         {
           name: 'Gestión de Usuarios',
           url: '/admin/users',
           iconComponent: { name: 'cil-people' },
-          requiredRoles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO]
+          requiredRoles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO],
         },
         {
           name: 'Configuración del Sistema',
           url: '/admin/system-config',
           iconComponent: { name: 'cil-settings' },
-          requiredRoles: [UserRole.PROPIETARIO]
+          requiredRoles: [UserRole.PROPIETARIO],
         },
         {
           name: 'Herramientas de Desarrollo',
           url: '/admin/dev-tools',
           iconComponent: { name: 'cil-code' },
-          requiredRoles: [UserRole.DESARROLLADOR, UserRole.PROPIETARIO]
-        }
+          requiredRoles: [UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
+        },
       ];
 
       // Test para LECTOR - solo debe ver elementos públicos
@@ -553,16 +593,16 @@ describe('NavigationService', () => {
       // Test para ADMINISTRADOR - debe ver dashboard y gestión de usuarios
       const adminItems = service.filterByPermissions(testItems, UserRole.ADMINISTRADOR);
       expect(adminItems.length).toBe(2);
-      expect(adminItems.some(item => item.name === 'Dashboard Público')).toBeTrue();
-      expect(adminItems.some(item => item.name === 'Gestión de Usuarios')).toBeTrue();
-      expect(adminItems.some(item => item.name === 'Configuración del Sistema')).toBeFalse();
+      expect(adminItems.some((item) => item.name === 'Dashboard Público')).toBeTrue();
+      expect(adminItems.some((item) => item.name === 'Gestión de Usuarios')).toBeTrue();
+      expect(adminItems.some((item) => item.name === 'Configuración del Sistema')).toBeFalse();
 
       // Test para DESARROLLADOR - debe ver dashboard y herramientas de desarrollo
       const devItems = service.filterByPermissions(testItems, UserRole.DESARROLLADOR);
       expect(devItems.length).toBe(2);
-      expect(devItems.some(item => item.name === 'Dashboard Público')).toBeTrue();
-      expect(devItems.some(item => item.name === 'Herramientas de Desarrollo')).toBeTrue();
-      expect(devItems.some(item => item.name === 'Gestión de Usuarios')).toBeFalse();
+      expect(devItems.some((item) => item.name === 'Dashboard Público')).toBeTrue();
+      expect(devItems.some((item) => item.name === 'Herramientas de Desarrollo')).toBeTrue();
+      expect(devItems.some((item) => item.name === 'Gestión de Usuarios')).toBeFalse();
 
       // Test para PROPIETARIO - debe ver todos los elementos
       const ownerItems = service.filterByPermissions(testItems, UserRole.PROPIETARIO);
@@ -574,19 +614,19 @@ describe('NavigationService', () => {
 
   describe('Active Section Integration', () => {
     it('should get active state from ActiveSectionService', () => {
-      service.getActiveState().subscribe(state => {
+      service.getActiveState().subscribe((state) => {
         expect(state).toBeDefined();
       });
     });
 
     it('should get menu expansion state from ActiveSectionService', () => {
-      service.getMenuExpansionState().subscribe(state => {
+      service.getMenuExpansionState().subscribe((state) => {
         expect(state).toBeDefined();
       });
     });
 
     it('should get navigation context from ActiveSectionService', () => {
-      service.getNavigationContext().subscribe(context => {
+      service.getNavigationContext().subscribe((context) => {
         expect(context).toBeDefined();
       });
     });
@@ -595,7 +635,7 @@ describe('NavigationService', () => {
       const testItem: INavItemEnhanced = {
         name: 'Test Item',
         url: '/test',
-        iconComponent: { name: 'cil-test' }
+        iconComponent: { name: 'cil-test' },
       };
 
       mockActiveSectionService.isItemActive.and.returnValue(true);
@@ -609,7 +649,7 @@ describe('NavigationService', () => {
     it('should check if section is active using ActiveSectionService', () => {
       const testSection: INavItemEnhanced = {
         title: true,
-        name: 'Test Section'
+        name: 'Test Section',
       };
 
       mockActiveSectionService.isSectionActive.and.returnValue(true);
@@ -657,7 +697,7 @@ describe('NavigationService', () => {
         activeUrl: '/admin/test',
         activeSectionId: 'test-section',
         activeItemId: 'test-item',
-        breadcrumb: ['Test']
+        breadcrumb: ['Test'],
       };
 
       mockActiveSectionService.getCurrentActiveState.and.returnValue(mockActiveState);

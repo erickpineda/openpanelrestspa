@@ -1,27 +1,28 @@
-import { DatePipe } from "@angular/common";
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { DatePipe } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { finalize, takeUntil } from 'rxjs/operators';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { Comentario } from "../../../core/models/comentario.model";
-import { Entrada } from "../../../core/models/entrada.model";
-import { PaginaResponse } from "../../../core/models/pagina-response.model";
-import { Usuario } from "../../../core/models/usuario.model";
-import { ComentarioService } from "../../../core/services/data/comentario.service";
-import { EntradaService } from "../../../core/services/data/entrada.service";
-import { UsuarioService } from "../../../core/services/data/usuario.service";
-import { CommonFunctionalityService } from "../../../shared/services/common-functionality.service";
-import { OpenpanelApiResponse } from "../../../core/models/openpanel-api-response.model";
-import { LoggerService } from "../../../core/services/logger.service";
+import { Comentario } from '../../../core/models/comentario.model';
+import { Entrada } from '../../../core/models/entrada.model';
+import { PaginaResponse } from '../../../core/models/pagina-response.model';
+import { Usuario } from '../../../core/models/usuario.model';
+import { ComentarioService } from '../../../core/services/data/comentario.service';
+import { EntradaService } from '../../../core/services/data/entrada.service';
+import { UsuarioService } from '../../../core/services/data/usuario.service';
+import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
+import { OpenpanelApiResponse } from '../../../core/models/openpanel-api-response.model';
+import { LoggerService } from '../../../core/services/logger.service';
+import { TranslationService } from '../../../core/services/translation.service';
+import { ToastService } from '../../../core/services/ui/toast.service';
 
 @Component({
   selector: 'app-listado-comentarios',
   templateUrl: './listado-comentarios.component.html',
-  styleUrls: ['./listado-comentarios.component.scss']
+  styleUrls: ['./listado-comentarios.component.scss'],
+  standalone: false,
 })
-
 export class ListadoComentariosComponent implements OnInit, OnDestroy {
-
   listaComentarios: Comentario[] = [];
 
   // Patrón de toolbar/búsqueda/paginación
@@ -42,6 +43,11 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   comentarioToDelete: Comentario | null = null;
 
+  // Modales
+  visibleModalCrear = false;
+  visibleModalEditar = false;
+  comentarioSeleccionado?: Comentario;
+
   estaVacio: boolean = false;
   cargando: boolean = false;
   private destroy$ = new Subject<void>();
@@ -53,10 +59,10 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     private entradaService: EntradaService,
     private commonFuncService: CommonFunctionalityService,
     private log: LoggerService,
-    private cdr: ChangeDetectorRef
-  ) {
-    
-  }
+    private cdr: ChangeDetectorRef,
+    private translate: TranslationService,
+    private toast: ToastService
+  ) { }
 
   ngOnInit(): void {
     this.initList();
@@ -71,24 +77,20 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     try {
       this.obtenerListaComentarios();
     } catch (error) {
-      this.log.error("Error initializing list:", error);
+      this.log.error('Error initializing list:', error);
     }
-  }
-
-  navigate(urlToNavigate: string) {
-    this.router.navigate([urlToNavigate])
   }
 
   private async obtenerDatosUsuario(idUsuario: number): Promise<Usuario> {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerPorId(idUsuario).subscribe({
         next: (response: OpenpanelApiResponse<any>) => {
-          const usuario: Usuario = (response.data) ? response.data : Usuario;
-          resolve(usuario)
+          const usuario: Usuario = response.data ? response.data : Usuario;
+          resolve(usuario);
         },
         error: (err: any) => {
           reject(err);
-        }
+        },
       });
     });
   }
@@ -97,12 +99,12 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(idEntrada).subscribe({
         next: (response: OpenpanelApiResponse<any>) => {
-          const entrada: Entrada = (response.data) ? response.data.elements : Entrada;
-          resolve(entrada)
+          const entrada: Entrada = response.data ? response.data.elements : Entrada;
+          resolve(entrada);
         },
         error: (err: any) => {
           reject(err);
-        }
+        },
       });
     });
   }
@@ -111,25 +113,39 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     this.cargando = true;
     const hasFilters = this.hasActiveFilters();
     if (!hasFilters) {
-      this.comentarioService.listarPaginaSinGlobalLoader(this.pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
+      this.comentarioService
+        .listarPaginaSinGlobalLoader(this.pageNo, this.pageSize)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.cargando = false;
+            this.cdr.detectChanges();
+          })
+        )
         .subscribe({
-        next: (response: OpenpanelApiResponse<any>) => {
-          const data: PaginaResponse = response?.data || new PaginaResponse();
-          this.setPageData(data);
-        },
-        error: (err: any) => this.handlePageError(err)
-      });
+          next: (response: OpenpanelApiResponse<any>) => {
+            const data: PaginaResponse = response?.data || new PaginaResponse();
+            this.setPageData(data);
+          },
+          error: (err: any) => this.handlePageError(err),
+        });
     } else {
       const payload: any = this.buildSearchPayload();
-      this.comentarioService.buscarSinGlobalLoader(payload, this.pageNo, this.pageSize)
-        .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
+      this.comentarioService
+        .buscarSinGlobalLoader(payload, this.pageNo, this.pageSize)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.cargando = false;
+            this.cdr.detectChanges();
+          })
+        )
         .subscribe({
-        next: (data: PaginaResponse) => {
-          this.setPageData(data);
-        },
-        error: (err: any) => this.handlePageError(err)
-      });
+          next: (data: PaginaResponse) => {
+            this.setPageData(data);
+          },
+          error: (err: any) => this.handlePageError(err),
+        });
     }
   }
 
@@ -142,16 +158,25 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
   }
 
   // ===== Toolbar / Búsqueda / Paginación =====
-  toggleAdvanced(): void { this.showAdvanced = !this.showAdvanced; }
-  onBasicSearchTextChange(text: string): void { this.basicSearchText = text || ''; this.pageNo = 0; this.search(); }
-  
-  onPageSizeChange(size: number): void { 
-    this.pageSize = Number(size) || 10; 
-    this.pageNo = 0; 
-    this.obtenerListaComentarios(); 
+  toggleAdvanced(): void {
+    this.showAdvanced = !this.showAdvanced;
+  }
+  onBasicSearchTextChange(text: string): void {
+    this.basicSearchText = text || '';
+    this.pageNo = 0;
+    this.search();
   }
 
-  search(): void { this.pageNo = 0; this.obtenerListaComentarios(); }
+  onPageSizeChange(size: number): void {
+    this.pageSize = Number(size) || 10;
+    this.pageNo = 0;
+    this.obtenerListaComentarios();
+  }
+
+  search(): void {
+    this.pageNo = 0;
+    this.obtenerListaComentarios();
+  }
 
   reset(): void {
     this.basicSearchText = '';
@@ -162,80 +187,83 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     this.obtenerListaComentarios();
   }
 
-  prev(): void { 
-    if (this.pageNo > 0) { 
-        this.pageNo--; 
-        if (this.allComentarios.length > 0 && this.pagedComentarios.length !== this.totalElements) {
-            this.applyPaging();
-        } else {
-            this.obtenerListaComentarios(); 
-        }
-    } 
+  onPageChange(page: number): void {
+    const totalPages = this.getTotalPages();
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    if (safePage === this.pageNo) return;
+    this.pageNo = safePage;
+    if (this.allComentarios.length > 0) {
+      this.applyPaging();
+      return;
+    }
+    this.obtenerListaComentarios();
   }
-  
-  next(): void { 
-    if (this.pageNo < this.totalPages - 1) { 
-        this.pageNo++; 
-        if (this.allComentarios.length > 0 && this.pagedComentarios.length !== this.totalElements) {
-            this.applyPaging();
-        } else {
-            this.obtenerListaComentarios(); 
-        }
-    } 
+
+  getTotalPages(): number {
+    return Math.max(1, this.totalPages);
   }
-  
-  getTotalPages(): number { return Math.max(1, this.totalPages); }
 
   private setPageData(data: PaginaResponse): void {
-    const raw = (data?.elements ?? (Array.isArray(data) ? data : []));
+    const raw = data?.elements ?? (Array.isArray(data) ? data : []);
     const elementos: Comentario[] = Array.isArray(raw) ? raw : [];
 
     // Detectar si es server paging o lista completa
-    const hasServerPaging = typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
+    const hasServerPaging =
+      typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
 
     if (hasServerPaging) {
-        this.listaComentarios = elementos;
-        this.estaVacio = !!data.empty;
-        this.totalElements = Number(data.totalElements || this.listaComentarios.length || 0);
-        this.totalPages = Number(data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1);
-        this.numberOfElements = Number((data as any).numberOfElements ?? this.listaComentarios.length);
-        this.pagedComentarios = this.listaComentarios;
+      this.listaComentarios = elementos;
+      this.allComentarios = [];
+      this.estaVacio = !!data.empty;
+      this.totalElements = Number(data.totalElements || this.listaComentarios.length || 0);
+      this.totalPages = Number(
+        data.totalPages || Math.ceil(this.totalElements / this.pageSize) || 1
+      );
+      this.numberOfElements = Number(
+        (data as any).numberOfElements ?? this.listaComentarios.length
+      );
+      this.pagedComentarios = this.listaComentarios;
 
-        // Boundary check
-        if (elementos.length === 0 && this.pageNo > 0 && this.pageNo >= this.totalPages) {
-            this.pageNo = Math.max(0, this.totalPages - 1);
-            this.obtenerListaComentarios();
-            return;
-        }
+      // Boundary check
+      if (elementos.length === 0 && this.pageNo > 0 && this.pageNo >= this.totalPages) {
+        this.pageNo = Math.max(0, this.totalPages - 1);
+        this.obtenerListaComentarios();
+        return;
+      }
     } else {
-        // Fallback client paging
-        this.allComentarios = elementos;
-        this.totalElements = this.allComentarios.length;
-        this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
-        this.estaVacio = this.totalElements === 0;
-        
-        if (this.pageNo >= this.totalPages) {
-            this.pageNo = Math.max(0, this.totalPages - 1);
-        }
-        
-        this.applyPaging();
+      // Fallback client paging
+      this.allComentarios = elementos;
+      this.totalElements = this.allComentarios.length;
+      this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
+      this.estaVacio = this.totalElements === 0;
+
+      if (this.pageNo >= this.totalPages) {
+        this.pageNo = Math.max(0, this.totalPages - 1);
+      }
+
+      this.applyPaging();
     }
     this.cdr.detectChanges();
   }
 
   private applyPaging(): void {
     if (this.allComentarios.length > 0) {
-        const start = this.pageNo * this.pageSize;
-        const end = start + this.pageSize;
-        this.pagedComentarios = this.allComentarios.slice(start, end);
-        this.numberOfElements = this.pagedComentarios.length;
-        this.listaComentarios = this.pagedComentarios;
+      const start = this.pageNo * this.pageSize;
+      const end = start + this.pageSize;
+      this.pagedComentarios = this.allComentarios.slice(start, end);
+      this.numberOfElements = this.pagedComentarios.length;
+      this.listaComentarios = this.pagedComentarios;
     }
     this.cdr.detectChanges();
   }
 
   private hasActiveFilters(): boolean {
-    return !!(this.basicSearchText || this.filtroUsuario || this.filtroAprobado !== null || this.filtroCuarentena !== null);
+    return !!(
+      this.basicSearchText ||
+      this.filtroUsuario ||
+      this.filtroAprobado !== null ||
+      this.filtroCuarentena !== null
+    );
   }
 
   private buildSearchPayload(): any {
@@ -261,15 +289,18 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  // Métodos antiguos de paginación por números eliminados en favor de Anterior/Siguiente
-
   public refrescarPagina(): void {
     window.location.reload();
   }
 
   openEdit(coment: Comentario): void {
     if (!coment?.idComentario) return;
-    this.navigate('/admin/control/comentarios/editar/' + coment.idComentario);
+    this.comentarioSeleccionado = coment;
+    this.visibleModalEditar = true;
+  }
+
+  onSuccessSave() {
+    this.obtenerListaComentarios();
   }
 
   deleteComentario(coment: Comentario): void {
@@ -279,30 +310,40 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(): void {
-    if (!this.comentarioToDelete?.idComentario) {
-        this.showDeleteModal = false;
-        return;
-    }
-    
+    if (!this.comentarioToDelete?.idComentario) return;
+
     this.cargando = true;
-    this.comentarioService.borrar(this.comentarioToDelete.idComentario!)
-        .pipe(takeUntil(this.destroy$), finalize(() => { this.cargando = false; this.cdr.detectChanges(); }))
-        .subscribe({
-            next: () => {
-                this.showDeleteModal = false;
-                this.comentarioToDelete = null;
-                this.search();
-            },
-            error: (err) => {
-                this.log.error('comentarios borrar', err);
-                this.showDeleteModal = false;
-                this.comentarioToDelete = null;
-            }
-        });
+    this.comentarioService
+      .borrar(this.comentarioToDelete.idComentario)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.cargando = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.toast.showSuccess(this.translate.instant('ADMIN.COMMENTS.SUCCESS.DELETE'), this.translate.instant('MENU.COMMENTS'));
+          this.showDeleteModal = false;
+          this.comentarioToDelete = null;
+          this.obtenerListaComentarios();
+        },
+        error: (err: any) => {
+          this.log.error('comentario eliminar', err || 'Error desconocido');
+          this.toast.showError(this.translate.instant('ADMIN.COMMENTS.ERROR.DELETE'), this.translate.instant('MENU.COMMENTS'));
+          this.showDeleteModal = false;
+          this.comentarioToDelete = null;
+        },
+      });
   }
 
   cancelDelete(): void {
-      this.showDeleteModal = false;
-      this.comentarioToDelete = null;
+    this.showDeleteModal = false;
+    this.comentarioToDelete = null;
+  }
+
+  trackByComentario(index: number, c: Comentario): number {
+    return c?.idComentario ?? index;
   }
 }

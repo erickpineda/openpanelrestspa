@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-mi-perfil',
   templateUrl: './mi-perfil.component.html',
-  styleUrls: ['./mi-perfil.component.scss']
+  styleUrls: ['./mi-perfil.component.scss'],
+  standalone: false,
 })
 export class MiPerfilComponent {}

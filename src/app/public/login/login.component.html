@@ -4,48 +4,68 @@
       <c-col md="4">
         <c-card class="p-4">
           <c-card-body>
-            <form cForm *ngIf="!isLoggedIn" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
-              <h1>Login</h1>
-              <p class="text-medium-emphasis">Inicia sesión con tu cuenta</p>
+            @if (!isLoggedIn) {
+            <form cForm name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+              <h1>{{ 'HEADER.LOGIN' | translate }}</h1>
+              <p class="text-medium-emphasis">{{ 'PUBLIC.LOGIN.SIGN_IN_MESSAGE' | translate }}</p>
               <c-input-group class="mb-3">
                 <span cInputGroupText>
                   <svg [cIcon]="icons.cilUser" name="cilUser"></svg>
                 </span>
-                <input id="username" autoComplete="username" cFormControl placeholder="Introduzca nombre de usuario"
-                  name="username" [(ngModel)]="form.username" required #username="ngModel"/>
+                <input id="username" autoComplete="username" cFormControl
+                  [placeholder]="'PUBLIC.LOGIN.USERNAME_PLACEHOLDER' | translate" name="username"
+                  [(ngModel)]="form.username" required #username="ngModel" />
               </c-input-group>
-              <c-alert color="danger" fade *ngIf="username.errors && f.submitted">El nombre de usuario es obligatorio</c-alert>
+              @if (username.errors && f.submitted) {
+              <c-alert color="danger" fade>{{ 'PUBLIC.LOGIN.USERNAME_REQUIRED' | translate }}</c-alert>
+              }
               <c-input-group class="mb-4">
                 <span cInputGroupText>
                   <svg [cIcon]="icons.cilLockLocked"></svg>
                 </span>
-                <input id="password" autoComplete="current-password" cFormControl placeholder="Introduzca la contraseña"
-                  type="password" name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"/>
+                <input id="password" autoComplete="current-password" cFormControl
+                  [placeholder]="'PUBLIC.LOGIN.PASSWORD_PLACEHOLDER' | translate" type="password" name="password"
+                  [(ngModel)]="form.password" required minlength="6" #password="ngModel" />
               </c-input-group>
-              <c-alert color="danger" fade *ngIf="password.errors && f.submitted">
-                <span *ngIf="password.errors['required']">La contraseña es obligatoria</span>
-                <span *ngIf="password.errors['minlength']">La contraseña debe tener 6 caracteres como mínimo</span>
+              @if (password.errors && f.submitted) {
+              <c-alert color="danger" fade>
+                @if (password.errors['required']) {
+                <span>{{ 'PUBLIC.LOGIN.PASSWORD_REQUIRED' | translate }}</span>
+                }
+                @if (password.errors['minlength']) {
+                <span>{{ 'PUBLIC.LOGIN.PASSWORD_MIN_LENGTH' | translate }}</span>
+                }
               </c-alert>
+              }
               <c-row>
                 <c-col xs="6">
-                  <button *ngIf="!isLoading" class="btn btn-primary" type="submit">
-                    Login
-                  </button>
-                  <button *ngIf="isLoading" class="btn btn-primary" type="button" disabled>
-                    Iniciando...
+                  @if (!isLoading) {
+                  <button class="btn btn-primary" type="submit">{{ 'HEADER.LOGIN' | translate }}</button>
+                  }
+                  @if (isLoading) {
+                  <button class="btn btn-primary" type="button" disabled>
+                    {{ 'PUBLIC.LOGIN.SIGNING_IN' | translate }}
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                   </button>
+                  }
                 </c-col>
                 <c-col class="text-right" xs="6">
-                  <button cButton class="px-0" color="link" type="button">¿Has olvidado la contraseña?</button>
+                  <button cButton class="px-0" color="link" type="button">
+                    {{ 'PUBLIC.LOGIN.FORGOT_PASSWORD' | translate }}
+                  </button>
                 </c-col>
               </c-row>
               <c-row>
-                <c-alert color="danger" fade *ngIf="isLoginFailed">Error: {{ errorMessage }}</c-alert>
+                @if (isLoginFailed) {
+                <c-alert color="danger" fade>{{ 'COMMON.ERROR' | translate }}: {{ errorMessage }}</c-alert>
+                }
               </c-row>
             </form>
+            }
             <c-row>
-              <c-alert color="success" *ngIf="isLoggedIn">El rol del usuario es {{ roles }}.</c-alert>
+              @if (isLoggedIn) {
+              <c-alert color="success">{{ 'PUBLIC.LOGIN.USER_ROLE_INFO' | translate }} {{ roles }}.</c-alert>
+              }
             </c-row>
           </c-card-body>
         </c-card>

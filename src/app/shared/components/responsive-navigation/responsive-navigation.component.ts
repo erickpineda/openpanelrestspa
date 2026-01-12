@@ -1,7 +1,19 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ResponsiveNavigationService, ResponsiveState } from '../../../core/services/ui/responsive-navigation.service';
+import {
+  ResponsiveNavigationService,
+  ResponsiveState,
+} from '../../../core/services/ui/responsive-navigation.service';
 import { NavigationService } from '../../../core/services/ui/navigation.service';
 import { INavItemEnhanced, UserRole } from '../../types/navigation.types';
 
@@ -9,7 +21,8 @@ import { INavItemEnhanced, UserRole } from '../../types/navigation.types';
   selector: 'app-responsive-navigation',
   templateUrl: './responsive-navigation.component.html',
   styleUrls: ['./responsive-navigation.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
   @Input() userRole: UserRole = UserRole.LECTOR;
@@ -25,7 +38,8 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
 
   constructor(
     private responsiveNavigationService: ResponsiveNavigationService,
-    private navigationService: NavigationService
+    private navigationService: NavigationService,
+    private cdr: ChangeDetectorRef
   ) {
     this.responsiveState$ = this.responsiveNavigationService.responsiveState$;
   }
@@ -45,19 +59,20 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
    */
   private initializeResponsiveNavigation(): void {
     // Suscribirse a cambios en el estado responsivo
-    this.responsiveState$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
-        this.adaptNavigationForCurrentState(state);
-      });
+    this.responsiveState$.pipe(takeUntil(this.destroy$)).subscribe((state) => {
+      this.adaptNavigationForCurrentState(state);
+      this.cdr.markForCheck();
+    });
 
     // Suscribirse a cambios en los elementos de navegación
-    this.navigationService.getNavigationItems(this.userRole)
+    this.navigationService
+      .getNavigationItems(this.userRole)
       .pipe(takeUntil(this.destroy$))
-      .subscribe(items => {
+      .subscribe((items) => {
         this.navigationItems = items;
         const currentState = this.responsiveNavigationService.getCurrentState();
         this.adaptNavigationForCurrentState(currentState);
+        this.cdr.markForCheck();
       });
   }
 
@@ -129,8 +144,8 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
    * Verifica si un elemento es una función crítica
    */
   private isCriticalFunction(item: INavItemEnhanced): boolean {
-    return this.criticalFunctions.some(critical => 
-      critical.url === item.url || critical.name === item.name
+    return this.criticalFunctions.some(
+      (critical) => critical.url === item.url || critical.name === item.name
     );
   }
 
@@ -216,7 +231,22 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
     return (item.url as string) || item.name || index.toString();
   }
 
+  public getBadgeClasses(badge?: { color?: string; text?: string } | null): string[] {
+    const color = badge?.color || 'info';
+    const classes = ['badge-' + color];
+    if (badge?.text === '0') classes.push('zero-count');
+    return classes;
+  }
+
   public toTestId(name?: string): string {
     return ('nav-item-' + (name || '')).toLowerCase().replace(/\s+/g, '-');
+  }
+
+  public onBottomToggleKeydown(event: KeyboardEvent): void {
+    const key = event.key.toLowerCase();
+    if (key === 'enter' || key === ' ') {
+      event.preventDefault();
+      this.toggleSidebar();
+    }
   }
 }

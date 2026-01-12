@@ -11,7 +11,8 @@ import { AuthSyncService } from '../../core/services/auth/auth-sync.service';
   selector: 'app-login',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
+  standalone: false,
 })
 export class LoginComponent implements OnInit {
   icons = { cilUser, cilLockLocked };
@@ -51,9 +52,7 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
 
     this.authService.login(username, password).subscribe({
-      next: data => {
-        this.tokenStorage.saveToken(data.jwttoken);
-        this.tokenStorage.saveUser(data);
+      next: (data) => {
         this.isLoginFailed = false;
         this.isLoggedIn = true;
         this.roles = this.tokenStorage.getUser().roles;
@@ -71,7 +70,7 @@ export class LoginComponent implements OnInit {
         this.isLoginFailed = true;
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -88,9 +87,15 @@ export class LoginComponent implements OnInit {
             try {
               const current = window.location.pathname + window.location.hash;
               if (!(current.indexOf('#' + target) >= 0 || current.endsWith(target))) {
-                try { window.location.hash = target; } catch (e) { /* ignore */ }
+                try {
+                  window.location.hash = target;
+                } catch (e) {
+                  /* ignore */
+                }
               }
-            } catch (e) { /* ignore */ }
+            } catch (e) {
+              /* ignore */
+            }
           }, 150);
         } catch (e) {
           this.router.navigateByUrl(target);
@@ -98,7 +103,9 @@ export class LoginComponent implements OnInit {
         }
         return;
       }
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
     this.router.navigate(['/admin']);
   }
 

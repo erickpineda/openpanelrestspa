@@ -30,12 +30,7 @@ export abstract class CrudService<T, ID> extends BaseService {
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
 
-    return this.safeGetList<T>(
-      this.endpoint,
-      params,
-      undefined,
-      `${this.endpoint}.listar`
-    );
+    return this.safeGetList<T>(this.endpoint, params, undefined, `${this.endpoint}.listar`);
   }
 
   /**
@@ -121,10 +116,7 @@ export abstract class CrudService<T, ID> extends BaseService {
 
   // ✅ MÉTODOS ORIGINALES (mantener exactamente como están)
 
-  public listarPagina(
-    pageNo?: number,
-    pageSize?: number
-  ): Observable<OpenpanelApiResponse<any>> {
+  public listarPagina(pageNo?: number, pageSize?: number): Observable<OpenpanelApiResponse<any>> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);

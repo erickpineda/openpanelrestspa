@@ -15,9 +15,10 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
   selector: 'app-crear-entrada',
   templateUrl: './crear-entrada.component.html',
   styleUrls: ['./crear-entrada.component.scss'],
+  standalone: false,
 })
 export class CrearEntradaComponent implements OnInit {
-  entradaForm : UntypedFormGroup;
+  entradaForm: UntypedFormGroup;
   tiposEntr: TipoEntrada[] = [];
   estadosEntr: EstadoEntrada[] = [];
   categorias: Categoria[] = [];
@@ -45,13 +46,13 @@ export class CrearEntradaComponent implements OnInit {
     this.entradaForm.enable();
   }
 
-  async onGuardar(ent: any) {
+  async onGuardar(ent: Entrada) {
     this.submitted = true;
     if (this.entradaForm.invalid) return;
-    
+
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuario = usuario?.idUsuario ?? null;
-    
+
     this.facade.crearEntrada(ent).subscribe({
       next: () => {
         this.toastService.showInfo('Se ha creado la entrada correctamente', 'Entrada creada');
@@ -61,12 +62,15 @@ export class CrearEntradaComponent implements OnInit {
       error: (error) => {
         // ❌ Error - mostrar mensaje y mantener en formulario
         this.log.error('Error creando entrada:', error);
-      }
+      },
     });
   }
 
   onPreviewEmit(payload: Partial<Entrada>) {
-    this.entradaParaPrevia = { ...(this.entradaParaPrevia || {}), ...(payload as Entrada) } as Entrada;
+    this.entradaParaPrevia = {
+      ...(this.entradaParaPrevia || {}),
+      ...(payload as Entrada),
+    } as Entrada;
     this.modalPreviaVisible = true;
   }
 
@@ -79,6 +83,13 @@ export class CrearEntradaComponent implements OnInit {
 
   onCerrarPreview() {
     this.modalPreviaVisible = false;
+  }
+
+  onPublicarDesdePreview() {
+    this.modalPreviaVisible = false;
+    if (this.entradaParaPrevia) {
+      this.onGuardar(this.entradaParaPrevia);
+    }
   }
 
   onCancelar() {

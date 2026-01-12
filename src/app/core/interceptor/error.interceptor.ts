@@ -5,7 +5,7 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-  HttpErrorResponse
+  HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -14,22 +14,24 @@ import { LoggerService } from '../services/logger.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-
-  constructor(private errorHandler: GlobalErrorHandlerService, private log: LoggerService) {}
+  constructor(
+    private errorHandler: GlobalErrorHandlerService,
+    private log: LoggerService
+  ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((error: unknown) => {
         // Convertir a HttpErrorResponse si es necesario
         const httpError = this.ensureHttpErrorResponse(error);
-        
+
         // No manejar errores de logging para evitar loops
         if (request.url.includes('/error')) {
           return throwError(() => httpError);
         }
 
         this.log.info('🔍 [INTERCEPTOR] Error capturado:', httpError);
-        
+
         // El GlobalErrorHandlerService se encargará de mostrar la notificación
         this.errorHandler.handleError(httpError);
 
@@ -43,14 +45,14 @@ export class ErrorInterceptor implements HttpInterceptor {
     if (error instanceof HttpErrorResponse) {
       return error;
     }
-    
+
     // Si no es HttpErrorResponse, crear uno
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     return new HttpErrorResponse({
       error: error,
       status: 0, // Unknown status
       statusText: 'Client Error',
-      url: undefined
+      url: undefined,
     });
   }
 }

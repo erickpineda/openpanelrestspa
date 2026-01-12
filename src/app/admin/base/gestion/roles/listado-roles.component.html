@@ -1,172 +1,183 @@
-<c-card aria-live="polite">
-  <c-card-header class="d-flex align-items-center justify-content-between">
-    <span>Roles</span>
-    <div class="btn-toolbar gap-2">
-      <div class="btn-group" role="group" aria-label="Acciones">
-        <button cButton color="primary" size="sm" (click)="openCreate()">
-          <svg cIcon name="cilPlus" class="me-2"></svg>
-          Nuevo
-        </button>
+<c-container fluid class="px-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <c-card-header class="bg-white p-4 border-bottom">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilShieldAlt" class="text-primary"></svg>
+            {{ 'ADMIN.ROLES.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.ROLES.SUBTITLE' | translate }}
+          </small>
+        </div>
+        <div class="d-flex gap-2">
+          <button cButton color="primary" size="sm" (click)="openCreate()" class="shadow-sm">
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            {{ 'ADMIN.ROLES.NEW_ROLE' | translate }}
+          </button>
+        </div>
       </div>
-    </div>
-  </c-card-header>
-  <c-card-body [attr.aria-busy]="loading ? 'true' : null">
-    <div *ngIf="error" class="alert alert-danger d-flex align-items-center justify-content-between my-2" role="alert">
-      <span>{{ error }}</span>
-      <button cButton color="danger" size="sm" (click)="load()">Reintentar</button>
-    </div>
-    
-    <div *ngIf="!loading; else loadingTemplate">
-      <c-row class="align-items-center mb-3 g-2">
-        <c-col xs="12" md="4">
-          <div class="text-muted small">Total {{ totalElements }}</div>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-center gap-2">
-          <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" placeholder="Buscar rol..." [disabled]="loading" style="max-width: 280px;" />
-          <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleAdvanced()" [disabled]="loading">Avanzado</button>
-        </c-col>
-        <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2 align-items-center">
-          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" style="max-width: 100px;">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </select>
-        </c-col>
-      </c-row>
-      
-      <div *ngIf="showAdvanced" class="mb-3">
-        <c-row class="g-3 align-items-end">
-          <c-col xs="12" md="4">
-            <label class="form-label mb-1">Nombre</label>
-            <input cFormControl class="form-control-sm" type="text" placeholder="Buscar por nombre..." [value]="filtroNombre" (input)="filtroNombre=$any($event.target).value" />
+    </c-card-header>
+
+    <c-card-body class="p-4">
+      @if (error) {
+      <c-alert color="danger" class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center gap-2">
+          <svg cIcon name="cilWarning" class="flex-shrink-0"></svg>
+          <span>{{ error }}</span>
+        </div>
+        <button cButton color="danger" variant="outline" size="sm" (click)="load()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </c-alert>
+      }
+
+      <!-- Filtros -->
+      <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
+        <c-row class="align-items-center g-3">
+          <c-col xs="12" md="3" class="d-flex align-items-center gap-3">
+            <div class="text-nowrap fw-semibold text-secondary">
+              {{ totalElements }} {{ 'COMMON.RECORDS' | translate }}
+            </div>
+            <select cSelect size="sm" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)"
+              name="pageSizeSelect" class="w-auto" aria-label="Registros por página">
+              <option [ngValue]="5">{{ 'AUTO.5_POR_P_G' | translate }}</option>
+              <option [ngValue]="10">{{ 'AUTO.10_POR_P_G' | translate }}</option>
+              <option [ngValue]="20">{{ 'AUTO.20_POR_P_G' | translate }}</option>
+              <option [ngValue]="50">{{ 'AUTO.50_POR_P_G' | translate }}</option>
+            </select>
           </c-col>
-          <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
-            <button cButton size="sm" color="primary" variant="outline" (click)="search()">
-              <svg cIcon name="cilSearch"></svg> Buscar
-            </button>
-            <button cButton size="sm" color="secondary" variant="outline" (click)="reset()">
-              <svg cIcon name="cilReload"></svg> Limpiar
-            </button>
+
+          <c-col xs="12" md="6">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0 text-secondary">
+                <svg cIcon name="cilSearch"></svg>
+              </span>
+              <input cFormControl type="text" [value]="basicSearchText"
+                (input)="onBasicSearchTextChange($any($event.target).value)"
+                [placeholder]="'ADMIN.ROLES.FILTER_PLACEHOLDER' | translate" class="border-start-0 ps-0" />
+              <button cButton color="secondary" variant="outline" (click)="toggleAdvanced()" [active]="showAdvanced">
+                <svg cIcon name="cilFilter" class="me-1"></svg>
+                {{ 'COMMON.FILTERS' | translate }}
+              </button>
+            </div>
           </c-col>
         </c-row>
-      </div>
 
-      <div class="table-responsive">
-      <table responsive hover striped cAlign="top" cTable class="table table-sm align-middle mb-0 border text-nowrap op-table" role="table" aria-label="Tabla de roles">
-        <thead cTableColor="light">
-          <tr>
-            <th scope="col" class="text-start">Código</th>
-            <th scope="col" class="text-start" style="min-width: 200px;">Nombre</th>
-            <th scope="col" class="text-start" style="min-width: 250px;">Descripción</th>
-            <th scope="col" class="text-center">Privilegios</th>
-            <th scope="col" class="text-center" style="min-width: 100px;">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of roles" [class.table-row-disabled]="r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE">
-            <td>{{ r.codigo }}</td>
-            <td>{{ r.nombre }}</td>
-            <td>{{ r.descripcion }}</td>
-            <td>
-              <c-badge color="info" shape="rounded-pill">{{ r.privilegios ? r.privilegios.length : 0 }}</c-badge>
-            </td>
-            <td class="text-center">
-              <div class="btn-group">
-                <button cButton color="warning" size="sm" variant="outline" (click)="openEdit(r)"><svg cIcon name="cilPencil"></svg></button>
-                <button cButton color="danger" size="sm" variant="outline" (click)="delete(r)" [disabled]="r.codigo === PROPIETARIO_ROLE_CODE || r.codigo === ADMIN_ROLE_CODE"><svg cIcon name="cilTrash"></svg></button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
-      <div *ngIf="roles.length === 0" class="text-muted">Sin roles</div>
-      <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
-        <button cButton color="light" size="sm" (click)="prev()" [disabled]="pageNo<=0">Anterior</button>
-        <button cButton color="light" size="sm" (click)="next()" [disabled]="pageNo>=getTotalPages() - 1">Siguiente</button>
-        <div class="text-muted small ms-2">Página {{ pageNo + 1 }} | Tamaño {{ pageSize }} | Total {{ totalElements }} · Mostrando {{ numberOfElements }}</div>
-      </div>
-    </div>
-    <ng-template #loadingTemplate>
-      <div class="text-center py-4"><c-spinner [attr.aria-label]="'Cargando roles'"></c-spinner><p class="mt-2 text-muted">Cargando roles...</p></div>
-    </ng-template>
-  </c-card-body>
-</c-card>
-
-<c-modal id="editRolModal" [visible]="editModalVisible" (visibleChange)="editModalVisible = $event" size="lg">
-  <c-modal-header class="d-flex justify-content-between align-items-center">
-    <h5 cModalTitle>{{ isEditing ? 'Editar Rol' : 'Nuevo Rol' }}</h5>
-  </c-modal-header>
-  <c-modal-body>
-    <div *ngIf="editRol">
-      <div class="mb-3">
-        <label class="form-label">Código</label>
-        <input cFormControl type="text" [value]="editRol.codigo || ''" (input)="onCodigoInput($any($event.target).value)" [disabled]="isEditing" [class.is-invalid]="!editRol.codigo" maxlength="5" placeholder="Máx. 5 caracteres" />
-        <div class="invalid-feedback d-block" *ngIf="!editRol.codigo">Código requerido (máx 5 caracteres)</div>
-        <div class="form-text text-muted" *ngIf="!isEditing">Se autogenerará desde el nombre si se deja vacío o no se modifica manualmente.</div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Nombre</label>
-        <input cFormControl type="text" [value]="editRol.nombre || ''" (input)="onNombreInput($any($event.target).value)" [class.is-invalid]="!editRol.nombre" [disabled]="isProtectedRole(editRol)" />
-        <div class="invalid-feedback d-block" *ngIf="!editRol.nombre">Nombre requerido</div>
-        <div class="form-text text-muted" *ngIf="isProtectedRole(editRol)">El nombre de este rol protegido no se puede modificar.</div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Descripción</label>
-        <textarea cFormControl rows="2" [value]="editRol.descripcion || ''" (input)="editRol && (editRol.descripcion=$any($event.target).value)"></textarea>
-      </div>
-      
-      <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="form-label fw-bold mb-0">Privilegios Asignados</label>
-          <c-form-check>
-            <input cFormCheckInput type="checkbox" id="selectAllPrivilegios"
-                   [checked]="areAllPrivilegiosSelected()"
-                   [indeterminate]="areSomePrivilegiosSelected()"
-                   (change)="toggleAllPrivilegios($any($event.target).checked)"
-                   [disabled]="privilegios.length === 0">
-            <label cFormCheckLabel for="selectAllPrivilegios">
-              Seleccionar todos
-            </label>
-          </c-form-check>
+        @if (showAdvanced) {
+        <div class="mt-3 pt-3 border-top animate__animated animate__fadeIn">
+          <c-row class="g-3">
+            <c-col xs="12" md="4">
+              <label class="form-label small text-muted mb-1">{{ 'ADMIN.ROLES.ROLE_NAME' | translate }}</label>
+              <input cFormControl size="sm" type="text" [placeholder]="'ADMIN.ROLES.FILTER_BY_NAME' | translate"
+                [value]="filtroNombre" (input)="filtroNombre = $any($event.target).value" [disabled]="loading" />
+            </c-col>
+            <c-col xs="12" md="12" class="d-flex justify-content-end gap-2 mt-3">
+              <button cButton color="secondary" variant="ghost" size="sm" (click)="reset()">
+                {{ 'COMMON.CLEAN' | translate }}
+              </button>
+              <button cButton color="primary" size="sm" (click)="search()">
+                {{ 'COMMON.APPLY' | translate }}
+              </button>
+            </c-col>
+          </c-row>
         </div>
-        <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto; background-color: #f8f9fa;">
-          <div *ngIf="privilegios.length === 0" class="text-muted text-center py-2">No hay privilegios disponibles</div>
-          <div class="row">
-            <div class="col-md-6" *ngFor="let p of privilegios">
-              <c-form-check class="mb-2 privilegio-item">
-                <input cFormCheckInput type="checkbox" [id]="'privilegio-'+p.codigo"
-                       [checked]="hasPrivilegio(p)"
-                       (change)="togglePrivilegio(p, $any($event.target).checked)">
-                <label cFormCheckLabel [for]="'privilegio-'+p.codigo"
-                       [class.text-success]="hasPrivilegio(p)"
-                       [class.text-muted]="!hasPrivilegio(p)">
-                  <strong>{{ p.nombre }}</strong>
-                  <div class="small" *ngIf="p.descripcion">{{ p.descripcion }}</div>
-                </label>
-              </c-form-check>
-            </div>
-          </div>
+        }
+      </div>
+
+      <!-- Tabla -->
+      <div class="tabla-con-loader-wrapper position-relative rounded-3 overflow-hidden border">
+        @if (loading) {
+        <div
+          class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex flex-column align-items-center justify-content-center"
+          style="z-index: 5;">
+          <c-spinner color="primary" size="sm"></c-spinner>
+          <small class="text-muted mt-2">{{ 'COMMON.LOADING' | translate }}</small>
+        </div>
+        }
+
+        <div class="table-responsive">
+          <table cTable hover class="mb-0 align-middle text-nowrap">
+            <thead class="bg-light text-secondary small text-uppercase fw-bold">
+              <tr>
+                <th scope="col" class="py-3 ps-4 border-0">{{ 'ADMIN.ROLES.TABLE.CODE' | translate }}</th>
+                <th scope="col" class="py-3 border-0">{{ 'ADMIN.ROLES.TABLE.NAME' | translate }}</th>
+                <th scope="col" class="py-3 border-0">{{ 'ADMIN.ROLES.TABLE.DESCRIPTION' | translate }}</th>
+                <th scope="col" class="py-3 border-0 text-center">{{ 'ADMIN.ROLES.TABLE.PRIVILEGES' | translate }}</th>
+                <th scope="col" class="py-3 pe-4 border-0 text-end">{{ 'ADMIN.ROLES.TABLE.ACTIONS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="border-top-0">
+              @for (r of roles; track trackByRol($index, r)) {
+              <tr class="align-middle">
+                <td class="ps-4 py-3 fw-bold text-primary">{{ r.codigo }}</td>
+                <td class="py-3">
+                  <div class="d-flex align-items-center">
+                    <span class="fw-semibold">{{ r.nombre }}</span>
+                    @if (r.codigo === PROPIETARIO_ROLE_CODE) {
+                    <c-badge color="warning" shape="rounded-pill" class="ms-2 bg-opacity-10 text-warning-emphasis border border-warning border-opacity-25">
+                      {{ 'ADMIN.ROLES.PROTECTED.PROPIETARIO' | translate }}
+                    </c-badge>
+                    }
+                    @if (r.codigo === ADMIN_ROLE_CODE) {
+                    <c-badge color="info" shape="rounded-pill" class="ms-2 bg-opacity-10 text-info-emphasis border border-info border-opacity-25">
+                      {{ 'ADMIN.ROLES.PROTECTED.ADMIN' | translate }}
+                    </c-badge>
+                    }
+                  </div>
+                </td>
+                <td class="py-3 text-body-secondary small text-truncate" style="max-width: 200px;" [title]="r.descripcion">
+                  {{ r.descripcion || '---' }}
+                </td>
+                <td class="py-3 text-center">
+                  <c-badge color="secondary" shape="rounded-pill" class="fw-normal">
+                    {{ r.privilegios ? r.privilegios.length : 0 }}
+                  </c-badge>
+                </td>
+                <td class="text-end pe-4 py-3">
+                  <c-button-group role="group">
+                    <button cButton color="primary" variant="ghost" size="sm" (click)="openEdit(r)"
+                      [cTooltip]="'COMMON.EDIT' | translate">
+                      <svg cIcon name="cilPen"></svg>
+                    </button>
+                    <button cButton color="danger" variant="ghost" size="sm" (click)="delete(r)"
+                      [cTooltip]="'COMMON.DELETE' | translate" [disabled]="isProtectedRole(r)">
+                      <svg cIcon name="cilTrash"></svg>
+                    </button>
+                  </c-button-group>
+                </td>
+              </tr>
+              } @empty {
+              <tr>
+                <td colspan="5" class="text-center py-5">
+                  <div class="d-flex flex-column align-items-center justify-content-center opacity-50">
+                    <svg cIcon name="cilFolderOpen" size="4xl" class="text-muted mb-3"></svg>
+                    <h5 class="fw-normal">{{ 'ADMIN.ROLES.NO_ROLES_FOUND' | translate }}</h5>
+                    <p class="small mb-0">{{ 'ADMIN.ROLES.ADJUST_FILTERS_HELP' | translate }}</p>
+                  </div>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Paginación Footer -->
+        <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+          <small class="text-secondary">
+            {{ 'COMMON.PAGINATION_INFO' | translate: { current: numberOfElements, total: totalElements } }}
+          </small>
+          <app-op-pagination [totalPages]="getTotalPages()" [currentPage]="pageNo" (pageChange)="onPageChange($event)" size="sm" class="mb-0">
+          </app-op-pagination>
         </div>
       </div>
-    </div>
-  </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" (click)="closeEdit()">Cerrar</button>
-    <button cButton color="primary" [disabled]="!isRolFormValid()" (click)="saveEdit()">Guardar</button>
-  </c-modal-footer>
-</c-modal>
+    </c-card-body>
+  </c-card>
+</c-container>
 
-<c-modal [visible]="showDeleteModal" (visibleChange)="showDeleteModal = $event" id="deleteRolModal">
-  <c-modal-header>
-    <h5 cModalTitle>Confirmar eliminación</h5>
-  </c-modal-header>
-  <c-modal-body>
-    ¿Estás seguro de que deseas eliminar el rol <strong>{{ rolToDelete?.nombre }}</strong>?
-    <br>Esta acción no se puede deshacer.
-  </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" (click)="cancelDelete()">Cancelar</button>
-    <button cButton color="danger" (click)="confirmDelete()">Eliminar</button>
-  </c-modal-footer>
-</c-modal>
+<app-rol-form [visible]="editModalVisible" [rol]="editRol" [isEditing]="isEditing" [privilegios]="privilegios"
+  (visibleChange)="editModalVisible = $event" (onSave)="saveEdit($event)"></app-rol-form>
+
+<app-eliminar-rol [visible]="showDeleteModal" [rol]="rolToDelete" [loading]="loading"
+  (visibleChange)="showDeleteModal = $event" (confirm)="confirmDelete()"></app-eliminar-rol>

@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.14% </span>
+                <span class="strong">58.82% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/14</span>
+                <span class='fraction'>10/17</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.14% </span>
+                <span class="strong">58.82% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>8/14</span>
+                <span class='fraction'>10/17</span>
             </div>
         
             
@@ -106,7 +106,19 @@
 <a name='L41'></a><a href='#L41'>41</a>
 <a name='L42'></a><a href='#L42'>42</a>
 <a name='L43'></a><a href='#L43'>43</a>
-<a name='L44'></a><a href='#L44'>44</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -129,6 +141,8 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -147,6 +161,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// src/app/app.component.ts
@@ -156,11 +172,15 @@ import { AuthSyncService } from './core/services/auth/auth-sync.service';
 import { LoggerService } from './core/services/logger.service';
 import { AuthService } from './core/services/auth/auth.service'; // inyectado para comprobar token
 import { RouteTrackerService } from './core/services/auth/route-tracker.service';
+import { OPConstants } from './shared/constants/op-global.constants';
+import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
+import { UiAnomalyMonitorService } from './core/services/ui/ui-anomaly-monitor.service';
 &nbsp;
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   title = 'openpanelspa';
@@ -171,8 +191,10 @@ export class AppComponent implements OnInit {
     private log: LoggerService,
     private authService: AuthService,
     private routeTracker: RouteTrackerService, // sólo para activar el tracking
-    private tokenStorage: TokenStorageService
-  ){ }
+    private tokenStorage: TokenStorageService,
+    private globalErrorHandler: GlobalErrorHandlerService,
+    private uiMonitor: UiAnomalyMonitorService
+  ) {}
 &nbsp;
 <span class="fstat-no" title="function not covered" >  ngOnInit(</span>): void {
     // Inicializar sincronización entre pestañas
@@ -186,10 +208,12 @@ export class AppComponent implements OnInit {
 <span class="cstat-no" title="statement not covered" >    this.tokenStorage.startPostLoginRedirectMaintenance(60 * 60 * 1000);</span>
 &nbsp;
     // Escuchar cambios de estado de autenticación
-<span class="cstat-no" title="statement not covered" >    window.addEventListener('authStateChanged', <span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, <span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      this.log.info('🔄 Estado de autenticación cambiado, actualizando interfaz...');</span>
       // Aquí podrías forzar la actualización de componentes si es necesario
     });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this.uiMonitor.start();</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -199,7 +223,7 @@ export class AppComponent implements OnInit {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-02T11:04:19.920Z
+                at 2025-12-31T07:59:30.392Z
             </div>
         <script src="../prettify.js"></script>
         <script>

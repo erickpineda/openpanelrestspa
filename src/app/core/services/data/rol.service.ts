@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
-import { Rol } from "../../models/rol.model";
-import { CrudService } from "../../_utils/crud.service";
-import { HttpContext } from "@angular/common/http";
-import { Observable } from "rxjs";
-import { NetworkInterceptor } from "../../interceptor/network.interceptor";
-import { OPConstants } from "../../../shared/constants/op-global.constants";
+import { Injectable } from '@angular/core';
+import { Rol } from '../../models/rol.model';
+import { CrudService } from '../../_utils/crud.service';
+import { HttpContext } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root',
 })
 export class RolService extends CrudService<Rol, string> {
   protected override endpoint = '/roles';
@@ -80,5 +80,4 @@ export class RolService extends CrudService<Rol, string> {
     const payload = { codigosPrivilegios };
     return this.put<any>(`${this.endpoint}/actualizarPrivilegios/${codigo}`, payload);
   }
-
 }

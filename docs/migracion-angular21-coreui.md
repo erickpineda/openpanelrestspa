@@ -1,6 +1,7 @@
 # Migración a Angular 21 y CoreUI (última versión)
 
 ## 1. Requisitos previos
+
 - Versión actual:
   - Angular 16 (`package.json:24–33`)
   - CoreUI Angular `~4.5.28` (`package.json:39,44`), CoreUI CSS `^4.2.6` (`package.json:42`)
@@ -34,115 +35,48 @@
   - `loader-utils 3.2.1`, `serve ^14.0.1` (auditar uso real y remover si no se usan)
 
 ## 2. Plan de migración Angular 21
-- Pasos detallados:
-  - Actualizar Node a una versión soportada por Angular 21 (`^20.19.0` o superior). Referencia: Version compatibility • Angular (https://angular.dev/reference/versions).
-  - Actualizar TypeScript a `^5.9.x`, `tslib` a `^2.6.x`, y `@types/node` (sugerido `^20.x`).
-  - Actualizar Angular local:
-    - Ruta incremental recomendada: 16→17→18→19→20→21 con `ng update` en cada salto, corrigiendo warnings y fallos.
-    - Ruta directa alternativa: `ng update @angular/cli@21 @angular/core@21` si se prefiere rapidez, con mayor riesgo.
-  - Ajustar `angular.json` según migraciones: builders modernos (esbuild), `dev-server`, `extract-i18n`.
-  - Evaluar mantener Zone o migrar a zoneless:
-    - Corto plazo: mantener Zone (añadir `provideZoneChangeDetection()` si la migración lo solicita).
-    - Medio plazo: migración progresiva a zoneless y señales.
-- Breaking changes a considerar:
-  - Zoneless por defecto en apps nuevas; apps existentes pueden seguir usando Zone si se provee explícitamente. Resumen de v21: Ninja Squad (https://blog.ninja-squad.com/2025/11/20/what-is-new-angular-21.0).
-  - `HttpClient` provisto por defecto en el inyector raíz; puede retirarse `HttpClientModule` del `AppModule` si no se requiere configuración especial.
-  - Migración de control flow (`@if`, `@for`, `@switch`), y recomendación de bindings `class.*`/`style.*` frente a `NgClass`/`NgStyle`.
-  - `typeCheckHostBindings` habilitado por defecto; posibles nuevos errores de tipo en plantillas.
-  - `SimpleChanges<T>` genérico para `ngOnChanges`, con tipos más estrictos.
-  - Test runner por defecto pasa de Karma a Vitest en proyectos nuevos; considerar migración.
-- Actualización de dependencias compatibles:
-  - RxJS: conservar `7.8.x` (compatible con v21).
-  - Zone.js: si se mantiene CD clásico, subir a `^0.16.x` (alineado con ecosistema actual).
-  - `@angular-devkit/build-angular` y CLI: aceptar versiones sugeridas por `ng update`.
-  - Angular ESLint y herramientas de linting: actualizar a línea 21.
-- Modificaciones necesarias en el código:
-  - `AppModule`: retirar `HttpClientModule` si no hay configuración de `provideHttpClient(...)` personalizada (`src/app/app.module.ts:16`).
-  - Interceptores: validar que el orden se conserva (`TimeoutInterceptor` → `AuthInterceptor` → `NetworkInterceptor` → `ErrorInterceptor`) (`src/app/core/core.module.ts:45–63`).
-  - `polyfills.ts`: mantener `import 'zone.js'` si se conserva Zone; eliminarlo en zoneless y ajustar detección de cambios.
-  - Plantillas: sustituir `NgClass`/`NgStyle` por bindings equivalentes; considerar aplicar migraciones automáticas disponibles en v21.
-  - Tests:
-    - Migrar de `HttpClientTestingModule` a `provideHttpClientTesting()` en nuevas pruebas donde proceda.
-    - Considerar migración total a Vitest; si se mantiene Karma temporalmente, conservar builder de Karma en `angular.json`.
-  - Arquitectura opcional (a medio plazo):
-    - Evaluar migración progresiva a Standalone y `bootstrapApplication` (sustituir `platformBrowserDynamic` en `src/main.ts:11`), manteniendo `AppRoutingModule` hasta migrar a `provideRouter`.
-  - `language-service`: mover `@angular/language-service` a `devDependencies` (actualmente está en `dependencies`, `package.json:30`).
-- Configuraciones de compilación y despliegue:
-  - Revisar `budgets` tras la migración (`angular.json:56–66`).
-  - Revisar `allowedCommonJsDependencies` y reducir CommonJS (lodash, CKEditor, jQuery) si el builder advierte.
-  - Alinear soportes de navegador y polyfills con Baseline de Angular 21.
-  - Validar builds `development` y `production`, y revisar warnings/dx del CLI.
-  - Builders:
-    - Migrar referencias de `@angular-devkit/build-angular:*` a `@angular/build:*` cuando `ng update` lo proponga (nuevo paquete de builders en Angular 21).
-  - TypeScript:
-    - Confirmar `target/module` recomendados por CLI, `useDefineForClassFields` acorde, y `strictTemplates` activo (ya configurado en `tsconfig.json:41–46`).
+
+- Estado: **COMPLETADO (Fase 2)**
+- Pasos realizados:
+  - Actualización de Node a v22.21.1.
+  - Actualización incremental de Angular (16 -> 17 -> 18 -> 19 -> 20 -> 21) usando `ng update`.
+  - Migración a `application` builder (esbuild).
+  - Actualización de `angular.json` para corregir configuración de polyfills.
+  - Actualización de TypeScript a v5.9.3.
+- Notas técnicas:
+  - Se utiliza el builder `@angular/build:application`.
+  - Se eliminó el uso de tilde (`~`) en imports SCSS (deprecated en nuevos builders).
+  - Se mantienen los polyfills y Zone.js por ahora (estrategia conservadora).
 
 ## 3. Migración a CoreUI
-- Versión objetivo:
-  - `@coreui/angular 5.6.x` y paquetes asociados para Angular 21 (releases oficiales: https://github.com/coreui/coreui-angular/releases, entradas 5.6.0–5.6.2).
-  - `@coreui/icons-angular 5.6.x`, `@coreui/angular-chartjs 5.6.x`, `@coreui/coreui` 5.x (CSS/SCSS).
-- Cambios en componentes y estilos:
-  - Migración interna de `NgClass`/`NgStyle` a bindings `class.*`/`style.*` en librería; revisar usos propios para coherencia.
-  - Señales en componentes CoreUI (ej. `modal`, `sidebar`): confirmar API y efectos en integración.
-  - Modales/backdrop: se han corregido comportamientos en zoneless en v5.5.x; validar en nuestra app.
-  - Revisión de imports: `ToastModule`, `ModalModule` deben seguir disponibles; confirmar API estable.
-- Actualización de temas y personalizaciones:
-  - `angular.json:39` importa `coreui.min.css`; con v5, se recomienda SCSS: `@import "@coreui/coreui/scss/coreui";` en `src/styles.scss`.
-  - Verificar overrides SCSS propios y variables de tema; alinear con Bootstrap 5.x y CoreUI 5.x.
-  - Iconos: actualizar a `@coreui/icons-angular 5.6.x` y confirmar nombres/paths.
-  - Chart.js: `@coreui/angular-chartjs 5.6.x` (wrapper para Chart.js v4); revisar `@coreui/chartjs` si se mantiene.
-- Compatibilidad con Angular 21:
-  - CoreUI 5.6 anuncia soporte para Angular 21 y TS 5.9 (npm page y releases). Ver: https://coreui.io/angular/docs/.
-  - En zoneless, validar componentes que dependían de Zone; CoreUI ha aplicado fixes y migraciones en 5.5.x/5.6.x.
-- Auditoría adicional de dependencias relacionadas con CoreUI:
-  - `@coreui/coreui ^4.2.6` (CSS) → actualizar a 5.x para plena compatibilidad con CoreUI Angular 5.6.x.
-  - `@coreui/chartjs ^3.1.2` → revisar compatibilidad con Chart.js v4 y wrapper Angular 5.6.x.
 
-## 3.1. Migración de CKEditor
-- Versión objetivo:
-  - `@ckeditor/ckeditor5-angular ^11` (soporta Angular 19+ y requiere CKEditor 5 ≥ 47). Referencias: npm y GitHub oficiales.
-  - Build: `@ckeditor/ckeditor5-build-classic ^47.x` (alinear todas las dependencias `@ckeditor/ckeditor5-*` al mismo mayor).
-- Paquetes a actualizar/alinear:
-  - `@ckeditor/ckeditor5-build-classic` → `^47.x`.
-  - `@ckeditor/ckeditor5-utils`, `@ckeditor/ckeditor5-watchdog`, `@ckeditor/ckeditor5-ckbox` → `^47.x` o versiones compatibles con el build elegido.
-  - Eliminar `@types/ckeditor` (corresponde a CKEditor 4 y no aplica en CKEditor 5).
-- Integración:
-  - Mantener integración por build (Classic) o evaluar `loadCKEditorCloud` para CDN si simplifica bundling y tipados.
-  - CKEditor 5 trae tipos nativos; si faltan tipos de plugins, añadir `devDependencies` `ckeditor5` y `ckeditor5-premium-features`.
-- Pruebas y compatibilidad:
-  - Probar inicialización del editor, carga de plugins usados (incluido CKBox si aplica) y eventos (`ready`, `change`).
-  - Verificar estilos del editor con nuestro tema SCSS y CoreUI 5.x.
+- Estado: **COMPLETADO (Fase 4)**
+- Versión actual:
+  - `@coreui/angular`: 5.x (Latest)
+  - `@coreui/coreui`: 5.x (Latest)
+  - Bootstrap: 5.3.x
+- Acciones realizadas:
+  - Actualización de paquetes CoreUI a últimas versiones compatibles con Angular 21.
+  - Corrección de rutas de assets en SCSS.
+  - Validación de build (con warnings de deprecación de SASS aceptados temporalmente).
 
 ## 4. Cronograma estimado
-- Fase 0 — Preparación (0.5–1 día)
-  - Rama de migración, auditoría de dependencias, limpieza de warnings.
-  - **Auditoría inicial (Estado actual):**
-    - Vulnerabilidades: `npm audit` detecta problemas en `esbuild`, `webpack-dev-server` y cadena de `ckeditor5`. Solución: actualización de Angular CLI a v21 y CKEditor a v44.x/v11.x resolverá la mayoría.
-    - Dependencias no usadas: `jquery` (remover), `@types/ckeditor` (obsoleto en v5), `sass` (innecesario explícitamente).
-    - Tipos faltantes: `@types/ckeditor__ckeditor5-core`, `@types/ckeditor__ckeditor5-utils`.
-  - Punto de verificación: build y tests pasan en v16 sin errores de auditoría crítica.
-- Fase 1 — Entorno y dependencias base (0.5 día)
-  - Node/TypeScript/tslib/`@types/node`.
-  - Punto de verificación: build con TS 5.9 sigue pasando.
-- Fase 2 — Angular 16→21 (2–3 días)
-  - Actualizaciones con `ng update` (incremental o directa), resolución de breaking changes.
-  - Punto de verificación: build prod y dev sin errores; E2E básicos pasan.
-- Fase 3 — Tests (1–2 días)
-  - Migración a Vitest o estabilización con Karma temporal; actualización de pruebas HTTP.
-  - Punto de verificación: suite unitaria estable y rápida.
-- Fase 4 — CoreUI 5.6.x (1–2 días)
-  - Actualización de paquetes, ajustes de estilos/temas, verificación visual.
-  - Punto de verificación: revisión UI de pantallas clave y componentes CoreUI.
-- Fase 4.1 — CKEditor (0.5–1 día)
-  - Actualizar wrapper Angular, build y plugins; remover `@types/ckeditor`.
-  - Punto de verificación: editor funcionando con nuestros plugins y estilos; pruebas pasan.
-- Fase 5 — QA y despliegue (1–2 días)
-  - Pruebas de regresión visual, performance budgets, smoke tests en entorno de staging.
-  - Punto de verificación: reporte de QA y go/no-go para producción.
-- Fase 6 — Limpieza (0.5 día)
-  - Remover dependencias obsoletas (Karma/Jasmine/Puppeteer/jQuery), CommonJS innecesarias y actualizar scripts en `package.json`.
+
+- **Fase 0 — Preparación:** (Completado)
+  - Auditoría y limpieza de dependencias.
+- **Fase 1 — Node & TypeScript:** (Completado)
+  - Actualización de entorno base.
+- **Fase 2 — Angular Core:** (Completado)
+  - Migración del framework y CLI.
+- **Fase 3 — Tests:** (Completado)
+  - Ejecución y corrección de tests unitarios críticos.
+  - Estabilización del entorno de pruebas (Karma/ChromeHeadless).
+- **Fase 4 — UI Libs (CoreUI, CKEditor):** (Completado)
+  - Actualización de librerías de interfaz.
+  - CKEditor actualizado a v11.x (wrapper) y v44.x (build).
 
 ### 4.0. Estrategia y ruta crítica de migración
+
 Orden recomendado de ataque para minimizar bloqueos y maximizar estabilidad progresiva:
 
 1. **Core & Shared (Cimientos):**
@@ -165,6 +99,7 @@ Orden recomendado de ataque para minimizar bloqueos y maximizar estabilidad prog
    - Dependen de todo lo anterior + CKEditor 5 (la parte más riesgosa).
 
 ### 4.1. Mapa detallado: Entradas y Dashboard
+
 - Entradas (`src/app/admin/base/entradas`):
   - Componentes clave:
     - `listado-entradas.component.ts` (`src/app/admin/base/entradas/listado-entradas.component.ts:1–30`)
@@ -198,10 +133,12 @@ Orden recomendado de ataque para minimizar bloqueos y maximizar estabilidad prog
     - HTTP: `DashboardApiService` aprovecha `HttpClient` por defecto; evaluar retiro de `HttpClientModule` del `AppModule`.
 
 Notas transversales:
+
 - Layout Admin: `NgScrollbarModule` en `AdminModule` (`src/app/admin/admin.module.ts:1–20`); actualizar `ngx-scrollbar` a versión compatible.
 - Shared CoreUI: `shared-coreui.module.ts` consolida imports CoreUI (`src/app/shared/shared-coreui.module.ts:1–30`); migrar a CoreUI 5.6 y revisar APIs.
 
 ### 4.2. Mapa detallado: Páginas
+
 - Páginas (`src/app/admin/base/paginas`):
   - Componentes clave:
     - `listado-paginas.component.ts` (`src/app/admin/base/paginas/listado-paginas.component.ts:1–30, 194–240, 271–287, 339–349, 425–447`)
@@ -217,6 +154,7 @@ Notas transversales:
     - Angular 21: lógica de paginación, `ChangeDetectorRef` y `NgZone` similares a Entradas; revisar posibles NG0100 en previews y modales.
 
 ### 4.3. Mapa detallado: Comentarios
+
 - Comentarios (`src/app/admin/base/comentarios`):
   - Componentes clave:
     - `listado-comentarios.component.ts` (`src/app/admin/base/comentarios/listado-comentarios.component.ts:1–47, 110–134, 275–308`)
@@ -230,6 +168,7 @@ Notas transversales:
     - HTTP: `ComentarioService`, `EntradaService`, `UsuarioService` en `src/app/core/services/data/*.service.ts` deben alinearse con HttpClient actualizado.
 
 ### 4.4. Mapa detallado: Categorías y Etiquetas
+
 - Categorías (`src/app/admin/base/categorias`):
   - Componentes:
     - `listado-categorias.component.ts` (`src/app/admin/base/categorias/listado-categorias.component.ts:1–36, 144–160`)
@@ -254,6 +193,7 @@ Notas transversales:
     - HTTP: `EtiquetaService` y `SearchUtilService` para filtros avanzados (`src/app/core/services/utils/search-util.service.ts:1–24`).
 
 ### 4.5. Mapa detallado: Gestión (usuarios, roles, privilegios)
+
 - Gestión (`src/app/admin/base/gestion`):
   - Módulo:
     - `GestionModule` y routing (`src/app/admin/base/gestion/gestion.module.ts:1–15`, `gestion-routing.module.ts:1–22`)
@@ -274,6 +214,7 @@ Notas transversales:
     - HTTP: `UsuarioService`, `RolService`, `PrivilegioService` dependen de `CrudService` y `NetworkInterceptor`.
 
 ### 4.6. Mapa detallado: Perfil
+
 - Perfil (`src/app/admin/base/perfil`):
   - Módulo:
     - `PerfilModule` (`src/app/admin/base/perfil/perfil.module.ts:1–24`)
@@ -287,6 +228,7 @@ Notas transversales:
     - HTTP: `UsuarioService` para datos de perfil.
 
 ### 4.7. Mapa detallado: Configuración (Ajustes, Temas)
+
 - Configuración (`src/app/admin/base/configuracion`):
   - Módulo:
     - `ConfiguracionModule` (`src/app/admin/base/configuracion/configuracion.module.ts:1–13`)
@@ -302,6 +244,7 @@ Notas transversales:
     - HTTP: `AjustesService`, `TemasService` y su integración con backend.
 
 ### 4.8. Mapa detallado: Contenido (archivos, imágenes)
+
 - Contenido (`src/app/admin/base/contenido`):
   - Módulo:
     - `ContenidoModule` (`src/app/admin/base/contenido/contenido.module.ts:1–19`)
@@ -318,6 +261,7 @@ Notas transversales:
     - HTTP: `FileStorageService` (`src/app/core/services/file-storage.service.ts`) ajustado a Angular 21 y `NetworkInterceptor`.
 
 ### 4.9. Mapa detallado: Mantenimiento
+
 - Mantenimiento (`src/app/admin/base/mantenimiento`):
   - Módulo:
     - `MantenimientoModule` (`src/app/admin/base/mantenimiento/mantenimiento.module.ts:1–19`)
@@ -333,6 +277,7 @@ Notas transversales:
     - Angular 21: timers (`setInterval` en logs), suscripciones y limpieza adecuada en zoneless.
 
 ### 4.10. Mapa detallado: Layout Admin, Core y App
+
 - Layout Admin:
   - `AdminModule` (`src/app/admin/admin.module.ts:1–42`), `AdminRoutingModule` (`src/app/admin/admin-routing.module.ts:1–30`)
   - Componentes: `AdminComponent`, `DefaultHeaderComponent`, `DefaultFooterComponent`, sidebar y navegación (`src/app/admin/default-layout/*`, `src/app/admin/admin.component.html:1–40`)
@@ -355,6 +300,7 @@ Notas transversales:
     - Revisión de `HttpClientModule` (retirar si se usa `provideHttpClient`) y `BrowserAnimationsModule`.
 
 ## 5. Pruebas requeridas
+
 - Pruebas unitarias:
   - Interceptores (`Auth`, `Network`, `Error`, `Timeout`) con orden y comportamiento (`src/app/core/core.module.ts:45–63`).
   - Servicios HTTP (`auth.service`, `dashboard-api.service`, `usuario.service`) validando parámetros y rutas; ejemplo existente: `dashboard-api.service.spec.ts`.
@@ -363,19 +309,29 @@ Notas transversales:
   - Flujo de sesión y expiración (`SessionExpiredComponent`, `UnsavedWorkDirective`) (`src/app/app.module.ts:12–21`).
   - Preloading de rutas (`CustomPreloadingStrategyService`) y navegación con estados de carga.
 - Pruebas de regresión visual:
+
+## 6. Seguridad y rendimiento post-migración
+
+- NPM: Resuelto conflicto de `@coreui/angular-chartjs@5.6.2` con `@coreui/chartjs`. Actualizado `@coreui/chartjs` a `^4.1.0` en `package.json` para cumplir peer dependency.
+- Auditoría: `npm audit` detectó 61 vulnerabilidades de baja severidad (principalmente CKEditor 5). No hay vulnerabilidades críticas/altas.
+- Mitigación CKEditor:
+  - Sanitización de campos `contenido` y `resumen` al guardar entradas (`src/app/admin/base/entradas/entrada-form/entrada-form.component.ts:418–434` y `src/app/admin/base/entradas/entrada-form/entrada-form.component.ts:456–478`).
+  - Mantener carga dinámica del build para mejorar rendimiento (`src/app/admin/base/entradas/entrada-form/entrada-form.component.ts:248–261`).
+- Karma/ChromeHeadless: Configuración optimizada con `ChromeHeadlessNoSandbox` y timeouts para estabilidad en CI (`karma.conf.js:79–91`).
   - Playwright con screenshots de páginas clave: dashboard, perfil (`src/app/admin/base/perfil/containers/perfil.component.html:3`), listas y modales.
   - Validar temas y componentes CoreUI (toasts, modales, sidebar).
 - Validación de funcionalidad:
   - Rendimiento: respetar `budgets` (`angular.json:56–66`) y revisar paquetes CommonJS.
   - Comprobación zoneless/Zone según decisión: estabilidad de detección de cambios.
- - Pruebas de compatibilidad de librerías:
-   - `ngx-scrollbar` y CKEditor contra Angular 21/TS 5.9; actualizar versiones y pruebas de integración.
-   - `@coreui/angular-chartjs` y Chart.js v4 en gráficas actuales.
- - Pruebas específicas CKEditor:
-   - Inicialización en contenedores, eventos `ready` y `change`, y watchdog.
-   - Carga de plugins utilizados (CKBox/premium) y validación de tipos en TS.
+- Pruebas de compatibilidad de librerías:
+  - `ngx-scrollbar` y CKEditor contra Angular 21/TS 5.9; actualizar versiones y pruebas de integración.
+  - `@coreui/angular-chartjs` y Chart.js v4 en gráficas actuales.
+- Pruebas específicas CKEditor:
+  - Inicialización en contenedores, eventos `ready` y `change`, y watchdog.
+  - Carga de plugins utilizados (CKBox/premium) y validación de tipos en TS.
 
 ## 6. Documentación adicional
+
 - Guía de referencia para cambios importantes:
   - Compatibilidad Angular 21 (Node/TS/RxJS): https://angular.dev/reference/versions
   - Novedades Angular 21 y migraciones (`NgClass`/`NgStyle`, control flow, zoneless): https://blog.ninja-squad.com/2025/11/20/what-is-new-angular-21.0
@@ -400,6 +356,7 @@ Notas transversales:
 ---
 
 ## Apéndice: ubicaciones clave del proyecto
+
 - `package.json` (`c:\dev\git\openpanelrestspa\package.json`)
 - `angular.json` (`c:\dev\git\openpanelrestspa\angular.json`)
 - `src/main.ts` (`c:\dev\git\openpanelrestspa\src\main.ts:11`)
@@ -407,7 +364,6 @@ Notas transversales:
 - `AppModule` (`c:\dev\git\openpanelrestspa\src\app\app.module.ts:1–44`)
 - `CoreModule` (`c:\dev\git\openpanelrestspa\src\app\core\core.module.ts:1–69`)
 - `DashboardApiService tests` (`c:\dev\git\openpanelrestspa\src\app\core\services\dashboard-api.service.spec.ts`)
- - `tsconfig.json` (`c:\dev\git\openpanelrestspa\tsconfig.json`)
- - `tsconfig.app.json` (`c:\dev\git\openpanelrestspa\tsconfig.app.json`)
- - `tsconfig.spec.json` (`c:\dev\git\openpanelrestspa\tsconfig.spec.json`)
-
+- `tsconfig.json` (`c:\dev\git\openpanelrestspa\tsconfig.json`)
+- `tsconfig.app.json` (`c:\dev\git\openpanelrestspa\tsconfig.app.json`)
+- `tsconfig.spec.json` (`c:\dev\git\openpanelrestspa\tsconfig.spec.json`)

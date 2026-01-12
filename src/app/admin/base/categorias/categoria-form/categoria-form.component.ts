@@ -6,10 +6,10 @@ import { Categoria } from '../../../../core/models/categoria.model';
   selector: 'app-categoria-form',
   styleUrls: ['./categoria-form.component.scss'],
   templateUrl: './categoria-form.component.html',
+  standalone: false,
 })
 export class CategoriaFormComponent implements OnChanges {
   @Input() categoria?: Categoria;
-  @Input() listaCategorias: Categoria[] = [];
   @Input() submitted = false;
   @Input() disabled = false;
   @Output() submitCategoria = new EventEmitter<Categoria>();
@@ -21,15 +21,13 @@ export class CategoriaFormComponent implements OnChanges {
   form: FormGroup;
   enviando = false;
   mostrarFeedback = false;
-  // Lista usada en la vista con un conteo ficticio de entradas cuando no existe
-  displayListaCategorias: Categoria[] = [];
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       idCategoria: [null],
       nombre: [null, Validators.required],
       descripcion: [null],
-      cantidadEntradas: [0]
+      cantidadEntradas: [0],
     });
   }
 
@@ -48,10 +46,6 @@ export class CategoriaFormComponent implements OnChanges {
       } else {
         this.form.enable();
       }
-    }
-    if (changes['listaCategorias']) {
-      const list = Array.isArray(this.listaCategorias) ? this.listaCategorias : [];
-      this.displayListaCategorias = this.assignDummyCounts(list);
     }
   }
 
@@ -89,11 +83,5 @@ export class CategoriaFormComponent implements OnChanges {
     this.form.enable();
   }
 
-  private assignDummyCounts(list: Categoria[]): Categoria[] {
-    return list.map(c => {
-      // Mantener valor real si existe; si no, asignar un número ficticio pequeño (1-5)
-      const cantidad = (c as any).cantidadEntradas ?? Math.floor(Math.random() * 5) + 1;
-      return { ...c, cantidadEntradas: cantidad } as Categoria;
-    });
-  }
+
 }

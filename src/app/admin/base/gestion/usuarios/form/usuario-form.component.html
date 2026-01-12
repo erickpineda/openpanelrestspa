@@ -1,0 +1,114 @@
+<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" id="editUserModal" backdrop="static"
+  size="lg" scrollable>
+  <c-modal-header>
+    <h5 cModalTitle class="d-flex align-items-center gap-2">
+      <svg cIcon [name]="usuario?.idUsuario ? 'cilPen' : 'cilUserPlus'" class="text-primary"></svg>
+      {{ usuario?.idUsuario ? ('ADMIN.USERS.EDIT_USER_TITLE' | translate) : ('ADMIN.USERS.NEW_USER_TITLE' | translate)
+      }}
+    </h5>
+    <button (click)="cerrarModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body class="p-4">
+    @if (usuario) {
+    <div class="row g-3">
+      <!-- Username & Email -->
+      <c-col md="6">
+        <label class="form-label fw-semibold">{{ 'COMMON.USER' | translate }}</label>
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilUser" size="sm"></svg></span>
+          <input cFormControl type="text" [value]="usuario.username || ''"
+            (input)="usuario.username = $any($event.target).value" [class.is-invalid]="!usuario.username"
+            [disabled]="!!usuario.idUsuario" [placeholder]="'ADMIN.USERS.USERNAME_PLACEHOLDER' | translate"
+            class="border-start-0" />
+        </div>
+        @if (!usuario.username) {
+        <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.REQUIRED' | translate }}</div>
+        }
+      </c-col>
+
+      <c-col md="6">
+        <label class="form-label fw-semibold">{{ 'COMMON.EMAIL' | translate }}</label>
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilEnvelopeClosed"
+              size="sm"></svg></span>
+          <input cFormControl type="email" [value]="usuario.email || ''"
+            (input)="usuario.email = $any($event.target).value" [class.is-invalid]="!isEmailValid(usuario.email)"
+            [placeholder]="'ADMIN.USERS.EMAIL_PLACEHOLDER' | translate" class="border-start-0" />
+        </div>
+        @if (!isEmailValid(usuario.email)) {
+        <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.EMAIL_INVALID' | translate }}</div>
+        }
+      </c-col>
+
+      <!-- Names -->
+      <c-col md="6">
+        <label class="form-label fw-semibold">{{ 'COMMON.NAME' | translate }}</label>
+        <input cFormControl type="text" [value]="usuario.nombre || ''"
+          (input)="usuario.nombre = $any($event.target).value"
+          [placeholder]="'ADMIN.USERS.FIRST_NAME_PLACEHOLDER' | translate" />
+      </c-col>
+      <c-col md="6">
+        <label class="form-label fw-semibold">{{ 'COMMON.LAST_NAME' | translate }}</label>
+        <input cFormControl type="text" [value]="usuario.apellido || ''"
+          (input)="usuario.apellido = $any($event.target).value"
+          [placeholder]="'ADMIN.USERS.LAST_NAME_PLACEHOLDER' | translate" />
+      </c-col>
+
+      <c-col xs="12">
+        <hr class="my-2 text-muted opacity-25">
+      </c-col>
+
+      <!-- Role & Status -->
+      <c-col md="6">
+        <label class="form-label fw-semibold">{{ 'ADMIN.USERS.ASSIGNED_ROLE' | translate }}</label>
+        <select cSelect [(ngModel)]="usuario.rolCodigo" [class.is-invalid]="!usuario.rolCodigo"
+          [disabled]="PROPIETARIO_ROLE_CODE && usuario.rolCodigo === PROPIETARIO_ROLE_CODE">
+          <option value="">{{ 'COMMON.SELECT_ROLE' | translate }}</option>
+          @for (r of roles; track r.codigo) {
+          @if (r.codigo !== PROPIETARIO_ROLE_CODE || usuario.rolCodigo === PROPIETARIO_ROLE_CODE) {
+          <option [value]="r.codigo">{{ r.nombre }}</option>
+          }
+          }
+        </select>
+        @if (!usuario.rolCodigo) {
+        <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.REQUIRED' | translate }}</div>
+        }
+        @if (PROPIETARIO_ROLE_CODE && usuario.rolCodigo === PROPIETARIO_ROLE_CODE) {
+        <div class="text-info small mt-1 d-flex align-items-center">
+          <svg cIcon name="cilLockLocked" size="sm" class="me-1"></svg>
+          {{ 'ADMIN.USERS.OWNER_ROLE_IMMUTABLE' | translate }}
+        </div>
+        }
+      </c-col>
+
+      <c-col md="6" class="d-flex align-items-center">
+        <div class="p-3 bg-light rounded w-100 border">
+          <c-form-check>
+            <input cFormCheckInput type="checkbox" id="userEnabled" [checked]="usuario.habilitado"
+              (change)="usuario.habilitado = $any($event.target).checked"
+              [disabled]="PROPIETARIO_ROLE_CODE && usuario.rolCodigo === PROPIETARIO_ROLE_CODE" />
+            <label cFormCheckLabel for="userEnabled" class="fw-semibold cursor-pointer select-none">
+              {{ 'ADMIN.USERS.USER_ENABLED' | translate }}
+            </label>
+          </c-form-check>
+          <div class="small text-muted ms-4">
+            {{ 'ADMIN.USERS.USER_ENABLED_HELP' | translate }}
+          </div>
+        </div>
+      </c-col>
+    </div>
+    }
+  </c-modal-body>
+  <c-modal-footer class="bg-light bg-opacity-10">
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button cButton color="primary" [disabled]="!isUserFormValid() || loading" (click)="guardar()">
+      @if (loading) {
+      <c-spinner size="sm" class="me-1"></c-spinner>
+      }
+      @if (!loading) {
+        <svg cIcon name="cilSave" class="me-1"></svg>
+      }
+      {{ 'ADMIN.USERS.SAVE_USER' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>

@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 @Component({
   selector: 'app-dashboard-series-panel',
   templateUrl: './dashboard-series-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardSeriesPanelComponent {
   @Input() seriesDays: number = 30;
@@ -27,4 +28,3 @@ export class DashboardSeriesPanelComponent {
   @Output() toggleMetrics = new EventEmitter<void>();
   @Output() copyPerf = new EventEmitter<void>();
 }
-

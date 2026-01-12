@@ -4,7 +4,7 @@ import { LoggerService } from '../logger.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UnsavedWorkService {
   private unsavedWorkSubject = new Subject<boolean>();
@@ -15,8 +15,14 @@ export class UnsavedWorkService {
 
   constructor(private log: LoggerService) {
     // Compatibilidad: escucha evento legacy y evento nuevo
-    window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.saveAllUnsavedWork.bind(this));
-    window.addEventListener(OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT, this.saveAllUnsavedWork.bind(this));
+    window.addEventListener(
+      OPConstants.Events.SAVE_UNSAVED_WORK,
+      this.saveAllUnsavedWork.bind(this)
+    );
+    window.addEventListener(
+      OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
+      this.saveAllUnsavedWork.bind(this)
+    );
   }
 
   public registerForm(formId: string, initialValue?: any): void {
@@ -38,10 +44,10 @@ export class UnsavedWorkService {
   public updateFormValue(formId: string, currentValue: any): void {
     const initialValue = this.formValues.get(formId);
     const currentValueStr = JSON.stringify(currentValue);
-    
+
     const hasChanged = initialValue !== currentValueStr;
     this.log.info(`📝 UnsavedWorkService: Formulario ${formId} - Cambios: ${hasChanged}`);
-    
+
     this.unsavedForms.set(formId, hasChanged);
     this.updateUnsavedWorkStatus();
   }
@@ -60,17 +66,21 @@ export class UnsavedWorkService {
   }
 
   public hasUnsavedWork(): boolean {
-    const hasUnsaved = Array.from(this.unsavedForms.values()).some(hasUnsaved => hasUnsaved);
-    this.log.info(`📝 UnsavedWorkService: Verificando trabajo sin guardar - Resultado: ${hasUnsaved}`);
+    const hasUnsaved = Array.from(this.unsavedForms.values()).some((hasUnsaved) => hasUnsaved);
+    this.log.info(
+      `📝 UnsavedWorkService: Verificando trabajo sin guardar - Resultado: ${hasUnsaved}`
+    );
     return hasUnsaved;
   }
 
   private saveAllUnsavedWork(): void {
-    const formsToSave = Array.from(this.unsavedForms.keys()).filter(formId => this.unsavedForms.get(formId));
+    const formsToSave = Array.from(this.unsavedForms.keys()).filter((formId) =>
+      this.unsavedForms.get(formId)
+    );
     this.log.info('💾 UnsavedWorkService: Guardando formularios:', formsToSave);
-    
+
     const saveEvent = new CustomEvent(OPConstants.Events.SAVE_FORM_DATA, {
-      detail: { forms: formsToSave }
+      detail: { forms: formsToSave },
     });
     window.dispatchEvent(saveEvent);
   }

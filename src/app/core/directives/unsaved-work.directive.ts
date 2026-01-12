@@ -4,7 +4,8 @@ import { LoggerService } from '../services/logger.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Directive({
-  selector: '[appUnsavedWork]'
+  selector: '[appUnsavedWork]',
+  standalone: false,
 })
 export class UnsavedWorkDirective implements OnInit, OnDestroy {
   @Input() appUnsavedWork: string = '';
@@ -21,24 +22,24 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
   ngOnInit(): void {
     const form = this.el.nativeElement;
     this.formId = this.appUnsavedWork || `form-${Date.now()}`;
-    
+
     this.log.info(`📝 UnsavedWorkDirective: Registrando formulario: ${this.formId}`);
-    
+
     // Guardar estado inicial
     this.initialFormData = this.getFormData(form);
     this.unsavedWorkService.registerForm(this.formId, this.initialFormData);
-    
+
     // Guardar en localStorage para persistencia
     this.saveToLocalStorage();
-    
+
     // Configurar observadores
     this.setupMutationObserver(form);
     this.setupEventListeners(form);
-    
+
     // Marcar visualmente
     form.classList.add('unsaved-work-tracked');
     form.setAttribute('data-tracked-form', this.formId);
-    
+
     this.log.info(`✅ UnsavedWorkDirective: Formulario ${this.formId} registrado`);
   }
 
@@ -50,7 +51,7 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     const forms = JSON.parse(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}');
     forms[this.formId] = {
       initialData: this.initialFormData,
-      hasChanges: false
+      hasChanges: false,
     };
     localStorage.setItem(OPConstants.Storage.UNSAVED_FORMS_KEY, JSON.stringify(forms));
   }
@@ -62,17 +63,17 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
 
     const inputs = form.querySelectorAll('input, select, textarea');
     inputs.forEach((input: any) => {
-      observer.observe(input, { 
-        attributes: true, 
-        attributeFilter: ['value', 'checked', 'class'] 
+      observer.observe(input, {
+        attributes: true,
+        attributeFilter: ['value', 'checked', 'class'],
       });
     });
   }
 
   private setupEventListeners(form: any): void {
     const events = ['input', 'change', 'keyup'];
-    
-    events.forEach(eventType => {
+
+    events.forEach((eventType) => {
       form.addEventListener(eventType, () => {
         setTimeout(() => {
           this.checkFormChanges(form);
@@ -88,7 +89,7 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
   private checkFormChanges(form: any): void {
     const currentData = this.getFormData(form);
     const hasChanges = this.hasFormDataChanged(this.initialFormData, currentData);
-    
+
     if (hasChanges) {
       this.markFormAsUnsaved(form, currentData);
     } else {
@@ -99,7 +100,7 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
   private getFormData(form: any): any {
     const formData: any = {};
     const inputs = form.querySelectorAll('input, select, textarea');
-    
+
     inputs.forEach((input: any) => {
       if (input.name) {
         if (input.type === 'checkbox') {
@@ -113,7 +114,7 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
         }
       }
     });
-    
+
     return formData;
   }
 
@@ -126,10 +127,10 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
     form.classList.add('ng-dirty');
     form.classList.add('ng-touched');
     form.setAttribute('data-unsaved', 'true');
-    
+
     // Actualizar en el servicio
     this.unsavedWorkService.updateFormValue(this.formId, currentData);
-    
+
     // Actualizar en localStorage
     const forms = JSON.parse(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}');
     if (forms[this.formId]) {
@@ -142,9 +143,9 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
   private markFormAsSaved(form: any): void {
     form.classList.remove('unsaved-work-modified');
     form.removeAttribute('data-unsaved');
-    
+
     this.unsavedWorkService.markFormAsSaved(this.formId);
-    
+
     // Actualizar en localStorage
     const forms = JSON.parse(localStorage.getItem(OPConstants.Storage.UNSAVED_FORMS_KEY) || '{}');
     if (forms[this.formId]) {

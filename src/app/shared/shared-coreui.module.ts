@@ -24,6 +24,7 @@ import {
   WidgetModule,
   TemplateIdDirective,
   TooltipModule,
+  ButtonGroupModule,
 } from '@coreui/angular';
 
 @NgModule({
@@ -54,6 +55,7 @@ import {
     AlertModule,
     TemplateIdDirective,
     TooltipModule,
+    ButtonGroupModule,
   ],
   exports: [
     CommonModule,
@@ -82,6 +84,7 @@ import {
     AlertModule,
     TemplateIdDirective,
     TooltipModule,
+    ButtonGroupModule,
   ],
 })
 export class SharedCoreUiModule {}

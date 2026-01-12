@@ -19,38 +19,50 @@ describe('UsuariosListComponent', () => {
 
   beforeEach(async () => {
     mockUsuarioService = {
-      buscarSinGlobalLoader: jasmine.createSpy('buscarSinGlobalLoader').and.returnValue(of({ elements: [], totalElements: 0 })),
+      buscarSinGlobalLoader: jasmine
+        .createSpy('buscarSinGlobalLoader')
+        .and.returnValue(of({ elements: [], totalElements: 0 })),
+      listarPaginaSinGlobalLoader: jasmine
+        .createSpy('listarPaginaSinGlobalLoader')
+        .and.returnValue(of({ data: { elements: [], totalElements: 0 } })),
       crear: jasmine.createSpy('crear').and.returnValue(of({})),
       actualizar: jasmine.createSpy('actualizar').and.returnValue(of({})),
       actualizarParcial: jasmine.createSpy('actualizarParcial').and.returnValue(of({})),
       eliminar: jasmine.createSpy('eliminar').and.returnValue(of({})),
-      borrar: jasmine.createSpy('borrar').and.returnValue(of({}))
+      borrar: jasmine.createSpy('borrar').and.returnValue(of({})),
     };
 
     mockRolService = {
       obtenerTodos: jasmine.createSpy('obtenerTodos').and.returnValue(of([])),
-      listarPagina: jasmine.createSpy('listarPagina').and.returnValue(of({ elements: [], totalElements: 0 }))
+      listarPagina: jasmine
+        .createSpy('listarPagina')
+        .and.returnValue(of({ elements: [], totalElements: 0 })),
     };
 
     mockToastService = {
       showSuccess: jasmine.createSpy('showSuccess'),
       showError: jasmine.createSpy('showError'),
-      showWarning: jasmine.createSpy('showWarning')
+      showWarning: jasmine.createSpy('showWarning'),
     };
 
     await TestBed.configureTestingModule({
-      declarations: [ UsuariosListComponent ],
-      imports: [ FormsModule ],
+      declarations: [UsuariosListComponent],
+      imports: [FormsModule],
       providers: [
         { provide: UsuarioService, useValue: mockUsuarioService },
         { provide: RolService, useValue: mockRolService },
         { provide: ToastService, useValue: mockToastService },
-        { provide: LoggerService, useValue: { log: () => {}, error: () => {} } },
-        { provide: SearchUtilService, useValue: { buildCriteria: () => [] } }
+        {
+          provide: LoggerService,
+          useValue: { log: () => {}, error: () => {} },
+        },
+        {
+          provide: SearchUtilService,
+          useValue: { buildCriteria: () => [], buildRequest: () => ({}) },
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    })
-    .compileComponents();
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -68,9 +80,16 @@ describe('UsuariosListComponent', () => {
   });
 
   it('should prevent deleting owner', () => {
-    const ownerUser = { idUsuario: 1, rolCodigo: OPConstants.Roles.PROPIETARIO, username: 'admin' } as any;
+    const ownerUser = {
+      idUsuario: 1,
+      rolCodigo: OPConstants.Roles.PROPIETARIO,
+      username: 'admin',
+    } as any;
     component.delete(ownerUser);
-    expect(mockToastService.showWarning).toHaveBeenCalledWith('No se puede eliminar al usuario Propietario', 'Acción no permitida');
+    expect(mockToastService.showWarning).toHaveBeenCalledWith(
+      'No se puede eliminar al usuario Propietario',
+      'Acción no permitida'
+    );
     expect(component.showDeleteModal).toBeFalse();
   });
 
@@ -82,37 +101,42 @@ describe('UsuariosListComponent', () => {
   });
 
   it('should validate form based on rolCodigo', () => {
-    component.editUser = { idUsuario: 1, username: 'test', email: 'test@test.com', rolCodigo: '' } as any;
+    component.editUser = {
+      idUsuario: 1,
+      username: 'test',
+      email: 'test@test.com',
+      rolCodigo: '',
+    } as any;
     // Assuming isEmailValid returns true for test@test.com or mocking it if it's a component method
     // isEmailValid is private or public in component? It's used in template so likely public.
     // Let's assume it works or spy on it if needed. But it's a simple regex usually.
-    
+
     expect(component.isUserFormValid()).toBeFalse(); // Missing rolCodigo
 
     component.editUser!.rolCodigo = 'ADMIN';
     expect(component.isUserFormValid()).toBeTrue();
   });
-  
+
   it('should use partial update for existing users', () => {
     const user = { idUsuario: 1, rolCodigo: 'USER', username: 'test' } as any;
     component.openEdit(user);
-    
+
     // Modify user
     if (component.editUser) {
       component.editUser.username = 'test_modified';
     }
-    
+
     component.saveEdit();
-    
+
     expect(mockUsuarioService.actualizarParcial).toHaveBeenCalled();
     expect(mockUsuarioService.actualizar).not.toHaveBeenCalled();
     expect(mockUsuarioService.crear).not.toHaveBeenCalled();
   });
-  
+
   it('should use create for new users', () => {
     component.openCreate();
     component.saveEdit();
-    
+
     expect(mockUsuarioService.crear).toHaveBeenCalled();
     expect(mockUsuarioService.actualizarParcial).not.toHaveBeenCalled();
   });

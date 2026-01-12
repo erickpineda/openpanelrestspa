@@ -1,17 +1,17 @@
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpContext } from "@angular/common/http";
-import { Usuario } from "../../models/usuario.model";
-import { CrudService } from "../../_utils/crud.service";
-import { TokenStorageService } from "../auth/token-storage.service";
-import { catchError, Observable, map, firstValueFrom, of } from "rxjs";
-import { PerfilResponse } from "../../models/perfil-response.model";
-import { OpenpanelApiResponse } from "../../models/openpanel-api-response.model";
-import { NetworkInterceptor } from "../../interceptor/network.interceptor";
-import { PaginaResponse } from "../../models/pagina-response.model";
-import { OPConstants } from "src/app/shared/constants/op-global.constants";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { Usuario } from '../../models/usuario.model';
+import { CrudService } from '../../_utils/crud.service';
+import { TokenStorageService } from '../auth/token-storage.service';
+import { catchError, Observable, map, firstValueFrom, of } from 'rxjs';
+import { PerfilResponse } from '../../models/perfil-response.model';
+import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
+import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { PaginaResponse } from '../../models/pagina-response.model';
+import { OPConstants } from 'src/app/shared/constants/op-global.constants';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root',
 })
 export class UsuarioService extends CrudService<Usuario, number> {
   protected override endpoint = '/usuarios';
@@ -84,7 +84,9 @@ export class UsuarioService extends CrudService<Usuario, number> {
 
   actualizarParcial(id: number, modificado: Usuario): Observable<OpenpanelApiResponse<any>> {
     // Content-Type application/json-patch+json is required for JSON Patch (even if body is Usuario model as per backend requirement)
-    const headers = this.setHeaders({ 'Content-Type': 'application/json-patch+json' });
+    const headers = this.setHeaders({
+      'Content-Type': 'application/json-patch+json',
+    });
     return this.patch<any>(`${this.endpoint}/perfil/${id}`, modificado, undefined, headers);
   }
 

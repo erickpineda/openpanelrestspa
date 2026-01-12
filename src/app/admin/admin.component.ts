@@ -1,8 +1,16 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { IconSetService } from '@coreui/icons-angular';
 import { DashboardApiService } from '../core/services/dashboard-api.service';
+import { TranslationService } from '../core/services/translation.service';
+import { LanguageService } from '../core/services/language.service';
 
 import { iconSubset } from '../shared/components/icons/icon-subset';
 import { navItems } from './default-layout/_nav';
@@ -21,6 +29,7 @@ import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AdminComponent implements OnInit, AfterViewInit {
   // ✅ NUEVO: Propiedades para controlar la notificación
@@ -37,6 +46,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   public isAuthed: boolean = false;
   public ready: boolean = false;
+  public sidebarNarrow: boolean = false;
 
   // Propiedades para el componente de recuperación
   showRecoveryNotification = false;
@@ -54,7 +64,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private tokenStorage: TokenStorageService,
     private authService: AuthService,
-    private sidebarState: SidebarStateService
+    private sidebarState: SidebarStateService,
+    private translationService: TranslationService,
+    private languageService: LanguageService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
@@ -84,22 +96,32 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.ready = true;
     this.checkForTemporaryData();
     this.cargaFinalizada = true;
-    const locale = (navigator && navigator.language) ? navigator.language : 'es-ES';
-    this.setHeaderLabels(locale);
+
+    // Suscribirse a cambios en las traducciones (se dispara cuando se carga el idioma o cambia)
+    this.translationService.translations$.subscribe(() => {
+      this.updateTranslations();
+      this.updateNavItems();
+      this.cdr.markForCheck();
+    });
+
     const isDashboardRoute = this.router.url.includes('/admin/base/dashboard');
     if (isDashboardRoute) {
-      this.dashboardApi.getContentStats().subscribe(stats => {
+      this.dashboardApi.getContentStats().subscribe((stats) => {
         this.projectsCount = Number(stats?.totalEntradas) || 0;
         this.commentsCount = Number(stats?.totalComentarios) || 0;
         this.messagesCount = this.commentsCount;
         this.cdr.markForCheck();
       });
     }
-    this.toastService.toasts$.subscribe(list => {
+    this.toastService.toasts$.subscribe((list) => {
       this.notificationsCount = Array.isArray(list) ? list.length : 0;
       this.cdr.markForCheck();
     });
     this.tasksCount = this.temporaryEntriesCount;
+    this.cdr.markForCheck();
+
+    // Estado inicial del sidebar (persistencia)
+    this.sidebarNarrow = this.readSidebarNarrowFromStorage();
     this.cdr.markForCheck();
 
     // Actualizar estado de sidebar en inicio y en cambios de ruta
@@ -119,10 +141,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
   private checkForTemporaryData(): void {
     const temporaryEntries = this.temporaryStorage.getAllTemporaryEntries();
     this.temporaryEntriesCount = temporaryEntries.length;
-    
+
     if (this.temporaryEntriesCount > 0) {
       this.log.info('📥 Datos temporales encontrados en admin:', temporaryEntries);
-      
+
       // ✅ MODIFICADO: Siempre mostrar notificación múltiple, incluso con una sola entrada
       this.showGlobalRecoveryNotification = true;
     }
@@ -150,19 +172,73 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.log.info('🗑️ Usuario descartó todos los datos temporales');
   }
 
-  private setHeaderLabels(locale: string): void {
-    this.labelDashboard = 'Escritorio';
-    this.labelUsers = 'Usuarios';
-    this.labelGoHome = 'Ir a inicio';
-    this.labelAccount = 'Cuenta';
-    this.labelUpdates = 'Actualizaciones';
-    this.labelMessages = 'Mensajes';
-    this.labelTasks = 'Tareas';
-    this.labelComments = 'Comentarios';
-    this.labelSettings = 'Ajustes';
-    this.labelProfile = 'Perfil';
-    // eliminado: etiqueta de pagos
-    this.labelProjects = 'Proyectos';
-    this.labelLockAccount = 'Bloquear cuenta';
+  private updateTranslations(): void {
+    this.labelDashboard = this.translationService.translate('MENU.DASHBOARD');
+    this.labelUsers = this.translationService.translate('MENU.USERS');
+    this.labelGoHome = this.translationService.translate('MENU.VIEW_WEBSITE');
+    this.labelAccount = this.translationService.translate('MENU.MY_ACCOUNT');
+    this.labelUpdates = this.translationService.translate('MENU.UPDATES');
+    this.labelMessages = this.translationService.translate('MENU.MESSAGES');
+    this.labelTasks = this.translationService.translate('MENU.TASKS');
+    this.labelComments = this.translationService.translate('MENU.COMMENTS');
+    this.labelSettings = this.translationService.translate('MENU.SETTINGS');
+    this.labelProfile = this.translationService.translate('MENU.MY_PROFILE');
+    this.labelProjects = this.translationService.translate('MENU.PROJECTS');
+    this.labelLockAccount = this.translationService.translate('MENU.LOCK_ACCOUNT');
+  }
+
+  private updateNavItems(): void {
+    // Usar spread para crear copias superficiales y evitar perder funciones (como en contextualActions)
+    // JSON.stringify eliminaba las funciones, rompiendo la UI si se esperaban
+    this.navItems = this.translateItems(navItems);
+    this.sidebarState.updateNavItems(this.navItems, this.router.url);
+  }
+
+  private translateItems(items: any[]): any[] {
+    return items.map((originalItem) => {
+      // Copia superficial para no mutar el objeto original
+      const item = { ...originalItem };
+
+      if (item.name) {
+        item.name = this.translationService.translate(item.name);
+      }
+      if (item.badge && item.badge.text) {
+        // Clonar badge para no mutar el original
+        item.badge = { ...item.badge };
+        
+        // Traducir badge si es una clave de traducción (contiene MENU. o similar) o es texto fijo
+        // Asumiremos que si empieza por MENU. es clave, si no, intentamos traducir igual por si acaso
+        if (item.badge.text === 'Pend' || item.badge.text === 'MENU.BADGE_PENDING') {
+             item.badge.text = this.translationService.translate('MENU.BADGE_PENDING');
+        } else {
+             item.badge.text = this.translationService.translate(item.badge.text);
+        }
+      }
+      if (item.children) {
+        item.children = this.translateItems(item.children);
+      }
+      return item;
+    });
+  }
+
+  private readSidebarNarrowFromStorage(): boolean {
+    try {
+      const raw = localStorage.getItem('sidebar_narrow');
+      return raw === 'true';
+    } catch {
+      return false;
+    }
+  }
+
+  private writeSidebarNarrowToStorage(value: boolean): void {
+    try {
+      localStorage.setItem('sidebar_narrow', value ? 'true' : 'false');
+    } catch {}
+  }
+
+  public toggleSidebarNarrow(): void {
+    this.sidebarNarrow = !this.sidebarNarrow;
+    this.writeSidebarNarrowToStorage(this.sidebarNarrow);
+    this.cdr.markForCheck();
   }
 }

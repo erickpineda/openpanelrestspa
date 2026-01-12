@@ -10,7 +10,8 @@ export type LoaderPosition = 'center' | 'top' | 'fullscreen';
   selector: 'app-op-loader',
   templateUrl: './op-loader.component.html',
   styleUrls: ['./op-loader.component.scss'],
-  exportAs: 'opLoader'
+  exportAs: 'opLoader',
+  standalone: false,
 })
 export class OpLoaderComponent implements OnInit, OnDestroy, OnChanges {
   @Input() message = 'Cargando...';
@@ -20,13 +21,7 @@ export class OpLoaderComponent implements OnInit, OnDestroy, OnChanges {
   @Input() debounceTime = 100;
   @Input() loaderStyle: LoaderStyle = 'progress';
   @Input() size: 'sm' = 'sm';
-  @Input() color:
-    | 'primary'
-    | 'secondary'
-    | 'success'
-    | 'danger'
-    | 'warning'
-    | 'info' = 'primary';
+  @Input() color: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' = 'primary';
 
   @Input() useGlobal: boolean = true;
   private _active: boolean = false;
@@ -36,7 +31,9 @@ export class OpLoaderComponent implements OnInit, OnDestroy, OnChanges {
       this.loading = this._active;
     }
   }
-  get active(): boolean { return this._active; }
+  get active(): boolean {
+    return this._active;
+  }
 
   loading = false;
   errorActive = false;

@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 @Component({
   selector: 'app-dashboard-estado-nominal-panel',
   templateUrl: './dashboard-estado-nominal-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DashboardEstadoNominalPanelComponent {
   @Input() estadoNominalChartType: 'line' | 'bar' = 'line';
@@ -17,4 +18,3 @@ export class DashboardEstadoNominalPanelComponent {
   @Output() downloadCsv = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
 }
-

@@ -8,8 +8,12 @@ import { LoadingService } from '../core/services/ui/loading.service';
 import { TokenStorageService } from '../core/services/auth/token-storage.service';
 import { AuthService } from '../core/services/auth/auth.service';
 
-class MockDashboardApiService { getContentStats = () => of({ totalEntradas: 0, totalComentarios: 0 }); }
-class MockLoadingService { globalLoading$ = new BehaviorSubject<boolean>(false); }
+class MockDashboardApiService {
+  getContentStats = () => of({ totalEntradas: 0, totalComentarios: 0 });
+}
+class MockLoadingService {
+  globalLoading$ = new BehaviorSubject<boolean>(false);
+}
 
 describe('AdminComponent NG0100 mitigation', () => {
   let component: AdminComponent;
@@ -27,7 +31,7 @@ describe('AdminComponent NG0100 mitigation', () => {
         { provide: TokenStorageService, useValue: { isLoggedIn: () => true } },
         { provide: AuthService, useValue: { isTokenValid: () => true } },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     TestBed.overrideTemplate(AdminComponent, '<div></div>');

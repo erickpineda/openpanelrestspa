@@ -6,22 +6,23 @@ import { DashboardApiService } from '../core/services/dashboard-api.service';
 import { TokenStorageService } from '../core/services/auth/token-storage.service';
 import { AuthService } from '../core/services/auth/auth.service';
 
-
 describe('AdminComponent', () => {
   let component: AdminComponent;
   let fixture: ComponentFixture<AdminComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AdminComponent ],
+      declarations: [AdminComponent],
       providers: [
-        { provide: DashboardApiService, useValue: { getContentStats: () => of({ totalEntradas: 0 }) } }
-        ,{ provide: TokenStorageService, useValue: { isLoggedIn: () => true } }
-        ,{ provide: AuthService, useValue: { isTokenValid: () => true } }
+        {
+          provide: DashboardApiService,
+          useValue: { getContentStats: () => of({ totalEntradas: 0 }) },
+        },
+        { provide: TokenStorageService, useValue: { isLoggedIn: () => true } },
+        { provide: AuthService, useValue: { isTokenValid: () => true } },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    })
-    .compileComponents();
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
 
     TestBed.overrideTemplate(AdminComponent, '<div></div>');
 

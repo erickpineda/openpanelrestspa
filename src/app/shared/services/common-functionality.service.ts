@@ -3,12 +3,21 @@ import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CommonFunctionalityService {
-  constructor(private router: Router, private datePipe: DatePipe) {}
+  constructor(
+    private router: Router,
+    private datePipe: DatePipe
+  ) {}
 
-  transformaFecha(fecha: Date, formato: string, flag: boolean): string {
+  transformaFecha(fecha: Date | any, formato: string, flag: boolean): string {
+    if (fecha instanceof Date) {
+      if (isNaN(fecha.getTime())) return '';
+      // Si es un Date válido, usarlo directamente (ignorar flag=false si se pasó por error para un Date real)
+      return this.datePipe.transform(fecha, formato) || '';
+    }
+    
     let resultado;
     if (fecha && !flag) {
       const str = fecha.toString();
