@@ -1,64 +1,66 @@
-<c-container class="container-fluid" data-testid="etiquetas-list">
-  <c-card class="mb-4 shadow-sm border-0">
-    <c-card-header class="bg-white border-bottom py-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-2">
-          <div class="bg-primary bg-opacity-10 p-2 rounded">
-            <svg cIcon name="cilTag" size="lg" class="text-primary"></svg>
-          </div>
-          <div>
-            <h5 class="mb-0 text-primary fw-bold">{{ 'ADMIN.TAGS.TITLE' | translate }}</h5>
-            <small class="text-muted">{{ 'ADMIN.TAGS.SUBTITLE' | translate }}</small>
-          </div>
+<c-container fluid class="px-0" data-testid="etiquetas-list">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <!-- Encabezado Principal -->
+    <c-card-header class="bg-white p-4 border-bottom">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilTag" class="text-primary"></svg>
+            {{ 'ADMIN.TAGS.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.TAGS.SUBTITLE' | translate }}
+          </small>
         </div>
         <div class="d-flex gap-2">
-          <button cButton color="primary" class="text-white shadow-sm" (click)="onCreate()"
+          <button cButton color="primary" size="sm" class="shadow-sm" (click)="onCreate()"
             [attr.aria-label]="'Crear nueva etiqueta'" data-testid="btn-nueva-etiqueta">
-            <svg cIcon name="cilPlus" size="sm" class="me-2"></svg> {{ 'ADMIN.TAGS.NEW_TAG' | translate }}
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            {{ 'ADMIN.TAGS.NEW_TAG' | translate }}
           </button>
         </div>
       </div>
     </c-card-header>
 
-    <c-card-body [attr.aria-busy]="loading ? 'true' : null">
-
+    <c-card-body class="p-4" [attr.aria-busy]="loading ? 'true' : null">
       <!-- Toolbar: Buscador y Filtros -->
-      <div
-        class="d-flex flex-wrap gap-3 mb-4 p-3 bg-light rounded align-items-end shadow-sm border-start border-4 border-primary">
-        <!-- Buscador Básico -->
-        <div class="flex-grow-1" style="min-width: 250px;">
-          <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SEARCH' | translate }}</label>
-          <div class="input-group">
-            <span class="input-group-text bg-white border-end-0">
-              <svg cIcon name="cilSearch" class="text-muted"></svg>
-            </span>
-            <input cFormControl type="text" [value]="basicSearchText"
-              (input)="onBasicSearchTextChange($any($event.target).value)"
-              [placeholder]="'ADMIN.TAGS.SEARCH_PLACEHOLDER' | translate" class="border-start-0 ps-0"
-              [disabled]="loading" />
+      <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
+        <div class="d-flex flex-wrap gap-3 align-items-end">
+          <!-- Buscador Básico -->
+          <div class="flex-grow-1" style="min-width: 250px;">
+            <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SEARCH' | translate }}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0">
+                <svg cIcon name="cilSearch" class="text-muted"></svg>
+              </span>
+              <input cFormControl type="text" [value]="basicSearchText"
+                (input)="onBasicSearchTextChange($any($event.target).value)"
+                [placeholder]="'ADMIN.TAGS.SEARCH_PLACEHOLDER' | translate" class="border-start-0 ps-0 shadow-none"
+                [disabled]="loading" />
+            </div>
           </div>
-        </div>
 
-        <!-- Botón Filtros Avanzados -->
-        <div>
-          <button cButton [color]="showAdvanced ? 'primary' : 'secondary'" variant="outline" (click)="toggleAdvanced()"
-            [disabled]="loading" class="d-flex align-items-center gap-2">
-            <svg cIcon name="cilFilter" size="sm"></svg>
-            {{ showAdvanced ? ('ADMIN.CATEGORIES.HIDE_FILTERS' | translate) : ('ADMIN.CATEGORIES.ADVANCED_FILTERS' |
-            translate) }}
-          </button>
-        </div>
+          <!-- Botón Filtros Avanzados -->
+          <div>
+            <button cButton [color]="showAdvanced ? 'primary' : 'secondary'" variant="outline" (click)="toggleAdvanced()"
+              [disabled]="loading" class="d-flex align-items-center gap-2">
+              <svg cIcon name="cilFilter" size="sm"></svg>
+              {{ showAdvanced ? ('ADMIN.CATEGORIES.HIDE_FILTERS' | translate) : ('ADMIN.CATEGORIES.ADVANCED_FILTERS' |
+              translate) }}
+            </button>
+          </div>
 
-        <!-- Selector de Registros por Página -->
-        <div>
-          <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SHOW' | translate }}</label>
-          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect"
-            style="width: 80px" [disabled]="loading">
-            <option [ngValue]="5">5</option>
-            <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
-            <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
-            <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
-          </select>
+          <!-- Selector de Registros por Página -->
+          <div>
+            <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SHOW' | translate }}</label>
+            <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect"
+              style="width: 80px" [disabled]="loading">
+              <option [ngValue]="5">5</option>
+              <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
+              <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
+              <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -107,8 +109,8 @@
         </div>
         }
 
-        <div class="table-responsive rounded border">
-          <table cTable hover striped class="align-middle mb-0" role="table" aria-label="Tabla de etiquetas">
+        <div class="table-responsive">
+          <table cTable [hover]="true" [striped]="true" [responsive]="true" align="middle" class="mb-0 border" role="table" aria-label="Tabla de etiquetas">
             <thead class="bg-light">
               <tr>
                 <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 90px">{{
@@ -117,7 +119,7 @@
                   'COMMON.NAME' | translate }}</th>
                 <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 250px">{{
                   'COMMON.DESCRIPTION' | translate }}</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-center"
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-end"
                   style="min-width: 100px">{{ 'COMMON.ACTIONS' | translate }}</th>
               </tr>
             </thead>
@@ -127,8 +129,7 @@
                 <td class="px-3">
                   <span class="badge border shadow-sm" [style.background-color]="etiqueta.colorHex"
                     [attr.aria-label]="'Color de etiqueta'"
-                    style="width: 24px; height: 24px; display: inline-block; border-radius: 50%;">{{ 'AUTO.NBSP' |
-                    translate }}</span>
+                    style="width: 24px; height: 24px; display: inline-block; border-radius: 50%;">&nbsp;</span>
                 </td>
                 <td class="px-3">
                   <div class="d-flex flex-column">
@@ -144,19 +145,19 @@
                     {{ etiqueta.descripcion || ('COMMON.NO_DESCRIPTION' | translate) }}
                   </span>
                 </td>
-                <td class="px-3 text-center">
-                  <div class="d-flex justify-content-center gap-2">
-                    <button cButton color="warning" variant="ghost" size="sm" (click)="onEdit(etiqueta)"
+                <td class="px-3 text-end">
+                  <c-button-group role="group">
+                    <button cButton color="info" variant="ghost" size="sm" (click)="onEdit(etiqueta)"
                       [attr.aria-label]="('ADMIN.TAGS.EDIT_TAG' | translate) + ' ' + etiqueta.nombre"
                       [cTooltip]="'ADMIN.TAGS.EDIT_TAG' | translate">
-                      <svg cIcon name="cilPencil" size="sm"></svg>
+                      <svg cIcon name="cilPen" size="sm"></svg>
                     </button>
                     <button cButton color="danger" variant="ghost" size="sm" (click)="onDelete(etiqueta)"
                       [attr.aria-label]="('ADMIN.TAGS.DELETE_TAG' | translate) + ' ' + etiqueta.nombre"
                       [cTooltip]="'ADMIN.TAGS.DELETE_TAG' | translate">
                       <svg cIcon name="cilTrash" size="sm"></svg>
                     </button>
-                  </div>
+                  </c-button-group>
                 </td>
               </tr>
               }
@@ -174,36 +175,36 @@
             </tbody>
           </table>
         </div>
-
-        <!-- Paginación -->
-        @if (totalItems > 0) {
-        <div class="d-flex justify-content-between align-items-center mt-3 px-2">
-          <div class="small text-muted fw-semibold">
-            {{ 'COMMON.PAGINATION_INFO' | translate: { current: pagedEtiquetas.length, total: totalItems } }}
-          </div>
-          <c-pagination class="mb-0" aria-label="Navegación de páginas">
-            <li cPageItem [disabled]="pageNo === 0">
-              <a cPageLink (click)="onPrev()" [attr.aria-label]="'Anterior'" style="cursor: pointer">
-                <span aria-hidden="true">{{ 'AUTO.LAQUO' | translate }}</span>
-              </a>
-            </li>
-            @for (p of [].constructor(getTotalPages()); track $index) {
-            <li cPageItem [active]="pageNo === $index">
-              <a cPageLink (click)="onPageChange($index)" style="cursor: pointer">
-                {{ $index + 1 }}
-              </a>
-            </li>
-            }
-            <li cPageItem [disabled]="isNextDisabled()">
-              <a cPageLink (click)="onNext()" [attr.aria-label]="'Siguiente'" style="cursor: pointer">
-                <span aria-hidden="true">{{ 'AUTO.RAQUO' | translate }}</span>
-              </a>
-            </li>
-          </c-pagination>
-        </div>
-        }
       </div>
     </c-card-body>
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+      <div class="text-muted small">
+        {{ 'COMMON.PAGINATION_INFO' | translate: { current: pagedEtiquetas.length, total: totalItems } }}
+      </div>
+      @if (totalItems > 0) {
+      <c-pagination class="mb-0" aria-label="Navegación de páginas">
+        <li cPageItem [disabled]="pageNo === 0">
+          <a cPageLink (click)="onPrev()" [attr.aria-label]="'Anterior'" style="cursor: pointer">
+            <span aria-hidden="true">{{ 'AUTO.LAQUO' | translate }}</span>
+          </a>
+        </li>
+        @for (p of [].constructor(getTotalPages()); track $index) {
+        <li cPageItem [active]="pageNo === $index">
+          <a cPageLink (click)="onPageChange($index)" style="cursor: pointer">
+            {{ $index + 1 }}
+          </a>
+        </li>
+        }
+        <li cPageItem [disabled]="isNextDisabled()">
+          <a cPageLink (click)="onNext()" [attr.aria-label]="'Siguiente'" style="cursor: pointer">
+            <span aria-hidden="true">{{ 'AUTO.RAQUO' | translate }}</span>
+          </a>
+        </li>
+      </c-pagination>
+      }
+    </div>
   </c-card>
 </c-container>
 

@@ -18,18 +18,6 @@
       <c-nav-item>
         <a
           cNavLink
-          routerLink="/admin/dashboard"
-          routerLinkActive="active"
-          #rlaDashboard="routerLinkActive"
-          [attr.aria-current]="rlaDashboard.isActive ? 'page' : null"
-          [attr.aria-label]="labelDashboard"
-        >
-          {{ labelDashboard }}
-        </a>
-      </c-nav-item>
-      <c-nav-item>
-        <a
-          cNavLink
           routerLink="/admin/control"
           routerLinkActive="active"
           #rlaControl="routerLinkActive"
@@ -37,29 +25,6 @@
           aria-label="Panel de Control"
         >
           Control
-        </a>
-      </c-nav-item>
-      <c-nav-item>
-        <a
-          cNavLink
-          routerLink="/admin/gestion/usuarios"
-          routerLinkActive="active"
-          #rlaUsers="routerLinkActive"
-          [attr.aria-current]="rlaUsers.isActive ? 'page' : null"
-          [attr.aria-label]="labelUsers"
-          >{{ labelUsers }}</a
-        >
-      </c-nav-item>
-      <c-nav-item>
-        <a
-          cNavLink
-          routerLink="/home"
-          routerLinkActive="active"
-          #rlaHome="routerLinkActive"
-          [attr.aria-current]="rlaHome.isActive ? 'page' : null"
-          [attr.aria-label]="labelGoHome"
-        >
-          {{ labelGoHome }}
         </a>
       </c-nav-item>
     </c-header-nav>

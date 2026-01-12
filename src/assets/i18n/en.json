@@ -1,4 +1,8 @@
 {
+  "AUTO": {
+    "NO_SE_ENCONTRARON_USUARIOS": "No users found",
+    "INTENTA_AJUSTAR_LOS_FILTROS_DE": "Try adjusting the search filters"
+  },
   "HEADER": {
     "HOME": "Home",
     "ABOUT": "About",
@@ -755,7 +759,7 @@
     },
     "FOOTER": {
       "COREUI": "CoreUI",
-      "COPYRIGHT": "&copy; 2021 creativeLabs",
+      "COPYRIGHT": "2021 creativeLabs",
       "POWERED_BY": "Powered by",
       "COREUI_ANGULAR": "CoreUI for Angular"
     },
@@ -974,7 +978,6 @@
     "DEBE_SELECCIONAR_UN_COLOR": "Debe seleccionar un color",
     "ETIQUETAS": "Etiquetas",
     "CLASIFICA_EL_CONTENIDO_CON_ETI": "Clasifica el contenido con etiquetas",
-    "NBSP": "&nbsp;",
     "NO_SE_ENCONTRARON_ETIQUETAS": "No se encontraron etiquetas",
     "INTENTA_AJUSTAR_LOS_FILTROS_O_": "Intenta ajustar los filtros o crea una nueva etiqueta",
     "CAMBIAR_CONTRASE_A": "Cambiar Contraseña",
@@ -1086,7 +1089,7 @@
     "ACTIVIDAD_RECIENTE": "Actividad Reciente",
     "CARGANDO_PERFIL": "Cargando perfil...",
     "COREUI": "CoreUI",
-    "COPY_2022_CREATIVELABS": "&copy; 2022 creativeLabs",
+    "COPY_2022_CREATIVELABS": "2022 creativeLabs",
     "COREUI_V4_FOR_ANGULAR": "CoreUI v4 for Angular",
     "LA_SESI_N_SE_CERR_DESDE_OTRO_D": "La sesión se cerró desde otro dispositivo o pestaña.",
     "SU_SESI_N_HA_CADUCADO_POR_INAC": "Su sesión ha caducado por inactividad.",

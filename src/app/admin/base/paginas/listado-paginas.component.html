@@ -1,211 +1,59 @@
-<c-card class="mb-4 shadow-sm border-0">
-  <c-card-header class="bg-white border-bottom py-3">
-    <div class="d-flex justify-content-between align-items-center">
-      <div class="d-flex align-items-center gap-2">
-        <div class="bg-primary bg-opacity-10 p-2 rounded">
-          <svg cIcon name="cilFile" size="lg" class="text-primary"></svg>
-        </div>
+<c-container fluid class="px-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <c-card-header class="bg-white p-4 border-bottom">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-          <h5 class="mb-0 text-primary fw-bold">{{ 'ADMIN.PAGES.TITLE' | translate }}</h5>
-          <small class="text-muted">{{ 'ADMIN.PAGES.SUBTITLE' | translate }}</small>
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilFile" class="text-primary"></svg>
+            {{ 'ADMIN.PAGES.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.PAGES.SUBTITLE' | translate }}
+          </small>
+        </div>
+        <div class="d-flex gap-2">
+          <button cButton color="secondary" variant="ghost" size="sm" [cTooltip]="'ADMIN.PAGES.PRINT_TOOLTIP' | translate">
+            <svg cIcon name="cilPrint" class="me-1"></svg>
+            {{ 'ADMIN.ENTRIES.PRINT' | translate }}
+          </button>
+          <button cButton color="primary" size="sm" routerLink="crear" class="shadow-sm">
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            {{ 'ADMIN.PAGES.NEW_PAGE' | translate }}
+          </button>
         </div>
       </div>
-      <div class="d-flex gap-2">
-        <button cButton color="light" size="sm" variant="ghost" [cTooltip]="'ADMIN.PAGES.PRINT_TOOLTIP' | translate">
-          <svg cIcon name="cilPrint" size="sm"></svg>
-        </button>
-        <button cButton color="warning" size="sm" variant="outline">
-          <svg cIcon name="cilWarning" class="me-1"></svg>
-          {{ 'ADMIN.PAGES.UNREVIEWED' | translate }}
-        </button>
-        <button cButton color="primary" class="text-white shadow-sm" routerLink="crear">
-          <svg cIcon name="cilPlus" size="sm" class="me-2"></svg>
-          {{ 'ADMIN.PAGES.NEW_PAGE' | translate }}
-        </button>
-      </div>
-    </div>
-  </c-card-header>
+    </c-card-header>
 
-  <c-card-body>
-    <!-- Toolbar: Buscador y Filtros -->
-    <div
-      class="d-flex flex-wrap gap-3 mb-4 p-3 bg-light rounded align-items-end shadow-sm border-start border-4 border-primary">
-      <!-- Buscador Básico -->
-      <div class="flex-grow-1" style="min-width: 250px;">
-        <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SEARCH' | translate }}</label>
-        <div class="input-group">
-          <span class="input-group-text bg-white border-end-0">
-            <svg cIcon name="cilSearch" class="text-muted"></svg>
-          </span>
-          <input cFormControl type="text" [value]="basicSearchText"
-            (input)="onBasicSearchTextChange($any($event.target).value)"
-            [placeholder]="'ADMIN.PAGES.SEARCH_PLACEHOLDER' | translate" class="border-start-0 ps-0" />
-        </div>
-      </div>
+    <div class="section-divider" aria-hidden="true"></div>
 
-      <!-- Botón Filtros Avanzados -->
-      <div>
-        <button cButton [color]="showAdvanced ? 'primary' : 'secondary'" variant="outline" (click)="toggleAdvanced()"
-          class="d-flex align-items-center gap-2">
-          <svg cIcon name="cilFilter" size="sm"></svg>
-          {{ showAdvanced ? ('ADMIN.PAGES.HIDE_ADVANCED_FILTERS' | translate) : ('ADMIN.PAGES.SHOW_ADVANCED_FILTERS' |
-          translate) }}
-        </button>
-      </div>
+    <c-card-body class="p-4">
+      <!-- Toolbar: Buscador y Filtros -->
+      <app-entradas-filter
+        [basicSearchText]="basicSearchText"
+        [showAdvanced]="showAdvanced"
+        [definiciones]="definiciones"
+        [cargarCatalogosFn]="cargarCatalogosEntrada"
+        [pagingInfo]="pagingInfoObject"
+        (basicSearchChange)="onBasicSearchTextChange($event)"
+        (toggleAdvanced)="toggleAdvanced()"
+        (filtroSeleccionado)="aplicarFiltro($event)"
+        (filtroChanged)="onFiltroChanged($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      ></app-entradas-filter>
 
-      <!-- Selector de Registros por Página -->
-      <div>
-        <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SHOW' | translate }}</label>
-        <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" style="width: 80px">
-          <option [ngValue]="5">5</option>
-          <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
-          <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
-          <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Buscador Avanzado (Expandible) -->
-    @if (showAdvanced) {
-    <div class="mb-4 p-3 bg-white rounded border shadow-sm">
-      <app-error-boundary context="listado-paginas" fallbackMessage="No se pudieron cargar las páginas"
-        fallbackDescription="Verifique su conexión e intente nuevamente." [autoRetry]="true">
-        <app-buscador-avanzado [definiciones]="definiciones" [autoTrigger]="true" [debounceMs]="300"
-          [showButton]="false" [showSearchButton]="true" [showClearButton]="true" [defaultField]="'titulo'"
-          [camposPrioritarios]="['titulo']" [camposCatalogo]="[
-              'tipoEntrada.nombre',
-              'estadoEntrada.nombre',
-              'categoria.nombre',
-              'etiqueta.nombre'
-            ]" [cargarCatalogosFn]="cargarCatalogosEntrada" (filtroSeleccionado)="aplicarFiltro($event)"
-          (filtroChanged)="onFiltroChanged($event)">
-        </app-buscador-avanzado>
-      </app-error-boundary>
-    </div>
-    }
-
-    <!-- Tabla de Resultados -->
-    <div class="position-relative">
-      @if (cargandoTabla) {
-      <div
-        class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3 rounded">
-        <div class="text-center">
-          <c-spinner color="primary"></c-spinner>
-          <p class="mt-2 text-muted small fw-bold">{{ 'COMMON.LOADING' | translate }}</p>
-        </div>
-      </div>
-      }
-
-      <div class="table-responsive rounded border">
-        <table cTable hover striped class="align-middle mb-0">
-          <thead class="bg-light">
-            <tr>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'ADMIN.PAGES.TABLE.TITLE' | translate }}</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'ADMIN.PAGES.TABLE.AUTHOR' | translate }}
-              </th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'ADMIN.PAGES.TABLE.PUBLICATION' | translate
-                }}</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'ADMIN.PAGES.TABLE.CATEGORIES' | translate }}
-              </th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-center">{{ 'ADMIN.PAGES.TABLE.STATUS' |
-                translate }}</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-end">{{ 'ADMIN.PAGES.TABLE.ACTIONS' |
-                translate }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (entrada of listaEntradas; track trackByEntradaId($index, entrada)) {
-            <tr>
-              <td class="px-3">
-                <div class="d-flex flex-column">
-                  <span class="fw-bold text-primary text-truncate d-inline-block" style="max-width: 300px"
-                    [title]="entrada.titulo">
-                    {{ entrada.titulo }}
-                  </span>
-                  <small class="text-muted font-monospace">ID: {{ entrada.idEntrada }}</small>
-                </div>
-              </td>
-              <td class="px-3">
-                <div class="d-flex align-items-center gap-2">
-                  <c-avatar size="sm" color="secondary" textColor="white" class="fw-bold">
-                    {{ entrada.usernameCreador.charAt(0).toUpperCase() || '?' }}
-                  </c-avatar>
-                  <span class="small fw-semibold">{{ entrada.usernameCreador }}</span>
-                </div>
-              </td>
-              <td class="px-3">
-                <div class="small text-muted">
-                  {{ checkFechaPublicacion(entrada.fechaPublicacion) }}
-                </div>
-              </td>
-              <td class="px-3">
-                @if (entrada.categoriasConComas) {
-                <span class="badge bg-light text-dark border d-inline-block text-truncate" style="max-width: 200px"
-                  [title]="entrada.categoriasConComas">
-                  {{ entrada.categoriasConComas }}
-                </span>
-                } @else {
-                <span class="text-muted fst-italic small">{{ 'ADMIN.PAGES.TABLE.NO_CATEGORY' | translate }}</span>
-                }
-              </td>
-              <td class="px-3 text-center">
-                @if (getEstadoInfo(entrada); as estado) {
-                <c-badge [color]="estado.color.replace('text-', '')" shape="rounded-pill" [cTooltip]="estado.tooltip"
-                  class="text-uppercase shadow-sm px-3 py-1">
-                  {{ estado.tooltip }}
-                </c-badge>
-                }
-              </td>
-              <td class="px-3 text-end">
-                <div class="d-flex justify-content-end gap-1">
-                  <button cButton color="info" variant="ghost" size="sm"
-                    [routerLink]="['/admin/control/paginas/editar', entrada.idEntrada]"
-                    [cTooltip]="'COMMON.EDIT' | translate">
-                    <svg cIcon name="cilPen" size="sm"></svg>
-                  </button>
-                  <button cButton color="primary" variant="ghost" size="sm" (click)="openPreview(entrada)"
-                    [cTooltip]="'COMMON.PREVIEW' | translate">
-                    <svg cIcon name="cilExternalLink" size="sm"></svg>
-                  </button>
-                  <button cButton color="danger" variant="ghost" size="sm" (click)="borrarEntrada(entrada)"
-                    [cTooltip]="'COMMON.DELETE' | translate">
-                    <svg cIcon name="cilTrash" size="sm"></svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            } @empty {
-            <tr>
-              <td colspan="6" class="text-center py-5 text-muted">
-                <div class="d-flex flex-column align-items-center">
-                  <svg cIcon name="cilFile" size="xl" class="mb-3 text-secondary opacity-50"></svg>
-                  <span>{{ 'ADMIN.PAGES.NO_PAGES_FOUND' | translate }}</span>
-                  <small class="text-muted mt-1">{{ 'ADMIN.PAGES.ADJUST_FILTERS_HELP' | translate }}</small>
-                </div>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </c-card-body>
-
-  @if (listaEntradas.length > 0) {
-  <c-card-footer class="bg-white border-top py-3">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-      <div class="text-muted small order-2 order-md-1">
-        {{ 'COMMON.PAGINATION_INFO' | translate: { current: numberOfElements, total: totalElements } }}
-      </div>
-      <div class="order-1 order-md-2 w-100 w-md-auto d-flex justify-content-center">
-        <app-op-pagination [totalPages]="totalPages" [currentPage]="currentPage"
-          (pageChange)="obtenerListaEntradas($event)" align="end">
-        </app-op-pagination>
-      </div>
-    </div>
-  </c-card-footer>
-  }
-</c-card>
+      <!-- Tabla de Resultados -->
+      <app-entradas-table
+        [entradas]="listaEntradas"
+        [loading]="cargandoTabla"
+        [pagingInfo]="pagingInfoObject"
+        [baseRoute]="'/admin/control/paginas'"
+        (pageChange)="obtenerListaEntradas($event)"
+        (preview)="openPreview($event)"
+        (delete)="borrarEntrada($event)"
+      ></app-entradas-table>
+    </c-card-body>
+  </c-card>
+</c-container>
 
 <app-confirmation-modal [visible]="visible" [title]="'ADMIN.PAGES.CONFIRM_DELETE_TITLE' | translate"
   [message]="('ADMIN.PAGES.CONFIRM_DELETE_MSG' | translate) + (entradaABorrar ? ' (' + entradaABorrar.titulo + ')' : '')"

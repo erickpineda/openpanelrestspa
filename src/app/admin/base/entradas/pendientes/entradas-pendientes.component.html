@@ -3,7 +3,7 @@
   {{ 'ADMIN.ENTRIES.UNREVIEWED' | translate }}
 </button>
 
-<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg">
+<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static">
   <c-modal-header>
     <h5 cModalTitle>{{ 'ADMIN.ENTRIES.UNREVIEWED' | translate }}</h5>
     <button (click)="visible = false" cButtonClose></button>
@@ -58,7 +58,6 @@
                         size="sm"
                         (click)="irAEditar(entrada.idEntrada)"
                         [cTooltip]="'COMMON.EDIT' | translate"
-                        class="text-primary-emphasis"
                       >
                         <svg cIcon name="cilPen"></svg>
                       </button>

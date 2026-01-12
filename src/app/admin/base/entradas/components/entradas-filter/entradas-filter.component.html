@@ -1,0 +1,83 @@
+<div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
+  <c-row class="align-items-center g-3">
+    <!-- Contador y Selección de Página -->
+    <c-col xs="12" md="3" class="d-flex align-items-center gap-3">
+      <div class="text-nowrap fw-semibold text-secondary">
+        {{ pagingInfo?.total }} {{ 'COMMON.RECORDS' | translate }}
+      </div>
+      <select
+        cSelect
+        size="sm"
+        [ngModel]="pagingInfo?.pageSize"
+        (ngModelChange)="onPageSizeChange($event)"
+        name="pageSizeSelect"
+        class="w-auto"
+        aria-label="Registros por página"
+      >
+        <option [ngValue]="5">{{ 'AUTO.5_POR_P_G' | translate }}</option>
+        <option [ngValue]="10">{{ 'AUTO.10_POR_P_G' | translate }}</option>
+        <option [ngValue]="20">{{ 'AUTO.20_POR_P_G' | translate }}</option>
+        <option [ngValue]="50">{{ 'AUTO.50_POR_P_G' | translate }}</option>
+      </select>
+    </c-col>
+
+    <!-- Barra de Búsqueda Central -->
+    <c-col xs="12" md="6">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0 text-secondary">
+          <svg cIcon name="cilSearch"></svg>
+        </span>
+        <input
+          cFormControl
+          type="text"
+          [value]="basicSearchText"
+          (input)="onBasicSearchTextChange($any($event.target).value)"
+          [placeholder]="'ADMIN.ENTRIES.FILTER_PLACEHOLDER' | translate"
+          class="border-start-0 ps-0"
+        />
+        <button 
+          cButton 
+          color="secondary" 
+          variant="outline" 
+          (click)="toggleAdvanced.emit()"
+          [active]="showAdvanced"
+        >
+          <svg cIcon name="cilFilter" class="me-1"></svg>
+          {{ 'ADMIN.ENTRIES.FILTERS' | translate }}
+        </button>
+      </div>
+    </c-col>
+  </c-row>
+
+  <!-- Filtros Avanzados Expandibles -->
+  @if (showAdvanced) {
+    <div class="mt-3 pt-3 border-top">
+      <app-error-boundary
+        context="listado-entradas"
+        [fallbackMessage]="'COMMON.ERROR' | translate"
+        [autoRetry]="true"
+      >
+        <app-buscador-avanzado
+          [definiciones]="definiciones"
+          [autoTrigger]="true"
+          [debounceMs]="300"
+          [showButton]="false"
+          [showSearchButton]="true"
+          [showClearButton]="true"
+          [defaultField]="'titulo'"
+          [camposPrioritarios]="['titulo']"
+          [camposCatalogo]="[
+            'tipoEntrada.nombre',
+            'estadoEntrada.nombre',
+            'categoria.nombre',
+            'etiqueta.nombre',
+          ]"
+          [cargarCatalogosFn]="cargarCatalogosFn"
+          (filtroSeleccionado)="filtroSeleccionado.emit($event)"
+          (filtroChanged)="filtroChanged.emit($event)"
+        >
+        </app-buscador-avanzado>
+      </app-error-boundary>
+    </div>
+  }
+</div>

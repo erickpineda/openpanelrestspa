@@ -45,6 +45,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
   totalElements = 0;
   numberOfElements = 0;
   estaVacio: boolean = false;
+  pagingInfoObject: { page: number; total: number; pages: number; pageSize: number } | null = null;
 
   // Search & Filters
   campoSeleccionado: string = '';
@@ -261,10 +262,21 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
       }
       this.applyPaging();
     }
+    
+    this.updatePagingInfoObject();
     this.cdr.markForCheck();
     try {
       this.cdr.detectChanges();
     } catch { }
+  }
+
+  private updatePagingInfoObject(): void {
+    this.pagingInfoObject = {
+      page: this.currentPage,
+      pages: this.totalPages,
+      total: this.totalElements,
+      pageSize: this.pageSize
+    };
   }
 
   obtenerListaEntradas(page: number): void {

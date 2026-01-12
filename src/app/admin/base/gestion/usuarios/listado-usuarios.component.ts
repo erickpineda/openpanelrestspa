@@ -57,6 +57,13 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadRoles();
     this.load();
+
+    // Suscribirse a cambios de traducción para asegurar actualización de la vista
+    this.translate.translations$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy(): void {
@@ -166,28 +173,8 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     this.load();
   }
 
-  prev(): void {
-    if (this.pageNo > 0) {
-      this.pageNo--;
-      this.load();
-    }
-  }
-
-  next(): void {
-    const maxPage = this.totalElements
-      ? Math.ceil(this.totalElements / this.pageSize) - 1
-      : this.pageNo + 1;
-    if (this.pageNo < maxPage) {
-      this.pageNo++;
-      this.load();
-    }
-  }
-
   onPageChange(page: number): void {
-    const totalPages = this.getTotalPages();
-    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
-    if (safePage === this.pageNo) return;
-    this.pageNo = safePage;
+    this.pageNo = page;
     this.load();
   }
 
@@ -296,14 +283,6 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         },
       });
-  }
-
-  trackByUsuario(index: number, u: Usuario): number | string {
-    return u?.idUsuario ?? u?.username ?? index;
-  }
-
-  trackByRol(index: number, r: Rol): number | string {
-    return r?.idRol ?? r?.codigo ?? index;
   }
 
   getRoleInfo(rolCodigo: string): { color: string; icon: string; label: string } {

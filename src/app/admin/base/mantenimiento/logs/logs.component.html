@@ -1,95 +1,93 @@
 <c-row>
   <c-col xs="12">
-    <c-card class="shadow-sm mb-4 border-0">
-      <c-card-header class="bg-white py-3 border-bottom">
+    <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+      <c-card-header class="bg-white border-bottom py-3">
         <div class="d-flex align-items-center gap-2">
-          <div class="bg-primary bg-opacity-10 p-2 rounded">
-            <svg cIcon name="cilList" size="lg" class="text-primary"></svg>
-          </div>
-          <div>
-            <h5 class="mb-0 text-primary fw-bold">{{ 'ADMIN.LOGS.TITLE' | translate }}</h5>
-            <small class="text-muted">{{ 'ADMIN.LOGS.SUBTITLE' | translate }}</small>
-          </div>
+          <svg cIcon name="cilList" size="lg" class="text-primary"></svg>
+          <h4 class="mb-0 text-primary">{{ 'ADMIN.LOGS.TITLE' | translate }}</h4>
         </div>
       </c-card-header>
-      <c-card-body class="p-4">
+      <c-card-body [attr.aria-busy]="loading ? 'true' : null">
         <!-- Toolbar -->
-        <div class="bg-light p-3 rounded border mb-4">
-          <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
-            <div class="d-flex flex-wrap gap-2 flex-grow-1 align-items-center">
-              <div class="position-relative flex-grow-1" style="max-width: 400px; min-width: 250px;">
-                <svg cIcon name="cilSearch" class="text-muted position-absolute top-50 start-0 translate-middle-y ms-3" size="sm"></svg>
-                <input
-                  cFormControl
-                  type="text"
-                  [placeholder]="'ADMIN.LOGS.FILTER_PLACEHOLDER' | translate"
-                  [(ngModel)]="filter"
-                  (keyup.enter)="search()"
-                  class="ps-5 bg-white"
-                />
+        <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
+          <div class="d-flex flex-wrap gap-3 align-items-end">
+            <div class="flex-grow-1" style="max-width: 400px;">
+              <label class="form-label text-muted small fw-bold mb-1">{{ 'COMMON.SEARCH' | translate }}</label>
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 text-secondary">
+                  <svg cIcon name="cilSearch" size="sm"></svg>
+                </span>
+                <input cFormControl type="text" [placeholder]="'ADMIN.LOGS.FILTER_PLACEHOLDER' | translate"
+                  [(ngModel)]="filter" (keyup.enter)="search()" class="border-start-0 ps-0 shadow-none" />
               </div>
-              <select
-                cSelect
-                [ngModel]="pageSize"
-                (ngModelChange)="onPageSizeChange($event)"
-                name="pageSizeSelect"
-                style="width: auto"
-                [disabled]="loading"
-              >
-                <option [ngValue]="10">{{ 'ADMIN.LOGS.ROWS_10' | translate }}</option>
-                <option [ngValue]="20">{{ 'ADMIN.LOGS.ROWS_20' | translate }}</option>
-                <option [ngValue]="50">{{ 'ADMIN.LOGS.ROWS_50' | translate }}</option>
-                <option [ngValue]="100">{{ 'ADMIN.LOGS.ROWS_100' | translate }}</option>
-              </select>
-              <button cButton color="primary" (click)="search()" class="px-4 text-white">
+            </div>
+            <div class="d-flex align-items-end gap-2">
+              <button cButton color="primary" (click)="search()" class="text-white">
                 {{ 'ADMIN.LOGS.SEARCH' | translate }}
               </button>
-              <button cButton color="secondary" variant="ghost" (click)="clear()" cTooltip="Limpiar Filtros">
+              <button cButton color="secondary" variant="ghost" (click)="clear()" [cTooltip]="'COMMON.CLEAN' | translate">
                 <svg cIcon name="cilX" size="sm"></svg>
               </button>
             </div>
-            
-            <button cButton color="info" variant="outline" (click)="sample()" class="d-flex align-items-center gap-2">
-              <svg cIcon name="cilReload" size="sm"></svg>
-              {{ 'ADMIN.LOGS.GENERATE_EXAMPLES' | translate }}
-            </button>
+            <div class="d-flex align-items-end ms-auto gap-2">
+              <button cButton color="info" variant="outline" (click)="sample()" class="d-flex align-items-center gap-2">
+                <svg cIcon name="cilReload" size="sm"></svg>
+                {{ 'ADMIN.LOGS.GENERATE_EXAMPLES' | translate }}
+              </button>
+              <div>
+                <label class="form-label small text-muted fw-bold mb-1 me-2">{{ 'COMMON.SHOW' | translate }}</label>
+                <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect"
+                  class="form-select-sm" style="width: auto" [disabled]="loading">
+                  <option [ngValue]="10">{{ 'ADMIN.LOGS.ROWS_10' | translate }}</option>
+                  <option [ngValue]="20">{{ 'ADMIN.LOGS.ROWS_20' | translate }}</option>
+                  <option [ngValue]="50">{{ 'ADMIN.LOGS.ROWS_50' | translate }}</option>
+                  <option [ngValue]="100">{{ 'ADMIN.LOGS.ROWS_100' | translate }}</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="position-relative border rounded overflow-hidden">
+        <div class="position-relative">
           @if (loading) {
-            <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex flex-column align-items-center justify-content-center" style="z-index: 5;">
+          <div
+            class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75"
+            style="z-index: 10;">
+            <div class="text-center">
               <c-spinner color="primary"></c-spinner>
-              <small class="text-primary mt-2 fw-medium">{{ 'ADMIN.LOGS.LOADING' | translate }}</small>
+              <p class="mt-2 text-muted small fw-bold">{{ 'ADMIN.LOGS.LOADING' | translate }}</p>
             </div>
+          </div>
           }
 
           @if (!loading && filtered.length === 0) {
-            <div class="text-center py-5">
-              <div class="d-flex flex-column align-items-center justify-content-center opacity-50">
-                <svg cIcon name="cilList" size="4xl" class="text-muted mb-3"></svg>
-                <h6 class="text-muted fw-bold">{{ 'ADMIN.LOGS.NO_LOGS' | translate }}</h6>
-                <p class="text-muted small mb-0">{{ 'ADMIN.LOGS.NO_RECORDS' | translate }}</p>
-              </div>
+          <div class="text-center py-5 text-muted">
+            <div class="d-flex flex-column align-items-center">
+              <svg cIcon name="cilList" size="xl" class="mb-3 text-secondary opacity-50"></svg>
+              <h6 class="text-muted fw-bold">{{ 'ADMIN.LOGS.NO_LOGS' | translate }}</h6>
+              <p class="text-muted small mb-0">{{ 'ADMIN.LOGS.NO_RECORDS' | translate }}</p>
             </div>
+          </div>
           }
 
           @if (paginated.length > 0) {
-            <div class="table-responsive">
-              <table cTable hover striped class="mb-0 align-middle">
-                <thead class="bg-light border-bottom">
-                  <tr>
-                    <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase" style="width: 100px">{{ 'ADMIN.LOGS.LEVEL' | translate }}</th>
-                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase" style="width: 180px">{{ 'ADMIN.LOGS.DATE' | translate }}</th>
-                    <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">{{ 'ADMIN.LOGS.MESSAGE' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody class="border-top-0">
-                  @for (e of paginated; track trackByLogEntry($index, e)) {
-                    <tr>
-                      <td class="ps-4">
-                        <c-badge
-                          [color]="
+          <div class="table-responsive">
+            <table cTable [hover]="true" [striped]="true" [responsive]="true" align="middle" class="mb-0 border">
+              <thead class="bg-light border-bottom">
+                <tr>
+                  <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase"
+                    style="width: 100px">{{ 'ADMIN.LOGS.LEVEL' | translate }}</th>
+                  <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase"
+                    style="width: 180px">{{ 'ADMIN.LOGS.DATE' | translate }}</th>
+                  <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">{{
+                    'ADMIN.LOGS.MESSAGE' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody class="border-top-0">
+                @for (e of paginated; track trackByLogEntry($index, e)) {
+                <tr>
+                  <td class="ps-4">
+                    <c-badge [color]="
                             e.level === 'error'
                               ? 'danger'
                               : e.level === 'warn'
@@ -97,40 +95,31 @@
                                 : e.level === 'info'
                                   ? 'info'
                                   : 'secondary'
-                          "
-                          class="text-white px-2 py-1 rounded-pill"
-                          style="font-size: 0.75rem; min-width: 60px;"
-                        >
-                          {{ e.level | uppercase }}
-                        </c-badge>
-                      </td>
-                      <td class="text-muted small font-monospace">{{ e.timestamp | date: 'medium' }}</td>
-                      <td class="text-break">{{ e.message }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
+                          " class="text-white px-2 py-1 rounded-pill fw-normal"
+                      style="font-size: 0.75rem; min-width: 60px;">
+                      {{ e.level | uppercase }}
+                    </c-badge>
+                  </td>
+                  <td class="text-muted small font-monospace">{{ e.timestamp | date: 'medium' }}</td>
+                  <td class="text-break">{{ e.message }}</td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
           }
         </div>
       </c-card-body>
-      
+
       @if (totalElements > 0) {
-        <c-card-footer class="bg-white border-top-0 py-3">
-          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-            <div class="text-muted small order-2 order-md-1">
-              {{ 'ADMIN.LOGS.PAGINATION_INFO' | translate: { current: paginated.length, total: totalElements } }}
-            </div>
-            <div class="order-1 order-md-2 w-100 w-md-auto d-flex justify-content-center">
-              <app-op-pagination
-                [totalPages]="totalPages"
-                [currentPage]="pageNo"
-                (pageChange)="onPageChange($event)"
-              >
-              </app-op-pagination>
-            </div>
-          </div>
-        </c-card-footer>
+      <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+        <div class="text-muted small">
+          {{ 'ADMIN.LOGS.PAGINATION_INFO' | translate: { current: paginated.length, total: totalElements } }}
+        </div>
+        <app-op-pagination [totalPages]="totalPages" [currentPage]="pageNo" (pageChange)="onPageChange($event)"
+          size="sm" class="mb-0">
+        </app-op-pagination>
+      </div>
       }
     </c-card>
   </c-col>

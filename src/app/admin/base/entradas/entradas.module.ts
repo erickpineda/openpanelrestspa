@@ -8,6 +8,8 @@ import { ListadoEntradasComponent } from './listado-entradas.component';
 import { CrearEntradaComponent } from './crear/crear-entrada.component';
 import { EditarEntradaComponent } from './editar/editar-entrada.component';
 import { EntradasPendientesComponent } from './pendientes/entradas-pendientes.component';
+import { EntradasTableComponent } from './components/entradas-table/entradas-table.component';
+import { EntradasFilterComponent } from './components/entradas-filter/entradas-filter.component';
 
 // Módulos externos usados por entradas
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
@@ -30,6 +32,11 @@ import { EntradasSharedModule } from './entradas-shared.module';
     MediaSharedModule,
     EntradasSharedModule,
   ],
-  declarations: [ListadoEntradasComponent, CrearEntradaComponent, EditarEntradaComponent, EntradasPendientesComponent],
+  declarations: [
+    ListadoEntradasComponent,
+    CrearEntradaComponent,
+    EditarEntradaComponent,
+    EntradasPendientesComponent,
+  ],
 })
 export class EntradasModule {}

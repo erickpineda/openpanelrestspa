@@ -1,41 +1,73 @@
-<c-card class="mb-4 shadow-sm border-0 preview-entrada-card">
-  <c-card-header class="bg-white border-bottom py-3">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 w-100">
-      <div>
-        <h3 class="h5 mb-1 fw-bold text-gray-800">{{ tituloMostrar || 'Sin título' }}</h3>
-        @if (categoriasMostrar.length) {
-          <div class="text-muted small d-flex align-items-center flex-wrap gap-1">
-            <svg cIcon name="cilFolderOpen" size="sm" class="text-secondary"></svg>
-            <span class="me-1">{{ 'AUTO.CATEGOR_AS' | translate }}</span>
-            @for (c of categoriasMostrar; track c; let last = $last) {
-              <c-badge color="light" class="text-secondary border border-light-subtle">
-                {{ c.nombre || c }}
-              </c-badge>
-            }
-          </div>
-        }
-      </div>
+<div class="preview-entrada-container">
+  <!-- Imagen Destacada -->
+  @if (imagenMostrar) {
+    <div class="text-center mb-4 bg-light p-2 rounded">
+      <img [src]="imagenMostrar" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;" alt="Imagen destacada">
+    </div>
+  }
 
-      @if (mostrarBotonesAccion) {
-        <div class="d-flex flex-wrap gap-2">
-          <button cButton color="warning" variant="ghost" size="sm" (click)="onEditar()" class="d-flex align-items-center">
-            <svg cIcon name="cilPencil" size="sm" class="me-2"></svg>
-            Editar
-          </button>
-          <button cButton color="danger" variant="ghost" size="sm" (click)="onCerrar()" class="d-flex align-items-center">
-            <svg cIcon name="cilX" size="sm" class="me-2"></svg>
-            Cerrar
-          </button>
-          <button cButton color="success" size="sm" (click)="onPublicar()" class="d-flex align-items-center text-white shadow-sm">
-            <svg cIcon name="cilPaperPlane" size="sm" class="me-2"></svg>
-            Publicar
-          </button>
+  <!-- Header: Título y Metadatos -->
+  <div class="mb-4">
+    @if (mostrarTitulo && tituloMostrar) {
+      <h3 class="h2 mb-3 fw-bold text-dark">{{ tituloMostrar }}</h3>
+    }
+    
+    <div class="d-flex align-items-center flex-wrap gap-3 text-secondary border-bottom pb-3">
+      @if (usernameMostrar) {
+        <div class="d-flex align-items-center">
+          <svg cIcon name="cilUser" size="sm" class="me-2"></svg>
+          {{ usernameMostrar }}
+        </div>
+      }
+
+      @if (usernameMostrar && (fechaMostrar || categoriasMostrar.length)) {
+        <div class="vr d-none d-sm-block"></div>
+      }
+
+      @if (fechaMostrar) {
+        <div class="d-flex align-items-center">
+          <svg cIcon name="cilCalendar" size="sm" class="me-2"></svg>
+          {{ fechaMostrar | date:'dd-MM-yyyy' }}
+        </div>
+      }
+
+      @if (fechaMostrar && categoriasMostrar.length) {
+        <div class="vr d-none d-sm-block"></div>
+      }
+
+      @if (categoriasMostrar.length) {
+        <div class="d-flex align-items-center">
+          <svg cIcon name="cilTags" size="sm" class="me-2"></svg>
+          <div class="d-flex flex-wrap gap-1 ms-2">
+             @for (c of categoriasMostrar; track c) {
+               <c-badge color="light" class="text-secondary border border-light-subtle">
+                 {{ c.nombre || c }}
+               </c-badge>
+             }
+          </div>
         </div>
       }
     </div>
-  </c-card-header>
+  </div>
 
-  <c-card-body class="p-4 bg-light bg-opacity-10">
-    <div class="bg-white p-4 rounded shadow-sm border preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
-  </c-card-body>
-</c-card>
+  <!-- Contenido -->
+  <div class="preview-entrada-contenido" [innerHTML]="contenidoSeguro"></div>
+
+  <!-- Botones de Acción -->
+  @if (mostrarBotonesAccion) {
+    <div class="d-flex gap-2 mt-4 pt-3 border-top justify-content-end">
+      <button cButton color="danger" variant="ghost" (click)="onCerrar()">
+        <svg cIcon name="cilX" class="me-2"></svg>
+        Cerrar
+      </button>
+      <button cButton color="warning" variant="ghost" (click)="onEditar()">
+        <svg cIcon name="cilPencil" class="me-2"></svg>
+        Editar
+      </button>
+      <button cButton color="success" (click)="onPublicar()" class="text-white">
+        <svg cIcon name="cilPaperPlane" class="me-2"></svg>
+        Publicar
+      </button>
+    </div>
+  }
+</div>

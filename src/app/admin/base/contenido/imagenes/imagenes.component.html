@@ -240,17 +240,18 @@
                     >
                       <svg cIcon name="cilZoom"></svg>
                     </button>
-                    <button
-                      cButton
-                      color="primary"
-                      variant="ghost"
-                      size="sm"
-                      (click)="selectItem.emit(m)"
-                      *ngIf="mode === 'selector'"
-                      cTooltip="Seleccionar"
-                    >
-                      <svg cIcon name="cilCheckAlt"></svg>
-                    </button>
+                    @if (mode === 'selector') {
+                      <button
+                        cButton
+                        color="primary"
+                        variant="ghost"
+                        size="sm"
+                        (click)="selectItem.emit(m)"
+                        cTooltip="Seleccionar"
+                      >
+                        <svg cIcon name="cilCheckAlt"></svg>
+                      </button>
+                    }
                     <button
                       cButton
                       color="danger"
@@ -336,10 +337,14 @@
     }
   </c-modal-body>
   <c-modal-footer class="bg-light border-top-0 justify-content-between">
-    <div *ngIf="previewItem" class="d-flex flex-column">
+    @if (previewItem) {
+      <div class="d-flex flex-column">
         <small class="text-muted fw-bold">{{ previewItem.nombre }}</small>
-        <small class="text-secondary">{{ previewItem.mime }} - {{ ((previewItem.tamano || 0) / 1024) | number:'1.2-2' }} KB</small>
+        <small class="text-secondary">
+          {{ previewItem.mime }} - {{ ((previewItem.tamano || 0) / 1024) | number:'1.2-2' }} KB
+        </small>
       </div>
+    }
     <button (click)="previewModalVisible = false" cButton color="secondary" variant="ghost">
       {{ 'COMMON.CANCEL' | translate }}
     </button>

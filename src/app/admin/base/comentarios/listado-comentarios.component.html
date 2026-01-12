@@ -1,233 +1,60 @@
-<c-card class="mb-4 shadow-sm border-0">
-  <c-card-header class="bg-white border-bottom py-3">
-    <div class="d-flex justify-content-between align-items-center">
-      <div class="d-flex align-items-center gap-2">
-        <div class="bg-primary bg-opacity-10 p-2 rounded">
-          <svg cIcon name="cilSpeech" size="lg" class="text-primary"></svg>
-        </div>
+<c-container fluid class="px-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <c-card-header class="bg-white p-4 border-bottom">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-          <h5 class="mb-0 text-primary fw-bold">{{ 'ADMIN.COMMENTS.TITLE' | translate }}</h5>
-          <small class="text-muted">{{ 'ADMIN.COMMENTS.SUBTITLE' | translate }}</small>
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilSpeech" class="text-primary"></svg>
+            {{ 'ADMIN.COMMENTS.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.COMMENTS.SUBTITLE' | translate }}
+          </small>
         </div>
-      </div>
-      <div class="d-flex gap-2">
-        <button cButton color="primary" class="text-white shadow-sm" (click)="visibleModalCrear = true">
-          <svg cIcon name="cilPlus" size="sm" class="me-2"></svg>
-          {{ 'ADMIN.COMMENTS.NEW_COMMENT' | translate }}
-        </button>
-      </div>
-    </div>
-  </c-card-header>
-
-  <c-card-body>
-    <!-- Toolbar: Buscador y Filtros -->
-    <div
-      class="d-flex flex-wrap gap-3 mb-4 p-3 bg-light rounded align-items-end shadow-sm border-start border-4 border-primary">
-      <!-- Buscador Básico -->
-      <div class="flex-grow-1" style="min-width: 250px;">
-        <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SEARCH' | translate }}</label>
-        <div class="input-group">
-          <span class="input-group-text bg-white border-end-0">
-            <svg cIcon name="cilSearch" class="text-muted"></svg>
-          </span>
-          <input cFormControl type="text" [value]="basicSearchText"
-            (input)="onBasicSearchTextChange($any($event.target).value)"
-            [placeholder]="'ADMIN.COMMENTS.SEARCH_PLACEHOLDER' | translate" class="border-start-0 ps-0"
-            [disabled]="cargando" />
-        </div>
-      </div>
-
-      <!-- Botón Filtros Avanzados -->
-      <div>
-        <button cButton [color]="showAdvanced ? 'primary' : 'secondary'" variant="outline" (click)="toggleAdvanced()"
-          [disabled]="cargando" class="d-flex align-items-center gap-2">
-          <svg cIcon name="cilFilter" size="sm"></svg>
-          {{ showAdvanced ? ('ADMIN.COMMENTS.FILTERS.HIDE_ADVANCED' | translate) :
-          ('ADMIN.COMMENTS.FILTERS.SHOW_ADVANCED' | translate) }}
-        </button>
-      </div>
-
-      <!-- Selector de Registros por Página -->
-      <div>
-        <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SHOW' | translate }}</label>
-        <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" style="width: auto"
-          [disabled]="cargando">
-          <option [ngValue]="5">5</option>
-          <option [ngValue]="10">{{ 'ADMIN.COMMENTS.X_RECORDS' | translate: { count: 10 } }}</option>
-          <option [ngValue]="20">{{ 'ADMIN.COMMENTS.X_RECORDS' | translate: { count: 20 } }}</option>
-          <option [ngValue]="50">{{ 'ADMIN.COMMENTS.X_RECORDS' | translate: { count: 50 } }}</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Buscador Avanzado (Expandible) -->
-    @if (showAdvanced) {
-    <div class="mb-4 p-3 bg-white rounded border shadow-sm">
-      <c-row class="g-3">
-        <c-col xs="12" md="4">
-          <label class="form-label small fw-bold text-muted">{{ 'ADMIN.COMMENTS.FILTERS.USER_ID' | translate }}</label>
-          <input cFormControl size="sm" type="text"
-            [placeholder]="'ADMIN.COMMENTS.FILTERS.USER_ID_PLACEHOLDER' | translate" [value]="filtroUsuario"
-            (input)="filtroUsuario = $any($event.target).value" [disabled]="cargando" />
-        </c-col>
-        <c-col xs="6" md="4">
-          <label class="form-label small fw-bold text-muted">{{ 'ADMIN.COMMENTS.FILTERS.STATUS_APPROVED' | translate
-            }}</label>
-          <select cSelect size="sm" [value]="filtroAprobado === null ? '' : filtroAprobado ? 'true' : 'false'"
-            (change)="filtroAprobado = $any($event.target).value === '' ? null : $any($event.target).value === 'true'"
-            [disabled]="cargando">
-            <option value="">{{ 'ADMIN.COMMENTS.FILTERS.ALL' | translate }}</option>
-            <option value="true">{{ 'ADMIN.COMMENTS.FILTERS.APPROVED' | translate }}</option>
-            <option value="false">{{ 'ADMIN.COMMENTS.FILTERS.NOT_APPROVED' | translate }}</option>
-          </select>
-        </c-col>
-        <c-col xs="6" md="4">
-          <label class="form-label small fw-bold text-muted">{{ 'ADMIN.COMMENTS.FILTERS.IN_QUARANTINE' | translate
-            }}</label>
-          <select cSelect size="sm" [value]="filtroCuarentena === null ? '' : filtroCuarentena ? 'true' : 'false'"
-            (change)="filtroCuarentena = $any($event.target).value === '' ? null : $any($event.target).value === 'true'"
-            [disabled]="cargando">
-            <option value="">{{ 'ADMIN.COMMENTS.FILTERS.ALL' | translate }}</option>
-            <option value="true">{{ 'ADMIN.COMMENTS.FILTERS.YES' | translate }}</option>
-            <option value="false">{{ 'ADMIN.COMMENTS.FILTERS.NO' | translate }}</option>
-          </select>
-        </c-col>
-        <c-col xs="12" class="d-flex justify-content-end gap-2 mt-2">
-          <button cButton size="sm" color="secondary" variant="ghost" (click)="reset()" [disabled]="cargando">
-            <svg cIcon name="cilX" size="sm" class="me-1"></svg>
-            {{ 'COMMON.CLEAN' | translate }}
+        <div class="d-flex gap-2">
+          <button cButton color="primary" size="sm" class="shadow-sm" (click)="visibleModalCrear = true">
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            {{ 'ADMIN.COMMENTS.NEW_COMMENT' | translate }}
           </button>
-          <button cButton size="sm" color="primary" (click)="search()" [disabled]="cargando">
-            <svg cIcon name="cilCheck" size="sm" class="me-1"></svg>
-            {{ 'ADMIN.COMMENTS.FILTERS.APPLY_FILTERS' | translate }}
-          </button>
-        </c-col>
-      </c-row>
-    </div>
-    }
-
-    <!-- Tabla de Resultados -->
-    <div class="position-relative">
-      @if (cargando) {
-      <div
-        class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3 rounded">
-        <div class="text-center">
-          <c-spinner color="primary"></c-spinner>
-          <p class="mt-2 text-muted small fw-bold">{{ 'COMMON.LOADING' | translate }}</p>
         </div>
       </div>
-      }
+    </c-card-header>
 
-      <div class="table-responsive rounded border">
-        <table cTable hover striped class="align-middle mb-0">
-          <thead class="bg-light">
-            <tr>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'ADMIN.COMMENTS.TABLE.CONTENT' | translate }}
-              </th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'ADMIN.COMMENTS.TABLE.USER' | translate }}
-              </th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'ADMIN.COMMENTS.TABLE.ENTRY' | translate }}
-              </th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold">{{ 'ADMIN.COMMENTS.TABLE.DATE' | translate }}
-              </th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-center">{{ 'ADMIN.COMMENTS.TABLE.STATUS' |
-                translate }}</th>
-              <th class="py-3 px-3 border-0 text-secondary fw-semibold text-end">{{ 'ADMIN.COMMENTS.TABLE.ACTIONS' |
-                translate }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (coment of pagedComentarios; track trackByComentario($index, coment)) {
-            <tr>
-              <td class="px-3">
-                <div class="d-flex flex-column">
-                  <span class="fw-bold text-dark text-truncate d-inline-block" style="max-width: 300px;"
-                    [title]="coment.contenido">
-                    {{ coment.contenido }}
-                  </span>
-                  <small class="text-muted font-monospace">ID: {{ coment.idComentario }}</small>
-                </div>
-              </td>
-              <td class="px-3">
-                <div class="d-flex align-items-center gap-2">
-                  <c-avatar size="sm" color="info" textColor="white" class="fw-bold">
-                    {{ coment.idUsuario.toString().charAt(0) || 'U' }}
-                  </c-avatar>
-                  <span class="small fw-semibold">ID: {{ coment.idUsuario }}</span>
-                </div>
-              </td>
-              <td class="px-3">
-                <div class="d-flex flex-column">
-                  <span class="small fw-semibold">Entrada #{{ coment.idEntrada }}</span>
-                  <span class="small text-muted text-truncate" style="max-width: 150px;" [title]="coment.tituloEntrada">
-                    {{ coment.tituloEntrada || 'Sin título' }}
-                  </span>
-                </div>
-              </td>
-              <td class="px-3">
-                <div class="small text-muted">
-                  {{ coment.fechaCreacion | date:'mediumDate' }}
-                </div>
-                <div class="small text-muted" style="font-size: 0.75rem;">
-                  {{ coment.fechaCreacion | date:'shortTime' }}
-                </div>
-              </td>
-              <td class="px-3 text-center">
-                @if (coment.aprobado) {
-                <c-badge color="success" shape="rounded-pill" class="shadow-sm px-3">{{
-                  'ADMIN.COMMENTS.FILTERS.APPROVED' | translate }}</c-badge>
-                } @else if (coment.cuarentena) {
-                <c-badge color="danger" shape="rounded-pill" class="shadow-sm px-3">{{
-                  'ADMIN.COMMENTS.FILTERS.IN_QUARANTINE' | translate }}</c-badge>
-                } @else {
-                <c-badge color="warning" shape="rounded-pill" class="shadow-sm px-3">{{ 'ADMIN.COMMENTS.FILTERS.PENDING'
-                  | translate }}</c-badge>
-                }
-              </td>
-              <td class="px-3 text-end">
-                <div class="d-flex justify-content-end gap-1">
-                  <button cButton color="info" variant="ghost" size="sm" (click)="openEdit(coment)" cTooltip="Editar">
-                    <svg cIcon name="cilPen" size="sm"></svg>
-                  </button>
-                  <button cButton color="danger" variant="ghost" size="sm" (click)="deleteComentario(coment)"
-                    [cTooltip]="'ADMIN.COMMENTS.DELETE_COMMENT' | translate">
-                    <svg cIcon name="cilTrash" size="sm"></svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            } @empty {
-            <tr>
-              <td colspan="6" class="text-center py-5 text-muted">
-                <div class="d-flex flex-column align-items-center">
-                  <svg cIcon name="cilSpeech" size="xl" class="mb-3 text-secondary opacity-50"></svg>
-                  <span>{{ 'ADMIN.COMMENTS.TABLE.NO_RESULTS' | translate }}</span>
-                  <small class="text-muted mt-1">{{ 'ADMIN.COMMENTS.TABLE.TRY_ADJUSTING' | translate }}</small>
-                </div>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </c-card-body>
+    <c-card-body class="p-4">
+      <app-comentarios-filter
+        [basicSearchText]="basicSearchText"
+        [showAdvanced]="showAdvanced"
+        [filtroUsuario]="filtroUsuario"
+        [filtroAprobado]="filtroAprobado"
+        [filtroCuarentena]="filtroCuarentena"
+        [totalElements]="totalElements"
+        [pageSize]="pageSize"
+        [cargando]="cargando"
+        (basicSearchChange)="onBasicSearchTextChange($event)"
+        (toggleAdvanced)="toggleAdvanced()"
+        (filtroUsuarioChange)="filtroUsuario = $event"
+        (filtroAprobadoChange)="filtroAprobado = $event"
+        (filtroCuarentenaChange)="filtroCuarentena = $event"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (reset)="reset()"
+        (search)="search()"
+      ></app-comentarios-filter>
 
-  @if (pagedComentarios.length > 0) {
-  <c-card-footer class="bg-white border-top py-3">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-      <div class="text-muted small order-2 order-md-1">
-        {{ 'COMMON.PAGINATION_INFO' | translate: { current: numberOfElements, total: totalElements } }}
-      </div>
-      <div class="order-1 order-md-2 w-100 w-md-auto d-flex justify-content-center">
-        <app-op-pagination [totalPages]="getTotalPages()" [currentPage]="pageNo" (pageChange)="onPageChange($event)"
-          align="end">
-        </app-op-pagination>
-      </div>
-    </div>
-  </c-card-footer>
-  }
-</c-card>
+      <app-comentarios-table
+        [pagedComentarios]="pagedComentarios"
+        [cargando]="cargando"
+        [totalElements]="totalElements"
+        [numberOfElements]="numberOfElements"
+        [pageNo]="pageNo"
+        [pageSize]="pageSize"
+        [totalPages]="getTotalPages()"
+        (pageChange)="onPageChange($event)"
+        (edit)="openEdit($event)"
+        (delete)="deleteComentario($event)"
+      ></app-comentarios-table>
+    </c-card-body>
+  </c-card>
+</c-container>
 
 <!-- Modal Crear Comentario -->
 <app-crear-comentario [visible]="visibleModalCrear" (visibleChange)="visibleModalCrear = $event"

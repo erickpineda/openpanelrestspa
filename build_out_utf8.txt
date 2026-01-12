@@ -1,8 +1,0 @@
-﻿
-> openpanelspa@0.0.1 build
-> ng build
-
-[33mÔØ»[39m Building...
-[32mÔ£ö[39m Building...
-Application bundle generation failed. [28.363 seconds] - 2026-01-05T22:33:31.442Z
-

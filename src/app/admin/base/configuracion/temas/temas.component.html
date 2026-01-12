@@ -1,10 +1,10 @@
 <div class="fade-in">
-  <c-card class="mb-4 shadow-sm border-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
     <c-card-header class="bg-white border-bottom py-3">
       <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h5 class="mb-0 fw-bold text-gray-800">{{ 'ADMIN.THEMES.TITLE' | translate }}</h5>
-          <small class="text-muted">{{ 'ADMIN.THEMES.SUBTITLE' | translate }}</small>
+        <div class="d-flex align-items-center gap-2">
+          <svg cIcon name="cilPaint" size="lg" class="text-primary"></svg>
+          <h4 class="mb-0 text-primary">{{ 'ADMIN.THEMES.TITLE' | translate }}</h4>
         </div>
         <button cButton color="primary" class="text-white shadow-sm" (click)="openNew()">
           <svg cIcon name="cilPlus" size="sm" class="me-2"></svg>
@@ -23,7 +23,7 @@
       }
 
       <!-- Filtros -->
-      <div class="p-3 bg-light border-bottom">
+      <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
         <c-row class="g-3 align-items-end">
           <c-col xs="12" md="6">
             <label class="form-label small text-muted mb-1">{{ 'ADMIN.THEMES.TABLE.NAME' | translate }}</label>
@@ -31,7 +31,7 @@
               <span cInputGroupText class="bg-white border-end-0 text-muted">
                 <svg cIcon name="cilSearch" size="sm"></svg>
               </span>
-              <input cFormControl type="text" class="border-start-0 ps-0" [value]="basicSearchText"
+              <input cFormControl type="text" class="border-start-0 ps-0 shadow-none" [value]="basicSearchText"
                 (input)="onBasicSearchTextChange($any($event.target).value)"
                 [placeholder]="'ADMIN.THEMES.SEARCH_PLACEHOLDER' | translate" [disabled]="loading">
             </c-input-group>
@@ -41,7 +41,7 @@
             <label class="form-label small fw-bold text-muted">{{ 'ADMIN.THEMES.TABLE.ACTIVE' | translate }}</label>
             <select cSelect [value]="filtroActivo === null ? '' : filtroActivo ? 'true' : 'false'"
               (change)="filtroActivo = $any($event.target).value === '' ? null : $any($event.target).value === 'true'; search()"
-              [disabled]="loading">
+              [disabled]="loading" class="shadow-none">
               <option value="">{{ 'COMMON.ALL' | translate }}</option>
               <option value="true">{{ 'ADMIN.THEMES.TABLE.STATUS_ACTIVE' | translate }}</option>
               <option value="false">{{ 'ADMIN.THEMES.TABLE.STATUS_INACTIVE' | translate }}</option>
@@ -57,7 +57,7 @@
       </div>
 
       <!-- Tabla -->
-      <div class="table-responsive position-relative rounded border">
+      <div class="table-responsive">
         @if (loading) {
         <div
           class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center"
@@ -66,8 +66,8 @@
         </div>
         }
 
-        <table cTable hover striped class="align-middle mb-0">
-          <thead class="bg-light">
+        <table cTable [hover]="true" [striped]="true" [responsive]="true" align="middle" class="mb-0 border">
+          <thead class="bg-light border-bottom-2">
             <tr>
               <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase"
                 style="width: 250px;">{{ 'ADMIN.THEMES.TABLE.NAME' | translate }}</th>
@@ -97,13 +97,16 @@
                 <code class="text-muted">{{ t.esquemaColor }}</code>
               </td>
               <td class="px-3 text-end">
-                <button cButton color="info" variant="ghost" size="sm" class="btn-icon rounded-circle me-1"
-                  (click)="openEdit(t)" [cTooltip]="'COMMON.EDIT' | translate">
-                  <svg cIcon name="cilPen" size="sm"></svg>
-                </button>
-                <button cButton color="danger" variant="ghost" size="sm" (click)="delete(t)" [cTooltip]="'COMMON.DELETE' | translate">
-                  <svg cIcon name="cilTrash" size="sm"></svg>
-                </button>
+                <c-button-group role="group">
+                  <button cButton color="primary" variant="ghost" size="sm" (click)="openEdit(t)"
+                    [cTooltip]="'COMMON.EDIT' | translate">
+                    <svg cIcon name="cilPen"></svg>
+                  </button>
+                  <button cButton color="danger" variant="ghost" size="sm" (click)="delete(t)"
+                    [cTooltip]="'COMMON.DELETE' | translate">
+                    <svg cIcon name="cilTrash"></svg>
+                  </button>
+                </c-button-group>
               </td>
             </tr>
             } @empty {
@@ -122,15 +125,13 @@
       </div>
     </c-card-body>
 
-    <c-card-footer class="bg-white border-top py-3">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-        <div class="text-muted small">
-          {{ 'COMMON.PAGINATION_INFO' | translate: { current: pagedTemas.length, total: totalElements } }}
-        </div>
-        <app-op-pagination [totalPages]="getTotalPages()" [currentPage]="pageNo" (pageChange)="onPageChange($event)"
-          align="end"></app-op-pagination>
+    <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+      <div class="text-muted small">
+        {{ 'COMMON.PAGINATION_INFO' | translate: { current: pagedTemas.length, total: totalElements } }}
       </div>
-    </c-card-footer>
+      <app-op-pagination [totalPages]="getTotalPages()" [currentPage]="pageNo" (pageChange)="onPageChange($event)"
+        align="end" class="mb-0"></app-op-pagination>
+    </div>
   </c-card>
 </div>
 

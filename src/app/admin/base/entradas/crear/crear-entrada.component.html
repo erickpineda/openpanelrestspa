@@ -18,6 +18,7 @@
   backdrop="static"
   [visible]="modalPreviaVisible"
   (close)="onCerrarPreview()"
+  scrollable
 >
   <c-modal-header>
     <h5 cModalTitle>{{ 'AUTO.PREVIA_DE_LA_ENTRADA' | translate }}</h5>
@@ -27,6 +28,7 @@
     <app-previa-entrada
       [entrada]="entradaParaPrevia"
       [categoriasMeta]="categorias"
+      [mostrarBotonesAccion]="false"
       (editar)="onEditarDesdePreview(); modalPreviaVisible = false"
       (cerrar)="onCerrarPreview()"
     >
@@ -35,5 +37,9 @@
 
   <c-modal-footer>
     <button cButton color="secondary" (click)="onCerrarPreview()">{{ 'AUTO.CERRAR' | translate }}</button>
+    <button cButton color="primary" (click)="onPublicarDesdePreview()">
+      <svg cIcon name="cilPaperPlane" class="me-1"></svg>
+      Publicar
+    </button>
   </c-modal-footer>
 </c-modal>

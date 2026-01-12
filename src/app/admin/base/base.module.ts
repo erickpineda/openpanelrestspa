@@ -12,6 +12,8 @@ import { ListadoComentariosComponent } from './comentarios/listado-comentarios.c
 import { CrearComentarioComponent } from './comentarios/crear/crear-comentario.component';
 import { EditarComentarioComponent } from './comentarios/editar/editar-comentario.component';
 import { ComentarioFormComponent } from './comentarios/comentario-form/comentario-form.component';
+import { ComentariosFilterComponent } from './comentarios/components/comentarios-filter/comentarios-filter.component';
+import { ComentariosTableComponent } from './comentarios/components/comentarios-table/comentarios-table.component';
 import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
 import { CategoriaFormComponent } from './categorias/categoria-form/categoria-form.component';
 import { CrearCategoriaComponent } from './categorias/crear/crear-categoria.component';
@@ -19,6 +21,7 @@ import { EditarCategoriaComponent } from './categorias/editar/editar-categoria.c
 // Entradas components are now lazy in EntradasModule; CKEditor moved there
 import { SharedOPModule } from '../../shared/shared.module';
 import { SharedCoreUiModule } from '../../shared/shared-coreui.module';
+import { SharedWidgetsModule } from '../../shared/shared-widgets.module';
 
 @NgModule({
   imports: [
@@ -30,6 +33,7 @@ import { SharedCoreUiModule } from '../../shared/shared-coreui.module';
     // ✅ Shared Module (contiene componentes compartidos)
     SharedOPModule,
     SharedCoreUiModule,
+    SharedWidgetsModule,
   ],
   declarations: [
     // ✅ Solo componentes específicos de Base
@@ -40,6 +44,8 @@ import { SharedCoreUiModule } from '../../shared/shared-coreui.module';
     CrearComentarioComponent,
     EditarComentarioComponent,
     ComentarioFormComponent,
+    ComentariosFilterComponent,
+    ComentariosTableComponent,
     ListadoCategoriasComponent,
     CrearCategoriaComponent,
     EditarCategoriaComponent,

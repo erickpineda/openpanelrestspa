@@ -65,14 +65,18 @@
  *     (limpiar)="onLimpiar()"
  *   ></app-buscador-avanzado>
  *
- *   <div *ngIf="filtrosAplicados.length > 0">
- *     <h2>Filtros Aplicados:</h2>
- *     <ul>
- *       <li *ngFor="let filtro of filtrosAplicados">
- *         {{ filtro.campo }} {{ filtro.operacion }} {{ filtro.valor }}
- *       </li>
- *     </ul>
- *   </div>
+ *   @if (filtrosAplicados.length > 0) {
+ *     <div>
+ *       <h2>Filtros Aplicados:</h2>
+ *       <ul>
+ *         @for (filtro of filtrosAplicados; track filtro.campo) {
+ *           <li>
+ *             {{ filtro.campo }} {{ filtro.operacion }} {{ filtro.valor }}
+ *           </li>
+ *         }
+ *       </ul>
+ *     </div>
+ *  }
  * </div>
  * ```
  */

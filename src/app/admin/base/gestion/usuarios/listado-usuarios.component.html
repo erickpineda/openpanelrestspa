@@ -1,7 +1,7 @@
 <c-container fluid class="px-0">
   <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
     <!-- Encabezado Principal -->
-    <c-card-header class="bg-white p-4 border-bottom-0">
+    <c-card-header class="bg-white p-4 border-bottom">
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
           <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
@@ -90,7 +90,7 @@
               <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'COMMON.ROLE' | translate }}</label>
               <select cSelect size="sm" [(ngModel)]="filtroRolCodigo" [disabled]="loading">
                 <option [ngValue]="null">{{ 'ADMIN.USERS.ALL_ROLES' | translate }}</option>
-                @for (r of roles; track trackByRol($index, r)) {
+                @for (r of roles; track r.idRol ?? $index) {
                 <option [value]="r.codigo">{{ r.nombre }}</option>
                 }
               </select>
@@ -147,7 +147,7 @@
               </tr>
             </thead>
             <tbody class="border-top-0">
-              @for (u of usuarios; track trackByUsuario($index, u)) {
+              @for (u of usuarios; track u.idUsuario ?? $index) {
               <tr class="align-middle" [class.bg-light]="!u.habilitado" [class.text-muted]="!u.habilitado">
                 <td class="ps-4 py-3">
                   <div class="d-flex align-items-center">
@@ -202,12 +202,12 @@
                 <td class="text-end pe-4 py-3">
                   <c-button-group role="group">
                     <button cButton color="primary" variant="ghost" size="sm" (click)="openEdit(u)"
-                      [cTooltip]="'COMMON.EDIT' | translate" class="text-primary-emphasis">
+                      [cTooltip]="'COMMON.EDIT' | translate">
                       <svg cIcon name="cilPen"></svg>
                     </button>
                     <button cButton color="danger" variant="ghost" size="sm" (click)="delete(u)"
                       [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE"
-                      [cTooltip]="'COMMON.DELETE' | translate" class="text-danger-emphasis">
+                      [cTooltip]="'COMMON.DELETE' | translate">
                       <svg cIcon name="cilTrash"></svg>
                     </button>
                   </c-button-group>
@@ -233,21 +233,8 @@
           <small class="text-secondary">
             {{ 'COMMON.PAGINATION_INFO' | translate: { current: numberOfElements, total: totalElements } }}
           </small>
-          <c-pagination class="mb-0" align="end" size="sm">
-            <li class="page-item" [class.disabled]="pageNo <= 0">
-              <a class="page-link" (click)="prev()" style="cursor: pointer" aria-label="Anterior">
-                <span aria-hidden="true">{{ 'COMMON.PREVIOUS' | translate }}</span>
-              </a>
-            </li>
-            <li class="page-item disabled">
-              <a class="page-link">{{ pageNo + 1 }} / {{ getTotalPages() }}</a>
-            </li>
-            <li class="page-item" [class.disabled]="pageNo >= getTotalPages() - 1">
-              <a class="page-link" (click)="next()" style="cursor: pointer" aria-label="Siguiente">
-                <span aria-hidden="true">{{ 'COMMON.NEXT' | translate }}</span>
-              </a>
-            </li>
-          </c-pagination>
+          <app-op-pagination [totalPages]="getTotalPages()" [currentPage]="pageNo" (pageChange)="onPageChange($event)" size="sm" class="mb-0">
+          </app-op-pagination>
         </div>
       </div>
     </c-card-body>

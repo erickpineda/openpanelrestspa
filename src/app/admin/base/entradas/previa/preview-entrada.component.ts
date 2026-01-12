@@ -24,6 +24,7 @@ export class PreviaEntradaComponent implements OnChanges {
   @Input() entrada?: Entrada;
   @Input() categoriasMeta?: Categoria[] = [];
   @Input() mostrarBotonesAccion = true;
+  @Input() mostrarTitulo = true;
 
   @Output() cerrar = new EventEmitter<void>();
   @Output() editar = new EventEmitter<void>();
@@ -32,6 +33,9 @@ export class PreviaEntradaComponent implements OnChanges {
   tituloMostrar = '';
   contenidoSeguro: SafeHtml = '';
   categoriasMostrar: { idCategoria?: number; nombre?: string }[] = [];
+  imagenMostrar: string | null = null;
+  usernameMostrar: string = '';
+  fechaMostrar: Date | string | null = null;
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -49,6 +53,31 @@ export class PreviaEntradaComponent implements OnChanges {
       this.tituloMostrar = this.entrada.titulo;
     } else {
       this.tituloMostrar = '';
+    }
+
+    // IMAGEN
+    if (this.form && this.form.get('imagenDestacada')) {
+      const val = this.form.get('imagenDestacada')?.value;
+      this.imagenMostrar = typeof val === 'string' ? val : null;
+    } else if (this.entrada && this.entrada.imagenDestacada) {
+      this.imagenMostrar = this.entrada.imagenDestacada;
+    } else {
+      this.imagenMostrar = null;
+    }
+
+    // AUTOR
+    if (this.entrada && this.entrada.usernameCreador) {
+      this.usernameMostrar = this.entrada.usernameCreador;
+    } else {
+      this.usernameMostrar = '';
+    }
+
+    // FECHA
+    if (this.entrada && this.entrada.fechaPublicacion) {
+      this.fechaMostrar = this.entrada.fechaPublicacion;
+    } else {
+      // Si no hay fecha (creación), mostramos fecha actual como preview
+      this.fechaMostrar = new Date();
     }
 
     // CONTENIDO

@@ -105,7 +105,9 @@
       @if (loading) {
       <c-spinner size="sm" class="me-1"></c-spinner>
       }
-      <svg cIcon name="cilSave" class="me-1" *ngIf="!loading"></svg>
+      @if (!loading) {
+        <svg cIcon name="cilSave" class="me-1"></svg>
+      }
       {{ 'ADMIN.USERS.SAVE_USER' | translate }}
     </button>
   </c-modal-footer>

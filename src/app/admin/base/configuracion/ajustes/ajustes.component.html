@@ -1,15 +1,10 @@
 <c-container class="container-fluid">
-  <c-card class="mb-4 shadow-sm border-0" aria-live="polite">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm" aria-live="polite">
     <c-card-header class="bg-white border-bottom py-3">
       <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
-          <div class="bg-primary bg-opacity-10 p-2 rounded">
-            <svg cIcon name="cilSettings" size="lg" class="text-primary"></svg>
-          </div>
-          <div>
-            <h5 class="mb-0 fw-bold text-gray-800">{{ 'ADMIN.SETTINGS.TITLE' | translate }}</h5>
-            <small class="text-muted">{{ 'ADMIN.SETTINGS.SUBTITLE' | translate }}</small>
-          </div>
+          <svg cIcon name="cilSettings" size="lg" class="text-primary"></svg>
+          <h4 class="mb-0 text-primary">{{ 'ADMIN.SETTINGS.TITLE' | translate }}</h4>
         </div>
         <div class="btn-group" role="group" aria-label="Acciones">
           <button cButton color="primary" class="text-white shadow-sm" (click)="openNew()">
@@ -32,11 +27,10 @@
       </c-alert>
       }
 
-      <div
-        class="d-flex flex-column flex-md-row gap-3 mb-4 justify-content-between align-items-end bg-light p-3 rounded">
-        <div class="d-flex flex-column flex-md-row gap-3 flex-grow-1 w-100">
+      <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
+        <div class="d-flex flex-wrap gap-3 align-items-end">
           <div class="flex-grow-1" style="max-width: 400px;">
-            <label class="form-label text-muted small text-uppercase fw-bold">{{ 'COMMON.SEARCH' | translate }}</label>
+            <label class="form-label text-muted small fw-bold mb-1">{{ 'COMMON.SEARCH' | translate }}</label>
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0 text-secondary">
                 <svg cIcon name="cilSearch" size="sm"></svg>
@@ -54,20 +48,21 @@
               <span>{{ 'COMMON.FILTERS' | translate }} {{ showAdvanced ? ('COMMON.ACTIVE' | translate) : '' }}</span>
             </button>
           </div>
-        </div>
-        <div class="d-flex align-items-end">
-          <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect"
-            class="form-select-sm" style="width: auto" [disabled]="loading">
-            <option value="5">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 5 } }}</option>
-            <option value="10">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 10 } }}</option>
-            <option value="20">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 20 } }}</option>
-            <option value="50">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 50 } }}</option>
-          </select>
+          <div class="d-flex align-items-end ms-auto">
+            <label class="form-label small text-muted fw-bold mb-1 me-2">{{ 'COMMON.SHOW' | translate }}</label>
+            <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect"
+              class="form-select-sm" style="width: auto" [disabled]="loading">
+              <option value="5">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 5 } }}</option>
+              <option value="10">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 10 } }}</option>
+              <option value="20">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 20 } }}</option>
+              <option value="50">{{ 'ADMIN.SETTINGS.X_RECORDS' | translate: { count: 50 } }}</option>
+            </select>
+          </div>
         </div>
       </div>
 
       @if (showAdvanced) {
-      <div class="mb-4 p-3 bg-light rounded border animate__animated animate__fadeIn">
+      <div class="mb-4 p-3 bg-white rounded border shadow-sm animate__animated animate__fadeIn">
         <c-row class="g-3 align-items-end">
           <c-col xs="12" md="4">
             <label class="form-label small fw-bold text-muted">{{ 'ADMIN.SETTINGS.TABLE.CATEGORY' | translate }}</label>
@@ -104,7 +99,7 @@
         }
 
         <div class="table-responsive">
-          <table cTable hover striped class="align-middle mb-0 border-start border-end">
+          <table cTable [hover]="true" [striped]="true" [responsive]="true" align="middle" class="mb-0 border">
             <thead class="bg-light border-bottom">
               <tr>
                 <th scope="col" class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase"
@@ -130,14 +125,16 @@
                   {{ a.valor }}
                 </td>
                 <td class="px-3 text-end">
-                  <button cButton color="info" variant="ghost" size="sm" (click)="openEdit(a)"
-                    [cTooltip]="'COMMON.EDIT' | translate" class="me-1">
-                    <svg cIcon name="cilPen" size="sm"></svg>
-                  </button>
-                  <button cButton color="danger" variant="ghost" size="sm" (click)="delete(a)"
-                    [cTooltip]="'COMMON.DELETE' | translate">
-                    <svg cIcon name="cilTrash" size="sm"></svg>
-                  </button>
+                  <c-button-group role="group">
+                    <button cButton color="info" variant="ghost" size="sm" (click)="openEdit(a)"
+                      [cTooltip]="'COMMON.EDIT' | translate">
+                      <svg cIcon name="cilPen" size="sm"></svg>
+                    </button>
+                    <button cButton color="danger" variant="ghost" size="sm" (click)="delete(a)"
+                      [cTooltip]="'COMMON.DELETE' | translate">
+                      <svg cIcon name="cilTrash" size="sm"></svg>
+                    </button>
+                  </c-button-group>
                 </td>
               </tr>
               } @empty {
@@ -155,11 +152,14 @@
         </div>
       </div>
     </c-card-body>
-    <c-card-footer class="bg-white border-top py-3">
-      <app-op-pagination [align]="'end'" [totalPages]="getTotalPages()" [currentPage]="pageNo"
-        (pageChange)="onPageChange($event)">
+    <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+      <div class="text-muted small">
+        {{ 'COMMON.PAGINATION_INFO' | translate: { current: pagedAjustes.length, total: totalElements } }}
+      </div>
+      <app-op-pagination [totalPages]="getTotalPages()" [currentPage]="pageNo" (pageChange)="onPageChange($event)"
+        size="sm" class="mb-0">
       </app-op-pagination>
-    </c-card-footer>
+    </div>
   </c-card>
 </c-container>
 

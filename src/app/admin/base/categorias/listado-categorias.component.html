@@ -1,186 +1,184 @@
-<c-card class="mb-4 shadow-sm border-0" aria-live="polite">
-  <c-card-header class="bg-white border-bottom py-3">
-    <div class="d-flex justify-content-between align-items-center">
-      <div class="d-flex align-items-center gap-2">
-        <div class="bg-primary bg-opacity-10 p-2 rounded">
-          <svg cIcon name="cilTags" size="lg" class="text-primary"></svg>
-        </div>
+<c-container fluid class="px-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm" aria-live="polite">
+    <!-- Encabezado Principal -->
+    <c-card-header class="bg-white p-4 border-bottom">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-          <h5 class="mb-0 text-primary fw-bold">{{ 'ADMIN.CATEGORIES.TITLE' | translate }}</h5>
-          <small class="text-muted">{{ 'ADMIN.CATEGORIES.SUBTITLE' | translate }}</small>
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilTags" class="text-primary"></svg>
+            {{ 'ADMIN.CATEGORIES.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.CATEGORIES.SUBTITLE' | translate }}
+          </small>
         </div>
-      </div>
-      <div class="d-flex gap-2">
-        <button cButton color="primary" class="text-white shadow-sm" (click)="crearCategoria()">
-          <svg cIcon name="cilPlus" size="sm" class="me-2"></svg>
-          {{ 'ADMIN.CATEGORIES.NEW_CATEGORY' | translate }}
-        </button>
-      </div>
-    </div>
-  </c-card-header>
-
-  <c-card-body [attr.aria-busy]="cargando ? 'true' : null">
-    @if (errorMsg) {
-    <div class="alert alert-danger d-flex align-items-center justify-content-between my-2 shadow-sm border-danger"
-      role="alert">
-      <div class="d-flex align-items-center gap-2">
-        <svg cIcon name="cilWarning" class="text-danger"></svg>
-        <span>{{ errorMsg }}</span>
-      </div>
-      <button cButton color="danger" size="sm" (click)="refrescar()">{{ 'COMMON.RETRY' | translate }}</button>
-    </div>
-    }
-
-    <!-- Toolbar: Buscador y Filtros -->
-    <div
-      class="d-flex flex-wrap gap-3 mb-4 p-3 bg-light rounded align-items-end shadow-sm border-start border-4 border-primary">
-      <!-- Buscador Básico -->
-      <div class="flex-grow-1" style="min-width: 250px;">
-        <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SEARCH' | translate }}</label>
-        <div class="input-group">
-          <span class="input-group-text bg-white border-end-0">
-            <svg cIcon name="cilSearch" class="text-muted"></svg>
-          </span>
-          <input cFormControl type="text" [value]="basicSearchText"
-            (input)="onBasicSearchTextChange($any($event.target).value)"
-            [placeholder]="'ADMIN.CATEGORIES.SEARCH_PLACEHOLDER' | translate" class="border-start-0 ps-0"
-            [disabled]="cargando" />
-        </div>
-      </div>
-
-      <!-- Botón Filtros Avanzados -->
-      <div>
-        <button cButton [color]="showAdvanced ? 'primary' : 'secondary'" variant="outline" (click)="toggleAdvanced()"
-          [disabled]="cargando" class="d-flex align-items-center gap-2">
-          <svg cIcon name="cilFilter" size="sm"></svg>
-          {{ showAdvanced ? ('ADMIN.CATEGORIES.HIDE_FILTERS' | translate) : ('ADMIN.CATEGORIES.ADVANCED_FILTERS' |
-          translate) }}
-        </button>
-      </div>
-
-      <!-- Selector de Registros por Página -->
-      <div>
-        <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SHOW' | translate }}</label>
-        <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" style="width: 80px"
-          [disabled]="cargando">
-          <option [ngValue]="5">5</option>
-          <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
-          <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
-          <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
-        </select>
-      </div>
-    </div>
-
-    @if (showAdvanced) {
-    <div class="mb-4 p-3 bg-white rounded border shadow-sm">
-      <c-row class="g-3 align-items-end">
-        <c-col xs="12" md="6">
-          <label class="form-label small fw-bold text-muted">{{ 'COMMON.NAME' | translate }}</label>
-          <input cFormControl size="sm" type="text" [placeholder]="'ADMIN.CATEGORIES.SEARCH_PLACEHOLDER' | translate"
-            [value]="filtroNombre" (input)="filtroNombre = $any($event.target).value" [disabled]="cargando" />
-        </c-col>
-        <c-col xs="12" md="6" class="d-flex justify-content-md-end gap-2">
-          <button cButton size="sm" color="secondary" variant="ghost" (click)="reset()" [disabled]="cargando">
-            <svg cIcon name="cilReload" class="me-1"></svg> {{ 'COMMON.CLEAN' | translate }}
+        <div class="d-flex gap-2">
+          <button cButton color="primary" size="sm" class="shadow-sm" (click)="crearCategoria()">
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            {{ 'ADMIN.CATEGORIES.NEW_CATEGORY' | translate }}
           </button>
-          <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="cargando">
-            <svg cIcon name="cilSearch" class="me-1"></svg> {{ 'COMMON.SEARCH' | translate }}
-          </button>
-        </c-col>
-      </c-row>
-    </div>
-    }
-
-    <!-- Tabla de Resultados -->
-    <div class="position-relative">
-      @if (cargando) {
-      <div
-        class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3 rounded">
-        <div class="text-center">
-          <c-spinner color="primary" [attr.aria-label]="'COMMON.LOADING' | translate"></c-spinner>
-          <p class="mt-2 text-muted small fw-bold">{{ 'COMMON.LOADING' | translate }}</p>
         </div>
+      </div>
+    </c-card-header>
+
+    <c-card-body class="p-4" [attr.aria-busy]="cargando ? 'true' : null">
+      @if (errorMsg) {
+      <div class="alert alert-danger d-flex align-items-center justify-content-between my-2 shadow-sm border-danger"
+        role="alert">
+        <div class="d-flex align-items-center gap-2">
+          <svg cIcon name="cilWarning" class="text-danger"></svg>
+          <span>{{ errorMsg }}</span>
+        </div>
+        <button cButton color="danger" size="sm" (click)="refrescar()">{{ 'COMMON.RETRY' | translate }}</button>
       </div>
       }
 
-      <div class="table-responsive rounded border">
-        <table cTable hover striped class="align-middle mb-0" role="table" aria-label="Tabla de categorías">
-          <thead class="bg-light">
-            <tr>
-              <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 200px">
-                {{ 'COMMON.NAME' | translate }}</th>
-              <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 250px">
-                {{ 'COMMON.DESCRIPTION' | translate }}</th>
-              <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-center"
-                style="min-width: 100px">{{ 'COMMON.ACTIONS' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (categ of pagedCategorias; track trackByCategoriaId($index, categ)) {
-            <tr>
-              <td class="px-3">
-                <div class="d-flex flex-column">
-                  <span class="fw-bold text-primary text-truncate" style="max-width: 250px" [title]="categ.nombre">
-                    {{ categ.nombre }}
-                  </span>
-                  <small class="text-muted font-monospace">{{ 'COMMON.ID' | translate }}: {{ categ.idCategoria
-                    }}</small>
-                </div>
-              </td>
-              <td class="px-3">
-                <span class="d-inline-block text-truncate text-muted" style="max-width: 300px"
-                  [title]="categ.descripcion">
-                  {{ categ.descripcion || ('COMMON.NO_DESCRIPTION' | translate) }}
-                </span>
-              </td>
-              <td class="px-3 text-center">
-                <div class="d-flex justify-content-center gap-1">
-                  <button cButton color="info" size="sm" variant="ghost" (click)="editarCategoria(categ.idCategoria)"
-                    [cTooltip]="'ADMIN.CATEGORIES.EDIT_CATEGORY' | translate"
-                    [attr.aria-label]="('ADMIN.CATEGORIES.EDIT_CATEGORY' | translate) + ' ' + categ.nombre">
-                    <svg cIcon name="cilPen" size="sm"></svg>
-                  </button>
-                  <button cButton color="danger" size="sm" variant="ghost" (click)="borrarCategoria(categ)"
-                    [cTooltip]="'ADMIN.CATEGORIES.DELETE_CATEGORY' | translate"
-                    [attr.aria-label]="('ADMIN.CATEGORIES.DELETE_CATEGORY' | translate) + ' ' + categ.nombre">
-                    <svg cIcon name="cilTrash" size="sm"></svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            }
-            @if (pagedCategorias.length === 0) {
-            <tr>
-              <td colspan="3" class="text-center py-5 text-muted">
-                <div class="d-flex flex-column align-items-center justify-content-center">
-                  <svg cIcon name="cilFolderOpen" size="xl" class="mb-3 text-secondary opacity-50"></svg>
-                  <span>{{ 'ADMIN.CATEGORIES.NO_RESULTS' | translate }}</span>
-                  <small class="text-muted mt-1">{{ 'ADMIN.CATEGORIES.TRY_ADJUSTING_FILTERS' | translate }}</small>
-                </div>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </c-card-body>
+      <!-- Toolbar: Buscador y Filtros -->
+      <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
+        <div class="d-flex flex-wrap gap-3 align-items-end">
+          <!-- Buscador Básico -->
+          <div class="flex-grow-1" style="min-width: 250px;">
+            <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SEARCH' | translate }}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0">
+                <svg cIcon name="cilSearch" class="text-muted"></svg>
+              </span>
+              <input cFormControl type="text" [value]="basicSearchText"
+                (input)="onBasicSearchTextChange($any($event.target).value)"
+                [placeholder]="'ADMIN.CATEGORIES.SEARCH_PLACEHOLDER' | translate" class="border-start-0 ps-0 shadow-none"
+                [disabled]="cargando" />
+            </div>
+          </div>
 
-  @if (pagedCategorias.length > 0) {
-  <c-card-footer class="bg-white border-top py-3">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-      <div class="text-muted small order-2 order-md-1">
+          <!-- Botón Filtros Avanzados -->
+          <div>
+            <button cButton [color]="showAdvanced ? 'primary' : 'secondary'" variant="outline" (click)="toggleAdvanced()"
+              [disabled]="cargando" class="d-flex align-items-center gap-2">
+              <svg cIcon name="cilFilter" size="sm"></svg>
+              {{ showAdvanced ? ('ADMIN.CATEGORIES.HIDE_FILTERS' | translate) : ('ADMIN.CATEGORIES.ADVANCED_FILTERS' |
+              translate) }}
+            </button>
+          </div>
+
+          <!-- Selector de Registros por Página -->
+          <div>
+            <label class="form-label small text-muted fw-bold mb-1">{{ 'COMMON.SHOW' | translate }}</label>
+            <select cSelect [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" style="width: 80px"
+              [disabled]="cargando">
+              <option [ngValue]="5">5</option>
+              <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
+              <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
+              <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      @if (showAdvanced) {
+      <div class="mb-4 p-3 bg-white rounded border shadow-sm">
+        <c-row class="g-3 align-items-end">
+          <c-col xs="12" md="6">
+            <label class="form-label small fw-bold text-muted">{{ 'COMMON.NAME' | translate }}</label>
+            <input cFormControl size="sm" type="text" [placeholder]="'ADMIN.CATEGORIES.SEARCH_PLACEHOLDER' | translate"
+              [value]="filtroNombre" (input)="filtroNombre = $any($event.target).value" [disabled]="cargando" />
+          </c-col>
+          <c-col xs="12" md="6" class="d-flex justify-content-md-end gap-2">
+            <button cButton size="sm" color="secondary" variant="ghost" (click)="reset()" [disabled]="cargando">
+              <svg cIcon name="cilReload" class="me-1"></svg> {{ 'COMMON.CLEAN' | translate }}
+            </button>
+            <button cButton size="sm" color="primary" variant="outline" (click)="search()" [disabled]="cargando">
+              <svg cIcon name="cilSearch" class="me-1"></svg> {{ 'COMMON.SEARCH' | translate }}
+            </button>
+          </c-col>
+        </c-row>
+      </div>
+      }
+
+      <!-- Tabla de Resultados -->
+      <div class="position-relative">
+        @if (cargando) {
+        <div
+          class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3 rounded">
+          <div class="text-center">
+            <c-spinner color="primary" [attr.aria-label]="'COMMON.LOADING' | translate"></c-spinner>
+            <p class="mt-2 text-muted small fw-bold">{{ 'COMMON.LOADING' | translate }}</p>
+          </div>
+        </div>
+        }
+
+        <div class="table-responsive">
+          <table cTable [hover]="true" [striped]="true" [responsive]="true" align="middle" class="mb-0 border" role="table" aria-label="Tabla de categorías">
+            <thead class="bg-light">
+              <tr>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 200px">
+                  {{ 'COMMON.NAME' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 250px">
+                  {{ 'COMMON.DESCRIPTION' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-end"
+                  style="min-width: 100px">{{ 'COMMON.ACTIONS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (categ of pagedCategorias; track trackByCategoriaId($index, categ)) {
+              <tr>
+                <td class="px-3">
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold text-primary text-truncate" style="max-width: 250px" [title]="categ.nombre">
+                      {{ categ.nombre }}
+                    </span>
+                    <small class="text-muted font-monospace">{{ 'COMMON.ID' | translate }}: {{ categ.idCategoria
+                      }}</small>
+                  </div>
+                </td>
+                <td class="px-3">
+                  <span class="d-inline-block text-truncate text-muted" style="max-width: 300px"
+                    [title]="categ.descripcion">
+                    {{ categ.descripcion || ('COMMON.NO_DESCRIPTION' | translate) }}
+                  </span>
+                </td>
+                <td class="px-3 text-end">
+                  <c-button-group role="group">
+                    <button cButton color="info" size="sm" variant="ghost" (click)="editarCategoria(categ.idCategoria)"
+                      [cTooltip]="'ADMIN.CATEGORIES.EDIT_CATEGORY' | translate"
+                      [attr.aria-label]="('ADMIN.CATEGORIES.EDIT_CATEGORY' | translate) + ' ' + categ.nombre">
+                      <svg cIcon name="cilPen" size="sm"></svg>
+                    </button>
+                    <button cButton color="danger" size="sm" variant="ghost" (click)="borrarCategoria(categ)"
+                      [cTooltip]="'ADMIN.CATEGORIES.DELETE_CATEGORY' | translate"
+                      [attr.aria-label]="('ADMIN.CATEGORIES.DELETE_CATEGORY' | translate) + ' ' + categ.nombre">
+                      <svg cIcon name="cilTrash" size="sm"></svg>
+                    </button>
+                  </c-button-group>
+                </td>
+              </tr>
+              }
+              @if (pagedCategorias.length === 0) {
+              <tr>
+                <td colspan="3" class="text-center py-5 text-muted">
+                  <div class="d-flex flex-column align-items-center justify-content-center">
+                    <svg cIcon name="cilFolderOpen" size="xl" class="mb-3 text-secondary opacity-50"></svg>
+                    <span>{{ 'ADMIN.CATEGORIES.NO_RESULTS' | translate }}</span>
+                    <small class="text-muted mt-1">{{ 'ADMIN.CATEGORIES.TRY_ADJUSTING_FILTERS' | translate }}</small>
+                  </div>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </c-card-body>
+
+    <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+      <div class="text-muted small">
         {{ 'COMMON.PAGINATION_INFO' | translate: { current: numberOfElements, total: totalElements } }}
       </div>
-      <div class="order-1 order-md-2 w-100 w-md-auto d-flex justify-content-center">
-        <app-op-pagination [align]="'end'" [totalPages]="getTotalPages()" [currentPage]="pageNo"
-          (pageChange)="onPageChange($event)">
-        </app-op-pagination>
-      </div>
+      <app-op-pagination [align]="'end'" [totalPages]="getTotalPages()" [currentPage]="pageNo"
+        (pageChange)="onPageChange($event)" size="sm" class="mb-0">
+      </app-op-pagination>
     </div>
-  </c-card-footer>
-  }
-</c-card>
+  </c-card>
+</c-container>
 
 <!-- Modal Crear Categoría -->
 <app-crear-categoria [visible]="visibleModalCrear" (visibleChange)="visibleModalCrear = $event"

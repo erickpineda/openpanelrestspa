@@ -125,6 +125,13 @@ export class EditarEntradaComponent implements OnInit {
     this.modalPreviaVisible = false;
   }
 
+  onPublicarDesdePreview() {
+    this.modalPreviaVisible = false;
+    if (this.entradaParaPrevia) {
+      this.onGuardar(this.entradaParaPrevia);
+    }
+  }
+
   onCancelar() {
     this.router.navigateByUrl('/admin/control/entradas');
   }

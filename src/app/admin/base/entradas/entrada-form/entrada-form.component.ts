@@ -18,18 +18,23 @@ import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
 import { TemporaryStorageService } from '../../../../core/services/ui/temporary-storage.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { OPConstants } from '../../../../shared/constants/op-global.constants';
-import { FileStorageService } from '../../../../core/services/file-storage.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { SafeUrl } from '@angular/platform-browser';
 import { ViewChild } from '@angular/core';
 import { ImagenesComponent } from '../../contenido/imagenes/imagenes.component';
 import { TranslationService } from '../../../../core/services/translation.service';
+import { EntradaImageService } from '../services/entrada-image.service';
+import { EntradaFormStateService } from '../services/entrada-form-state.service';
+
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-entrada-form',
   templateUrl: './entrada-form.component.html',
   styleUrls: ['./entrada-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [EntradaFormStateService],
   standalone: false,
 })
 export class EntradaFormComponent implements OnInit, OnChanges {
@@ -77,45 +82,44 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   public Editor: any = null;
   public editorLoading = false;
   public estaEditando = false;
-  public isFullWidth = false;
-  public isFullScreen = false;
-  public showBackToTop = false;
 
-  // ✅ REVERTIMOS: Volvemos a notificación individual
-  showRecoveryNotification = false;
-  showMultipleRecoveryNotification = false; // Mantenemos por si acaso, pero no la usaremos
-  temporaryData: any = null;
-  multipleTemporaryEntries: any[] = [];
+  // State delegation getters
+  get isFullWidth() { return this.stateService.currentState.isFullWidth; }
+  get isFullScreen() { return this.stateService.currentState.isFullScreen; }
+  get showBackToTop() { return this.stateService.currentState.showBackToTop; }
+  get showRecoveryNotification() { return this.stateService.currentState.showRecoveryNotification; }
+  get temporaryData() { return this.stateService.currentState.temporaryData; }
+  get imagenPreviewUrl() { return this.stateService.currentState.imagenPreviewUrl; }
+  set imagenPreviewUrl(val: SafeUrl | string | null) { this.stateService.setImagenPreviewUrl(val); }
 
-  // ✅ NUEVO: Bandera para controlar si estamos recuperando desde navegación
-  private isRecoveringFromNavigation = false;
-
-  // ✅ NUEVO: ID único para esta instancia de formulario
-  private currentTemporaryEntryId: string | null = null;
-
-  public imagenPreviewUrl: SafeUrl | string | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private temporaryStorage: TemporaryStorageService,
     private router: Router,
     private cdRef: ChangeDetectorRef,
     private log: LoggerService,
-    private fileStorage: FileStorageService,
+    private imageService: EntradaImageService,
     private toastService: ToastService,
-    private sanitizer: DomSanitizer,
-    private translate: TranslationService
+    private translate: TranslationService,
+    public stateService: EntradaFormStateService
   ) { }
 
   ngOnInit(): void {
+    // Sync state changes with view
+    this.stateService.state$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.cdRef.markForCheck();
+      });
+
     window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.saveBeforeLogout.bind(this));
 
     // Verificar navegación con recuperación
     this.checkNavigationState();
 
     // Verificar datos temporales solo si no venimos de recuperación
-    if (!this.estaEditando && !this.isRecoveringFromNavigation) {
-      this.checkForTemporaryData();
-    }
+    this.stateService.checkForTemporaryData(this.estaEditando);
 
     // Cargar CKEditor dinámicamente
     this.loadEditorBuild();
@@ -129,23 +133,19 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   // Helper para cargar imagen segura si es un endpoint protegido
   private checkAndLoadSecureImage(url: string): void {
-    // Regex simple para detectar UUID en la URL de descarga
-    const match = url.match(/\/descargar\/([0-9a-fA-F-]{36})/);
-    if (match && match[1]) {
-      this.cargarPreviewSegura(match[1]);
+    const uuid = this.imageService.extractUuidFromUrl(url);
+    if (uuid) {
+      this.cargarPreviewSegura(uuid);
     }
   }
 
   private cargarPreviewSegura(uuid: string): void {
-    this.fileStorage.descargarFichero(uuid).subscribe({
-      next: (blob) => {
-        // Solo revocamos si es string, SafeUrl no se puede revocar así
-        if (typeof this.imagenPreviewUrl === 'string') {
-          URL.revokeObjectURL(this.imagenPreviewUrl);
-        }
+    this.imageService.loadSecureImage(uuid).subscribe({
+      next: (safeUrl) => {
+        // Revocar anterior si era blob
+        this.imageService.revokeUrl(this.imagenPreviewUrl);
 
-        const objectUrl = URL.createObjectURL(blob);
-        this.imagenPreviewUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
+        this.imagenPreviewUrl = safeUrl;
         this.cdRef.markForCheck();
       },
       error: (err) => console.error('Error cargando preview segura', err),
@@ -156,44 +156,39 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   onImagenSeleccionada(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Preview inmediata local y conversión a Base64 para el backend
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        const base64 = e.target.result;
+      // 1. Procesar imagen para preview y base64
+      this.imageService.processSelectedImage(file).subscribe({
+        next: (result) => {
+          // Revocar URL anterior si es necesario
+          this.imageService.revokeUrl(this.imagenPreviewUrl);
 
-        // Revocar URL anterior si era un string (blob url)
-        if (typeof this.imagenPreviewUrl === 'string') {
-          URL.revokeObjectURL(this.imagenPreviewUrl);
-        }
+          // Asignar preview
+          this.imagenPreviewUrl = result.previewUrl;
 
-        // Base64 es seguro para mostrar directamente (data:image/...)
-        // Opcionalmente podríamos sanitizarlo también, pero suele funcionar directo en src
-        this.imagenPreviewUrl = base64;
+          // Asignar Base64 al formulario
+          this.form.patchValue({ imagenDestacada: result.base64 });
+          this.form.markAsDirty();
+          this.cdRef.markForCheck();
+        },
+        error: (err) => this.log.error('Error procesando imagen', err)
+      });
 
-        // IMPORTANTE: El backend espera byte[] (Base64), no una URL.
-        // Asignamos el Base64 directamente al formulario.
-        this.form.patchValue({ imagenDestacada: base64 });
-        this.form.markAsDirty();
-        this.cdRef.markForCheck();
-      };
-      reader.readAsDataURL(file);
-
-      this.log.info('Subiendo imagen destacada a librería...', file.name);
-
-      // Subimos a FileStorage solo para tenerla en la librería, pero no usamos la URL retornada para el form
-      this.fileStorage.uploadFile(file).subscribe({
-        next: (response: any) => {
-          this.log.info('Imagen subida a librería correctamente', response);
+      // 2. Subir a librería (efecto secundario, no bloqueante)
+      this.imageService.uploadToLibrary(file).subscribe({
+        next: (response) => {
           // Refrescar librería si está cargada
           if (this.imagenesComponent) {
             this.imagenesComponent.load();
           }
-          this.toastService.showSuccess(this.translate.instant('ADMIN.ENTRIES.IMAGE_UPLOADED_SUCCESS'), this.translate.instant('COMMON.SUCCESS'));
+          this.toastService.showSuccess(
+            this.translate.instant('ADMIN.ENTRIES.IMAGE_UPLOADED_SUCCESS'), 
+            this.translate.instant('COMMON.SUCCESS')
+          );
         },
         error: (err) => {
-          this.log.error('Error subiendo imagen a librería', err);
           // No mostramos error bloqueante porque ya tenemos la imagen en local para enviar
-        },
+          this.log.error('Error subiendo imagen a librería', err);
+        }
       });
     }
   }
@@ -233,6 +228,9 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+
     window.removeEventListener(
       OPConstants.Events.SAVE_UNSAVED_WORK,
       this.saveBeforeLogout.bind(this)
@@ -251,7 +249,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
     if (state?.temporaryEntry && state?.recoverData) {
       this.log.info('🔄 Recibiendo entrada temporal desde navegación:', state.temporaryEntry);
-      this.isRecoveringFromNavigation = true;
+      
+      this.stateService.setRecoveringFromNavigation(true);
 
       // Recuperar los datos en el formulario
       this.recoverTemporaryData(state.temporaryEntry.formData);
@@ -267,44 +266,20 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     }
   }
 
-  private checkForTemporaryData(): void {
-    const temporaryEntries = this.temporaryStorage.getTemporaryEntriesByType('entrada');
-
-    if (temporaryEntries.length > 0 && !this.isRecoveringFromNavigation) {
-      this.log.info('📥 Entradas temporales encontradas en formulario:', temporaryEntries);
-
-      // ✅ REVERTIMOS: Volvemos al comportamiento original - mostrar individual
-      if (temporaryEntries.length === 1) {
-        // Una sola entrada - mostrar notificación individual
-        this.temporaryData = temporaryEntries[0];
-        this.showRecoveryNotification = true;
-      } else {
-        // Múltiples entradas - mostrar notificación individual de la más reciente
-        const mostRecent = temporaryEntries.sort(
-          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        )[0];
-
-        this.temporaryData = mostRecent;
-        this.showRecoveryNotification = true;
-      }
-    }
-  }
-
   // ✅ REVERTIMOS: Métodos para notificación individual
   onRecoverData(): void {
-    this.showRecoveryNotification = false;
+    this.stateService.dismissRecoveryNotification();
     this.recoverTemporaryData(this.temporaryData.formData);
     this.temporaryStorage.removeTemporaryEntry(this.temporaryData.id);
   }
 
   onIgnoreData(): void {
-    this.showRecoveryNotification = false;
+    this.stateService.dismissRecoveryNotification();
     this.log.info('ℹ️ Usuario ignoró los datos temporales');
   }
 
   onDiscardData(): void {
-    this.showRecoveryNotification = false;
-    this.temporaryStorage.removeTemporaryEntry(this.temporaryData.id);
+    this.stateService.clearTemporaryData();
     this.log.info('🗑️ Usuario descartó los datos temporales');
   }
 
@@ -339,10 +314,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       this.log.info('✅ Datos temporales recuperados correctamente');
 
       // Limpiar datos temporales después de recuperarlos
-      if (this.currentTemporaryEntryId) {
-        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
-        this.currentTemporaryEntryId = null;
-      }
+      this.stateService.removeCurrentTemporaryEntry();
     } catch (error) {
       this.log.error('❌ Error al recuperar datos temporales:', error);
     }
@@ -366,33 +338,12 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   }
 
   private saveToTemporaryStorage(): void {
-    try {
-      const formData = this.form.value;
-
-      // ✅ NUEVO: Crear entrada temporal con metadatos
-      const temporaryEntry = {
-        formData: formData,
-        timestamp: new Date().toISOString(),
-        formType: 'entrada', // Tipo de formulario
-        title: formData.titulo || this.translate.instant('ADMIN.ENTRIES.UNTITLED_ENTRY'), // Título para mostrar
-        description: `${this.translate.instant('COMMON.CREATED')}: ${new Date().toLocaleString()}`, // Descripción
-      };
-
-      // Si ya existe una entrada temporal para este formulario, actualizarla
-      if (this.currentTemporaryEntryId) {
-        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
-      }
-
-      // Guardar nueva entrada temporal
-      this.currentTemporaryEntryId = this.temporaryStorage.saveTemporaryEntry(temporaryEntry);
-
-      this.log.info(
-        '✅ Datos guardados en almacenamiento temporal con ID:',
-        this.currentTemporaryEntryId
-      );
-    } catch (error) {
-      this.log.error('❌ Error al guardar temporalmente:', error);
-    }
+    const formData = this.form.value;
+    this.stateService.saveTemporaryEntry({
+      formData,
+      title: formData.titulo || this.translate.instant('ADMIN.ENTRIES.UNTITLED_ENTRY'),
+      description: `${this.translate.instant('COMMON.CREATED')}: ${new Date().toLocaleString()}`
+    });
   }
 
   onSubmit() {
@@ -404,10 +355,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       this.submitForm.emit(clean as Entrada);
 
       // ✅ MODIFICADO: Limpiar entrada temporal específica al guardar exitosamente
-      if (this.currentTemporaryEntryId) {
-        this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
-        this.currentTemporaryEntryId = null;
-      }
+      this.stateService.removeCurrentTemporaryEntry();
     } else {
       this.form.markAllAsTouched();
     }
@@ -415,10 +363,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   onReset() {
     // ✅ MODIFICADO: Limpiar entrada temporal específica al cancelar
-    if (this.currentTemporaryEntryId) {
-      this.temporaryStorage.removeTemporaryEntry(this.currentTemporaryEntryId);
-      this.currentTemporaryEntryId = null;
-    }
+    this.stateService.removeCurrentTemporaryEntry();
     this.cancelar.emit();
   }
 
@@ -431,12 +376,12 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   }
 
   toggleFullWidth() {
-    this.isFullWidth = !this.isFullWidth;
+    this.stateService.toggleFullWidth();
     this.setupEditorScrollListener();
   }
 
   toggleFullScreen() {
-    this.isFullScreen = !this.isFullScreen;
+    this.stateService.toggleFullScreen();
     this.setupEditorScrollListener();
   }
 
@@ -453,7 +398,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
       editorMain.addEventListener('scroll', this.onInternalScroll);
       
       // Verificar estado inicial
-      this.showBackToTop = editorMain.scrollTop > 300;
+      this.stateService.updateState({ showBackToTop: editorMain.scrollTop > 300 });
       
       this.cdRef.detectChanges();
     }, 200);
@@ -462,7 +407,7 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   // Arrow function para mantener el contexto 'this' automáticamente
   private onInternalScroll = (event: any) => {
     // El scroll siempre es interno ahora
-    this.showBackToTop = event.target.scrollTop > 300;
+    this.stateService.updateState({ showBackToTop: event.target.scrollTop > 300 });
     this.cdRef.detectChanges();
   }
 
@@ -630,30 +575,20 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
       // Si tiene UUID, descargamos el blob
       if (item.uuid) {
-        this.fileStorage.descargarFichero(item.uuid).subscribe({
-          next: (blob: Blob) => {
-            // Convertir a Base64 tanto para preview como para el formulario
-            // Esto asegura consistencia con la subida local que sí funciona
-            const reader = new FileReader();
-            reader.onload = (e: any) => {
-              const base64 = e.target.result;
+        this.imageService.downloadImageAsBase64(item.uuid).subscribe({
+          next: (base64: string) => {
+            // Limpieza de URL anterior si era blob
+            this.imageService.revokeUrl(this.imagenPreviewUrl);
 
-              // Limpieza de URL anterior si era blob
-              if (typeof this.imagenPreviewUrl === 'string' && this.imagenPreviewUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(this.imagenPreviewUrl);
-              }
+            // Usamos Base64 para la preview (igual que en onImagenSeleccionada)
+            this.imagenPreviewUrl = base64;
 
-              // Usamos Base64 para la preview (igual que en onImagenSeleccionada)
-              this.imagenPreviewUrl = base64;
-
-              // Y para el formulario
-              this.form.patchValue({ imagenDestacada: base64 });
-              this.form.markAsDirty();
-              this.cdRef.markForCheck();
-            };
-            reader.readAsDataURL(blob);
+            // Y para el formulario
+            this.form.patchValue({ imagenDestacada: base64 });
+            this.form.markAsDirty();
+            this.cdRef.markForCheck();
           },
-          error: (err) => {
+          error: (err: any) => {
             this.log.error('Error descargando fichero de galería', err);
             this.toastService.showError(this.translate.instant('ADMIN.ENTRIES.IMAGE_LOAD_ERROR'), this.translate.instant('COMMON.ERROR'));
           }

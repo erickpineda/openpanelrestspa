@@ -1,4 +1,8 @@
 {
+  "AUTO": {
+    "NO_SE_ENCONTRARON_USUARIOS": "No se encontraron usuarios",
+    "INTENTA_AJUSTAR_LOS_FILTROS_DE": "Intenta ajustar los filtros de búsqueda"
+  },
   "HEADER": {
     "HOME": "Inicio",
     "ABOUT": "Acerca de",
@@ -64,6 +68,8 @@
     "APPLY": "Aplicar",
     "RESET": "Limpiar",
     "UNPUBLISHED": "No Publicada",
+    "FILTERS": "Filtros",
+    "ACTIVE": "Activos",
     "VALIDATION": {
       "REQUIRED": "Este campo es obligatorio",
       "EMAIL_INVALID": "Correo electrónico inválido",
@@ -90,8 +96,8 @@
     "USERS": "Usuarios",
     "ROLES_AND_PERMISSIONS": "Roles y Permisos",
     "ROLES": "Roles",
-    "PRIVILEGES": "Privilegios",
-    "MY_ACCOUNT": "Mi Cuenta",
+      "PRIVILEGES": "Privilegios",
+      "MY_ACCOUNT": "Mi Cuenta",
     "MY_PROFILE": "Mi Perfil",
     "CHANGE_PASSWORD": "Cambiar Contraseña",
     "SYSTEM_CONFIGURATION": "Config. del Sistema",
@@ -443,6 +449,14 @@
       "DELETE_PERMANENTLY": "Eliminar Definitivamente",
       "OWNER_DELETE_ERROR": "No se puede eliminar al usuario Propietario",
       "ACTION_NOT_ALLOWED": "Acción no permitida",
+      "ROLES": {
+        "PROPIETARIO": "Propietario",
+        "ADMINISTRADOR": "Administrador",
+        "EDITOR": "Editor",
+        "AUTOR": "Autor",
+        "LECTOR": "Lector",
+        "SIN_ROL": "Sin Rol"
+      },
       "ERROR_LOADING": "Error cargando usuarios",
       "SUCCESS": {
         "CREATE": "Usuario creado correctamente",
@@ -454,17 +468,24 @@
         "CREATE": "Error creando usuario",
         "UPDATE": "Error actualizando usuario",
         "DELETE": "Error eliminando usuario"
-      },
-      "ROLES": {
+      }
+    },
+    "ROLES": {
+        "TITLE": "Roles",
+        "SUBTITLE": "Gestión de roles de usuario",
+        "NEW_ROLE": "Nuevo Rol",
+        "FILTER_PLACEHOLDER": "Filtrar por nombre...",
+        "ROLE_NAME": "Nombre del Rol",
+        "FILTER_BY_NAME": "Filtrar por nombre",
         "PROPIETARIO": "Propietario",
         "ADMINISTRADOR": "Administrador",
         "EDITOR": "Editor",
         "AUTOR": "Autor",
         "LECTOR": "Lector",
         "SIN_ROL": "Sin Rol"
-      }
     },
     "SETTINGS": {
+      "TITLE": "Ajustes del Sistema",
       "NEW_SETTING": "Nuevo Ajuste",
       "EDIT_SETTING": "Editar Ajuste",
       "DELETE_SETTING": "Eliminar Ajuste",
@@ -554,6 +575,7 @@
       "EDIT_ROLE": "Editar Rol",
       "DELETE_ROLE": "Eliminar Rol",
       "VERIFY_DELETE": "¿Está seguro de que desea eliminar este rol?",
+      "FILTER_PLACEHOLDER": "Buscar por nombre o código...",
       "SEARCH_PLACEHOLDER": "Buscar por nombre o código...",
       "X_RECORDS": "{{count}} registros",
       "ADVANCED_FILTERS": "Filtros Avanzados",
@@ -613,6 +635,7 @@
       "EDIT_PRIVILEGE": "Editar Privilegio",
       "DELETE_PRIVILEGE": "Eliminar Privilegio",
       "VERIFY_DELETE": "¿Está seguro de que desea eliminar este privilegio?",
+      "FILTER_PLACEHOLDER": "Buscar por nombre o código...",
       "SEARCH_PLACEHOLDER": "Buscar por nombre o código...",
       "PRIVILEGE_NAME": "Nombre del Privilegio",
       "FILTER_BY_NAME": "Filtrar por nombre...",
@@ -811,7 +834,7 @@
     },
     "FOOTER": {
       "COREUI": "CoreUI",
-      "COPYRIGHT": "&copy; 2021 creativeLabs",
+      "COPYRIGHT": "2021 creativeLabs",
       "POWERED_BY": "Powered by",
       "COREUI_ANGULAR": "CoreUI for Angular"
     },
@@ -1030,7 +1053,6 @@
     "DEBE_SELECCIONAR_UN_COLOR": "Debe seleccionar un color",
     "ETIQUETAS": "Etiquetas",
     "CLASIFICA_EL_CONTENIDO_CON_ETI": "Clasifica el contenido con etiquetas",
-    "NBSP": "&nbsp;",
     "NO_SE_ENCONTRARON_ETIQUETAS": "No se encontraron etiquetas",
     "INTENTA_AJUSTAR_LOS_FILTROS_O_": "Intenta ajustar los filtros o crea una nueva etiqueta",
     "CAMBIAR_CONTRASE_A": "Cambiar Contraseña",
@@ -1142,7 +1164,7 @@
     "ACTIVIDAD_RECIENTE": "Actividad Reciente",
     "CARGANDO_PERFIL": "Cargando perfil...",
     "COREUI": "CoreUI",
-    "COPY_2022_CREATIVELABS": "&copy; 2022 creativeLabs",
+    "COPY_2022_CREATIVELABS": "2022 creativeLabs",
     "COREUI_V4_FOR_ANGULAR": "CoreUI v4 for Angular",
     "LA_SESI_N_SE_CERR_DESDE_OTRO_D": "La sesión se cerró desde otro dispositivo o pestaña.",
     "SU_SESI_N_HA_CADUCADO_POR_INAC": "Su sesión ha caducado por inactividad.",
