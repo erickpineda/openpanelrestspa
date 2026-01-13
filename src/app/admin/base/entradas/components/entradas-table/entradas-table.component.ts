@@ -25,16 +25,28 @@ export class EntradasTableComponent {
 
   // Helper para info de estado (simplificado para ejemplo, idealmente vendría de un helper compartido o pipe)
   getEstadoInfo(entrada: Entrada): { color: string; icon: string; tooltip: string } {
-    // Lógica básica basada en lo que vi en el componente original
-    // Adaptar según los modelos reales de EstadoEntrada
     const nombreEstado = entrada.estadoEntrada?.nombre?.toUpperCase();
     
-    if (nombreEstado === 'PUBLICADA') {
-      return { color: 'text-success', icon: 'cilCheckCircle', tooltip: 'Publicada' };
-    } else if (nombreEstado === 'BORRADOR') {
-      return { color: 'text-warning', icon: 'cilPencil', tooltip: 'Borrador' };
-    } else {
-      return { color: 'text-secondary', icon: 'cilFile', tooltip: 'Archivada' }; // Fallback
+    switch (nombreEstado) {
+      case 'PUBLICADA':
+        return { color: 'success', icon: 'cilCheckCircle', tooltip: 'Publicada' };
+      case 'NO PUBLICADA':
+        return { color: 'danger', icon: 'cilXCircle', tooltip: 'No Publicada' };
+      case 'GUARDADA':
+      case 'BORRADOR':
+        return { color: 'secondary', icon: 'cilSave', tooltip: 'Guardada' };
+      case 'PENDIENTE REVISION':
+        return { color: 'warning', icon: 'cilWarning', tooltip: 'Pendiente Revisión' };
+      case 'EN REVISION':
+        return { color: 'info', icon: 'cilZoom', tooltip: 'En Revisión' };
+      case 'REVISADA':
+        return { color: 'primary', icon: 'cilTask', tooltip: 'Revisada' };
+      case 'HISTORICA':
+        return { color: 'dark', icon: 'cilHistory', tooltip: 'Histórica' };
+      case 'PROGRAMADA':
+        return { color: 'info', icon: 'cilCalendar', tooltip: 'Programada' };
+      default:
+        return { color: 'secondary', icon: 'cilFile', tooltip: entrada.estadoEntrada?.nombre || 'Archivada' };
     }
   }
   

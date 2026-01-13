@@ -73,7 +73,7 @@
             <td class="text-center py-3">
               @if (getEstadoInfo(entrada); as estado) {
                 <c-badge 
-                  [color]="estado.color === 'text-success' ? 'success' : (estado.color === 'text-warning' ? 'warning' : 'secondary')" 
+                  [color]="estado.color" 
                   shape="rounded-pill"
                   class="px-3 py-2"
                   [cTooltip]="estado.tooltip"
