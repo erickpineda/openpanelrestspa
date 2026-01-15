@@ -1,8 +1,4 @@
 {
-  "AUTO": {
-    "NO_SE_ENCONTRARON_USUARIOS": "No se encontraron usuarios",
-    "INTENTA_AJUSTAR_LOS_FILTROS_DE": "Intenta ajustar los filtros de búsqueda"
-  },
   "HEADER": {
     "HOME": "Inicio",
     "ABOUT": "Acerca de",
@@ -30,6 +26,7 @@
     "CLEAN": "Limpiar",
     "ID": "ID",
     "NO_DESCRIPTION": "Sin descripción",
+    "NO_RESULTS": "No se encontraron resultados",
     "PAGINATION_INFO": "Mostrando {{ current }} de {{ total }} registros",
     "VERIFY_DELETE": "¿Estás seguro de que deseas eliminar este elemento?",
     "BASIC_INFO": "Información básica",
@@ -48,6 +45,8 @@
     "DATE": "Fecha",
     "TITLE_LABEL": "Título",
     "STATUS": "Estado",
+    "SLUG": "Slug",
+    "GENERATED_AUTO": "Generado automáticamente",
     "CATEGORY": "Categoría",
     "CREATED": "Creada",
     "USER": "Usuario",
@@ -60,12 +59,9 @@
     "CLOSING_SESSION": "Cerrando...",
     "REFRESH": "Refrescar",
     "DOWNLOAD_CSV": "Descargar CSV",
-    "RETRY": "Reintentar",
     "CSV": "CSV",
     "ON": "On",
     "OFF": "Off",
-    "CANCEL": "Cancelar",
-    "APPLY": "Aplicar",
     "RESET": "Limpiar",
     "UNPUBLISHED": "No Publicada",
     "FILTERS": "Filtros",
@@ -319,8 +315,13 @@
       "ADVANCED_FILTERS": "Filtros Avanzados",
       "HIDE_FILTERS": "Ocultar Filtros",
       "TABLE": {
-        "ENTRIES_COUNT": "Nº Entradas"
+        "ENTRIES_COUNT": "Nº Entradas",
+        "CODE": "Código"
       },
+      "CODE": "Código",
+      "CODE_REQUIRED": "El código es obligatorio.",
+      "CODE_REQUIRED_MAX_5_CHARS": "Código obligatorio (máx 5 caracteres)",
+      "CODE_AUTO_GENERATED_IF_EMPTY": "Se generará automáticamente si se deja vacío",
       "NAME_REQUIRED": "El nombre es obligatorio.",
       "DESCRIPTION_HELP": "Breve descripción de la categoría.",
       "NO_CATEGORIES": "No hay categorías para mostrar",
@@ -336,6 +337,13 @@
       "DELETE_TAG": "Eliminar Etiqueta",
       "SEARCH_PLACEHOLDER": "Buscar etiqueta...",
       "SEARCH_BY_DESCRIPTION": "Buscar por descripción...",
+      "TABLE": {
+        "CODE": "Código"
+      },
+      "CODE": "Código",
+      "CODE_REQUIRED_MAX_5_CHARS": "Código obligatorio (máx 5 caracteres)",
+      "CODE_AUTO_GENERATED_IF_EMPTY": "Se generará automáticamente si se deja vacío",
+      "CODE_PLACEHOLDER_TEXT": "Código (ej. TAG01)",
       "NAME_REQUIRED": "El nombre es obligatorio",
       "NAME_MAX_LENGTH": "El nombre no puede exceder 50 caracteres",
       "DESCRIPTION_MAX_LENGTH": "La descripción no puede exceder 200 caracteres",
@@ -404,7 +412,9 @@
         "QUARANTINE_HELP": "Marcar si el comentario está en cuarentena",
         "CONTENT_UNCENSORED": "Contenido sin censura",
         "EDIT_DATE": "F. Edición",
-        "CONTENT_CENSORED": "Contenido censurado"
+        "CONTENT_CENSORED": "Contenido censurado",
+        "GO_TO_ENTRY": "Ir a la entrada",
+        "ENTRY_PLACEHOLDER": "Escribe el título de la entrada para buscar..."
       },
       "SUCCESS": {
         "CREATE": "Comentario creado correctamente",
@@ -470,22 +480,9 @@
         "DELETE": "Error eliminando usuario"
       }
     },
-    "ROLES": {
-        "TITLE": "Roles",
-        "SUBTITLE": "Gestión de roles de usuario",
-        "NEW_ROLE": "Nuevo Rol",
-        "FILTER_PLACEHOLDER": "Filtrar por nombre...",
-        "ROLE_NAME": "Nombre del Rol",
-        "FILTER_BY_NAME": "Filtrar por nombre",
-        "PROPIETARIO": "Propietario",
-        "ADMINISTRADOR": "Administrador",
-        "EDITOR": "Editor",
-        "AUTOR": "Autor",
-        "LECTOR": "Lector",
-        "SIN_ROL": "Sin Rol"
-    },
     "SETTINGS": {
       "TITLE": "Ajustes del Sistema",
+      "SUBTITLE": "Configuración general del sistema",
       "NEW_SETTING": "Nuevo Ajuste",
       "EDIT_SETTING": "Editar Ajuste",
       "DELETE_SETTING": "Eliminar Ajuste",
@@ -582,7 +579,6 @@
       "ROLE_NAME": "Nombre del Rol",
       "FILTER_BY_NAME": "Filtrar por nombre...",
       "NAME_PLACEHOLDER": "Ej. Editor de Contenido",
-      "CODE_PLACEHOLDER": "Ej. EDIT",
       "DESC_PLACEHOLDER": "Descripción opcional del rol...",
       "NAME_PROTECTED": "Nombre protegido",
       "PERMISSIONS_COUNT": "{{ count }} permisos",
@@ -682,6 +678,7 @@
       "SEARCH_PLACEHOLDER": "Buscar página por título...",
       "PRINT_TOOLTIP": "Imprimir listado",
       "UNREVIEWED": "Sin revisar",
+      "NO_UNREVIEWED": "No hay páginas pendientes de revisión",
       "ALL_PAGES": "Todas las páginas",
       "FILTER_BY_TITLE": "Filtrar por título...",
       "SHOW_ADVANCED_FILTERS": "Filtros Avanzados",
@@ -733,7 +730,17 @@
       "FILTERS": "Filtros",
       "PUBLISH": "Publicar Entrada",
       "SAVE_CHANGES": "Guardar Cambios",
+      "SUBTITLE_LABEL": "Subtítulo",
       "SUBTITLE_PLACEHOLDER": "Un breve subtítulo descriptivo (opcional)",
+      "NOTES_LABEL": "Notas Internas",
+      "NOTES_PLACEHOLDER": "Anotaciones privadas sobre esta entrada...",
+      "SCHEDULED_DATE_LABEL": "Programar Publicación",
+      "SCHEDULED_DATE_HELP": "Si el estado es PROGRAMADA, la fecha es obligatoria",
+      "SCHEDULED_DATE_ERROR_PAST": "La fecha no puede ser anterior a la actual",
+      "SCHEDULED_DATE_ERROR_MARGIN": "Debe haber al menos 30 minutos de margen",
+      "SCHEDULED_DATE_ERROR_REQUIRED_WHEN_SCHEDULED": "La fecha es obligatoria cuando el estado es PROGRAMADA",
+      "RESET_CONFIRM_TITLE": "Restablecer formulario",
+      "RESET_CONFIRM_MESSAGE": "Vas a descartar los cambios no guardados de esta entrada. ¿Seguro que quieres restablecer el formulario?",
       "SELECT_LIBRARY": "Seleccionar de Librería",
       "UPLOAD_LOCAL": "Subir Local",
       "SUMMARY_PLACEHOLDER": "Un breve resumen para SEO y listados...",
@@ -758,7 +765,10 @@
       "VALIDATION": {
         "TITLE_REQUIRED": "El título es obligatorio",
         "TITLE_LENGTH": "Entre 1 y 100 caracteres",
-        "TITLE_PLACEHOLDER": "Escribe un título atractivo..."
+        "TITLE_PLACEHOLDER": "Escribe un título atractivo...",
+        "CONTENT_REQUIRED": "El contenido es obligatorio",
+        "STATUS_REQUIRED": "El estado de la entrada es obligatorio",
+        "TYPE_REQUIRED": "El tipo de entrada es obligatorio"
       },
       "THEMES": {
         "TITLE": "Temas del Sistema",

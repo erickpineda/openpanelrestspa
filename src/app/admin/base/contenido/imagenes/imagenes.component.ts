@@ -1,19 +1,12 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ElementRef,
-  ViewChild,
-  ChangeDetectorRef,
-  Input,
-  Output,
-  EventEmitter,
-} from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { Subject, Subscription, fromEvent, takeUntil, finalize } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
 import { MediaItem } from '../../../../core/models/media-item.model';
-import { saveAs } from 'file-saver';
 import { ToastService } from '../../../../core/services/ui/toast.service';
-import { Subject, takeUntil, finalize } from 'rxjs';
+import { parseAllowedDate } from '../../../../shared/utils/date-utils';
+import saveAs from 'file-saver';
 
 @Component({
   selector: 'app-imagenes',
@@ -21,7 +14,7 @@ import { Subject, takeUntil, finalize } from 'rxjs';
   styleUrls: ['./imagenes.component.scss'],
   standalone: false,
 })
-export class ImagenesComponent implements OnInit, OnDestroy {
+export class ImagenesComponent implements OnInit, OnDestroy, AfterViewInit {
   loading = false;
   error: string | null = null;
   items: MediaItem[] = [];
@@ -77,6 +70,8 @@ export class ImagenesComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  ngAfterViewInit(): void {}
 
   load(pageNo = this.pageNo): void {
     this.loading = true;
@@ -520,18 +515,7 @@ export class ImagenesComponent implements OnInit, OnDestroy {
   }
 
   parseFecha(fechaStr: string | undefined | null): Date | null {
-    if (!fechaStr) return null;
-    // Formato esperado: "dd-MM-yyyy HH:mm:ss"
-    const partes = fechaStr.split(' ');
-    if (partes.length !== 2) return null;
-
-    const [dia, mes, anio] = partes[0].split('-').map(Number);
-    const [hora, min, seg] = partes[1].split(':').map(Number);
-
-    if (!dia || !mes || !anio) return null;
-
-    // Mes en Date es 0-indexado
-    return new Date(anio, mes - 1, dia, hora || 0, min || 0, seg || 0);
+    return parseAllowedDate(fechaStr);
   }
 
   onSelect(item: MediaItem): void {

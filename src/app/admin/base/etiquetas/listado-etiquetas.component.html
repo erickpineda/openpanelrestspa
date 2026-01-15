@@ -113,14 +113,22 @@
           <table cTable [hover]="true" [striped]="true" [responsive]="true" align="middle" class="mb-0 border" role="table" aria-label="Tabla de etiquetas">
             <thead class="bg-light">
               <tr>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 90px">{{
-                  'COMMON.COLOR' | translate }}</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 200px">{{
-                  'COMMON.NAME' | translate }}</th>
-                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 250px">{{
-                  'COMMON.DESCRIPTION' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 90px">
+                  {{ 'COMMON.COLOR' | translate }}
+                </th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 200px">
+                  {{ 'COMMON.NAME' | translate }}
+                </th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 100px">
+                  {{ 'ADMIN.TAGS.TABLE.CODE' | translate }}
+                </th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold" style="min-width: 250px">
+                  {{ 'COMMON.DESCRIPTION' | translate }}
+                </th>
                 <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-end"
-                  style="min-width: 100px">{{ 'COMMON.ACTIONS' | translate }}</th>
+                  style="min-width: 100px">
+                  {{ 'COMMON.ACTIONS' | translate }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -135,9 +143,12 @@
                   <div class="d-flex flex-column">
                     <span class="fw-bold text-primary text-truncate d-inline-block" style="max-width: 240px"
                       [title]="etiqueta.nombre">{{ etiqueta.nombre }}</span>
-                    <small class="text-muted font-monospace">{{ 'COMMON.ID' | translate }}: {{ etiqueta.idEtiqueta
-                      }}</small>
                   </div>
+                </td>
+                <td class="px-3">
+                  <span class="font-monospace">
+                    {{ etiqueta.codigo }}
+                  </span>
                 </td>
                 <td class="px-3">
                   <span class="d-inline-block text-truncate text-muted" style="max-width: 320px"
@@ -163,7 +174,7 @@
               }
               @if (pagedEtiquetas.length === 0 && !loading) {
               <tr>
-                <td colspan="4" class="text-center py-5">
+                <td colspan="5" class="text-center py-5">
                   <div class="d-flex flex-column align-items-center opacity-50">
                     <svg cIcon name="cilTags" size="4xl" class="mb-3"></svg>
                     <h6 class="fw-bold">{{ 'ADMIN.TAGS.NO_RESULTS' | translate }}</h6>

@@ -12,7 +12,7 @@ import { OPConstants } from 'src/app/shared/constants/op-global.constants';
   providedIn: 'root',
 })
 export class CategoriaService extends CrudService<Categoria, number> {
-  protected endpoint = '/categorias';
+  protected endpoint = OPConstants.Methods.CATEGORIAS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
   buscarSafe(searchRequest: any, pageNo: number, size: number): Observable<PaginaResponse> {
@@ -21,7 +21,7 @@ export class CategoriaService extends CrudService<Categoria, number> {
     params[this.pageSizeParam] = size.toString();
     const context = new HttpContext();
     return this.safePostData<PaginaResponse>(
-      `${this.endpoint}/buscar`,
+      OPConstants.Methods.CATEGORIAS.BUSCAR,
       searchRequest,
       new PaginaResponse(),
       params,
@@ -41,7 +41,7 @@ export class CategoriaService extends CrudService<Categoria, number> {
     params[this.pageSizeParam] = pageSize.toString();
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.safePostData<PaginaResponse>(
-      `${this.endpoint}/buscar`,
+      OPConstants.Methods.CATEGORIAS.BUSCAR,
       searchRequest,
       new PaginaResponse(),
       params,
@@ -49,5 +49,17 @@ export class CategoriaService extends CrudService<Categoria, number> {
       'categorias.buscar',
       context
     );
+  }
+
+  obtenerPorCodigo(codigo: string): Observable<any> {
+    return this.get<any>(OPConstants.Methods.CATEGORIAS.OBTENER_POR_CODIGO(codigo));
+  }
+
+  actualizarPorCodigo(codigo: string, categoria: Categoria): Observable<any> {
+    return this.put<any>(OPConstants.Methods.CATEGORIAS.ACTUALIZAR_POR_CODIGO(codigo), categoria);
+  }
+
+  borrarPorCodigo(codigo: string): Observable<any> {
+    return this.delete<any>(OPConstants.Methods.CATEGORIAS.BORRAR_POR_CODIGO(codigo));
   }
 }

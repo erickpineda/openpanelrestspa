@@ -1,6 +1,8 @@
 <app-entrada-form [form]="entradaForm" [tiposEntr]="tiposEntr" [estadosEntr]="estadosEntr" [categorias]="categorias"
   [modoLectura]="false" [submitted]="submitted" (submitForm)="onGuardar($event)" (preview)="onPreviewEmit($event)"
-  (cancelar)="onCancelar()">
+  (cancelar)="onCancelar()"
+  [customTitle]="'ADMIN.PAGES.NEW_PAGE' | translate"
+  [customSubtitle]="'ADMIN.PAGES.SUBTITLE' | translate">
 </app-entrada-form>
 
 <!-- Modal Previa -->

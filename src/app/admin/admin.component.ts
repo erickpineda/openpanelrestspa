@@ -21,6 +21,7 @@ import { ToastService } from '../core/services/ui/toast.service';
 import { TokenStorageService } from '../core/services/auth/token-storage.service';
 import { AuthService } from '../core/services/auth/auth.service';
 import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
+import { UserRole } from '../shared/types/navigation.types';
 
 // ... imports existentes
 
@@ -37,6 +38,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   temporaryEntriesCount = 0;
 
   public navItems = navItems;
+  public userRole: UserRole = UserRole.LECTOR;
   public cargaFinalizada: boolean = false;
   public projectsCount: number = 0;
   public notificationsCount: number = 0;
@@ -94,13 +96,25 @@ export class AdminComponent implements OnInit, AfterViewInit {
     }
     this.isAuthed = true;
     this.ready = true;
+    
+    // Establecer rol del usuario para la navegación usando el servicio centralizado
+    this.userRole = this.tokenStorage.getUserRole();
+    
+    // Filtrar items según rol antes de cualquier traducción (ESTABLECER ESTRUCTURA INICIAL UNA ÚNICA VEZ)
+    this.navItems = this.filterItemsByRole(navItems, this.userRole);
+    
+    // Aplicar traducciones iniciales sobre la estructura ya creada
+    this.applyTranslationsInPlace(this.navItems);
+
     this.checkForTemporaryData();
     this.cargaFinalizada = true;
 
     // Suscribirse a cambios en las traducciones (se dispara cuando se carga el idioma o cambia)
     this.translationService.translations$.subscribe(() => {
       this.updateTranslations();
-      this.updateNavItems();
+      // Actualizar traducciones IN-PLACE para no romper referencias
+      this.applyTranslationsInPlace(this.navItems);
+      this.sidebarState.updateNavItems(this.navItems, this.router.url);
       this.cdr.markForCheck();
     });
 
@@ -188,39 +202,94 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   private updateNavItems(): void {
-    // Usar spread para crear copias superficiales y evitar perder funciones (como en contextualActions)
-    // JSON.stringify eliminaba las funciones, rompiendo la UI si se esperaban
-    this.navItems = this.translateItems(navItems);
+    // MÉTODO DEPRECADO EN FAVOR DE applyTranslationsInPlace
+    // Se mantiene por compatibilidad si es llamado desde otro lugar, pero ahora usa la lógica in-place
+    this.applyTranslationsInPlace(this.navItems);
     this.sidebarState.updateNavItems(this.navItems, this.router.url);
   }
 
-  private translateItems(items: any[]): any[] {
-    return items.map((originalItem) => {
-      // Copia superficial para no mutar el objeto original
-      const item = { ...originalItem };
-
-      if (item.name) {
-        item.name = this.translationService.translate(item.name);
+  /**
+   * Aplica traducciones mutando directamente los objetos existentes para preservar referencias.
+   * Esto evita el error NG0956 (recreación de colección) en componentes CoreUI.
+   */
+  private applyTranslationsInPlace(items: any[]): void {
+    items.forEach((item) => {
+      // 1. Persistir clave de nombre original la primera vez
+      if (!item.translationKey) {
+        item.translationKey = item.name;
       }
-      if (item.badge && item.badge.text) {
-        // Clonar badge para no mutar el original
-        item.badge = { ...item.badge };
+      
+      // 2. Traducir nombre usando la clave persistida
+      if (item.translationKey) {
+        item.name = this.translationService.translate(item.translationKey);
+      }
+
+      // 3. Persistir y traducir Badge
+      if (item.badge) {
+        if (!item.badge.translationKey) {
+           item.badge.translationKey = item.badge.text;
+        }
         
-        // Traducir badge si es una clave de traducción (contiene MENU. o similar) o es texto fijo
-        // Asumiremos que si empieza por MENU. es clave, si no, intentamos traducir igual por si acaso
-        if (item.badge.text === 'Pend' || item.badge.text === 'MENU.BADGE_PENDING') {
-             item.badge.text = this.translationService.translate('MENU.BADGE_PENDING');
+        const key = item.badge.translationKey;
+        // Lógica específica para badges conocidos
+        if (key === 'MENU.BADGE_PENDING' || key === 'Pend') {
+           item.badge.text = this.translationService.translate('MENU.BADGE_PENDING');
         } else {
-             item.badge.text = this.translationService.translate(item.badge.text);
+           item.badge.text = this.translationService.translate(key);
         }
       }
+
+      // 4. Recursividad para hijos
       if (item.children) {
-        item.children = this.translateItems(item.children);
+        this.applyTranslationsInPlace(item.children);
       }
-      return item;
     });
   }
 
+  private filterItemsByRole(items: any[], role: UserRole): any[] {
+    // Si es PROPIETARIO, ve todo, pero clonamos para tener nuestra propia estructura
+    if (role === UserRole.PROPIETARIO) {
+      return items.map(item => {
+        const copy = { ...item };
+        if (copy.children) {
+          copy.children = this.filterItemsByRole(copy.children, role);
+        }
+        return copy;
+      });
+    }
+
+    const filtered: any[] = [];
+    
+    items.forEach((originalItem) => {
+      // 1. Check requiredRoles
+      if (originalItem.requiredRoles && !originalItem.requiredRoles.includes(role)) {
+        return;
+      }
+      
+      // Clonar el item para no mutar el original de la configuración global
+      const item = { ...originalItem };
+      
+      // 2. Filter children recursively
+      if (item.children) {
+        item.children = this.filterItemsByRole(item.children, role);
+        
+        // Si se queda sin hijos y no es un enlace directo (es un wrapper), lo descartamos
+        if (item.children.length === 0 && item.url === undefined && !item.title) {
+           return;
+        }
+      }
+      
+      filtered.push(item);
+    });
+    
+    return filtered;
+  }
+/*
+  private translateItems(items: any[]): any[] {
+     // MÉTODO ELIMINADO EN FAVOR DE applyTranslationsInPlace
+     // ...
+  }
+*/
   private readSidebarNarrowFromStorage(): boolean {
     try {
       const raw = localStorage.getItem('sidebar_narrow');

@@ -69,16 +69,14 @@
   </c-modal-header>
   <c-modal-body>
     @if (previewEntrada) {
-    <div class="mb-3">
-      @if (previewEntrada.imagenDestacada) {
-      <img [src]="previewEntrada.imagenDestacada" class="img-fluid mb-3 rounded shadow-sm"
-        style="max-height: 300px; width: 100%; object-fit: cover;" alt="Imagen destacada">
-      }
-      <div [innerHTML]="previewEntrada.contenido" class="border p-3 rounded bg-light"></div>
-    </div>
+      <app-previa-entrada
+        [entrada]="previewEntrada"
+        [mostrarBotonesAccion]="false"
+        [mostrarTitulo]="false"
+      ></app-previa-entrada>
     }
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="closePreview()" cButton color="secondary">{{ 'COMMON.CLOSE' | translate }}</button>
+    <button (click)="closePreview()" cButton color="secondary">{{ 'AUTO.CERRAR' | translate }}</button>
   </c-modal-footer>
 </c-modal>

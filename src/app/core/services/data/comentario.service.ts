@@ -15,7 +15,7 @@ import { OPConstants } from 'src/app/shared/constants/op-global.constants';
   providedIn: 'root',
 })
 export class ComentarioService extends CrudService<Comentario, number> {
-  protected endpoint = '/comentarios';
+  protected endpoint = OPConstants.Methods.COMENTARIOS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
   buscarSafe(searchRequest: any, page: number, size: number): Observable<PaginaResponse> {
@@ -24,7 +24,7 @@ export class ComentarioService extends CrudService<Comentario, number> {
     params[this.pageSizeParam] = size.toString();
     const context = new HttpContext();
     return this.safePostData<PaginaResponse>(
-      `${this.endpoint}/buscar`,
+      OPConstants.Methods.COMENTARIOS.BUSCAR,
       searchRequest,
       new PaginaResponse(),
       params,
@@ -44,13 +44,26 @@ export class ComentarioService extends CrudService<Comentario, number> {
     params[this.pageSizeParam] = size.toString();
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.safePostData<PaginaResponse>(
-      `${this.endpoint}/buscar`,
+      OPConstants.Methods.COMENTARIOS.BUSCAR,
       searchRequest,
       new PaginaResponse(),
       params,
       undefined,
       'comentarios.buscar',
       context
+    );
+  }
+
+  listarPorIdEntrada(idEntrada: number, page: number, size: number): Observable<PaginaResponse> {
+    const params: any = {};
+    params[OPConstants.Pagination.PAGE_NO_PARAM] = page.toString();
+    params[this.pageSizeParam] = size.toString();
+    return this.safeGetData<PaginaResponse>(
+      OPConstants.Methods.COMENTARIOS.LISTAR_POR_ID_ENTRADA(idEntrada),
+      new PaginaResponse(),
+      params,
+      undefined,
+      'comentarios.listarPorIdEntrada'
     );
   }
 }

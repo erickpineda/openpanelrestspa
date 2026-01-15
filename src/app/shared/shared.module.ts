@@ -26,6 +26,7 @@ import { GlobalErrorComponent } from './components/errors/global/global-error.co
 import { ErrorBoundaryComponent } from './components/errors/error-boundary/error-boundary.component';
 import { SharedWidgetsModule } from './shared-widgets.module';
 import { TranslatePipe } from './pipes/translate.pipe';
+import { AllowedDatePipe } from './pipes/allowed-date.pipe';
 
 @NgModule({
   imports: [
@@ -49,6 +50,7 @@ import { TranslatePipe } from './pipes/translate.pipe';
     TooltipModule,
     SharedWidgetsModule,
     TranslatePipe,
+    AllowedDatePipe,
   ],
   declarations: [
     GlobalErrorComponent,
@@ -82,6 +84,7 @@ import { TranslatePipe } from './pipes/translate.pipe';
     OpPaginationComponent,
     SharedWidgetsModule,
     TranslatePipe,
+    AllowedDatePipe,
   ],
 })
 export class SharedOPModule { }

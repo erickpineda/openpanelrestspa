@@ -40,9 +40,11 @@ export class EditarCategoriaComponent implements OnChanges {
   }
 
   guardar(cat: Categoria) {
-    if (!cat.idCategoria) return;
-    
-    this.facade.actualizarCategoria(cat.idCategoria, cat).subscribe({
+    if (!cat.codigo && !cat.idCategoria) return;
+    const obs = cat.codigo
+      ? this.facade.actualizarCategoriaPorCodigo(cat.codigo, cat)
+      : this.facade.actualizarCategoria(cat.idCategoria, cat);
+    obs.subscribe({
       next: () => {
         this.toastService.showSuccess('La categoría se ha modificado correctamente.', 'Categoría modificada');
         this.onSuccess.emit();
@@ -50,6 +52,10 @@ export class EditarCategoriaComponent implements OnChanges {
       },
       error: (err) => {
         console.error('Error al actualizar la categoría:', err);
+        this.toastService.showError(
+          err?.error?.message || 'Error al actualizar la categoría.',
+          'Error'
+        );
         if (this.formComponent) {
           this.formComponent.onError.emit();
         }

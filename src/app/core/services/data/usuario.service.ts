@@ -8,7 +8,7 @@ import { PerfilResponse } from '../../models/perfil-response.model';
 import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
 import { NetworkInterceptor } from '../../interceptor/network.interceptor';
 import { PaginaResponse } from '../../models/pagina-response.model';
-import { OPConstants } from 'src/app/shared/constants/op-global.constants';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 @Injectable({
   providedIn: 'root',

@@ -26,6 +26,7 @@ import {
   cilArrowLeft,
   cilArrowRight,
   cilArrowTop,
+  cilBarcode,
   cilBasket,
   cilBell,
   cilBold,
@@ -134,9 +135,11 @@ import {
   cilZoom,
   cilResizeWidth,
   cilCompress,
+  cilThumbUp,
 } from '@coreui/icons';
 
 export const iconSubset = {
+  cilThumbUp,
   cilAsterisk,
   cibCcAmex,
   cibCcApplePay,
@@ -164,6 +167,7 @@ export const iconSubset = {
   cilArrowLeft,
   cilArrowRight,
   cilArrowTop,
+  cilBarcode,
   cilBasket,
   cilBell,
   cilBold,
@@ -304,6 +308,7 @@ export enum IconSubset {
   cilArrowLeft = 'cilArrowLeft',
   cilArrowRight = 'cilArrowRight',
   cilArrowTop = 'cilArrowTop',
+  cilBarcode = 'cilBarcode',
   cilBasket = 'cilBasket',
   cilBell = 'cilBell',
   cilBold = 'cilBold',

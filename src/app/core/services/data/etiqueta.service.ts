@@ -16,7 +16,7 @@ export interface AsociacionEtiquetaDTO {
   providedIn: 'root',
 })
 export class EtiquetaService extends CrudService<Etiqueta, number> {
-  protected endpoint = '/etiquetas';
+  protected endpoint = OPConstants.Methods.ETIQUETAS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
   override listarPagina(pageNo?: number, pageSize?: number): Observable<any> {
@@ -31,22 +31,22 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
   }
 
   override crear(etiqueta: Etiqueta): Observable<any> {
-    return this.post<any>(`${this.endpoint}/crear`, etiqueta);
+    return this.post<any>(OPConstants.Methods.ETIQUETAS.CREAR, etiqueta);
   }
 
   override actualizar(id: number, etiqueta: Etiqueta): Observable<any> {
-    return this.put<any>(`${this.endpoint}/${id}`, etiqueta);
+    return this.put<any>(OPConstants.Methods.ETIQUETAS.ACTUALIZAR(id), etiqueta);
   }
 
   override borrar(id: number): Observable<any> {
-    return this.delete<any>(`${this.endpoint}/${id}`);
+    return this.delete<any>(OPConstants.Methods.ETIQUETAS.ELIMINAR(id));
   }
 
   buscar(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
-    return this.post<any>(`${this.endpoint}/buscar`, payload, params);
+    return this.post<any>(OPConstants.Methods.ETIQUETAS.BUSCAR, payload, params);
   }
 
   buscarSinGlobalLoader(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
@@ -54,7 +54,7 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.post<any>(`${this.endpoint}/buscar`, payload, params, undefined, context);
+    return this.post<any>(OPConstants.Methods.ETIQUETAS.BUSCAR, payload, params, undefined, context);
   }
 
   asociarConEntrada(etiquetaId: number, entradaId: number): Observable<any> {
@@ -89,5 +89,17 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
 
   obtenerEtiquetasPorCategoria(categoriaId: number): Observable<any> {
     return this.get<any>(`${this.endpoint}/porCategoria/${categoriaId}`);
+  }
+
+  obtenerPorCodigo(codigo: string): Observable<any> {
+    return this.get<any>(OPConstants.Methods.ETIQUETAS.OBTENER_POR_CODIGO(codigo));
+  }
+
+  actualizarPorCodigo(codigo: string, etiqueta: Etiqueta): Observable<any> {
+    return this.put<any>(OPConstants.Methods.ETIQUETAS.ACTUALIZAR_POR_CODIGO(codigo), etiqueta);
+  }
+
+  borrarPorCodigo(codigo: string): Observable<any> {
+    return this.delete<any>(OPConstants.Methods.ETIQUETAS.BORRAR_POR_CODIGO(codigo));
   }
 }

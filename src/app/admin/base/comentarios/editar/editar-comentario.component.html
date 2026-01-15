@@ -17,6 +17,7 @@
       [submitted]="submitted"
       (submitComentario)="guardar($event)"
       (cancel)="cerrarModal()"
+      (goToEntry)="irAEntrada($event)"
     ></app-comentario-form>
   </c-modal-body>
   <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">

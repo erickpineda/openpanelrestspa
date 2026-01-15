@@ -115,7 +115,8 @@ export class UiAnomalyMonitorService {
         )
         .subscribe((e) => {
           if (e instanceof NavigationEnd) {
-            this.scanAndRecover('navigation');
+            // Delay scan to allow animations/cleanups to finish
+            setTimeout(() => this.scanAndRecover('navigation'), 500);
           }
         });
 

@@ -18,6 +18,7 @@ import {
   ContentStatsDTO,
 } from '../../../shared/models/dashboard.models';
 import { ToastService } from '../../../core/services/ui/toast.service';
+import { parseAllowedDate } from '../../../shared/utils/date-utils';
 import { environment } from '../../../../environments/environment';
 import { AuthSyncService } from '../../../core/services/auth/auth-sync.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
@@ -1808,35 +1809,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * - si ya es ISO o reconocible por Date, devolver directamente
    */
   private parseBackendDate(dateStr?: string): Date | null {
-    if (!dateStr) return null;
-    // Intentar parseo nativo primero
-    const native = new Date(dateStr);
-    if (!isNaN(native.getTime())) return native;
-
-    // Intentar formato 'DD-MM-YYYY HH:mm:ss' o 'DD-MM-YYYY'
-    // Separar fecha y hora
-    const parts = dateStr.split(' ');
-    const datePart = parts[0]; // expected DD-MM-YYYY
-    const dateSegments = datePart.split('-').map((s) => Number(s));
-    if (dateSegments.length === 3) {
-      const [dd, mm, yyyy] = dateSegments;
-      // Validar números
-      if (!isNaN(dd) && !isNaN(mm) && !isNaN(yyyy)) {
-        // Hora opcional
-        let hh = 0,
-          min = 0,
-          sec = 0;
-        if (parts.length > 1) {
-          const timeSegments = parts[1].split(':').map((s) => Number(s));
-          if (timeSegments.length >= 1 && !isNaN(timeSegments[0])) hh = timeSegments[0];
-          if (timeSegments.length >= 2 && !isNaN(timeSegments[1])) min = timeSegments[1];
-          if (timeSegments.length >= 3 && !isNaN(timeSegments[2])) sec = timeSegments[2];
-        }
-        return new Date(yyyy, mm - 1, dd, hh, min, sec);
-      }
-    }
-
-    return null;
+    return parseAllowedDate(dateStr);
   }
 
   // Formatea etiquetas para el eje del gráfico principal según granularidad:

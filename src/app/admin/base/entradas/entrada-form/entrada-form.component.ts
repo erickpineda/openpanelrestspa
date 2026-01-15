@@ -25,6 +25,7 @@ import { ImagenesComponent } from '../../contenido/imagenes/imagenes.component';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { EntradaImageService } from '../services/entrada-image.service';
 import { EntradaFormStateService } from '../services/entrada-form-state.service';
+import { parseAllowedDate } from '../../../../shared/utils/date-utils';
 
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -71,6 +72,8 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   @Input() modoLectura = false; // si true, el componente mostrará el botón "Editar"
   @Input() entrada?: Entrada; // opcional: datos actuales de la entrada (para checked inicial)
   @Input() submitted = false; // el contenedor puede pasar el estado "submitted"
+  @Input() customTitle = '';
+  @Input() customSubtitle = '';
 
   @Output() submitForm = new EventEmitter<Entrada>();
   @Output() cancelar = new EventEmitter<void>();
@@ -82,6 +85,9 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   public Editor: any = null;
   public editorLoading = false;
   public estaEditando = false;
+  public resetConfirmVisible = false;
+
+  private editorInstance: any;
 
   // State delegation getters
   get isFullWidth() { return this.stateService.currentState.isFullWidth; }
@@ -91,6 +97,40 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   get temporaryData() { return this.stateService.currentState.temporaryData; }
   get imagenPreviewUrl() { return this.stateService.currentState.imagenPreviewUrl; }
   set imagenPreviewUrl(val: SafeUrl | string | null) { this.stateService.setImagenPreviewUrl(val); }
+  get currentSlug(): string | null {
+    const fromForm = this.form?.get('slug')?.value;
+    if (fromForm) {
+      return fromForm;
+    }
+    return this.entrada?.slug ?? null;
+  }
+
+  get minDate(): string {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 30);
+    return this.formatDateTimeLocal(now);
+  }
+
+  get esPublicada(): boolean {
+    const nombreEstado = this.entrada?.estadoEntrada?.nombre?.toUpperCase();
+    return nombreEstado === 'PUBLICADA';
+  }
+
+  get fechaPublicacionMostrar(): Date | null {
+    if (!this.entrada || !this.entrada.fechaPublicacion) {
+      return null;
+    }
+    return parseAllowedDate(this.entrada.fechaPublicacion) || null;
+  }
+
+  private formatDateTimeLocal(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
 
   private destroy$ = new Subject<void>();
 
@@ -106,25 +146,52 @@ export class EntradaFormComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnInit(): void {
-    // Sync state changes with view
     this.stateService.state$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.cdRef.markForCheck();
       });
 
+    const estadoCtrl = this.form.get('estadoEntrada');
+    const fechaCtrl = this.form.get('fechaPublicacionProgramada');
+
+    if (estadoCtrl && fechaCtrl) {
+      estadoCtrl.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          fechaCtrl.updateValueAndValidity({ emitEvent: false });
+
+          if (this.isScheduled) {
+            const hasValue = !!fechaCtrl.value;
+            if (!hasValue) {
+              const nowPlusMargin = new Date();
+              nowPlusMargin.setMinutes(nowPlusMargin.getMinutes() + 30);
+              fechaCtrl.setValue(this.formatDateTimeLocal(nowPlusMargin), { emitEvent: false });
+            }
+          } else {
+            fechaCtrl.setValue(null, { emitEvent: false });
+          }
+        });
+    }
+
+    // Subscribe to content status changes to update editor read-only mode
+    const contenidoCtrl = this.form.get('contenido');
+    if (contenidoCtrl) {
+      contenidoCtrl.statusChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.updateEditorDisabledState();
+        });
+    }
+
     window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.saveBeforeLogout.bind(this));
 
-    // Verificar navegación con recuperación
     this.checkNavigationState();
 
-    // Verificar datos temporales solo si no venimos de recuperación
     this.stateService.checkForTemporaryData(this.estaEditando);
 
-    // Cargar CKEditor dinámicamente
     this.loadEditorBuild();
 
-    // Cargar preview segura si ya existe imagen destacada
     const currentImg = this.imagenDestacadaUrl;
     if (currentImg) {
       this.checkAndLoadSecureImage(currentImg);
@@ -361,10 +428,46 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     }
   }
 
+  openResetConfirm() {
+    if (!this.form) return;
+    if (this.form.pristine) return;
+    this.resetConfirmVisible = true;
+    this.cdRef.markForCheck();
+  }
+
+  onConfirmReset() {
+    this.resetConfirmVisible = false;
+    this.onReset();
+  }
+
+  onCancelReset() {
+    this.resetConfirmVisible = false;
+    this.cdRef.markForCheck();
+  }
+
   onReset() {
-    // ✅ MODIFICADO: Limpiar entrada temporal específica al cancelar
+    this.log.info('🔄 Reseteando formulario...');
+    // Limpiar entrada temporal específica
     this.stateService.removeCurrentTemporaryEntry();
-    this.cancelar.emit();
+
+    // Resetear formulario a vacío
+    this.form.reset();
+
+    // Limpiar categorías
+    const arr = this.categoriasArray();
+    while (arr.length !== 0) {
+      arr.removeAt(0);
+    }
+
+    // Limpiar imagen
+    this.imagenPreviewUrl = null;
+    this.form.patchValue({ imagenDestacada: null });
+
+    // Marcar como pristine para deshabilitar el botón de reset
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
+
+    this.cdRef.markForCheck();
   }
 
   onEditar() {
@@ -373,6 +476,23 @@ export class EntradaFormComponent implements OnInit, OnChanges {
 
   onPreview() {
     this.preview.emit(this.form.value as Entrada);
+  }
+
+  onReady(editor: any) {
+    this.editorInstance = editor;
+    this.updateEditorDisabledState();
+  }
+
+  private updateEditorDisabledState() {
+    if (!this.editorInstance) return;
+    const disabled = this.control('contenido')?.disabled;
+    const lockId = 'angular-disabled-lock';
+    
+    if (disabled) {
+      this.editorInstance.enableReadOnlyMode(lockId);
+    } else {
+      this.editorInstance.disableReadOnlyMode(lockId);
+    }
   }
 
   toggleFullWidth() {
@@ -482,6 +602,14 @@ export class EntradaFormComponent implements OnInit, OnChanges {
     return arr.controls.some(
       (control) => control.value && control.value.nombre === categoria.nombre
     );
+  }
+
+  // Helper para verificar estado programado
+  get isScheduled(): boolean {
+    const estado = this.form.get('estadoEntrada')?.value;
+    // Asumiendo que el nombre o ID define el estado 'PROGRAMADA'
+    // Ajusta 'PROGRAMADA' según el valor real en tu base de datos o constante
+    return estado?.nombre === 'PROGRAMADA' || estado?.idEstadoEntrada === 4; 
   }
 
   // Cambiar el estado de una categoría (versión unificada)

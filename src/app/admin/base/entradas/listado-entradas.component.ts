@@ -9,12 +9,14 @@ import {
   NgZone,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Observable, of } from 'rxjs';
 import { EntradaCatalogService } from '../../../core/services/data/entrada-catalog.service';
 import { catchError, Subject, takeUntil, throwError, finalize } from 'rxjs';
 import { Entrada } from '../../../core/models/entrada.model';
 import { EntradaService } from '../../../core/services/data/entrada.service';
 import { CommonFunctionalityService } from '../../../shared/services/common-functionality.service';
+import { parseAllowedDate } from '../../../shared/utils/date-utils';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
 import { ToastService } from '../../../core/services/ui/toast.service';
 import { ErrorBoundaryService } from '../../../core/errors/error-boundary/error-boundary.service';
@@ -74,7 +76,8 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     private entradaCatalogService: EntradaCatalogService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private stateService: ListadoEntradasStateService
+    private stateService: ListadoEntradasStateService,
+    private datePipe: DatePipe
   ) {}
 
   // #region Lifecycle Methods
@@ -371,47 +374,14 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   // #region Helpers
 
   checkFechaPublicacion(fechaPublicacion: any): string {
-    const date = this.getFechaDate(fechaPublicacion);
+    const date = parseAllowedDate(fechaPublicacion);
     return date
-      ? this.commonFuncService.transformaFecha(date, 'dd-MM-yyyy', true)
+      ? this.datePipe.transform(date, 'dd-MM-yyyy') || ''
       : 'No publicada';
   }
 
   getFechaDate(fecha: any): Date | null {
-    if (!fecha) return null;
-    
-    // Si ya es un objeto Date, verificar que sea válido
-    if (fecha instanceof Date) {
-      return !isNaN(fecha.getTime()) ? fecha : null;
-    }
-    
-    // Si es string "dd-MM-yyyy HH:mm:ss" o "dd-MM-yyyy"
-    if (typeof fecha === 'string') {
-      // Intentar parsing directo primero (ISO)
-      let d = new Date(fecha);
-      if (!isNaN(d.getTime())) return d;
-
-      // Intentar formato español dd-MM-yyyy
-      const parts = fecha.split(' ');
-      const dateParts = parts[0].split('-');
-      if (dateParts.length === 3) {
-        const day = parseInt(dateParts[0], 10);
-        const month = parseInt(dateParts[1], 10) - 1;
-        const year = parseInt(dateParts[2], 10);
-        
-        let hour = 0, min = 0, sec = 0;
-        if (parts.length > 1) {
-          const timeParts = parts[1].split(':');
-          hour = parseInt(timeParts[0], 10) || 0;
-          min = parseInt(timeParts[1], 10) || 0;
-          sec = parseInt(timeParts[2], 10) || 0;
-        }
-        
-        d = new Date(year, month, day, hour, min, sec);
-        if (!isNaN(d.getTime())) return d;
-      }
-    }
-    return null;
+    return parseAllowedDate(fecha);
   }
 
   private mostrarError(mensaje: string): void {

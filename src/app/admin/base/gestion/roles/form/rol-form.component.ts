@@ -27,8 +27,18 @@ export class RolFormComponent implements OnChanges {
 
   // Clone for editing
   editRol: Rol | null = null;
+  
+  disabled = false;
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['visible'] && this.visible) {
+      if (this.isEditing) {
+        this.disabled = true;
+      } else {
+        this.disabled = false;
+      }
+    }
+
     if (changes['rol'] && this.rol) {
       this.editRol = JSON.parse(JSON.stringify(this.rol));
       if (!this.editRol!.privilegios) {
@@ -146,5 +156,9 @@ export class RolFormComponent implements OnChanges {
 
   trackByPrivilegio(index: number, p: Privilegio): number | string {
     return p?.idPrivilegio ?? p?.codigo ?? index;
+  }
+
+  enableEdit() {
+    this.disabled = false;
   }
 }

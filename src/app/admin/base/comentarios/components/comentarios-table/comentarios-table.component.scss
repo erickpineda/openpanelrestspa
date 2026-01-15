@@ -1,4 +1,8 @@
-// Asegurar que no aparezca scrollbar fantasma en Windows
+.tabla-con-loader-wrapper {
+  position: relative;
+  min-height: 200px;
+}
+
 .table-responsive {
   scrollbar-width: thin;
   &::-webkit-scrollbar {

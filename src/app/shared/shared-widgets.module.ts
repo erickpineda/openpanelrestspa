@@ -14,6 +14,7 @@ import { DashboardChartComponent } from './components/dashboard-chart/dashboard-
 import { TranslatePipe } from './pipes/translate.pipe';
 import { RouterModule } from '@angular/router';
 import { TooltipModule, WidgetModule } from '@coreui/angular';
+import { ResponsiveNavigationComponent } from './components/responsive-navigation/responsive-navigation.component';
 
 @NgModule({
   imports: [CommonModule, IconModule, SharedCoreUiModule, ChartjsModule, TranslatePipe, RouterModule, TooltipModule, WidgetModule],
@@ -26,6 +27,7 @@ import { TooltipModule, WidgetModule } from '@coreui/angular';
     TemporaryEntriesManagerComponent,
     KpiCardComponent,
     DashboardChartComponent,
+    ResponsiveNavigationComponent,
   ],
   exports: [
     SharedCoreUiModule,
@@ -38,6 +40,7 @@ import { TooltipModule, WidgetModule } from '@coreui/angular';
     TemporaryEntriesManagerComponent,
     KpiCardComponent,
     DashboardChartComponent,
+    ResponsiveNavigationComponent,
   ],
 })
 export class SharedWidgetsModule {}

@@ -22,11 +22,14 @@ import { LoggerService } from '../../../../core/services/logger.service';
 export class EtiquetaFormComponent implements OnInit, OnChanges {
   @Input() etiqueta: Etiqueta | null = null;
   @Input() isEdit = false;
+  @Input() disabled = false;
   @Output() save = new EventEmitter<Etiqueta>();
   @Output() cancel = new EventEmitter<void>();
 
   form: FormGroup;
   loading = false;
+  manualCodeEntry = false;
+  internoSubmitted = false;
 
   colores = [
     { value: '#FF6B6B', label: 'Rojo' },
@@ -46,6 +49,7 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
     private log: LoggerService
   ) {
     this.form = this.fb.group({
+      codigo: ['', [Validators.required, Validators.maxLength(5)]],
       nombre: ['', [Validators.required, Validators.maxLength(50)]],
       descripcion: ['', Validators.maxLength(200)],
       colorHex: ['#4ECDC4', Validators.required],
@@ -55,10 +59,12 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     if (this.isEdit && this.etiqueta) {
       this.form.patchValue({
+        codigo: this.etiqueta.codigo,
         nombre: this.etiqueta.nombre,
         descripcion: this.etiqueta.descripcion,
         colorHex: this.etiqueta.colorHex || '#4ECDC4',
       });
+      this.form.get('codigo')?.disable();
     }
   }
 
@@ -66,27 +72,65 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
     if (changes['etiqueta'] || changes['isEdit']) {
       if (this.isEdit && this.etiqueta) {
         this.form.patchValue({
+          codigo: this.etiqueta.codigo,
           nombre: this.etiqueta.nombre,
           descripcion: this.etiqueta.descripcion,
           colorHex: this.etiqueta.colorHex || '#4ECDC4',
         });
+        this.form.get('codigo')?.disable();
       } else {
         this.form.reset({
+          codigo: '',
           nombre: '',
           descripcion: '',
           colorHex: '#4ECDC4',
         });
+        this.form.get('codigo')?.enable();
+        this.manualCodeEntry = false;
+        this.internoSubmitted = false;
+      }
+    }
+
+    if (changes['disabled']) {
+      if (this.disabled) {
+        this.form.disable();
+      } else {
+        this.form.enable();
+        if (this.isEdit) {
+          this.form.get('codigo')?.disable();
+        }
       }
     }
   }
 
+  onNombreInput(nombre: string): void {
+    if (!this.manualCodeEntry && !this.isEdit) {
+      const code = this.generateCodeFromNombre(nombre);
+      this.form.patchValue({ codigo: code });
+    }
+  }
+
+  onCodigoInput(value: string): void {
+    this.manualCodeEntry = true;
+    if (value) {
+      this.form.patchValue({ codigo: value.toUpperCase() }, { emitEvent: false });
+    }
+  }
+
+  private generateCodeFromNombre(nombre: string): string {
+    if (!nombre) return '';
+    return nombre.replace(/\s/g, '').substring(0, 5).toUpperCase();
+  }
+
   onSubmit(): void {
+    this.internoSubmitted = true;
+    this.form.markAllAsTouched();
     if (this.form.valid) {
       this.loading = true;
-      const etiquetaData: Etiqueta = { ...this.form.value } as Etiqueta;
+      const etiquetaData: Etiqueta = { ...this.form.getRawValue() } as Etiqueta;
       const operation =
-        this.isEdit && this.etiqueta?.idEtiqueta
-          ? this.etiquetasService.actualizar(this.etiqueta.idEtiqueta, etiquetaData)
+        this.isEdit && this.etiqueta?.codigo
+          ? this.etiquetasService.actualizarPorCodigo(this.etiqueta.codigo, etiquetaData)
           : this.etiquetasService.crear(etiquetaData);
       operation.subscribe({
         next: () => {

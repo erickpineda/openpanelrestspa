@@ -2,13 +2,35 @@
     isEdit ? 'Formulario de edición de etiqueta' : 'Formulario de creación de etiqueta'
   " data-testid="etiqueta-form">
   <div class="mb-3">
+    <label for="codigo" class="form-label">{{ 'ADMIN.TAGS.CODE' | translate }}<span class="text-danger">*</span></label>
+    <div class="input-group">
+      <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilBarcode" size="sm"></svg></span>
+      <input cFormControl formControlName="codigo" id="codigo" type="text" class="border-start-0"
+        [class.is-invalid]="(internoSubmitted || form.get('codigo')?.touched) && form.get('codigo')?.invalid"
+        [class.is-valid]="form.get('codigo')?.valid && (internoSubmitted || form.get('codigo')?.touched)"
+        (input)="onCodigoInput($any($event.target).value)"
+        [placeholder]="'ADMIN.TAGS.CODE_PLACEHOLDER_TEXT' | translate" />
+      @if ((internoSubmitted || form.get('codigo')?.touched) && form.get('codigo')?.invalid) {
+      <div class="invalid-feedback">
+        {{ 'ADMIN.TAGS.CODE_REQUIRED_MAX_5_CHARS' | translate }}
+      </div>
+      }
+    </div>
+    @if (!isEdit) {
+    <div class="form-text text-muted small">
+      {{ 'ADMIN.TAGS.CODE_AUTO_GENERATED_IF_EMPTY' | translate }}
+    </div>
+    }
+  </div>
+
+  <div class="mb-3">
     <label for="nombre" class="form-label">{{ 'COMMON.NAME' | translate }}<span class="text-danger">*</span></label>
     <input type="text" id="nombre" cFormControl formControlName="nombre"
       [class.is-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
       [attr.aria-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched" [attr.aria-describedby]="
         form.get('nombre')?.invalid && form.get('nombre')?.touched ? 'nombre-error' : null
       " [attr.aria-label]="'ADMIN.TAGS.ENTER_NAME' | translate" [placeholder]="'ADMIN.TAGS.ENTER_NAME' | translate"
-      maxlength="50" data-testid="input-nombre" />
+      maxlength="50" data-testid="input-nombre" (input)="onNombreInput($any($event.target).value)" />
     @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
     <div id="nombre-error" class="invalid-feedback">
       @if (form.get('nombre')?.errors?.['required']) {
@@ -54,25 +76,8 @@
       </div>
       }
     </div>
-    @if (form.get('colorHex')?.invalid && form.get('colorHex')?.touched) {
+    @if ((form.get('colorHex')?.invalid && form.get('colorHex')?.touched) || (internoSubmitted && form.get('colorHex')?.invalid)) {
     <div class="invalid-feedback d-block">{{ 'ADMIN.TAGS.COLOR_REQUIRED' | translate }}</div>
     }
-  </div>
-
-  <div class="d-flex justify-content-end gap-2">
-    <button type="button" cButton color="secondary" (click)="onCancel()" [disabled]="loading"
-      [attr.aria-label]="'COMMON.CANCEL' | translate" data-testid="btn-cancelar">
-      {{ 'COMMON.CANCEL' | translate }}
-    </button>
-    <button type="submit" cButton color="primary" [disabled]="form.invalid || loading"
-      [attr.aria-label]="isEdit ? ('ADMIN.TAGS.EDIT_TAG' | translate) : ('ADMIN.TAGS.NEW_TAG' | translate)"
-      data-testid="btn-guardar">
-      @if (loading) {
-      <span class="me-2"><c-spinner size="sm"></c-spinner></span>
-      }
-      @if (!loading) {
-      <span>{{ isEdit ? ('COMMON.UPDATE' | translate) : ('COMMON.CREATE' | translate) }}</span>
-      }
-    </button>
   </div>
 </form>

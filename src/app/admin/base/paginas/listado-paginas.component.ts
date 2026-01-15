@@ -22,6 +22,8 @@ import { ErrorBoundaryComponent } from '../../../shared/components/errors/error-
 import { LoggerService } from '../../../core/services/logger.service';
 import { Router } from '@angular/router';
 import { TranslationService } from '../../../core/services/translation.service';
+import { parseAllowedDate } from '../../../shared/utils/date-utils';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-listado-paginas',
@@ -83,7 +85,8 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     private entradaCatalogService: EntradaCatalogService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private translate: TranslationService
+    private translate: TranslationService,
+    private datePipe: DatePipe
   ) { }
 
   // #region Lifecycle Methods
@@ -492,9 +495,10 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
 
   // #region Helpers
 
-  checkFechaPublicacion(fechaPublicacion: Date): string {
-    return fechaPublicacion
-      ? this.commonFuncService.transformaFecha(fechaPublicacion, 'dd-MM-yyyy', true)
+  checkFechaPublicacion(fechaPublicacion: Date | any): string {
+    const date = parseAllowedDate(fechaPublicacion);
+    return date
+      ? this.datePipe.transform(date, 'dd-MM-yyyy') || ''
       : this.translate.instant('ADMIN.PAGES.TABLE.NOT_PUBLISHED');
   }
 

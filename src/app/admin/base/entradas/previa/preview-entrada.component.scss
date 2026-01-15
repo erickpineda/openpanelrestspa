@@ -1,4 +1,4 @@
-.preview-entrada-card {
+.preview-entrada-container {
   .preview-entrada-contenido {
     p {
       margin-bottom: 1rem;
@@ -25,5 +25,23 @@
       padding: 1rem;
       overflow: auto;
     }
+  }
+
+  .fecha-programada {
+    color: #3399ff; // Info color
+    font-weight: 500;
+    background-color: rgba(51, 153, 255, 0.1);
+    padding: 0.1rem 0.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid rgba(51, 153, 255, 0.2);
+  }
+
+  .fecha-publicada {
+    color: #2eb85c; // Success color
+    font-weight: 500;
+    background-color: rgba(46, 184, 92, 0.1);
+    padding: 0.1rem 0.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid rgba(46, 184, 92, 0.2);
   }
 }

@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Entrada } from '../../../../../core/models/entrada.model';
+import { parseAllowedDate } from '../../../../../shared/utils/date-utils';
 
 @Component({
   selector: 'app-entradas-table',
   templateUrl: './entradas-table.component.html',
-  styleUrls: [],
+  styleUrls: ['./entradas-table.component.scss'],
   standalone: false
 })
 export class EntradasTableComponent {
@@ -17,10 +18,10 @@ export class EntradasTableComponent {
   @Output() preview = new EventEmitter<Entrada>();
   @Output() delete = new EventEmitter<Entrada>();
 
-  // Helper para convertir fechas
+  constructor() {}
+
   getFechaDate(fecha: string | Date | undefined): Date | null {
-    if (!fecha) return null;
-    return new Date(fecha);
+    return parseAllowedDate(fecha ?? null);
   }
 
   // Helper para info de estado (simplificado para ejemplo, idealmente vendría de un helper compartido o pipe)

@@ -25,6 +25,7 @@ export class ComentarioFormComponent implements OnChanges {
   @Output() submitComentario = new EventEmitter<Comentario>();
   @Output() cancel = new EventEmitter<void>();
   @Output() editarComentario = new EventEmitter<void>(); // Solicitud de habilitar edición
+  @Output() goToEntry = new EventEmitter<number>();
 
   form: FormGroup;
   searchResults: Entrada[] = [];
@@ -111,6 +112,13 @@ export class ComentarioFormComponent implements OnChanges {
     this.searchResults = [];
   }
 
+  irAEntrada() {
+    const idEntrada = this.form.get('idEntrada')?.value;
+    if (idEntrada) {
+      this.goToEntry.emit(idEntrada);
+    }
+  }
+
   private disableReadonlyFields() {
     const readonlyFields = [
       'username',
@@ -147,6 +155,18 @@ export class ComentarioFormComponent implements OnChanges {
       // Emitimos el valor del form, mezclado con el ID original si es necesario
       // Ojo: getRawValue() incluye los campos deshabilitados
       const formValue = this.form.getRawValue();
+
+      // Asegurar que los IDs críticos estén presentes si no vienen del form
+      if (!formValue.idComentario && this.comentario?.idComentario) {
+        formValue.idComentario = this.comentario.idComentario;
+      }
+      if (!formValue.idEntrada && this.comentario?.idEntrada) {
+        formValue.idEntrada = this.comentario.idEntrada;
+      }
+      if (!formValue.idUsuario && this.comentario?.idUsuario) {
+        formValue.idUsuario = this.comentario.idUsuario;
+      }
+
       this.submitComentario.emit(formValue);
     } else {
       this.form.markAllAsTouched();

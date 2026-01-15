@@ -187,13 +187,13 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(): void {
-    if (!this.etiquetaToDelete?.idEtiqueta) {
+    if (!this.etiquetaToDelete?.codigo) {
       this.showDeleteModal = false;
       return;
     }
     this.loading = true;
     this.etiquetasService
-      .borrar(this.etiquetaToDelete.idEtiqueta!)
+      .borrarPorCodigo(this.etiquetaToDelete.codigo)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -233,6 +233,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
     const mapped = Array.isArray(raw)
       ? (raw.map((e: any) => ({
           idEtiqueta: e?.idEtiqueta ?? e?.id ?? e?.id_tag ?? e?.idLabel,
+          codigo: e?.codigo ?? '',
           nombre: e?.nombre ?? e?.name,
           frecuencia: e?.frecuencia ?? 0,
           descripcion: e?.descripcion ?? e?.description,

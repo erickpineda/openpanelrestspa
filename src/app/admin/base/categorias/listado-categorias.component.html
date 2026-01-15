@@ -112,6 +112,8 @@
               <tr>
                 <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 200px">
                   {{ 'COMMON.NAME' | translate }}</th>
+                <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 120px">
+                  {{ 'ADMIN.CATEGORIES.TABLE.CODE' | translate }}</th>
                 <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-start" style="min-width: 250px">
                   {{ 'COMMON.DESCRIPTION' | translate }}</th>
                 <th scope="col" class="py-3 px-3 border-0 text-secondary fw-semibold text-end"
@@ -122,13 +124,14 @@
               @for (categ of pagedCategorias; track trackByCategoriaId($index, categ)) {
               <tr>
                 <td class="px-3">
-                  <div class="d-flex flex-column">
-                    <span class="fw-bold text-primary text-truncate" style="max-width: 250px" [title]="categ.nombre">
-                      {{ categ.nombre }}
-                    </span>
-                    <small class="text-muted font-monospace">{{ 'COMMON.ID' | translate }}: {{ categ.idCategoria
-                      }}</small>
-                  </div>
+                  <span class="fw-bold text-primary text-truncate" style="max-width: 250px" [title]="categ.nombre">
+                    {{ categ.nombre }}
+                  </span>
+                </td>
+                <td class="px-3">
+                  <span class="font-monospace">
+                    {{ categ.codigo }}
+                  </span>
                 </td>
                 <td class="px-3">
                   <span class="d-inline-block text-truncate text-muted" style="max-width: 300px"
@@ -138,7 +141,7 @@
                 </td>
                 <td class="px-3 text-end">
                   <c-button-group role="group">
-                    <button cButton color="info" size="sm" variant="ghost" (click)="editarCategoria(categ.idCategoria)"
+                    <button cButton color="info" size="sm" variant="ghost" (click)="editarCategoriaPorCodigo(categ.codigo)"
                       [cTooltip]="'ADMIN.CATEGORIES.EDIT_CATEGORY' | translate"
                       [attr.aria-label]="('ADMIN.CATEGORIES.EDIT_CATEGORY' | translate) + ' ' + categ.nombre">
                       <svg cIcon name="cilPen" size="sm"></svg>
@@ -154,7 +157,7 @@
               }
               @if (pagedCategorias.length === 0) {
               <tr>
-                <td colspan="3" class="text-center py-5 text-muted">
+                <td colspan="4" class="text-center py-5 text-muted">
                   <div class="d-flex flex-column align-items-center justify-content-center">
                     <svg cIcon name="cilFolderOpen" size="xl" class="mb-3 text-secondary opacity-50"></svg>
                     <span>{{ 'ADMIN.CATEGORIES.NO_RESULTS' | translate }}</span>

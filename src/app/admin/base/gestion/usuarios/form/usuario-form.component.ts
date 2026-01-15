@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { Usuario } from '../../../../../core/models/usuario.model';
 import { Rol } from '../../../../../core/models/rol.model';
 import { OPConstants } from '../../../../../shared/constants/op-global.constants';
@@ -8,7 +8,7 @@ import { OPConstants } from '../../../../../shared/constants/op-global.constants
   templateUrl: './usuario-form.component.html',
   standalone: false
 })
-export class UsuarioFormComponent {
+export class UsuarioFormComponent implements OnChanges {
   @Input() visible = false;
   @Input() usuario: Usuario | null = null;
   @Input() roles: Rol[] = [];
@@ -17,6 +17,18 @@ export class UsuarioFormComponent {
   @Output() onSave = new EventEmitter<Usuario>();
 
   readonly PROPIETARIO_ROLE_CODE = OPConstants.Roles.PROPIETARIO;
+  
+  disabled = false;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['visible'] && this.visible) {
+      if (this.usuario && this.usuario.idUsuario) {
+        this.disabled = true;
+      } else {
+        this.disabled = false;
+      }
+    }
+  }
 
   handleVisibleChange(event: boolean) {
     this.visible = event;
@@ -31,6 +43,10 @@ export class UsuarioFormComponent {
     if (this.usuario && this.isUserFormValid()) {
       this.onSave.emit(this.usuario);
     }
+  }
+  
+  enableEdit() {
+    this.disabled = false;
   }
 
   isEmailValid(e?: string): boolean {

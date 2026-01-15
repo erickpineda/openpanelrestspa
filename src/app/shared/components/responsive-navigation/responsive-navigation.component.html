@@ -3,8 +3,8 @@
   <div class="responsive-navigation-container" [ngClass]="getNavigationClasses(state)">
     <!-- CoreUI Toggle Button for Mobile/Tablet -->
     @if (shouldShowToggleButton(state)) {
-      <c-button
-        variant="ghost"
+      <button
+        type="button"
         class="sidebar-toggle-btn"
         [class.mobile]="state.isMobile"
         [class.tablet]="state.isTablet"
@@ -17,7 +17,7 @@
             {{ getToggleButtonText(state) }}
           </span>
         }
-      </c-button>
+      </button>
     }
     <!-- CoreUI Navigation Menu -->
     <c-sidebar-nav
@@ -26,7 +26,6 @@
       [class.mobile-menu]="state.isMobile"
       [class.tablet-menu]="state.isTablet"
       [class.desktop-menu]="state.isDesktop"
-      [perfectScrollbar]="true"
     >
       <!-- Mobile Overlay -->
       @if (state.isMobile && !state.sidebarCollapsed) {
@@ -37,9 +36,9 @@
         @if (shouldShowItem(item, state)) {
           <!-- Section Title using CoreUI -->
           @if (item.title) {
-            <c-nav-title class="nav-section-title" [class.mobile-hidden]="state.isMobile">
+            <div class="nav-section-title" [class.mobile-hidden]="state.isMobile">
               {{ item.name }}
-            </c-nav-title>
+            </div>
           }
           <!-- Navigation Item using CoreUI -->
           @if (!item.title) {
@@ -88,39 +87,37 @@
               </c-nav-link>
               <!-- CoreUI Submenu -->
               @if (item.children && item.children.length > 0 && !state.isMobile) {
-                <c-nav-group [compact]="state.sidebarCollapsed">
-                  <div class="nav-section-content">
-                    @for (child of item.children; track trackByNavItem($index, child)) {
-                      <c-nav-item>
-                        <c-nav-link
-                          [routerLink]="child.url"
-                          routerLinkActive="active"
-                          class="nav-sublink"
-                          [class.touch-target]="state.touchEnabled"
-                          [attr.aria-label]="child.name"
-                          [attr.data-testid]="toTestId(child.name || '')"
-                          (click)="onNavigationItemClick(child)"
-                        >
-                          @if (child.icon) {
-                            <svg cIcon [name]="child.icon" class="nav-subicon"></svg>
-                          }
-                          @if (!state.sidebarCollapsed) {
-                            {{ child.name }}
-                          }
-                          @if (child.badge) {
-                            <c-badge
-                              [color]="child.badge.color"
-                              class="ms-auto nav-subbadge"
-                              [ngClass]="['badge-' + child.badge.color]"
-                            >
-                              {{ child.badge.text }}
-                            </c-badge>
-                          }
-                        </c-nav-link>
-                      </c-nav-item>
-                    }
-                  </div>
-                </c-nav-group>
+                <div class="nav-section-content">
+                  @for (child of item.children; track trackByNavItem($index, child)) {
+                    <c-nav-item>
+                      <c-nav-link
+                        [routerLink]="child.url"
+                        routerLinkActive="active"
+                        class="nav-sublink"
+                        [class.touch-target]="state.touchEnabled"
+                        [attr.aria-label]="child.name"
+                        [attr.data-testid]="toTestId(child.name || '')"
+                        (click)="onNavigationItemClick(child)"
+                      >
+                        @if (child.icon) {
+                          <svg cIcon [name]="child.icon" class="nav-subicon"></svg>
+                        }
+                        @if (!state.sidebarCollapsed) {
+                          {{ child.name }}
+                        }
+                        @if (child.badge) {
+                          <c-badge
+                            [color]="child.badge.color"
+                            class="ms-auto nav-subbadge"
+                            [ngClass]="['badge-' + child.badge.color]"
+                          >
+                            {{ child.badge.text }}
+                          </c-badge>
+                        }
+                      </c-nav-link>
+                    </c-nav-item>
+                  }
+                </div>
               }
             </c-nav-item>
           }
@@ -128,8 +125,10 @@
       }
       <!-- Critical Functions Quick Access (Mobile Only) using CoreUI -->
       @if (state.isMobile && state.sidebarCollapsed) {
-        <c-nav-group class="critical-functions-bar">
-          <c-nav-title>{{ 'AUTO.ACCESO_R_PIDO' | translate }}</c-nav-title>
+        <div class="critical-functions-bar">
+          <div class="nav-section-title">
+            {{ 'AUTO.ACCESO_R_PIDO' | translate }}
+          </div>
           @for (func of criticalFunctions.slice(0, 4); track func.url) {
             <c-nav-item>
               <c-nav-link
@@ -149,7 +148,7 @@
               </c-nav-link>
             </c-nav-item>
           }
-        </c-nav-group>
+        </div>
       }
     </c-sidebar-nav>
     <!-- Bottom toggle control -->

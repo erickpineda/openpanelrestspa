@@ -8,8 +8,9 @@
     <button (click)="cerrarModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body class="p-4">
-    <app-categoria-form (submitCategoria)="guardar($event)"
-      (onReset)="cerrarModal()"></app-categoria-form>
+    @if (visible) {
+    <app-categoria-form (submitCategoria)="guardar($event)" (onReset)="cerrarModal()"></app-categoria-form>
+    }
   </c-modal-body>
   <c-modal-footer class="bg-light bg-opacity-10">
     <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'COMMON.CANCEL' | translate }}</button>

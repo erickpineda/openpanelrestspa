@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators, UntypedFormArray } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, UntypedFormArray, AbstractControl, ValidationErrors } from '@angular/forms';
 import { EstadoEntrada } from '../../../../../core/models/estado-entrada.model';
 import { TipoEntrada } from '../../../../../core/models/tipo-entrada.model';
 import { Categoria } from '../../../../../core/models/categoria.model';
@@ -36,6 +36,10 @@ export class ValidationEntradaFormsService {
     contenido: {
       required: 'Escribe algo en la entrada',
     },
+    fechaPublicacionProgramada: {
+      minDate: 'La fecha no puede ser anterior a la actual',
+      minMargin: 'Debe haber al menos 30 minutos de margen con la hora actual'
+    }
   };
 
   formErrors = {
@@ -45,6 +49,34 @@ export class ValidationEntradaFormsService {
   };
 
   constructor(private fb: UntypedFormBuilder) {}
+
+  private scheduledDateValidator(control: AbstractControl): ValidationErrors | null {
+    const parent = control.parent as UntypedFormGroup | null;
+    const estado = parent?.get('estadoEntrada')?.value as EstadoEntrada | null;
+    const isScheduled =
+      !!estado && (estado.nombre === 'PROGRAMADA' || estado.idEstadoEntrada === 4);
+
+    if (!control.value) {
+      if (isScheduled) {
+        return { requiredWhenScheduled: true };
+      }
+      return null;
+    }
+
+    const inputDate = new Date(control.value);
+    const now = new Date();
+    
+    if (inputDate < now) {
+      return { minDate: true };
+    }
+
+    const thirtyMinutesLater = new Date(now.getTime() + 30 * 60000);
+    if (inputDate < thirtyMinutesLater) {
+      return { minMargin: true };
+    }
+
+    return null;
+  }
 
   // buildForm() crea y devuelve el FormGroup listo para usar.
   public buildForm(entrada?: any): UntypedFormGroup {
@@ -60,6 +92,7 @@ export class ValidationEntradaFormsService {
           Validators.maxLength(this.formRules.tituloMax),
         ],
       ],
+      slug: [entrada?.slug ?? ''],
       subtitulo: [entrada?.subtitulo ?? '', [Validators.maxLength(this.formRules.subtituloMax)]],
       contenido: [
         entrada?.contenido ?? '',
@@ -75,7 +108,7 @@ export class ValidationEntradaFormsService {
       password: [entrada?.password ?? null],
       privado: [entrada?.privado ?? false],
       estadoEntrada: [entrada?.estadoEntrada ?? null, [Validators.required]],
-      fechaPublicacionProgramada: [entrada?.fechaPublicacionProgramada ?? null],
+      fechaPublicacionProgramada: [entrada?.fechaPublicacionProgramada ?? null, [this.scheduledDateValidator]],
       permitirComentario: [entrada?.permitirComentario ?? true],
       imagenDestacada: [entrada?.imagenDestacada ?? null],
       votos: [entrada?.votos ?? 0],
@@ -84,6 +117,7 @@ export class ValidationEntradaFormsService {
         entrada?.categorias ? entrada.categorias.map((c: Categoria) => this.fb.control(c)) : []
       ),
       categoriasConComas: [entrada?.categoriasConComas ?? ''],
+      usernameCreador: [entrada?.usernameCreador ?? ''],
       etiquetas: [entrada?.etiquetas ?? []],
     });
   }

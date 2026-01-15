@@ -11,6 +11,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { UntypedFormGroup } from '@angular/forms';
 import { Entrada } from '../../../../core/models/entrada.model';
 import { Categoria } from '../../../../core/models/categoria.model';
+import { parseAllowedDate } from '../../../../shared/utils/date-utils';
 
 @Component({
   selector: 'app-previa-entrada',
@@ -35,7 +36,12 @@ export class PreviaEntradaComponent implements OnChanges {
   categoriasMostrar: { idCategoria?: number; nombre?: string }[] = [];
   imagenMostrar: string | null = null;
   usernameMostrar: string = '';
-  fechaMostrar: Date | string | null = null;
+  fechaMostrar: Date | null = null;
+  esFechaProgramada: boolean = false;
+  esFechaPublicada: boolean = false;
+  estadoTooltip: string = '';
+  estadoIcon: string = '';
+  estadoColor: string = '';
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -72,13 +78,11 @@ export class PreviaEntradaComponent implements OnChanges {
       this.usernameMostrar = '';
     }
 
+    // ESTADO (Must be called before resolveFecha)
+    this.resolveEstado();
+
     // FECHA
-    if (this.entrada && this.entrada.fechaPublicacion) {
-      this.fechaMostrar = this.entrada.fechaPublicacion;
-    } else {
-      // Si no hay fecha (creación), mostramos fecha actual como preview
-      this.fechaMostrar = new Date();
-    }
+    this.resolveFecha();
 
     // CONTENIDO
     const contenidoRaw =
@@ -92,6 +96,96 @@ export class PreviaEntradaComponent implements OnChanges {
 
     // CATEGORIAS
     this.categoriasMostrar = this.resolveCategorias();
+  }
+
+  private resolveFecha(): void {
+    const entrada = this.entrada;
+    this.esFechaProgramada = false;
+    this.esFechaPublicada = false;
+
+    if (!entrada) {
+      this.fechaMostrar = new Date();
+      return;
+    }
+
+    const nombreEstado = entrada.estadoEntrada?.nombre?.toUpperCase();
+
+    if (nombreEstado === 'PROGRAMADA' && entrada.fechaPublicacionProgramada) {
+      const parsed = parseAllowedDate(entrada.fechaPublicacionProgramada);
+      this.fechaMostrar = parsed || new Date();
+      this.esFechaProgramada = true;
+    } else if (nombreEstado === 'PUBLICADA' && entrada.fechaPublicacion) {
+      const parsed = parseAllowedDate(entrada.fechaPublicacion);
+      this.fechaMostrar = parsed || new Date();
+      this.esFechaPublicada = true;
+    } else if (entrada.fechaPublicacion) {
+      const parsed = parseAllowedDate(entrada.fechaPublicacion);
+      this.fechaMostrar = parsed || new Date();
+    } else {
+      // Si no hay fecha (creación), mostramos fecha actual como preview
+      this.fechaMostrar = new Date();
+    }
+  }
+
+  private resolveEstado(): void {
+    const entrada = this.entrada;
+    if (!entrada) {
+      this.estadoTooltip = '';
+      this.estadoIcon = '';
+      this.estadoColor = '';
+      return;
+    }
+
+    const nombreEstado = entrada.estadoEntrada?.nombre?.toUpperCase();
+
+    switch (nombreEstado) {
+      case 'PUBLICADA':
+        this.estadoColor = 'success';
+        this.estadoIcon = 'cilCheckCircle';
+        this.estadoTooltip = 'Publicada';
+        break;
+      case 'NO PUBLICADA':
+        this.estadoColor = 'danger';
+        this.estadoIcon = 'cilXCircle';
+        this.estadoTooltip = 'No Publicada';
+        break;
+      case 'GUARDADA':
+      case 'BORRADOR':
+        this.estadoColor = 'secondary';
+        this.estadoIcon = 'cilSave';
+        this.estadoTooltip = 'Guardada';
+        break;
+      case 'PENDIENTE REVISION':
+        this.estadoColor = 'warning';
+        this.estadoIcon = 'cilWarning';
+        this.estadoTooltip = 'Pendiente Revisión';
+        break;
+      case 'EN REVISION':
+        this.estadoColor = 'info';
+        this.estadoIcon = 'cilZoom';
+        this.estadoTooltip = 'En Revisión';
+        break;
+      case 'REVISADA':
+        this.estadoColor = 'primary';
+        this.estadoIcon = 'cilTask';
+        this.estadoTooltip = 'Revisada';
+        break;
+      case 'HISTORICA':
+        this.estadoColor = 'dark';
+        this.estadoIcon = 'cilHistory';
+        this.estadoTooltip = 'Histórica';
+        break;
+      case 'PROGRAMADA':
+        this.estadoColor = 'info';
+        this.estadoIcon = 'cilCalendar';
+        this.estadoTooltip = 'Programada';
+        break;
+      default:
+        this.estadoColor = 'secondary';
+        this.estadoIcon = 'cilFile';
+        this.estadoTooltip = entrada.estadoEntrada?.nombre || 'Archivada';
+        break;
+    }
   }
 
   private resolveCategorias(): Categoria[] {

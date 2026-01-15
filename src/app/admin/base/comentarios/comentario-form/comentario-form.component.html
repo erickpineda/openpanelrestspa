@@ -28,17 +28,41 @@
     <c-col md="6" class="position-relative">
       <label class="form-label fw-semibold">{{ 'ADMIN.COMMENTS.TABLE.ENTRY' | translate }}</label>
       <div class="input-group">
-        <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilFile" size="sm"></svg></span>
-        <input cFormControl formControlName="tituloEntrada" type="text" class="border-start-0" 
-               (input)="onSearchInput($event)" autocomplete="off"
-               [ngClass]="{'is-invalid': (submitted || f['idEntrada'].touched) && f['idEntrada'].invalid}" />
+        <span class="input-group-text bg-light border-end-0">
+          <svg cIcon name="cilFile" size="sm"></svg>
+        </span>
+        <input
+          cFormControl
+          formControlName="tituloEntrada"
+          type="text"
+          class="border-start-0"
+          autocomplete="off"
+          (input)="onSearchInput($event)"
+          [placeholder]="'ADMIN.COMMENTS.FORM.ENTRY_PLACEHOLDER' | translate"
+          [ngClass]="{
+            'is-invalid': (submitted || f['idEntrada'].touched) && f['idEntrada'].invalid
+          }"
+        />
+        @if (isEditMode && f['idEntrada'].value) {
+          <button
+            cButton
+            color="secondary"
+            variant="outline"
+            type="button"
+            class="border-start-0"
+            (click)="irAEntrada()"
+            [cTooltip]="'ADMIN.COMMENTS.FORM.GO_TO_ENTRY' | translate"
+          >
+            <svg cIcon name="cilExternalLink"></svg>
+          </button>
+        }
         @if ((submitted || f['idEntrada'].touched) && f['idEntrada'].invalid) {
-            <div class="invalid-feedback">
-                {{ 'COMMON.VALIDATION.REQUIRED' | translate }}
-            </div>
+          <div class="invalid-feedback">
+            {{ 'COMMON.VALIDATION.REQUIRED' | translate }}
+          </div>
         }
       </div>
-      @if (searchResults.length > 0) {
+      @if (!isEditMode && searchResults.length > 0) {
         <ul class="list-group position-absolute w-100 shadow-sm" style="z-index: 1000; max-height: 200px; overflow-y: auto;">
           @for (entrada of searchResults; track entrada.idEntrada) {
             <li class="list-group-item list-group-item-action cursor-pointer" (click)="seleccionarEntrada(entrada)">

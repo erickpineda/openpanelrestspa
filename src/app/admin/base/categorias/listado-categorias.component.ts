@@ -251,9 +251,9 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     this.visibleModalCrear = true;
   }
 
-  editarCategoria(id: number): void {
+  editarCategoriaPorCodigo(codigo: string): void {
     this.cargando = true;
-    this.facade.obtenerCategoriaPorId(id).subscribe({
+    this.facade.obtenerCategoriaPorCodigo(codigo).subscribe({
       next: (cat) => {
         this.cargando = false;
         if (cat) {
@@ -283,21 +283,23 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
 
 
   borrarCategoria(categ: Categoria): void {
-    if (!categ?.idCategoria) return;
+    if (!categ?.codigo && !categ?.idCategoria) return;
     this.categoriaToDelete = categ;
     this.showDeleteModal = true;
     this.cdr.detectChanges();
   }
 
   confirmDelete(): void {
-    if (!this.categoriaToDelete?.idCategoria) {
+    if (!this.categoriaToDelete?.codigo && !this.categoriaToDelete?.idCategoria) {
       this.showDeleteModal = false;
       return;
     }
 
     this.cargando = true;
-    this.categoriaService
-      .borrar(this.categoriaToDelete.idCategoria)
+    const obs = this.categoriaToDelete.codigo
+      ? this.categoriaService.borrarPorCodigo(this.categoriaToDelete.codigo)
+      : this.categoriaService.borrar(this.categoriaToDelete.idCategoria);
+    obs
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
@@ -325,8 +327,8 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     this.categoriaToDelete = null;
   }
 
-  trackByCategoriaId(index: number, categoria: Categoria): number {
-    return categoria.idCategoria;
+  trackByCategoriaId(index: number, categoria: Categoria): string | number {
+    return categoria.codigo || categoria.idCategoria;
   }
 
   // ===== Toolbar / Búsqueda / Paginación =====

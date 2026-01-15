@@ -10,6 +10,7 @@ export class Entrada {
   idUsuarioEditado: number = 0;
   titulo: string = '';
   subtitulo: string = '';
+  slug: string = '';
   contenido: string = '';
   notas: string = '';
   tipoEntrada: TipoEntrada = new TipoEntrada();
@@ -43,6 +44,7 @@ export interface Entrada {
   idUsuarioEditado: number;
   titulo: string;
   subtitulo: string;
+  slug: string;
   contenido: string;
   notas: string;
   tipoEntrada: TipoEntrada;

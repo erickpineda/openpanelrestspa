@@ -355,9 +355,11 @@
   "etiquetas": [
     {
       "idEtiqueta": 1,
+      "codigo": "EVENT",
       "nombre": "Evento",
-      "frecuencia": null,
-      "descripcion": "Etiquetas para eventos"
+      "frecuencia": 0,
+      "descripcion": "Etiquetas para eventos",
+      "colorHex": "#4ECDC4"
     }
   ],
   "herramientas": [

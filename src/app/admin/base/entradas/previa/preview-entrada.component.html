@@ -20,18 +20,18 @@
         </div>
       }
 
-      @if (usernameMostrar && (fechaMostrar || categoriasMostrar.length)) {
+      @if (usernameMostrar && (fechaMostrar || categoriasMostrar.length || estadoTooltip)) {
         <div class="vr d-none d-sm-block"></div>
       }
 
       @if (fechaMostrar) {
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center" [class.fecha-programada]="esFechaProgramada" [class.fecha-publicada]="esFechaPublicada">
           <svg cIcon name="cilCalendar" size="sm" class="me-2"></svg>
-          {{ fechaMostrar | date:'dd-MM-yyyy' }}
+          {{ fechaMostrar | date:'dd-MM-yyyy HH:mm' }}
         </div>
       }
 
-      @if (fechaMostrar && categoriasMostrar.length) {
+      @if (fechaMostrar && (categoriasMostrar.length || estadoTooltip)) {
         <div class="vr d-none d-sm-block"></div>
       }
 
@@ -45,6 +45,19 @@
                </c-badge>
              }
           </div>
+        </div>
+      }
+
+      @if (estadoTooltip) {
+        <div class="d-flex align-items-center">
+          <c-badge
+            [color]="estadoColor"
+            shape="rounded-pill"
+            class="px-3 py-1"
+          >
+            <svg cIcon [name]="estadoIcon" size="sm" class="me-1"></svg>
+            {{ estadoTooltip }}
+          </c-badge>
         </div>
       }
     </div>

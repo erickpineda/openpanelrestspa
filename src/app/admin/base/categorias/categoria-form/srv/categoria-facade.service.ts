@@ -29,6 +29,13 @@ export class CategoriaFacadeService {
     );
   }
 
+  obtenerCategoriaPorCodigo(codigo: string): Observable<Categoria | null> {
+    return this.categoriaService.obtenerPorCodigo(codigo).pipe(
+      map((resp) => (resp.data ? resp.data : null)),
+      catchError(() => of(null))
+    );
+  }
+
   obtenerUsuarioActual(): Observable<PerfilResponse | null> {
     return this.usuarioService.obtenerDatosSesionActual().pipe(
       map((resp) => (resp.data ? resp.data : null)),
@@ -65,5 +72,9 @@ export class CategoriaFacadeService {
 
   actualizarCategoria(id: number, cat: Categoria) {
     return this.categoriaService.actualizar(id, cat);
+  }
+
+  actualizarCategoriaPorCodigo(codigo: string, cat: Categoria) {
+    return this.categoriaService.actualizarPorCodigo(codigo, cat);
   }
 }

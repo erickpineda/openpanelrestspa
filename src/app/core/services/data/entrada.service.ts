@@ -8,6 +8,7 @@ import { Entrada } from '../../models/entrada.model';
 import { TipoEntrada } from '../../models/tipo-entrada.model';
 import { EstadoEntrada } from '../../models/estado-entrada.model';
 import { CrudService } from '../../_utils/crud.service';
+import { OPConstants } from 'src/app/shared/constants/op-global.constants';
 
 // Interfaces para las respuestas específicas
 interface TiposEntradasResponse {
@@ -27,7 +28,7 @@ interface BuscarResponse {
   providedIn: 'root',
 })
 export class EntradaService extends CrudService<Entrada, number> {
-  protected endpoint = '/entradas';
+  protected endpoint = OPConstants.Methods.ENTRADAS.BASE;
 
   // ✅ MÉTODOS SEGUROS ESPECÍFICOS (nuevos)
 
@@ -105,7 +106,11 @@ export class EntradaService extends CrudService<Entrada, number> {
   }
 
   obtenerDefinicionesBuscador(): Observable<any> {
-    return this.get(`${this.endpoint}/buscar/definicionesBuscador`);
+    return this.get(OPConstants.Methods.ENTRADAS.BUSCAR_DEFINICIONES);
+  }
+
+  obtenerPorSlug(slug: string): Observable<any> {
+    return this.get(OPConstants.Methods.ENTRADAS.OBTENER_POR_SLUG(slug));
   }
 
   // ... mantener todos tus otros métodos existentes

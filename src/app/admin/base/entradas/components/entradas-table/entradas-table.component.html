@@ -76,7 +76,7 @@
                   [color]="estado.color" 
                   shape="rounded-pill"
                   class="px-3 py-2"
-                  [cTooltip]="estado.tooltip"
+                  [cTooltip]="entrada.estadoEntrada.nombre.toUpperCase() === 'PROGRAMADA' && entrada.fechaPublicacionProgramada ? ($any(getFechaDate(entrada.fechaPublicacionProgramada) | date:'dd-MM-yyyy HH:mm') || estado.tooltip) : estado.tooltip"
                 >
                   <svg cIcon [name]="estado.icon" size="sm" class="me-1"></svg>
                   {{ estado.tooltip }}

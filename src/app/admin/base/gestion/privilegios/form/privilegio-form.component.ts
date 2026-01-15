@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { Privilegio } from '../../../../../core/models/privilegio.model';
 import { TranslationService } from '../../../../../core/services/translation.service';
 
@@ -7,16 +7,32 @@ import { TranslationService } from '../../../../../core/services/translation.ser
   templateUrl: './privilegio-form.component.html',
   standalone: false,
 })
-export class PrivilegioFormComponent {
+export class PrivilegioFormComponent implements OnChanges {
   @Input() visible = false;
   @Input() privilegio: Privilegio | null = null;
   @Input() isEditing = false;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() onSave = new EventEmitter<Privilegio>();
 
+  disabled = false;
+
   constructor(private translate: TranslationService) { }
 
   manualCodeEntry = false;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['visible'] && this.visible) {
+      if (this.isEditing) {
+        this.disabled = true;
+      } else {
+        this.disabled = false;
+      }
+    }
+  }
+
+  enableEdit() {
+    this.disabled = false;
+  }
 
   close() {
     this.visible = false;

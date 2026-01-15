@@ -3,6 +3,7 @@ import { Comentario } from '../../../../core/models/comentario.model';
 import { ComentarioFacadeService } from '../comentario-form/srv/comentario-facade.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { ComentarioFormComponent } from '../comentario-form/comentario-form.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-editar-comentario',
@@ -26,7 +27,8 @@ export class EditarComentarioComponent implements OnChanges {
 
   constructor(
     private facade: ComentarioFacadeService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private router: Router
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -75,6 +77,13 @@ export class EditarComentarioComponent implements OnChanges {
     this.handleVisibleChange(false);
   }
 
+  irAEntrada(idEntrada: number) {
+    this.cerrarModal();
+    setTimeout(() => {
+      this.router.navigate(['/admin/control/entradas/editar', idEntrada]);
+    }, 350);
+  }
+
   guardar(comentario: Comentario) {
     if (!comentario.idComentario) return;
 
@@ -87,6 +96,10 @@ export class EditarComentarioComponent implements OnChanges {
       },
       error: (err) => {
         console.error('Error al actualizar comentario:', err);
+        this.toastService.showError(
+          err?.error?.message || 'Error al actualizar el comentario.',
+          'Error'
+        );
       }
     });
   }

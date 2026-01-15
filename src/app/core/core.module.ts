@@ -24,6 +24,7 @@ import { ErrorBoundaryService } from './errors/error-boundary/error-boundary.ser
 import { RouterModule } from '@angular/router';
 
 import { LanguageInterceptor } from './interceptor/language.interceptor';
+import { DateInterceptor } from './interceptor/date.interceptor';
 import { LanguageService } from './services/language.service';
 
 import { TranslationService } from './services/translation.service';
@@ -58,6 +59,11 @@ import { TranslationService } from './services/translation.service';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: LanguageInterceptor, // 2º: Idioma (antes de auth para que auth también pueda llevarlo si es necesario)
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: DateInterceptor, // Formateo de fechas para el backend
       multi: true,
     },
     {

@@ -33,6 +33,7 @@
               size="sm"></svg></span>
           <input cFormControl type="email" [value]="usuario.email || ''"
             (input)="usuario.email = $any($event.target).value" [class.is-invalid]="!isEmailValid(usuario.email)"
+            [disabled]="disabled"
             [placeholder]="'ADMIN.USERS.EMAIL_PLACEHOLDER' | translate" class="border-start-0" />
         </div>
         @if (!isEmailValid(usuario.email)) {
@@ -62,7 +63,7 @@
       <c-col md="6">
         <label class="form-label fw-semibold">{{ 'ADMIN.USERS.ASSIGNED_ROLE' | translate }}</label>
         <select cSelect [(ngModel)]="usuario.rolCodigo" [class.is-invalid]="!usuario.rolCodigo"
-          [disabled]="PROPIETARIO_ROLE_CODE && usuario.rolCodigo === PROPIETARIO_ROLE_CODE">
+          [disabled]="(PROPIETARIO_ROLE_CODE && usuario.rolCodigo === PROPIETARIO_ROLE_CODE) || disabled">
           <option value="">{{ 'COMMON.SELECT_ROLE' | translate }}</option>
           @for (r of roles; track r.codigo) {
           @if (r.codigo !== PROPIETARIO_ROLE_CODE || usuario.rolCodigo === PROPIETARIO_ROLE_CODE) {
@@ -99,16 +100,28 @@
     </div>
     }
   </c-modal-body>
-  <c-modal-footer class="bg-light bg-opacity-10">
-    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'COMMON.CANCEL' | translate }}</button>
-    <button cButton color="primary" [disabled]="!isUserFormValid() || loading" (click)="guardar()">
-      @if (loading) {
-      <c-spinner size="sm" class="me-1"></c-spinner>
+  <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
+    <div>
+      @if (disabled && usuario?.idUsuario) {
+      <button cButton color="warning" variant="outline" (click)="enableEdit()">
+        <svg cIcon name="cilLockUnlocked" class="me-1"></svg>
+        {{ 'COMMON.ENABLE_EDIT' | translate }}
+      </button>
       }
-      @if (!loading) {
+    </div>
+    <div class="d-flex gap-2">
+      <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+      @if (!disabled) {
+      <button cButton color="primary" [disabled]="!isUserFormValid() || loading" (click)="guardar()">
+        @if (loading) {
+        <c-spinner size="sm" class="me-1"></c-spinner>
+        }
+        @if (!loading) {
         <svg cIcon name="cilSave" class="me-1"></svg>
+        }
+        {{ 'ADMIN.USERS.SAVE_USER' | translate }}
+      </button>
       }
-      {{ 'ADMIN.USERS.SAVE_USER' | translate }}
-    </button>
+    </div>
   </c-modal-footer>
 </c-modal>

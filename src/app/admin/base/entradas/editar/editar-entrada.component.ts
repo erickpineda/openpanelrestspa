@@ -9,6 +9,7 @@ import { TipoEntrada } from '../../../../core/models/tipo-entrada.model';
 import { EstadoEntrada } from '../../../../core/models/estado-entrada.model';
 import { Categoria } from '../../../../core/models/categoria.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
+import { formatForDateTimeLocal, parseAllowedDate } from '../../../../shared/utils/date-utils';
 
 @Component({
   selector: 'app-editar-entrada',
@@ -30,6 +31,18 @@ export class EditarEntradaComponent implements OnInit {
   modalPreviaVisible = false;
   entradaParaPrevia?: Entrada;
 
+  get esPublicada(): boolean {
+    const nombreEstado = this.entrada?.estadoEntrada?.nombre?.toUpperCase();
+    return nombreEstado === 'PUBLICADA';
+  }
+
+  get fechaPublicacionMostrar(): Date | null {
+    if (!this.entrada || !this.entrada.fechaPublicacion) {
+      return null;
+    }
+    return parseAllowedDate(this.entrada.fechaPublicacion) || null;
+  }
+
   constructor(
     private route: ActivatedRoute,
     private vf: ValidationEntradaFormsService,
@@ -40,7 +53,9 @@ export class EditarEntradaComponent implements OnInit {
 
   async ngOnInit() {
     this.entradaForm = this.vf.buildForm(this.entrada);
-    this.entradaForm.disable(); // Deshabilitar por defecto
+    // Inicializar deshabilitado
+    this.entradaForm.disable({ emitEvent: false });
+    
     this.idEntrada = this.route.snapshot.params['idEntrada'];
     const data = await this.facade.loadInitData();
     this.tiposEntr = data.tipos;
@@ -60,26 +75,37 @@ export class EditarEntradaComponent implements OnInit {
         (t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada
       );
 
-      this.entradaForm.patchValue({
-        ...ent,
-        estadoEntrada: estadoCorrecto ?? null,
-        tipoEntrada: tipoCorrecto ?? null,
-      });
+      // Usar patchValue con emitEvent: false para evitar disparar valueChanges innecesariamente durante la carga
+            this.entradaForm.patchValue({
+              ...ent,
+              estadoEntrada: estadoCorrecto ?? null,
+              tipoEntrada: tipoCorrecto ?? null,
+              fechaPublicacionProgramada: formatForDateTimeLocal(ent.fechaPublicacionProgramada)
+            }, { emitEvent: false });
 
-      // Rellenar categorías igual que antes
+            // Rellenar categorías
       const arr = this.entradaForm.get('categorias') as UntypedFormArray;
+      // Limpiar primero por si acaso
+      arr.clear();
+      
       if (ent.categorias && Array.isArray(ent.categorias)) {
         ent.categorias.forEach((cat: any) => arr.push(new UntypedFormControl(cat)));
       }
 
-      // Por defecto en modo lectura
-      this.entradaForm.disable();
-      this.modoLectura = true;
+      // Asegurar estado final correcto
+      if (this.modoLectura) {
+        this.entradaForm.disable({ emitEvent: false });
+      } else {
+        this.entradaForm.enable({ emitEvent: false });
+      }
+      
+      // Marcar como pristine después de cargar datos
+      this.entradaForm.markAsPristine();
     });
 
-    // Activar dirty en cualquier cambio, incluidas categorías
+    // Activar dirty en cualquier cambio posterior
     this.entradaForm.valueChanges.subscribe(() => {
-      if (this.entradaForm.pristine) {
+      if (this.entradaForm.pristine && !this.entradaForm.disabled) {
         this.entradaForm.markAsDirty();
       }
     });
@@ -94,6 +120,7 @@ export class EditarEntradaComponent implements OnInit {
   async onGuardar(ent: any) {
     this.submitted = true;
     if (this.entradaForm.invalid) return;
+
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuarioEditado = usuario?.idUsuario ?? null;
 
