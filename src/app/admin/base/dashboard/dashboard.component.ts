@@ -1351,17 +1351,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   downloadCsvContentStats(): void {
-    if (!this.contentStats) return;
     const now = new Date();
     const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
     const headers = ['metric', 'value'];
     const rows = [
-      ['totalUsuarios', this.contentStats.totalUsuarios ?? 0],
-      ['totalEntradas', this.contentStats.totalEntradas ?? 0],
-      ['totalComentarios', this.contentStats.totalComentarios ?? 0],
-      ['totalFicheros', this.contentStats.totalFicheros ?? 0],
-      ['storageBytes', this.contentStats.storageBytes ?? 0],
+      ['totalUsuarios', this.contentStats?.totalUsuarios ?? 0],
+      ['totalEntradas', this.contentStats?.totalEntradas ?? 0],
+      ['totalComentarios', this.contentStats?.totalComentarios ?? 0],
+      ['totalFicheros', this.contentStats?.totalFicheros ?? 0],
+      ['storageBytes', this.contentStats?.storageBytes ?? 0],
     ];
     this.saveCsv(
       `dashboard_content_stats_${datePart}_${timePart}.csv`,
@@ -1370,15 +1369,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   downloadCsvContentStatsEstados(): void {
-    if (!this.contentStats || !this.contentStats.entradasByEstado) return;
     const now = new Date();
     const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
     const headers = ['estado', 'count'];
-    const rows = Object.entries(this.contentStats.entradasByEstado).map(([k, v]) => [
-      k,
-      Number(v) || 0,
-    ]);
+    const byEstado = this.contentStats?.entradasByEstado || {};
+    const rows =
+      Object.keys(byEstado).length > 0
+        ? Object.entries(byEstado).map(([k, v]) => [k, Number(v) || 0])
+        : [];
     this.saveCsv(
       `dashboard_content_stats_estados_${datePart}_${timePart}.csv`,
       this.buildCsv(headers, rows)

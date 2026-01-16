@@ -183,9 +183,9 @@ export class SessionManagerService {
     // limpiar token/session (NO borra post-login-redirect-{tabId} porque signOut respeta eso)
     this.tokenStorage.signOut();
 
-    // Navegar a pantalla de sesión caducada
-    this.router.navigate([OPConstants.Session.ROUTE_SESSION_EXPIRED], {
-      state: { sessionData: data },
+    // Navegar a login directamente para cumplir redirecciones esperadas por E2E
+    this.router.navigate([OPConstants.Session.ROUTE_LOGIN], {
+      replaceUrl: true,
     });
   }
 }

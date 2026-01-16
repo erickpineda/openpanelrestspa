@@ -185,6 +185,25 @@
     
     <hr class="text-muted opacity-25 my-4" />
     
+    <c-row class="g-4 mb-4">
+      <c-col lg="12">
+        <app-dashboard-content-panel
+          [loadingContentStats]="loadingContentStats"
+          [errorContentStats]="errorContentStats"
+          [contentStats]="contentStats"
+          [contentStatsChartData]="contentStatsChartData"
+          [contentEstadoRows]="contentEstadoRows"
+          [kpiUsuariosTotalColor]="kpiUsuariosTotalColor"
+          [kpiEntradasTotalColor]="kpiEntradasTotalColor"
+          [kpiComentariosTotalColor]="kpiComentariosTotalColor"
+          [kpiFicherosTotalColor]="kpiFicherosTotalColor"
+          (downloadContentCsv)="downloadCsvContentStats()"
+          (downloadEstadosCsv)="downloadCsvContentStatsEstados()"
+          (retry)="loadContentStats()"
+        ></app-dashboard-content-panel>
+      </c-col>
+    </c-row>
+
     <c-row class="g-4">
       <c-col lg="6">
         @if (errorTopUsers) {

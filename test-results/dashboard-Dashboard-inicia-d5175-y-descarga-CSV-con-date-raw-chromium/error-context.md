@@ -3,263 +3,321 @@
 ```yaml
 - generic [ref=e3]:
   - generic [ref=e4]:
-    - img "CoreUI Logo" [ref=e7]
-    - navigation [ref=e10]:
-      - generic [ref=e11]: MENU.CONTENT_MANAGEMENT
-      - generic [ref=e12]: MENU.MY_ACCOUNT
-      - link "Mi Perfil Yo" [ref=e14] [cursor=pointer]:
+    - generic [ref=e5]:
+      - strong [ref=e6]: Error
+      - generic [ref=e7]: 16-01-2026 17:15:33
+      - button "Close" [ref=e8] [cursor=pointer]
+    - generic [ref=e9]: No se pudo conectar con el servidor. Verifique su conexión a internet.
+  - generic [ref=e10]:
+    - img "CoreUI Logo" [ref=e13]
+    - navigation [ref=e16]:
+      - generic [ref=e17]: MENU.CONTENT_MANAGEMENT
+      - generic [ref=e18]: MENU.MY_ACCOUNT
+      - link "Mi Perfil Yo" [ref=e20] [cursor=pointer]:
         - /url: "#/admin/control/perfil"
         - img
-        - generic [ref=e15]: Mi Perfil
-        - generic [ref=e16]: Yo
-      - link "Cambiar Contraseña" [ref=e18] [cursor=pointer]:
+        - generic [ref=e21]: Mi Perfil
+        - generic [ref=e22]: Yo
+      - link "Cambiar Contraseña" [ref=e24] [cursor=pointer]:
         - /url: "#/admin/control/gestion/changepassword"
         - img
-        - generic [ref=e19]: Cambiar Contraseña
-      - generic [ref=e20]: MENU.SYSTEM_CONFIGURATION
-      - generic [ref=e21]: MENU.QUICK_LINKS
-      - link "Ver Sitio Web" [ref=e23] [cursor=pointer]:
+        - generic [ref=e25]: Cambiar Contraseña
+      - generic [ref=e26]: MENU.SYSTEM_CONFIGURATION
+      - generic [ref=e27]: MENU.QUICK_LINKS
+      - link "Ver Sitio Web" [ref=e29] [cursor=pointer]:
         - /url: "#/"
         - img
-        - generic [ref=e24]: Ver Sitio Web
-    - generic "Compactar sidebar" [ref=e25]:
-      - button "Toggle sidebar fold" [ref=e26] [cursor=pointer]
-  - generic [ref=e27]:
-    - banner [ref=e28]:
-      - generic [ref=e29]:
-        - button "Toggle navigation" [ref=e30] [cursor=pointer]:
+        - generic [ref=e30]: Ver Sitio Web
+    - generic "Compactar sidebar" [ref=e31]:
+      - button "Toggle sidebar fold" [ref=e32] [cursor=pointer]
+  - generic [ref=e33]:
+    - banner [ref=e34]:
+      - generic [ref=e35]:
+        - button "Toggle navigation" [ref=e36] [cursor=pointer]:
           - img
-        - navigation "Navegación principal" [ref=e31]:
-          - link "Panel de Control" [ref=e33] [cursor=pointer]:
+        - navigation "Navegación principal" [ref=e37]:
+          - link "Panel de Control" [ref=e39] [cursor=pointer]:
             - /url: "#/admin/control"
             - text: Control
-        - navigation "Acciones rápidas" [ref=e34]:
-          - generic "Cambiar a Inglés" [ref=e36] [cursor=pointer]: EN
-          - link "Notificaciones" [ref=e38] [cursor=pointer]:
+        - navigation "Acciones rápidas" [ref=e40]:
+          - generic "Cambiar a Inglés" [ref=e42] [cursor=pointer]: EN
+          - link "Notificaciones" [ref=e44] [cursor=pointer]:
             - /url: "#/admin"
             - img
-          - link "Tareas" [ref=e40] [cursor=pointer]:
+          - link "Tareas" [ref=e46] [cursor=pointer]:
             - /url: "#/admin"
             - img
-          - link "Mensajes" [ref=e42] [cursor=pointer]:
+          - link "Mensajes" [ref=e48] [cursor=pointer]:
             - /url: "#/admin"
             - img
-        - navigation "Menú de usuario" [ref=e43]:
-          - generic "Abrir menú de usuario" [ref=e45] [cursor=pointer]
-      - navigation "breadcrumb" [ref=e50]:
-        - listitem [ref=e51]:
-          - link "Inicio" [ref=e52] [cursor=pointer]:
+        - navigation "Menú de usuario" [ref=e49]:
+          - generic "Abrir menú de usuario" [ref=e51] [cursor=pointer]
+      - navigation "breadcrumb" [ref=e56]:
+        - listitem [ref=e57]:
+          - link "Inicio" [ref=e58] [cursor=pointer]:
             - /url: "#/admin"
-        - listitem [ref=e53]: / Escritorio
-    - generic [ref=e57]:
-      - generic [ref=e59]:
-        - generic [ref=e61]:
-          - generic [ref=e62]:
-            - img
-          - generic [ref=e63]:
-            - heading "Dashboard" [level=5] [ref=e64]
-            - text: Resumen general y estadísticas
+        - listitem [ref=e59]: / Escritorio
+    - generic [ref=e63]:
+      - generic [ref=e65]:
         - generic [ref=e67]:
-          - button "Refrescar Gráficos" [ref=e68] [cursor=pointer]:
+          - generic [ref=e68]:
+            - img
+          - generic [ref=e69]:
+            - heading "Dashboard" [level=5] [ref=e70]
+            - text: Resumen general y estadísticas
+        - generic [ref=e73]:
+          - button "Refrescar Gráficos" [ref=e74] [cursor=pointer]:
             - img
             - text: Refrescar Gráficos
-          - 'button "Forzar BD: Off" [ref=e69] [cursor=pointer]'
-          - button "Descargar Datos" [ref=e70] [cursor=pointer]:
+          - 'button "Forzar BD: Off" [ref=e75] [cursor=pointer]'
+          - button "Descargar Datos" [ref=e76] [cursor=pointer]:
             - img
             - text: Descargar Datos
-          - button "Exportar CSV en ZIP" [ref=e71] [cursor=pointer]:
+          - button "Exportar CSV en ZIP" [ref=e77] [cursor=pointer]:
             - img
             - text: Exportar ZIP
-      - generic [ref=e72]:
-        - generic [ref=e73]:
-          - heading "Estadísticas Rápidas" [level=5] [ref=e74]:
+      - generic [ref=e78]:
+        - generic [ref=e79]:
+          - heading "Estadísticas Rápidas" [level=5] [ref=e80]:
             - img
             - text: Estadísticas Rápidas
-          - button "Ajustar Parámetros" [ref=e76] [cursor=pointer]:
+          - button "Ajustar Parámetros" [ref=e82] [cursor=pointer]:
             - img
             - text: Ajustar Parámetros
-        - generic [ref=e77]:
-          - generic [ref=e82]:
-            - generic [ref=e83]:
+        - generic [ref=e83]:
+          - generic [ref=e88]:
+            - generic [ref=e89]:
               - img
-            - generic [ref=e84]:
-              - generic [ref=e85]: "0"
-              - generic [ref=e86]: Usuarios Activos
-          - generic [ref=e91]:
-            - generic [ref=e92]:
+            - generic [ref=e90]:
+              - generic [ref=e91]: "0"
+              - generic [ref=e92]: Usuarios Activos
+          - generic [ref=e97]:
+            - generic [ref=e98]:
               - img
-            - generic [ref=e93]:
-              - generic [ref=e94]: "0"
-              - generic [ref=e95]: Total Entradas
-          - generic [ref=e100]:
-            - generic [ref=e101]:
+            - generic [ref=e99]:
+              - generic [ref=e100]: "0"
+              - generic [ref=e101]: Total Entradas
+          - generic [ref=e106]:
+            - generic [ref=e107]:
               - img
-            - generic [ref=e102]:
-              - generic [ref=e103]: "15"
-              - generic [ref=e104]: Publicadas (30d)
-          - generic [ref=e109]:
-            - generic [ref=e110]:
+            - generic [ref=e108]:
+              - generic [ref=e109]: "15"
+              - generic [ref=e110]: Publicadas (30d)
+          - generic [ref=e115]:
+            - generic [ref=e116]:
               - img
-            - generic [ref=e111]:
-              - generic [ref=e112]: "5"
-              - generic [ref=e113]: No publicadas (30d)
-        - separator [ref=e114]
-        - generic [ref=e115]:
-          - generic [ref=e117]:
-            - heading "Evolución y Series" [level=6] [ref=e119]:
+            - generic [ref=e117]:
+              - generic [ref=e118]: "5"
+              - generic [ref=e119]: No publicadas (30d)
+        - separator [ref=e120]
+        - generic [ref=e121]:
+          - generic [ref=e123]:
+            - heading "Evolución y Series" [level=6] [ref=e125]:
               - img
               - text: Evolución y Series
-            - generic [ref=e120]:
-              - generic [ref=e121]:
-                - generic [ref=e122]:
-                  - generic [ref=e123]:
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - generic [ref=e128]:
+                  - generic [ref=e129]:
                     - img
-                    - heading "Configuración" [level=6] [ref=e124]
-                  - toolbar "Controles de serie" [ref=e125]:
-                    - group "Rango" [ref=e126]:
-                      - button "7d" [ref=e127] [cursor=pointer]
-                      - button "30d" [pressed] [ref=e128] [cursor=pointer]
-                      - button "90d" [ref=e129] [cursor=pointer]
-                    - group "Granularidad" [ref=e130]:
-                      - button "Hora" [ref=e131] [cursor=pointer]
-                      - button "Día" [pressed] [ref=e132] [cursor=pointer]
-                      - button "Semana" [ref=e133] [cursor=pointer]
-                      - button "Mes" [ref=e134] [cursor=pointer]
-                    - group "Descargas" [ref=e135]:
-                      - button "Descargar serie en CSV" [ref=e136] [cursor=pointer]:
+                    - heading "Configuración" [level=6] [ref=e130]
+                  - toolbar "Controles de serie" [ref=e131]:
+                    - group "Rango" [ref=e132]:
+                      - button "7d" [ref=e133] [cursor=pointer]
+                      - button "30d" [pressed] [ref=e134] [cursor=pointer]
+                      - button "90d" [ref=e135] [cursor=pointer]
+                    - group "Granularidad" [ref=e136]:
+                      - button "Hora" [ref=e137] [cursor=pointer]
+                      - button "Día" [pressed] [ref=e138] [cursor=pointer]
+                      - button "Semana" [ref=e139] [cursor=pointer]
+                      - button "Mes" [ref=e140] [cursor=pointer]
+                    - group "Descargas" [ref=e141]:
+                      - button "Descargar serie en CSV" [ref=e142] [cursor=pointer]:
                         - img
-                - img [ref=e141]
-                - generic [ref=e142]:
-                  - generic [ref=e147] [cursor=pointer]:
-                    - generic [ref=e148]: "0"
-                    - generic [ref=e149]: Últimas Entradas
-                  - generic [ref=e154] [cursor=pointer]:
-                    - generic [ref=e155]: "0"
-                    - generic [ref=e156]: Comentarios (30d)
-                  - generic [ref=e161] [cursor=pointer]:
-                    - generic [ref=e162]: "0"
-                    - generic [ref=e163]: Nuevos Usuarios (30d)
-              - generic [ref=e166]:
-                - generic [ref=e167]:
-                  - generic [ref=e168]:
+                - img [ref=e147]
+                - generic [ref=e148]:
+                  - generic [ref=e153] [cursor=pointer]:
+                    - generic [ref=e154]: "0"
+                    - generic [ref=e155]: Últimas Entradas
+                  - generic [ref=e160] [cursor=pointer]:
+                    - generic [ref=e161]: "0"
+                    - generic [ref=e162]: Comentarios (30d)
+                  - generic [ref=e167] [cursor=pointer]:
+                    - generic [ref=e168]: "0"
+                    - generic [ref=e169]: Nuevos Usuarios (30d)
+              - generic [ref=e172]:
+                - generic [ref=e173]:
+                  - generic [ref=e174]:
                     - img
-                    - heading "Serie por Estado Nominal" [level=6] [ref=e169]
-                  - generic "Tipo" [ref=e170]:
-                    - group [ref=e171]:
-                      - button "Línea" [ref=e172] [cursor=pointer]
-                      - button "Barras" [pressed] [ref=e173] [cursor=pointer]
-                    - button "Apiladas" [ref=e174] [cursor=pointer]
-                    - button "Descargar CSV" [ref=e175] [cursor=pointer]:
+                    - heading "Serie por Estado Nominal" [level=6] [ref=e175]
+                  - generic "Tipo" [ref=e176]:
+                    - group [ref=e177]:
+                      - button "Línea" [ref=e178] [cursor=pointer]
+                      - button "Barras" [pressed] [ref=e179] [cursor=pointer]
+                    - button "Apiladas" [ref=e180] [cursor=pointer]
+                    - button "Descargar CSV" [ref=e181] [cursor=pointer]:
                       - img
-                - img [ref=e180]
-              - generic [ref=e183]:
-                - generic [ref=e185]:
-                  - generic [ref=e186]:
+                - img [ref=e186]
+              - generic [ref=e189]:
+                - generic [ref=e191]:
+                  - generic [ref=e192]:
                     - img
-                    - heading "Serie por Estado" [level=6] [ref=e187]
-                  - generic "Acciones" [ref=e188]:
-                    - button "Descargar serie por estado en CSV" [ref=e189] [cursor=pointer]:
+                    - heading "Serie por Estado" [level=6] [ref=e193]
+                  - generic "Acciones" [ref=e194]:
+                    - button "Descargar serie por estado en CSV" [ref=e195] [cursor=pointer]:
                       - img
                       - text: CSV
-                - img [ref=e195]
-          - generic [ref=e197]:
-            - generic [ref=e198]:
-              - heading "Actividad Reciente" [level=6] [ref=e200]:
+                - img [ref=e201]
+          - generic [ref=e203]:
+            - generic [ref=e204]:
+              - heading "Actividad Reciente" [level=6] [ref=e206]:
                 - img
                 - text: Actividad Reciente
-              - generic [ref=e203]:
-                - generic [ref=e205]:
-                  - generic [ref=e206]:
-                    - generic [ref=e207]: Mostrar
-                    - combobox [ref=e208]:
+              - generic [ref=e209]:
+                - generic [ref=e211]:
+                  - generic [ref=e212]:
+                    - generic [ref=e213]: Mostrar
+                    - combobox [ref=e214]:
                       - option "5" [selected]
                       - option "10"
                       - option "20"
-                  - button "Descargar actividad reciente en CSV" [ref=e210] [cursor=pointer]:
+                  - button "Descargar actividad reciente en CSV" [ref=e216] [cursor=pointer]:
                     - img
                     - text: CSV
-                - alert [ref=e211]:
-                  - generic [ref=e212]:
+                - alert [ref=e217]:
+                  - generic [ref=e218]:
                     - img
-                    - generic [ref=e213]: Error obteniendo actividad reciente
-                  - button "Reintentar" [active] [ref=e214] [cursor=pointer]
-                - list [ref=e215]:
-                  - listitem [ref=e216]: No hay actividad reciente
-                - navigation "Paginación" [ref=e219]:
-                  - list [ref=e220]:
-                    - listitem [ref=e221]:
+                    - generic [ref=e219]: Error obteniendo actividad reciente
+                  - button "Reintentar" [ref=e220] [cursor=pointer]
+                - list [ref=e221]:
+                  - listitem [ref=e222]: No hay actividad reciente
+                - navigation "Paginación" [ref=e225]:
+                  - list [ref=e226]:
+                    - listitem [ref=e227]:
                       - generic "Anterior": «
-                    - listitem [ref=e222]:
+                    - listitem [ref=e228]:
                       - generic "Siguiente": »
-            - generic [ref=e223]:
-              - heading "Almacenamiento" [level=6] [ref=e225]:
+            - generic [ref=e229]:
+              - heading "Almacenamiento" [level=6] [ref=e231]:
                 - img
                 - text: Almacenamiento
-              - generic [ref=e228]:
-                - button "Descargar almacenamiento en CSV" [ref=e230] [cursor=pointer]:
+              - generic [ref=e234]:
+                - button "Descargar almacenamiento en CSV" [ref=e236] [cursor=pointer]:
                   - img
                   - text: CSV
-                - generic [ref=e231]:
-                  - generic [ref=e232]:
+                - generic [ref=e237]:
+                  - generic [ref=e238]:
                     - text: Ficheros Totales
-                    - heading "12" [level=3] [ref=e233]
-                  - separator [ref=e234]
-                  - generic [ref=e235]:
+                    - heading "12" [level=3] [ref=e239]
+                  - separator [ref=e240]
+                  - generic [ref=e241]:
                     - text: Uso de Disco
-                    - heading "2.00 KB" [level=4] [ref=e236]
-        - separator [ref=e237]
-        - generic [ref=e238]:
-          - generic [ref=e240]:
-            - heading "Top Usuarios" [level=6] [ref=e242]
-            - generic [ref=e245]:
-              - generic [ref=e246]:
-                - generic [ref=e247]:
-                  - generic [ref=e248]: Top
-                  - spinbutton [ref=e249]: "10"
-                - group "Periodo" [ref=e250]:
-                  - button "7d" [ref=e251] [cursor=pointer]
-                  - button "30d" [pressed] [ref=e252] [cursor=pointer]
-                  - button "90d" [ref=e253] [cursor=pointer]
-                - button "Descargar CSV" [ref=e254] [cursor=pointer]:
+                    - heading "2.00 KB" [level=4] [ref=e242]
+        - separator [ref=e243]
+        - generic [ref=e247]:
+          - generic [ref=e249]:
+            - heading "Estadísticas de Contenido" [level=6] [ref=e251]
+            - generic [ref=e253]:
+              - button "Descargar métricas de contenido en CSV" [ref=e254] [cursor=pointer]: CSV
+              - button "Descargar estados en CSV" [ref=e255] [cursor=pointer]: CSV estados
+          - generic [ref=e256]:
+            - generic [ref=e257]:
+              - generic [ref=e262]:
+                - generic [ref=e263]:
                   - img
-              - list [ref=e255]:
-                - listitem [ref=e256]:
-                  - generic [ref=e257]: user1
-                  - generic [ref=e258]: "3"
-                - listitem [ref=e259]:
-                  - generic [ref=e260]: user2
-                  - generic [ref=e261]: "1"
-          - generic [ref=e263]:
-            - heading "Top Categorías" [level=6] [ref=e265]
-            - generic [ref=e268]:
-              - button "Descargar CSV" [ref=e270] [cursor=pointer]:
+                - generic [ref=e264]:
+                  - generic [ref=e265]: "10"
+                  - generic [ref=e266]: Usuarios Activos
+              - generic [ref=e271]:
+                - generic [ref=e272]:
+                  - img
+                - generic [ref=e273]:
+                  - generic [ref=e274]: "20"
+                  - generic [ref=e275]: Total Entradas
+              - generic [ref=e280]:
+                - generic [ref=e281]:
+                  - img
+                - generic [ref=e282]:
+                  - generic [ref=e283]: "5"
+                  - generic [ref=e284]: Comentarios
+              - generic [ref=e289]:
+                - generic [ref=e290]:
+                  - img
+                - generic [ref=e291]:
+                  - generic [ref=e292]: "2"
+                  - generic [ref=e293]: Ficheros
+            - generic [ref=e294]:
+              - heading "Entradas por Estado" [level=6] [ref=e295]
+              - generic [ref=e298]: Sin datos
+              - table [ref=e300]:
+                - rowgroup [ref=e301]:
+                  - row "Estado Total %" [ref=e302]:
+                    - columnheader "Estado" [ref=e303]
+                    - columnheader "Total" [ref=e304]
+                    - columnheader "%" [ref=e305]
+                - rowgroup [ref=e306]:
+                  - row "PUBLICADA 15 75%" [ref=e307]:
+                    - cell "PUBLICADA" [ref=e308]
+                    - cell "15" [ref=e309]:
+                      - generic [ref=e310]: "15"
+                    - cell "75%" [ref=e311]
+                  - row "NO PUBLICADA 5 25%" [ref=e312]:
+                    - cell "NO PUBLICADA" [ref=e313]
+                    - cell "5" [ref=e314]:
+                      - generic [ref=e315]: "5"
+                    - cell "25%" [ref=e316]
+        - generic [ref=e317]:
+          - generic [ref=e319]:
+            - heading "Top Usuarios" [level=6] [ref=e321]
+            - generic [ref=e324]:
+              - generic [ref=e325]:
+                - generic [ref=e326]:
+                  - generic [ref=e327]: Top
+                  - spinbutton [ref=e328]: "10"
+                - group "Periodo" [ref=e329]:
+                  - button "7d" [ref=e330] [cursor=pointer]
+                  - button "30d" [pressed] [ref=e331] [cursor=pointer]
+                  - button "90d" [ref=e332] [cursor=pointer]
+                - button "Descargar CSV" [ref=e333] [cursor=pointer]:
+                  - img
+              - list [ref=e334]:
+                - listitem [ref=e335]:
+                  - generic [ref=e336]: user1
+                  - generic [ref=e337]: "3"
+                - listitem [ref=e338]:
+                  - generic [ref=e339]: user2
+                  - generic [ref=e340]: "1"
+          - generic [ref=e342]:
+            - heading "Top Categorías" [level=6] [ref=e344]
+            - generic [ref=e347]:
+              - button "Descargar CSV" [ref=e349] [cursor=pointer]:
                 - img
-              - list [ref=e271]:
-                - listitem [ref=e272]:
-                  - generic [ref=e273]: cat1
-                  - generic [ref=e274]: "5"
-                - listitem [ref=e275]:
-                  - generic [ref=e276]: cat2
-                  - generic [ref=e277]: "2"
-          - generic [ref=e279]:
-            - heading "Top Tags" [level=6] [ref=e281]
-            - generic [ref=e284]:
-              - button "Descargar CSV" [ref=e286] [cursor=pointer]:
+              - list [ref=e350]:
+                - listitem [ref=e351]:
+                  - generic [ref=e352]: cat1
+                  - generic [ref=e353]: "5"
+                - listitem [ref=e354]:
+                  - generic [ref=e355]: cat2
+                  - generic [ref=e356]: "2"
+          - generic [ref=e358]:
+            - heading "Top Tags" [level=6] [ref=e360]
+            - generic [ref=e363]:
+              - button "Descargar CSV" [ref=e365] [cursor=pointer]:
                 - img
-              - list [ref=e287]:
-                - listitem [ref=e288]:
-                  - generic [ref=e289]: tag1
-                  - generic [ref=e290]: "4"
-                - listitem [ref=e291]:
-                  - generic [ref=e292]: tag2
-                  - generic [ref=e293]: "1"
-    - contentinfo [ref=e294]:
-      - generic [ref=e295]:
-        - link "CoreUI" [ref=e296] [cursor=pointer]:
+              - list [ref=e366]:
+                - listitem [ref=e367]:
+                  - generic [ref=e368]: tag1
+                  - generic [ref=e369]: "4"
+                - listitem [ref=e370]:
+                  - generic [ref=e371]: tag2
+                  - generic [ref=e372]: "1"
+    - contentinfo [ref=e373]:
+      - generic [ref=e374]:
+        - link "CoreUI" [ref=e375] [cursor=pointer]:
           - /url: https://coreui.io/pro/angular/
         - text: ©2022 creativeLabs
-      - generic [ref=e297]:
+      - generic [ref=e376]:
         - text: Powered by
-        - link "CoreUI v4 for Angular" [ref=e298] [cursor=pointer]:
+        - link "CoreUI v4 for Angular" [ref=e377] [cursor=pointer]:
           - /url: https://coreui.io/pro/angular
 ```
