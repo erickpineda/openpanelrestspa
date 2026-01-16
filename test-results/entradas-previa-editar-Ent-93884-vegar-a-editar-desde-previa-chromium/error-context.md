@@ -1,0 +1,127 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img "CoreUI Logo" [ref=e7]
+    - navigation [ref=e10]:
+      - generic [ref=e11]: MENU.CONTENT_MANAGEMENT
+      - generic [ref=e12]: MENU.MY_ACCOUNT
+      - link "Mi Perfil Yo" [ref=e14] [cursor=pointer]:
+        - /url: "#/admin/control/perfil"
+        - img
+        - generic [ref=e15]: Mi Perfil
+        - generic [ref=e16]: Yo
+      - link "Cambiar Contraseña" [ref=e18] [cursor=pointer]:
+        - /url: "#/admin/control/gestion/changepassword"
+        - img
+        - generic [ref=e19]: Cambiar Contraseña
+      - generic [ref=e20]: MENU.SYSTEM_CONFIGURATION
+      - generic [ref=e21]: MENU.QUICK_LINKS
+      - link "Ver Sitio Web" [ref=e23] [cursor=pointer]:
+        - /url: "#/"
+        - img
+        - generic [ref=e24]: Ver Sitio Web
+    - generic "Compactar sidebar" [ref=e25]:
+      - button "Toggle sidebar fold" [ref=e26] [cursor=pointer]
+  - generic [ref=e27]:
+    - banner [ref=e28]:
+      - generic [ref=e29]:
+        - button "Toggle navigation" [ref=e30] [cursor=pointer]:
+          - img
+        - navigation "Navegación principal" [ref=e31]:
+          - link "Panel de Control" [ref=e33] [cursor=pointer]:
+            - /url: "#/admin/control"
+            - text: Control
+        - navigation "Acciones rápidas" [ref=e34]:
+          - generic "Cambiar a Inglés" [ref=e36] [cursor=pointer]: EN
+          - link "Notificaciones" [ref=e38] [cursor=pointer]:
+            - /url: "#/admin"
+            - img
+          - link "Tareas" [ref=e40] [cursor=pointer]:
+            - /url: "#/admin"
+            - img
+          - link "Mensajes" [ref=e42] [cursor=pointer]:
+            - /url: "#/admin"
+            - img
+        - navigation "Menú de usuario" [ref=e43]:
+          - generic "Abrir menú de usuario" [ref=e45] [cursor=pointer]
+      - navigation "breadcrumb" [ref=e50]:
+        - listitem [ref=e51]:
+          - link "Inicio" [ref=e52] [cursor=pointer]:
+            - /url: "#/admin"
+        - listitem [ref=e53]:
+          - text: /
+          - link "Panel de Control" [ref=e54] [cursor=pointer]:
+            - /url: "#/admin/control"
+        - listitem [ref=e55]: / Entradas
+    - generic [ref=e61]:
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - heading "Listado de Entradas" [level=4] [ref=e65]:
+            - img
+            - text: Listado de Entradas
+          - text: Administra, filtra y organiza todas las publicaciones del sitio
+        - generic [ref=e66]:
+          - button "Imprimir listado" [ref=e67] [cursor=pointer]:
+            - img
+            - text: Imprimir
+          - button "Sin revisar" [ref=e69] [cursor=pointer]:
+            - img
+            - text: Sin revisar
+          - button "Nueva Entrada" [ref=e70] [cursor=pointer]:
+            - img
+            - text: Nueva Entrada
+      - generic [ref=e72]:
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - generic [ref=e77]: 0 registros
+            - combobox "Registros por página" [ref=e78]:
+              - option "5 por pág."
+              - option "10 por pág."
+              - option "20 por pág." [selected]
+              - option "50 por pág."
+          - generic [ref=e80]:
+            - generic [ref=e81]:
+              - img
+            - textbox "Buscar por título, contenido o autor..." [ref=e82]
+            - button "Filtros" [ref=e83] [cursor=pointer]:
+              - img
+              - text: Filtros
+        - generic [ref=e85]:
+          - table [ref=e87]:
+            - rowgroup [ref=e88]:
+              - row "Título Autor Fecha Categoría Estado Acciones" [ref=e89]:
+                - columnheader "Título" [ref=e90]
+                - columnheader "Autor" [ref=e91]
+                - columnheader "Fecha" [ref=e92]
+                - columnheader "Categoría" [ref=e93]
+                - columnheader "Estado" [ref=e94]
+                - columnheader "Acciones" [ref=e95]
+            - rowgroup [ref=e96]:
+              - row "No se encontraron entradas Intenta ajustar los filtros de búsqueda" [ref=e97]:
+                - cell "No se encontraron entradas Intenta ajustar los filtros de búsqueda" [ref=e98]:
+                  - generic [ref=e99]:
+                    - img
+                    - heading "No se encontraron entradas" [level=5] [ref=e100]
+                    - paragraph [ref=e101]: Intenta ajustar los filtros de búsqueda
+          - generic [ref=e102]:
+            - generic [ref=e103]: Mostrando 0 de 0 registros
+            - navigation [ref=e104]:
+              - list [ref=e105]:
+                - listitem [ref=e106]:
+                  - generic "Anterior": «
+                - listitem [ref=e107]:
+                  - generic: 1 / 0
+                - listitem [ref=e108]:
+                  - generic "Siguiente": »
+    - contentinfo [ref=e109]:
+      - generic [ref=e110]:
+        - link "CoreUI" [ref=e111] [cursor=pointer]:
+          - /url: https://coreui.io/pro/angular/
+        - text: ©2022 creativeLabs
+      - generic [ref=e112]:
+        - text: Powered by
+        - link "CoreUI v4 for Angular" [ref=e113] [cursor=pointer]:
+          - /url: https://coreui.io/pro/angular
+```

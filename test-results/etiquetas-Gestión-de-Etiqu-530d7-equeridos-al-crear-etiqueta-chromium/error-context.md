@@ -1,0 +1,173 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - strong [ref=e6]: Etiquetas
+      - generic [ref=e7]: 16-01-2026 14:44:48
+      - button "Close" [ref=e8] [cursor=pointer]
+    - generic [ref=e9]: Error cargando etiquetas
+  - generic [ref=e10]:
+    - img "CoreUI Logo" [ref=e13]
+    - navigation [ref=e16]:
+      - generic [ref=e17]: MENU.CONTENT_MANAGEMENT
+      - generic [ref=e18]: MENU.MY_ACCOUNT
+      - link "Mi Perfil Yo" [ref=e20] [cursor=pointer]:
+        - /url: "#/admin/control/perfil"
+        - img
+        - generic [ref=e21]: Mi Perfil
+        - generic [ref=e22]: Yo
+      - link "Cambiar Contraseña" [ref=e24] [cursor=pointer]:
+        - /url: "#/admin/control/gestion/changepassword"
+        - img
+        - generic [ref=e25]: Cambiar Contraseña
+      - generic [ref=e26]: MENU.SYSTEM_CONFIGURATION
+      - generic [ref=e27]: MENU.QUICK_LINKS
+      - link "Ver Sitio Web" [ref=e29] [cursor=pointer]:
+        - /url: "#/"
+        - img
+        - generic [ref=e30]: Ver Sitio Web
+    - generic "Compactar sidebar" [ref=e31]:
+      - button "Toggle sidebar fold" [ref=e32] [cursor=pointer]
+  - generic [ref=e33]:
+    - banner [ref=e34]:
+      - generic [ref=e35]:
+        - button "Toggle navigation" [ref=e36] [cursor=pointer]:
+          - img
+        - navigation "Navegación principal" [ref=e37]:
+          - link "Panel de Control" [ref=e39] [cursor=pointer]:
+            - /url: "#/admin/control"
+            - text: Control
+        - navigation "Acciones rápidas" [ref=e40]:
+          - generic "Cambiar a Inglés" [ref=e42] [cursor=pointer]: EN
+          - link "Notificaciones" [ref=e44] [cursor=pointer]:
+            - /url: "#/admin"
+            - img
+          - link "Tareas" [ref=e46] [cursor=pointer]:
+            - /url: "#/admin"
+            - img
+          - link "Mensajes" [ref=e48] [cursor=pointer]:
+            - /url: "#/admin"
+            - img
+        - navigation "Menú de usuario" [ref=e49]:
+          - generic "Abrir menú de usuario" [ref=e51] [cursor=pointer]
+      - navigation "breadcrumb" [ref=e56]:
+        - listitem [ref=e57]:
+          - link "Inicio" [ref=e58] [cursor=pointer]:
+            - /url: "#/admin"
+        - listitem [ref=e59]:
+          - text: /
+          - link "Panel de Control" [ref=e60] [cursor=pointer]:
+            - /url: "#/admin/control"
+        - listitem [ref=e61]: / Etiquetas
+    - generic [ref=e65]:
+      - generic [ref=e67]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - heading "Etiquetas" [level=4] [ref=e71]:
+              - img
+              - text: Etiquetas
+            - text: Clasifica el contenido con etiquetas
+          - button "Crear nueva etiqueta" [ref=e73] [cursor=pointer]:
+            - img
+            - text: Nueva Etiqueta
+        - generic [ref=e74]:
+          - generic [ref=e76]:
+            - generic [ref=e77]:
+              - generic [ref=e78]: Buscar
+              - generic [ref=e79]:
+                - generic [ref=e80]:
+                  - img
+                - textbox "Buscar etiqueta..." [ref=e81]
+            - button "Filtros Avanzados" [ref=e83] [cursor=pointer]:
+              - img
+              - text: Filtros Avanzados
+            - generic [ref=e84]:
+              - generic [ref=e85]: Mostrar
+              - combobox [ref=e86]:
+                - option "5" [selected]
+                - option "10"
+                - option "20"
+                - option "50"
+          - table "Tabla de etiquetas" [ref=e90]:
+            - rowgroup [ref=e91]:
+              - row "Color Nombre Código Descripción Acciones" [ref=e92]:
+                - columnheader "Color" [ref=e93]
+                - columnheader "Nombre" [ref=e94]
+                - columnheader "Código" [ref=e95]
+                - columnheader "Descripción" [ref=e96]
+                - columnheader "Acciones" [ref=e97]
+            - rowgroup [ref=e98]:
+              - row "No se encontraron etiquetas Intenta ajustar los filtros de búsqueda o crea una nueva etiqueta" [ref=e99]:
+                - cell "No se encontraron etiquetas Intenta ajustar los filtros de búsqueda o crea una nueva etiqueta" [ref=e100]:
+                  - generic [ref=e101]:
+                    - img
+                    - heading "No se encontraron etiquetas" [level=6] [ref=e102]
+                    - paragraph [ref=e103]: Intenta ajustar los filtros de búsqueda o crea una nueva etiqueta
+        - generic [ref=e105]: Mostrando 0 de 0 registros
+      - dialog [ref=e106]:
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - heading "Nueva Etiqueta" [level=5] [ref=e111]:
+              - img
+              - text: Nueva Etiqueta
+            - button [active] [ref=e112] [cursor=pointer]
+          - form "Formulario de creación de etiqueta" [ref=e115]:
+            - generic [ref=e116]:
+              - generic [ref=e117]: Código*
+              - generic [ref=e118]:
+                - generic [ref=e119]:
+                  - img
+                - textbox "Código*" [ref=e120]:
+                  - /placeholder: Código (ej. TAG01)
+              - generic [ref=e121]: Se generará automáticamente si se deja vacío
+            - generic [ref=e122]:
+              - generic [ref=e123]: Nombre*
+              - textbox "Ingrese el nombre de la etiqueta" [ref=e124]
+            - generic [ref=e125]:
+              - generic [ref=e126]: Descripción
+              - textbox "Ingrese una descripción opcional para la etiqueta" [ref=e127]
+              - generic [ref=e128]: 0/200 caracteres
+            - generic [ref=e129]:
+              - generic [ref=e130]: Color*
+              - generic [ref=e131]:
+                - generic [ref=e132]:
+                  - radio "Rojo" [ref=e133]
+                  - generic [ref=e134] [cursor=pointer]: Rojo
+                - generic [ref=e136]:
+                  - radio "Turquesa" [checked] [ref=e137]
+                  - generic [ref=e138] [cursor=pointer]: Turquesa
+                - generic [ref=e140]:
+                  - radio "Azul" [ref=e141]
+                  - generic [ref=e142] [cursor=pointer]: Azul
+                - generic [ref=e144]:
+                  - radio "Verde" [ref=e145]
+                  - generic [ref=e146] [cursor=pointer]: Verde
+                - generic [ref=e148]:
+                  - radio "Amarillo" [ref=e149]
+                  - generic [ref=e150] [cursor=pointer]: Amarillo
+                - generic [ref=e152]:
+                  - radio "Morado" [ref=e153]
+                  - generic [ref=e154] [cursor=pointer]: Morado
+                - generic [ref=e156]:
+                  - radio "Naranja" [ref=e157]
+                  - generic [ref=e158] [cursor=pointer]: Naranja
+                - generic [ref=e160]:
+                  - radio "Rosa" [ref=e161]
+                  - generic [ref=e162] [cursor=pointer]: Rosa
+          - generic [ref=e164]:
+            - button "Cancelar" [ref=e165] [cursor=pointer]
+            - button "Crear" [disabled]:
+              - img
+              - text: Crear
+    - contentinfo [ref=e167]:
+      - generic [ref=e168]:
+        - link "CoreUI" [ref=e169] [cursor=pointer]:
+          - /url: https://coreui.io/pro/angular/
+        - text: ©2022 creativeLabs
+      - generic [ref=e170]:
+        - text: Powered by
+        - link "CoreUI v4 for Angular" [ref=e171] [cursor=pointer]:
+          - /url: https://coreui.io/pro/angular
+```

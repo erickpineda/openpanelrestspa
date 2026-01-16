@@ -104,6 +104,6 @@
 ## Próximos pasos para SPA
 
 - Actualizar mapeos de servicios: categorías, etiquetas, tipos y estados por código.
-- Ajustar vistas de detalle: entrada por `slug`, comentario por `idEntrada` (paginado).
+- Ajustar vistas de detalle: entrada por `slug`, comentario por `idEntrada` (paginado), agravio por `palabra`, `username` para usuarios, excepciones por `uuid`, sesiones por `hash`, literales por `codigoLiteral` y así sucesivamente el resto.
 - Internacionalización: usar siempre el `data` del servidor como mensaje para operaciones de borrado/éxito.
 

@@ -9,14 +9,14 @@ const routes: Routes = [
   {
     path: '',
     data: { preload: true, delay: 1000 },
-    loadChildren: () => import('./public/public.module').then((m) => m.PublicModule),
+    loadChildren: () => import('@features/public/public.module').then((m) => m.PublicFeatureModule),
   },
   {
     path: 'admin',
     data: { preload: true, delay: 3000 },
     canMatch: [AuthGuard],
     canLoad: [AuthGuard],
-    loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule),
+    loadChildren: () => import('@features/admin/admin.module').then((m) => m.AdminFeatureModule),
   },
   { path: 'error', component: GlobalErrorComponent },
   { path: '**', component: NotFoundComponent },
