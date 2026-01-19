@@ -1,0 +1,67 @@
+<div class="d-flex justify-content-between align-items-center dashboard-toolbar-container mb-3 bg-light p-2 rounded border">
+  <div class="d-flex align-items-center gap-2">
+    <svg cIcon name="cilGraph" class="text-secondary"></svg>
+    <h6 class="card-title mb-0 fw-bold text-secondary text-uppercase small">{{ 'ADMIN.DASHBOARD.SERIES.CONFIGURATION' | translate }}</h6>
+  </div>
+  <div class="btn-toolbar dashboard-toolbar gap-2 flex-wrap" role="toolbar" [attr.aria-label]="'ADMIN.DASHBOARD.SERIES.CONTROLS' | translate" data-testid="dashboard-toolbar">
+    <div class="btn-group shadow-sm" role="group" [attr.aria-label]="'ADMIN.DASHBOARD.SERIES.RANGE' | translate">
+      <button cButton color="white" variant="outline" size="sm" [active]="seriesDays === 7" (click)="changeDays.emit(7)">7d</button>
+      <button cButton color="white" variant="outline" size="sm" [active]="seriesDays === 30" (click)="changeDays.emit(30)">30d</button>
+      <button cButton color="white" variant="outline" size="sm" [active]="seriesDays === 90" (click)="changeDays.emit(90)">90d</button>
+    </div>
+    <div class="btn-group shadow-sm" role="group" [attr.aria-label]="'ADMIN.DASHBOARD.SERIES.GRANULARITY' | translate">
+      <button cButton color="white" variant="outline" size="sm" [active]="seriesGranularity === 'hour'" (click)="changeGranularity.emit('hour')">{{ 'ADMIN.DASHBOARD.SERIES.HOUR' | translate }}</button>
+      <button cButton color="white" variant="outline" size="sm" [active]="seriesGranularity === 'day'" (click)="changeGranularity.emit('day')">{{ 'ADMIN.DASHBOARD.SERIES.DAY' | translate }}</button>
+      <button cButton color="white" variant="outline" size="sm" [active]="seriesGranularity === 'week'" (click)="changeGranularity.emit('week')">{{ 'ADMIN.DASHBOARD.SERIES.WEEK' | translate }}</button>
+      <button cButton color="white" variant="outline" size="sm" [active]="seriesGranularity === 'month'" (click)="changeGranularity.emit('month')">{{ 'ADMIN.DASHBOARD.SERIES.MONTH' | translate }}</button>
+    </div>
+    <div class="btn-group shadow-sm" role="group" [attr.aria-label]="'ADMIN.DASHBOARD.SERIES.DOWNLOADS' | translate">
+      <button cButton color="white" variant="outline" size="sm" (click)="downloadCsv.emit()" [title]="'ADMIN.DASHBOARD.SERIES.DOWNLOAD_CSV' | translate" [attr.aria-label]="'ADMIN.DASHBOARD.SERIES.DOWNLOAD_CSV' | translate" data-testid="btn-csv-series">
+        <svg cIcon name="cilCloudDownload" size="sm" class="text-secondary"></svg>
+      </button>
+    </div>
+    @if (showMetricsTools) {
+      <div class="btn-group shadow-sm" role="group" aria-label="Herramientas">
+        <button cButton color="white" variant="outline" size="sm" (click)="toggleMetrics.emit()" [attr.aria-expanded]="metricsExpanded ? 'true' : 'false'" aria-controls="metrics-panel" title="Mostrar/Ocultar métricas" aria-label="Mostrar/ocultar métricas">
+          Métricas
+          <svg cIcon [name]="metricsExpanded ? 'cilChevronTop' : 'cilChevronBottom'" size="sm" class="ms-1"></svg>
+        </button>
+        <button cButton color="white" variant="outline" size="sm" (click)="copyPerf.emit()" title="Copiar métricas" aria-label="Copiar métricas">Copiar</button>
+      </div>
+    }
+  </div>
+  </div>
+@if (showMetricsTools) {
+  <div class="mt-2 mb-3 metrics-panel p-3 bg-light border rounded shadow-sm" [class.expanded]="metricsExpanded" [class.collapsed]="!metricsExpanded" id="metrics-panel" role="region" aria-label="Métricas de rendimiento" [attr.aria-hidden]="!metricsExpanded ? 'true' : null" aria-live="polite">
+    <div class="small text-muted mb-2 fw-bold text-uppercase border-bottom pb-1">Rendimiento (dev) — Actualizado: {{ perfUpdatedAt | date: 'HH:mm:ss' }}</div>
+    <ul class="list-unstyled small mb-0 row g-2">
+      <li class="col-6 col-md-3">{{ 'AUTO.SUMMARY' | translate }}<span class="fw-bold">{{ perf['summary'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.SERIES' | translate }}<span class="fw-bold">{{ perf['series'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.TOP_USUARIOS' | translate }}<span class="fw-bold">{{ perf['topUsers'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.TOP_CATEGOR_AS' | translate }}<span class="fw-bold">{{ perf['topCategories'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.TOP_TAGS' | translate }}<span class="fw-bold">{{ perf['topTags'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.STORAGE' | translate }}<span class="fw-bold">{{ perf['storage'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.CONTENIDO' | translate }}<span class="fw-bold">{{ perf['contentStats'] || 0 }} ms</span></li>
+      <li class="col-6 col-md-3">{{ 'AUTO.RECIENTE' | translate }}<span class="fw-bold">{{ perf['recent'] || 0 }} ms</span></li>
+    </ul>
+  </div>
+}
+@if (loadingSeries) {
+  <div class="mb-3 d-flex justify-content-center" aria-live="polite" aria-busy="true">
+    <c-spinner color="primary"></c-spinner>
+  </div>
+}
+<div class="chart-container mb-4 shadow-sm rounded border p-3 bg-white" [attr.aria-busy]="loadingSeries ? 'true' : null" aria-live="polite">
+  <app-dashboard-chart [data]="data" type="line"></app-dashboard-chart>
+</div>
+<c-row class="g-4">
+  <c-col lg="4">
+    <app-kpi-card variant="simple" [value]="sumEntradasSerie" [label]="'ADMIN.DASHBOARD.LATEST_ENTRIES' | translate" [color]="kpiUltimasEntradasColor" class="h-100 d-block shadow-sm border-0" [route]="['/admin/control/entradas']" tooltip="Ver listado de entradas"></app-kpi-card>
+  </c-col>
+  <c-col lg="4">
+    <app-kpi-card variant="simple" [value]="sumComentarios" [label]="'ADMIN.DASHBOARD.COMMENTS_LAST_DAYS' | translate: { days: seriesDays }" [color]="kpiComentariosColor" class="h-100 d-block shadow-sm border-0" [route]="['/admin/control/comentarios']" tooltip="Ver comentarios recientes"></app-kpi-card>
+  </c-col>
+  <c-col lg="4">
+    <app-kpi-card variant="simple" [value]="sumUsuarios" [label]="'ADMIN.DASHBOARD.NEW_USERS_LAST_DAYS' | translate: { days: seriesDays }" [color]="kpiNuevosUsuariosColor" class="h-100 d-block shadow-sm border-0" [route]="['/admin/control/gestion/usuarios']" tooltip="Ver nuevos usuarios"></app-kpi-card>
+  </c-col>
+</c-row>

@@ -11,6 +11,7 @@
   "COMMON": {
     "LOADING": "Loading...",
     "ERROR": "Error",
+    "WARNING": "Warning",
     "SUCCESS": "Success",
     "RETRY": "Retry",
     "CSV": "CSV",
@@ -46,6 +47,8 @@
     "EDIT": "Edit",
     "AUTHOR": "Author",
     "DATE": "Date",
+    "TITLE": "Title",
+    "SUBTITLE": "Subtitle",
     "TITLE_LABEL": "Title",
     "STATUS": "Status",
     "SLUG": "Slug",
@@ -70,7 +73,14 @@
       "REQUIRED": "This field is required",
       "EMAIL_INVALID": "Invalid email address",
       "MIN_LENGTH": "Minimum {{ min }} characters",
-      "MAX_LENGTH": "Maximum {{ max }} characters"
+      "MAX_LENGTH": "Maximum {{ max }} characters",
+      "PASSWORD_PATTERN": "Password must be 8-20 characters long, include uppercase, lowercase, numbers, and special characters (@#$%&-+=!.çÇ()).",
+      "USERNAME_PATTERN": "Username must be 5-31 alphanumeric characters.",
+      "CHECK_USERNAME_ERROR": "Error checking username",
+      "CREATE_SUCCESS": "User created successfully",
+      "CREATE_ERROR": "Error creating user",
+      "UPDATE_SUCCESS": "User updated successfully",
+      "UPDATE_ERROR": "Error updating user"
     }
   },
   "MENU": {

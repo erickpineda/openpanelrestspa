@@ -1,22 +1,18 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-
-import { EntradasRoutingModule } from './entradas-routing.module';
-import { EntradasSharedModule } from './entradas-shared.module';
-
-// Módulos externos usados por entradas
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { DatePipe, AsyncPipe } from '@angular/common';
 import { SharedOPModule } from '@shared/shared.module';
 import { SharedCoreUiModule } from '@shared/shared-coreui.module';
-import { MediaSharedModule } from '@app/admin/base/contenido/media-shared.module';
-
-// Componentes principales (desde ubicación original por ahora)
-import { ListadoEntradasComponent } from '@app/admin/base/entradas/listado-entradas.component';
-import { CrearEntradaComponent } from '@app/admin/base/entradas/crear/crear-entrada.component';
-import { EditarEntradaComponent } from '@app/admin/base/entradas/editar/editar-entrada.component';
-import { EntradasPendientesComponent } from '@app/admin/base/entradas/pendientes/entradas-pendientes.component';
+import { MediaSharedModule } from '@features/admin/contenido/media-shared.module';
+import { EntradasRoutingModule } from './entradas-routing.module';
+import { EntradasSharedModule } from './entradas-shared.module';
+import { ListadoEntradasComponent } from './listado-entradas.component';
+import { CrearEntradaComponent } from './crear/crear-entrada.component';
+import { EditarEntradaComponent } from './editar/editar-entrada.component';
+import { EntradasPendientesComponent } from './pendientes/entradas-pendientes.component';
 
 @NgModule({
   imports: [
@@ -29,7 +25,9 @@ import { EntradasPendientesComponent } from '@app/admin/base/entradas/pendientes
     SharedOPModule,
     CKEditorModule,
     SharedCoreUiModule,
-    MediaSharedModule
+    MediaSharedModule,
+    DatePipe,
+    AsyncPipe
   ],
   declarations: [
     ListadoEntradasComponent,
@@ -37,5 +35,6 @@ import { EntradasPendientesComponent } from '@app/admin/base/entradas/pendientes
     EditarEntradaComponent,
     EntradasPendientesComponent
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class EntradasModule {}

@@ -1,0 +1,35 @@
+<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static"
+  alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle class="d-flex align-items-center gap-2">
+      <svg cIcon name="cilPen" class="text-primary"></svg>
+      {{ 'ADMIN.CATEGORIES.EDIT_CATEGORY' | translate }}
+    </h5>
+    <button (click)="cerrarModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body class="p-4">
+    <app-categoria-form [categoria]="categoria" 
+      [disabled]="disabled"
+      (submitCategoria)="guardar($event)"
+      (onReset)="cerrarModal()"></app-categoria-form>
+  </c-modal-body>
+  <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
+    <div>
+      @if (disabled) {
+        <button cButton color="warning" variant="outline" (click)="onEditarCategoria()">
+          <svg cIcon name="cilLockUnlocked" class="me-1"></svg>
+          {{ 'COMMON.ENABLE_EDIT' | translate }}
+        </button>
+      }
+    </div>
+    <div class="d-flex gap-2">
+      <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+      @if (!disabled) {
+        <button cButton color="primary" (click)="onGuardarClick()">
+          <svg cIcon name="cilSave" class="me-1"></svg>
+          {{ 'COMMON.SAVE' | translate }}
+        </button>
+      }
+    </div>
+  </c-modal-footer>
+</c-modal>

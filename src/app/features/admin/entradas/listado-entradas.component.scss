@@ -1,0 +1,17 @@
+.entries-toolbar {
+  .input-group-text {
+    background-color: #fff;
+  }
+}
+.entries-table {
+  th {
+    text-transform: uppercase;
+    letter-spacing: .02em;
+  }
+  td {
+    vertical-align: middle;
+  }
+  .font-monospace {
+    opacity: .85;
+  }
+}

@@ -1,0 +1,162 @@
+<div class="tabla-con-loader-wrapper position-relative rounded-3 overflow-hidden border">
+  @if (cargando) {
+    <div
+      class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75"
+      style="z-index: 10; min-height: 200px"
+    >
+      <div class="text-center text-primary">
+        <c-spinner size="sm"></c-spinner>
+        <p class="mt-2 small fw-semibold">{{ 'COMMON.LOADING' | translate }}</p>
+      </div>
+    </div>
+  }
+
+  <div class="table-responsive">
+    <table cTable hover class="mb-0 align-middle text-nowrap">
+      <thead class="bg-light text-secondary small text-uppercase fw-bold">
+        <tr>
+          <th scope="col" class="border-0 py-3 ps-4">
+            {{ 'ADMIN.COMMENTS.TABLE.CONTENT' | translate }}
+          </th>
+          <th scope="col" class="border-0 py-3">
+            {{ 'ADMIN.COMMENTS.TABLE.USER' | translate }}
+          </th>
+          <th scope="col" class="border-0 py-3">
+            {{ 'ADMIN.COMMENTS.TABLE.ENTRY' | translate }}
+          </th>
+          <th scope="col" class="border-0 py-3">
+            {{ 'ADMIN.COMMENTS.TABLE.DATE' | translate }}
+          </th>
+          <th scope="col" class="border-0 py-3 text-center">
+            {{ 'ADMIN.COMMENTS.TABLE.STATUS' | translate }}
+          </th>
+          <th scope="col" class="border-0 py-3 text-end pe-4">
+            {{ 'ADMIN.COMMENTS.TABLE.ACTIONS' | translate }}
+          </th>
+        </tr>
+      </thead>
+      <tbody class="border-top-0">
+        @for (coment of pagedComentarios; track trackByComentario($index, coment)) {
+          <tr class="align-middle">
+            <td class="ps-4 py-3">
+              <div class="d-flex flex-column">
+                <span
+                  class="fw-bold text-dark text-truncate d-inline-block"
+                  style="max-width: 300px"
+                  [title]="coment.contenido"
+                >
+                  {{ coment.contenido }}
+                </span>
+                <small class="text-body-secondary font-monospace"
+                  >ID: {{ coment.idComentario }}</small
+                >
+              </div>
+            </td>
+            <td class="py-3">
+              <div class="d-flex align-items-center gap-2">
+                <c-avatar size="sm" color="info" textColor="white" class="fw-bold">
+                  {{ coment.idUsuario.toString().charAt(0) || 'U' }}
+                </c-avatar>
+                <span class="small fw-semibold">ID: {{ coment.idUsuario }}</span>
+              </div>
+            </td>
+            <td class="py-3">
+              <div class="d-flex flex-column">
+                <span class="small fw-semibold">Entrada #{{ coment.idEntrada }}</span>
+                <span
+                  class="small text-muted text-truncate"
+                  style="max-width: 150px"
+                  [title]="coment.tituloEntrada"
+                >
+                  {{ coment.tituloEntrada || 'Sin título' }}
+                </span>
+              </div>
+            </td>
+            <td class="py-3">
+              <div class="d-flex flex-column">
+                <span class="small fw-semibold">
+                  {{ coment.fechaCreacion | date: 'mediumDate' }}
+                </span>
+                <small class="text-body-secondary" style="font-size: 0.75rem">
+                  {{ coment.fechaCreacion | date: 'shortTime' }}
+                </small>
+              </div>
+            </td>
+            <td class="text-center py-3">
+              @if (coment.aprobado) {
+                <c-badge color="success" shape="rounded-pill" class="px-3 py-2 shadow-sm">
+                  {{ 'ADMIN.COMMENTS.FILTERS.APPROVED' | translate }}
+                </c-badge>
+              } @else if (coment.cuarentena) {
+                <c-badge color="danger" shape="rounded-pill" class="px-3 py-2 shadow-sm">
+                  {{ 'ADMIN.COMMENTS.FILTERS.IN_QUARANTINE' | translate }}
+                </c-badge>
+              } @else {
+                <c-badge color="warning" shape="rounded-pill" class="px-3 py-2 shadow-sm">
+                  {{ 'ADMIN.COMMENTS.FILTERS.PENDING' | translate }}
+                </c-badge>
+              }
+            </td>
+            <td class="text-end pe-4 py-3">
+              <c-button-group role="group">
+                <button
+                  cButton
+                  color="primary"
+                  variant="ghost"
+                  size="sm"
+                  (click)="edit.emit(coment)"
+                  [cTooltip]="'COMMON.EDIT' | translate"
+                >
+                  <svg cIcon name="cilPen"></svg>
+                </button>
+                <button
+                  cButton
+                  color="danger"
+                  variant="ghost"
+                  size="sm"
+                  (click)="delete.emit(coment)"
+                  [cTooltip]="'ADMIN.COMMENTS.DELETE_COMMENT' | translate"
+                >
+                  <svg cIcon name="cilTrash"></svg>
+                </button>
+              </c-button-group>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="text-center py-5">
+              <div class="d-flex flex-column align-items-center text-secondary opacity-75">
+                <svg cIcon name="cilSpeech" size="4xl" class="mb-3"></svg>
+                <h5 class="fw-normal">
+                  {{ 'ADMIN.COMMENTS.TABLE.NO_RESULTS' | translate }}
+                </h5>
+                <p class="small mb-0">
+                  {{ 'ADMIN.COMMENTS.TABLE.TRY_ADJUSTING' | translate }}
+                </p>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10"
+  >
+    <div class="text-muted small">
+      {{
+        'COMMON.PAGINATION_INFO'
+          | translate: { current: numberOfElements, total: totalElements }
+      }}
+    </div>
+    <app-op-pagination
+      [totalPages]="totalPages"
+      [currentPage]="pageNo"
+      (pageChange)="onPageChange($event)"
+      size="sm"
+      class="mb-0"
+    >
+    </app-op-pagination>
+  </div>
+</div>

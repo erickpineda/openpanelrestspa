@@ -1,0 +1,19 @@
+<app-entrada-form [form]="entradaForm" [tiposEntr]="tiposEntr" [estadosEntr]="estadosEntr" [categorias]="categorias"
+  [modoLectura]="modoLectura" [submitted]="submitted" [entrada]="entrada" (editar)="onEditar()"
+  (submitForm)="onGuardar($event)" (preview)="onPreviewEmit($event)" (cancelar)="onCancelar()"
+  [customTitle]="'ADMIN.PAGES.EDIT_PAGE' | translate"
+  [customSubtitle]="'ADMIN.PAGES.SUBTITLE' | translate">
+</app-entrada-form>
+
+<!-- Modal Previa -->
+<c-modal id="previewPaginaModal" [visible]="modalPreviaVisible" (visibleChange)="modalPreviaVisible = $event" size="xl">
+  <c-modal-header>
+    <h5 cModalTitle>{{ 'ADMIN.PAGES.PREVIEW_TITLE' | translate }}</h5>
+    <button (click)="onCerrarPreview()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <app-previa-entrada [entrada]="entradaParaPrevia" [mostrarBotonesAccion]="true" (cerrar)="onCerrarPreview()"
+      (editar)="onEditarDesdePreview()">
+    </app-previa-entrada>
+  </c-modal-body>
+</c-modal>

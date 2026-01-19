@@ -1,7 +1,34 @@
 import { NgModule } from '@angular/core';
-import { EtiquetasModule as OriginalEtiquetasModule } from '@app/admin/base/etiquetas/etiquetas.module';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { SharedOPModule } from '@shared/shared.module';
+import { SharedCoreUiModule } from '@shared/shared-coreui.module';
+import { EtiquetasFeatureRoutingModule } from './etiquetas-routing.module';
+import { EtiquetasListComponent } from './listado-etiquetas.component';
+import { EtiquetaFormComponent } from './etiqueta-form/etiqueta-form.component';
+import { SearchToolbarBasicComponent } from './components/search-toolbar-basic/search-toolbar-basic.component';
+import { CrearEtiquetaComponent } from './crear/crear-etiqueta.component';
+import { EditarEtiquetaComponent } from './editar/editar-etiqueta.component';
+import { EliminarEtiquetaComponent } from './eliminar/eliminar-etiqueta.component';
 
 @NgModule({
-  imports: [OriginalEtiquetasModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    SharedOPModule,
+    SharedCoreUiModule,
+    EtiquetasFeatureRoutingModule,
+  ],
+  declarations: [
+    EtiquetasListComponent,
+    EtiquetaFormComponent,
+    SearchToolbarBasicComponent,
+    CrearEtiquetaComponent,
+    EditarEtiquetaComponent,
+    EliminarEtiquetaComponent,
+  ],
 })
 export class EtiquetasFeatureModule {}

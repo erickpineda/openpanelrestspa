@@ -1,0 +1,63 @@
+@if (form) {
+  <form [formGroup]="form" class="row g-3" novalidate role="form" aria-label="Formulario de categoría">
+    <c-col xs="12">
+      <label cLabel for="codigo" class="fw-semibold">{{ 'ADMIN.CATEGORIES.CODE' | translate }}<span class="text-danger">*</span></label>
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilBarcode" size="sm"></svg></span>
+        <input cFormControl formControlName="codigo" id="codigo" type="text" class="border-start-0"
+          [ngClass]="{
+            'is-invalid': (submitted || f['codigo'].touched) && f['codigo'].invalid,
+            'is-valid': f['codigo'].valid && (submitted || f['codigo'].touched)
+          }" (input)="mostrarFeedback = true; onCodigoInput($any($event.target).value)" 
+             placeholder="{{ 'ADMIN.ROLES.CODE_PLACEHOLDER' | translate }}" />
+        @if ((submitted || f['codigo'].touched) && f['codigo'].invalid) {
+          <div class="invalid-feedback">
+            {{ 'ADMIN.CATEGORIES.CODE_REQUIRED_MAX_5_CHARS' | translate }}
+          </div>
+        }
+      </div>
+      @if (!isEditing) {
+        <div class="form-text text-muted small">
+          {{ 'ADMIN.CATEGORIES.CODE_AUTO_GENERATED_IF_EMPTY' | translate }}
+        </div>
+      }
+    </c-col>
+    <c-col xs="12">
+      <label cLabel for="nombre" class="fw-semibold">{{ 'COMMON.NAME' | translate }}<span class="text-danger">*</span></label>
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilTag" size="sm"></svg></span>
+        <input cFormControl formControlName="nombre" id="nombre" type="text" class="border-start-0" 
+          [ngClass]="{
+            'is-invalid': (submitted || f['nombre'].touched) && f['nombre'].invalid,
+            'is-valid': f['nombre'].valid && (submitted || f['nombre'].touched)
+          }" (input)="mostrarFeedback = true; onNombreInput($any($event.target).value)" />
+        @if ((submitted || f['nombre'].touched) && f['nombre'].invalid) {
+          <div class="invalid-feedback">
+            {{ 'ADMIN.CATEGORIES.NAME_REQUIRED' | translate }}
+          </div>
+        }
+      </div>
+    </c-col>
+
+    <c-col xs="12">
+      <label cLabel for="descripcion" class="fw-semibold">{{ 'COMMON.DESCRIPTION' | translate }}</label>
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilAlignLeft" size="sm"></svg></span>
+        <textarea cFormControl formControlName="descripcion" id="descripcion" rows="4" class="border-start-0"></textarea>
+      </div>
+      <div class="form-text text-muted mt-1">
+        {{ 'ADMIN.CATEGORIES.DESCRIPTION_HELP' | translate }}
+      </div>
+    </c-col>
+
+    @if (categoria?.codigo) {
+      <c-col md="6">
+        <label class="form-label fw-semibold">{{ 'ADMIN.CATEGORIES.TABLE.ENTRIES_COUNT' | translate }}</label>
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilFile" size="sm"></svg></span>
+          <input cFormControl [value]="categoria?.cantidadEntradas || 0" type="text" class="border-start-0" readonly />
+        </div>
+      </c-col>
+    }
+  </form>
+}

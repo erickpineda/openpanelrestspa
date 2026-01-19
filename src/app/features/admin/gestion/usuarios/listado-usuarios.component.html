@@ -1,0 +1,239 @@
+<c-container fluid class="px-0">
+  <!-- Copied content from base with same structure -->
+  <!-- See original at admin/base/gestion/usuarios/listado-usuarios.component.html -->
+  <!-- Using as-is for functional parity -->
+  <!-- START CONTENT -->
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <c-card-header class="bg-white p-4 border-bottom">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilPeople" class="text-primary"></svg>
+            {{ 'ADMIN.USERS.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.USERS.SUBTITLE' | translate }}
+          </small>
+        </div>
+        <div class="d-flex gap-2">
+          <button cButton color="secondary" variant="ghost" size="sm" aria-label="Imprimir listado">
+            <svg cIcon name="cilPrint" class="me-1"></svg>
+            {{ 'ADMIN.USERS.PRINT' | translate }}
+          </button>
+          <button cButton color="warning" variant="outline" size="sm">
+            <svg cIcon name="cilWarning" class="me-1"></svg>
+            {{ 'ADMIN.USERS.UNVERIFIED' | translate }}
+          </button>
+          <button cButton color="primary" size="sm" (click)="openCreate()" class="shadow-sm">
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            {{ 'ADMIN.USERS.NEW_USER' | translate }}
+          </button>
+        </div>
+      </div>
+    </c-card-header>
+    <c-card-body class="p-4">
+      @if (error) {
+      <c-alert color="danger" class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+          <svg cIcon name="cilWarning" class="me-2"></svg>
+          <span>{{ error }}</span>
+        </div>
+        <button cButton color="danger" size="sm" variant="outline" (click)="load()">{{ 'COMMON.RETRY' | translate }}</button>
+      </c-alert>
+      }
+      <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
+        <c-row class="align-items-center g-3">
+          <c-col xs="12" md="3" class="d-flex align-items-center gap-3">
+            <div class="text-nowrap fw-semibold text-secondary">
+              {{ totalElements }} {{ 'ADMIN.USERS.USERS_LABEL' | translate }}
+            </div>
+            <select cSelect size="sm" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" name="pageSizeSelect" class="w-auto" aria-label="Usuarios por página" [disabled]="loading">
+              <option [ngValue]="5">{{ 'ADMIN.USERS.X_RECORDS' | translate: { count: 5 } }}</option>
+              <option [ngValue]="10">{{ 'ADMIN.USERS.X_RECORDS' | translate: { count: 10 } }}</option>
+              <option [ngValue]="20">{{ 'ADMIN.USERS.X_RECORDS' | translate: { count: 20 } }}</option>
+              <option [ngValue]="50">{{ 'ADMIN.USERS.X_RECORDS' | translate: { count: 50 } }}</option>
+            </select>
+          </c-col>
+          <c-col xs="12" md="6">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0 text-secondary">
+                <svg cIcon name="cilSearch"></svg>
+              </span>
+              <input cFormControl type="text" [value]="basicSearchText" (input)="onBasicSearchTextChange($any($event.target).value)" [placeholder]="'ADMIN.USERS.FILTER_PLACEHOLDER' | translate" class="border-start-0 ps-0" [disabled]="loading" />
+              <button cButton color="secondary" variant="outline" (click)="toggleAdvanced()" [active]="showAdvanced" [disabled]="loading">
+                <svg cIcon name="cilFilter" class="me-1"></svg>
+                {{ 'ADMIN.USERS.FILTERS' | translate }}
+              </button>
+            </div>
+          </c-col>
+        </c-row>
+        @if (showAdvanced) {
+        <div class="mt-3 pt-3 border-top">
+          <c-row class="g-3 align-items-end">
+            <c-col xs="12" md="4">
+              <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'COMMON.USER' | translate }}</label>
+              <input cFormControl size="sm" type="text" [placeholder]="'ADMIN.USERS.FILTER_USERNAME' | translate" [value]="filtroUsuario" (input)="filtroUsuario = $any($event.target).value" [disabled]="loading" />
+            </c-col>
+            <c-col xs="6" md="3">
+              <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'COMMON.ROLE' | translate }}</label>
+              <select cSelect size="sm" [(ngModel)]="filtroRolCodigo" [disabled]="loading">
+                <option [ngValue]="null">{{ 'ADMIN.USERS.ALL_ROLES' | translate }}</option>
+                @for (r of roles; track r.idRol ?? $index) {
+                <option [value]="r.codigo">{{ r.nombre }}</option>
+                }
+              </select>
+            </c-col>
+            <c-col xs="6" md="3">
+              <label class="form-label mb-1 text-secondary small fw-semibold">{{ 'ADMIN.USERS.EMAIL_CONFIRMED' | translate }}</label>
+              <select cSelect size="sm" [value]="filtroEmailConfirmado === null ? '' : filtroEmailConfirmado ? 'true' : 'false'" (change)="filtroEmailConfirmado = $any($event.target).value === '' ? null : $any($event.target).value === 'true'" [disabled]="loading">
+                <option value="">{{ 'COMMON.ALL' | translate }}</option>
+                <option value="true">{{ 'COMMON.YES' | translate }}</option>
+                <option value="false">{{ 'COMMON.NO' | translate }}</option>
+              </select>
+            </c-col>
+            <c-col xs="12" md="2" class="d-flex justify-content-md-end gap-2">
+              <button cButton size="sm" color="primary" (click)="search()" [disabled]="loading" class="text-white">
+                {{ 'COMMON.APPLY' | translate }}
+              </button>
+              <button cButton size="sm" color="secondary" variant="ghost" (click)="reset()" [disabled]="loading">
+                {{ 'COMMON.CLEAN' | translate }}
+              </button>
+            </c-col>
+          </c-row>
+        </div>
+        }
+      </div>
+      <div class="tabla-con-loader-wrapper position-relative rounded-3 overflow-hidden border">
+        <div class="table-responsive">
+          <table cTable hover class="mb-0 align-middle text-nowrap">
+            <thead class="bg-light text-secondary small text-uppercase fw-bold">
+              <tr>
+                <th scope="col" class="border-0 py-3 ps-4">{{ 'COMMON.USER' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'ADMIN.USERS.FULL_NAME' | translate }}</th>
+                <th scope="col" class="border-0 py-3">{{ 'COMMON.EMAIL' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'COMMON.ROLE' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-center">{{ 'COMMON.STATUS' | translate }}</th>
+                <th scope="col" class="border-0 py-3 text-end pe-4">{{ 'COMMON.ACTIONS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="border-top-0">
+              @if (loading) {
+                @for (i of [1,2,3,4,5]; track i) {
+                  <tr>
+                    <td class="ps-4 py-3">
+                      <div class="d-flex align-items-center">
+                        <div class="skeleton skeleton-avatar me-3"></div>
+                        <div class="d-flex flex-column w-100">
+                          <div class="skeleton skeleton-text mb-1" style="width: 120px;"></div>
+                          <div class="skeleton skeleton-text" style="width: 80px; height: 0.75rem;"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-3">
+                      <div class="skeleton skeleton-text" style="width: 150px;"></div>
+                    </td>
+                    <td class="py-3">
+                      <div class="skeleton skeleton-text" style="width: 180px;"></div>
+                    </td>
+                    <td class="text-center py-3">
+                      <div class="skeleton skeleton-badge"></div>
+                    </td>
+                    <td class="text-center py-3">
+                      <div class="skeleton skeleton-badge"></div>
+                    </td>
+                    <td class="text-end pe-4 py-3">
+                      <div class="skeleton skeleton-badge" style="width: 60px;"></div>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                @for (u of usuarios; track u.idUsuario ?? $index) {
+                <tr class="align-middle" [class.bg-light]="!u.habilitado" [class.text-muted]="!u.habilitado">
+                  <td class="ps-4 py-3">
+                    <div class="d-flex align-items-center">
+                      <c-avatar color="primary" textColor="white" shape="rounded-circle" size="md" class="me-3">
+                        {{ getInitial(u) }}
+                      </c-avatar>
+                      <div class="d-flex flex-column">
+                        <span class="fw-bold text-primary-emphasis text-truncate" style="max-width: 200px" [title]="u.username">
+                          {{ u.username }}
+                        </span>
+                        <small class="text-body-secondary" style="font-size: 0.75rem">ID: {{ u.idUsuario }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-3">
+                    <span class="d-inline-block text-truncate fw-semibold" style="max-width: 200px" [title]="(u.nombre + ' ' + u.apellido).trim()">
+                      {{ u.nombre }} {{ u.apellido }}
+                    </span>
+                  </td>
+                  <td class="py-3">
+                    <div class="d-flex align-items-center">
+                      <span class="text-truncate" style="max-width: 240px" [title]="u.email">{{ u.email }}</span>
+                      @if (u.emailConfirmado) {
+                      <svg cIcon name="cilCheckCircle" class="text-success ms-2" size="sm" [cTooltip]="'ADMIN.USERS.STATUS.VERIFIED' | translate"></svg>
+                      } @else {
+                      <svg cIcon name="cilWarning" class="text-warning ms-2" size="sm" [cTooltip]="'ADMIN.USERS.UNVERIFIED' | translate"></svg>
+                      }
+                    </div>
+                  </td>
+                  <td class="text-center py-3">
+                    @if (getRoleInfo(u.rolCodigo); as roleInfo) {
+                    <c-badge [color]="roleInfo.color" shape="rounded-pill" class="px-3 py-2 bg-opacity-10 text-{{ roleInfo.color }}-emphasis border border-{{ roleInfo.color }} border-opacity-25">
+                      <svg cIcon [name]="roleInfo.icon" size="sm" class="me-1"></svg>
+                      {{ roleInfo.label | translate }}
+                    </c-badge>
+                    }
+                  </td>
+                  <td class="text-center py-3">
+                    @if (u.habilitado) {
+                    <c-badge color="success" shape="rounded-pill" class="px-3 py-2 bg-opacity-10 text-success-emphasis border border-success border-opacity-25">
+                      <svg cIcon name="cilCheckCircle" size="sm" class="me-1"></svg>
+                      {{ 'ADMIN.USERS.STATUS.ACTIVE' | translate }}
+                    </c-badge>
+                    } @else {
+                    <c-badge color="secondary" shape="rounded-pill" class="px-3 py-2 bg-opacity-10 text-secondary-emphasis border border-secondary border-opacity-25">
+                      <svg cIcon name="cilBan" size="sm" class="me-1"></svg>
+                      {{ 'ADMIN.USERS.STATUS.INACTIVE' | translate }}
+                    </c-badge>
+                    }
+                  </td>
+                  <td class="text-end pe-4 py-3">
+                    <c-button-group role="group">
+                      <button cButton color="primary" variant="ghost" size="sm" (click)="openEdit(u)" [cTooltip]="'COMMON.EDIT' | translate">
+                        <svg cIcon name="cilPen"></svg>
+                      </button>
+                      <button cButton color="danger" variant="ghost" size="sm" (click)="delete(u)" [disabled]="PROPIETARIO_ROLE_CODE && u.rolCodigo === PROPIETARIO_ROLE_CODE" [cTooltip]="'COMMON.DELETE' | translate">
+                        <svg cIcon name="cilTrash"></svg>
+                      </button>
+                    </c-button-group>
+                  </td>
+                </tr>
+                } @empty {
+                <tr>
+                  <td colspan="6" class="text-center py-5">
+                    <div class="d-flex flex-column align-items-center text-secondary opacity-75">
+                      <svg cIcon name="cilSearch" size="4xl" class="mb-3"></svg>
+                      <h5 class="fw-normal">{{ 'ADMIN.USERS.NO_USERS_FOUND' | translate }}</h5>
+                      <p class="small mb-0">{{ 'ADMIN.USERS.ADJUST_FILTERS_HELP' | translate }}</p>
+                    </div>
+                  </td>
+                </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+          <small class="text-secondary">
+            {{ 'COMMON.PAGINATION_INFO' | translate: { current: numberOfElements, total: totalElements } }}
+          </small>
+          <app-op-pagination [totalPages]="getTotalPages()" [currentPage]="pageNo" (pageChange)="onPageChange($event)" size="sm" class="mb-0"> </app-op-pagination>
+        </div>
+      </div>
+    </c-card-body>
+  </c-card>
+  <app-crear-usuario [visible]="showCreateModal" [roles]="roles" (visibleChange)="showCreateModal = $event" (onSuccess)="load()"></app-crear-usuario>
+  <app-editar-usuario [visible]="showEditModal" [usuario]="editUser" [roles]="roles" (visibleChange)="showEditModal = $event" (onSuccess)="load()"></app-editar-usuario>
+  <app-confirmation-modal [visible]="showDeleteModal" [title]="'COMMON.DELETE' | translate" [message]="'COMMON.VERIFY_DELETE' | translate" [itemName]="userToDelete?.username" [warningText]="'ADMIN.USERS.DELETE_WARNING' | translate" [confirmText]="'ADMIN.USERS.DELETE_PERMANENTLY' | translate" [cancelText]="'COMMON.CANCEL' | translate" [type]="'danger'" [loading]="loading" (visibleChange)="showDeleteModal = $event" (confirm)="confirmDelete()"></app-confirmation-modal>
+</c-container>

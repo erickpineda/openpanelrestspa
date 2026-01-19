@@ -1,0 +1,32 @@
+<c-container>
+  <c-row class="justify-content-center">
+    <c-col md="6">
+      <c-card class="mb-4">
+        <c-card-header>{{ 'HEADER.LOGIN' | translate }}</c-card-header>
+        <c-card-body>
+          <form (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label class="form-label">{{ 'AUTH.USERNAME' | translate }}</label>
+              <input cFormControl type="text" [(ngModel)]="form.username" name="username" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ 'AUTH.PASSWORD' | translate }}</label>
+              <input cFormControl type="password" [(ngModel)]="form.password" name="password" required />
+            </div>
+            @if (isLoginFailed) {
+            <c-alert color="danger">{{ errorMessage }}</c-alert>
+            }
+            <button cButton color="primary" type="submit" [disabled]="isLoading">
+              @if (!isLoading) {
+              <span>{{ 'HEADER.LOGIN' | translate }}</span>
+              }
+              @if (isLoading) {
+              <span class="spinner-border spinner-border-sm" role="status"></span>
+              }
+            </button>
+          </form>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
+</c-container>

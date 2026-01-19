@@ -1,0 +1,234 @@
+<form [formGroup]="form">
+  <div class="row g-3">
+    <!-- Avatar Preview -->
+    <c-col xs="12" class="d-flex justify-content-center mb-2">
+      <div class="d-flex flex-column align-items-center">
+        <div class="position-relative mb-2">
+          <c-avatar [color]="roleColor" class="text-white fw-bold d-flex align-items-center justify-content-center" 
+                    style="width: 80px; height: 80px; font-size: 2rem;">
+            {{ initials }}
+          </c-avatar>
+          <div class="position-absolute bottom-0 end-0 p-1 bg-white rounded-circle">
+            <div [class]="'rounded-circle bg-' + (form.get('habilitado')?.value ? 'success' : 'secondary')" 
+                 style="width: 16px; height: 16px; border: 2px solid white;"></div>
+          </div>
+        </div>
+        <div class="text-muted small">
+          {{ form.get('username')?.value || ('ADMIN.USERS.USERNAME_PLACEHOLDER' | translate) }}
+        </div>
+      </div>
+    </c-col>
+
+    <!-- Account Info -->
+    <c-col md="6">
+      <label class="form-label fw-semibold">{{ 'COMMON.USER' | translate }}</label>
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilUser" size="sm"></svg></span>
+        <input cFormControl type="text" formControlName="username"
+          (input)="onUsernameInput($event)"
+          [class.is-invalid]="form.get('username')?.invalid && form.get('username')?.touched"
+          [class.is-valid]="form.get('username')?.valid && form.get('username')?.touched"
+          [placeholder]="'ADMIN.USERS.USERNAME_PLACEHOLDER' | translate" class="border-start-0 border-end-0" />
+        
+        @if (form.get('username')?.valid && form.get('username')?.touched) {
+          <span class="input-group-text bg-white border-start-0 border-end-0 text-success">
+            <svg cIcon name="cilCheckCircle" size="sm"></svg>
+          </span>
+        }
+
+        <button cButton color="light" class="border border-start-0 text-primary" type="button" (click)="generateUsername()"
+                [cTooltip]="'COMMON.GENERATE' | translate"
+                [class.opacity-50]="disabled" [style.cursor]="disabled ? 'not-allowed' : 'pointer'">
+          <svg cIcon name="cilReload" size="sm"></svg>
+        </button>
+
+        <button cButton color="light" class="border border-start-0 text-primary" type="button" 
+                (click)="checkUsernameAvailability()" [disabled]="(!disabled && form.get('username')?.invalid) || checkUsernameLoading"
+                [cTooltip]="'ADMIN.USERS.CHECK_AVAILABILITY' | translate"
+                [class.opacity-50]="disabled" [style.cursor]="disabled ? 'not-allowed' : 'pointer'">
+          @if (checkUsernameLoading) {
+            <c-spinner size="sm"></c-spinner>
+          } @else {
+            <svg cIcon name="cilCheckCircle" size="sm"></svg>
+          }
+        </button>
+      </div>
+      @if (form.get('username')?.invalid && form.get('username')?.touched) {
+        @if (form.get('username')?.errors?.['required']) {
+          <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.REQUIRED' | translate }}</div>
+        }
+        @if (form.get('username')?.errors?.['pattern']) {
+          <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.USERNAME_PATTERN' | translate }}</div>
+        }
+        @if (form.get('username')?.errors?.['taken']) {
+          <div class="text-danger small mt-1">{{ 'ADMIN.USERS.USERNAME_TAKEN' | translate }}</div>
+        }
+      }
+    </c-col>
+
+    <c-col md="6">
+      <label class="form-label fw-semibold">{{ 'COMMON.PASSWORD' | translate }}</label>
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilLockLocked" size="sm"></svg></span>
+        <input cFormControl [type]="passwordVisible ? 'text' : 'password'" formControlName="password"
+          [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched"
+          [class.is-valid]="form.get('password')?.valid && form.get('password')?.touched"
+          [placeholder]="(form.get('idUsuario')?.value ? 'ADMIN.USERS.PASSWORD_PLACEHOLDER_EDIT' : 'ADMIN.USERS.PASSWORD_PLACEHOLDER_NEW') | translate" 
+          class="border-start-0 border-end-0" />
+        
+        @if (form.get('password')?.valid && form.get('password')?.touched) {
+          <span class="input-group-text bg-white border-start-0 border-end-0 text-success">
+            <svg cIcon name="cilCheckCircle" size="sm"></svg>
+          </span>
+        }
+
+        <button cButton color="light" class="border border-start-0 text-muted" type="button" (click)="togglePasswordVisibility()"
+                [cTooltip]="passwordVisible ? ('COMMON.HIDE' | translate) : ('COMMON.SHOW' | translate)"
+                [class.opacity-50]="disabled" [style.cursor]="disabled ? 'not-allowed' : 'pointer'">
+          <svg cIcon [name]="passwordVisible ? 'cilLockUnlocked' : 'cilZoom'" size="sm"></svg>
+        </button>
+        <button cButton color="light" class="border border-start-0 text-primary" type="button" (click)="generatePassword()"
+                [cTooltip]="'COMMON.GENERATE' | translate"
+                [class.opacity-50]="disabled" [style.cursor]="disabled ? 'not-allowed' : 'pointer'">
+          <svg cIcon name="cilReload" size="sm"></svg>
+        </button>
+      </div>
+      @if (form.get('password')?.invalid && form.get('password')?.touched) {
+        @if (form.get('password')?.errors?.['required']) {
+          <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.REQUIRED' | translate }}</div>
+        }
+        @if (form.get('password')?.errors?.['pattern']) {
+          <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.PASSWORD_PATTERN' | translate }}</div>
+        }
+      }
+      @if (form.get('idUsuario')?.value) {
+        <div class="text-muted small mt-1">{{ 'ADMIN.USERS.PASSWORD_HELP_EDIT' | translate }}</div>
+      }
+    </c-col>
+
+    <c-col md="6">
+      <label class="form-label fw-semibold">{{ 'COMMON.EMAIL' | translate }}</label>
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0"><svg cIcon name="cilEnvelopeClosed"
+            size="sm"></svg></span>
+        <input cFormControl type="email" formControlName="email"
+          [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+          [class.is-valid]="form.get('email')?.valid && form.get('email')?.touched"
+          [placeholder]="'ADMIN.USERS.EMAIL_PLACEHOLDER' | translate" class="border-start-0 border-end-0" />
+        
+        @if (form.get('email')?.valid && form.get('email')?.touched) {
+          <span class="input-group-text bg-white border-start-0 text-success">
+            <svg cIcon name="cilCheckCircle" size="sm"></svg>
+          </span>
+        }
+      </div>
+      @if (form.get('email')?.invalid && form.get('email')?.touched) {
+        @if (form.get('email')?.errors?.['required']) {
+          <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.REQUIRED' | translate }}</div>
+        }
+        @if (form.get('email')?.errors?.['email']) {
+          <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.EMAIL_INVALID' | translate }}</div>
+        }
+      }
+    </c-col>
+
+    <!-- Role -->
+    <c-col md="6">
+      <label class="form-label fw-semibold">{{ 'ADMIN.USERS.ASSIGNED_ROLE' | translate }}</label>
+      <select cSelect formControlName="rolCodigo"
+        [class.is-invalid]="form.get('rolCodigo')?.invalid && form.get('rolCodigo')?.touched"
+        [class.is-valid]="form.get('rolCodigo')?.valid && form.get('rolCodigo')?.touched">
+        <option value="">{{ 'COMMON.SELECT_ROLE' | translate }}</option>
+        @for (r of roles; track r.codigo) {
+        @if (r.codigo !== PROPIETARIO_ROLE_CODE || form.get('rolCodigo')?.value === PROPIETARIO_ROLE_CODE) {
+        <option [value]="r.codigo">{{ r.nombre }}</option>
+        }
+        }
+      </select>
+      @if (form.get('rolCodigo')?.invalid && form.get('rolCodigo')?.touched) {
+      <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.REQUIRED' | translate }}</div>
+      }
+      @if (PROPIETARIO_ROLE_CODE && form.get('rolCodigo')?.value === PROPIETARIO_ROLE_CODE) {
+      <div class="text-info small mt-1 d-flex align-items-center">
+        <svg cIcon name="cilLockLocked" size="sm" class="me-1"></svg>
+        {{ 'ADMIN.USERS.OWNER_ROLE_IMMUTABLE' | translate }}
+      </div>
+      }
+    </c-col>
+
+    <c-col xs="12">
+      <hr class="my-2 text-muted opacity-25">
+    </c-col>
+
+    <!-- Personal Info -->
+    <c-col md="6">
+      <label class="form-label fw-semibold">{{ 'COMMON.NAME' | translate }}</label>
+      <input cFormControl type="text" formControlName="nombre"
+        [class.is-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
+        [class.is-valid]="form.get('nombre')?.valid && form.get('nombre')?.touched"
+        [placeholder]="'ADMIN.USERS.FIRST_NAME_PLACEHOLDER' | translate" />
+        @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+          <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.REQUIRED' | translate }}</div>
+        }
+    </c-col>
+    <c-col md="6">
+      <label class="form-label fw-semibold">{{ 'COMMON.LAST_NAME' | translate }}</label>
+      <input cFormControl type="text" formControlName="apellido"
+        [class.is-invalid]="form.get('apellido')?.invalid && form.get('apellido')?.touched"
+        [class.is-valid]="form.get('apellido')?.valid && form.get('apellido')?.touched"
+        [placeholder]="'ADMIN.USERS.LAST_NAME_PLACEHOLDER' | translate" />
+        @if (form.get('apellido')?.invalid && form.get('apellido')?.touched) {
+          <div class="text-danger small mt-1">{{ 'COMMON.VALIDATION.REQUIRED' | translate }}</div>
+        }
+    </c-col>
+
+    <!-- Status & Checks -->
+    <c-col xs="12" class="d-flex flex-wrap gap-3">
+       <div class="p-3 bg-light rounded flex-grow-1 border">
+         <c-form-check [switch]="true">
+           <input cFormCheckInput type="checkbox" id="userEnabled" formControlName="habilitado" />
+           <label cFormCheckLabel for="userEnabled" class="fw-semibold cursor-pointer select-none d-flex align-items-center">
+             {{ 'ADMIN.USERS.USER_ENABLED' | translate }}
+             @if (form.get('habilitado')?.value) {
+               <c-badge color="success" class="ms-2 small">{{ 'ADMIN.USERS.STATUS.ACTIVE' | translate }}</c-badge>
+             } @else {
+               <c-badge color="secondary" class="ms-2 small">{{ 'ADMIN.USERS.STATUS.INACTIVE' | translate }}</c-badge>
+             }
+           </label>
+         </c-form-check>
+         <div class="small text-muted ms-4 mt-1">
+           {{ 'ADMIN.USERS.USER_ENABLED_HELP' | translate }}
+         </div>
+       </div>
+       
+       <div class="p-3 bg-light rounded flex-grow-1 border">
+          <c-form-check [switch]="true">
+           <input cFormCheckInput type="checkbox" id="emailConfirmado" formControlName="emailConfirmado" />
+           <label cFormCheckLabel for="emailConfirmado" class="fw-semibold cursor-pointer select-none d-flex align-items-center">
+             {{ 'ADMIN.USERS.EMAIL_CONFIRMED' | translate }}
+             @if (form.get('emailConfirmado')?.value) {
+               <c-badge color="success" class="ms-2 small">{{ 'ADMIN.USERS.STATUS.VERIFIED' | translate }}</c-badge>
+             } @else {
+               <c-badge color="warning" class="ms-2 small">{{ 'ADMIN.USERS.STATUS.PENDING' | translate }}</c-badge>
+             }
+           </label>
+         </c-form-check>
+         <div class="small text-muted ms-4 mt-1">
+           {{ 'ADMIN.USERS.EMAIL_CONFIRMED_HELP' | translate }}
+         </div>
+       </div>
+    </c-col>
+    
+    <c-col xs="12">
+        <div>
+          @if (disabled && form.get('idUsuario')?.value) {
+          <button cButton color="warning" variant="outline" (click)="enableEdit()">
+            <svg cIcon name="cilLockUnlocked" class="me-1"></svg>
+            {{ 'COMMON.ENABLE_EDIT' | translate }}
+          </button>
+          }
+        </div>
+    </c-col>
+  </div>
+</form>
+

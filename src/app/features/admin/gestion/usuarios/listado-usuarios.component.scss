@@ -1,0 +1,35 @@
+.skeleton {
+  background: #f6f7f8;
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+  animation: shimmer 2s linear infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -800px 0;
+  }
+  100% {
+    background-position: 800px 0;
+  }
+}
+
+.skeleton-text {
+  height: 1rem;
+  width: 80%;
+  display: inline-block;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.skeleton-badge {
+  height: 24px;
+  width: 80px;
+  display: inline-block;
+  border-radius: 12px;
+}

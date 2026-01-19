@@ -1,11 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ListadoComentariosComponent } from './comentarios/listado-comentarios.component';
-import { CrearComentarioComponent } from './comentarios/crear/crear-comentario.component';
-import { EditarComentarioComponent } from './comentarios/editar/editar-comentario.component';
 import { BaseComponent } from './base.component';
 import { BaseIndexComponent } from './base-index.component';
-import { ListadoCategoriasComponent } from './categorias/listado-categorias.component';
 // Entradas feature is lazy-loaded (EntradasModule)
 
 const routes: Routes = [
@@ -73,12 +69,14 @@ const routes: Routes = [
       },
       {
         path: 'categorias',
-        component: ListadoCategoriasComponent,
+        loadChildren: () =>
+          import('@features/admin/categorias/categorias.module').then((m) => m.CategoriasFeatureModule),
         data: { title: 'MENU.CATEGORIES' },
       },
       {
         path: 'comentarios',
-        component: ListadoComentariosComponent,
+        loadChildren: () =>
+          import('@features/admin/comentarios/comentarios.module').then((m) => m.ComentariosFeatureModule),
         data: { title: 'MENU.COMMENTS' },
       },
     ],

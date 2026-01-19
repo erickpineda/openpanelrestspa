@@ -118,7 +118,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
       this.cdr.markForCheck();
     });
 
-    const isDashboardRoute = this.router.url.includes('/admin/base/dashboard');
+    const isDashboardRoute =
+      this.router.url.includes('/admin/dashboard') ||
+      this.router.url.includes('/admin/control');
     if (isDashboardRoute) {
       this.dashboardApi.getContentStats().subscribe((stats) => {
         this.projectsCount = Number(stats?.totalEntradas) || 0;

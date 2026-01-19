@@ -1,8 +1,44 @@
 import { NgModule } from '@angular/core';
-import { EntradasSharedModule as OriginalEntradasSharedModule } from '@app/admin/base/entradas/entradas-shared.module';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { SharedOPModule } from '@shared/shared.module';
+import { SharedCoreUiModule } from '@shared/shared-coreui.module';
+import {
+  EntradasFilterComponent,
+  EntradasTableComponent,
+  PreviaEntradaComponent
+} from './components';
+import { EntradaFormComponent } from './entrada-form/entrada-form.component';
+import { MediaSharedModule } from '@features/admin/contenido/media-shared.module';
 
 @NgModule({
-  imports: [OriginalEntradasSharedModule],
-  exports: [OriginalEntradasSharedModule],
+  declarations: [
+    EntradasFilterComponent,
+    EntradasTableComponent,
+    PreviaEntradaComponent,
+    EntradaFormComponent,
+  ],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    CKEditorModule,
+    SharedOPModule,
+    SharedCoreUiModule,
+    MediaSharedModule,
+  ],
+  exports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    SharedOPModule,
+    SharedCoreUiModule,
+    EntradasFilterComponent,
+    EntradasTableComponent,
+    PreviaEntradaComponent,
+    EntradaFormComponent,
+  ],
 })
 export class EntradasSharedModule {}

@@ -1,0 +1,208 @@
+<c-card data-testid="dashboard-root" class="shadow-sm mb-4 border-0">
+  <c-card-header class="bg-white py-3 border-bottom">
+    <c-row class="align-items-center g-2">
+      <c-col xs="12" md="6">
+        <div class="d-flex align-items-center gap-2">
+          <div class="bg-primary bg-opacity-10 p-2 rounded">
+            <svg cIcon name="cilSpeedometer" size="lg" class="text-primary"></svg>
+          </div>
+          <div>
+            <h5 cCardTitle class="mb-0 fw-bold text-primary">{{ 'ADMIN.DASHBOARD.WELCOME_TITLE' | translate }}</h5>
+            <small class="text-muted">{{ 'ADMIN.DASHBOARD.WELCOME_SUBTITLE' | translate }}</small>
+          </div>
+        </div>
+      </c-col>
+      <c-col xs="12" md="6">
+        <app-dashboard-toolbar
+          [forceFromDb]="forceFromDb"
+          [exportingZip]="exportingZip"
+          [exportError]="exportError"
+          (refresh)="refreshDashboard()"
+          (toggleForce)="toggleForceFromDb()"
+          (downloadData)="downloadCurrentData()"
+          (downloadZip)="downloadZip()"
+        ></app-dashboard-toolbar>
+      </c-col>
+    </c-row>
+  </c-card-header>
+  <c-card-body>
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <h5 cCardTitle class="fw-bold text-secondary mb-0">
+        <svg cIcon name="cilChartPie" class="me-2 text-info"></svg>{{ 'ADMIN.DASHBOARD.QUICK_STATS' | translate }}
+      </h5>
+      <div class="hstack gap-3">
+        <button cButton color="light" size="sm" class="text-primary shadow-sm" (click)="openSettings()">
+          <svg cIcon name="cilSettings" class="me-2" size="sm" [title]="'ADMIN.DASHBOARD.ADJUST_SETTINGS' | translate"></svg>
+          {{ 'ADMIN.DASHBOARD.ADJUST_SETTINGS' | translate }}
+        </button>
+      </div>
+    </div>
+    <c-row class="g-3 mb-4">
+      <c-col lg="3">
+        <app-kpi-card [label]="'ADMIN.DASHBOARD.ACTIVE_USERS' | translate" [value]="cantidadUsuariosActivos" iconName="cilUser" color="primary" class="h-100 shadow-sm"></app-kpi-card>
+      </c-col>
+      <c-col lg="3">
+        <app-kpi-card [label]="'ADMIN.DASHBOARD.TOTAL_ENTRIES' | translate" [value]="totalEntradas" iconName="cilNotes" color="info" class="h-100 shadow-sm"></app-kpi-card>
+      </c-col>
+      <c-col lg="3">
+        <app-kpi-card [label]="'ADMIN.DASHBOARD.PUBLISHED_LAST_DAYS' | translate: { days: seriesDays }" [value]="kpiPublicadas" iconName="cilCheckCircle" color="success" class="h-100 shadow-sm"></app-kpi-card>
+      </c-col>
+      <c-col lg="3">
+        <app-kpi-card [label]="'ADMIN.DASHBOARD.UNPUBLISHED_LAST_DAYS' | translate: { days: seriesDays }" [value]="kpiNoPublicadas" iconName="cilXCircle" color="warning" class="h-100 shadow-sm"></app-kpi-card>
+      </c-col>
+    </c-row>
+    <hr class="text-muted opacity-25 my-4" />
+    <c-row class="g-4">
+      <c-col lg="8">
+        <c-card class="shadow-sm h-100 border-0">
+          <c-card-header class="bg-white border-bottom py-3">
+            <h6 class="mb-0 fw-bold text-secondary"><svg cIcon name="cilGraph" class="me-2 text-primary"></svg>{{ 'ADMIN.DASHBOARD.EVOLUTION_SERIES' | translate }}</h6>
+          </c-card-header>
+          <c-card-body>
+            <app-dashboard-series-panel
+              [seriesDays]="seriesDays"
+              [seriesGranularity]="seriesGranularity"
+              [data]="data"
+              [loadingSeries]="loadingSeries"
+              [showMetricsTools]="isLocalEnv() && metricsVisible()"
+              [metricsExpanded]="metricsExpanded"
+              [perf]="perf"
+              [perfUpdatedAt]="perfUpdatedAt"
+              [sumEntradasSerie]="sumEntradasSerie"
+              [sumComentarios]="sumComentarios"
+              [sumUsuarios]="sumUsuarios"
+              (changeDays)="changeSeriesDays($event)"
+              (changeGranularity)="changeSeriesGranularity($event)"
+              (downloadCsv)="downloadCsv()"
+              (toggleMetrics)="metricsToggle()"
+              (copyPerf)="copyPerfToClipboard()"
+            ></app-dashboard-series-panel>
+            <div class="mt-4 pt-3 border-top">
+              <app-dashboard-estado-nominal-panel
+                [estadoNominalChartType]="estadoNominalChartType"
+                [estadoNominalStacked]="estadoNominalStacked"
+                [seriesEntriesSplitEstadoNombreData]="seriesEntriesSplitEstadoNombreData"
+                [estadoNominalChartOptions]="estadoNominalChartOptions"
+                [errorSplitEstadoNombre]="errorSplitEstadoNombre"
+                (setChartType)="setEstadoNominalChartType($event)"
+                (toggleStacked)="toggleEstadoNominalStacked()"
+              ></app-dashboard-estado-nominal-panel>
+            </div>
+            <div class="mt-4 pt-3 border-top" [attr.aria-busy]="loadingSplitEstado ? 'true' : null">
+              <app-dashboard-estado-split-panel
+                [loadingSplitEstado]="loadingSplitEstado"
+                [seriesEntriesSplitData]="seriesEntriesSplitData"
+                [errorSplitEstado]="errorSplitEstado"
+              ></app-dashboard-estado-split-panel>
+            </div>
+          </c-card-body>
+        </c-card>
+      </c-col>
+      <c-col lg="4">
+        <div class="d-flex flex-column gap-4 h-100">
+          <c-card class="shadow-sm border-0 flex-grow-1">
+            <c-card-header class="bg-white border-bottom py-3">
+              <h6 class="mb-0 fw-bold text-secondary"><svg cIcon name="cilHistory" class="me-2 text-info"></svg>Actividad Reciente</h6>
+            </c-card-header>
+            <c-card-body>
+              <app-dashboard-recent-panel
+                [recentItems]="recentItems"
+                [loadingRecent]="loadingRecent"
+                [errorRecent]="errorRecent"
+                [recentSize]="recentSize"
+                [recentTotalPages]="recentTotalPages"
+                [recentPage]="recentPage"
+                (changeSize)="onRecentSizeChange($event)"
+                (pageChange)="onRecentPageChange($event)"
+              ></app-dashboard-recent-panel>
+            </c-card-body>
+          </c-card>
+          <c-card class="shadow-sm border-0">
+            <c-card-header class="bg-white border-bottom py-3">
+              <h6 class="mb-0 fw-bold text-secondary"><svg cIcon name="cilStorage" class="me-2 text-warning"></svg>Almacenamiento</h6>
+            </c-card-header>
+            <c-card-body>
+              <app-dashboard-storage-panel [loadingStorage]="loadingStorage" [storage]="storage" [formatBytesFn]="formatBytes.bind(this)"></app-dashboard-storage-panel>
+            </c-card-body>
+          </c-card>
+        </div>
+      </c-col>
+    </c-row>
+    <hr class="text-muted opacity-25 my-4" />
+    <c-row class="g-4 mb-4">
+      <c-col lg="12">
+        <app-dashboard-content-panel
+          [loadingContentStats]="loadingContentStats"
+          [errorContentStats]="errorContentStats"
+          [contentStats]="contentStats"
+          [contentStatsChartData]="contentStatsChartData"
+          [contentEstadoRows]="contentEstadoRows"
+        ></app-dashboard-content-panel>
+      </c-col>
+    </c-row>
+    <c-row class="g-4">
+      <c-col lg="6">
+        <c-card class="shadow-sm border-0 h-100">
+          <c-card-header class="bg-white border-bottom py-3">
+            <h6 class="mb-0 fw-bold text-secondary">{{ 'ADMIN.DASHBOARD.TOP_USERS' | translate }}</h6>
+          </c-card-header>
+          <c-card-body>
+            <app-dashboard-top-panel
+              [title]="'ADMIN.DASHBOARD.TOP_USERS' | translate"
+              [items]="topUsers"
+              [loading]="loadingTopUsers"
+              [error]="errorTopUsers"
+              badgeColor="primary"
+              [showPeriodControls]="true"
+              [topLimit]="topLimit"
+              [topPeriodDays]="topPeriodDays"
+              (changeTopLimit)="onChangeTopLimit($event)"
+              (changePeriod)="topPeriodDays = $event; loadTopWidgets()"
+            ></app-dashboard-top-panel>
+          </c-card-body>
+        </c-card>
+      </c-col>
+      <c-col lg="6">
+        <c-card class="shadow-sm border-0 h-100">
+          <c-card-header class="bg-white border-bottom py-3">
+            <h6 class="mb-0 fw-bold text-secondary">{{ 'ADMIN.DASHBOARD.TOP_CATEGORIES' | translate }}</h6>
+          </c-card-header>
+          <c-card-body>
+            <app-dashboard-top-panel
+              [title]="'ADMIN.DASHBOARD.TOP_CATEGORIES' | translate"
+              [items]="topCategories"
+              [loading]="loadingTopCategories"
+              [error]="errorTopCategories"
+              badgeColor="info"
+            ></app-dashboard-top-panel>
+          </c-card-body>
+        </c-card>
+      </c-col>
+      <c-col lg="6" class="mt-4">
+        <c-card class="shadow-sm border-0 h-100">
+          <c-card-header class="bg-white border-bottom py-3">
+            <h6 class="mb-0 fw-bold text-secondary">{{ 'ADMIN.DASHBOARD.TOP_TAGS' | translate }}</h6>
+          </c-card-header>
+          <c-card-body>
+            <app-dashboard-top-panel
+              [title]="'ADMIN.DASHBOARD.TOP_TAGS' | translate"
+              [items]="topTags"
+              [loading]="loadingTopTags"
+              [error]="errorTopTags"
+              badgeColor="warning"
+            ></app-dashboard-top-panel>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+  </c-card-body>
+  <app-dashboard-settings-modal
+    [visible]="showSettingsModal"
+    (visibleChange)="showSettingsModal = $event"
+    [settings]="settings"
+    [clearFeedback]="clearFeedback"
+    (apply)="applySettings()"
+    (reset)="resetSettings()"
+    (close)="closeSettings()"
+  ></app-dashboard-settings-modal>
+</c-card>
