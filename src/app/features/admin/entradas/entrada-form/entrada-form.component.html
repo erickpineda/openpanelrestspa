@@ -11,29 +11,43 @@
               @if (customTitle) {
                 {{ customTitle }}
               } @else {
-                {{ entrada?.idEntrada ? ('ADMIN.ENTRIES.EDIT_ENTRY_TITLE' | translate) : ('ADMIN.ENTRIES.CREATE_ENTRY_TITLE' | translate) }}
+                {{
+                  entrada?.idEntrada
+                    ? ('ADMIN.ENTRIES.EDIT_ENTRY_TITLE' | translate)
+                    : ('ADMIN.ENTRIES.CREATE_ENTRY_TITLE' | translate)
+                }}
               }
             </h5>
             <small class="text-muted">
               @if (customSubtitle) {
                 {{ customSubtitle }}
               } @else {
-                {{ entrada?.idEntrada ? ('ADMIN.ENTRIES.EDIT_SUBTITLE' | translate) : ('ADMIN.ENTRIES.CREATE_SUBTITLE' | translate) }}
+                {{
+                  entrada?.idEntrada
+                    ? ('ADMIN.ENTRIES.EDIT_SUBTITLE' | translate)
+                    : ('ADMIN.ENTRIES.CREATE_SUBTITLE' | translate)
+                }}
               }
             </small>
           </div>
         </div>
         <div class="d-flex gap-2">
           @if (modoLectura) {
-          <button cButton color="warning" variant="outline" (click)="onEditar()">
-            <svg cIcon name="cilLockUnlocked" class="me-1"></svg>
-            {{ 'COMMON.ENABLE_EDIT' | translate }}
-          </button>
+            <button cButton color="warning" variant="outline" (click)="onEditar()">
+              <svg cIcon name="cilLockUnlocked" class="me-1"></svg>
+              {{ 'COMMON.ENABLE_EDIT' | translate }}
+            </button>
           } @else {
-          <button cButton color="secondary" variant="ghost" (click)="openResetConfirm()" [disabled]="form.pristine">
-            <svg cIcon name="cilReload" class="me-2"></svg>
-            {{ 'ADMIN.ENTRIES.RESET' | translate }}
-          </button>
+            <button
+              cButton
+              color="secondary"
+              variant="ghost"
+              (click)="openResetConfirm()"
+              [disabled]="form.pristine"
+            >
+              <svg cIcon name="cilReload" class="me-2"></svg>
+              {{ 'ADMIN.ENTRIES.RESET' | translate }}
+            </button>
           }
         </div>
       </div>
@@ -49,7 +63,11 @@
         @if (showRecoveryNotification) {
           <app-data-recovery-notification
             [title]="'ADMIN.ENTRIES.RECOVERY.TITLE' | translate"
-            [message]="('ADMIN.ENTRIES.RECOVERY.MESSAGE' | translate) + ' ' + (temporaryData?.title || 'Sin título')"
+            [message]="
+              ('ADMIN.ENTRIES.RECOVERY.MESSAGE' | translate) +
+              ' ' +
+              (temporaryData?.title || 'Sin título')
+            "
             [recoverText]="'ADMIN.ENTRIES.RECOVERY.RECOVER' | translate"
             [ignoreText]="'ADMIN.ENTRIES.RECOVERY.IGNORE' | translate"
             [discardText]="'ADMIN.ENTRIES.RECOVERY.DISCARD' | translate"
@@ -99,17 +117,17 @@
                 </h6>
 
                 @if (form.get('slug')?.value) {
-                <div class="mb-2">
-                  <a
-                    class="small text-decoration-none text-primary"
-                    [href]="'/blog/' + form.get('slug')?.value"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    /blog/{{ form.get('slug')?.value }}
-                    <svg cIcon name="cilExternalLink" size="sm" class="ms-1"></svg>
-                  </a>
-                </div>
+                  <div class="mb-2">
+                    <a
+                      class="small text-decoration-none text-primary"
+                      [href]="'/blog/' + form.get('slug')?.value"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      /blog/{{ form.get('slug')?.value }}
+                      <svg cIcon name="cilExternalLink" size="sm" class="ms-1"></svg>
+                    </a>
+                  </div>
                 }
 
                 <div class="mb-3">
@@ -122,14 +140,16 @@
                     formControlName="titulo"
                     [placeholder]="'ADMIN.ENTRIES.VALIDATION.TITLE_PLACEHOLDER' | translate"
                     [ngClass]="{
-                      'is-invalid': (submitted || control('titulo')?.touched) && control('titulo')?.invalid,
-                      'is-valid': control('titulo')?.valid && (submitted || control('titulo')?.touched)
+                      'is-invalid':
+                        (submitted || control('titulo')?.touched) && control('titulo')?.invalid,
+                      'is-valid':
+                        control('titulo')?.valid && (submitted || control('titulo')?.touched),
                     }"
                   />
                   @if ((submitted || control('titulo')?.touched) && control('titulo')?.invalid) {
-                  <div class="invalid-feedback">
-                    {{ 'ADMIN.ENTRIES.VALIDATION.TITLE_REQUIRED' | translate }}
-                  </div>
+                    <div class="invalid-feedback">
+                      {{ 'ADMIN.ENTRIES.VALIDATION.TITLE_REQUIRED' | translate }}
+                    </div>
                   }
                   <div class="form-text text-muted small">
                     {{ 'ADMIN.ENTRIES.VALIDATION.TITLE_LENGTH' | translate }}
@@ -144,26 +164,33 @@
             </c-card>
 
             <c-card class="mb-4 shadow-sm refined-card">
-              <c-card-body class="p-4"
-                [ngClass]="{'editor-fullscreen': isFullScreen, 'editor-expanded': isFullWidth && !isFullScreen}">
-                <div class="d-flex justify-content-between align-items-center mb-3"
-                  [class.fullscreen-toolbar]="isFullScreen">
+              <c-card-body
+                class="p-4"
+                [ngClass]="{
+                  'editor-fullscreen': isFullScreen,
+                  'editor-expanded': isFullWidth && !isFullScreen,
+                }"
+              >
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                  [class.fullscreen-toolbar]="isFullScreen"
+                >
                   <h6 class="text-secondary fw-bold mb-0 text-uppercase small ls-1">
                     {{ 'AUTO.CONTENIDO' | translate }}
                   </h6>
                   <div class="d-flex gap-2">
                     @if (!isFullScreen) {
-                    <button
-                      cButton
-                      color="secondary"
-                      variant="ghost"
-                      size="sm"
-                      (click)="toggleFullWidth()"
-                      [active]="isFullWidth"
-                      [cTooltip]="'ADMIN.ENTRIES.TOOLTIP.EXPAND' | translate"
-                    >
-                      <svg cIcon name="cilResizeWidth"></svg>
-                    </button>
+                      <button
+                        cButton
+                        color="secondary"
+                        variant="ghost"
+                        size="sm"
+                        (click)="toggleFullWidth()"
+                        [active]="isFullWidth"
+                        [cTooltip]="'ADMIN.ENTRIES.TOOLTIP.EXPAND' | translate"
+                      >
+                        <svg cIcon name="cilResizeWidth"></svg>
+                      </button>
                     }
                     <button
                       cButton
@@ -180,24 +207,26 @@
                 </div>
 
                 @if (Editor) {
-                <div class="editor-wrapper border rounded">
-                  <ckeditor
-                    [editor]="Editor"
-                    formControlName="contenido"
-                    (ready)="onReady($event)"
-                    (blur)="form.get('contenido')?.markAsTouched()"
-                  ></ckeditor>
-                </div>
+                  <div class="editor-wrapper border rounded">
+                    <ckeditor
+                      [editor]="Editor"
+                      formControlName="contenido"
+                      (ready)="onReady($event)"
+                      (blur)="form.get('contenido')?.markAsTouched()"
+                    ></ckeditor>
+                  </div>
                 } @else {
-                <div class="d-flex justify-content-center py-5 bg-light rounded">
-                  <c-spinner color="primary"></c-spinner>
-                </div>
+                  <div class="d-flex justify-content-center py-5 bg-light rounded">
+                    <c-spinner color="primary"></c-spinner>
+                  </div>
                 }
 
-                @if ((submitted || form.get('contenido')?.touched) && form.get('contenido')?.invalid) {
-                <div class="text-danger small mt-2">
-                  {{ 'ADMIN.ENTRIES.VALIDATION.CONTENT_REQUIRED' | translate }}
-                </div>
+                @if (
+                  (submitted || form.get('contenido')?.touched) && form.get('contenido')?.invalid
+                ) {
+                  <div class="text-danger small mt-2">
+                    {{ 'ADMIN.ENTRIES.VALIDATION.CONTENT_REQUIRED' | translate }}
+                  </div>
                 }
               </c-card-body>
             </c-card>
@@ -209,32 +238,34 @@
                 </h6>
 
                 @if (imagenDestacadaUrl) {
-                <div
-                  class="mb-3 position-relative rounded overflow-hidden shadow-sm border bg-light d-flex justify-content-center align-items-center"
-                  style="min-height: 200px"
-                >
-                  <img
-                    [src]="imagenDestacadaUrl"
-                    class="img-fluid"
-                    style="max-height: 300px; width: auto"
-                    alt="Imagen destacada"
-                  />
-                  <button
-                    cButton
-                    color="danger"
-                    size="sm"
-                    class="position-absolute top-0 end-0 m-2 shadow-sm rounded-circle"
-                    (click)="onQuitarImagen()"
-                    [cTooltip]="'ADMIN.ENTRIES.TOOLTIP.REMOVE_IMAGE' | translate"
+                  <div
+                    class="mb-3 position-relative rounded overflow-hidden shadow-sm border bg-light d-flex justify-content-center align-items-center"
+                    style="min-height: 200px"
                   >
-                    <svg cIcon name="cilTrash"></svg>
-                  </button>
-                </div>
+                    <img
+                      [src]="imagenDestacadaUrl"
+                      class="img-fluid"
+                      style="max-height: 300px; width: auto"
+                      alt="Imagen destacada"
+                    />
+                    <button
+                      cButton
+                      color="danger"
+                      size="sm"
+                      class="position-absolute top-0 end-0 m-2 shadow-sm rounded-circle"
+                      (click)="onQuitarImagen()"
+                      [cTooltip]="'ADMIN.ENTRIES.TOOLTIP.REMOVE_IMAGE' | translate"
+                    >
+                      <svg cIcon name="cilTrash"></svg>
+                    </button>
+                  </div>
                 } @else {
-                <div class="mb-3 py-5 text-center bg-light border border-dashed rounded text-muted">
-                  <svg cIcon name="cilImage" size="3xl" class="mb-2 opacity-50"></svg>
-                  <p class="mb-0 small">{{ 'AUTO.NO_HAY_IMAGEN_SELECCIONADA' | translate }}</p>
-                </div>
+                  <div
+                    class="mb-3 py-5 text-center bg-light border border-dashed rounded text-muted"
+                  >
+                    <svg cIcon name="cilImage" size="3xl" class="mb-2 opacity-50"></svg>
+                    <p class="mb-0 small">{{ 'AUTO.NO_HAY_IMAGEN_SELECCIONADA' | translate }}</p>
+                  </div>
                 }
 
                 <div class="d-flex gap-2">
@@ -251,17 +282,17 @@
                     {{ 'ADMIN.ENTRIES.SELECT_LIBRARY' | translate }}
                   </button>
                   @if (imagenDestacadaUrl) {
-                  <button
-                    cButton
-                    color="secondary"
-                    variant="outline"
-                    type="button"
-                    class="w-100"
-                    (click)="onQuitarImagen()"
-                  >
-                    <svg cIcon name="cilTrash" class="me-2"></svg>
-                    {{ 'COMMON.REMOVE' | translate }}
-                  </button>
+                    <button
+                      cButton
+                      color="secondary"
+                      variant="outline"
+                      type="button"
+                      class="w-100"
+                      (click)="onQuitarImagen()"
+                    >
+                      <svg cIcon name="cilTrash" class="me-2"></svg>
+                      {{ 'COMMON.REMOVE' | translate }}
+                    </button>
                   }
                 </div>
               </c-card-body>
@@ -272,111 +303,134 @@
             <c-row class="g-4">
               <c-col [md]="isFullWidth ? 4 : 12">
                 <c-card class="mb-4 shadow-sm refined-card">
-              <c-card-body class="p-4">
-                <h6 class="text-secondary fw-bold mb-3 text-uppercase small">
-                  {{ 'AUTO.PUBLICACI_N' | translate }}
-                </h6>
+                  <c-card-body class="p-4">
+                    <h6 class="text-secondary fw-bold mb-3 text-uppercase small">
+                      {{ 'AUTO.PUBLICACI_N' | translate }}
+                    </h6>
 
-                @if (esPublicada && fechaPublicacionMostrar) {
-                <div class="d-flex align-items-center mb-3 small text-success">
-                  <svg cIcon name="cilCalendar" size="sm" class="me-2"></svg>
-                  <span>
-                    {{ 'PUBLIC.HOME.PUBLISHED_DATE' | translate }}:
-                    {{ fechaPublicacionMostrar | date: 'dd-MM-yyyy HH:mm' }}
-                  </span>
-                </div>
-                }
+                    @if (esPublicada && fechaPublicacionMostrar) {
+                      <div class="d-flex align-items-center mb-3 small text-success">
+                        <svg cIcon name="cilCalendar" size="sm" class="me-2"></svg>
+                        <span>
+                          {{ 'PUBLIC.HOME.PUBLISHED_DATE' | translate }}:
+                          {{ fechaPublicacionMostrar | date: 'dd-MM-yyyy HH:mm' }}
+                        </span>
+                      </div>
+                    }
 
-                <div class="mb-3">
-                  <label class="form-label small fw-semibold">
-                    {{ 'COMMON.STATUS' | translate }}
-                  </label>
-                  <select
-                    cSelect
-                    formControlName="estadoEntrada"
-                    [ngClass]="{
-                      'is-invalid': (submitted || control('estadoEntrada')?.touched) && control('estadoEntrada')?.invalid,
-                      'is-valid': control('estadoEntrada')?.valid && (submitted || control('estadoEntrada')?.touched)
-                    }"
-                  >
-                    <option [ngValue]="null" disabled>
-                      {{ 'AUTO.SELECCIONAR' | translate }}
-                    </option>
-                    @for (e of estadosEntr; track e.idEstadoEntrada) {
-                    <option [ngValue]="e">{{ e.nombre }}</option>
-                    }
-                  </select>
-                  @if ((submitted || control('estadoEntrada')?.touched) && control('estadoEntrada')?.invalid) {
-                  <div class="text-danger small mt-1">
-                    {{ 'ADMIN.ENTRIES.VALIDATION.STATUS_REQUIRED' | translate }}
-                  </div>
-                  }
-                </div>
+                    <div class="mb-3">
+                      <label class="form-label small fw-semibold">
+                        {{ 'COMMON.STATUS' | translate }}
+                      </label>
+                      <select
+                        cSelect
+                        formControlName="estadoEntrada"
+                        [ngClass]="{
+                          'is-invalid':
+                            (submitted || control('estadoEntrada')?.touched) &&
+                            control('estadoEntrada')?.invalid,
+                          'is-valid':
+                            control('estadoEntrada')?.valid &&
+                            (submitted || control('estadoEntrada')?.touched),
+                        }"
+                      >
+                        <option [ngValue]="null" disabled>
+                          {{ 'AUTO.SELECCIONAR' | translate }}
+                        </option>
+                        @for (e of estadosEntr; track e.idEstadoEntrada) {
+                          <option [ngValue]="e">{{ e.nombre }}</option>
+                        }
+                      </select>
+                      @if (
+                        (submitted || control('estadoEntrada')?.touched) &&
+                        control('estadoEntrada')?.invalid
+                      ) {
+                        <div class="text-danger small mt-1">
+                          {{ 'ADMIN.ENTRIES.VALIDATION.STATUS_REQUIRED' | translate }}
+                        </div>
+                      }
+                    </div>
 
-                <div class="mb-3">
-                  <label class="form-label small fw-semibold">
-                    {{ 'AUTO.TIPO_DE_ENTRADA' | translate }}
-                  </label>
-                  <select
-                    cSelect
-                    formControlName="tipoEntrada"
-                    [ngClass]="{
-                      'is-invalid': (submitted || control('tipoEntrada')?.touched) && control('tipoEntrada')?.invalid,
-                      'is-valid': control('tipoEntrada')?.valid && (submitted || control('tipoEntrada')?.touched)
-                    }"
-                  >
-                    <option [ngValue]="null" disabled>
-                      {{ 'AUTO.SELECCIONAR' | translate }}
-                    </option>
-                    @for (t of tiposEntr; track t.idTipoEntrada) {
-                    <option [ngValue]="t">{{ t.nombre }}</option>
-                    }
-                  </select>
-                  @if ((submitted || control('tipoEntrada')?.touched) && control('tipoEntrada')?.invalid) {
-                  <div class="text-danger small mt-1">
-                    {{ 'ADMIN.ENTRIES.VALIDATION.TYPE_REQUIRED' | translate }}
-                  </div>
-                  }
-                </div>
+                    <div class="mb-3">
+                      <label class="form-label small fw-semibold">
+                        {{ 'AUTO.TIPO_DE_ENTRADA' | translate }}
+                      </label>
+                      <select
+                        cSelect
+                        formControlName="tipoEntrada"
+                        [ngClass]="{
+                          'is-invalid':
+                            (submitted || control('tipoEntrada')?.touched) &&
+                            control('tipoEntrada')?.invalid,
+                          'is-valid':
+                            control('tipoEntrada')?.valid &&
+                            (submitted || control('tipoEntrada')?.touched),
+                        }"
+                      >
+                        <option [ngValue]="null" disabled>
+                          {{ 'AUTO.SELECCIONAR' | translate }}
+                        </option>
+                        @for (t of tiposEntr; track t.idTipoEntrada) {
+                          <option [ngValue]="t">{{ t.nombre }}</option>
+                        }
+                      </select>
+                      @if (
+                        (submitted || control('tipoEntrada')?.touched) &&
+                        control('tipoEntrada')?.invalid
+                      ) {
+                        <div class="text-danger small mt-1">
+                          {{ 'ADMIN.ENTRIES.VALIDATION.TYPE_REQUIRED' | translate }}
+                        </div>
+                      }
+                    </div>
 
-                @if (isScheduled) {
-                <div class="mb-3">
-                  <label class="form-label small fw-semibold">
-                    {{ 'ADMIN.ENTRIES.SCHEDULED_DATE_LABEL' | translate }}
-                  </label>
-                  <input
-                    cFormControl
-                    type="datetime-local"
-                    formControlName="fechaPublicacionProgramada"
-                    [min]="minDate"
-                    [ngClass]="{
-                      'is-invalid': (submitted || control('fechaPublicacionProgramada')?.touched) && control('fechaPublicacionProgramada')?.invalid,
-                      'is-valid': control('fechaPublicacionProgramada')?.valid && (submitted || control('fechaPublicacionProgramada')?.touched)
-                    }"
-                  />
-                  @if (
-                    (submitted || control('fechaPublicacionProgramada')?.touched) &&
-                    control('fechaPublicacionProgramada')?.invalid
-                  ) {
-                  <div class="invalid-feedback">
-                    @if (
-                      control('fechaPublicacionProgramada')?.errors?.['requiredWhenScheduled']
-                    ) {
-                    {{ 'ADMIN.ENTRIES.SCHEDULED_DATE_ERROR_REQUIRED_WHEN_SCHEDULED' | translate }}
+                    @if (isScheduled) {
+                      <div class="mb-3">
+                        <label class="form-label small fw-semibold">
+                          {{ 'ADMIN.ENTRIES.SCHEDULED_DATE_LABEL' | translate }}
+                        </label>
+                        <input
+                          cFormControl
+                          type="datetime-local"
+                          formControlName="fechaPublicacionProgramada"
+                          [min]="minDate"
+                          [ngClass]="{
+                            'is-invalid':
+                              (submitted || control('fechaPublicacionProgramada')?.touched) &&
+                              control('fechaPublicacionProgramada')?.invalid,
+                            'is-valid':
+                              control('fechaPublicacionProgramada')?.valid &&
+                              (submitted || control('fechaPublicacionProgramada')?.touched),
+                          }"
+                        />
+                        @if (
+                          (submitted || control('fechaPublicacionProgramada')?.touched) &&
+                          control('fechaPublicacionProgramada')?.invalid
+                        ) {
+                          <div class="invalid-feedback">
+                            @if (
+                              control('fechaPublicacionProgramada')?.errors?.[
+                                'requiredWhenScheduled'
+                              ]
+                            ) {
+                              {{
+                                'ADMIN.ENTRIES.SCHEDULED_DATE_ERROR_REQUIRED_WHEN_SCHEDULED'
+                                  | translate
+                              }}
+                            }
+                            @if (control('fechaPublicacionProgramada')?.errors?.['minDate']) {
+                              {{ 'ADMIN.ENTRIES.SCHEDULED_DATE_ERROR_PAST' | translate }}
+                            }
+                            @if (control('fechaPublicacionProgramada')?.errors?.['minMargin']) {
+                              {{ 'ADMIN.ENTRIES.SCHEDULED_DATE_ERROR_MARGIN' | translate }}
+                            }
+                          </div>
+                        }
+                        <div class="form-text text-muted small">
+                          {{ 'ADMIN.ENTRIES.SCHEDULED_DATE_HELP' | translate }}
+                        </div>
+                      </div>
                     }
-                    @if (control('fechaPublicacionProgramada')?.errors?.['minDate']) {
-                    {{ 'ADMIN.ENTRIES.SCHEDULED_DATE_ERROR_PAST' | translate }}
-                    }
-                    @if (control('fechaPublicacionProgramada')?.errors?.['minMargin']) {
-                    {{ 'ADMIN.ENTRIES.SCHEDULED_DATE_ERROR_MARGIN' | translate }}
-                    }
-                  </div>
-                  }
-                  <div class="form-text text-muted small">
-                    {{ 'ADMIN.ENTRIES.SCHEDULED_DATE_HELP' | translate }}
-                  </div>
-                </div>
-                }
                   </c-card-body>
                 </c-card>
               </c-col>
@@ -395,35 +449,42 @@
                   </c-card-header>
                   <c-card-body class="p-3" style="max-height: 300px; overflow-y: auto">
                     @if (categorias.length > 0) {
-                    <div class="mb-2 pb-2 border-bottom">
-                      <c-form-check>
-                        <input cFormCheckInput type="checkbox" id="all-cats"
-                          [checked]="estanTodasCategoriasSeleccionadas()"
-                          [indeterminate]="estanAlgunasCategoriasSeleccionadas()"
-                          (change)="toggleTodasCategorias($event)" [disabled]="!form.enabled">
-                        <label cFormCheckLabel for="all-cats" class="fw-semibold small">{{ 'AUTO.SELECCIONAR_TODAS' | translate }}</label>
-                      </c-form-check>
-                    </div>
-                    <div class="d-flex flex-column gap-2">
-                      @for (c of categorias; track c.idCategoria) {
-                      <c-form-check>
-                        <input
-                          cFormCheckInput
-                          type="checkbox"
-                          [id]="'cat-' + c.idCategoria"
-                          [checked]="hasCategoria(c)"
-                          (change)="onCategoriaToggle(c, $any($event.target).checked)"
-                        />
-                        <label cFormCheckLabel [for]="'cat-' + c.idCategoria" class="small">
-                          {{ c.nombre }}
-                        </label>
-                      </c-form-check>
-                      }
-                    </div>
+                      <div class="mb-2 pb-2 border-bottom">
+                        <c-form-check>
+                          <input
+                            cFormCheckInput
+                            type="checkbox"
+                            id="all-cats"
+                            [checked]="estanTodasCategoriasSeleccionadas()"
+                            [indeterminate]="estanAlgunasCategoriasSeleccionadas()"
+                            (change)="toggleTodasCategorias($event)"
+                            [disabled]="!form.enabled"
+                          />
+                          <label cFormCheckLabel for="all-cats" class="fw-semibold small">{{
+                            'AUTO.SELECCIONAR_TODAS' | translate
+                          }}</label>
+                        </c-form-check>
+                      </div>
+                      <div class="d-flex flex-column gap-2">
+                        @for (c of categorias; track c.idCategoria) {
+                          <c-form-check>
+                            <input
+                              cFormCheckInput
+                              type="checkbox"
+                              [id]="'cat-' + c.idCategoria"
+                              [checked]="hasCategoria(c)"
+                              (change)="onCategoriaToggle(c, $any($event.target).checked)"
+                            />
+                            <label cFormCheckLabel [for]="'cat-' + c.idCategoria" class="small">
+                              {{ c.nombre }}
+                            </label>
+                          </c-form-check>
+                        }
+                      </div>
                     } @else {
-                    <div class="text-center text-muted small">
-                      {{ 'AUTO.NO_HAY_CATEGOR_AS_DISPONIBLES' | translate }}
-                    </div>
+                      <div class="text-center text-muted small">
+                        {{ 'AUTO.NO_HAY_CATEGOR_AS_DISPONIBLES' | translate }}
+                      </div>
                     }
                   </c-card-body>
                 </c-card>
@@ -536,9 +597,7 @@
                           cFormControl
                           type="password"
                           formControlName="password"
-                          [placeholder]="
-                            'ADMIN.ENTRIES.PASSWORD_PLACEHOLDER' | translate
-                          "
+                          [placeholder]="'ADMIN.ENTRIES.PASSWORD_PLACEHOLDER' | translate"
                         />
                       </div>
                       <small class="text-muted mt-1 d-block" style="font-size: 0.75rem">
@@ -567,7 +626,12 @@
     </c-card-body>
   </c-card>
   <!-- Image Selector Modal -->
-  <c-modal [visible]="modalSeleccionVisible" (visibleChange)="modalSeleccionVisible = $event" size="xl" backdrop="static">
+  <c-modal
+    [visible]="modalSeleccionVisible"
+    (visibleChange)="modalSeleccionVisible = $event"
+    size="xl"
+    backdrop="static"
+  >
     <c-modal-header class="bg-primary text-white">
       <h5 cModalTitle class="fw-bold">{{ 'AUTO.BIBLIOTECA_MULTIMEDIA' | translate }}</h5>
       <button cButtonClose white (click)="cerrarSelectorImagen()"></button>
@@ -580,8 +644,13 @@
 
 <!-- Back to Top Button -->
 @if (showBackToTop) {
-<button cButton color="primary" class="back-to-top text-white" (click)="scrollToTop()"
-  [cTooltip]="'ADMIN.ENTRIES.BACK_TO_TOP' | translate">
-  <svg cIcon name="cilArrowTop" size="lg"></svg>
-</button>
+  <button
+    cButton
+    color="primary"
+    class="back-to-top text-white"
+    (click)="scrollToTop()"
+    [cTooltip]="'ADMIN.ENTRIES.BACK_TO_TOP' | translate"
+  >
+    <svg cIcon name="cilArrowTop" size="lg"></svg>
+  </button>
 }

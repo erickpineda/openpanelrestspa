@@ -8,8 +8,10 @@
   border-right: 0;
 }
 
-input[cFormControl], textarea[cFormControl] {
-  &:disabled, &[readonly] {
+input[cFormControl],
+textarea[cFormControl] {
+  &:disabled,
+  &[readonly] {
     background-color: #f8f9fa;
     opacity: 1;
   }

@@ -234,7 +234,7 @@ export class TokenStorageService {
    */
   public getUserRole(): UserRole {
     const user = this.getUser();
-    
+
     // Si no hay usuario, retornamos ANONYMOUS o LECTOR según política (aquí LECTOR por defecto seguro)
     if (!user) {
       return UserRole.LECTOR;
@@ -243,7 +243,7 @@ export class TokenStorageService {
     if (user.roles && Array.isArray(user.roles)) {
       // Mapeo dinámico de roles de Spring Security (ROLE_KEY) a UserRole (KEY)
       const userRoleKeys = Object.keys(UserRole) as Array<keyof typeof UserRole>;
-      
+
       for (const key of userRoleKeys) {
         if (user.roles.includes(`ROLE_${key}`)) {
           return UserRole[key];

@@ -5,66 +5,100 @@
         <c-card class="p-4">
           <c-card-body>
             @if (!isLoggedIn) {
-            <form cForm name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
-              <h1>{{ 'HEADER.LOGIN' | translate }}</h1>
-              <p class="text-medium-emphasis">{{ 'PUBLIC.LOGIN.SIGN_IN_MESSAGE' | translate }}</p>
-              <c-input-group class="mb-3">
-                <span cInputGroupText>
-                  <svg [cIcon]="icons.cilUser" name="cilUser"></svg>
-                </span>
-                <input id="username" autoComplete="username" cFormControl
-                  [placeholder]="'PUBLIC.LOGIN.USERNAME_PLACEHOLDER' | translate" name="username"
-                  [(ngModel)]="form.username" required #username="ngModel" />
-              </c-input-group>
-              @if (username.errors && f.submitted) {
-              <c-alert color="danger" fade>{{ 'PUBLIC.LOGIN.USERNAME_REQUIRED' | translate }}</c-alert>
-              }
-              <c-input-group class="mb-4">
-                <span cInputGroupText>
-                  <svg [cIcon]="icons.cilLockLocked"></svg>
-                </span>
-                <input id="password" autoComplete="current-password" cFormControl
-                  [placeholder]="'PUBLIC.LOGIN.PASSWORD_PLACEHOLDER' | translate" type="password" name="password"
-                  [(ngModel)]="form.password" required minlength="6" #password="ngModel" />
-              </c-input-group>
-              @if (password.errors && f.submitted) {
-              <c-alert color="danger" fade>
-                @if (password.errors['required']) {
-                <span>{{ 'PUBLIC.LOGIN.PASSWORD_REQUIRED' | translate }}</span>
+              <form
+                cForm
+                name="form"
+                (ngSubmit)="f.form.valid && onSubmit()"
+                #f="ngForm"
+                novalidate
+              >
+                <h1>{{ 'HEADER.LOGIN' | translate }}</h1>
+                <p class="text-medium-emphasis">{{ 'PUBLIC.LOGIN.SIGN_IN_MESSAGE' | translate }}</p>
+                <c-input-group class="mb-3">
+                  <span cInputGroupText>
+                    <svg [cIcon]="icons.cilUser" name="cilUser"></svg>
+                  </span>
+                  <input
+                    id="username"
+                    autoComplete="username"
+                    cFormControl
+                    [placeholder]="'PUBLIC.LOGIN.USERNAME_PLACEHOLDER' | translate"
+                    name="username"
+                    [(ngModel)]="form.username"
+                    required
+                    #username="ngModel"
+                  />
+                </c-input-group>
+                @if (username.errors && f.submitted) {
+                  <c-alert color="danger" fade>{{
+                    'PUBLIC.LOGIN.USERNAME_REQUIRED' | translate
+                  }}</c-alert>
                 }
-                @if (password.errors['minlength']) {
-                <span>{{ 'PUBLIC.LOGIN.PASSWORD_MIN_LENGTH' | translate }}</span>
+                <c-input-group class="mb-4">
+                  <span cInputGroupText>
+                    <svg [cIcon]="icons.cilLockLocked"></svg>
+                  </span>
+                  <input
+                    id="password"
+                    autoComplete="current-password"
+                    cFormControl
+                    [placeholder]="'PUBLIC.LOGIN.PASSWORD_PLACEHOLDER' | translate"
+                    type="password"
+                    name="password"
+                    [(ngModel)]="form.password"
+                    required
+                    minlength="6"
+                    #password="ngModel"
+                  />
+                </c-input-group>
+                @if (password.errors && f.submitted) {
+                  <c-alert color="danger" fade>
+                    @if (password.errors['required']) {
+                      <span>{{ 'PUBLIC.LOGIN.PASSWORD_REQUIRED' | translate }}</span>
+                    }
+                    @if (password.errors['minlength']) {
+                      <span>{{ 'PUBLIC.LOGIN.PASSWORD_MIN_LENGTH' | translate }}</span>
+                    }
+                  </c-alert>
                 }
-              </c-alert>
-              }
-              <c-row>
-                <c-col xs="6">
-                  @if (!isLoading) {
-                  <button class="btn btn-primary" type="submit">{{ 'HEADER.LOGIN' | translate }}</button>
+                <c-row>
+                  <c-col xs="6">
+                    @if (!isLoading) {
+                      <button class="btn btn-primary" type="submit">
+                        {{ 'HEADER.LOGIN' | translate }}
+                      </button>
+                    }
+                    @if (isLoading) {
+                      <button class="btn btn-primary" type="button" disabled>
+                        {{ 'PUBLIC.LOGIN.SIGNING_IN' | translate }}
+                        <span
+                          class="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                      </button>
+                    }
+                  </c-col>
+                  <c-col class="text-right" xs="6">
+                    <button cButton class="px-0" color="link" type="button">
+                      {{ 'PUBLIC.LOGIN.FORGOT_PASSWORD' | translate }}
+                    </button>
+                  </c-col>
+                </c-row>
+                <c-row>
+                  @if (isLoginFailed) {
+                    <c-alert color="danger" fade
+                      >{{ 'COMMON.ERROR' | translate }}: {{ errorMessage }}</c-alert
+                    >
                   }
-                  @if (isLoading) {
-                  <button class="btn btn-primary" type="button" disabled>
-                    {{ 'PUBLIC.LOGIN.SIGNING_IN' | translate }}
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  </button>
-                  }
-                </c-col>
-                <c-col class="text-right" xs="6">
-                  <button cButton class="px-0" color="link" type="button">
-                    {{ 'PUBLIC.LOGIN.FORGOT_PASSWORD' | translate }}
-                  </button>
-                </c-col>
-              </c-row>
-              <c-row>
-                @if (isLoginFailed) {
-                <c-alert color="danger" fade>{{ 'COMMON.ERROR' | translate }}: {{ errorMessage }}</c-alert>
-                }
-              </c-row>
-            </form>
+                </c-row>
+              </form>
             }
             <c-row>
               @if (isLoggedIn) {
-              <c-alert color="success">{{ 'PUBLIC.LOGIN.USER_ROLE_INFO' | translate }} {{ roles }}.</c-alert>
+                <c-alert color="success"
+                  >{{ 'PUBLIC.LOGIN.USER_ROLE_INFO' | translate }} {{ roles }}.</c-alert
+                >
               }
             </c-row>
           </c-card-body>

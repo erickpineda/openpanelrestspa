@@ -45,10 +45,10 @@
     data-testid="admin-root"
   >
     @if (showGlobalRecoveryNotification) {
-      <div class="px-3 pt-3">
+      <div class="px-3 pt-2">
         <app-data-recovery-notification
           [title]="'ADMIN.RECOVERY.GLOBAL_TITLE' | translate"
-          [message]="('ADMIN.RECOVERY.GLOBAL_MESSAGE' | translate : { count: temporaryEntriesCount })"
+          [message]="'ADMIN.RECOVERY.GLOBAL_MESSAGE' | translate: { count: temporaryEntriesCount }"
           [recoverText]="'ADMIN.RECOVERY.GO_TO_LIST' | translate"
           [ignoreText]="'ADMIN.RECOVERY.IGNORE_ALL' | translate"
           [discardText]="'ADMIN.RECOVERY.DISCARD_ALL' | translate"

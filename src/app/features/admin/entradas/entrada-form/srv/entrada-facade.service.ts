@@ -18,16 +18,28 @@ export class EntradaFacadeService {
     private catSrv: CategoriaService,
     private entradaSrv: EntradaService,
     private usuarioService: UsuarioService,
-    private etiquetaSrv: EtiquetaService,
+    private etiquetaSrv: EtiquetaService
   ) {}
-  loadInitData(): Promise<{ tipos: TipoEntrada[]; estados: EstadoEntrada[]; categorias: Categoria[]; etiquetas: any[] }> {
+  loadInitData(): Promise<{
+    tipos: TipoEntrada[];
+    estados: EstadoEntrada[];
+    categorias: Categoria[];
+    etiquetas: any[];
+  }> {
     return firstValueFrom(
       forkJoin({
         tipos: this.entradaSrv.listarTiposEntradasSafe(),
         estados: this.entradaSrv.listarEstadosEntradasSafe(),
         categorias: this.catSrv.listarSafe(0, 50),
         etiquetas: this.etiquetaSrv.listarSafe(0, 50),
-      }).pipe(map(({ tipos, estados, categorias, etiquetas }) => ({ tipos, estados, categorias, etiquetas })))
+      }).pipe(
+        map(({ tipos, estados, categorias, etiquetas }) => ({
+          tipos,
+          estados,
+          categorias,
+          etiquetas,
+        }))
+      )
     );
   }
 

@@ -9,6 +9,7 @@ import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
 import { TemporaryStorageService } from '../../core/services/ui/temporary-storage.service';
 import { LoggerService } from '../services/logger.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
+import { OPSessionConstants } from '../../shared/constants/op-session.constants';
 
 @Component({
   selector: 'app-unsaved-work-modal',
@@ -37,22 +38,38 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
       this.sessionManager.sessionExpired$.subscribe((data) => {
         this.log.info('📡 UnsavedWorkModalComponent: Evento recibido:', data);
 
-        const isLogoutWithSave = data.type === 'LOGOUT' && data.allowSave === true;
-        this.log.info('🔍 Es logout con allowSave:', isLogoutWithSave);
+        const isLogoutWithSave = data.type === OPSessionConstants.TYPE_LOGOUT && data.allowSave === true;
+        this.log.info(`🔍 Análisis de evento: type=${data.type}, allowSave=${data.allowSave}, isLogoutWithSave=${isLogoutWithSave}, origin=${data.origin}`);
+
+        if (isLogoutWithSave && data.origin === 'remote') {
+          this.log.info('UnsavedWorkModal: Ignorando logout remoto (lo maneja SessionExpiredComponent)');
+          return;
+        }
 
         if (isLogoutWithSave) {
           // Validation: Check if there is ACTUAL unsaved work before showing the modal
-          if (this.unsavedWorkService.hasUnsavedWork()) {
-            this.log.info('✅ Mostrando modal porque es LOGOUT con allowSave y hay trabajo sin guardar');
+          const hasUnsavedWork = this.unsavedWorkService.hasUnsavedWork();
+          this.log.info(`🔍 Estado de trabajo sin guardar: ${hasUnsavedWork}`);
+          
+          if (hasUnsavedWork) {
+            this.log.info(
+              '✅ Mostrando modal porque es LOGOUT con allowSave y hay trabajo sin guardar'
+            );
             this.sessionData = data;
             this.showModal();
           } else {
-            this.log.info('⚠️ LOGOUT con allowSave pero sin trabajo real detectado. Procediendo a logout...');
+            this.log.info(
+              '⚠️ LOGOUT con allowSave pero sin trabajo real detectado. Procediendo a logout...'
+            );
             this.sessionManager.performLogout(data);
           }
-        } else {
-          this.log.info('❌ No se muestra modal, redirigiendo...');
+        } else if (data.type !== OPSessionConstants.TYPE_SESSION_EXPIRED) {
+          // Si NO es SESSION_EXPIRED, procedemos al logout inmediato.
+          // Si ES SESSION_EXPIRED, no hacemos nada aquí, dejamos que SessionExpiredComponent muestre su modal.
+          this.log.info('❌ No se muestra modal de trabajo no guardado, redirigiendo... (Evento no es SESSION_EXPIRED o no permite guardar)');
           this.sessionManager.performLogout(data);
+        } else {
+          this.log.info('ℹ️ Evento SESSION_EXPIRED recibido, UnsavedWorkModal lo ignora deliberadamente (delegado a SessionExpiredComponent)');
         }
       })
     );

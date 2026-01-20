@@ -7,7 +7,11 @@ import { CrearPaginaComponent } from './crear/crear-pagina.component';
 const routes: Routes = [
   { path: '', component: ListadoPaginasComponent },
   { path: 'crear', component: CrearPaginaComponent, data: { title: 'MENU.CREATE_PAGE' } },
-  { path: 'editar/:idEntrada', component: EditarPaginaComponent, data: { title: 'MENU.EDIT_PAGE' } },
+  {
+    path: 'editar/:idEntrada',
+    component: EditarPaginaComponent,
+    data: { title: 'MENU.EDIT_PAGE' },
+  },
 ];
 
 @NgModule({

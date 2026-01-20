@@ -26,13 +26,16 @@
           <c-col lg="6">
             <c-card class="mb-3">
               <c-card-body>
-                <h5 class="card-title">{{ entry.title || ('ADMIN.TEMP_ENTRIES.NO_TITLE' | translate) }}</h5>
+                <h5 class="card-title">
+                  {{ entry.title || ('ADMIN.TEMP_ENTRIES.NO_TITLE' | translate) }}
+                </h5>
                 <p class="card-text text-muted small">
                   {{ entry.description || ('ADMIN.TEMP_ENTRIES.NO_SUMMARY' | translate) }}
                 </p>
                 <p class="card-text">
                   <small class="text-muted">
-                    {{ 'ADMIN.TEMP_ENTRIES.SAVED_AT' | translate }} {{ entry.timestamp | date: 'medium' }}
+                    {{ 'ADMIN.TEMP_ENTRIES.SAVED_AT' | translate }}
+                    {{ entry.timestamp | date: 'medium' }}
                   </small>
                 </p>
                 <div class="btn-group">
@@ -70,7 +73,9 @@
   (visibleChange)="viewModalVisible = $event"
 >
   <c-modal-header>
-    <h5 cModalTitle>{{ 'ADMIN.TEMP_ENTRIES.PREVIEW_TITLE' | translate }}: {{ selectedEntry?.title }}</h5>
+    <h5 cModalTitle>
+      {{ 'ADMIN.TEMP_ENTRIES.PREVIEW_TITLE' | translate }}: {{ selectedEntry?.title }}
+    </h5>
   </c-modal-header>
   <c-modal-body>
     @if (selectedEntry) {
@@ -87,17 +92,25 @@
           <strong>{{ 'ADMIN.TEMP_ENTRIES.SUMMARY_FIELD' | translate }}</strong>
           {{ selectedEntry.formData.resumen || ('ADMIN.TEMP_ENTRIES.NO_SUMMARY' | translate) }}
         </p>
-        <p><strong>{{ 'ADMIN.TEMP_ENTRIES.CONTENT_FIELD' | translate }}</strong></p>
+        <p>
+          <strong>{{ 'ADMIN.TEMP_ENTRIES.CONTENT_FIELD' | translate }}</strong>
+        </p>
         <div
           class="border p-2 bg-light"
-          [innerHTML]="selectedEntry.formData.contenido || ('ADMIN.TEMP_ENTRIES.NO_CONTENT' | translate)"
+          [innerHTML]="
+            selectedEntry.formData.contenido || ('ADMIN.TEMP_ENTRIES.NO_CONTENT' | translate)
+          "
         ></div>
       </div>
     }
   </c-modal-body>
   <c-modal-footer>
-    <button cButton color="secondary" (click)="viewModalVisible = false">{{ 'AUTO.CERRAR' | translate }}</button>
-    <button cButton color="primary" (click)="recoverSelectedEntry()">{{ 'ADMIN.TEMP_ENTRIES.RECOVER' | translate }}</button>
+    <button cButton color="secondary" (click)="viewModalVisible = false">
+      {{ 'AUTO.CERRAR' | translate }}
+    </button>
+    <button cButton color="primary" (click)="recoverSelectedEntry()">
+      {{ 'ADMIN.TEMP_ENTRIES.RECOVER' | translate }}
+    </button>
   </c-modal-footer>
 </c-modal>
 

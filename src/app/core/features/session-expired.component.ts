@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, NavigationStart } from '@angular/router';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import {
@@ -10,6 +10,7 @@ import { TokenStorageService } from '../services/auth/token-storage.service';
 import { RouteTrackerService } from '../../core/services/auth/route-tracker.service';
 import { PostLoginRedirectService } from '../services/auth/post-login-redirect.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
+import { OPSessionConstants } from '../../shared/constants/op-session.constants';
 import { LoggerService } from '../services/logger.service';
 
 @Component({
@@ -23,6 +24,8 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
   isVisible = false;
   sessionData: SessionExpirationData | null = null;
+  timeSinceExpiry: string = '';
+  private timerInterval: any;
 
   constructor(
     private router: Router,
@@ -30,12 +33,15 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
     private tokenStorage: TokenStorageService,
     private routeTracker: RouteTrackerService,
     private postLoginRedirect: PostLoginRedirectService,
-    private log: LoggerService
+    private log: LoggerService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.log.info('SessionExpiredComponent: Inicializando...');
     // Si estamos en login, no hacemos nada
     if (this.router.url.includes('/login')) {
+      this.log.info('SessionExpiredComponent: En login, no se activa');
       return;
     }
 
@@ -48,6 +54,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
     // Si ya hay sessionData al montar, mostramos el modal
     if (this.sessionData) {
+      this.log.info('SessionExpiredComponent: Datos encontrados al iniciar', this.sessionData);
       this.showModal();
     }
 
@@ -56,20 +63,37 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
       this.sessionManager.sessionExpired$.subscribe((data: SessionExpirationData) => {
         this.log.info('SessionExpiredComponent: Evento recibido', data);
 
-        // Si es un logout voluntario con opción de guardado, dejamos que UnsavedWorkModal lo maneje
-        if (data.type === 'LOGOUT' && data.allowSave) {
-          this.log.info('SessionExpiredComponent: Ignorando evento (lo maneja UnsavedWorkModal)');
+        // Verificación crítica: Si es cierre manual LOCAL, nunca mostrar modal.
+        if (data.isManual && data.origin === 'local') {
+          this.log.info('SessionExpiredComponent: Ignorando logout manual local explícito');
           return;
         }
 
+        // Si es un logout voluntario local con opción de guardado, dejamos que UnsavedWorkModal lo maneje
+        if (data.type === OPSessionConstants.TYPE_LOGOUT && data.allowSave) {
+          if (data.origin === 'local') {
+            this.log.info(
+              'SessionExpiredComponent: Ignorando logout local (lo maneja UnsavedWorkModal)'
+            );
+            return;
+          }
+          // Si es remoto, continuamos para mostrar el modal de "Sesión finalizada"
+        }
+
         if (this.router.url.includes('/login')) {
+          this.log.info('SessionExpiredComponent: Ignorando evento por estar en /login');
           return;
         }
 
         // Si la sesión expiró, intentamos guardar trabajo pendiente automáticamente
-        if (data.type === 'SESSION_EXPIRED') {
+        if (data.type === OPSessionConstants.TYPE_SESSION_EXPIRED) {
+          this.log.info('SessionExpiredComponent: Intentando auto-guardado por sesión expirada');
           const saveEvent = new CustomEvent(OPConstants.Events.SAVE_UNSAVED_WORK);
           window.dispatchEvent(saveEvent);
+          
+          this.startTimer(data.timestamp);
+        } else {
+          this.stopTimer();
         }
 
         // Guarda datos y muestra modal
@@ -78,13 +102,45 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
       })
     );
 
-    // Escuchar cambios de ruta para cerrar el modal si vamos al login
+    // Escuchar restauración de sesión (login en otra pestaña)
     this.subs.add(
-      this.router.events.pipe(
-        filter((event: any) => event instanceof NavigationStart)
-      ).subscribe((event: any) => {
-        if (event.url.includes('/login')) {
-          this.hideModal();
+      this.sessionManager.sessionRestored$.subscribe(() => {
+        this.log.info('SessionExpiredComponent: Sesión restaurada, cerrando modal');
+        this.hideModal();
+        // Opcional: recargar o navegar a home si estamos atrapados en el modal
+        // Pero hideModal ya hace isVisible = false.
+        // Si estábamos en una ruta protegida, el guard/interceptor funcionarán ahora.
+      })
+    );
+
+    // Escuchar cambios de ruta
+    this.subs.add(
+      this.router.events.subscribe((event) => {
+        if (event instanceof NavigationStart) {
+          // Si vamos al login, ocultamos el modal...
+          if (event.url.includes('/login')) {
+            // ...PERO si la navegación lleva sessionData (por redirección de AuthGuard),
+            // no lo ocultamos, o lo dejamos para que NavigationEnd lo maneje.
+            const nav = this.router.getCurrentNavigation();
+            const hasSessionData = nav?.extras?.state?.['sessionData'];
+            
+            if (!hasSessionData) {
+               this.hideModal();
+            }
+          }
+        }
+
+        if (event instanceof NavigationEnd) {
+           // Al terminar la navegación, verificamos si hay sessionData en el state
+           // Esto es crucial si AuthGuard nos redirigió al login con state
+           const nav = this.router.getCurrentNavigation();
+           const state = nav?.extras?.state || window.history.state;
+           
+           if (state?.sessionData) {
+             this.log.info('SessionExpiredComponent: sessionData detectado en NavigationEnd', state.sessionData);
+             this.sessionData = state.sessionData;
+             this.showModal();
+           }
         }
       })
     );
@@ -92,10 +148,50 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+    this.stopTimer();
+  }
+
+  private startTimer(timestamp: number) {
+    this.stopTimer();
+    this.updateTime(timestamp);
+    this.timerInterval = setInterval(() => this.updateTime(timestamp), 1000);
+  }
+
+  private stopTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+    this.timeSinceExpiry = '';
+  }
+
+  private updateTime(timestamp: number) {
+    const now = Date.now();
+    const diff = Math.max(0, Math.floor((now - timestamp) / 1000));
+    
+    // Format: "Hace X minutos y Y segundos" or just "Hace X segundos"
+    const minutes = Math.floor(diff / 60);
+    const seconds = diff % 60;
+    
+    if (minutes > 0) {
+      this.timeSinceExpiry = `Hace ${minutes} min y ${seconds} seg`;
+    } else {
+      this.timeSinceExpiry = `Hace ${seconds} seg`;
+    }
+    // Force detection manually if needed, but Angular usually picks up timer changes if in zone.
+    // However, since we use OnPush sometimes or detached, let's be safe if we were Detached.
+    // But this component is default strategy.
+    this.cdr.detectChanges(); 
   }
 
   private showModal(): void {
-    this.isVisible = true;
+    this.log.info('SessionExpiredComponent: showModal() llamado. Mostrando modal.');
+    // Usamos setTimeout para asegurar que el cambio de visibilidad ocurra en el siguiente ciclo
+    // y evitar problemas con actualizaciones de vista síncronas o conflictos con otros modales.
+    setTimeout(() => {
+      this.isVisible = true;
+      this.cdr.detectChanges(); // Forzar detección de cambios
+    }, 0);
   }
 
   private hideModal(): void {
@@ -105,6 +201,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
   // Si el usuario, por alguna razón, intenta cerrar el modal (visibleChange), lo evitamos/rehabilitamos
   onVisibleChange(visible: boolean): void {
+    this.log.info('SessionExpiredComponent: onVisibleChange', visible);
     // Si estamos en login, permitimos que se cierre
     if (this.router.url.includes('/login')) {
       this.isVisible = false;
@@ -113,8 +210,12 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
     // Si se intentó cerrar y aún tenemos sessionData, reabrimos inmediatamente (evita cierre accidental).
     if (!visible && this.sessionData) {
+      this.log.info('SessionExpiredComponent: Intento de cierre prevenido (sessionData presente)');
       // Reestablece visible con micro-tick para no pelear con el control interno
-      setTimeout(() => (this.isVisible = true), 0);
+      setTimeout(() => {
+        this.isVisible = true;
+        this.cdr.detectChanges();
+      }, 0);
       return;
     }
     this.isVisible = visible;
@@ -131,8 +232,12 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
       const backdrops = document.querySelectorAll('.modal-backdrop');
-      backdrops.forEach((backdrop) => backdrop.remove());
-      
+      backdrops.forEach((backdrop) => {
+        if (backdrop && backdrop.parentNode) {
+          backdrop.parentNode.removeChild(backdrop);
+        }
+      });
+
       // 3. Navegar después de la limpieza
       this.saveRedirectUrl();
       this.router.navigate(['/login'], { replaceUrl: true });
@@ -157,15 +262,19 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
   goToHome(): void {
     this.isVisible = false;
     this.sessionData = null;
-    
-    setTimeout(() => {
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
-        const backdrops = document.querySelectorAll('.modal-backdrop');
-        backdrops.forEach((backdrop) => backdrop.remove());
 
-        this.router.navigate(['/'], { replaceUrl: true });
+    setTimeout(() => {
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach((backdrop) => {
+        if (backdrop && backdrop.parentNode) {
+          backdrop.parentNode.removeChild(backdrop);
+        }
+      });
+
+      this.router.navigate(['/'], { replaceUrl: true });
     }, 300);
   }
 }

@@ -9,7 +9,9 @@
         [class.is-valid]="form.get('nombre')?.touched && form.get('nombre')?.valid"
         [class.is-invalid]="form.get('nombre')?.touched && form.get('nombre')?.invalid"
       />
-      <c-form-feedback [valid]="false">{{ 'AUTO.EL_NOMBRE_ES_REQUERIDO' | translate }}</c-form-feedback>
+      <c-form-feedback [valid]="false">{{
+        'AUTO.EL_NOMBRE_ES_REQUERIDO' | translate
+      }}</c-form-feedback>
     </c-col>
     <c-col md="6" class="mb-3">
       <label cLabel for="apellido">{{ 'AUTO.APELLIDO' | translate }}</label>
@@ -20,7 +22,9 @@
         [class.is-valid]="form.get('apellido')?.touched && form.get('apellido')?.valid"
         [class.is-invalid]="form.get('apellido')?.touched && form.get('apellido')?.invalid"
       />
-      <c-form-feedback [valid]="false">{{ 'AUTO.EL_APELLIDO_ES_REQUERIDO' | translate }}</c-form-feedback>
+      <c-form-feedback [valid]="false">{{
+        'AUTO.EL_APELLIDO_ES_REQUERIDO' | translate
+      }}</c-form-feedback>
     </c-col>
   </c-row>
 
@@ -46,7 +50,9 @@
         [class.is-valid]="form.get('telefono')?.touched && form.get('telefono')?.valid"
         [class.is-invalid]="form.get('telefono')?.touched && form.get('telefono')?.invalid"
       />
-      <c-form-feedback [valid]="false">{{ 'AUTO.SOLO_N_MEROS_PERMITIDOS' | translate }}</c-form-feedback>
+      <c-form-feedback [valid]="false">{{
+        'AUTO.SOLO_N_MEROS_PERMITIDOS' | translate
+      }}</c-form-feedback>
     </c-col>
   </c-row>
 

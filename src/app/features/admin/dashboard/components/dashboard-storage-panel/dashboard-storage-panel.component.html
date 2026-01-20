@@ -1,6 +1,15 @@
 <div class="d-flex flex-column">
   <div class="d-flex justify-content-end mb-3">
-    <button cButton color="secondary" variant="ghost" size="sm" (click)="downloadCsv.emit()" [title]="'ADMIN.DASHBOARD.STORAGE.DOWNLOAD_CSV' | translate" [attr.aria-label]="'ADMIN.DASHBOARD.STORAGE.DOWNLOAD_CSV' | translate" data-testid="btn-csv-storage">
+    <button
+      cButton
+      color="secondary"
+      variant="ghost"
+      size="sm"
+      (click)="downloadCsv.emit()"
+      [title]="'ADMIN.DASHBOARD.STORAGE.DOWNLOAD_CSV' | translate"
+      [attr.aria-label]="'ADMIN.DASHBOARD.STORAGE.DOWNLOAD_CSV' | translate"
+      data-testid="btn-csv-storage"
+    >
       <svg cIcon name="cilCloudDownload" size="sm" class="me-1"></svg>
       {{ 'COMMON.CSV' | translate }}
     </button>
@@ -10,14 +19,20 @@
   }
   <div class="bg-light bg-opacity-50 p-3 rounded border border-dashed text-center">
     <div class="mb-2">
-      <span class="text-muted small text-uppercase fw-bold">{{ 'ADMIN.DASHBOARD.STORAGE.TOTAL_FILES' | translate }}</span>
+      <span class="text-muted small text-uppercase fw-bold">{{
+        'ADMIN.DASHBOARD.STORAGE.TOTAL_FILES' | translate
+      }}</span>
       <h3 class="text-dark fw-bold mb-0">{{ storage?.totalFiles || 0 }}</h3>
     </div>
-    <hr class="my-2 opacity-25">
+    <hr class="my-2 opacity-25" />
     <div>
-      <span class="text-muted small text-uppercase fw-bold">{{ 'ADMIN.DASHBOARD.STORAGE.DISK_USAGE' | translate }}</span>
+      <span class="text-muted small text-uppercase fw-bold">{{
+        'ADMIN.DASHBOARD.STORAGE.DISK_USAGE' | translate
+      }}</span>
       <h4 class="text-warning fw-bold mb-0">
-        {{ formatBytesFn ? formatBytesFn(storage?.storageBytes) : (storage?.storageBytes | number) }}
+        {{
+          formatBytesFn ? formatBytesFn(storage?.storageBytes) : (storage?.storageBytes | number)
+        }}
       </h4>
     </div>
   </div>

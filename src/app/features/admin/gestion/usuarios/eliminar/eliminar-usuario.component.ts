@@ -4,7 +4,7 @@ import { Usuario } from '../../../../core/models/usuario.model';
 @Component({
   selector: 'app-eliminar-usuario',
   templateUrl: './eliminar-usuario.component.html',
-  standalone: false
+  standalone: false,
 })
 export class EliminarUsuarioComponent {
   @Input() visible = false;

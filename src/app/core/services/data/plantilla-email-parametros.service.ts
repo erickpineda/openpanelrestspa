@@ -21,4 +21,3 @@ export class PlantillaEmailParametrosService extends BaseService {
     return this.get<any>(OPConstants.Methods.PLANTILLA_EMAIL.PARAMETROS.OBTENER_POR_VALOR(valor));
   }
 }
-

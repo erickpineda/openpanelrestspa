@@ -51,7 +51,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
     private log: LoggerService,
     private searchUtil: SearchUtilService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadPrivilegios();

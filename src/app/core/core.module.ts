@@ -35,14 +35,8 @@ import { TranslatePipe } from '../shared/pipes/translate.pipe';
 
 @NgModule({
   imports: [CommonModule, RouterModule, ModalModule, ButtonModule, AlertModule, TranslatePipe],
-  declarations: [
-    UnsavedWorkModalComponent,
-    SessionExpiredComponent,
-  ],
-  exports: [
-    UnsavedWorkModalComponent,
-    SessionExpiredComponent,
-  ],
+  declarations: [UnsavedWorkModalComponent, SessionExpiredComponent],
+  exports: [UnsavedWorkModalComponent, SessionExpiredComponent],
   providers: [
     // Servicios singleton
     GlobalErrorHandlerService,
@@ -51,7 +45,7 @@ import { TranslatePipe } from '../shared/pipes/translate.pipe';
     TokenStorageService,
     LoadingService,
     TemporaryStorageService,
-    SessionManagerService,
+    // SessionManagerService, // Provided in root
     UnsavedWorkService,
     SearchUtilService,
     EntradaService,

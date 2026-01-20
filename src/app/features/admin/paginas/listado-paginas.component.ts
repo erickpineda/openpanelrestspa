@@ -87,7 +87,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     private zone: NgZone,
     private translate: TranslationService,
     private datePipe: DatePipe
-  ) { }
+  ) {}
 
   // #region Lifecycle Methods
 
@@ -102,7 +102,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
   ngAfterViewInit(): void {
     try {
       this.cdr.detectChanges();
-    } catch { }
+    } catch {}
   }
 
   ngOnDestroy(): void {
@@ -265,12 +265,12 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
       }
       this.applyPaging();
     }
-    
+
     this.updatePagingInfoObject();
     this.cdr.markForCheck();
     try {
       this.cdr.detectChanges();
-    } catch { }
+    } catch {}
   }
 
   private updatePagingInfoObject(): void {
@@ -278,7 +278,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
       page: this.currentPage,
       pages: this.totalPages,
       total: this.totalElements,
-      pageSize: this.pageSize
+      pageSize: this.pageSize,
     };
   }
 
@@ -334,7 +334,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     this.cdr.markForCheck();
     try {
       this.cdr.detectChanges();
-    } catch { }
+    } catch {}
   }
 
   public onPageSizeChange(size: number): void {
@@ -446,7 +446,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     this.cdr.markForCheck();
     try {
       this.cdr.detectChanges();
-    } catch { }
+    } catch {}
   }
 
   // #endregion

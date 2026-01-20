@@ -4,7 +4,7 @@ import { EtiquetaFormComponent } from '../etiqueta-form/etiqueta-form.component'
 @Component({
   selector: 'app-crear-etiqueta',
   templateUrl: './crear-etiqueta.component.html',
-  standalone: false
+  standalone: false,
 })
 export class CrearEtiquetaComponent {
   @Input() visible = false;

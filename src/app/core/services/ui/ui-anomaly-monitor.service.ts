@@ -241,7 +241,7 @@ export class UiAnomalyMonitorService {
   forceCleanupForLogout(): void {
     this.log.info('UiAnomalyMonitor: Force cleanup for logout');
     try {
-      this.loading.forceStopLoading();
+      this.loading.forceStopLoading(true);
     } catch {}
     this.recoverFromBlockers({ removeLoaderOverlay: true });
   }
@@ -291,9 +291,7 @@ export class UiAnomalyMonitorService {
     if (!doc) return false;
 
     const candidates = Array.from(
-      doc.querySelectorAll(
-        '.modal.show, .offcanvas.show, [role="dialog"][aria-modal="true"]'
-      )
+      doc.querySelectorAll('.modal.show, .offcanvas.show, [role="dialog"][aria-modal="true"]')
     ) as HTMLElement[];
 
     // Consider open only if it is actually visible in the layout
@@ -537,7 +535,9 @@ export class UiAnomalyMonitorService {
     const toRemove = Array.from(doc.querySelectorAll(selectors)) as HTMLElement[];
     for (const el of toRemove) {
       try {
-        el.remove();
+        if (el && el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
       } catch {}
     }
 
@@ -545,7 +545,9 @@ export class UiAnomalyMonitorService {
       const toRemoveLoader = Array.from(doc.querySelectorAll(loaderSelectors)) as HTMLElement[];
       for (const el of toRemoveLoader) {
         try {
-          el.remove();
+          if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+          }
         } catch {}
       }
     }

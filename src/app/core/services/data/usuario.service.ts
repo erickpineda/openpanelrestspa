@@ -93,7 +93,13 @@ export class UsuarioService extends CrudService<Usuario, number> {
   checkUsernameAvailability(username: string): Observable<OpenpanelApiResponse<any>> {
     const body = { username };
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.post<any>(`${this.endpoint}/checkUsernameAvailability`, body, undefined, undefined, context);
+    return this.post<any>(
+      `${this.endpoint}/checkUsernameAvailability`,
+      body,
+      undefined,
+      undefined,
+      context
+    );
   }
 
   // ✅ Implementación mínima requerida

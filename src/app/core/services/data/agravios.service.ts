@@ -11,4 +11,3 @@ export class AgraviosService extends BaseService {
     return this.get<any>(OPConstants.Methods.AGRAVIOS.OBTENER_POR_PALABRA(palabra));
   }
 }
-

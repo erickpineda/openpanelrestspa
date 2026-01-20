@@ -37,4 +37,3 @@ describe('EntradaService obtenerPorSlug', () => {
     req.flush({ data: {} });
   });
 });
-

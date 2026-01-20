@@ -96,13 +96,13 @@ export class AdminComponent implements OnInit, AfterViewInit {
     }
     this.isAuthed = true;
     this.ready = true;
-    
+
     // Establecer rol del usuario para la navegación usando el servicio centralizado
     this.userRole = this.tokenStorage.getUserRole();
-    
+
     // Filtrar items según rol antes de cualquier traducción (ESTABLECER ESTRUCTURA INICIAL UNA ÚNICA VEZ)
     this.navItems = this.filterItemsByRole(navItems, this.userRole);
-    
+
     // Aplicar traducciones iniciales sobre la estructura ya creada
     this.applyTranslationsInPlace(this.navItems);
 
@@ -119,8 +119,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     });
 
     const isDashboardRoute =
-      this.router.url.includes('/admin/dashboard') ||
-      this.router.url.includes('/admin/control');
+      this.router.url.includes('/admin/dashboard') || this.router.url.includes('/admin/control');
     if (isDashboardRoute) {
       this.dashboardApi.getContentStats().subscribe((stats) => {
         this.projectsCount = Number(stats?.totalEntradas) || 0;
@@ -220,7 +219,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
       if (!item.translationKey) {
         item.translationKey = item.name;
       }
-      
+
       // 2. Traducir nombre usando la clave persistida
       if (item.translationKey) {
         item.name = this.translationService.translate(item.translationKey);
@@ -229,15 +228,15 @@ export class AdminComponent implements OnInit, AfterViewInit {
       // 3. Persistir y traducir Badge
       if (item.badge) {
         if (!item.badge.translationKey) {
-           item.badge.translationKey = item.badge.text;
+          item.badge.translationKey = item.badge.text;
         }
-        
+
         const key = item.badge.translationKey;
         // Lógica específica para badges conocidos
         if (key === 'MENU.BADGE_PENDING' || key === 'Pend') {
-           item.badge.text = this.translationService.translate('MENU.BADGE_PENDING');
+          item.badge.text = this.translationService.translate('MENU.BADGE_PENDING');
         } else {
-           item.badge.text = this.translationService.translate(key);
+          item.badge.text = this.translationService.translate(key);
         }
       }
 
@@ -251,7 +250,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   private filterItemsByRole(items: any[], role: UserRole): any[] {
     // Si es PROPIETARIO, ve todo, pero clonamos para tener nuestra propia estructura
     if (role === UserRole.PROPIETARIO) {
-      return items.map(item => {
+      return items.map((item) => {
         const copy = { ...item };
         if (copy.children) {
           copy.children = this.filterItemsByRole(copy.children, role);
@@ -261,32 +260,32 @@ export class AdminComponent implements OnInit, AfterViewInit {
     }
 
     const filtered: any[] = [];
-    
+
     items.forEach((originalItem) => {
       // 1. Check requiredRoles
       if (originalItem.requiredRoles && !originalItem.requiredRoles.includes(role)) {
         return;
       }
-      
+
       // Clonar el item para no mutar el original de la configuración global
       const item = { ...originalItem };
-      
+
       // 2. Filter children recursively
       if (item.children) {
         item.children = this.filterItemsByRole(item.children, role);
-        
+
         // Si se queda sin hijos y no es un enlace directo (es un wrapper), lo descartamos
         if (item.children.length === 0 && item.url === undefined && !item.title) {
-           return;
+          return;
         }
       }
-      
+
       filtered.push(item);
     });
-    
+
     return filtered;
   }
-/*
+  /*
   private translateItems(items: any[]): any[] {
      // MÉTODO ELIMINADO EN FAVOR DE applyTranslationsInPlace
      // ...

@@ -20,10 +20,10 @@ export class LanguageService {
     if (savedLang === 'en' || savedLang === 'es') {
       defaultLang = savedLang;
     }
-    
+
     this.currentLangSubject = new BehaviorSubject<Language>(defaultLang);
     this.currentLang$ = this.currentLangSubject.asObservable();
-    
+
     // Asegurar que esté en localStorage
     localStorage.setItem(this.LANG_KEY, defaultLang);
   }

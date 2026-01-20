@@ -4,7 +4,7 @@ import { Privilegio } from '../../../../../core/models/privilegio.model';
 @Component({
   selector: 'app-eliminar-privilegio',
   templateUrl: './eliminar-privilegio.component.html',
-  standalone: false
+  standalone: false,
 })
 export class EliminarPrivilegioComponent {
   @Input() visible = false;

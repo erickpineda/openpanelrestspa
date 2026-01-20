@@ -5,14 +5,15 @@ import { Observable } from 'rxjs';
   selector: 'app-entradas-filter',
   templateUrl: './entradas-filter.component.html',
   styleUrls: [],
-  standalone: false
+  standalone: false,
 })
 export class EntradasFilterComponent {
   @Input() basicSearchText: string = '';
   @Input() showAdvanced: boolean = false;
   @Input() definiciones: any[] = [];
   @Input() cargarCatalogosFn!: () => Observable<any>;
-  @Input() pagingInfo: { page: number; total: number; pages: number; pageSize: number } | null = null;
+  @Input() pagingInfo: { page: number; total: number; pages: number; pageSize: number } | null =
+    null;
 
   @Output() basicSearchChange = new EventEmitter<string>();
   @Output() toggleAdvanced = new EventEmitter<void>();

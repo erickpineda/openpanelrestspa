@@ -8,7 +8,11 @@ import { TemporaryEntriesManagerComponent } from '@shared/components/temporary-e
 const routes: Routes = [
   { path: '', component: ListadoEntradasComponent },
   { path: 'crear', component: CrearEntradaComponent, data: { title: 'MENU.CREATE_ENTRY' } },
-  { path: 'editar/:idEntrada', component: EditarEntradaComponent, data: { title: 'MENU.EDIT_ENTRY' } },
+  {
+    path: 'editar/:idEntrada',
+    component: EditarEntradaComponent,
+    data: { title: 'MENU.EDIT_ENTRY' },
+  },
   {
     path: 'entradas-temporales',
     component: TemporaryEntriesManagerComponent,

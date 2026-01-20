@@ -17,4 +17,3 @@ export class LiteralesService extends BaseService {
     );
   }
 }
-

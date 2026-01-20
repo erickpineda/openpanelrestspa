@@ -11,7 +11,12 @@
   {{ 'ADMIN.ENTRIES.UNREVIEWED' | translate }}
 </button>
 
-<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static">
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  size="lg"
+  backdrop="static"
+>
   <c-modal-header>
     <h5 cModalTitle>{{ 'ADMIN.ENTRIES.UNREVIEWED' | translate }}</h5>
     <button (click)="visible = false" cButtonClose></button>
@@ -65,7 +70,11 @@
               @for (entrada of entradas; track entrada.idEntrada) {
                 <tr>
                   <td>
-                    <div class="fw-semibold text-truncate" style="max-width: 250px;" [title]="entrada.titulo">
+                    <div
+                      class="fw-semibold text-truncate"
+                      style="max-width: 250px"
+                      [title]="entrada.titulo"
+                    >
                       {{ entrada.titulo }}
                     </div>
                   </td>
@@ -73,7 +82,7 @@
                     <div class="d-flex align-items-center gap-2">
                       <div
                         class="bg-light rounded-circle p-1 d-flex align-items-center justify-content-center"
-                        style="width: 32px; height: 32px;"
+                        style="width: 32px; height: 32px"
                       >
                         <svg cIcon name="cilUser" size="sm" class="text-secondary"></svg>
                       </div>

@@ -93,10 +93,14 @@
     @if (debeMostrarBotonBusqueda() || showClearButton) {
       <c-col xs="12" md="2" class="d-flex gap-1 justify-content-md-end mt-2 mt-md-0">
         @if (debeMostrarBotonBusqueda()) {
-          <button cButton color="primary" (click)="buscar()">{{ 'AUTO.BUSCAR' | translate }}</button>
+          <button cButton color="primary" (click)="buscar()">
+            {{ 'AUTO.BUSCAR' | translate }}
+          </button>
         }
         @if (showClearButton) {
-          <button cButton color="secondary" (click)="limpiar()">{{ 'AUTO.LIMPIAR' | translate }}</button>
+          <button cButton color="secondary" (click)="limpiar()">
+            {{ 'AUTO.LIMPIAR' | translate }}
+          </button>
         }
       </c-col>
     }

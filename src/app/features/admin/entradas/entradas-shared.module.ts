@@ -8,7 +8,7 @@ import { SharedCoreUiModule } from '@shared/shared-coreui.module';
 import {
   EntradasFilterComponent,
   EntradasTableComponent,
-  PreviaEntradaComponent
+  PreviaEntradaComponent,
 } from './components';
 import { EntradaFormComponent } from './entrada-form/entrada-form.component';
 import { MediaSharedModule } from '@features/admin/contenido/media-shared.module';

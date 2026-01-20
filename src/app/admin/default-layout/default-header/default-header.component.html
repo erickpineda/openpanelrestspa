@@ -32,7 +32,12 @@
     <c-header-nav class="d-none d-lg-flex" role="navigation" aria-label="Acciones rápidas">
       <!-- Selector de Idioma -->
       <c-nav-item>
-        <a cNavLink (click)="toggleLanguage()" style="cursor: pointer" [attr.aria-label]="currentLang === 'es' ? 'Cambiar a Inglés' : 'Switch to Spanish'">
+        <a
+          cNavLink
+          (click)="toggleLanguage()"
+          style="cursor: pointer"
+          [attr.aria-label]="currentLang === 'es' ? 'Cambiar a Inglés' : 'Switch to Spanish'"
+        >
           {{ currentLang === 'es' ? 'EN' : 'ES' }}
         </a>
       </c-nav-item>

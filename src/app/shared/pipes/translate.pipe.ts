@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 @Pipe({
   name: 'translate',
   pure: false, // Necesario para detectar cambios de idioma dinámicamente
-  standalone: true
+  standalone: true,
 })
 export class TranslatePipe implements PipeTransform, OnDestroy {
   private subscription: Subscription;

@@ -24,12 +24,14 @@ export class HomeComponent implements OnInit {
     private entradaService: EntradaService,
     private log: LoggerService,
     private translate: TranslationService
-  ) { }
+  ) {}
   ngOnInit(): void {
     this.obtenerListaEntradas()
       .then((listaRes: Entrada[]) => {
         listaRes.forEach((entradaRes: any) => {
-          entradaRes.categoriasConComas = entradaRes.categorias.map((e: any) => e.nombre).join(', ');
+          entradaRes.categoriasConComas = entradaRes.categorias
+            .map((e: any) => e.nombre)
+            .join(', ');
         });
         this.refreshEntradas();
       })

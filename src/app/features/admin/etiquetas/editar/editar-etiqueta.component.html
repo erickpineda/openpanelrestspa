@@ -1,5 +1,10 @@
-<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static"
-  alignment="center">
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  size="lg"
+  backdrop="static"
+  alignment="center"
+>
   <c-modal-header>
     <h5 cModalTitle class="d-flex align-items-center gap-2">
       <svg cIcon name="cilTag" class="text-primary"></svg>
@@ -9,8 +14,13 @@
   </c-modal-header>
   <c-modal-body class="p-4">
     @if (visible) {
-    <app-etiqueta-form [etiqueta]="etiqueta" [isEdit]="true" [disabled]="disabled" (save)="onGuardar()"
-      (cancel)="cerrarModal()"></app-etiqueta-form>
+      <app-etiqueta-form
+        [etiqueta]="etiqueta"
+        [isEdit]="true"
+        [disabled]="disabled"
+        (save)="onGuardar()"
+        (cancel)="cerrarModal()"
+      ></app-etiqueta-form>
     }
   </c-modal-body>
   <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
@@ -23,7 +33,9 @@
       }
     </div>
     <div class="d-flex gap-2">
-      <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
       @if (!disabled) {
         <button cButton color="primary" (click)="onGuardarClick()">
           <svg cIcon name="cilSave" class="me-1"></svg>

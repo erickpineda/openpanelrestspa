@@ -127,15 +127,18 @@ export const OPRestMethods: any = {
     BORRAR_POR_CODIGO: (codigo: string) => `/plantillaEmail/borrarPorCodigo/${codigo}`,
     PARAMETROS: {
       BASE: '/plantillaEmail/parametros',
-      LISTAR_POR_ID_PLANTILLA: (id: number) => `/plantillaEmail/parametros/listarPorIdPlantilla/${id}`,
+      LISTAR_POR_ID_PLANTILLA: (id: number) =>
+        `/plantillaEmail/parametros/listarPorIdPlantilla/${id}`,
       OBTENER_POR_CLAVE: (clave: string) => `/plantillaEmail/parametros/obtenerPorClave/${clave}`,
       OBTENER_POR_VALOR: (valor: string) => `/plantillaEmail/parametros/obtenerPorValor/${valor}`,
     },
   },
   LITERALES: {
     BASE: '/literales',
-    OBTENER_POR_CODIGO_LITERAL: (codigoLiteral: string) => `/literales/obtenerPorCodigoLiteral/${codigoLiteral}`,
-    OBTENER_POR_CODIGO_PROPIEDAD: (codigoPropiedad: string) => `/literales/obtenerPorCodigoPropiedad/${codigoPropiedad}`,
+    OBTENER_POR_CODIGO_LITERAL: (codigoLiteral: string) =>
+      `/literales/obtenerPorCodigoLiteral/${codigoLiteral}`,
+    OBTENER_POR_CODIGO_PROPIEDAD: (codigoPropiedad: string) =>
+      `/literales/obtenerPorCodigoPropiedad/${codigoPropiedad}`,
   },
   AGRAVIOS: {
     BASE: '/agravios',

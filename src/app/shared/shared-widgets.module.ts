@@ -17,7 +17,16 @@ import { TooltipModule, WidgetModule } from '@coreui/angular';
 import { ResponsiveNavigationComponent } from './components/responsive-navigation/responsive-navigation.component';
 
 @NgModule({
-  imports: [CommonModule, IconModule, SharedCoreUiModule, ChartjsModule, TranslatePipe, RouterModule, TooltipModule, WidgetModule],
+  imports: [
+    CommonModule,
+    IconModule,
+    SharedCoreUiModule,
+    ChartjsModule,
+    TranslatePipe,
+    RouterModule,
+    TooltipModule,
+    WidgetModule,
+  ],
   declarations: [
     OpLoaderComponent,
     InlineLoaderComponent,

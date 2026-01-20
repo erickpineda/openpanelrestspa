@@ -1,6 +1,9 @@
 <div class="tabla-con-loader-wrapper position-relative rounded-3 overflow-hidden border">
   @if (loading) {
-    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75" style="z-index: 10; min-height: 200px">
+    <div
+      class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75"
+      style="z-index: 10; min-height: 200px"
+    >
       <div class="text-center text-primary">
         <c-spinner size="sm"></c-spinner>
         <p class="mt-2 small fw-semibold">{{ 'AUTO.ACTUALIZANDO_LISTADO' | translate }}</p>
@@ -16,7 +19,9 @@
           <th scope="col" class="border-0 py-3 text-center">{{ 'COMMON.DATE' | translate }}</th>
           <th scope="col" class="border-0 py-3">{{ 'COMMON.CATEGORY' | translate }}</th>
           <th scope="col" class="border-0 py-3 text-center">{{ 'COMMON.STATUS' | translate }}</th>
-          <th scope="col" class="border-0 py-3 text-end pe-4">{{ 'COMMON.ACTIONS' | translate }}</th>
+          <th scope="col" class="border-0 py-3 text-end pe-4">
+            {{ 'COMMON.ACTIONS' | translate }}
+          </th>
         </tr>
       </thead>
       <tbody class="border-top-0">
@@ -24,17 +29,24 @@
           <tr class="align-middle">
             <td class="ps-4 py-3">
               <div class="d-flex flex-column">
-                <span class="fw-bold text-primary text-truncate" style="max-width: 300px;" [title]="entrada.titulo">
+                <span
+                  class="fw-bold text-primary text-truncate"
+                  style="max-width: 300px"
+                  [title]="entrada.titulo"
+                >
                   {{ entrada.titulo }}
                 </span>
-                <small class="text-body-secondary text-truncate" style="max-width: 300px;">
+                <small class="text-body-secondary text-truncate" style="max-width: 300px">
                   {{ entrada.subtitulo }}
                 </small>
               </div>
             </td>
             <td class="py-3">
               <div class="d-flex align-items-center">
-                <div class="bg-light rounded-circle p-1 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <div
+                  class="bg-light rounded-circle p-1 me-2 d-flex align-items-center justify-content-center"
+                  style="width: 32px; height: 32px"
+                >
                   <svg cIcon name="cilUser" size="sm" class="text-secondary"></svg>
                 </div>
                 <span class="small fw-semibold">{{ entrada.usernameCreador }}</span>
@@ -43,32 +55,52 @@
             <td class="text-center py-3">
               <div class="d-flex flex-column">
                 @if (getFechaDate(entrada.fechaPublicacion); as fecha) {
-                  <span class="small fw-semibold">{{ fecha | date:'dd MMM yyyy' }}</span>
-                  <small class="text-body-secondary" style="font-size: 0.75rem;">
-                    {{ fecha | date:'HH:mm' }}
+                  <span class="small fw-semibold">{{ fecha | date: 'dd MMM yyyy' }}</span>
+                  <small class="text-body-secondary" style="font-size: 0.75rem">
+                    {{ fecha | date: 'HH:mm' }}
                   </small>
                 } @else {
-                  <span class="small fw-semibold text-secondary fst-italic">{{ 'AUTO.NO_PUBLICADA' | translate }}</span>
+                  <span class="small fw-semibold text-secondary fst-italic">{{
+                    'AUTO.NO_PUBLICADA' | translate
+                  }}</span>
                 }
               </div>
             </td>
             <td class="py-3">
               @if (entrada.categoriasConComas) {
-                <div class="d-flex gap-1 flex-wrap" style="max-width: 200px;">
+                <div class="d-flex gap-1 flex-wrap" style="max-width: 200px">
                   @for (cat of entrada.categoriasConComas.split(','); track $index) {
-                    <c-badge color="info" shape="rounded-pill" class="fw-normal bg-opacity-10 text-info-emphasis border border-info border-opacity-25">
+                    <c-badge
+                      color="info"
+                      shape="rounded-pill"
+                      class="fw-normal bg-opacity-10 text-info-emphasis border border-info border-opacity-25"
+                    >
                       {{ cat.trim() }}
                     </c-badge>
                   }
                 </div>
               } @else {
-                <span class="text-body-secondary small fst-italic">{{ 'AUTO.SIN_CATEGOR_A' | translate }}</span>
+                <span class="text-body-secondary small fst-italic">{{
+                  'AUTO.SIN_CATEGOR_A' | translate
+                }}</span>
               }
             </td>
             <td class="text-center py-3">
               @if (getEstadoInfo(entrada); as estado) {
-                <c-badge [color]="estado.color" shape="rounded-pill" class="px-3 py-2"
-                  [cTooltip]="entrada.estadoEntrada.nombre.toUpperCase() === 'PROGRAMADA' && entrada.fechaPublicacionProgramada ? ($any(getFechaDate(entrada.fechaPublicacionProgramada) | date:'dd-MM-yyyy HH:mm') || estado.tooltip) : estado.tooltip">
+                <c-badge
+                  [color]="estado.color"
+                  shape="rounded-pill"
+                  class="px-3 py-2"
+                  [cTooltip]="
+                    entrada.estadoEntrada.nombre.toUpperCase() === 'PROGRAMADA' &&
+                    entrada.fechaPublicacionProgramada
+                      ? $any(
+                          getFechaDate(entrada.fechaPublicacionProgramada)
+                            | date: 'dd-MM-yyyy HH:mm'
+                        ) || estado.tooltip
+                      : estado.tooltip
+                  "
+                >
                   <svg cIcon [name]="estado.icon" size="sm" class="me-1"></svg>
                   {{ estado.tooltip }}
                 </c-badge>
@@ -76,13 +108,34 @@
             </td>
             <td class="text-end pe-4 py-3">
               <c-button-group role="group">
-                <button cButton color="info" variant="ghost" size="sm" (click)="preview.emit(entrada)" [cTooltip]="'ADMIN.ENTRIES.VIEW_PREVIEW' | translate">
+                <button
+                  cButton
+                  color="info"
+                  variant="ghost"
+                  size="sm"
+                  (click)="preview.emit(entrada)"
+                  [cTooltip]="'ADMIN.ENTRIES.VIEW_PREVIEW' | translate"
+                >
                   <svg cIcon name="cilMagnifyingGlass"></svg>
                 </button>
-                <button cButton color="primary" variant="ghost" size="sm" [routerLink]="[baseRoute, 'editar', entrada.idEntrada]" [cTooltip]="'COMMON.EDIT' | translate">
+                <button
+                  cButton
+                  color="primary"
+                  variant="ghost"
+                  size="sm"
+                  [routerLink]="[baseRoute, 'editar', entrada.idEntrada]"
+                  [cTooltip]="'COMMON.EDIT' | translate"
+                >
                   <svg cIcon name="cilPen"></svg>
                 </button>
-                <button cButton color="danger" variant="ghost" size="sm" (click)="delete.emit(entrada)" [cTooltip]="'COMMON.DELETE' | translate">
+                <button
+                  cButton
+                  color="danger"
+                  variant="ghost"
+                  size="sm"
+                  (click)="delete.emit(entrada)"
+                  [cTooltip]="'COMMON.DELETE' | translate"
+                >
                   <svg cIcon name="cilTrash"></svg>
                 </button>
               </c-button-group>
@@ -102,10 +155,15 @@
       </tbody>
     </table>
   </div>
-  <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10">
+  <div
+    class="d-flex justify-content-between align-items-center p-3 border-top bg-light bg-opacity-10"
+  >
     @if (pagingInfo) {
       <small class="text-secondary">
-        {{ 'COMMON.PAGINATION_INFO' | translate: { current: entradas.length, total: pagingInfo.total } }}
+        {{
+          'COMMON.PAGINATION_INFO'
+            | translate: { current: entradas.length, total: pagingInfo.total }
+        }}
       </small>
       <c-pagination class="mb-0" align="end" size="sm">
         <li class="page-item" [class.disabled]="pagingInfo.page === 0">
@@ -116,7 +174,7 @@
         <li class="page-item disabled">
           <a class="page-link">{{ pagingInfo.page + 1 }} / {{ pagingInfo.pages }}</a>
         </li>
-        <li class="page-item" [class.disabled]="pagingInfo.page >= (pagingInfo.pages - 1)">
+        <li class="page-item" [class.disabled]="pagingInfo.page >= pagingInfo.pages - 1">
           <a class="page-link" (click)="onNext()" style="cursor: pointer" aria-label="Siguiente">
             <span aria-hidden="true">{{ 'AUTO.RAQUO' | translate }}</span>
           </a>

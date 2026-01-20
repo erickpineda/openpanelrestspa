@@ -49,7 +49,12 @@
     </c-card-body>
   </c-card>
 </c-container>
-<c-modal [visible]="visible" (visibleChange)="onVisibleModalChange($event)" id="modalBorrar" backdrop="static">
+<c-modal
+  [visible]="visible"
+  (visibleChange)="onVisibleModalChange($event)"
+  id="modalBorrar"
+  backdrop="static"
+>
   <c-modal-header class="border-bottom-0">
     <h5 cModalTitle class="fw-bold text-danger">{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
   </c-modal-header>
@@ -62,15 +67,26 @@
     </div>
   </c-modal-body>
   <c-modal-footer class="border-top-0 justify-content-center pb-4">
-    <button cButton color="secondary" variant="ghost" (click)="toggleModal()">{{ 'AUTO.CANCELAR' | translate }}</button>
+    <button cButton color="secondary" variant="ghost" (click)="toggleModal()">
+      {{ 'AUTO.CANCELAR' | translate }}
+    </button>
     <button cButton color="danger" class="px-4" (click)="confirmarBorrado()">
       {{ 'AUTO.ELIMINAR' | translate }}
     </button>
   </c-modal-footer>
 </c-modal>
-<c-modal [visible]="previewVisible" (visibleChange)="onPreviewVisibleChange($event)" size="xl" scrollable id="modalPreview" backdrop="static">
+<c-modal
+  [visible]="previewVisible"
+  (visibleChange)="onPreviewVisibleChange($event)"
+  size="xl"
+  scrollable
+  id="modalPreview"
+  backdrop="static"
+>
   <c-modal-header>
-    <h5 cModalTitle>{{ 'ADMIN.ENTRIES.VIEW_PREVIEW' | translate }}: {{ previewEntrada?.titulo }}</h5>
+    <h5 cModalTitle>
+      {{ 'ADMIN.ENTRIES.VIEW_PREVIEW' | translate }}: {{ previewEntrada?.titulo }}
+    </h5>
     <button #previewCloseBtn (click)="closePreview()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
@@ -83,7 +99,9 @@
     }
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="closePreview()" cButton color="secondary">{{ 'AUTO.CERRAR' | translate }}</button>
+    <button (click)="closePreview()" cButton color="secondary">
+      {{ 'AUTO.CERRAR' | translate }}
+    </button>
     <button (click)="onEditarDesdePreview()" cButton color="primary">
       <svg cIcon name="cilPen" class="me-1"></svg>
       {{ 'COMMON.EDIT' | translate }}

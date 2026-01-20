@@ -81,8 +81,8 @@ export class PreviaEntradaComponent implements OnChanges {
       this.form && this.form.get('contenido')
         ? this.form.get('contenido')?.value
         : this.entrada
-        ? this.entrada.contenido
-        : '';
+          ? this.entrada.contenido
+          : '';
 
     this.contenidoSeguro = this.sanitizeHtml(contenidoRaw);
     this.categoriasMostrar = this.resolveCategorias();

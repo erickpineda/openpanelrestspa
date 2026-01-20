@@ -1,5 +1,15 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, catchError, finalize, map, tap, throwError, of, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  catchError,
+  finalize,
+  map,
+  tap,
+  throwError,
+  of,
+  switchMap,
+} from 'rxjs';
 import { Entrada } from '@app/core/models/entrada.model';
 import { Categoria } from '@app/core/models/categoria.model';
 import { EntradaService } from '@app/core/services/data/entrada.service';
@@ -35,23 +45,25 @@ const INITIAL_STATE: ListState = {
   error: null,
   allEntradasClientCache: [],
   isServerPaging: true,
-  lastSearchParams: null
+  lastSearchParams: null,
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ListadoEntradasStateService {
   private state = new BehaviorSubject<ListState>(INITIAL_STATE);
   state$ = this.state.asObservable();
-  entradas$ = this.state.pipe(map(s => s.entradas));
-  loading$ = this.state.pipe(map(s => s.loading));
-  pagingInfo$ = this.state.pipe(map(s => ({
-    page: s.currentPage,
-    total: s.totalElements,
-    pages: s.totalPages,
-    pageSize: s.pageSize
-  })));
+  entradas$ = this.state.pipe(map((s) => s.entradas));
+  loading$ = this.state.pipe(map((s) => s.loading));
+  pagingInfo$ = this.state.pipe(
+    map((s) => ({
+      page: s.currentPage,
+      total: s.totalElements,
+      pages: s.totalPages,
+      pageSize: s.pageSize,
+    }))
+  );
 
   constructor(
     private entradaService: EntradaService,
@@ -117,7 +129,7 @@ export class ListadoEntradasStateService {
     return this.entradaService.borrar(id).pipe(
       switchMap(() => this.reloadCurrentPage()),
       map(() => void 0),
-      catchError(error => {
+      catchError((error) => {
         this.log.error('Error deleting entrada', error);
         this.updateState({ loading: false, error });
         return throwError(() => error);
@@ -140,8 +152,8 @@ export class ListadoEntradasStateService {
       ],
     };
     return this.entradaService.buscarSafe(searchRequest, page, this.state.value.pageSize).pipe(
-      tap(response => this.processResponse(response, page)),
-      catchError(error => {
+      tap((response) => this.processResponse(response, page)),
+      catchError((error) => {
         this.log.error('Error searching entradas', error);
         this.updateState({ loading: false, error });
         return throwError(() => error);
@@ -165,14 +177,16 @@ export class ListadoEntradasStateService {
       typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
     if (hasServerPaging) {
       const totalElements = Number(data.totalElements || elementos.length || 0);
-      const totalPages = Number(data.totalPages || Math.ceil(totalElements / this.state.value.pageSize) || 1);
+      const totalPages = Number(
+        data.totalPages || Math.ceil(totalElements / this.state.value.pageSize) || 1
+      );
       this.updateState({
         entradas: elementos,
         totalElements,
         totalPages,
         currentPage: pageRequest,
         isServerPaging: true,
-        allEntradasClientCache: []
+        allEntradasClientCache: [],
       });
     } else {
       const totalElements = elementos.length;
@@ -182,7 +196,7 @@ export class ListadoEntradasStateService {
         allEntradasClientCache: elementos,
         totalElements,
         totalPages,
-        isServerPaging: false
+        isServerPaging: false,
       });
       this.applyClientPaging(elementos, pageRequest, pageSize);
     }
@@ -197,7 +211,7 @@ export class ListadoEntradasStateService {
     this.updateState({
       entradas: pagedEntries,
       currentPage: validPage,
-      totalPages: totalPages
+      totalPages: totalPages,
     });
   }
 

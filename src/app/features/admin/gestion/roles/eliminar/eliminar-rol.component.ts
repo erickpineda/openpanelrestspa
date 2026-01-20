@@ -4,7 +4,7 @@ import { Rol } from '../../../../../core/models/rol.model';
 @Component({
   selector: 'app-eliminar-rol',
   templateUrl: './eliminar-rol.component.html',
-  standalone: false
+  standalone: false,
 })
 export class EliminarRolComponent {
   @Input() visible = false;

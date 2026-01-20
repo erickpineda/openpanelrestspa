@@ -17,7 +17,7 @@ export class PrivilegioFormComponent implements OnChanges {
   submitted = false;
   nombreTouched = false;
   codigoTouched = false;
-  constructor(private translate: TranslationService) { }
+  constructor(private translate: TranslationService) {}
   manualCodeEntry = false;
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {

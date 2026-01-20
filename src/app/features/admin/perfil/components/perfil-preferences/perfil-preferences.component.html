@@ -18,11 +18,15 @@
   <div class="mb-3">
     <c-form-check>
       <input cFormCheckInput type="checkbox" id="notifications" formControlName="notifications" />
-      <label cFormCheckLabel for="notifications">{{ 'AUTO.RECIBIR_NOTIFICACIONES_POR_COR' | translate }}</label>
+      <label cFormCheckLabel for="notifications">{{
+        'AUTO.RECIBIR_NOTIFICACIONES_POR_COR' | translate
+      }}</label>
     </c-form-check>
   </div>
 
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button cButton color="primary" type="submit">{{ 'AUTO.GUARDAR_PREFERENCIAS' | translate }}</button>
+    <button cButton color="primary" type="submit">
+      {{ 'AUTO.GUARDAR_PREFERENCIAS' | translate }}
+    </button>
   </div>
 </form>

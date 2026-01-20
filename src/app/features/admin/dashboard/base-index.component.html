@@ -23,13 +23,31 @@
             </c-card-header>
             <c-card-body>
               <div class="d-grid gap-2">
-                <a routerLink="./entradas" cButton color="primary" variant="ghost" class="text-start text-decoration-none">
+                <a
+                  routerLink="./entradas"
+                  cButton
+                  color="primary"
+                  variant="ghost"
+                  class="text-start text-decoration-none"
+                >
                   <svg cIcon name="cilList" class="me-2"></svg> {{ 'MENU.ENTRIES' | translate }}
                 </a>
-                <a routerLink="./paginas" cButton color="primary" variant="ghost" class="text-start text-decoration-none">
+                <a
+                  routerLink="./paginas"
+                  cButton
+                  color="primary"
+                  variant="ghost"
+                  class="text-start text-decoration-none"
+                >
                   <svg cIcon name="cilLibrary" class="me-2"></svg> {{ 'MENU.PAGES' | translate }}
                 </a>
-                <a routerLink="./contenido" cButton color="primary" variant="ghost" class="text-start text-decoration-none">
+                <a
+                  routerLink="./contenido"
+                  cButton
+                  color="primary"
+                  variant="ghost"
+                  class="text-start text-decoration-none"
+                >
                   <svg cIcon name="cilImage" class="me-2"></svg> {{ 'MENU.MEDIA' | translate }}
                 </a>
               </div>
@@ -44,13 +62,31 @@
             </c-card-header>
             <c-card-body>
               <div class="d-grid gap-2">
-                <a routerLink="./gestion/usuarios" cButton color="success" variant="ghost" class="text-start text-decoration-none">
+                <a
+                  routerLink="./gestion/usuarios"
+                  cButton
+                  color="success"
+                  variant="ghost"
+                  class="text-start text-decoration-none"
+                >
                   <svg cIcon name="cilUser" class="me-2"></svg> {{ 'MENU.USERS' | translate }}
                 </a>
-                <a routerLink="./gestion/roles" cButton color="success" variant="ghost" class="text-start text-decoration-none">
+                <a
+                  routerLink="./gestion/roles"
+                  cButton
+                  color="success"
+                  variant="ghost"
+                  class="text-start text-decoration-none"
+                >
                   <svg cIcon name="cilShieldAlt" class="me-2"></svg> {{ 'MENU.ROLES' | translate }}
                 </a>
-                <a routerLink="./perfil" cButton color="success" variant="ghost" class="text-start text-decoration-none">
+                <a
+                  routerLink="./perfil"
+                  cButton
+                  color="success"
+                  variant="ghost"
+                  class="text-start text-decoration-none"
+                >
                   <svg cIcon name="cilUser" class="me-2"></svg> {{ 'MENU.MY_PROFILE' | translate }}
                 </a>
               </div>
@@ -59,20 +95,43 @@
         </c-col>
         <c-col md="6" xl="4" class="mb-4">
           <c-card class="h-100 border-0 shadow-sm">
-            <c-card-header class="bg-warning bg-opacity-10 text-warning-emphasis border-bottom-0 fw-bold">
+            <c-card-header
+              class="bg-warning bg-opacity-10 text-warning-emphasis border-bottom-0 fw-bold"
+            >
               <svg cIcon name="cilSettings" class="me-2"></svg>
               {{ 'ADMIN.DASHBOARD.SYSTEM' | translate }}
             </c-card-header>
             <c-card-body>
               <div class="d-grid gap-2">
-                <a routerLink="./configuracion/ajustes" cButton color="warning" variant="ghost" class="text-start text-decoration-none text-warning-emphasis">
-                  <svg cIcon name="cilSettings" class="me-2"></svg> {{ 'MENU.GENERAL_SETTINGS' | translate }}
+                <a
+                  routerLink="./configuracion/ajustes"
+                  cButton
+                  color="warning"
+                  variant="ghost"
+                  class="text-start text-decoration-none text-warning-emphasis"
+                >
+                  <svg cIcon name="cilSettings" class="me-2"></svg>
+                  {{ 'MENU.GENERAL_SETTINGS' | translate }}
                 </a>
-                <a routerLink="./configuracion/temas" cButton color="warning" variant="ghost" class="text-start text-decoration-none text-warning-emphasis">
-                  <svg cIcon name="cilPaintBucket" class="me-2"></svg> {{ 'MENU.APPEARANCE' | translate }}
+                <a
+                  routerLink="./configuracion/temas"
+                  cButton
+                  color="warning"
+                  variant="ghost"
+                  class="text-start text-decoration-none text-warning-emphasis"
+                >
+                  <svg cIcon name="cilPaintBucket" class="me-2"></svg>
+                  {{ 'MENU.APPEARANCE' | translate }}
                 </a>
-                <a routerLink="./mantenimiento" cButton color="warning" variant="ghost" class="text-start text-decoration-none text-warning-emphasis">
-                  <svg cIcon name="cilSpeedometer" class="me-2"></svg> {{ 'MENU.MAINTENANCE' | translate }}
+                <a
+                  routerLink="./mantenimiento"
+                  cButton
+                  color="warning"
+                  variant="ghost"
+                  class="text-start text-decoration-none text-warning-emphasis"
+                >
+                  <svg cIcon name="cilSpeedometer" class="me-2"></svg>
+                  {{ 'MENU.MAINTENANCE' | translate }}
                 </a>
               </div>
             </c-card-body>
@@ -86,14 +145,34 @@
             </c-card-header>
             <c-card-body>
               <div class="d-grid gap-2">
-                <a routerLink="./comentarios" cButton color="info" variant="ghost" class="text-start text-decoration-none text-info-emphasis">
-                  <svg cIcon name="cilCommentSquare" class="me-2"></svg> {{ 'MENU.COMMENTS' | translate }}
+                <a
+                  routerLink="./comentarios"
+                  cButton
+                  color="info"
+                  variant="ghost"
+                  class="text-start text-decoration-none text-info-emphasis"
+                >
+                  <svg cIcon name="cilCommentSquare" class="me-2"></svg>
+                  {{ 'MENU.COMMENTS' | translate }}
                 </a>
-                <a routerLink="./etiquetas" cButton color="info" variant="ghost" class="text-start text-decoration-none text-info-emphasis">
+                <a
+                  routerLink="./etiquetas"
+                  cButton
+                  color="info"
+                  variant="ghost"
+                  class="text-start text-decoration-none text-info-emphasis"
+                >
                   <svg cIcon name="cilTags" class="me-2"></svg> {{ 'MENU.TAGS' | translate }}
                 </a>
-                <a routerLink="./categorias" cButton color="info" variant="ghost" class="text-start text-decoration-none text-info-emphasis">
-                  <svg cIcon name="cilSpreadsheet" class="me-2"></svg> {{ 'MENU.CATEGORIES' | translate }}
+                <a
+                  routerLink="./categorias"
+                  cButton
+                  color="info"
+                  variant="ghost"
+                  class="text-start text-decoration-none text-info-emphasis"
+                >
+                  <svg cIcon name="cilSpreadsheet" class="me-2"></svg>
+                  {{ 'MENU.CATEGORIES' | translate }}
                 </a>
               </div>
             </c-card-body>

@@ -28,7 +28,9 @@
             [disabled]="uploading"
           >
             <svg cIcon name="cilCloudUpload" class="me-2"></svg>
-            {{ uploading ? ('ADMIN.MEDIA.UPLOADING' | translate) : ('ADMIN.MEDIA.UPLOAD' | translate) }}
+            {{
+              uploading ? ('ADMIN.MEDIA.UPLOADING' | translate) : ('ADMIN.MEDIA.UPLOAD' | translate)
+            }}
           </button>
         </div>
       </div>
@@ -36,10 +38,14 @@
 
     <c-card-body [attr.aria-busy]="loading ? 'true' : null">
       <!-- Buscador y Filtros -->
-      <div class="d-flex flex-column flex-md-row gap-3 mb-4 justify-content-between align-items-end bg-light p-3 rounded">
+      <div
+        class="d-flex flex-column flex-md-row gap-3 mb-4 justify-content-between align-items-end bg-light p-3 rounded"
+      >
         <div class="d-flex flex-column flex-md-row gap-3 flex-grow-1 w-100">
-          <div class="flex-grow-1" style="max-width: 400px;">
-            <label class="form-label text-muted small text-uppercase fw-bold">{{ 'COMMON.SEARCH' | translate }}</label>
+          <div class="flex-grow-1" style="max-width: 400px">
+            <label class="form-label text-muted small text-uppercase fw-bold">{{
+              'COMMON.SEARCH' | translate
+            }}</label>
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0 text-secondary">
                 <svg cIcon name="cilSearch" size="sm"></svg>
@@ -55,7 +61,7 @@
               />
             </div>
           </div>
-          
+
           <div class="d-flex align-items-end">
             <button
               cButton
@@ -66,7 +72,9 @@
               class="d-flex align-items-center gap-2"
             >
               <svg cIcon name="cilFilter" size="sm"></svg>
-              <span>{{ 'ADMIN.ENTRIES.FILTERS' | translate }} {{ showAdvanced ? 'Activos' : '' }}</span>
+              <span
+                >{{ 'ADMIN.ENTRIES.FILTERS' | translate }} {{ showAdvanced ? 'Activos' : '' }}</span
+              >
             </button>
           </div>
         </div>
@@ -92,11 +100,11 @@
       <!-- Filtros Avanzados -->
       @if (showAdvanced) {
         <div class="mb-4 p-4 bg-white border rounded shadow-sm position-relative">
-           <button 
-            cButton 
-            color="light" 
-            size="sm" 
-            class="position-absolute top-0 end-0 m-2 btn-close-filters" 
+          <button
+            cButton
+            color="light"
+            size="sm"
+            class="position-absolute top-0 end-0 m-2 btn-close-filters"
             (click)="toggleAdvanced()"
             aria-label="Cerrar filtros"
           >
@@ -104,8 +112,16 @@
           </button>
           <c-row class="g-3 align-items-end">
             <c-col xs="12" md="4">
-              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'ADMIN.MEDIA.MIME_TYPE' | translate }}</label>
-              <select cSelect size="sm" [(ngModel)]="filtroMime" [disabled]="loading" class="shadow-sm">
+              <label class="form-label mb-1 small fw-bold text-secondary">{{
+                'ADMIN.MEDIA.MIME_TYPE' | translate
+              }}</label>
+              <select
+                cSelect
+                size="sm"
+                [(ngModel)]="filtroMime"
+                [disabled]="loading"
+                class="shadow-sm"
+              >
                 <option value="">{{ 'COMMON.ALL' | translate }}</option>
                 <option value="image/jpeg">{{ 'ADMIN.MEDIA.JPEG' | translate }}</option>
                 <option value="image/png">{{ 'ADMIN.MEDIA.PNG' | translate }}</option>
@@ -114,7 +130,9 @@
               </select>
             </c-col>
             <c-col xs="6" md="3">
-              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'ADMIN.MEDIA.FROM' | translate }}</label>
+              <label class="form-label mb-1 small fw-bold text-secondary">{{
+                'ADMIN.MEDIA.FROM' | translate
+              }}</label>
               <input
                 cFormControl
                 size="sm"
@@ -125,7 +143,9 @@
               />
             </c-col>
             <c-col xs="6" md="3">
-              <label class="form-label mb-1 small fw-bold text-secondary">{{ 'ADMIN.MEDIA.TO' | translate }}</label>
+              <label class="form-label mb-1 small fw-bold text-secondary">{{
+                'ADMIN.MEDIA.TO' | translate
+              }}</label>
               <input
                 cFormControl
                 size="sm"
@@ -164,19 +184,26 @@
       }
 
       @if (error) {
-        <c-alert color="danger" class="d-flex align-items-center justify-content-between mb-4 shadow-sm border-danger border-opacity-25">
+        <c-alert
+          color="danger"
+          class="d-flex align-items-center justify-content-between mb-4 shadow-sm border-danger border-opacity-25"
+        >
           <div class="d-flex align-items-center gap-2">
             <svg cIcon name="cilWarning" class="text-danger"></svg>
             <span>{{ error }}</span>
           </div>
-          <button cButton color="danger" size="sm" variant="outline" (click)="load()">{{ 'COMMON.RETRY' | translate }}</button>
+          <button cButton color="danger" size="sm" variant="outline" (click)="load()">
+            {{ 'COMMON.RETRY' | translate }}
+          </button>
         </c-alert>
       }
 
       <!-- Tabla -->
       <div class="position-relative table-responsive">
         @if (loading) {
-          <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3">
+          <div
+            class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center z-3"
+          >
             <div class="text-center">
               <c-spinner color="primary"></c-spinner>
               <p class="mt-2 text-primary fw-semibold small">{{ 'COMMON.LOADING' | translate }}</p>
@@ -187,10 +214,18 @@
         <table cTable hover small class="align-middle mb-0 border">
           <thead class="bg-light text-secondary text-uppercase small fw-bold border-bottom">
             <tr>
-              <th scope="col" class="border-0 py-3 ps-3" style="min-width: 80px">{{ 'ADMIN.MEDIA.VIEW' | translate }}</th>
-              <th scope="col" class="border-0 py-3" style="min-width: 200px">{{ 'COMMON.NAME' | translate }}</th>
-              <th scope="col" class="border-0 py-3 text-center" style="min-width: 160px">{{ 'ADMIN.MEDIA.DATE' | translate }}</th>
-              <th scope="col" class="border-0 py-3 text-end pe-3" style="min-width: 110px">{{ 'COMMON.ACTIONS' | translate }}</th>
+              <th scope="col" class="border-0 py-3 ps-3" style="min-width: 80px">
+                {{ 'ADMIN.MEDIA.VIEW' | translate }}
+              </th>
+              <th scope="col" class="border-0 py-3" style="min-width: 200px">
+                {{ 'COMMON.NAME' | translate }}
+              </th>
+              <th scope="col" class="border-0 py-3 text-center" style="min-width: 160px">
+                {{ 'ADMIN.MEDIA.DATE' | translate }}
+              </th>
+              <th scope="col" class="border-0 py-3 text-end pe-3" style="min-width: 110px">
+                {{ 'COMMON.ACTIONS' | translate }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -198,15 +233,18 @@
               <tr>
                 <td class="ps-3">
                   @if (m.uuid && preview[m.uuid]) {
-                    <div class="rounded border d-inline-block overflow-hidden shadow-sm" style="width: 48px; height: 48px; cursor: pointer" (click)="openPreview(m)">
-                      <img
-                        [src]="preview[m.uuid]"
-                        alt=""
-                        class="w-100 h-100 object-fit-cover"
-                      />
+                    <div
+                      class="rounded border d-inline-block overflow-hidden shadow-sm"
+                      style="width: 48px; height: 48px; cursor: pointer"
+                      (click)="openPreview(m)"
+                    >
+                      <img [src]="preview[m.uuid]" alt="" class="w-100 h-100 object-fit-cover" />
                     </div>
                   } @else {
-                    <div class="rounded border bg-light d-flex align-items-center justify-content-center text-secondary shadow-sm" style="width: 48px; height: 48px;">
+                    <div
+                      class="rounded border bg-light d-flex align-items-center justify-content-center text-secondary shadow-sm"
+                      style="width: 48px; height: 48px"
+                    >
                       <svg cIcon name="cilImage" size="lg"></svg>
                     </div>
                   }
@@ -215,17 +253,18 @@
                   <div class="d-flex flex-column">
                     <span
                       class="fw-semibold text-truncate d-inline-block text-primary"
-                      style="max-width: 260px; cursor: pointer;"
+                      style="max-width: 260px; cursor: pointer"
                       [title]="m.nombre"
                       (click)="openPreview(m)"
-                    >{{ m.nombre }}</span>
+                      >{{ m.nombre }}</span
+                    >
                     <small class="text-muted">{{ m.mime || 'Desconocido' }}</small>
                   </div>
                 </td>
                 <td class="text-center">
                   <div class="d-flex flex-column align-items-center">
-                    <span class="fw-medium">{{ m.fechaCreacion | date:'dd/MM/yyyy' }}</span>
-                    <small class="text-muted">{{ m.fechaCreacion | date:'HH:mm' }}</small>
+                    <span class="fw-medium">{{ m.fechaCreacion | date: 'dd/MM/yyyy' }}</span>
+                    <small class="text-muted">{{ m.fechaCreacion | date: 'HH:mm' }}</small>
                   </div>
                 </td>
                 <td class="text-end pe-3">
@@ -275,7 +314,12 @@
                 <tr>
                   <td colspan="4" class="text-center py-5">
                     <div class="d-flex flex-column align-items-center text-muted">
-                      <svg cIcon name="cilImage" size="4xl" class="mb-3 text-secondary opacity-25"></svg>
+                      <svg
+                        cIcon
+                        name="cilImage"
+                        size="4xl"
+                        class="mb-3 text-secondary opacity-25"
+                      ></svg>
                       <h6 class="fw-bold mb-1">{{ 'ADMIN.MEDIA.NO_IMAGES_FOUND' | translate }}</h6>
                       <p class="small mb-0">{{ 'ADMIN.MEDIA.UPLOAD_NEW' | translate }}</p>
                     </div>
@@ -298,47 +342,95 @@
 </c-container>
 
 <!-- Modal Preview -->
-<c-modal [visible]="previewModalVisible" (visibleChange)="previewModalVisible = $event" size="xl" backdrop="static">
+<c-modal
+  [visible]="previewModalVisible"
+  (visibleChange)="previewModalVisible = $event"
+  size="xl"
+  backdrop="static"
+>
   <c-modal-header class="bg-light border-bottom-0">
     <h5 cModalTitle class="fw-bold text-primary">{{ 'ADMIN.MEDIA.PREVIEW' | translate }}</h5>
     <button (click)="previewModalVisible = false" cButtonClose></button>
   </c-modal-header>
-  <c-modal-body class="p-0 bg-dark position-relative d-flex justify-content-center align-items-center preview-body" style="min-height: 500px; overflow: hidden;">
+  <c-modal-body
+    class="p-0 bg-dark position-relative d-flex justify-content-center align-items-center preview-body"
+    style="min-height: 500px; overflow: hidden"
+  >
     @if (previewItem && previewItem.uuid && preview[previewItem.uuid]) {
-        <div class="w-100 h-100 d-flex justify-content-center align-items-center"
-             style="cursor: grab"
-             (mousedown)="onPreviewMouseDown($event)"
-             (mousemove)="onPreviewMouseMove($event)"
-             (mouseup)="onPreviewMouseUp()"
-             (mouseleave)="onPreviewMouseLeave()"
-             (touchstart)="onPreviewTouchStart($event)"
-             (touchmove)="onPreviewTouchMove($event)"
-             (touchend)="onPreviewTouchEnd()"
+      <div
+        class="w-100 h-100 d-flex justify-content-center align-items-center"
+        style="cursor: grab"
+        (mousedown)="onPreviewMouseDown($event)"
+        (mousemove)="onPreviewMouseMove($event)"
+        (mouseup)="onPreviewMouseUp()"
+        (mouseleave)="onPreviewMouseLeave()"
+        (touchstart)="onPreviewTouchStart($event)"
+        (touchmove)="onPreviewTouchMove($event)"
+        (touchend)="onPreviewTouchEnd()"
+      >
+        <img
+          [src]="preview[previewItem.uuid]"
+          [style.transform]="
+            'scale(' +
+            previewZoom +
+            ') translate(' +
+            dragScrollLeft +
+            'px, ' +
+            dragScrollTop +
+            'px)'
+          "
+          class="img-fluid transition-transform"
+          style="
+            max-height: 90%;
+            max-width: 90%;
+            object-fit: contain;
+            transition: transform 0.1s ease-out;
+          "
+          alt="Preview"
+          draggable="false"
+        />
+      </div>
+
+      <!-- Controles de Zoom -->
+      <div
+        class="position-absolute bottom-0 start-50 translate-middle-x mb-4 d-flex gap-2 bg-black bg-opacity-50 p-2 rounded-pill shadow-lg z-3"
+      >
+        <button
+          cButton
+          color="light"
+          variant="ghost"
+          size="sm"
+          class="text-white rounded-circle"
+          (click)="zoomOut()"
         >
-           <img
-            [src]="preview[previewItem.uuid]"
-            [style.transform]="'scale(' + previewZoom + ') translate(' + dragScrollLeft + 'px, ' + dragScrollTop + 'px)'"
-            class="img-fluid transition-transform"
-            style="max-height: 90%; max-width: 90%; object-fit: contain; transition: transform 0.1s ease-out;"
-            alt="Preview"
-            draggable="false"
-          />
-       </div>
-       
-       <!-- Controles de Zoom -->
-       <div class="position-absolute bottom-0 start-50 translate-middle-x mb-4 d-flex gap-2 bg-black bg-opacity-50 p-2 rounded-pill shadow-lg z-3">
-          <button cButton color="light" variant="ghost" size="sm" class="text-white rounded-circle" (click)="zoomOut()">
-             <svg cIcon name="cilMinus"></svg>
-          </button>
-          <span class="text-white align-self-center px-2 small fw-bold">{{ (previewZoom * 100) | number:'1.0-0' }}%</span>
-          <button cButton color="light" variant="ghost" size="sm" class="text-white rounded-circle" (click)="zoomIn()">
-             <svg cIcon name="cilPlus"></svg>
-          </button>
-          <div class="vr bg-white opacity-25 mx-1"></div>
-          <button cButton color="light" variant="ghost" size="sm" class="text-white rounded-circle" (click)="resetZoom()" cTooltip="Reset Zoom">
-             <svg cIcon name="cilFullscreen"></svg>
-          </button>
-       </div>
+          <svg cIcon name="cilMinus"></svg>
+        </button>
+        <span class="text-white align-self-center px-2 small fw-bold"
+          >{{ previewZoom * 100 | number: '1.0-0' }}%</span
+        >
+        <button
+          cButton
+          color="light"
+          variant="ghost"
+          size="sm"
+          class="text-white rounded-circle"
+          (click)="zoomIn()"
+        >
+          <svg cIcon name="cilPlus"></svg>
+        </button>
+        <div class="vr bg-white opacity-25 mx-1"></div>
+        <button
+          cButton
+          color="light"
+          variant="ghost"
+          size="sm"
+          class="text-white rounded-circle"
+          (click)="resetZoom()"
+          cTooltip="Reset Zoom"
+        >
+          <svg cIcon name="cilFullscreen"></svg>
+        </button>
+      </div>
     }
   </c-modal-body>
   <c-modal-footer class="bg-light border-top-0 justify-content-between">
@@ -346,7 +438,7 @@
       <div class="d-flex flex-column">
         <small class="text-muted fw-bold">{{ previewItem.nombre }}</small>
         <small class="text-secondary">
-          {{ previewItem.mime }} - {{ ((previewItem.tamano || 0) / 1024) | number:'1.2-2' }} KB
+          {{ previewItem.mime }} - {{ (previewItem.tamano || 0) / 1024 | number: '1.2-2' }} KB
         </small>
       </div>
     }
@@ -359,7 +451,9 @@
 <app-confirmation-modal
   [visible]="confirmationModalVisible"
   [title]="'COMMON.CONFIRM_DELETE' | translate"
-  [message]="('COMMON.VERIFY_DELETE' | translate) + (itemToDelete ? ' (' + itemToDelete.nombre + ')' : '')"
+  [message]="
+    ('COMMON.VERIFY_DELETE' | translate) + (itemToDelete ? ' (' + itemToDelete.nombre + ')' : '')
+  "
   [confirmText]="'COMMON.DELETE' | translate"
   [cancelText]="'COMMON.CANCEL' | translate"
   [type]="'danger'"

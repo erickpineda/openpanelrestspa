@@ -6,7 +6,7 @@ import { LanguageService, Language } from './language.service';
 import { LoggerService } from './logger.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TranslationService {
   private translationsSubject = new BehaviorSubject<any>({});
@@ -25,27 +25,29 @@ export class TranslationService {
 
   private init(): void {
     // Cargar traducciones por defecto primero o en paralelo
-    this.loadLanguage(this.DEFAULT_LANG).subscribe(trans => {
+    this.loadLanguage(this.DEFAULT_LANG).subscribe((trans) => {
       this.defaultTranslations = trans;
 
       // Suscribirse a cambios de idioma
-      this.languageService.currentLang$.pipe(
-        switchMap(lang => {
-          if (lang === this.DEFAULT_LANG) {
-            return of(this.defaultTranslations);
-          }
-          return this.loadLanguage(lang);
-        })
-      ).subscribe(translations => {
-        this.translationsSubject.next(translations);
-      });
+      this.languageService.currentLang$
+        .pipe(
+          switchMap((lang) => {
+            if (lang === this.DEFAULT_LANG) {
+              return of(this.defaultTranslations);
+            }
+            return this.loadLanguage(lang);
+          })
+        )
+        .subscribe((translations) => {
+          this.translationsSubject.next(translations);
+        });
     });
   }
 
   private loadLanguage(lang: Language): Observable<any> {
     return this.http.get(`assets/i18n/${lang}.json`).pipe(
       tap(() => this.logger.debug(`Traducciones cargadas para: ${lang}`)),
-      catchError(err => {
+      catchError((err) => {
         this.logger.error(`Error cargando traducciones para ${lang}`, err);
         return of({});
       })
@@ -53,7 +55,8 @@ export class TranslationService {
   }
 
   translate(key: string, params?: any): string {
-    const translation = this.getValue(this.translationsSubject.value, key) ||
+    const translation =
+      this.getValue(this.translationsSubject.value, key) ||
       this.getValue(this.defaultTranslations, key) ||
       key;
 

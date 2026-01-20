@@ -44,9 +44,7 @@ export class ComentarioFacadeService {
     );
   }
 
-  cargarDatosParaEdicion(
-    idComentario: number
-  ): Observable<{
+  cargarDatosParaEdicion(idComentario: number): Observable<{
     comentario: Comentario | null;
     usuario: PerfilResponse | null;
     entrada: Entrada | null;
@@ -80,9 +78,8 @@ export class ComentarioFacadeService {
         },
       ],
     };
-    return this.entradaService.buscarSafe(searchRequest, 0, 10).pipe(
-      map((resp: any) => resp.elements || [])
-    );
+    return this.entradaService
+      .buscarSafe(searchRequest, 0, 10)
+      .pipe(map((resp: any) => resp.elements || []));
   }
 }
-

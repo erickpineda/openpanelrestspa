@@ -122,4 +122,3 @@ export class EditarComentarioComponent implements OnChanges {
     this.formComponent.guardar();
   }
 }
-

@@ -20,7 +20,6 @@ import { ToastService } from '@app/core/services/ui/toast.service';
 import { environment } from '../../../../environments/environment';
 import { AuthSyncService } from '@app/core/services/auth/auth-sync.service';
 import { OPConstants } from '@shared/constants/op-global.constants';
- 
 
 @Component({
   selector: 'app-dashboard',
@@ -215,7 +214,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } catch {}
     this.refreshDashboard();
     this.loadRecentActivity();
- 
+
     this.onAuthChangedHandler = (ev: any) => {
       const d = ev && ev.detail ? ev.detail : null;
       const key = d && d.key ? String(d.key) : '';
@@ -242,10 +241,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   metricsVisible(): boolean {
     try {
       const win = typeof window !== 'undefined' ? window : null;
-      const searchFlag = win ? new URLSearchParams(win.location.search).get('metrics') === '1' : false;
+      const searchFlag = win
+        ? new URLSearchParams(win.location.search).get('metrics') === '1'
+        : false;
       const hash = win ? win.location.hash || '' : '';
       const qm = hash.indexOf('?');
-      const hashFlag = qm >= 0 ? new URLSearchParams(hash.substring(qm + 1)).get('metrics') === '1' : false;
+      const hashFlag =
+        qm >= 0 ? new URLSearchParams(hash.substring(qm + 1)).get('metrics') === '1' : false;
       const urlFlag = searchFlag || hashFlag;
       return this.isLocalEnv() && (this.metricsExpanded || urlFlag);
     } catch {
@@ -256,7 +258,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!this.isLocalEnv()) return;
     this.metricsExpanded = !this.metricsExpanded;
     try {
-      sessionStorage.setItem(OPConstants.Storage.DASH_METRICS_EXPANDED_KEY, this.metricsExpanded ? '1' : '0');
+      sessionStorage.setItem(
+        OPConstants.Storage.DASH_METRICS_EXPANDED_KEY,
+        this.metricsExpanded ? '1' : '0'
+      );
     } catch {}
   }
   toggleForceFromDb(): void {
@@ -319,7 +324,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       } catch {}
     };
     const sub = this.dashboardFacade
-      .refreshAll(this.seriesDays, this.seriesGranularity, this.topLimit, force, this.topCustomStartDate, this.topCustomEndDate)
+      .refreshAll(
+        this.seriesDays,
+        this.seriesGranularity,
+        this.topLimit,
+        force,
+        this.topCustomStartDate,
+        this.topCustomEndDate
+      )
       .subscribe({
         next: ([summary, series, topUsers, topCategories, topTags, storage, contentStats]) => {
           try {
@@ -333,9 +345,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
               this.data = {
                 labels: points.map((p) => this.formatLabelFromDate(p.date)),
                 datasets: [
-                  { label: 'Entradas', backgroundColor: '#007bff', data: points.map((p) => p.entradas) },
-                  { label: 'Comentarios', backgroundColor: '#ff7f0e', data: points.map((p) => p.comentarios) },
-                  { label: 'Usuarios', backgroundColor: '#2ca02c', data: points.map((p) => p.usuarios) },
+                  {
+                    label: 'Entradas',
+                    backgroundColor: '#007bff',
+                    data: points.map((p) => p.entradas),
+                  },
+                  {
+                    label: 'Comentarios',
+                    backgroundColor: '#ff7f0e',
+                    data: points.map((p) => p.comentarios),
+                  },
+                  {
+                    label: 'Usuarios',
+                    backgroundColor: '#2ca02c',
+                    data: points.map((p) => p.usuarios),
+                  },
                 ],
               };
               this.dataRawLabels = (series as ActivityPointDTO[]).map((p) => String(p.date || ''));
@@ -376,7 +400,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
     try {
       if (this.onAuthChangedHandler)
-        window.removeEventListener(OPConstants.Events.AUTH_CHANGED, this.onAuthChangedHandler as any);
+        window.removeEventListener(
+          OPConstants.Events.AUTH_CHANGED,
+          this.onAuthChangedHandler as any
+        );
     } catch {}
   }
   cargarEstadisticas(): void {
@@ -405,39 +432,45 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.topCustomStartDate && this.topCustomEndDate
         ? { startDate: this.topCustomStartDate, endDate: this.topCustomEndDate }
         : this.getPeriodDates(this.topPeriodDays);
-    const subTopUsers = this.dashboardFacade.getTop('users', this.topLimit, false, startDate, endDate).subscribe({
-      next: (items: TopItemDTO[]) => {
-        this.topUsers = items || [];
-        this.loadingTopUsers = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.loadingTopUsers = false;
-        this.errorTopUsers = 'Error obteniendo Top Usuarios';
-      },
-    });
-    const subTopCategories = this.dashboardFacade.getTop('categories', this.topLimit, false, startDate, endDate).subscribe({
-      next: (items: TopItemDTO[]) => {
-        this.topCategories = items || [];
-        this.loadingTopCategories = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.loadingTopCategories = false;
-        this.errorTopCategories = 'Error obteniendo Top Categorías';
-      },
-    });
-    const subTopTags = this.dashboardFacade.getTop('tags', this.topLimit, false, startDate, endDate).subscribe({
-      next: (items: TopItemDTO[]) => {
-        this.topTags = items || [];
-        this.loadingTopTags = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.loadingTopTags = false;
-        this.errorTopTags = 'Error obteniendo Top Tags';
-      },
-    });
+    const subTopUsers = this.dashboardFacade
+      .getTop('users', this.topLimit, false, startDate, endDate)
+      .subscribe({
+        next: (items: TopItemDTO[]) => {
+          this.topUsers = items || [];
+          this.loadingTopUsers = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.loadingTopUsers = false;
+          this.errorTopUsers = 'Error obteniendo Top Usuarios';
+        },
+      });
+    const subTopCategories = this.dashboardFacade
+      .getTop('categories', this.topLimit, false, startDate, endDate)
+      .subscribe({
+        next: (items: TopItemDTO[]) => {
+          this.topCategories = items || [];
+          this.loadingTopCategories = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.loadingTopCategories = false;
+          this.errorTopCategories = 'Error obteniendo Top Categorías';
+        },
+      });
+    const subTopTags = this.dashboardFacade
+      .getTop('tags', this.topLimit, false, startDate, endDate)
+      .subscribe({
+        next: (items: TopItemDTO[]) => {
+          this.topTags = items || [];
+          this.loadingTopTags = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.loadingTopTags = false;
+          this.errorTopTags = 'Error obteniendo Top Tags';
+        },
+      });
     this.subscription.add(subTopUsers);
     this.subscription.add(subTopCategories);
     this.subscription.add(subTopTags);
@@ -528,19 +561,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
   changeSeriesDays(days: number): void {
     const d = Math.max(1, Math.min(365, Number(days) || 30));
     this.seriesDays = d;
-    const sub = this.dashboardFacade.getSeries(this.seriesDays, true, this.seriesGranularity).subscribe({
-      next: (points: ActivityPointDTO[]) => {
-        this.data = {
-          labels: points.map((p) => this.formatLabelFromDate(p.date)),
-          datasets: [
-            { label: 'Entradas', backgroundColor: '#007bff', data: points.map((p) => p.entradas) },
-            { label: 'Comentarios', backgroundColor: '#ff7f0e', data: points.map((p) => p.comentarios) },
-            { label: 'Usuarios', backgroundColor: '#2ca02c', data: points.map((p) => p.usuarios) },
-          ],
-        };
-        this.cdr.detectChanges();
-      },
-    });
+    const sub = this.dashboardFacade
+      .getSeries(this.seriesDays, true, this.seriesGranularity)
+      .subscribe({
+        next: (points: ActivityPointDTO[]) => {
+          this.data = {
+            labels: points.map((p) => this.formatLabelFromDate(p.date)),
+            datasets: [
+              {
+                label: 'Entradas',
+                backgroundColor: '#007bff',
+                data: points.map((p) => p.entradas),
+              },
+              {
+                label: 'Comentarios',
+                backgroundColor: '#ff7f0e',
+                data: points.map((p) => p.comentarios),
+              },
+              {
+                label: 'Usuarios',
+                backgroundColor: '#2ca02c',
+                data: points.map((p) => p.usuarios),
+              },
+            ],
+          };
+          this.cdr.detectChanges();
+        },
+      });
     this.subscription.add(sub);
     this.loadSeriesEntriesSplitEstado();
     this.loadSeriesEntriesSplitEstadoNombre();
@@ -569,7 +616,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   applySettings(): void {
     const sd = Math.max(1, Math.min(365, Number(this.settings.seriesDays) || this.seriesDays));
     const tl = Math.max(1, Math.min(200, Number(this.settings.topLimit) || this.topLimit));
-    const tp = Math.max(1, Math.min(365, Number(this.settings.topPeriodDays) || this.topPeriodDays));
+    const tp = Math.max(
+      1,
+      Math.min(365, Number(this.settings.topPeriodDays) || this.topPeriodDays)
+    );
     const gran = this.settings.seriesGranularity;
     const sDate = this.settings.topStartDate;
     const eDate = this.settings.topEndDate;
@@ -664,10 +714,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
       if (this.data && Array.isArray(this.data.labels) && Array.isArray(this.data.datasets)) {
-        const headers = ['date', ...this.data.datasets.map((ds: any) => String(ds.label || 'serie'))];
+        const headers = [
+          'date',
+          ...this.data.datasets.map((ds: any) => String(ds.label || 'serie')),
+        ];
         const rows: any[][] = (this.data.labels as string[]).map((d: string, i: number) => [
           d,
-          ...this.data.datasets.map((ds: any) => (Array.isArray(ds.data) ? (ds.data[i] ?? '') : '')),
+          ...this.data.datasets.map((ds: any) =>
+            Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+          ),
         ]);
         const csv = this.buildCsv(headers, rows);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
@@ -689,57 +744,119 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (folder) folder.file(name, content);
       };
       if (this.data && Array.isArray(this.data.labels) && Array.isArray(this.data.datasets)) {
-        const headers = ['date', ...this.data.datasets.map((ds: any) => String(ds.label || 'serie'))];
+        const headers = [
+          'date',
+          ...this.data.datasets.map((ds: any) => String(ds.label || 'serie')),
+        ];
         const rows: any[][] = (this.data.labels as string[]).map((d: string, i: number) => [
           d,
-          ...this.data.datasets.map((ds: any) => (Array.isArray(ds.data) ? (ds.data[i] ?? '') : '')),
+          ...this.data.datasets.map((ds: any) =>
+            Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+          ),
         ]);
         addFile('series.csv', this.buildCsv(headers, rows));
       }
-      if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.labels) && Array.isArray(this.seriesEntriesSplitData.datasets)) {
-        const headers = ['date', ...this.seriesEntriesSplitData.datasets.map((ds: any) => String(ds.label || 'valor'))];
-        const rows: any[][] = (this.seriesEntriesSplitData.labels as string[]).map((d: string, i: number) => [
-          d,
-          ...this.seriesEntriesSplitData.datasets.map((ds: any) => (Array.isArray(ds.data) ? (ds.data[i] ?? '') : '')),
-        ]);
+      if (
+        this.seriesEntriesSplitData &&
+        Array.isArray(this.seriesEntriesSplitData.labels) &&
+        Array.isArray(this.seriesEntriesSplitData.datasets)
+      ) {
+        const headers = [
+          'date',
+          ...this.seriesEntriesSplitData.datasets.map((ds: any) => String(ds.label || 'valor')),
+        ];
+        const rows: any[][] = (this.seriesEntriesSplitData.labels as string[]).map(
+          (d: string, i: number) => [
+            d,
+            ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
+              Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+            ),
+          ]
+        );
         addFile('series_split_estado.csv', this.buildCsv(headers, rows));
       }
-      if (this.seriesEntriesSplitEstadoNombreData && Array.isArray(this.seriesEntriesSplitEstadoNombreData.labels) && Array.isArray(this.seriesEntriesSplitEstadoNombreData.datasets)) {
-        const headers = ['date', ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) => String(ds.label || 'estado'))];
-        const rows: any[][] = (this.seriesEntriesSplitEstadoNombreData.labels as string[]).map((d: string, i: number) => [
-          d,
-          ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) => (Array.isArray(ds.data) ? (ds.data[i] ?? '') : '')),
-        ]);
+      if (
+        this.seriesEntriesSplitEstadoNombreData &&
+        Array.isArray(this.seriesEntriesSplitEstadoNombreData.labels) &&
+        Array.isArray(this.seriesEntriesSplitEstadoNombreData.datasets)
+      ) {
+        const headers = [
+          'date',
+          ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
+            String(ds.label || 'estado')
+          ),
+        ];
+        const rows: any[][] = (this.seriesEntriesSplitEstadoNombreData.labels as string[]).map(
+          (d: string, i: number) => [
+            d,
+            ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
+              Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
+            ),
+          ]
+        );
         addFile('series_split_estado_nombre.csv', this.buildCsv(headers, rows));
       }
       if (Array.isArray(this.topUsers) && this.topUsers.length) {
-        addFile('top_users.csv', this.buildCsv(['name', 'count'], this.topUsers.map((t) => [t?.name ?? '', t?.count ?? 0])));
+        addFile(
+          'top_users.csv',
+          this.buildCsv(
+            ['name', 'count'],
+            this.topUsers.map((t) => [t?.name ?? '', t?.count ?? 0])
+          )
+        );
       }
       if (Array.isArray(this.topCategories) && this.topCategories.length) {
-        addFile('top_categories.csv', this.buildCsv(['name', 'count'], this.topCategories.map((t) => [t?.name ?? '', t?.count ?? 0])));
+        addFile(
+          'top_categories.csv',
+          this.buildCsv(
+            ['name', 'count'],
+            this.topCategories.map((t) => [t?.name ?? '', t?.count ?? 0])
+          )
+        );
       }
       if (Array.isArray(this.topTags) && this.topTags.length) {
-        addFile('top_tags.csv', this.buildCsv(['name', 'count'], this.topTags.map((t) => [t?.name ?? '', t?.count ?? 0])));
+        addFile(
+          'top_tags.csv',
+          this.buildCsv(
+            ['name', 'count'],
+            this.topTags.map((t) => [t?.name ?? '', t?.count ?? 0])
+          )
+        );
       }
       if (this.contentStats) {
-        addFile('content_stats.csv', this.buildCsv(['metric', 'value'], [
-          ['totalUsuarios', this.contentStats.totalUsuarios ?? 0],
-          ['totalEntradas', this.contentStats.totalEntradas ?? 0],
-          ['totalComentarios', this.contentStats.totalComentarios ?? 0],
-          ['totalFicheros', this.contentStats.totalFicheros ?? 0],
-          ['storageBytes', this.contentStats.storageBytes ?? 0],
-        ]));
+        addFile(
+          'content_stats.csv',
+          this.buildCsv(
+            ['metric', 'value'],
+            [
+              ['totalUsuarios', this.contentStats.totalUsuarios ?? 0],
+              ['totalEntradas', this.contentStats.totalEntradas ?? 0],
+              ['totalComentarios', this.contentStats.totalComentarios ?? 0],
+              ['totalFicheros', this.contentStats.totalFicheros ?? 0],
+              ['storageBytes', this.contentStats.storageBytes ?? 0],
+            ]
+          )
+        );
         if (this.contentStats.entradasByEstado) {
           const headers = ['estado', 'count'];
-          const rows = Object.entries(this.contentStats.entradasByEstado).map(([k, v]) => [k, Number(v) || 0]);
+          const rows = Object.entries(this.contentStats.entradasByEstado).map(([k, v]) => [
+            k,
+            Number(v) || 0,
+          ]);
           addFile('content_stats_estados.csv', this.buildCsv(headers, rows));
         }
       }
       if (this.storage) {
-        addFile('storage.csv', this.buildCsv(['metric', 'value'], [
-          ['totalFiles', this.storage.totalFiles ?? 0],
-          ['storageBytes', this.storage.storageBytes ?? 0],
-        ]));
+        addFile(
+          'storage.csv',
+          this.buildCsv(
+            ['metric', 'value'],
+            [
+              ['totalFiles', this.storage.totalFiles ?? 0],
+              ['storageBytes', this.storage.storageBytes ?? 0],
+            ]
+          )
+        );
       }
       const blob = await zip.generateAsync({ type: 'blob' });
       saveAs(blob, `dashboard_${datePart}_${timePart}.zip`);
@@ -765,7 +882,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const data = labels.map((k) => Number(cs.entradasByEstado?.[k]) || 0);
     const chart = {
       labels,
-      datasets: [{ label: 'Entradas por estado', backgroundColor: labels.map((l, i) => this.colorForLabel(l, i)), data }],
+      datasets: [
+        {
+          label: 'Entradas por estado',
+          backgroundColor: labels.map((l, i) => this.colorForLabel(l, i)),
+          data,
+        },
+      ],
     };
     this.contentStatsChartData = chart;
     try {
@@ -776,8 +899,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } catch {}
   }
   get contentEstadoRows(): { estado: string; total: number; porcentaje: number }[] {
-    const entries = this.contentStats && (this.contentStats as any).entradasByEstado ? Object.entries((this.contentStats as any).entradasByEstado) : [];
-    const total = (this.contentStats as any)?.totalEntradas || entries.reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
+    const entries =
+      this.contentStats && (this.contentStats as any).entradasByEstado
+        ? Object.entries((this.contentStats as any).entradasByEstado)
+        : [];
+    const total =
+      (this.contentStats as any)?.totalEntradas ||
+      entries.reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
     return entries
       .map(([k, v]) => {
         const count = Number(v) || 0;
@@ -794,83 +922,103 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadSeriesEntriesSplitEstado(): void {
     this.loadingSplitEstado = true;
     this.errorSplitEstado = null;
-    const sub = this.dashboardFacade.getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, true).subscribe({
-      next: (arr: any[]) => {
-        const labels = Array.isArray(arr) ? arr.map((p) => this.formatLabelFromDate(p?.date)) : [];
-        const hasNested = Array.isArray(arr) && arr.some((p) => p && typeof p.entradasByEstado === 'object');
-        if (hasNested) {
-          const estados = Array.from(new Set(arr.flatMap((p) => Object.keys(p.entradasByEstado || {}))));
-          const datasets = estados.map((estado, i) => ({
-            label: estado,
-            backgroundColor: this.colorForLabel(estado, i),
-            data: arr.map((p) => Number(p.entradasByEstado?.[estado]) || 0),
-          }));
-          this.seriesEntriesSplitData = { labels, datasets };
-        } else {
-          const keys = Array.from(new Set(arr.flatMap((p) => Object.keys(p || {}).filter((k) => k !== 'date'))));
-          const datasets = keys.map((k, i) => ({
-            label: String(k).toUpperCase(),
-            backgroundColor: this.colorForLabel(k, i),
-            data: arr.map((p) => Number(p?.[k] || 0)),
-          }));
-          this.seriesEntriesSplitData = { labels, datasets };
-        }
-        try {
-          setTimeout(() => {
-            this.seriesEntriesSplitData = {
-              labels: [...labels],
-              datasets: (this.seriesEntriesSplitData.datasets || []).map((d: any) => ({ ...d, data: [...d.data] })),
-            };
-            this.cdr.detectChanges();
-          }, 0);
-        } catch {}
-        this.loadingSplitEstado = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.loadingSplitEstado = false;
-        this.errorSplitEstado = 'Error obteniendo series por estado';
-      },
-    });
+    const sub = this.dashboardFacade
+      .getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, true)
+      .subscribe({
+        next: (arr: any[]) => {
+          const labels = Array.isArray(arr)
+            ? arr.map((p) => this.formatLabelFromDate(p?.date))
+            : [];
+          const hasNested =
+            Array.isArray(arr) && arr.some((p) => p && typeof p.entradasByEstado === 'object');
+          if (hasNested) {
+            const estados = Array.from(
+              new Set(arr.flatMap((p) => Object.keys(p.entradasByEstado || {})))
+            );
+            const datasets = estados.map((estado, i) => ({
+              label: estado,
+              backgroundColor: this.colorForLabel(estado, i),
+              data: arr.map((p) => Number(p.entradasByEstado?.[estado]) || 0),
+            }));
+            this.seriesEntriesSplitData = { labels, datasets };
+          } else {
+            const keys = Array.from(
+              new Set(arr.flatMap((p) => Object.keys(p || {}).filter((k) => k !== 'date')))
+            );
+            const datasets = keys.map((k, i) => ({
+              label: String(k).toUpperCase(),
+              backgroundColor: this.colorForLabel(k, i),
+              data: arr.map((p) => Number(p?.[k] || 0)),
+            }));
+            this.seriesEntriesSplitData = { labels, datasets };
+          }
+          try {
+            setTimeout(() => {
+              this.seriesEntriesSplitData = {
+                labels: [...labels],
+                datasets: (this.seriesEntriesSplitData.datasets || []).map((d: any) => ({
+                  ...d,
+                  data: [...d.data],
+                })),
+              };
+              this.cdr.detectChanges();
+            }, 0);
+          } catch {}
+          this.loadingSplitEstado = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.loadingSplitEstado = false;
+          this.errorSplitEstado = 'Error obteniendo series por estado';
+        },
+      });
     this.subscription.add(sub);
   }
   loadSeriesEntriesSplitEstadoNombre(): void {
     this.errorSplitEstadoNombre = null;
-    const sub = this.dashboardFacade.getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, true).subscribe({
-      next: (arr: any[]) => {
-        const flatArr = Array.isArray(arr)
-          ? arr.map((p) => (p && typeof p.entradasByEstado === 'object' ? { date: p.date, ...p.entradasByEstado } : p))
-          : [];
-        const labels = flatArr.map((p) => this.formatLabelFromDate(p?.date));
-        const estadosSet = new Set<string>();
-        flatArr.forEach((p) => Object.keys(p || {}).forEach((k) => k !== 'date' && estadosSet.add(k)));
-        const estados = Array.from(estadosSet);
-        const datasets = estados.map((e, i) => ({
-          label: String(e),
-          backgroundColor: this.colorForLabel(e, i),
-          borderColor: this.colorForLabel(e, i),
-          fill: false,
-          tension: 0.2,
-          data: flatArr.map((r) => Number(r?.[e] || 0)),
-        }));
-        const chart = { labels, datasets };
-        this.seriesEntriesSplitEstadoNombreData = chart;
-        this.updateEstadoNominalOptions();
-        try {
-          setTimeout(() => {
-            this.seriesEntriesSplitEstadoNombreData = {
-              labels: [...labels],
-              datasets: datasets.map((d) => ({ ...d, data: [...d.data] })),
-            };
-            this.cdr.detectChanges();
-          }, 0);
-        } catch {}
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.errorSplitEstadoNombre = 'Error obteniendo series pivot por estado';
-      },
-    });
+    const sub = this.dashboardFacade
+      .getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, true)
+      .subscribe({
+        next: (arr: any[]) => {
+          const flatArr = Array.isArray(arr)
+            ? arr.map((p) =>
+                p && typeof p.entradasByEstado === 'object'
+                  ? { date: p.date, ...p.entradasByEstado }
+                  : p
+              )
+            : [];
+          const labels = flatArr.map((p) => this.formatLabelFromDate(p?.date));
+          const estadosSet = new Set<string>();
+          flatArr.forEach((p) =>
+            Object.keys(p || {}).forEach((k) => k !== 'date' && estadosSet.add(k))
+          );
+          const estados = Array.from(estadosSet);
+          const datasets = estados.map((e, i) => ({
+            label: String(e),
+            backgroundColor: this.colorForLabel(e, i),
+            borderColor: this.colorForLabel(e, i),
+            fill: false,
+            tension: 0.2,
+            data: flatArr.map((r) => Number(r?.[e] || 0)),
+          }));
+          const chart = { labels, datasets };
+          this.seriesEntriesSplitEstadoNombreData = chart;
+          this.updateEstadoNominalOptions();
+          try {
+            setTimeout(() => {
+              this.seriesEntriesSplitEstadoNombreData = {
+                labels: [...labels],
+                datasets: datasets.map((d) => ({ ...d, data: [...d.data] })),
+              };
+              this.cdr.detectChanges();
+            }, 0);
+          } catch {}
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.errorSplitEstadoNombre = 'Error obteniendo series pivot por estado';
+        },
+      });
     this.subscription.add(sub);
   }
   updateEstadoNominalOptions(): void {
@@ -878,7 +1026,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       maintainAspectRatio: false,
       plugins: { legend: { position: 'top' } },
       responsive: true,
-      scales: this.estadoNominalChartType === 'bar' ? { x: { stacked: this.estadoNominalStacked }, y: { stacked: this.estadoNominalStacked } } : {},
+      scales:
+        this.estadoNominalChartType === 'bar'
+          ? { x: { stacked: this.estadoNominalStacked }, y: { stacked: this.estadoNominalStacked } }
+          : {},
     };
   }
   setEstadoNominalChartType(t: 'line' | 'bar'): void {
@@ -889,15 +1040,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.estadoNominalStacked = !this.estadoNominalStacked;
     this.updateEstadoNominalOptions();
   }
-  formatLabelFromDate(dateStr: string, granularity: 'hour' | 'day' | 'week' | 'month' = this.seriesGranularity, short = true): string {
+  formatLabelFromDate(
+    dateStr: string,
+    granularity: 'hour' | 'day' | 'week' | 'month' = this.seriesGranularity,
+    short = true
+  ): string {
     try {
       const d = new Date(dateStr + 'T00:00:00Z');
       const opts: Intl.DateTimeFormatOptions =
         granularity === 'month'
           ? { month: 'short' }
           : granularity === 'week'
-          ? { day: '2-digit', month: 'short' }
-          : { day: '2-digit', month: 'short' };
+            ? { day: '2-digit', month: 'short' }
+            : { day: '2-digit', month: 'short' };
       return new Intl.DateTimeFormat('es-ES', opts).format(d);
     } catch {
       return dateStr;
@@ -905,9 +1060,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
   get sumEntradasSerie(): number {
     try {
-      const arr = this.data && this.data.datasets && this.data.datasets[0] && Array.isArray(this.data.datasets[0].data)
-        ? (this.data.datasets[0].data as number[])
-        : [];
+      const arr =
+        this.data &&
+        this.data.datasets &&
+        this.data.datasets[0] &&
+        Array.isArray(this.data.datasets[0].data)
+          ? (this.data.datasets[0].data as number[])
+          : [];
       return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
     } catch {
       return 0;
@@ -915,9 +1074,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
   get sumComentarios(): number {
     try {
-      const arr = this.data && this.data.datasets && this.data.datasets[1] && Array.isArray(this.data.datasets[1].data)
-        ? (this.data.datasets[1].data as number[])
-        : [];
+      const arr =
+        this.data &&
+        this.data.datasets &&
+        this.data.datasets[1] &&
+        Array.isArray(this.data.datasets[1].data)
+          ? (this.data.datasets[1].data as number[])
+          : [];
       return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
     } catch {
       return 0;
@@ -925,9 +1088,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
   get sumUsuarios(): number {
     try {
-      const arr = this.data && this.data.datasets && this.data.datasets[2] && Array.isArray(this.data.datasets[2].data)
-        ? (this.data.datasets[2].data as number[])
-        : [];
+      const arr =
+        this.data &&
+        this.data.datasets &&
+        this.data.datasets[2] &&
+        Array.isArray(this.data.datasets[2].data)
+          ? (this.data.datasets[2].data as number[])
+          : [];
       return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
     } catch {
       return 0;

@@ -25,13 +25,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
     ContactComponent,
     NavBarPublicComponent,
   ],
-  imports: [
-    PublicRoutingModule,
-    CoreModule,
-    SharedOPModule,
-    SharedCoreUiModule,
-    IconModule,
-  ],
+  imports: [PublicRoutingModule, CoreModule, SharedOPModule, SharedCoreUiModule, IconModule],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })
 export class PublicFeatureModule {}

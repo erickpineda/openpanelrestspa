@@ -31,7 +31,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   // Patrón de toolbar/búsqueda
   showAdvanced: boolean = false;
   basicSearchText: string = '';
-  
+
   confirmationModalVisible = false;
   itemToDelete: MediaItem | null = null;
 
@@ -109,14 +109,17 @@ export class ArchivosComponent implements OnInit, OnDestroy {
 
   confirmDelete(): void {
     if (!this.itemToDelete || !this.itemToDelete.uuid) return;
-    
+
     this.loading = true;
-    this.fileStorage.deleteMedia(this.itemToDelete.uuid)
-      .pipe(finalize(() => {
-        this.loading = false;
-        this.itemToDelete = null;
-        this.cdr.detectChanges();
-      }))
+    this.fileStorage
+      .deleteMedia(this.itemToDelete.uuid)
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.itemToDelete = null;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: () => {
           this.toast.showSuccess('Archivo eliminado correctamente');
@@ -125,7 +128,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error(err);
           this.toast.showError('Error al eliminar el archivo');
-        }
+        },
       });
   }
 

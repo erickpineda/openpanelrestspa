@@ -66,11 +66,7 @@ export class EntradaFormStateService {
     this.updateState({ isFullWidth: !this.currentState.isFullWidth });
   }
 
-  saveTemporaryEntry(data: {
-    formData: any;
-    title?: string;
-    description?: string;
-  }): void {
+  saveTemporaryEntry(data: { formData: any; title?: string; description?: string }): void {
     const entry = {
       formData: data.formData,
       timestamp: new Date().toISOString(),
@@ -78,11 +74,11 @@ export class EntradaFormStateService {
       title: data.title,
       description: data.description,
     };
-    
+
     // Pasamos el ID actual si existe para actualizar la entrada en lugar de crear una nueva
     const currentId = this.currentState.currentTemporaryEntryId || undefined;
     const id = this.temporaryStorage.saveTemporaryEntry(entry, currentId);
-    
+
     if (id !== currentId) {
       this.updateState({ currentTemporaryEntryId: id });
     }

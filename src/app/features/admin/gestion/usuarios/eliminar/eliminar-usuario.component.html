@@ -1,4 +1,9 @@
-<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" id="deleteUserModal" backdrop="static">
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  id="deleteUserModal"
+  backdrop="static"
+>
   <c-modal-header class="border-bottom-0">
     <h5 cModalTitle class="fw-bold text-danger">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h5>
   </c-modal-header>
@@ -11,10 +16,12 @@
     </div>
   </c-modal-body>
   <c-modal-footer class="border-top-0 justify-content-center pb-4">
-    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
     <button cButton color="danger" class="px-4" (click)="confirmar()" [disabled]="loading">
       @if (loading) {
-      <c-spinner size="sm" class="me-2"></c-spinner>
+        <c-spinner size="sm" class="me-2"></c-spinner>
       }
       {{ 'ADMIN.USERS.DELETE_PERMANENTLY' | translate }}
     </button>

@@ -31,14 +31,16 @@ const routes: Routes = [
         path: 'configuracion',
         loadChildren: () =>
           import('@features/admin/configuracion/configuracion.module').then(
-            (m) => m.ConfiguracionFeatureModule,
+            (m) => m.ConfiguracionFeatureModule
           ),
         data: { preload: true, delay: 1200, title: 'MENU.SETTINGS' },
       },
       {
         path: 'contenido',
         loadChildren: () =>
-          import('@features/admin/contenido/contenido.module').then((m) => m.ContenidoFeatureModule),
+          import('@features/admin/contenido/contenido.module').then(
+            (m) => m.ContenidoFeatureModule
+          ),
         data: { preload: true, delay: 1400, title: 'MENU.CONTENT' },
       },
       {
@@ -50,7 +52,9 @@ const routes: Routes = [
       {
         path: 'etiquetas',
         loadChildren: () =>
-          import('@features/admin/etiquetas/etiquetas.module').then((m) => m.EtiquetasFeatureModule),
+          import('@features/admin/etiquetas/etiquetas.module').then(
+            (m) => m.EtiquetasFeatureModule
+          ),
         data: { preload: true, delay: 1800, title: 'MENU.TAGS' },
       },
       {
@@ -63,20 +67,24 @@ const routes: Routes = [
         path: 'mantenimiento',
         loadChildren: () =>
           import('@features/admin/mantenimiento/mantenimiento.module').then(
-            (m) => m.MantenimientoFeatureModule,
+            (m) => m.MantenimientoFeatureModule
           ),
         data: { preload: true, delay: 2000, title: 'MENU.MAINTENANCE' },
       },
       {
         path: 'categorias',
         loadChildren: () =>
-          import('@features/admin/categorias/categorias.module').then((m) => m.CategoriasFeatureModule),
+          import('@features/admin/categorias/categorias.module').then(
+            (m) => m.CategoriasFeatureModule
+          ),
         data: { title: 'MENU.CATEGORIES' },
       },
       {
         path: 'comentarios',
         loadChildren: () =>
-          import('@features/admin/comentarios/comentarios.module').then((m) => m.ComentariosFeatureModule),
+          import('@features/admin/comentarios/comentarios.module').then(
+            (m) => m.ComentariosFeatureModule
+          ),
         data: { title: 'MENU.COMMENTS' },
       },
     ],

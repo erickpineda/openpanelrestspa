@@ -37,7 +37,7 @@
           <!-- Section Title using CoreUI -->
           @if (item.title) {
             <div class="nav-section-title" [class.mobile-hidden]="state.isMobile">
-              {{ (item.name || '') | translate }}
+              {{ item.name || '' | translate }}
             </div>
           }
           <!-- Navigation Item using CoreUI -->
@@ -49,7 +49,7 @@
                 [routerLinkActiveOptions]="{ exact: false }"
                 class="nav-link"
                 [class.touch-target]="state.touchEnabled"
-                [attr.aria-label]="(item.name || '') | translate"
+                [attr.aria-label]="item.name || '' | translate"
                 [attr.data-testid]="toTestId(item.name || '')"
                 (click)="onNavigationItemClick(item)"
               >
@@ -62,7 +62,7 @@
                 }
                 <!-- Text -->
                 @if (!state.sidebarCollapsed || state.isMobile) {
-                  {{ (item.name || '') | translate }}
+                  {{ item.name || '' | translate }}
                 }
                 <!-- CoreUI Badge -->
                 @if (item.badge) {
@@ -95,7 +95,7 @@
                         routerLinkActive="active"
                         class="nav-sublink"
                         [class.touch-target]="state.touchEnabled"
-                        [attr.aria-label]="(child.name || '') | translate"
+                        [attr.aria-label]="child.name || '' | translate"
                         [attr.data-testid]="toTestId(child.name || '')"
                         (click)="onNavigationItemClick(child)"
                       >
@@ -103,7 +103,7 @@
                           <svg cIcon [name]="child.icon" class="nav-subicon"></svg>
                         }
                         @if (!state.sidebarCollapsed) {
-                          {{ (child.name || '') | translate }}
+                          {{ child.name || '' | translate }}
                         }
                         @if (child.badge) {
                           <c-badge

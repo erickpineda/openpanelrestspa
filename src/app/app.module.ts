@@ -16,10 +16,7 @@ import { SharedOPModule } from './shared/shared.module';
 import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    GlobalNotificationsComponent,
-  ],
+  declarations: [AppComponent, GlobalNotificationsComponent],
   bootstrap: [AppComponent],
   imports: [
     BrowserModule,

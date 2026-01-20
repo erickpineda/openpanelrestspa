@@ -6,7 +6,13 @@
         <span class="input-group-text bg-light border-end-0">
           <svg cIcon name="cilUser" size="sm"></svg>
         </span>
-        <input cFormControl formControlName="username" type="text" class="border-start-0" readonly />
+        <input
+          cFormControl
+          formControlName="username"
+          type="text"
+          class="border-start-0"
+          readonly
+        />
       </div>
     </c-col>
 
@@ -45,7 +51,7 @@
           (input)="onSearchInput($event)"
           [placeholder]="'ADMIN.COMMENTS.FORM.ENTRY_PLACEHOLDER' | translate"
           [ngClass]="{
-            'is-invalid': (submitted || f['idEntrada'].touched) && f['idEntrada'].invalid
+            'is-invalid': (submitted || f['idEntrada'].touched) && f['idEntrada'].invalid,
           }"
         />
         @if (isEditMode && f['idEntrada'].value) {
@@ -101,7 +107,9 @@
     </c-col>
 
     <c-col md="6">
-      <label class="form-label fw-semibold">{{ 'ADMIN.COMMENTS.FORM.EDIT_DATE' | translate }}</label>
+      <label class="form-label fw-semibold">{{
+        'ADMIN.COMMENTS.FORM.EDIT_DATE' | translate
+      }}</label>
       <div class="input-group">
         <span class="input-group-text bg-light border-end-0">
           <svg cIcon name="cilHistory" size="sm"></svg>
@@ -173,7 +181,7 @@
         formControlName="contenido"
         rows="4"
         [ngClass]="{
-          'is-invalid': (submitted || f['contenido'].touched) && f['contenido'].invalid
+          'is-invalid': (submitted || f['contenido'].touched) && f['contenido'].invalid,
         }"
       ></textarea>
       @if ((submitted || f['contenido'].touched) && f['contenido'].invalid) {
@@ -191,4 +199,3 @@
     </c-col>
   </form>
 }
-

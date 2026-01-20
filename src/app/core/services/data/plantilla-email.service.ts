@@ -19,4 +19,3 @@ export class PlantillaEmailService extends BaseService {
     return this.delete<any>(OPConstants.Methods.PLANTILLA_EMAIL.BORRAR_POR_CODIGO(codigo));
   }
 }
-

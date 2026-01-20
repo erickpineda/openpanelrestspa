@@ -7,7 +7,7 @@ import { CategoriaFormComponent } from '../categoria-form/categoria-form.compone
 @Component({
   selector: 'app-crear-categoria',
   templateUrl: './crear-categoria.component.html',
-  standalone: false
+  standalone: false,
 })
 export class CrearCategoriaComponent {
   @Input() visible = false;
@@ -33,7 +33,10 @@ export class CrearCategoriaComponent {
   guardar(cat: Categoria) {
     this.facade.crearCategoria(cat).subscribe({
       next: () => {
-        this.toastService.showSuccess('La categoría se ha creado correctamente.', 'Categoría creada');
+        this.toastService.showSuccess(
+          'La categoría se ha creado correctamente.',
+          'Categoría creada'
+        );
         this.onSuccess.emit();
         this.cerrarModal();
       },
@@ -41,7 +44,7 @@ export class CrearCategoriaComponent {
         if (this.formComponent) {
           this.formComponent.onError.emit();
         }
-      }
+      },
     });
   }
 

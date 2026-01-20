@@ -53,17 +53,15 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     private searchUtil: SearchUtilService,
     private cdr: ChangeDetectorRef,
     private translate: TranslationService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadRoles();
     this.load();
 
-    this.translate.translations$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.cdr.markForCheck();
-      });
+    this.translate.translations$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnDestroy(): void {
@@ -156,7 +154,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
           this.roles = roles;
         },
-        error: () => { },
+        error: () => {},
       });
   }
 
@@ -236,14 +234,20 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.toast.showSuccess(this.translate.instant('ADMIN.USERS.SUCCESS.DELETE'), this.translate.instant('MENU.USERS'));
+          this.toast.showSuccess(
+            this.translate.instant('ADMIN.USERS.SUCCESS.DELETE'),
+            this.translate.instant('MENU.USERS')
+          );
           this.loading = false;
           this.showDeleteModal = false;
           this.userToDelete = null;
           this.load();
         },
         error: (err: any) => {
-          this.toast.showError(this.translate.instant('ADMIN.USERS.ERROR.DELETE'), this.translate.instant('MENU.USERS'));
+          this.toast.showError(
+            this.translate.instant('ADMIN.USERS.ERROR.DELETE'),
+            this.translate.instant('MENU.USERS')
+          );
           this.log.error('usuarios borrar', err);
           this.loading = false;
           this.showDeleteModal = false;

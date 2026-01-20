@@ -21,7 +21,7 @@ export class ConfirmationModalComponent {
   @Output() cancel = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef) {}
 
   onVisibleChange(isVisible: boolean): void {
     this.visible = isVisible;

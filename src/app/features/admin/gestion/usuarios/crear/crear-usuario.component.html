@@ -1,4 +1,11 @@
-<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" id="createUserModal" backdrop="static" size="lg" scrollable>
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  id="createUserModal"
+  backdrop="static"
+  size="lg"
+  scrollable
+>
   <c-modal-header>
     <h5 cModalTitle class="d-flex align-items-center gap-2">
       <svg cIcon name="cilUserPlus" class="text-primary"></svg>
@@ -7,10 +14,7 @@
     <button (click)="cerrarModal()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body class="p-4">
-    <app-usuario-form
-      [roles]="roles"
-      [loading]="loading"
-      (onSave)="guardar($event)">
+    <app-usuario-form [roles]="roles" [loading]="loading" (onSave)="guardar($event)">
     </app-usuario-form>
   </c-modal-body>
   <c-modal-footer class="bg-light bg-opacity-10">

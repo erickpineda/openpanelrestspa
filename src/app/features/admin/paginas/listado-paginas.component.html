@@ -12,7 +12,13 @@
           </small>
         </div>
         <div class="d-flex gap-2">
-          <button cButton color="secondary" variant="ghost" size="sm" [cTooltip]="'ADMIN.PAGES.PRINT_TOOLTIP' | translate">
+          <button
+            cButton
+            color="secondary"
+            variant="ghost"
+            size="sm"
+            [cTooltip]="'ADMIN.PAGES.PRINT_TOOLTIP' | translate"
+          >
             <svg cIcon name="cilPrint" class="me-1"></svg>
             {{ 'ADMIN.ENTRIES.PRINT' | translate }}
           </button>
@@ -55,14 +61,28 @@
   </c-card>
 </c-container>
 
-<app-confirmation-modal [visible]="visible" [title]="'ADMIN.PAGES.CONFIRM_DELETE_TITLE' | translate"
-  [message]="('ADMIN.PAGES.CONFIRM_DELETE_MSG' | translate) + (entradaABorrar ? ' (' + entradaABorrar.titulo + ')' : '')"
-  [confirmText]="'ADMIN.PAGES.DELETE_PAGE' | translate" [cancelText]="'COMMON.CANCEL' | translate" [type]="'danger'"
-  [loading]="cargando" (visibleChange)="onVisibleModalChange($event)"
-  (confirm)="confirmarBorrado()"></app-confirmation-modal>
+<app-confirmation-modal
+  [visible]="visible"
+  [title]="'ADMIN.PAGES.CONFIRM_DELETE_TITLE' | translate"
+  [message]="
+    ('ADMIN.PAGES.CONFIRM_DELETE_MSG' | translate) +
+    (entradaABorrar ? ' (' + entradaABorrar.titulo + ')' : '')
+  "
+  [confirmText]="'ADMIN.PAGES.DELETE_PAGE' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'danger'"
+  [loading]="cargando"
+  (visibleChange)="onVisibleModalChange($event)"
+  (confirm)="confirmarBorrado()"
+></app-confirmation-modal>
 
-<c-modal #previewModal id="previewModal" [visible]="previewVisible" (visibleChange)="onPreviewVisibleChange($event)"
-  size="xl">
+<c-modal
+  #previewModal
+  id="previewModal"
+  [visible]="previewVisible"
+  (visibleChange)="onPreviewVisibleChange($event)"
+  size="xl"
+>
   <c-modal-header>
     <h5 cModalTitle>{{ 'ADMIN.PAGES.PREVIEW_TITLE' | translate }}: {{ previewEntrada?.titulo }}</h5>
     <button (click)="closePreview()" cButtonClose></button>
@@ -77,6 +97,8 @@
     }
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="closePreview()" cButton color="secondary">{{ 'AUTO.CERRAR' | translate }}</button>
+    <button (click)="closePreview()" cButton color="secondary">
+      {{ 'AUTO.CERRAR' | translate }}
+    </button>
   </c-modal-footer>
 </c-modal>

@@ -22,9 +22,6 @@ import { SharedWidgetsModule } from '../../shared/shared-widgets.module';
     SharedCoreUiModule,
     SharedWidgetsModule,
   ],
-  declarations: [
-    BaseComponent,
-    BaseIndexComponent,
-  ],
+  declarations: [BaseComponent, BaseIndexComponent],
 })
 export class BaseModule {}

@@ -28,6 +28,12 @@ import { DashboardSettingsModalComponent } from './components/dashboard-settings
     DashboardEstadoSplitPanelComponent,
     DashboardSettingsModalComponent,
   ],
-  imports: [CommonModule, SharedOPModule, SharedCoreUiModule, ChartjsModule, DashboardRoutingModule],
+  imports: [
+    CommonModule,
+    SharedOPModule,
+    SharedCoreUiModule,
+    ChartjsModule,
+    DashboardRoutingModule,
+  ],
 })
 export class DashboardFeatureModule {}

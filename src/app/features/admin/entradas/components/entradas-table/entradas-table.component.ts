@@ -6,12 +6,13 @@ import { parseAllowedDate } from '@shared/utils/date-utils';
   selector: 'app-entradas-table',
   templateUrl: './entradas-table.component.html',
   styleUrls: ['./entradas-table.component.scss'],
-  standalone: false
+  standalone: false,
 })
 export class EntradasTableComponent {
   @Input() entradas: Entrada[] = [];
   @Input() loading: boolean = false;
-  @Input() pagingInfo: { page: number; total: number; pages: number; pageSize: number } | null = null;
+  @Input() pagingInfo: { page: number; total: number; pages: number; pageSize: number } | null =
+    null;
   @Input() baseRoute: string = '/admin/control/entradas';
 
   @Output() pageChange = new EventEmitter<number>();
@@ -43,7 +44,11 @@ export class EntradasTableComponent {
       case 'PROGRAMADA':
         return { color: 'info', icon: 'cilCalendar', tooltip: 'Programada' };
       default:
-        return { color: 'secondary', icon: 'cilFile', tooltip: entrada.estadoEntrada?.nombre || 'Archivada' };
+        return {
+          color: 'secondary',
+          icon: 'cilFile',
+          tooltip: entrada.estadoEntrada?.nombre || 'Archivada',
+        };
     }
   }
 

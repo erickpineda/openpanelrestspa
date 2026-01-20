@@ -39,4 +39,3 @@ describe('ComentarioService listarPorIdEntrada', () => {
     req.flush({ data: { elements: [], totalPages: 0 } });
   });
 });
-

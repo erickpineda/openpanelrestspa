@@ -46,6 +46,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   @Input() entrada?: Entrada;
   @Input() customTitle?: string;
   @Input() customSubtitle?: string;
+  @Input() isEditMode = false;
   @Output() submitForm = new EventEmitter<any>();
   @Output() preview = new EventEmitter<Partial<Entrada>>();
   @Output() editar = new EventEmitter<void>();
@@ -94,11 +95,9 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.stateService.state$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.cdRef.markForCheck();
-      });
+    this.stateService.state$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.cdRef.markForCheck();
+    });
 
     this.loadEditorBuild();
 
@@ -115,28 +114,23 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     const fechaCtrl = this.form?.get('fechaPublicacionProgramada');
 
     if (estadoCtrl && fechaCtrl) {
-      this.estadoFechaSub = estadoCtrl.valueChanges
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(() => {
-          fechaCtrl.updateValueAndValidity({ emitEvent: false });
+      this.estadoFechaSub = estadoCtrl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+        fechaCtrl.updateValueAndValidity({ emitEvent: false });
 
-          if (this.isScheduled) {
-            const hasValue = !!fechaCtrl.value;
-            if (!hasValue) {
-              const nowPlusMargin = new Date();
-              nowPlusMargin.setMinutes(nowPlusMargin.getMinutes() + 30);
-              fechaCtrl.setValue(this.formatDateTimeLocal(nowPlusMargin), { emitEvent: false });
-            }
-          } else {
-            fechaCtrl.setValue(null, { emitEvent: false });
+        if (this.isScheduled) {
+          const hasValue = !!fechaCtrl.value;
+          if (!hasValue) {
+            const nowPlusMargin = new Date();
+            nowPlusMargin.setMinutes(nowPlusMargin.getMinutes() + 30);
+            fechaCtrl.setValue(this.formatDateTimeLocal(nowPlusMargin), { emitEvent: false });
           }
-        });
+        } else {
+          fechaCtrl.setValue(null, { emitEvent: false });
+        }
+      });
     }
 
-    window.addEventListener(
-      OPConstants.Events.SAVE_UNSAVED_WORK,
-      this.saveBeforeLogout.bind(this)
-    );
+    window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.saveBeforeLogout.bind(this));
 
     window.addEventListener(
       OPConstants.Events.SAVE_FORM_DATA,
@@ -144,7 +138,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     );
 
     this.checkNavigationState();
-    this.stateService.checkForTemporaryData(!!this.entrada?.idEntrada);
+    this.stateService.checkForTemporaryData(this.isEditMode || !!this.entrada?.idEntrada);
   }
 
   ngOnDestroy(): void {
@@ -224,8 +218,10 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   get esPublicada(): boolean {
-    const estado = (this.entrada?.estadoEntrada ||
-      this.form.get('estadoEntrada')?.value) as EstadoEntrada | null | undefined;
+    const estado = (this.entrada?.estadoEntrada || this.form.get('estadoEntrada')?.value) as
+      | EstadoEntrada
+      | null
+      | undefined;
     const nombreEstado = estado?.nombre?.toUpperCase();
     return nombreEstado === 'PUBLICADA';
   }
@@ -249,7 +245,6 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     now.setMinutes(now.getMinutes() + 30);
     return this.formatDateTimeLocal(now);
   }
-
 
   hasCategoria(c: Categoria): boolean {
     return this.categoriasArray?.value?.some((x: any) => x?.idCategoria === c?.idCategoria);
@@ -452,9 +447,25 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   onRecoverData(): void {
+    if (!this.temporaryData) {
+      this.stateService.dismissRecoveryNotification();
+      return;
+    }
+    
+    // Almacenar referencias antes de ocultar la notificación
+    const dataToRecover = this.temporaryData.formData;
+    const entryId = this.temporaryData.id;
+
+    // 1. Ocultar notificación primero
     this.stateService.dismissRecoveryNotification();
-    this.recoverTemporaryData(this.temporaryData.formData);
-    this.temporaryStorage.removeTemporaryEntry(this.temporaryData.id);
+    
+    // 2. Dar tiempo al ciclo de detección de cambios de Angular para eliminar el elemento del DOM
+    // Esto evita bloqueos de UI o problemas de renderizado ("pantalla seminegra")
+    setTimeout(() => {
+      this.recoverTemporaryData(dataToRecover);
+      this.temporaryStorage.removeTemporaryEntry(entryId);
+      this.cdRef.markForCheck();
+    }, 100);
   }
 
   onIgnoreData(): void {
@@ -486,19 +497,16 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
         resumen: formData.resumen ?? '',
         contenido: formData.contenido ?? '',
         notas: formData.notas ?? '',
-        borrador:
-          formData.borrador ??
-          this.form.get('borrador')?.value ??
-          true,
+        borrador: formData.borrador ?? this.form.get('borrador')?.value ?? true,
         publicada: formData.publicada ?? this.form.get('publicada')?.value ?? false,
         password: formData.password ?? '',
         privado: formData.privado ?? this.form.get('privado')?.value ?? false,
         permitirComentario:
-          formData.permitirComentario ??
-          this.form.get('permitirComentario')?.value ??
-          true,
-        imagenDestacada: formData.imagenDestacada ?? this.form.get('imagenDestacada')?.value ?? null,
-        fechaPublicacion: formData.fechaPublicacion ?? this.form.get('fechaPublicacion')?.value ?? null,
+          formData.permitirComentario ?? this.form.get('permitirComentario')?.value ?? true,
+        imagenDestacada:
+          formData.imagenDestacada ?? this.form.get('imagenDestacada')?.value ?? null,
+        fechaPublicacion:
+          formData.fechaPublicacion ?? this.form.get('fechaPublicacion')?.value ?? null,
         fechaEdicion: formData.fechaEdicion ?? this.form.get('fechaEdicion')?.value ?? null,
         fechaPublicacionProgramada:
           formData.fechaPublicacionProgramada ??
@@ -508,9 +516,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
         tipoEntrada: formData.tipoEntrada ?? null,
         votos: formData.votos ?? this.form.get('votos')?.value ?? 0,
         cantidadComentarios:
-          formData.cantidadComentarios ??
-          this.form.get('cantidadComentarios')?.value ??
-          0,
+          formData.cantidadComentarios ?? this.form.get('cantidadComentarios')?.value ?? 0,
         categoriasConComas: formData.categoriasConComas ?? '',
         usernameCreador: formData.usernameCreador ?? this.form.get('usernameCreador')?.value ?? '',
       });

@@ -1,8 +1,13 @@
-<c-modal [visible]="visible" (visibleChange)="onVisibleChange($event)" class="confirmation-modal" backdrop="static">
+<c-modal
+  [visible]="visible"
+  (visibleChange)="onVisibleChange($event)"
+  class="confirmation-modal"
+  backdrop="static"
+>
   <c-modal-header class="border-bottom-0">
     <h5 cModalTitle [class]="'fw-bold text-' + getHeaderColor()">{{ title }}</h5>
   </c-modal-header>
-  
+
   <c-modal-body>
     <div class="text-center py-3">
       @if (type === 'danger') {
@@ -12,13 +17,13 @@
       } @else {
         <svg cIcon name="cilInfo" size="4xl" class="text-primary mb-3 opacity-75"></svg>
       }
-      
+
       <p class="mb-1" [class.fs-5]="!itemName">{{ message }}</p>
 
       @if (itemName) {
         <h4 class="fw-bold text-dark">{{ itemName }}</h4>
       }
-      
+
       @if (warningText) {
         <p class="text-muted small mt-2">{{ warningText }}</p>
       }
@@ -27,9 +32,15 @@
 
   <c-modal-footer class="border-top-0 justify-content-center pb-4">
     <button cButton color="secondary" variant="ghost" (click)="onCancel()">{{ cancelText }}</button>
-    <button cButton [color]="getHeaderColor()" class="px-4" (click)="onConfirm()" [disabled]="loading">
+    <button
+      cButton
+      [color]="getHeaderColor()"
+      class="px-4"
+      (click)="onConfirm()"
+      [disabled]="loading"
+    >
       @if (loading) {
-      <c-spinner size="sm" class="me-2"></c-spinner>
+        <c-spinner size="sm" class="me-2"></c-spinner>
       }
       {{ confirmText }}
     </button>

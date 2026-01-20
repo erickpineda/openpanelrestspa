@@ -50,6 +50,18 @@ export class GlobalErrorHandlerService implements ErrorHandler {
   }
 
   handleError(error: any): void {
+    // ✅ Ignorar errores benignos de DOM (Node.removeChild)
+    // Estos ocurren cuando Angular intenta remover un elemento que ya fue eliminado manualmente (por UiAnomalyMonitor o SessionExpiredComponent)
+    const errorMsg = error?.message || (typeof error === 'string' ? error : '');
+    if (
+      errorMsg.includes('Node.removeChild') ||
+      errorMsg.includes('not a child of this node') ||
+      errorMsg.includes('NotFoundError')
+    ) {
+      this.log.info('🧹 [GLOBAL HANDLER] Ignorando error de limpieza DOM benigno:', errorMsg);
+      return;
+    }
+
     this.ngZone.run(() => {
       this.errorCount++;
 

@@ -1,6 +1,12 @@
 <c-pagination [align]="align" aria-label="Paginación" size="sm">
   <li cPageItem [class.disabled]="currentPage === 0">
-    <a cPageLink (click)="currentPage !== 0 && cambiarPagina(-1)" aria-label="Anterior" [attr.aria-disabled]="currentPage === 0 ? true : null" [style.cursor]="currentPage === 0 ? 'default' : 'pointer'">
+    <a
+      cPageLink
+      (click)="currentPage !== 0 && cambiarPagina(-1)"
+      aria-label="Anterior"
+      [attr.aria-disabled]="currentPage === 0 ? true : null"
+      [style.cursor]="currentPage === 0 ? 'default' : 'pointer'"
+    >
       <span aria-hidden="true">{{ 'AUTO.LAQUO' | translate }}</span>
     </a>
   </li>
@@ -12,7 +18,13 @@
     </li>
   }
   <li cPageItem [class.disabled]="currentPage >= totalPages - 1">
-    <a cPageLink (click)="currentPage < totalPages - 1 && cambiarPagina(1)" aria-label="Siguiente" [attr.aria-disabled]="currentPage >= totalPages - 1 ? true : null" [style.cursor]="currentPage >= totalPages - 1 ? 'default' : 'pointer'">
+    <a
+      cPageLink
+      (click)="currentPage < totalPages - 1 && cambiarPagina(1)"
+      aria-label="Siguiente"
+      [attr.aria-disabled]="currentPage >= totalPages - 1 ? true : null"
+      [style.cursor]="currentPage >= totalPages - 1 ? 'default' : 'pointer'"
+    >
       <span aria-hidden="true">{{ 'AUTO.RAQUO' | translate }}</span>
     </a>
   </li>

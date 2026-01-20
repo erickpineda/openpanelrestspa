@@ -85,9 +85,7 @@
             [value]="filtroAprobado === null ? '' : filtroAprobado ? 'true' : 'false'"
             (change)="
               filtroAprobadoChange.emit(
-                $any($event.target).value === ''
-                  ? null
-                  : $any($event.target).value === 'true'
+                $any($event.target).value === '' ? null : $any($event.target).value === 'true'
               )
             "
             [disabled]="cargando"
@@ -113,9 +111,7 @@
             [value]="filtroCuarentena === null ? '' : filtroCuarentena ? 'true' : 'false'"
             (change)="
               filtroCuarentenaChange.emit(
-                $any($event.target).value === ''
-                  ? null
-                  : $any($event.target).value === 'true'
+                $any($event.target).value === '' ? null : $any($event.target).value === 'true'
               )
             "
             [disabled]="cargando"
@@ -143,13 +139,7 @@
             <svg cIcon name="cilX" size="sm" class="me-1"></svg>
             {{ 'COMMON.CLEAN' | translate }}
           </button>
-          <button
-            cButton
-            size="sm"
-            color="primary"
-            (click)="search.emit()"
-            [disabled]="cargando"
-          >
+          <button cButton size="sm" color="primary" (click)="search.emit()" [disabled]="cargando">
             <svg cIcon name="cilCheck" size="sm" class="me-1"></svg>
             {{ 'ADMIN.COMMENTS.FILTERS.APPLY_FILTERS' | translate }}
           </button>

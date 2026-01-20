@@ -8,7 +8,9 @@
           </div>
           <div>
             <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.GESTI_N_DE_ARCHIVOS' | translate }}</h5>
-            <small class="text-muted">{{ 'AUTO.ADMINISTRA_LOS_RECURSOS_Y_DOCU' | translate }}</small>
+            <small class="text-muted">{{
+              'AUTO.ADMINISTRA_LOS_RECURSOS_Y_DOCU' | translate
+            }}</small>
           </div>
         </div>
         <div class="d-flex gap-2">
@@ -35,12 +37,17 @@
 
     <c-card-body class="p-4" [attr.aria-busy]="loading ? 'true' : null">
       @if (error) {
-        <c-alert color="danger" class="d-flex align-items-center justify-content-between mb-4 shadow-sm border-0">
+        <c-alert
+          color="danger"
+          class="d-flex align-items-center justify-content-between mb-4 shadow-sm border-0"
+        >
           <div class="d-flex align-items-center gap-2">
             <svg cIcon name="cilWarning" class="flex-shrink-0"></svg>
             <span>{{ error }}</span>
           </div>
-          <button cButton color="danger" variant="outline" size="sm" (click)="load()">{{ 'AUTO.REINTENTAR' | translate }}</button>
+          <button cButton color="danger" variant="outline" size="sm" (click)="load()">
+            {{ 'AUTO.REINTENTAR' | translate }}
+          </button>
         </c-alert>
       }
 
@@ -53,9 +60,18 @@
                 Total: <span class="text-primary fw-bold">{{ totalElements }}</span> archivos
               </div>
             </c-col>
-            <c-col xs="12" md="8" class="d-flex flex-wrap justify-content-md-end gap-2 align-items-center">
-              <div class="position-relative flex-grow-1 flex-md-grow-0" style="min-width: 250px;">
-                <svg cIcon name="cilSearch" class="text-muted position-absolute top-50 start-0 translate-middle-y ms-3" size="sm"></svg>
+            <c-col
+              xs="12"
+              md="8"
+              class="d-flex flex-wrap justify-content-md-end gap-2 align-items-center"
+            >
+              <div class="position-relative flex-grow-1 flex-md-grow-0" style="min-width: 250px">
+                <svg
+                  cIcon
+                  name="cilSearch"
+                  class="text-muted position-absolute top-50 start-0 translate-middle-y ms-3"
+                  size="sm"
+                ></svg>
                 <input
                   cFormControl
                   type="text"
@@ -96,7 +112,9 @@
             <div class="mt-3 pt-3 border-top animate__animated animate__fadeIn">
               <c-row class="g-3 align-items-end">
                 <c-col xs="12" md="4">
-                  <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.TIPO_MIME' | translate }}</label>
+                  <label class="form-label small text-muted fw-bold mb-1">{{
+                    'AUTO.TIPO_MIME' | translate
+                  }}</label>
                   <select
                     cSelect
                     class="form-select-sm"
@@ -110,7 +128,9 @@
                   </select>
                 </c-col>
                 <c-col xs="6" md="3">
-                  <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.DESDE' | translate }}</label>
+                  <label class="form-label small text-muted fw-bold mb-1">{{
+                    'AUTO.DESDE' | translate
+                  }}</label>
                   <input
                     cFormControl
                     class="form-control-sm"
@@ -120,7 +140,9 @@
                   />
                 </c-col>
                 <c-col xs="6" md="3">
-                  <label class="form-label small text-muted fw-bold mb-1">{{ 'AUTO.HASTA' | translate }}</label>
+                  <label class="form-label small text-muted fw-bold mb-1">{{
+                    'AUTO.HASTA' | translate
+                  }}</label>
                   <input
                     cFormControl
                     class="form-control-sm"
@@ -161,27 +183,47 @@
           @if (loading) {
             <div
               class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-white bg-opacity-75"
-              style="z-index: 10;"
+              style="z-index: 10"
             >
               <c-spinner color="primary"></c-spinner>
-              <small class="text-primary mt-2 fw-medium">{{ 'AUTO.CARGANDO_ARCHIVOS' | translate }}</small>
+              <small class="text-primary mt-2 fw-medium">{{
+                'AUTO.CARGANDO_ARCHIVOS' | translate
+              }}</small>
             </div>
           }
 
           <div class="table-responsive">
-            <table
-              cTable
-              hover
-              striped
-              class="mb-0 align-middle"
-              aria-label="Tabla de archivos"
-            >
+            <table cTable hover striped class="mb-0 align-middle" aria-label="Tabla de archivos">
               <thead class="bg-light">
                 <tr>
-                  <th scope="col" class="border-0 py-3 ps-4 text-secondary small fw-bold text-uppercase" style="min-width: 200px">{{ 'AUTO.NOMBRE' | translate }}</th>
-                  <th scope="col" class="border-0 py-3 text-secondary small fw-bold text-uppercase text-end" style="min-width: 120px">{{ 'AUTO.TAMA_O' | translate }}</th>
-                  <th scope="col" class="border-0 py-3 text-secondary small fw-bold text-uppercase text-center" style="min-width: 160px">{{ 'AUTO.FECHA' | translate }}</th>
-                  <th scope="col" class="border-0 py-3 pe-4 text-secondary small fw-bold text-uppercase text-center" style="min-width: 110px">{{ 'AUTO.ACCIONES' | translate }}</th>
+                  <th
+                    scope="col"
+                    class="border-0 py-3 ps-4 text-secondary small fw-bold text-uppercase"
+                    style="min-width: 200px"
+                  >
+                    {{ 'AUTO.NOMBRE' | translate }}
+                  </th>
+                  <th
+                    scope="col"
+                    class="border-0 py-3 text-secondary small fw-bold text-uppercase text-end"
+                    style="min-width: 120px"
+                  >
+                    {{ 'AUTO.TAMA_O' | translate }}
+                  </th>
+                  <th
+                    scope="col"
+                    class="border-0 py-3 text-secondary small fw-bold text-uppercase text-center"
+                    style="min-width: 160px"
+                  >
+                    {{ 'AUTO.FECHA' | translate }}
+                  </th>
+                  <th
+                    scope="col"
+                    class="border-0 py-3 pe-4 text-secondary small fw-bold text-uppercase text-center"
+                    style="min-width: 110px"
+                  >
+                    {{ 'AUTO.ACCIONES' | translate }}
+                  </th>
                 </tr>
               </thead>
               <tbody class="border-top-0">
@@ -235,10 +277,16 @@
                 @if (items.length === 0 && !loading) {
                   <tr>
                     <td colspan="4" class="text-center py-5">
-                      <div class="d-flex flex-column align-items-center justify-content-center opacity-50">
+                      <div
+                        class="d-flex flex-column align-items-center justify-content-center opacity-50"
+                      >
                         <svg cIcon name="cilFolderOpen" size="4xl" class="text-muted mb-3"></svg>
-                        <h6 class="text-muted fw-bold">{{ 'AUTO.NO_SE_ENCONTRARON_ARCHIVOS' | translate }}</h6>
-                        <p class="text-muted small mb-0">{{ 'AUTO.INTENTA_SUBIR_UN_ARCHIVO_O_AJU' | translate }}</p>
+                        <h6 class="text-muted fw-bold">
+                          {{ 'AUTO.NO_SE_ENCONTRARON_ARCHIVOS' | translate }}
+                        </h6>
+                        <p class="text-muted small mb-0">
+                          {{ 'AUTO.INTENTA_SUBIR_UN_ARCHIVO_O_AJU' | translate }}
+                        </p>
                       </div>
                     </td>
                   </tr>
@@ -247,12 +295,13 @@
             </table>
           </div>
         </div>
-
       </div>
     </c-card-body>
     @if (totalElements > 0) {
       <c-card-footer class="bg-white border-top-0 py-3">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <div
+          class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3"
+        >
           <div class="text-muted small order-2 order-md-1">
             Mostrando {{ items.length }} de {{ totalElements }} archivos
           </div>
@@ -270,7 +319,11 @@
   </c-card>
 </c-container>
 
-<c-modal [visible]="confirmationModalVisible" (visibleChange)="confirmationModalVisible = $event" backdrop="static">
+<c-modal
+  [visible]="confirmationModalVisible"
+  (visibleChange)="confirmationModalVisible = $event"
+  backdrop="static"
+>
   <c-modal-header class="border-bottom-0">
     <h5 cModalTitle class="fw-bold text-danger">{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
   </c-modal-header>
@@ -283,10 +336,12 @@
     </div>
   </c-modal-body>
   <c-modal-footer class="border-top-0 justify-content-center pb-4">
-    <button cButton color="secondary" variant="ghost" (click)="cancelDelete()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button cButton color="secondary" variant="ghost" (click)="cancelDelete()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
     <button cButton color="danger" class="px-4" (click)="confirmDelete()" [disabled]="loading">
       @if (loading) {
-      <c-spinner size="sm" class="me-2"></c-spinner>
+        <c-spinner size="sm" class="me-2"></c-spinner>
       }
       {{ 'COMMON.DELETE' | translate }}
     </button>

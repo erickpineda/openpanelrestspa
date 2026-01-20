@@ -1,4 +1,11 @@
-<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" id="editUserModal" backdrop="static" size="lg" scrollable>
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  id="editUserModal"
+  backdrop="static"
+  size="lg"
+  scrollable
+>
   <c-modal-header>
     <h5 cModalTitle class="d-flex align-items-center gap-2">
       <svg cIcon name="cilPen" class="text-primary"></svg>
@@ -12,22 +19,23 @@
       [roles]="roles"
       [loading]="loading"
       (onSave)="guardar($event)"
-      (onEditEnabled)="handleEditEnabled()">
+      (onEditEnabled)="handleEditEnabled()"
+    >
     </app-usuario-form>
   </c-modal-body>
   @if (isEditing) {
-  <c-modal-footer class="bg-light bg-opacity-10">
-    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">
-      {{ 'COMMON.CANCEL' | translate }}
-    </button>
-    <button cButton color="primary" (click)="onGuardarClick()" [disabled]="loading">
-      @if (loading) {
-        <c-spinner size="sm" class="me-1"></c-spinner>
-      } @else {
-        <svg cIcon name="cilSave" class="me-1"></svg>
-      }
-      {{ 'COMMON.SAVE' | translate }}
-    </button>
-  </c-modal-footer>
+    <c-modal-footer class="bg-light bg-opacity-10">
+      <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button cButton color="primary" (click)="onGuardarClick()" [disabled]="loading">
+        @if (loading) {
+          <c-spinner size="sm" class="me-1"></c-spinner>
+        } @else {
+          <svg cIcon name="cilSave" class="me-1"></svg>
+        }
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </c-modal-footer>
   }
 </c-modal>

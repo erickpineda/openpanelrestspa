@@ -27,13 +27,13 @@ import { EntradasPendientesComponent } from './pendientes/entradas-pendientes.co
     SharedCoreUiModule,
     MediaSharedModule,
     DatePipe,
-    AsyncPipe
+    AsyncPipe,
   ],
   declarations: [
     ListadoEntradasComponent,
     CrearEntradaComponent,
     EditarEntradaComponent,
-    EntradasPendientesComponent
+    EntradasPendientesComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

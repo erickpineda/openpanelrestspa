@@ -1,11 +1,19 @@
-import { Component, EventEmitter, Input, Output, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { Etiqueta } from '../../../../core/models/etiqueta.model';
 import { EtiquetaFormComponent } from '../etiqueta-form/etiqueta-form.component';
 
 @Component({
   selector: 'app-editar-etiqueta',
   templateUrl: './editar-etiqueta.component.html',
-  standalone: false
+  standalone: false,
 })
 export class EditarEtiquetaComponent implements OnChanges {
   @Input() visible = false;

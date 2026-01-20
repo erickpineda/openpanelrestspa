@@ -16,7 +16,7 @@ export class RolFormComponent implements OnChanges {
   @Input() privilegios: Privilegio[] = [];
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() onSave = new EventEmitter<Rol>();
-  constructor(private translate: TranslationService) { }
+  constructor(private translate: TranslationService) {}
   readonly PROPIETARIO_ROLE_CODE = OPConstants.Roles.PROPIETARIO_CODE;
   readonly ADMIN_ROLE_CODE = OPConstants.Roles.ADMIN_CODE;
   manualCodeEntry = false;
@@ -104,7 +104,9 @@ export class RolFormComponent implements OnChanges {
   }
   hasPrivilegio(privilegio: Privilegio): boolean {
     if (!this.editRol || !this.editRol.privilegios) return false;
-    return this.editRol.privilegios.some((p: Privilegio) => p.idPrivilegio === privilegio.idPrivilegio);
+    return this.editRol.privilegios.some(
+      (p: Privilegio) => p.idPrivilegio === privilegio.idPrivilegio
+    );
   }
   areAllPrivilegiosSelected(): boolean {
     if (!this.editRol || !this.editRol.privilegios || this.privilegios.length === 0) return false;

@@ -90,4 +90,4 @@ import { UnsavedWorkDirective } from '../core/directives/unsaved-work.directive'
     UnsavedWorkDirective,
   ],
 })
-export class SharedOPModule { }
+export class SharedOPModule {}

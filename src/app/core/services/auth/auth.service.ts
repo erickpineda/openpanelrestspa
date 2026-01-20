@@ -80,10 +80,12 @@ export class AuthService {
       allowSave: true,
       timestamp: Date.now(),
       originTabId: this.tokenStorage.getOrCreateTabId(),
+      isManual: true,
     });
     // Notificaremos a las otras pestañas
     this.authSync.notifyLogout({
       originTabId: this.tokenStorage.getOrCreateTabId(),
+      isManual: true,
     });
     // actualizamos estado local observable
     this.userSubject.next(null);

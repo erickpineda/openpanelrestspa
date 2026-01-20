@@ -14,32 +14,64 @@
             {{ 'ADMIN.DEV_TOOLS.WARNING' | translate }}
           </div>
         </c-alert>
-        <h6 class="text-uppercase text-secondary fw-bold small mb-3">{{ 'ADMIN.DEV_TOOLS.EXPERIMENTAL_FEATURES' | translate }}</h6>
+        <h6 class="text-uppercase text-secondary fw-bold small mb-3">
+          {{ 'ADMIN.DEV_TOOLS.EXPERIMENTAL_FEATURES' | translate }}
+        </h6>
         <ul class="list-group shadow-sm mb-4">
           @for (f of features; track trackByFeature($index, f)) {
-            <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-start-0 border-end-0">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center py-3 border-start-0 border-end-0"
+            >
               <div class="d-flex flex-column">
                 <span class="fw-medium">{{ f.name }}</span>
-                <small class="text-muted">{{ 'ADMIN.DEV_TOOLS.TOGGLE_FEATURE_HELP' | translate }}</small>
+                <small class="text-muted">{{
+                  'ADMIN.DEV_TOOLS.TOGGLE_FEATURE_HELP' | translate
+                }}</small>
               </div>
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" [id]="'switch-' + f.name" [checked]="f.enabled" (change)="toggle(f)">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  [id]="'switch-' + f.name"
+                  [checked]="f.enabled"
+                  (change)="toggle(f)"
+                />
                 <label class="form-check-label visually-hidden" [for]="'switch-' + f.name">
-                  {{ f.enabled ? ('ADMIN.DEV_TOOLS.ENABLED' | translate) : ('ADMIN.DEV_TOOLS.DISABLED' | translate) }}
+                  {{
+                    f.enabled
+                      ? ('ADMIN.DEV_TOOLS.ENABLED' | translate)
+                      : ('ADMIN.DEV_TOOLS.DISABLED' | translate)
+                  }}
                 </label>
               </div>
             </li>
           }
         </ul>
         <hr class="mb-4" />
-        <h6 class="mb-2 text-uppercase text-secondary fw-bold small">{{ 'ADMIN.DEV_TOOLS.HAR_ANALYSIS' | translate }}</h6>
+        <h6 class="mb-2 text-uppercase text-secondary fw-bold small">
+          {{ 'ADMIN.DEV_TOOLS.HAR_ANALYSIS' | translate }}
+        </h6>
         <div class="mb-2 text-muted small">
           {{ 'ADMIN.DEV_TOOLS.HAR_HELP' | translate }}
         </div>
-        <textarea cFormControl rows="8" [(ngModel)]="harText" [placeholder]="'ADMIN.DEV_TOOLS.HAR_PLACEHOLDER' | translate" class="mb-3"></textarea>
+        <textarea
+          cFormControl
+          rows="8"
+          [(ngModel)]="harText"
+          [placeholder]="'ADMIN.DEV_TOOLS.HAR_PLACEHOLDER' | translate"
+          class="mb-3"
+        ></textarea>
         <div class="d-flex gap-2 mt-2">
-          <button cButton color="primary" class="text-white" (click)="analyzeHar()">{{ 'ADMIN.DEV_TOOLS.ANALYZE_HAR' | translate }}</button>
-          <button cButton color="secondary" variant="outline" (click)="harText = ''; harSummary = undefined; harError = ''">
+          <button cButton color="primary" class="text-white" (click)="analyzeHar()">
+            {{ 'ADMIN.DEV_TOOLS.ANALYZE_HAR' | translate }}
+          </button>
+          <button
+            cButton
+            color="secondary"
+            variant="outline"
+            (click)="harText = ''; harSummary = undefined; harError = ''"
+          >
             {{ 'COMMON.CLEAN' | translate }}
           </button>
         </div>
@@ -51,26 +83,42 @@
             <div class="row g-2">
               <div class="col-md-3">
                 <div class="border rounded p-3 bg-light bg-opacity-50">
-                  <div class="text-muted small fw-bold text-uppercase mb-1">{{ 'ADMIN.DEV_TOOLS.TOTAL_REQUESTS' | translate }}</div>
+                  <div class="text-muted small fw-bold text-uppercase mb-1">
+                    {{ 'ADMIN.DEV_TOOLS.TOTAL_REQUESTS' | translate }}
+                  </div>
                   <div class="fs-4 fw-bold text-primary">{{ s.total }}</div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="border rounded p-3 bg-light bg-opacity-50">
-                  <div class="text-muted small fw-bold text-uppercase mb-1">{{ 'ADMIN.DEV_TOOLS.FAILED_REQUESTS' | translate }}</div>
+                  <div class="text-muted small fw-bold text-uppercase mb-1">
+                    {{ 'ADMIN.DEV_TOOLS.FAILED_REQUESTS' | translate }}
+                  </div>
                   <div class="fs-4 fw-bold text-danger">{{ s.failed.count }}</div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="border rounded p-3 bg-light bg-opacity-50">
-                  <div class="text-muted small fw-bold text-uppercase mb-1">{{ 'ADMIN.DEV_TOOLS.SLOW_REQUESTS' | translate: { threshold: s.slow.thresholdMs } }}</div>
+                  <div class="text-muted small fw-bold text-uppercase mb-1">
+                    {{
+                      'ADMIN.DEV_TOOLS.SLOW_REQUESTS' | translate: { threshold: s.slow.thresholdMs }
+                    }}
+                  </div>
                   <div class="fs-4 fw-bold text-warning">{{ s.slow.count }}</div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="border rounded p-3 bg-light bg-opacity-50">
-                  <div class="text-muted small fw-bold text-uppercase mb-1">{{ 'ADMIN.DEV_TOOLS.CRITICAL_ASSETS_FAILED' | translate }}</div>
-                  <div class="fs-4 fw-bold text-danger">{{ s.assetIssues.scriptsFailed + s.assetIssues.stylesFailed + s.assetIssues.fontsFailed }}</div>
+                  <div class="text-muted small fw-bold text-uppercase mb-1">
+                    {{ 'ADMIN.DEV_TOOLS.CRITICAL_ASSETS_FAILED' | translate }}
+                  </div>
+                  <div class="fs-4 fw-bold text-danger">
+                    {{
+                      s.assetIssues.scriptsFailed +
+                        s.assetIssues.stylesFailed +
+                        s.assetIssues.fontsFailed
+                    }}
+                  </div>
                 </div>
               </div>
             </div>

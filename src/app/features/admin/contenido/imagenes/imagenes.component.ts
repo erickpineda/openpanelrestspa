@@ -1,4 +1,15 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  OnDestroy,
+  AfterViewInit,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Subject, Subscription, fromEvent, takeUntil, finalize } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -116,14 +127,17 @@ export class ImagenesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   confirmDelete(): void {
     if (!this.itemToDelete || !this.itemToDelete.uuid) return;
-    
+
     this.loading = true;
-    this.fileStorage.deleteMedia(this.itemToDelete.uuid)
-      .pipe(finalize(() => {
-        this.loading = false;
-        this.itemToDelete = null;
-        this.cdr.detectChanges();
-      }))
+    this.fileStorage
+      .deleteMedia(this.itemToDelete.uuid)
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.itemToDelete = null;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: () => {
           this.toast.showSuccess('Archivo eliminado correctamente');
@@ -132,7 +146,7 @@ export class ImagenesComponent implements OnInit, OnDestroy, AfterViewInit {
         error: (err) => {
           console.error(err);
           this.toast.showError('Error al eliminar el archivo');
-        }
+        },
       });
   }
 

@@ -1,17 +1,12 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-} from '@angular/common/http';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { formatForBackend } from '../../shared/utils/date-utils';
 
 @Injectable()
 export class DateInterceptor implements HttpInterceptor {
   // Regex para detectar strings que parecen fechas ISO o datetime-local
-  // Ejemplos: 
+  // Ejemplos:
   // 2025-01-01T12:00 (datetime-local)
   // 2025-01-01T12:00:00.000Z (ISO)
   // 2025-01-01 (date)
@@ -29,7 +24,7 @@ export class DateInterceptor implements HttpInterceptor {
 
       const modifiedBody = this.processBody(request.body);
       const modifiedRequest = request.clone({
-        body: modifiedBody
+        body: modifiedBody,
       });
 
       return next.handle(modifiedRequest);
@@ -42,7 +37,7 @@ export class DateInterceptor implements HttpInterceptor {
     if (!body) return body;
 
     if (Array.isArray(body)) {
-      return body.map(item => this.processBody(item));
+      return body.map((item) => this.processBody(item));
     }
 
     if (typeof body === 'object' && !(body instanceof Date)) {

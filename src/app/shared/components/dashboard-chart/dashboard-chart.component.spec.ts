@@ -34,4 +34,4 @@ describe('DashboardChartComponent', () => {
     const canvas = fixture.debugElement.query(By.css('canvas'));
     expect(canvas).toBeTruthy();
   });
-})
+});

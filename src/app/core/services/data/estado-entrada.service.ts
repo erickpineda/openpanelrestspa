@@ -15,11 +15,13 @@ export class EstadoEntradaService extends BaseService {
   }
 
   actualizarPorCodigo(codigo: string, entity: EstadoEntrada): Observable<any> {
-    return this.put<any>(OPConstants.Methods.ESTADOS_ENTRADAS.ACTUALIZAR_POR_CODIGO(codigo), entity);
+    return this.put<any>(
+      OPConstants.Methods.ESTADOS_ENTRADAS.ACTUALIZAR_POR_CODIGO(codigo),
+      entity
+    );
   }
 
   borrarPorCodigo(codigo: string): Observable<any> {
     return this.delete<any>(OPConstants.Methods.ESTADOS_ENTRADAS.BORRAR_POR_CODIGO(codigo));
   }
 }
-

@@ -16,7 +16,7 @@ const routes: Routes = [
         path: 'dashboard',
         loadChildren: () =>
           import('@features/admin/dashboard/dashboard.module').then(
-            (m) => m.DashboardFeatureModule,
+            (m) => m.DashboardFeatureModule
           ),
         data: { preload: true, delay: 1000, title: 'MENU.DASHBOARD' },
       },

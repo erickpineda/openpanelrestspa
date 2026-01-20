@@ -11,4 +11,3 @@ export class ExcepcionesService extends BaseService {
     return this.get<any>(OPConstants.Methods.EXCEPCIONES.OBTENER_POR_UUID(uuid));
   }
 }
-

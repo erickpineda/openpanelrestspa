@@ -212,7 +212,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
         this.cargando = false;
         this.log.error('Error al cargar categoría para edición', err);
         this.toastService.showError('Error al cargar la categoría', 'Error');
-      }
+      },
     });
   }
   cerrarModalCrear(): void {

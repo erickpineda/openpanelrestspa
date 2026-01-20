@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { Categoria } from '@app/core/models/categoria.model';
 import { CategoriaFacadeService } from '../categoria-form/srv/categoria-facade.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
@@ -7,7 +15,7 @@ import { CategoriaFormComponent } from '../categoria-form/categoria-form.compone
 @Component({
   selector: 'app-editar-categoria',
   templateUrl: './editar-categoria.component.html',
-  standalone: false
+  standalone: false,
 })
 export class EditarCategoriaComponent implements OnChanges {
   @Input() visible = false;
@@ -46,19 +54,19 @@ export class EditarCategoriaComponent implements OnChanges {
       : this.facade.actualizarCategoria(cat.idCategoria, cat);
     obs.subscribe({
       next: () => {
-        this.toastService.showSuccess('La categoría se ha modificado correctamente.', 'Categoría modificada');
+        this.toastService.showSuccess(
+          'La categoría se ha modificado correctamente.',
+          'Categoría modificada'
+        );
         this.onSuccess.emit();
         this.cerrarModal();
       },
       error: () => {
-        this.toastService.showError(
-          'Error al actualizar la categoría.',
-          'Error'
-        );
+        this.toastService.showError('Error al actualizar la categoría.', 'Error');
         if (this.formComponent) {
           this.formComponent.onError.emit();
         }
-      }
+      },
     });
   }
 

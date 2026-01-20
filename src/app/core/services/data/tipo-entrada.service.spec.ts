@@ -64,4 +64,3 @@ describe('TipoEntradaService', () => {
     req.flush({ result: { success: true } });
   });
 });
-

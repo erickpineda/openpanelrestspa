@@ -54,7 +54,13 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.post<any>(OPConstants.Methods.ETIQUETAS.BUSCAR, payload, params, undefined, context);
+    return this.post<any>(
+      OPConstants.Methods.ETIQUETAS.BUSCAR,
+      payload,
+      params,
+      undefined,
+      context
+    );
   }
 
   asociarConEntrada(etiquetaId: number, entradaId: number): Observable<any> {

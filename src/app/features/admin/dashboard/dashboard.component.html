@@ -7,7 +7,9 @@
             <svg cIcon name="cilSpeedometer" size="lg" class="text-primary"></svg>
           </div>
           <div>
-            <h5 cCardTitle class="mb-0 fw-bold text-primary">{{ 'ADMIN.DASHBOARD.WELCOME_TITLE' | translate }}</h5>
+            <h5 cCardTitle class="mb-0 fw-bold text-primary">
+              {{ 'ADMIN.DASHBOARD.WELCOME_TITLE' | translate }}
+            </h5>
             <small class="text-muted">{{ 'ADMIN.DASHBOARD.WELCOME_SUBTITLE' | translate }}</small>
           </div>
         </div>
@@ -28,27 +30,64 @@
   <c-card-body>
     <div class="d-flex justify-content-between align-items-end mb-4">
       <h5 cCardTitle class="fw-bold text-secondary mb-0">
-        <svg cIcon name="cilChartPie" class="me-2 text-info"></svg>{{ 'ADMIN.DASHBOARD.QUICK_STATS' | translate }}
+        <svg cIcon name="cilChartPie" class="me-2 text-info"></svg
+        >{{ 'ADMIN.DASHBOARD.QUICK_STATS' | translate }}
       </h5>
       <div class="hstack gap-3">
-        <button cButton color="light" size="sm" class="text-primary shadow-sm" (click)="openSettings()">
-          <svg cIcon name="cilSettings" class="me-2" size="sm" [title]="'ADMIN.DASHBOARD.ADJUST_SETTINGS' | translate"></svg>
+        <button
+          cButton
+          color="light"
+          size="sm"
+          class="text-primary shadow-sm"
+          (click)="openSettings()"
+        >
+          <svg
+            cIcon
+            name="cilSettings"
+            class="me-2"
+            size="sm"
+            [title]="'ADMIN.DASHBOARD.ADJUST_SETTINGS' | translate"
+          ></svg>
           {{ 'ADMIN.DASHBOARD.ADJUST_SETTINGS' | translate }}
         </button>
       </div>
     </div>
     <c-row class="g-3 mb-4">
       <c-col lg="3">
-        <app-kpi-card [label]="'ADMIN.DASHBOARD.ACTIVE_USERS' | translate" [value]="cantidadUsuariosActivos" iconName="cilUser" color="primary" class="h-100 shadow-sm"></app-kpi-card>
+        <app-kpi-card
+          [label]="'ADMIN.DASHBOARD.ACTIVE_USERS' | translate"
+          [value]="cantidadUsuariosActivos"
+          iconName="cilUser"
+          color="primary"
+          class="h-100 shadow-sm"
+        ></app-kpi-card>
       </c-col>
       <c-col lg="3">
-        <app-kpi-card [label]="'ADMIN.DASHBOARD.TOTAL_ENTRIES' | translate" [value]="totalEntradas" iconName="cilNotes" color="info" class="h-100 shadow-sm"></app-kpi-card>
+        <app-kpi-card
+          [label]="'ADMIN.DASHBOARD.TOTAL_ENTRIES' | translate"
+          [value]="totalEntradas"
+          iconName="cilNotes"
+          color="info"
+          class="h-100 shadow-sm"
+        ></app-kpi-card>
       </c-col>
       <c-col lg="3">
-        <app-kpi-card [label]="'ADMIN.DASHBOARD.PUBLISHED_LAST_DAYS' | translate: { days: seriesDays }" [value]="kpiPublicadas" iconName="cilCheckCircle" color="success" class="h-100 shadow-sm"></app-kpi-card>
+        <app-kpi-card
+          [label]="'ADMIN.DASHBOARD.PUBLISHED_LAST_DAYS' | translate: { days: seriesDays }"
+          [value]="kpiPublicadas"
+          iconName="cilCheckCircle"
+          color="success"
+          class="h-100 shadow-sm"
+        ></app-kpi-card>
       </c-col>
       <c-col lg="3">
-        <app-kpi-card [label]="'ADMIN.DASHBOARD.UNPUBLISHED_LAST_DAYS' | translate: { days: seriesDays }" [value]="kpiNoPublicadas" iconName="cilXCircle" color="warning" class="h-100 shadow-sm"></app-kpi-card>
+        <app-kpi-card
+          [label]="'ADMIN.DASHBOARD.UNPUBLISHED_LAST_DAYS' | translate: { days: seriesDays }"
+          [value]="kpiNoPublicadas"
+          iconName="cilXCircle"
+          color="warning"
+          class="h-100 shadow-sm"
+        ></app-kpi-card>
       </c-col>
     </c-row>
     <hr class="text-muted opacity-25 my-4" />
@@ -56,7 +95,10 @@
       <c-col lg="8">
         <c-card class="shadow-sm h-100 border-0">
           <c-card-header class="bg-white border-bottom py-3">
-            <h6 class="mb-0 fw-bold text-secondary"><svg cIcon name="cilGraph" class="me-2 text-primary"></svg>{{ 'ADMIN.DASHBOARD.EVOLUTION_SERIES' | translate }}</h6>
+            <h6 class="mb-0 fw-bold text-secondary">
+              <svg cIcon name="cilGraph" class="me-2 text-primary"></svg
+              >{{ 'ADMIN.DASHBOARD.EVOLUTION_SERIES' | translate }}
+            </h6>
           </c-card-header>
           <c-card-body>
             <app-dashboard-series-panel
@@ -102,7 +144,9 @@
         <div class="d-flex flex-column gap-4 h-100">
           <c-card class="shadow-sm border-0 flex-grow-1">
             <c-card-header class="bg-white border-bottom py-3">
-              <h6 class="mb-0 fw-bold text-secondary"><svg cIcon name="cilHistory" class="me-2 text-info"></svg>Actividad Reciente</h6>
+              <h6 class="mb-0 fw-bold text-secondary">
+                <svg cIcon name="cilHistory" class="me-2 text-info"></svg>Actividad Reciente
+              </h6>
             </c-card-header>
             <c-card-body>
               <app-dashboard-recent-panel
@@ -119,10 +163,16 @@
           </c-card>
           <c-card class="shadow-sm border-0">
             <c-card-header class="bg-white border-bottom py-3">
-              <h6 class="mb-0 fw-bold text-secondary"><svg cIcon name="cilStorage" class="me-2 text-warning"></svg>Almacenamiento</h6>
+              <h6 class="mb-0 fw-bold text-secondary">
+                <svg cIcon name="cilStorage" class="me-2 text-warning"></svg>Almacenamiento
+              </h6>
             </c-card-header>
             <c-card-body>
-              <app-dashboard-storage-panel [loadingStorage]="loadingStorage" [storage]="storage" [formatBytesFn]="formatBytes.bind(this)"></app-dashboard-storage-panel>
+              <app-dashboard-storage-panel
+                [loadingStorage]="loadingStorage"
+                [storage]="storage"
+                [formatBytesFn]="formatBytes.bind(this)"
+              ></app-dashboard-storage-panel>
             </c-card-body>
           </c-card>
         </div>
@@ -144,7 +194,9 @@
       <c-col lg="6">
         <c-card class="shadow-sm border-0 h-100">
           <c-card-header class="bg-white border-bottom py-3">
-            <h6 class="mb-0 fw-bold text-secondary">{{ 'ADMIN.DASHBOARD.TOP_USERS' | translate }}</h6>
+            <h6 class="mb-0 fw-bold text-secondary">
+              {{ 'ADMIN.DASHBOARD.TOP_USERS' | translate }}
+            </h6>
           </c-card-header>
           <c-card-body>
             <app-dashboard-top-panel
@@ -165,7 +217,9 @@
       <c-col lg="6">
         <c-card class="shadow-sm border-0 h-100">
           <c-card-header class="bg-white border-bottom py-3">
-            <h6 class="mb-0 fw-bold text-secondary">{{ 'ADMIN.DASHBOARD.TOP_CATEGORIES' | translate }}</h6>
+            <h6 class="mb-0 fw-bold text-secondary">
+              {{ 'ADMIN.DASHBOARD.TOP_CATEGORIES' | translate }}
+            </h6>
           </c-card-header>
           <c-card-body>
             <app-dashboard-top-panel
@@ -181,7 +235,9 @@
       <c-col lg="6" class="mt-4">
         <c-card class="shadow-sm border-0 h-100">
           <c-card-header class="bg-white border-bottom py-3">
-            <h6 class="mb-0 fw-bold text-secondary">{{ 'ADMIN.DASHBOARD.TOP_TAGS' | translate }}</h6>
+            <h6 class="mb-0 fw-bold text-secondary">
+              {{ 'ADMIN.DASHBOARD.TOP_TAGS' | translate }}
+            </h6>
           </c-card-header>
           <c-card-body>
             <app-dashboard-top-panel

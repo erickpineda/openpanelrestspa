@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, OnInit, OnChanges, SimpleChanges, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  Output,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Usuario } from '../../../../../core/models/usuario.model';
 import { Rol } from '../../../../../core/models/rol.model';
@@ -10,7 +18,7 @@ import { TranslationService } from '../../../../../core/services/translation.ser
 @Component({
   selector: 'app-usuario-form',
   templateUrl: './usuario-form.component.html',
-  standalone: false
+  standalone: false,
 })
 export class UsuarioFormComponent implements OnInit, OnChanges {
   @Input() usuario: Usuario | null = null;
@@ -28,7 +36,8 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
   // Regex Patterns
   // Java: "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%&-+=!.çÇ()])(?=\\S+$).{8,20}$"
   // Note: Escaping hyphen inside character class to ensure it's treated as a literal, not a range.
-  readonly PASSWORD_PATTERN = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%&\-+=!.çÇ()])(?=\S+$).{8,20}$/;
+  readonly PASSWORD_PATTERN =
+    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%&\-+=!.çÇ()])(?=\S+$).{8,20}$/;
   // Java: "[A-Za-z0-9]{4,30}\\w" -> Interpreted as ^[A-Za-z0-9]{4,30}\w$
   readonly USERNAME_PATTERN = /^[A-Za-z0-9]{4,30}\w$/;
 
@@ -64,11 +73,16 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
   get roleColor(): string {
     const roleCode = this.form.get('rolCodigo')?.value;
     switch (roleCode) {
-      case OPConstants.Roles.PROPIETARIO: return 'danger';
-      case OPConstants.Roles.ADMINISTRADOR: return 'warning';
-      case OPConstants.Roles.EDITOR: return 'info';
-      case OPConstants.Roles.LECTOR: return 'secondary';
-      default: return 'primary';
+      case OPConstants.Roles.PROPIETARIO:
+        return 'danger';
+      case OPConstants.Roles.ADMINISTRADOR:
+        return 'warning';
+      case OPConstants.Roles.EDITOR:
+        return 'info';
+      case OPConstants.Roles.LECTOR:
+        return 'secondary';
+      default:
+        return 'primary';
     }
   }
 
@@ -92,14 +106,14 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
       email: '',
       rolCodigo: '',
       habilitado: true,
-      emailConfirmado: false
+      emailConfirmado: false,
     });
-    
+
     this.passwordVisible = false;
 
     if (this.usuario) {
       this.form.patchValue(this.usuario);
-      
+
       // If editing existing user, password is optional
       if (this.usuario.idUsuario) {
         this.disabled = true;
@@ -110,13 +124,17 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
         // New user
         this.disabled = false;
         this.form.enable();
-        this.form.get('password')?.setValidators([Validators.required, Validators.pattern(this.PASSWORD_PATTERN)]);
+        this.form
+          .get('password')
+          ?.setValidators([Validators.required, Validators.pattern(this.PASSWORD_PATTERN)]);
         this.form.get('password')?.updateValueAndValidity();
       }
     } else {
       this.disabled = false;
       this.form.enable();
-      this.form.get('password')?.setValidators([Validators.required, Validators.pattern(this.PASSWORD_PATTERN)]);
+      this.form
+        .get('password')
+        ?.setValidators([Validators.required, Validators.pattern(this.PASSWORD_PATTERN)]);
       this.form.get('password')?.updateValueAndValidity();
     }
   }
@@ -155,7 +173,7 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
         // So path is response.data.respuesta
         const respuesta = response.data as any; // Cast to any or define proper interface if strictly needed
         const isTaken = respuesta?.respuesta === 'true';
-        
+
         if (isTaken) {
           this.toastService.showError(
             this.translate.instant('ADMIN.USERS.USERNAME_TAKEN'),
@@ -177,7 +195,7 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
         // But user provided code suggests it returns explicit response or throws exception.
         // If "perfil.username.x.no.existe" exception maps to 404, then it means available.
         if (err.status === 404) {
-           this.toastService.showSuccess(
+          this.toastService.showSuccess(
             this.translate.instant('ADMIN.USERS.USERNAME_AVAILABLE'),
             this.translate.instant('COMMON.SUCCESS')
           );
@@ -188,7 +206,7 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
             this.translate.instant('COMMON.ERROR')
           );
         }
-      }
+      },
     });
   }
 
@@ -198,19 +216,19 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
     this.onEditEnabled.emit();
     // Username is immutable for existing users usually? Old code: [disabled]="!!usuario.idUsuario"
     if (this.usuario && this.usuario.idUsuario) {
-       this.form.get('username')?.disable();
-       // Password remains optional on edit unless user wants to change it
-       // If user enters a password, it must match the pattern. But Validators.pattern passes on empty string if not required.
-       // So we set pattern validator but NOT required.
-       this.form.get('password')?.setValidators([Validators.pattern(this.PASSWORD_PATTERN)]);
-       this.form.get('password')?.updateValueAndValidity();
+      this.form.get('username')?.disable();
+      // Password remains optional on edit unless user wants to change it
+      // If user enters a password, it must match the pattern. But Validators.pattern passes on empty string if not required.
+      // So we set pattern validator but NOT required.
+      this.form.get('password')?.setValidators([Validators.pattern(this.PASSWORD_PATTERN)]);
+      this.form.get('password')?.updateValueAndValidity();
     }
-    
+
     // Check owner role lock
     if (this.PROPIETARIO_ROLE_CODE && this.usuario?.rolCodigo === this.PROPIETARIO_ROLE_CODE) {
-       this.form.get('rolCodigo')?.disable();
-       this.form.get('habilitado')?.disable();
-       this.form.get('emailConfirmado')?.disable();
+      this.form.get('rolCodigo')?.disable();
+      this.form.get('habilitado')?.disable();
+      this.form.get('emailConfirmado')?.disable();
     }
   }
 
@@ -226,7 +244,7 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
     const numbers = '0123456789';
     const specials = '@#$%&-+=!.çÇ()';
     const all = uppers + lowers + numbers + specials;
-    
+
     // Ensure at least one of each required type
     let pass = '';
     pass += uppers.charAt(Math.floor(Math.random() * uppers.length));
@@ -240,7 +258,10 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
     }
 
     // Shuffle
-    pass = pass.split('').sort(() => 0.5 - Math.random()).join('');
+    pass = pass
+      .split('')
+      .sort(() => 0.5 - Math.random())
+      .join('');
 
     this.form.get('password')?.setValue(pass);
     // passwordVisible remains false (hidden) by default, user must click to see it
@@ -251,7 +272,7 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
     const consonants = 'bcdfghjklmnpqrstvwxyz';
     const vowels = 'aeiou';
     let result = '';
-    
+
     // Generate readable username base (CVCVCV pattern - 6 chars)
     for (let i = 0; i < 3; i++) {
       result += consonants.charAt(Math.floor(Math.random() * consonants.length));
@@ -259,9 +280,11 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
     }
 
     // Add 2 random digits to ensure uniqueness and variety
-    const randomNum = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+    const randomNum = Math.floor(Math.random() * 100)
+      .toString()
+      .padStart(2, '0');
     result += randomNum;
-    
+
     this.form.get('username')?.setValue(result);
   }
 
@@ -269,7 +292,7 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
     const input = event.target as HTMLInputElement;
     const value = input.value;
     const lowerValue = value.toLowerCase();
-    
+
     if (value !== lowerValue) {
       input.value = lowerValue;
       this.form.get('username')?.setValue(lowerValue);
@@ -281,13 +304,13 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
       this.form.markAllAsTouched();
       return;
     }
-    
+
     const rawValue = this.form.getRawValue();
     const payload: Usuario = { ...rawValue } as Usuario;
 
     // Fix: Ensure idRol is set based on rolCodigo
     if (payload.rolCodigo && this.roles.length > 0) {
-      const selectedRole = this.roles.find(r => r.codigo === payload.rolCodigo);
+      const selectedRole = this.roles.find((r) => r.codigo === payload.rolCodigo);
       if (selectedRole) {
         payload.idRol = selectedRole.idRol;
       }

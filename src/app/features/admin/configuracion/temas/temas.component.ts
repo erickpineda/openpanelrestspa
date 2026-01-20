@@ -123,7 +123,9 @@ export class TemasComponent implements OnInit, OnDestroy {
     op.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.toast.showSuccess(
-          this.isEditing ? this.translate.instant('ADMIN.THEMES.SUCCESS.UPDATE') : this.translate.instant('ADMIN.THEMES.SUCCESS.CREATE'),
+          this.isEditing
+            ? this.translate.instant('ADMIN.THEMES.SUCCESS.UPDATE')
+            : this.translate.instant('ADMIN.THEMES.SUCCESS.CREATE'),
           this.translate.instant('MENU.THEMES')
         );
         this.loading = false;
@@ -132,7 +134,9 @@ export class TemasComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.toast.showError(
-          this.isEditing ? this.translate.instant('ADMIN.THEMES.ERROR.UPDATE') : this.translate.instant('ADMIN.THEMES.ERROR.CREATE'),
+          this.isEditing
+            ? this.translate.instant('ADMIN.THEMES.ERROR.UPDATE')
+            : this.translate.instant('ADMIN.THEMES.ERROR.CREATE'),
           this.translate.instant('MENU.THEMES')
         );
         this.log.error('temas guardar', err);
@@ -152,18 +156,25 @@ export class TemasComponent implements OnInit, OnDestroy {
   confirmDelete(): void {
     if (!this.itemToDelete || !this.itemToDelete.id) return;
     this.loading = true;
-    this.temasService.eliminarSafe(this.itemToDelete.id)
+    this.temasService
+      .eliminarSafe(this.itemToDelete.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.toast.showSuccess(this.translate.instant('ADMIN.THEMES.SUCCESS.DELETE'), this.translate.instant('MENU.THEMES'));
+          this.toast.showSuccess(
+            this.translate.instant('ADMIN.THEMES.SUCCESS.DELETE'),
+            this.translate.instant('MENU.THEMES')
+          );
           this.loading = false;
           this.showDeleteModal = false;
           this.itemToDelete = null;
           this.load();
         },
         error: (err) => {
-          this.toast.showError(this.translate.instant('ADMIN.THEMES.ERROR.DELETE'), this.translate.instant('MENU.THEMES'));
+          this.toast.showError(
+            this.translate.instant('ADMIN.THEMES.ERROR.DELETE'),
+            this.translate.instant('MENU.THEMES')
+          );
           this.log.error('temas eliminar', err);
           this.loading = false;
           this.cdr.detectChanges();

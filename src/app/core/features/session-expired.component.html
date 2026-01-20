@@ -24,13 +24,19 @@
 
     @if (sessionData?.type === 'LOGOUT') {
       <div class="mb-2">
-        <p class="mb-0">{{ 'AUTO.LA_SESI_N_SE_CERR_DESDE_OTRO_D' | translate }}</p>
+        <p class="mb-0">{{ 'AUTO.LA_SESION_SE_CERRO_DESDE_OTRO_DISPOSITIVO' | translate }}</p>
       </div>
     }
 
     @if (sessionData?.type === 'SESSION_EXPIRED') {
       <div class="mb-2">
-        <p class="mb-0">{{ 'AUTO.SU_SESI_N_HA_CADUCADO_POR_INAC' | translate }}</p>
+        <p class="mb-0">{{ 'AUTO.SU_SESION_HA_CADUCADO_POR_INACTIVIDAD' | translate }}</p>
+        @if (timeSinceExpiry) {
+          <small class="text-muted d-block mt-2 session-timer">
+            <i class="fas fa-clock me-1"></i>
+            {{ timeSinceExpiry }}
+          </small>
+        }
       </div>
     }
   </c-modal-body>

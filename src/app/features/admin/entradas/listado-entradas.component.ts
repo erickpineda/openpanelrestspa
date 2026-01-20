@@ -1,4 +1,14 @@
-import { Component, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef, NgZone, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  ChangeDetectorRef,
+  NgZone,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Observable, Subject, catchError, finalize, throwError } from 'rxjs';
 import { EntradaCatalogService } from '@app/core/services/data/entrada-catalog.service';
@@ -126,7 +136,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       term,
       field: this.campoSeleccionado,
       operation: this.operacionSeleccionada,
-      dataOption: this.dataOptionSeleccionada
+      dataOption: this.dataOptionSeleccionada,
     };
     return this.stateService.search(searchParams, page);
   }
@@ -135,7 +145,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       term: this.valorBusqueda,
       field: this.campoSeleccionado,
       operation: this.operacionSeleccionada,
-      dataOption: this.dataOptionSeleccionada
+      dataOption: this.dataOptionSeleccionada,
     };
     this.stateService.goToPage(page, searchParams).subscribe();
   }
@@ -192,24 +202,22 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   }
   confirmarBorrado(): void {
     if (this.entradaABorrar) {
-      this.stateService
-        .deleteEntrada(this.entradaABorrar.idEntrada)
-        .subscribe({
-          next: () => {
-            this.entradaABorrar = null;
-            this.visible = false;
-            this.toastService.showSuccess(
-              'La entrada se ha eliminado correctamente.',
-              'Entrada eliminada'
-            );
-            this.cdr.markForCheck();
-          },
-          error: (error) => {
-            this.visible = false;
-            this.toastService.showError('Error al eliminar la entrada', 'Error');
-            this.cdr.markForCheck();
-          },
-        });
+      this.stateService.deleteEntrada(this.entradaABorrar.idEntrada).subscribe({
+        next: () => {
+          this.entradaABorrar = null;
+          this.visible = false;
+          this.toastService.showSuccess(
+            'La entrada se ha eliminado correctamente.',
+            'Entrada eliminada'
+          );
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.visible = false;
+          this.toastService.showError('Error al eliminar la entrada', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
     }
   }
   toggleModal(): void {
@@ -241,18 +249,27 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   getPreviewStateColor(entrada?: Entrada): string {
     if (!entrada?.estadoEntrada?.nombre) return 'primary';
-    
+
     switch (entrada.estadoEntrada.nombre.toUpperCase()) {
-      case 'PUBLICADA': return 'success';
-      case 'NO PUBLICADA': return 'danger';
+      case 'PUBLICADA':
+        return 'success';
+      case 'NO PUBLICADA':
+        return 'danger';
       case 'GUARDADA':
-      case 'BORRADOR': return 'secondary';
-      case 'PENDIENTE REVISION': return 'warning';
-      case 'EN REVISION': return 'info';
-      case 'REVISADA': return 'primary';
-      case 'HISTORICA': return 'dark';
-      case 'PROGRAMADA': return 'info';
-      default: return 'secondary';
+      case 'BORRADOR':
+        return 'secondary';
+      case 'PENDIENTE REVISION':
+        return 'warning';
+      case 'EN REVISION':
+        return 'info';
+      case 'REVISADA':
+        return 'primary';
+      case 'HISTORICA':
+        return 'dark';
+      case 'PROGRAMADA':
+        return 'info';
+      default:
+        return 'secondary';
     }
   }
 

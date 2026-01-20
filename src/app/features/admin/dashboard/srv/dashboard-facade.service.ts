@@ -21,7 +21,15 @@ export class DashboardFacadeService {
     topStartDate?: string,
     topEndDate?: string
   ): Observable<
-    [SummaryDTO, ActivityPointDTO[], TopItemDTO[], TopItemDTO[], TopItemDTO[], StorageDTO, ContentStatsDTO]
+    [
+      SummaryDTO,
+      ActivityPointDTO[],
+      TopItemDTO[],
+      TopItemDTO[],
+      TopItemDTO[],
+      StorageDTO,
+      ContentStatsDTO,
+    ]
   > {
     const summary$ = this.api.getSummary(force);
     const series$ = this.api.getSeriesActivity(seriesDays, force, granularity);
@@ -30,13 +38,31 @@ export class DashboardFacadeService {
     const topTags$ = this.api.getTop('tags', topLimit, force, topStartDate, topEndDate);
     const storage$ = this.api.getStorage();
     const contentStats$ = this.api.getContentStats();
-    return forkJoin([summary$, series$, topUsers$, topCategories$, topTags$, storage$, contentStats$]);
+    return forkJoin([
+      summary$,
+      series$,
+      topUsers$,
+      topCategories$,
+      topTags$,
+      storage$,
+      contentStats$,
+    ]);
   }
 
-  getSeries(days: number, force: boolean, granularity: 'hour' | 'day' | 'week' | 'month'): Observable<ActivityPointDTO[]> {
+  getSeries(
+    days: number,
+    force: boolean,
+    granularity: 'hour' | 'day' | 'week' | 'month'
+  ): Observable<ActivityPointDTO[]> {
     return this.api.getSeriesActivity(days, force, granularity);
   }
-  getTop(type: 'users' | 'categories' | 'tags', limit: number, force = false, startDate?: string, endDate?: string): Observable<TopItemDTO[]> {
+  getTop(
+    type: 'users' | 'categories' | 'tags',
+    limit: number,
+    force = false,
+    startDate?: string,
+    endDate?: string
+  ): Observable<TopItemDTO[]> {
     return this.api.getTop(type, limit, force, startDate, endDate);
   }
   getStorage(): Observable<StorageDTO> {
@@ -48,10 +74,18 @@ export class DashboardFacadeService {
   getRecentActivity(page = 0, size = 5): Observable<any> {
     return this.api.getRecentActivity(page, size);
   }
-  getSeriesEntriesSplitEstado(days: number, granularity: 'hour' | 'day' | 'week' | 'month', force = false): Observable<any[]> {
+  getSeriesEntriesSplitEstado(
+    days: number,
+    granularity: 'hour' | 'day' | 'week' | 'month',
+    force = false
+  ): Observable<any[]> {
     return this.api.getSeriesEntriesSplitEstado(days, granularity, force);
   }
-  getSeriesEntriesSplitEstadoNombre(days: number, granularity: 'hour' | 'day' | 'week' | 'month', force = false): Observable<any[]> {
+  getSeriesEntriesSplitEstadoNombre(
+    days: number,
+    granularity: 'hour' | 'day' | 'week' | 'month',
+    force = false
+  ): Observable<any[]> {
     return this.api.getSeriesEntriesSplitEstadoNombre(days, granularity, force);
   }
   evictSeries(days?: number) {

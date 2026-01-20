@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { Usuario } from '@app/core/models/usuario.model';
 import { UsuarioService } from '@app/core/services/data/usuario.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
@@ -10,7 +19,7 @@ import { TranslationService } from '@app/core/services/translation.service';
   selector: 'app-crear-usuario',
   templateUrl: './crear-usuario.component.html',
   styleUrls: ['./crear-usuario.component.scss'],
-  standalone: false
+  standalone: false,
 })
 export class CrearUsuarioComponent implements OnChanges {
   @Input() visible = false;
@@ -64,7 +73,7 @@ export class CrearUsuarioComponent implements OnChanges {
           this.translate.instant('ADMIN.USERS.ERROR.CREATE'),
           this.translate.instant('COMMON.ERROR')
         );
-      }
+      },
     });
   }
 

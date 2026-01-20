@@ -147,7 +147,7 @@ export class LoadingService {
   }
 
   // Método para forzar el cierre del loading (en casos de error)
-  forceStopLoading(): void {
+  forceStopLoading(silent: boolean = false): void {
     this.httpRequestCount = 0;
     this.updateGlobalState(false);
     if (this.loadingTimeout) {
@@ -155,7 +155,9 @@ export class LoadingService {
       this.loadingTimeout = null;
     }
     this.clearMaxWaitTimer();
-    this.logger.warn('Loading forzado a detenerse');
+    if (!silent) {
+      this.logger.warn('Loading forzado a detenerse');
+    }
   }
 
   // Estado de error
@@ -196,7 +198,7 @@ export class LoadingService {
     return {
       activeRequests: this.httpRequestCount,
       trackedRequests: this.stateSubject.value.requests.size,
-      isLoading: this.httpRequestCount > 0,
+      isLoading: this.stateSubject.value.global,
     };
   }
 }

@@ -4,7 +4,7 @@ import { Etiqueta } from '../../../../core/models/etiqueta.model';
 @Component({
   selector: 'app-eliminar-etiqueta',
   templateUrl: './eliminar-etiqueta.component.html',
-  standalone: false
+  standalone: false,
 })
 export class EliminarEtiquetaComponent {
   @Input() visible = false;

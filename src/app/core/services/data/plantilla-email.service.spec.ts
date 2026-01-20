@@ -46,4 +46,3 @@ describe('PlantillaEmailService', () => {
     req.flush({ result: { success: true }, data: 'plantilla.mensaje.borrado.ok' });
   });
 });
-

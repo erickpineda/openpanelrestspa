@@ -1,5 +1,10 @@
-<c-modal [visible]="visible" (visibleChange)="handleVisibleChange($event)" size="lg" backdrop="static"
-  alignment="center">
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  size="lg"
+  backdrop="static"
+  alignment="center"
+>
   <c-modal-header>
     <h5 cModalTitle class="d-flex align-items-center gap-2">
       <svg cIcon name="cilFolderOpen" class="text-primary"></svg>
@@ -9,11 +14,16 @@
   </c-modal-header>
   <c-modal-body class="p-4">
     @if (visible) {
-    <app-categoria-form (submitCategoria)="guardar($event)" (onReset)="cerrarModal()"></app-categoria-form>
+      <app-categoria-form
+        (submitCategoria)="guardar($event)"
+        (onReset)="cerrarModal()"
+      ></app-categoria-form>
     }
   </c-modal-body>
   <c-modal-footer class="bg-light bg-opacity-10">
-    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
     <button cButton color="primary" (click)="onGuardarClick()">
       <svg cIcon name="cilSave" class="me-1"></svg>
       {{ 'COMMON.SAVE' | translate }}

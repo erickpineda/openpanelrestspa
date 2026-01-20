@@ -5,24 +5,38 @@
   <c-modal-body>
     <c-row>
       <c-col lg="6">
-        <label class="form-label">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.SERIES_DAYS' | translate }}</label>
+        <label class="form-label">{{
+          'ADMIN.DASHBOARD.SETTINGS_MODAL.SERIES_DAYS' | translate
+        }}</label>
         <input cFormControl type="number" min="1" max="365" [(ngModel)]="settings.seriesDays" />
       </c-col>
       <c-col lg="6">
-        <label class="form-label">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.GRANULARITY' | translate }}</label>
+        <label class="form-label">{{
+          'ADMIN.DASHBOARD.SETTINGS_MODAL.GRANULARITY' | translate
+        }}</label>
         <select cSelect [(ngModel)]="settings.seriesGranularity">
-          <option [ngValue]="'hour'">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.HOUR' | translate }}</option>
+          <option [ngValue]="'hour'">
+            {{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.HOUR' | translate }}
+          </option>
           <option [ngValue]="'day'">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.DAY' | translate }}</option>
-          <option [ngValue]="'week'">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.WEEK' | translate }}</option>
-          <option [ngValue]="'month'">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.MONTH' | translate }}</option>
+          <option [ngValue]="'week'">
+            {{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.WEEK' | translate }}
+          </option>
+          <option [ngValue]="'month'">
+            {{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.MONTH' | translate }}
+          </option>
         </select>
       </c-col>
       <c-col lg="6">
-        <label class="form-label">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.TOP_LIMIT' | translate }}</label>
+        <label class="form-label">{{
+          'ADMIN.DASHBOARD.SETTINGS_MODAL.TOP_LIMIT' | translate
+        }}</label>
         <input cFormControl type="number" min="1" max="200" [(ngModel)]="settings.topLimit" />
       </c-col>
       <c-col lg="6">
-        <label class="form-label">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.TOP_PERIOD_DAYS' | translate }}</label>
+        <label class="form-label">{{
+          'ADMIN.DASHBOARD.SETTINGS_MODAL.TOP_PERIOD_DAYS' | translate
+        }}</label>
         <select cSelect [(ngModel)]="settings.topPeriodDays">
           <option [ngValue]="7">7</option>
           <option [ngValue]="30">30</option>
@@ -31,15 +45,33 @@
       </c-col>
       <c-col lg="12">
         <hr />
-        <div class="small text-muted mb-2">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.TOP_EXACT_RANGE_OPTIONAL' | translate }}</div>
+        <div class="small text-muted mb-2">
+          {{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.TOP_EXACT_RANGE_OPTIONAL' | translate }}
+        </div>
       </c-col>
       <c-col lg="6">
-        <label class="form-label" for="topStartDate">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.START_DATE' | translate }}</label>
-        <input id="topStartDate" cFormControl type="date" [(ngModel)]="settings.topStartDate" aria-describedby="topRangeHelp" />
+        <label class="form-label" for="topStartDate">{{
+          'ADMIN.DASHBOARD.SETTINGS_MODAL.START_DATE' | translate
+        }}</label>
+        <input
+          id="topStartDate"
+          cFormControl
+          type="date"
+          [(ngModel)]="settings.topStartDate"
+          aria-describedby="topRangeHelp"
+        />
       </c-col>
       <c-col lg="6">
-        <label class="form-label" for="topEndDate">{{ 'ADMIN.DASHBOARD.SETTINGS_MODAL.END_DATE' | translate }}</label>
-        <input id="topEndDate" cFormControl type="date" [(ngModel)]="settings.topEndDate" aria-describedby="topRangeHelp" />
+        <label class="form-label" for="topEndDate">{{
+          'ADMIN.DASHBOARD.SETTINGS_MODAL.END_DATE' | translate
+        }}</label>
+        <input
+          id="topEndDate"
+          cFormControl
+          type="date"
+          [(ngModel)]="settings.topEndDate"
+          aria-describedby="topRangeHelp"
+        />
       </c-col>
       <c-col lg="12">
         <div id="topRangeHelp" class="form-text">
@@ -55,7 +87,14 @@
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="onClose()">{{ 'COMMON.CANCEL' | translate }}</button>
-    <button cButton color="warning" class="settings-clear-btn" (click)="onReset()" [title]="'ADMIN.DASHBOARD.SETTINGS_MODAL.RESET_TITLE' | translate" [attr.aria-label]="'ADMIN.DASHBOARD.SETTINGS_MODAL.RESET_ARIA_LABEL' | translate">
+    <button
+      cButton
+      color="warning"
+      class="settings-clear-btn"
+      (click)="onReset()"
+      [title]="'ADMIN.DASHBOARD.SETTINGS_MODAL.RESET_TITLE' | translate"
+      [attr.aria-label]="'ADMIN.DASHBOARD.SETTINGS_MODAL.RESET_ARIA_LABEL' | translate"
+    >
       {{ 'COMMON.RESET' | translate }}
     </button>
     <button cButton color="primary" (click)="onApply()">{{ 'COMMON.APPLY' | translate }}</button>

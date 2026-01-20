@@ -82,11 +82,11 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
 
   ngOnInit(): void {
     this.breadcrumbs = this.createBreadcrumbs(this.router.routerState.root);
-    
+
     this.languageService.currentLang$.subscribe((lang: Language) => {
       this.currentLang = lang;
     });
-    
+
     this.routerSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {

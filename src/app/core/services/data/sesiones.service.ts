@@ -11,4 +11,3 @@ export class SesionesService extends BaseService {
     return this.get<any>(OPConstants.Methods.SESIONES.OBTENER_POR_HASH_SESION_TOKEN(hash));
   }
 }
-

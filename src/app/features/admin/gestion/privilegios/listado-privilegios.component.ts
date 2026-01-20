@@ -44,7 +44,7 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     private searchUtil: SearchUtilService,
     private cdr: ChangeDetectorRef,
     private translate: TranslationService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.load();
@@ -168,7 +168,9 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     op$.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.toast.showSuccess(
-          this.isEditing ? this.translate.instant('ADMIN.PRIVILEGES.SUCCESS.UPDATE') : this.translate.instant('ADMIN.PRIVILEGES.SUCCESS.CREATE'),
+          this.isEditing
+            ? this.translate.instant('ADMIN.PRIVILEGES.SUCCESS.UPDATE')
+            : this.translate.instant('ADMIN.PRIVILEGES.SUCCESS.CREATE'),
           this.translate.instant('MENU.PRIVILEGES')
         );
         this.loading = false;
@@ -177,7 +179,9 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.toast.showError(
-          this.isEditing ? this.translate.instant('ADMIN.PRIVILEGES.ERROR.UPDATE') : this.translate.instant('ADMIN.PRIVILEGES.ERROR.CREATE'),
+          this.isEditing
+            ? this.translate.instant('ADMIN.PRIVILEGES.ERROR.UPDATE')
+            : this.translate.instant('ADMIN.PRIVILEGES.ERROR.CREATE'),
           this.translate.instant('MENU.PRIVILEGES')
         );
         this.log.error(this.isEditing ? 'privilegios actualizar' : 'privilegios crear', err);
@@ -205,14 +209,20 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.toast.showSuccess(this.translate.instant('ADMIN.PRIVILEGES.SUCCESS.DELETE'), this.translate.instant('MENU.PRIVILEGES'));
+          this.toast.showSuccess(
+            this.translate.instant('ADMIN.PRIVILEGES.SUCCESS.DELETE'),
+            this.translate.instant('MENU.PRIVILEGES')
+          );
           this.loading = false;
           this.showDeleteModal = false;
           this.privilegioToDelete = null;
           this.load();
         },
         error: (err: any) => {
-          this.toast.showError(this.translate.instant('ADMIN.PRIVILEGES.ERROR.DELETE'), this.translate.instant('MENU.PRIVILEGES'));
+          this.toast.showError(
+            this.translate.instant('ADMIN.PRIVILEGES.ERROR.DELETE'),
+            this.translate.instant('MENU.PRIVILEGES')
+          );
           this.log.error('privilegios borrar', err);
           this.loading = false;
           this.showDeleteModal = false;

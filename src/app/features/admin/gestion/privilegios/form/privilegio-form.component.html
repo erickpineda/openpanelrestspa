@@ -1,62 +1,103 @@
-<c-modal [visible]="visible" (visibleChange)="visibleChange.emit($event)" size="lg" backdrop="static" id="privilegioFormModal" scrollable>
+<c-modal
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  size="lg"
+  backdrop="static"
+  id="privilegioFormModal"
+  scrollable
+>
   <c-modal-header>
     <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
       <svg cIcon name="cilLockLocked" class="text-primary"></svg>
-      {{ isEditing ? ('ADMIN.PRIVILEGES.EDIT_PRIVILEGE' | translate) : ('ADMIN.PRIVILEGES.NEW_PRIVILEGE' | translate) }}
+      {{
+        isEditing
+          ? ('ADMIN.PRIVILEGES.EDIT_PRIVILEGE' | translate)
+          : ('ADMIN.PRIVILEGES.NEW_PRIVILEGE' | translate)
+      }}
     </h5>
     <button (click)="close()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body class="py-4">
     @if (privilegio) {
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label small fw-bold text-muted">{{ 'COMMON.NAME' | translate }}</label>
-        <input cFormControl 
-             id="nombre" 
-             [value]="privilegio.nombre" 
-             (input)="onNombreInput($any($event.target).value)"
-             (blur)="nombreTouched = true"
-             [disabled]="disabled" 
-             [class.is-invalid]="!privilegio.nombre && (submitted || nombreTouched)"
-             placeholder="{{ 'ADMIN.PRIVILEGES.NAME_PLACEHOLDER' | translate }}" />
-      @if (!privilegio.nombre && (submitted || nombreTouched)) {
-      <div class="invalid-feedback d-block">{{ 'ADMIN.PRIVILEGES.NAME_REQUIRED' | translate }}</div>
-      }
-      </div>
-      <div class="col-md-6">
-        <label class="form-label small fw-bold text-muted">{{ 'ADMIN.PRIVILEGES.TABLE.CODE' | translate }}</label>
-        <input cFormControl type="text" [value]="privilegio.codigo || ''" (input)="onCodigoInput($any($event.target).value)" (blur)="codigoTouched = true" [disabled]="isEditing || disabled" [class.is-invalid]="!privilegio.codigo && (submitted || codigoTouched)" maxlength="20" [placeholder]="'ADMIN.PRIVILEGES.CODE_PLACEHOLDER' | translate" class="text-uppercase" />
-        @if (!privilegio.codigo && (submitted || codigoTouched)) {
-        <div class="invalid-feedback d-block">{{ 'ADMIN.PRIVILEGES.CODE_REQUIRED_MAX_20_CHARS' | translate }}</div>
-        }
-        @if (!isEditing) {
-        <div class="form-text text-muted small">
-          {{ 'ADMIN.PRIVILEGES.CODE_AUTO_GENERATED_IF_EMPTY' | translate }}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">{{ 'COMMON.NAME' | translate }}</label>
+          <input
+            cFormControl
+            id="nombre"
+            [value]="privilegio.nombre"
+            (input)="onNombreInput($any($event.target).value)"
+            (blur)="nombreTouched = true"
+            [disabled]="disabled"
+            [class.is-invalid]="!privilegio.nombre && (submitted || nombreTouched)"
+            placeholder="{{ 'ADMIN.PRIVILEGES.NAME_PLACEHOLDER' | translate }}"
+          />
+          @if (!privilegio.nombre && (submitted || nombreTouched)) {
+            <div class="invalid-feedback d-block">
+              {{ 'ADMIN.PRIVILEGES.NAME_REQUIRED' | translate }}
+            </div>
+          }
         </div>
-        }
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">{{
+            'ADMIN.PRIVILEGES.TABLE.CODE' | translate
+          }}</label>
+          <input
+            cFormControl
+            type="text"
+            [value]="privilegio.codigo || ''"
+            (input)="onCodigoInput($any($event.target).value)"
+            (blur)="codigoTouched = true"
+            [disabled]="isEditing || disabled"
+            [class.is-invalid]="!privilegio.codigo && (submitted || codigoTouched)"
+            maxlength="20"
+            [placeholder]="'ADMIN.PRIVILEGES.CODE_PLACEHOLDER' | translate"
+            class="text-uppercase"
+          />
+          @if (!privilegio.codigo && (submitted || codigoTouched)) {
+            <div class="invalid-feedback d-block">
+              {{ 'ADMIN.PRIVILEGES.CODE_REQUIRED_MAX_20_CHARS' | translate }}
+            </div>
+          }
+          @if (!isEditing) {
+            <div class="form-text text-muted small">
+              {{ 'ADMIN.PRIVILEGES.CODE_AUTO_GENERATED_IF_EMPTY' | translate }}
+            </div>
+          }
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-bold text-muted">{{
+            'COMMON.DESCRIPTION' | translate
+          }}</label>
+          <textarea
+            cFormControl
+            rows="2"
+            [value]="privilegio.descripcion || ''"
+            (input)="privilegio && (privilegio.descripcion = $any($event.target).value)"
+            [disabled]="disabled"
+            [placeholder]="'ADMIN.PRIVILEGES.DESC_PLACEHOLDER' | translate"
+          ></textarea>
+        </div>
       </div>
-      <div class="col-12">
-        <label class="form-label small fw-bold text-muted">{{ 'COMMON.DESCRIPTION' | translate }}</label>
-        <textarea cFormControl rows="2" [value]="privilegio.descripcion || ''" (input)="privilegio && (privilegio.descripcion = $any($event.target).value)" [disabled]="disabled" [placeholder]="'ADMIN.PRIVILEGES.DESC_PLACEHOLDER' | translate"></textarea>
-      </div>
-    </div>
     }
   </c-modal-body>
   <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
     <div>
       @if (disabled && isEditing) {
-      <button cButton color="warning" variant="outline" (click)="enableEdit()">
-        <svg cIcon name="cilLockUnlocked" class="me-1"></svg>
-        {{ 'COMMON.ENABLE_EDIT' | translate }}
-      </button>
+        <button cButton color="warning" variant="outline" (click)="enableEdit()">
+          <svg cIcon name="cilLockUnlocked" class="me-1"></svg>
+          {{ 'COMMON.ENABLE_EDIT' | translate }}
+        </button>
       }
     </div>
     <div class="d-flex gap-2">
-      <button cButton color="secondary" variant="ghost" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
-      @if (!disabled) {
-      <button cButton color="primary" class="px-4" [disabled]="!isFormValid()" (click)="save()">
-        {{ isEditing ? ('COMMON.SAVE_CHANGES' | translate) : ('COMMON.CREATE' | translate) }}
+      <button cButton color="secondary" variant="ghost" (click)="close()">
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
+      @if (!disabled) {
+        <button cButton color="primary" class="px-4" [disabled]="!isFormValid()" (click)="save()">
+          {{ isEditing ? ('COMMON.SAVE_CHANGES' | translate) : ('COMMON.CREATE' | translate) }}
+        </button>
       }
     </div>
   </c-modal-footer>

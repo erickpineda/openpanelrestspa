@@ -4,7 +4,7 @@
       <img
         [src]="imagenMostrar"
         class="img-fluid rounded shadow-sm"
-        style="max-height: 400px; object-fit: contain;"
+        style="max-height: 400px; object-fit: contain"
         alt="Imagen destacada"
       />
     </div>
@@ -30,9 +30,17 @@
       @if (fechaMostrar) {
         <div
           class="d-flex align-items-center px-3 py-1 rounded-pill border"
-          [ngClass]="estadoColor ? 
-            'bg-' + estadoColor + '-subtle text-' + estadoColor + '-emphasis border-' + estadoColor + '-subtle' : 
-            'bg-light text-secondary border-light-subtle'"
+          [ngClass]="
+            estadoColor
+              ? 'bg-' +
+                estadoColor +
+                '-subtle text-' +
+                estadoColor +
+                '-emphasis border-' +
+                estadoColor +
+                '-subtle'
+              : 'bg-light text-secondary border-light-subtle'
+          "
         >
           <svg cIcon name="cilCalendar" size="sm" class="me-2"></svg>
           <span class="fw-medium">{{ fechaMostrar | date: 'dd-MM-yyyy HH:mm' }}</span>

@@ -120,7 +120,9 @@ export class AjustesComponent implements OnInit, OnDestroy {
     op.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.toast.showSuccess(
-          this.isEditing ? this.translate.instant('ADMIN.SETTINGS.SUCCESS.UPDATE') : this.translate.instant('ADMIN.SETTINGS.SUCCESS.CREATE'),
+          this.isEditing
+            ? this.translate.instant('ADMIN.SETTINGS.SUCCESS.UPDATE')
+            : this.translate.instant('ADMIN.SETTINGS.SUCCESS.CREATE'),
           this.translate.instant('MENU.SETTINGS')
         );
         this.loading = false;
@@ -129,7 +131,9 @@ export class AjustesComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.toast.showError(
-          this.isEditing ? this.translate.instant('ADMIN.SETTINGS.ERROR.UPDATE') : this.translate.instant('ADMIN.SETTINGS.ERROR.CREATE'),
+          this.isEditing
+            ? this.translate.instant('ADMIN.SETTINGS.ERROR.UPDATE')
+            : this.translate.instant('ADMIN.SETTINGS.ERROR.CREATE'),
           this.translate.instant('MENU.SETTINGS')
         );
         this.log.error('ajustes guardar', err);
@@ -151,14 +155,20 @@ export class AjustesComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.ajustesService.eliminarSafe(this.itemToDelete.id).subscribe({
       next: () => {
-        this.toast.showSuccess(this.translate.instant('ADMIN.SETTINGS.SUCCESS.DELETE'), this.translate.instant('MENU.SETTINGS'));
+        this.toast.showSuccess(
+          this.translate.instant('ADMIN.SETTINGS.SUCCESS.DELETE'),
+          this.translate.instant('MENU.SETTINGS')
+        );
         this.loading = false;
         this.showDeleteModal = false;
         this.itemToDelete = null;
         this.load();
       },
       error: (err) => {
-        this.toast.showError(this.translate.instant('ADMIN.SETTINGS.ERROR.DELETE'), this.translate.instant('MENU.SETTINGS'));
+        this.toast.showError(
+          this.translate.instant('ADMIN.SETTINGS.ERROR.DELETE'),
+          this.translate.instant('MENU.SETTINGS')
+        );
         this.log.error('ajustes eliminar', err);
         this.loading = false;
         this.cdr.detectChanges();
@@ -173,7 +183,7 @@ export class AjustesComponent implements OnInit, OnDestroy {
   onBasicSearchTextChange(text: string): void {
     this.basicSearchText = text || '';
     this.pageNo = 0;
-   	this.search();
+    this.search();
   }
   onPageSizeChange(size: number): void {
     this.pageSize = Number(size) || 10;
