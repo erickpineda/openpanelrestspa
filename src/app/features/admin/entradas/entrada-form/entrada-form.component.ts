@@ -138,6 +138,11 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       this.saveBeforeLogout.bind(this)
     );
 
+    window.addEventListener(
+      OPConstants.Events.SAVE_FORM_DATA,
+      this.saveToTemporaryStorage.bind(this)
+    );
+
     this.checkNavigationState();
     this.stateService.checkForTemporaryData(!!this.entrada?.idEntrada);
   }
@@ -151,6 +156,16 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     window.removeEventListener(
       OPConstants.Events.SAVE_UNSAVED_WORK,
       this.saveBeforeLogout.bind(this)
+    );
+
+    window.removeEventListener(
+      OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
+      this.saveBeforeLogout.bind(this)
+    );
+
+    window.removeEventListener(
+      OPConstants.Events.SAVE_FORM_DATA,
+      this.saveToTemporaryStorage.bind(this)
     );
 
     const editorMain = document.querySelector('.ck-editor__main');
@@ -413,22 +428,26 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   private checkNavigationState(): void {
-    const navigation = this.router.currentNavigation();
-    const state = navigation?.extras?.state as any;
+    // Usar history.state es más fiable en ngOnInit que router.getCurrentNavigation()
+    const state = history.state;
 
     if (state?.temporaryEntry && state?.recoverData) {
       this.log.info('🔄 Recibiendo entrada temporal desde navegación:', state.temporaryEntry);
 
-      this.stateService.setRecoveringFromNavigation(true);
+      // Usamos setTimeout para asegurar que la directiva appUnsavedWork haya inicializado
+      // y capturado el estado "vacío" del formulario antes de parchearlo.
+      setTimeout(() => {
+        this.stateService.setRecoveringFromNavigation(true);
 
-      this.recoverTemporaryData(state.temporaryEntry.formData);
+        this.recoverTemporaryData(state.temporaryEntry.formData);
 
-      this.temporaryStorage.removeTemporaryEntry(state.temporaryEntry.id);
-
-      this.router.navigate([], {
-        replaceUrl: true,
-        state: [null],
-      });
+        // No eliminamos la entrada aquí para permitir que el usuario decida si guardar o no
+        // Solo limpiamos el estado de navegación
+        this.router.navigate([], {
+          replaceUrl: true,
+          state: { ...state, temporaryEntry: null, recoverData: null },
+        });
+      }, 100);
     }
   }
 
@@ -529,8 +548,6 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     if (this.form.valid) {
       this.onSubmit();
     }
-
-    this.saveToTemporaryStorage();
   }
 
   private saveToTemporaryStorage(): void {

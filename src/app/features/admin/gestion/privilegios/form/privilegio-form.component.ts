@@ -14,10 +14,16 @@ export class PrivilegioFormComponent implements OnChanges {
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() onSave = new EventEmitter<Privilegio>();
   disabled = false;
+  submitted = false;
+  nombreTouched = false;
+  codigoTouched = false;
   constructor(private translate: TranslationService) { }
   manualCodeEntry = false;
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
+      this.submitted = false;
+      this.nombreTouched = false;
+      this.codigoTouched = false;
       if (this.isEditing) {
         this.disabled = true;
       } else {
@@ -33,6 +39,7 @@ export class PrivilegioFormComponent implements OnChanges {
     this.visibleChange.emit(false);
   }
   save() {
+    this.submitted = true;
     if (this.isFormValid() && this.privilegio) {
       this.onSave.emit(this.privilegio);
     }

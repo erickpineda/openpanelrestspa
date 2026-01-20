@@ -78,8 +78,14 @@ export class EntradaFormStateService {
       title: data.title,
       description: data.description,
     };
-    const id = this.temporaryStorage.saveTemporaryEntry(entry);
-    this.updateState({ currentTemporaryEntryId: id });
+    
+    // Pasamos el ID actual si existe para actualizar la entrada en lugar de crear una nueva
+    const currentId = this.currentState.currentTemporaryEntryId || undefined;
+    const id = this.temporaryStorage.saveTemporaryEntry(entry, currentId);
+    
+    if (id !== currentId) {
+      this.updateState({ currentTemporaryEntryId: id });
+    }
   }
 
   removeCurrentTemporaryEntry(): void {

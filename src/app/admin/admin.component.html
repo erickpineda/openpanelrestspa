@@ -45,15 +45,13 @@
     data-testid="admin-root"
   >
     @if (showGlobalRecoveryNotification) {
-      <div class="container mt-3">
+      <div class="px-3 pt-3">
         <app-data-recovery-notification
-          title="📥 Entradas no guardadas"
-          [message]="
-            'Tienes ' + temporaryEntriesCount + ' entrada(s) no guardada(s) de sesiones anteriores'
-          "
-          recoverText="Ver entradas temporales"
-          ignoreText="Más tarde"
-          discardText="Descartar todas"
+          [title]="'ADMIN.RECOVERY.GLOBAL_TITLE' | translate"
+          [message]="('ADMIN.RECOVERY.GLOBAL_MESSAGE' | translate : { count: temporaryEntriesCount })"
+          [recoverText]="'ADMIN.RECOVERY.GO_TO_LIST' | translate"
+          [ignoreText]="'ADMIN.RECOVERY.IGNORE_ALL' | translate"
+          [discardText]="'ADMIN.RECOVERY.DISCARD_ALL' | translate"
           (onRecover)="onGlobalRecover()"
           (onIgnore)="onGlobalIgnore()"
           (onDiscard)="onGlobalDiscard()"

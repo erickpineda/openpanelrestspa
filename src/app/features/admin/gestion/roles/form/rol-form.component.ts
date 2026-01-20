@@ -22,8 +22,14 @@ export class RolFormComponent implements OnChanges {
   manualCodeEntry = false;
   editRol: Rol | null = null;
   disabled = false;
+  submitted = false;
+  nombreTouched = false;
+  codigoTouched = false;
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
+      this.submitted = false;
+      this.nombreTouched = false;
+      this.codigoTouched = false;
       if (this.isEditing) {
         this.disabled = true;
       } else {
@@ -46,6 +52,7 @@ export class RolFormComponent implements OnChanges {
     this.visibleChange.emit(false);
   }
   save(): void {
+    this.submitted = true;
     if (this.editRol && this.isRolFormValid()) {
       this.onSave.emit(this.editRol);
     }

@@ -113,6 +113,16 @@ export class SessionManagerService {
     this.handleLogout(payload);
   }
 
+  public logout(): void {
+    const payload: SessionExpirationData = {
+      type: 'LOGOUT',
+      message: 'Sesión cerrada por el usuario',
+      allowSave: true,
+      timestamp: Date.now(),
+    };
+    this.handleLogout(payload);
+  }
+
   private handleLogout(payload: SessionExpirationData): void {
     this.log.info('SessionManager: manejando logout', payload);
 

@@ -11,9 +11,6 @@ import { DatePipe, registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import localeEn from '@angular/common/locales/en';
 import { ModalModule, ToastModule } from '@coreui/angular';
-import { UnsavedWorkDirective } from './core/directives/unsaved-work.directive';
-import { SessionExpiredComponent } from './core/features/session-expired.component';
-import { UnsavedWorkModalComponent } from './core/features/unsaved-work-modal.component';
 import { GlobalNotificationsComponent } from './shared/components/global-notifications/global-notifications.component';
 import { SharedOPModule } from './shared/shared.module';
 import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
@@ -21,9 +18,6 @@ import { GlobalErrorHandlerService } from './core/errors/global-error/global-err
 @NgModule({
   declarations: [
     AppComponent,
-    SessionExpiredComponent,
-    UnsavedWorkModalComponent,
-    UnsavedWorkDirective,
     GlobalNotificationsComponent,
   ],
   bootstrap: [AppComponent],

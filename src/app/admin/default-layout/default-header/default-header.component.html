@@ -173,7 +173,7 @@
         <hr cDropdownDivider />
       </li>
       <li>
-        <a routerLink="/login" cDropdownItem>
+        <a cDropdownItem (click)="logout()" style="cursor: pointer">
           <svg cIcon class="me-2" name="cilLockLocked"></svg>
           {{ labelLockAccount }}
         </a>

@@ -246,10 +246,15 @@
                         color="primary"
                         variant="ghost"
                         size="sm"
-                        (click)="selectItem.emit(m)"
+                        (click)="onSelect(m)"
                         cTooltip="Seleccionar"
+                        [disabled]="selectingItemUuid === m.uuid"
                       >
-                        <svg cIcon name="cilCheckAlt"></svg>
+                        @if (selectingItemUuid === m.uuid) {
+                          <c-spinner size="sm" aria-hidden="true"></c-spinner>
+                        } @else {
+                          <svg cIcon name="cilCheckAlt"></svg>
+                        }
                       </button>
                     }
                     <button

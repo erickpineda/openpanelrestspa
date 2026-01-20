@@ -41,6 +41,7 @@
     "CHARACTERS": "caracteres",
     "CONFIRM_DELETE": "Confirmar eliminación",
     "DELETE": "Eliminar",
+    "REMOVE": "Eliminar",
     "YES_DELETE": "Sí, eliminar",
     "ACTION_CANNOT_BE_UNDONE": "Esta acción no se puede deshacer.",
     "RECORDS": "registros",
@@ -317,6 +318,13 @@
       "CLEAR_ALL_CONFIRMATION": "¿Estás seguro de que quieres eliminar todas las entradas temporales?",
       "DELETE_TITLE": "Eliminar Entrada Temporal",
       "CLEAR_ALL_TITLE": "Limpiar Todo"
+    },
+    "RECOVERY": {
+      "GLOBAL_TITLE": "Entradas no guardadas",
+      "GLOBAL_MESSAGE": "Tienes {{ count }} entrada(s) no guardada(s) de sesiones anteriores",
+      "GO_TO_LIST": "Ver entradas temporales",
+      "IGNORE_ALL": "Más tarde",
+      "DISCARD_ALL": "Descartar todas"
     },
     "CATEGORIES": {
       "TITLE": "Categorías",
@@ -671,7 +679,7 @@
       "NO_PRIVILEGES_FOUND": "No se encontraron privilegios",
       "ADJUST_FILTERS_HELP": "Intenta ajustar los criterios de búsqueda",
       "NAME_PLACEHOLDER": "Ej. Gestionar Usuarios",
-      "CODE_PLACEHOLDER": "Ej. USERS_MANAGE",
+      "CODE_PLACEHOLDER": "Ej. GESTIONAR_USUARIOS",
       "DESC_PLACEHOLDER": "Descripción opcional del privilegio...",
       "CODE_HELP": "Se genera automáticamente si se deja vacío.",
       "TABLE": {

@@ -1,21 +1,32 @@
 <c-modal [visible]="visible" (visibleChange)="visibleChange.emit($event)" size="lg" backdrop="static" id="privilegioFormModal" scrollable>
-  <c-modal-header class="border-bottom-0 pb-0">
-    <h5 cModalTitle class="fw-bold">{{ isEditing ? ('ADMIN.PRIVILEGES.EDIT_PRIVILEGE' | translate) : ('ADMIN.PRIVILEGES.NEW_PRIVILEGE' | translate) }}</h5>
+  <c-modal-header>
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilLockLocked" class="text-primary"></svg>
+      {{ isEditing ? ('ADMIN.PRIVILEGES.EDIT_PRIVILEGE' | translate) : ('ADMIN.PRIVILEGES.NEW_PRIVILEGE' | translate) }}
+    </h5>
+    <button (click)="close()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body class="py-4">
     @if (privilegio) {
     <div class="row g-3">
       <div class="col-md-6">
         <label class="form-label small fw-bold text-muted">{{ 'COMMON.NAME' | translate }}</label>
-        <input cFormControl type="text" [value]="privilegio.nombre || ''" (input)="onNombreInput($any($event.target).value)" [class.is-invalid]="!privilegio.nombre" [disabled]="disabled" [placeholder]="'ADMIN.PRIVILEGES.NAME_PLACEHOLDER' | translate" />
-        @if (!privilegio.nombre) {
-        <div class="invalid-feedback d-block">{{ 'ADMIN.PRIVILEGES.NAME_REQUIRED' | translate }}</div>
-        }
+        <input cFormControl 
+             id="nombre" 
+             [value]="privilegio.nombre" 
+             (input)="onNombreInput($any($event.target).value)"
+             (blur)="nombreTouched = true"
+             [disabled]="disabled" 
+             [class.is-invalid]="!privilegio.nombre && (submitted || nombreTouched)"
+             placeholder="{{ 'ADMIN.PRIVILEGES.NAME_PLACEHOLDER' | translate }}" />
+      @if (!privilegio.nombre && (submitted || nombreTouched)) {
+      <div class="invalid-feedback d-block">{{ 'ADMIN.PRIVILEGES.NAME_REQUIRED' | translate }}</div>
+      }
       </div>
       <div class="col-md-6">
         <label class="form-label small fw-bold text-muted">{{ 'ADMIN.PRIVILEGES.TABLE.CODE' | translate }}</label>
-        <input cFormControl type="text" [value]="privilegio.codigo || ''" (input)="onCodigoInput($any($event.target).value)" [disabled]="isEditing || disabled" [class.is-invalid]="!privilegio.codigo" maxlength="20" [placeholder]="'ADMIN.PRIVILEGES.CODE_PLACEHOLDER' | translate" class="text-uppercase" />
-        @if (!privilegio.codigo) {
+        <input cFormControl type="text" [value]="privilegio.codigo || ''" (input)="onCodigoInput($any($event.target).value)" (blur)="codigoTouched = true" [disabled]="isEditing || disabled" [class.is-invalid]="!privilegio.codigo && (submitted || codigoTouched)" maxlength="20" [placeholder]="'ADMIN.PRIVILEGES.CODE_PLACEHOLDER' | translate" class="text-uppercase" />
+        @if (!privilegio.codigo && (submitted || codigoTouched)) {
         <div class="invalid-feedback d-block">{{ 'ADMIN.PRIVILEGES.CODE_REQUIRED_MAX_20_CHARS' | translate }}</div>
         }
         @if (!isEditing) {
@@ -31,7 +42,7 @@
     </div>
     }
   </c-modal-body>
-  <c-modal-footer class="border-top-0 pt-0 pb-4 d-flex justify-content-between">
+  <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
     <div>
       @if (disabled && isEditing) {
       <button cButton color="warning" variant="outline" (click)="enableEdit()">

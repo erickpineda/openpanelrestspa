@@ -52,6 +52,7 @@ export class ImagenesComponent implements OnInit, OnDestroy, AfterViewInit {
   // Patrón de toolbar/búsqueda
   showAdvanced: boolean = false;
   basicSearchText: string = '';
+  selectingItemUuid: string | null = null;
 
   @Input() mode: 'admin' | 'selector' = 'admin';
   @Output() selectItem = new EventEmitter<MediaItem>();
@@ -519,6 +520,9 @@ export class ImagenesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onSelect(item: MediaItem): void {
+    if (item.uuid) {
+      this.selectingItemUuid = item.uuid;
+    }
     this.selectItem.emit(item);
   }
 

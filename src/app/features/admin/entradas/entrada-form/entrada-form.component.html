@@ -44,7 +44,22 @@
         (ngSubmit)="onSubmit()"
         novalidate
         class="needs-validation"
+        [appUnsavedWork]="'entrada-form'"
       >
+        @if (showRecoveryNotification) {
+          <app-data-recovery-notification
+            [title]="'ADMIN.ENTRIES.RECOVERY.TITLE' | translate"
+            [message]="('ADMIN.ENTRIES.RECOVERY.MESSAGE' | translate) + ' ' + (temporaryData?.title || 'Sin título')"
+            [recoverText]="'ADMIN.ENTRIES.RECOVERY.RECOVER' | translate"
+            [ignoreText]="'ADMIN.ENTRIES.RECOVERY.IGNORE' | translate"
+            [discardText]="'ADMIN.ENTRIES.RECOVERY.DISCARD' | translate"
+            (onRecover)="onRecoverData()"
+            (onIgnore)="onIgnoreData()"
+            (onDiscard)="onDiscardData()"
+            class="mb-4 d-block"
+          ></app-data-recovery-notification>
+        }
+
         <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
           <button cButton color="secondary" variant="ghost" type="button" (click)="cancelar.emit()">
             {{ 'COMMON.CANCEL' | translate }}

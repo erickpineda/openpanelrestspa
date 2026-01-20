@@ -28,11 +28,21 @@ import { DateInterceptor } from './interceptor/date.interceptor';
 import { LanguageService } from './services/language.service';
 
 import { TranslationService } from './services/translation.service';
+import { UnsavedWorkModalComponent } from './features/unsaved-work-modal.component';
+import { SessionExpiredComponent } from './features/session-expired.component';
+import { ModalModule, ButtonModule, AlertModule } from '@coreui/angular';
+import { TranslatePipe } from '../shared/pipes/translate.pipe';
 
 @NgModule({
-  imports: [CommonModule, RouterModule],
-  declarations: [],
-  exports: [],
+  imports: [CommonModule, RouterModule, ModalModule, ButtonModule, AlertModule, TranslatePipe],
+  declarations: [
+    UnsavedWorkModalComponent,
+    SessionExpiredComponent,
+  ],
+  exports: [
+    UnsavedWorkModalComponent,
+    SessionExpiredComponent,
+  ],
   providers: [
     // Servicios singleton
     GlobalErrorHandlerService,

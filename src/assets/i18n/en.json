@@ -41,6 +41,7 @@
     "CHARACTERS": "characters",
     "CONFIRM_DELETE": "Confirm deletion",
     "DELETE": "Delete",
+    "REMOVE": "Remove",
     "YES_DELETE": "Yes, delete",
     "ACTION_CANNOT_BE_UNDONE": "This action cannot be undone.",
     "RECORDS": "records",
@@ -314,6 +315,13 @@
       "CLEAR_ALL_CONFIRMATION": "Are you sure you want to delete all temporary entries?",
       "DELETE_TITLE": "Delete Temporary Entry",
       "CLEAR_ALL_TITLE": "Clear All"
+    },
+    "RECOVERY": {
+      "GLOBAL_TITLE": "Unsaved Entries",
+      "GLOBAL_MESSAGE": "You have {{ count }} unsaved entry(ies) from previous sessions",
+      "GO_TO_LIST": "View Temporary Entries",
+      "IGNORE_ALL": "Later",
+      "DISCARD_ALL": "Discard All"
     },
     "CATEGORIES": {
       "TITLE": "Categories",

@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { ClassToggleService, HeaderComponent } from '@coreui/angular';
 import { LanguageService, Language } from '../../../core/services/language.service';
+import { SessionManagerService } from '../../../core/services/auth/session-manager.service';
 
 interface IBreadcrumb {
   label: string;
@@ -69,9 +70,14 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     private classToggler: ClassToggleService,
     private router: Router,
     private route: ActivatedRoute,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private sessionManager: SessionManagerService
   ) {
     super();
+  }
+
+  logout(): void {
+    this.sessionManager.logout();
   }
 
   ngOnInit(): void {

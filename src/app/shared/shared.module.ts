@@ -27,6 +27,7 @@ import { ErrorBoundaryComponent } from './components/errors/error-boundary/error
 import { SharedWidgetsModule } from './shared-widgets.module';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { AllowedDatePipe } from './pipes/allowed-date.pipe';
+import { UnsavedWorkDirective } from '../core/directives/unsaved-work.directive';
 
 @NgModule({
   imports: [
@@ -58,6 +59,7 @@ import { AllowedDatePipe } from './pipes/allowed-date.pipe';
     ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
+    UnsavedWorkDirective,
   ],
   exports: [
     CommonModule,
@@ -85,6 +87,7 @@ import { AllowedDatePipe } from './pipes/allowed-date.pipe';
     SharedWidgetsModule,
     TranslatePipe,
     AllowedDatePipe,
+    UnsavedWorkDirective,
   ],
 })
 export class SharedOPModule { }

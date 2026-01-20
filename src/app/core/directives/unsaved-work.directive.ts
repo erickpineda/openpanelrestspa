@@ -1,7 +1,9 @@
-import { Directive, ElementRef, OnInit, OnDestroy, Input } from '@angular/core';
+import { Directive, ElementRef, OnInit, OnDestroy, Input, Optional } from '@angular/core';
 import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
 import { LoggerService } from '../services/logger.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
+import { FormGroupDirective } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Directive({
   selector: '[appUnsavedWork]',
@@ -12,11 +14,13 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
 
   private formId: any;
   private initialFormData: any;
+  private formSub: Subscription = new Subscription();
 
   constructor(
     private el: ElementRef,
     private unsavedWorkService: UnsavedWorkService,
-    private log: LoggerService
+    private log: LoggerService,
+    @Optional() private formGroupDirective: FormGroupDirective
   ) {}
 
   ngOnInit(): void {
@@ -25,16 +29,28 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
 
     this.log.info(`📝 UnsavedWorkDirective: Registrando formulario: ${this.formId}`);
 
-    // Guardar estado inicial
-    this.initialFormData = this.getFormData(form);
-    this.unsavedWorkService.registerForm(this.formId, this.initialFormData);
+    if (this.formGroupDirective && this.formGroupDirective.form) {
+      // Modo Reactive Forms
+      this.log.info(`📝 UnsavedWorkDirective: Detectado Reactive Forms`);
+      this.initialFormData = this.formGroupDirective.form.getRawValue();
+      this.unsavedWorkService.registerForm(this.formId, this.initialFormData);
+
+      this.formSub = this.formGroupDirective.form.valueChanges.subscribe((val) => {
+        this.checkReactiveFormChanges();
+      });
+    } else {
+      // Modo Template/DOM (Legacy)
+      // Guardar estado inicial
+      this.initialFormData = this.getFormData(form);
+      this.unsavedWorkService.registerForm(this.formId, this.initialFormData);
+
+      // Configurar observadores
+      this.setupMutationObserver(form);
+      this.setupEventListeners(form);
+    }
 
     // Guardar en localStorage para persistencia
     this.saveToLocalStorage();
-
-    // Configurar observadores
-    this.setupMutationObserver(form);
-    this.setupEventListeners(form);
 
     // Marcar visualmente
     form.classList.add('unsaved-work-tracked');
@@ -44,7 +60,21 @@ export class UnsavedWorkDirective implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.formSub.unsubscribe();
     this.unsavedWorkService.unregisterForm(this.formId);
+  }
+
+  private checkReactiveFormChanges(): void {
+    if (!this.formGroupDirective?.form) return;
+    const currentData = this.formGroupDirective.form.getRawValue();
+    const hasChanges = this.hasFormDataChanged(this.initialFormData, currentData);
+    const formElement = this.el.nativeElement;
+
+    if (hasChanges) {
+      this.markFormAsUnsaved(formElement, currentData);
+    } else {
+      this.markFormAsSaved(formElement);
+    }
   }
 
   private saveToLocalStorage(): void {

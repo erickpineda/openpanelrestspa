@@ -1,17 +1,18 @@
 <c-modal [visible]="visible" (visibleChange)="visibleChange.emit($event)" id="editRolModal" size="lg" backdrop="static" scrollable>
-  <c-modal-header class="border-bottom-0 pb-0">
+  <c-modal-header>
     <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
       <svg cIcon name="cilShieldAlt" class="text-primary"></svg>
       {{ isEditing ? ('ADMIN.ROLES.EDIT_ROLE' | translate) : ('ADMIN.ROLES.NEW_ROLE' | translate) }}
     </h5>
+    <button (click)="close()" cButtonClose></button>
   </c-modal-header>
   <c-modal-body class="py-4">
     @if (editRol) {
     <div class="row g-3">
       <div class="col-md-6">
         <label class="form-label small fw-bold text-muted">{{ 'ADMIN.ROLES.TABLE.NAME' | translate }}</label>
-        <input cFormControl type="text" [value]="editRol.nombre || ''" (input)="onNombreInput($any($event.target).value)" [class.is-invalid]="!editRol.nombre" [disabled]="disabled || isProtectedRole(editRol)" [placeholder]="'ADMIN.ROLES.ROLE_NAME_PLACEHOLDER' | translate" />
-        @if (!editRol.nombre) {
+        <input cFormControl type="text" [value]="editRol.nombre || ''" (input)="onNombreInput($any($event.target).value)" (blur)="nombreTouched = true" [class.is-invalid]="!editRol.nombre && (submitted || nombreTouched)" [disabled]="disabled || isProtectedRole(editRol)" [placeholder]="'ADMIN.ROLES.ROLE_NAME_PLACEHOLDER' | translate" />
+        @if (!editRol.nombre && (submitted || nombreTouched)) {
         <div class="invalid-feedback d-block">{{ 'ADMIN.ROLES.NAME_REQUIRED' | translate }}</div>
         }
         @if (isProtectedRole(editRol)) {
@@ -23,8 +24,8 @@
       </div>
       <div class="col-md-6">
         <label class="form-label small fw-bold text-muted">{{ 'ADMIN.ROLES.TABLE.CODE' | translate }}</label>
-        <input cFormControl type="text" [value]="editRol.codigo || ''" (input)="onCodigoInput($any($event.target).value)" [disabled]="isEditing" [class.is-invalid]="!editRol.codigo" maxlength="5" [placeholder]="'ADMIN.ROLES.CODE_PLACEHOLDER' | translate" class="text-uppercase" />
-        @if (!editRol.codigo) {
+        <input cFormControl type="text" [value]="editRol.codigo || ''" (input)="onCodigoInput($any($event.target).value)" (blur)="codigoTouched = true" [disabled]="isEditing" [class.is-invalid]="!editRol.codigo && (submitted || codigoTouched)" maxlength="5" [placeholder]="'ADMIN.ROLES.CODE_PLACEHOLDER' | translate" class="text-uppercase" />
+        @if (!editRol.codigo && (submitted || codigoTouched)) {
         <div class="invalid-feedback d-block">{{ 'ADMIN.ROLES.CODE_REQUIRED_MAX_5_CHARS' | translate }}</div>
         }
         @if (!isEditing) {
@@ -75,7 +76,7 @@
     </div>
     }
   </c-modal-body>
-  <c-modal-footer class="border-top-0 pt-0 pb-4 d-flex justify-content-between">
+  <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
     <div>
       @if (disabled && isEditing) {
       <button cButton color="warning" variant="outline" (click)="enableEdit()">
