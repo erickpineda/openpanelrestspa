@@ -224,4 +224,30 @@ describe('UiAnomalyMonitorService', () => {
     expect(loading.forceStopLoading).not.toHaveBeenCalled();
     expect(log.warn).not.toHaveBeenCalled();
   });
+
+  it('scanAndRecover no se ejecuta si enabled es false y el trigger no es manual', () => {
+    service.setConfig({ enabled: false }, false);
+
+    const el = document.createElement('div');
+    el.className = 'modal-backdrop fade show';
+    el.style.position = 'fixed';
+    el.style.top = '0';
+    el.style.left = '0';
+    el.style.width = '100vw';
+    el.style.height = '100vh';
+    el.style.zIndex = '1040';
+    el.style.background = 'rgba(0,0,0,.5)';
+    document.body.appendChild(el);
+    document.body.classList.add('modal-open');
+
+    service.scanAndRecover('startup_safety');
+
+    expect(document.querySelectorAll('.modal-backdrop').length).toBe(1);
+    expect(log.warn).not.toHaveBeenCalled();
+
+    service.scanAndRecover('manual');
+
+    expect(document.querySelectorAll('.modal-backdrop').length).toBe(0);
+    expect(log.warn).toHaveBeenCalled();
+  });
 });

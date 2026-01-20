@@ -70,3 +70,4 @@ import './app/core/services/ui/loading.service.spec';
 import './app/core/services/logger.service.spec';
 import './app/shared/utils/navigation.utils.spec';
 import './app/core/_utils/jwt.utils.spec';
+import './app/core/services/ui/ui-anomaly-monitor.service.spec';

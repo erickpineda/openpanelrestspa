@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Usuario } from '../../../../core/models/usuario.model';
+import { Usuario } from '@core/models/usuario.model';
 
 @Component({
   selector: 'app-eliminar-usuario',

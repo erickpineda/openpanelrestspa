@@ -8,7 +8,6 @@ import {
 } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
 import { LoggerService } from '../logger.service';
 import { LoadingService } from './loading.service';
 
@@ -191,6 +190,8 @@ export class UiAnomalyMonitorService {
 
   scanAndRecover(trigger: UiAnomalyTrigger = 'manual'): void {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    if (!this.config.enabled && trigger !== 'manual') return;
 
     const blockers = this.findViewportBlockers();
     if (blockers.length === 0) return;
