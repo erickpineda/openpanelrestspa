@@ -267,7 +267,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   hasCategoria(c: Categoria): boolean {
-    return this.categoriasArray?.value?.some((x: any) => x?.idCategoria === c?.idCategoria);
+    return this.categoriasArray?.value?.some((x: any) => x?.codigo === c?.codigo);
   }
 
   onCategoriaToggle(c: Categoria, checked: boolean) {
@@ -275,7 +275,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     if (checked) {
       arr.push(new UntypedFormControl(c));
     } else {
-      const idx = arr.value.findIndex((x: Categoria) => x?.idCategoria === c?.idCategoria);
+      const idx = arr.value.findIndex((x: Categoria) => x?.codigo === c?.codigo);
       if (idx >= 0) arr.removeAt(idx);
     }
   }

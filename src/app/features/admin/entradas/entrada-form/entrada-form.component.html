@@ -467,16 +467,16 @@
                         </c-form-check>
                       </div>
                       <div class="d-flex flex-column gap-2">
-                        @for (c of categorias; track c.idCategoria) {
+                        @for (c of categorias; track c.codigo) {
                           <c-form-check>
                             <input
                               cFormCheckInput
                               type="checkbox"
-                              [id]="'cat-' + c.idCategoria"
+                              [id]="'cat-' + c.codigo"
                               [checked]="hasCategoria(c)"
                               (change)="onCategoriaToggle(c, $any($event.target).checked)"
                             />
-                            <label cFormCheckLabel [for]="'cat-' + c.idCategoria" class="small">
+                            <label cFormCheckLabel [for]="'cat-' + c.codigo" class="small">
                               {{ c.nombre }}
                             </label>
                           </c-form-check>

@@ -223,20 +223,18 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     this.categoriaSeleccionada = undefined;
   }
   borrarCategoria(categ: Categoria): void {
-    if (!categ?.codigo && !categ?.idCategoria) return;
+    if (!categ?.codigo) return;
     this.categoriaToDelete = categ;
     this.showDeleteModal = true;
     this.cdr.detectChanges();
   }
   confirmDelete(): void {
-    if (!this.categoriaToDelete?.codigo && !this.categoriaToDelete?.idCategoria) {
+    if (!this.categoriaToDelete?.codigo) {
       this.showDeleteModal = false;
       return;
     }
     this.cargando = true;
-    const obs = this.categoriaToDelete.codigo
-      ? this.categoriaService.borrarPorCodigo(this.categoriaToDelete.codigo)
-      : this.categoriaService.borrar(this.categoriaToDelete.idCategoria);
+    const obs = this.categoriaService.borrarPorCodigo(this.categoriaToDelete.codigo);
     obs
       .pipe(
         takeUntil(this.destroy$),
@@ -264,7 +262,7 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
     this.categoriaToDelete = null;
   }
   trackByCategoriaId(index: number, categoria: Categoria): string | number {
-    return categoria.codigo || categoria.idCategoria;
+    return categoria.codigo;
   }
   toggleAdvanced(): void {
     this.showAdvanced = !this.showAdvanced;

@@ -64,7 +64,7 @@ describe('ListadoCategoriasComponent Spinner', () => {
   it('oculta spinner cuando cargando=false', async () => {
     spyOn(component, 'obtenerListaCategorias');
     component.cargando = false;
-    component.pagedCategorias = [{ idCategoria: 1, nombre: 'A', descripcion: '' } as any];
+    component.pagedCategorias = [{ codigo: 'A', nombre: 'A', descripcion: '' } as any];
     fixture.detectChanges();
     await fixture.whenStable();
     const el: HTMLElement = fixture.nativeElement;

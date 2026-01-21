@@ -188,7 +188,7 @@
   ],
   "categorias": [
     {
-      "idCategoria": 1,
+      "codigo": "SIN_CAT",
       "nombre": "Sin categoria",
       "descripcion": "Categoria por defecto"
     }

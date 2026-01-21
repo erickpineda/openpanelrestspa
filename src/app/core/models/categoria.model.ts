@@ -1,5 +1,4 @@
 export class Categoria {
-  idCategoria: number = 0;
   codigo: string = '';
   nombre: string = '';
   descripcion: string = '';
@@ -9,7 +8,6 @@ export class Categoria {
 }
 
 export interface Categoria {
-  idCategoria: number;
   codigo: string;
   nombre: string;
   descripcion: string;

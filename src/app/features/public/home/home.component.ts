@@ -88,7 +88,7 @@ export class HomeComponent implements OnInit {
     window.location.reload();
   }
   trackByCategoria(index: number, c: Categoria): number | string {
-    return c?.idCategoria ?? c?.nombre ?? index;
+    return c?.codigo ?? c?.nombre ?? index;
   }
   trackByEntrada(index: number, e: Entrada): number {
     return e?.idEntrada ?? index;

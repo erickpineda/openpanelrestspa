@@ -22,13 +22,6 @@ export class CategoriaFacadeService {
     );
   }
 
-  obtenerCategoriaPorId(id: number): Observable<Categoria | null> {
-    return this.categoriaService.obtenerPorId(id).pipe(
-      map((resp) => (resp.data ? resp.data : null)),
-      catchError(() => of(null))
-    );
-  }
-
   obtenerCategoriaPorCodigo(codigo: string): Observable<Categoria | null> {
     return this.categoriaService.obtenerPorCodigo(codigo).pipe(
       map((resp) => (resp.data ? resp.data : null)),
@@ -50,27 +43,8 @@ export class CategoriaFacadeService {
     );
   }
 
-  cargarDatosParaEdicion(
-    idCategoria: number,
-    idEntrada: number
-  ): Observable<{
-    categoria: Categoria | null;
-    usuario: PerfilResponse | null;
-    entrada: Entrada | null;
-  }> {
-    return forkJoin({
-      categoria: this.obtenerCategoriaPorId(idCategoria),
-      usuario: this.obtenerUsuarioActual(),
-      entrada: this.obtenerEntradaPorId(idEntrada),
-    });
-  }
-
   crearCategoria(cat: Categoria) {
     return this.categoriaService.crear(cat);
-  }
-
-  actualizarCategoria(id: number, cat: Categoria) {
-    return this.categoriaService.actualizar(id, cat);
   }
 
   actualizarCategoriaPorCodigo(codigo: string, cat: Categoria) {

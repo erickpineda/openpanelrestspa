@@ -27,7 +27,6 @@ export class CategoriaFormComponent implements OnChanges {
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
-      idCategoria: [null],
       codigo: [null, [Validators.required, Validators.maxLength(5)]],
       nombre: [null, Validators.required],
       descripcion: [null],
@@ -38,7 +37,7 @@ export class CategoriaFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['categoria'] && this.categoria) {
       this.form.patchValue(this.categoria);
-      this.isEditing = !!this.categoria.idCategoria;
+      this.isEditing = !!this.categoria.codigo;
       if (this.isEditing) {
         this.form.get('codigo')?.disable();
       }

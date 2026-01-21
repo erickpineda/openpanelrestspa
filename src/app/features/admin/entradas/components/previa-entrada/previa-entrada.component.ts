@@ -32,7 +32,7 @@ export class PreviaEntradaComponent implements OnChanges {
 
   tituloMostrar = '';
   contenidoSeguro: SafeHtml = '';
-  categoriasMostrar: { idCategoria?: number; nombre?: string }[] = [];
+  categoriasMostrar: { codigo?: string; nombre?: string }[] = [];
   imagenMostrar: string | null = null;
   usernameMostrar: string = '';
   fechaMostrar: Date | null = null;
@@ -191,8 +191,9 @@ export class PreviaEntradaComponent implements OnChanges {
       }
 
       if (this.categoriasMeta && this.categoriasMeta.length) {
-        const ids = formCats.map((x: any) => Number(x));
-        return this.categoriasMeta.filter((c) => ids.includes(Number(c.idCategoria)));
+        // Asumimos que si no son objetos, son códigos
+        const codes = formCats.map((x: any) => String(x));
+        return this.categoriasMeta.filter((c) => codes.includes(c.codigo));
       }
     }
 

@@ -48,10 +48,8 @@ export class EditarCategoriaComponent implements OnChanges {
   }
 
   guardar(cat: Categoria) {
-    if (!cat.codigo && !cat.idCategoria) return;
-    const obs = cat.codigo
-      ? this.facade.actualizarCategoriaPorCodigo(cat.codigo, cat)
-      : this.facade.actualizarCategoria(cat.idCategoria, cat);
+    if (!cat.codigo) return;
+    const obs = this.facade.actualizarCategoriaPorCodigo(cat.codigo, cat);
     obs.subscribe({
       next: () => {
         this.toastService.showSuccess(
