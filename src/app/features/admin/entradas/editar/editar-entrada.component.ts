@@ -66,7 +66,7 @@ export class EditarEntradaComponent implements OnInit {
         (e) => e.codigo === ent.estadoEntrada?.codigo
       );
       const tipoCorrecto = this.tiposEntr.find(
-        (t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada
+        (t) => t.codigo === ent.tipoEntrada?.codigo
       );
 
       this.entradaForm.patchValue(

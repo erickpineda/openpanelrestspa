@@ -88,7 +88,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   compareTipos(o1: TipoEntrada, o2: TipoEntrada): boolean {
-    return o1 && o2 ? o1.idTipoEntrada === o2.idTipoEntrada : o1 === o2;
+    return o1 && o2 ? o1.codigo === o2.codigo : o1 === o2;
   }
 
   // Bound event handlers for correct removal

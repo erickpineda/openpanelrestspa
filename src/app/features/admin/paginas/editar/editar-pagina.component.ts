@@ -61,8 +61,8 @@ export class EditarPaginaComponent implements OnInit {
       );
       // Usamos la lista filtrada o la completa si no encontramos 'Página'
       const tipoCorrecto =
-        this.tiposEntr.find((t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada) ||
-        data.tipos.find((t) => t.idTipoEntrada === ent.tipoEntrada?.idTipoEntrada);
+        this.tiposEntr.find((t) => t.codigo === ent.tipoEntrada?.codigo) ||
+        data.tipos.find((t) => t.codigo === ent.tipoEntrada?.codigo);
 
       this.entradaForm.patchValue({
         ...ent,
