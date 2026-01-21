@@ -21,6 +21,8 @@
   [visible]="modalPreviaVisible"
   (visibleChange)="modalPreviaVisible = $event"
   size="xl"
+  backdrop="static"
+  scrollable
 >
   <c-modal-header>
     <h5 cModalTitle>{{ 'ADMIN.PAGES.PREVIEW_TITLE' | translate }}</h5>
@@ -29,10 +31,19 @@
   <c-modal-body>
     <app-previa-entrada
       [entrada]="entradaParaPrevia"
-      [mostrarBotonesAccion]="true"
+      [mostrarBotonesAccion]="false"
       (cerrar)="onCerrarPreview()"
       (editar)="onEditarDesdePreview()"
     >
     </app-previa-entrada>
   </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="onCerrarPreview()">
+      {{ 'AUTO.CERRAR' | translate }}
+    </button>
+    <button cButton color="primary" (click)="onEditarDesdePreview()">
+      <svg cIcon name="cilPen" class="me-1"></svg>
+      {{ 'COMMON.EDIT' | translate }}
+    </button>
+  </c-modal-footer>
 </c-modal>

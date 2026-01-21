@@ -611,6 +611,18 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       this.stateService.removeCurrentTemporaryEntry();
     } else {
       this.form.markAllAsTouched();
+      
+      // Log errors to help debug
+      const controls = this.form.controls;
+      const invalidControls = [];
+      for (const name in controls) {
+        if (controls[name].invalid) {
+          invalidControls.push(name);
+          console.error(`Field '${name}' is invalid:`, controls[name].errors);
+        }
+      }
+      this.toast.showError('Por favor revise los campos marcados en rojo (' + invalidControls.join(', ') + ')');
+      this.cdRef.markForCheck();
     }
   }
 

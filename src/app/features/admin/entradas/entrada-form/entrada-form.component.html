@@ -96,7 +96,7 @@
             color="primary"
             type="submit"
             class="text-white shadow-sm px-4"
-            [disabled]="modoLectura || form.disabled"
+            [disabled]="modoLectura || form.disabled || form.invalid"
           >
             <svg cIcon name="cilSave" class="me-2"></svg>
             {{
@@ -147,7 +147,12 @@
                   />
                   @if ((submitted || control('titulo')?.touched) && control('titulo')?.invalid) {
                     <div class="invalid-feedback">
-                      {{ 'ADMIN.ENTRIES.VALIDATION.TITLE_REQUIRED' | translate }}
+                      @if (control('titulo')?.errors?.['required']) {
+                        {{ 'ADMIN.ENTRIES.VALIDATION.TITLE_REQUIRED' | translate }}
+                      }
+                      @if (control('titulo')?.errors?.['maxlength']) {
+                        {{ 'ADMIN.ENTRIES.VALIDATION.TITLE_LENGTH' | translate }}
+                      }
                     </div>
                   }
                   <div class="form-text text-muted small">
