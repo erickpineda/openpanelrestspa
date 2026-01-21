@@ -21,7 +21,7 @@ export class ValidationEntradaFormsService {
     const parent = control.parent as UntypedFormGroup | null;
     const estado = parent?.get('estadoEntrada')?.value as EstadoEntrada | null;
     const isScheduled =
-      !!estado && (estado.nombre === 'PROGRAMADA' || estado.idEstadoEntrada === 4);
+      !!estado && (estado.nombre === 'PROGRAMADA' || estado.codigo === 'PRO');
 
     if (!control.value) {
       if (isScheduled) {

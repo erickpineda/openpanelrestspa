@@ -290,44 +290,44 @@
   ],
   "estados": [
     {
-      "idEstadoEntrada": 1,
       "nombre": "PUBLICADA",
-      "descripcion": "Entrada/Página en estado publicada"
+      "descripcion": "Entrada/Página en estado publicada",
+      "codigo": "PUB"
     },
     {
-      "idEstadoEntrada": 2,
       "nombre": "NO PUBLICADA",
-      "descripcion": "Entrada/Página sin publicar"
+      "descripcion": "Entrada/Página sin publicar",
+      "codigo": "NOP"
     },
     {
-      "idEstadoEntrada": 3,
       "nombre": "GUARDADA",
-      "descripcion": "Entrada/Página que ha sido guardada o puesta en borrador"
+      "descripcion": "Entrada/Página que ha sido guardada o puesta en borrador",
+      "codigo": "GUA"
     },
     {
-      "idEstadoEntrada": 4,
       "nombre": "PENDIENTE REVISION",
-      "descripcion": "Entrada/Página que está pendiente de revisión, bien sea por parte de un Editor"
+      "descripcion": "Entrada/Página que está pendiente de revisión, bien sea por parte de un Editor",
+      "codigo": "PDR"
     },
     {
-      "idEstadoEntrada": 5,
       "nombre": "EN REVISION",
-      "descripcion": "Entrada/Página que está siendo revisada"
+      "descripcion": "Entrada/Página que está siendo revisada",
+      "codigo": "ER"
     },
     {
-      "idEstadoEntrada": 6,
       "nombre": "REVISADA",
-      "descripcion": "Entrada/Página que ha sido revisada"
+      "descripcion": "Entrada/Página que ha sido revisada",
+      "codigo": "REV"
     },
     {
-      "idEstadoEntrada": 7,
-      "nombre": "HISTORICA",
-      "descripcion": "Entrada/Página historica y no activa"
-    },
-    {
-      "idEstadoEntrada": 8,
       "nombre": "PROGRAMADA",
-      "descripcion": "Entrada/Página que ha sido programada, para que sea publicada a cierta fecha y hora"
+      "descripcion": "Entrada/Página que ha sido programada, para que sea publicada a cierta fecha y hora",
+      "codigo": "PRO"
+    },
+    {
+      "nombre": "HISTORICA",
+      "descripcion": "Entrada/Página historica y no activa",
+      "codigo": "HIS"
     }
   ],
   "ficheros": [

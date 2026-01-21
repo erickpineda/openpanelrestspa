@@ -84,7 +84,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   compareEstados(o1: EstadoEntrada, o2: EstadoEntrada): boolean {
-    return o1 && o2 ? o1.idEstadoEntrada === o2.idEstadoEntrada : o1 === o2;
+    return o1 && o2 ? o1.codigo === o2.codigo : o1 === o2;
   }
 
   compareTipos(o1: TipoEntrada, o2: TipoEntrada): boolean {
@@ -257,7 +257,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
 
   get isScheduled(): boolean {
     const estado = this.form.get('estadoEntrada')?.value as EstadoEntrada | null;
-    return !!estado && (estado.nombre === 'PROGRAMADA' || estado.idEstadoEntrada === 4);
+    return !!estado && (estado.nombre === 'PROGRAMADA' || estado.codigo === 'PRO');
   }
 
   get minDate(): string {
@@ -585,7 +585,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       (typeof estadoEntrada === 'number' || typeof estadoEntrada === 'string') &&
       this.estadosEntr?.length > 0
     ) {
-      const found = this.estadosEntr.find((e) => e.idEstadoEntrada == estadoEntrada);
+      const found = this.estadosEntr.find((e) => e.codigo == estadoEntrada);
       if (found) {
         estadoEntrada = found;
       }

@@ -109,16 +109,15 @@ export class TemporaryEntriesManagerComponent implements OnInit {
   private resolveEstado(data: any): void {
     let nombreEstado = data.estadoEntrada?.nombre?.toUpperCase();
 
-    // Fallback: Si no hay nombre pero hay ID, intentamos mapear (esto es un parche de UI)
-    if (!nombreEstado && data.estadoEntrada && typeof data.estadoEntrada !== 'object') {
-       // Intento de mapeo básico por si solo tenemos ID
-       const id = Number(data.estadoEntrada);
-       switch(id) {
-          case 1: nombreEstado = 'BORRADOR'; break;
-          case 2: nombreEstado = 'PUBLICADA'; break;
-          case 3: nombreEstado = 'PENDIENTE REVISION'; break;
-          case 4: nombreEstado = 'PROGRAMADA'; break;
-          case 5: nombreEstado = 'NO PUBLICADA'; break; // Asumiendo IDs estándar
+    // Fallback: Si no hay nombre pero hay codigo
+    if (!nombreEstado && data.estadoEntrada?.codigo) {
+       const codigo = data.estadoEntrada.codigo;
+       switch(codigo) {
+          case 'BOR': nombreEstado = 'BORRADOR'; break;
+          case 'PUB': nombreEstado = 'PUBLICADA'; break;
+          case 'PDR': nombreEstado = 'PENDIENTE REVISION'; break;
+          case 'PRO': nombreEstado = 'PROGRAMADA'; break;
+          case 'NOP': nombreEstado = 'NO PUBLICADA'; break;
        }
     }
 
