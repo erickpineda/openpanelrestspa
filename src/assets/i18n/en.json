@@ -297,6 +297,7 @@
       "SUBTITLE": "These are entries that were temporarily saved during session closures.",
       "NEW_ENTRY": "New Entry",
       "NO_ENTRIES": "No temporary entries saved",
+      "NO_ENTRIES_DESC": "You have no temporary entries saved at this moment.",
       "SAVED_AT": "Saved:",
       "RECOVER": "Recover",
       "VIEW": "View",

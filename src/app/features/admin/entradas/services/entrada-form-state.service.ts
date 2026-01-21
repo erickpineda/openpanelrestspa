@@ -108,7 +108,9 @@ export class EntradaFormStateService {
     this.updateState({
       showRecoveryNotification: true,
       temporaryData: latest,
-      currentTemporaryEntryId: latest.id,
+      // No asignamos el ID inmediatamente para evitar sobrescribir la entrada existente
+      // si el usuario decide ignorar la recuperación y empezar de cero.
+      // currentTemporaryEntryId: latest.id, 
     });
   }
 
@@ -116,6 +118,8 @@ export class EntradaFormStateService {
     this.updateState({
       showRecoveryNotification: false,
       temporaryData: null,
+      // Aseguramos que no haya un ID vinculado si se descarta la recuperación
+      currentTemporaryEntryId: null,
     });
   }
 

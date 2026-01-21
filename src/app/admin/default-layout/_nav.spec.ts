@@ -1,9 +1,9 @@
 import { navItems } from './_nav';
 
 describe('Admin Navigation Config', () => {
-  it('debe configurar icono de Base de Datos correctamente', () => {
-    const db = navItems.find((i) => i.name === 'Base de Datos');
-    expect(db).toBeTruthy();
-    expect(db?.iconComponent?.name).toBe('cil-storage');
+  it('debe configurar icono de Dashboard correctamente', () => {
+    const dashboard = navItems.find((i) => i.name === 'MENU.DASHBOARD');
+    expect(dashboard).toBeTruthy();
+    expect(dashboard?.iconComponent?.name).toBe('cil-speedometer');
   });
 });

@@ -132,10 +132,10 @@ export class SidebarStateService {
     const stack: INavData[] = [...items];
     while (stack.length) {
       const item = stack.pop()!;
-      if (item.name === 'Entradas' && item.children && item.children.length > 0) {
+      if (item.name === 'MENU.ENTRIES' && item.children && item.children.length > 0) {
         this.expandedItems.add(item.name);
         for (const child of item.children) {
-          if (child.name === 'Taxonomía') {
+          if (child.name === 'MENU.TAXONOMY') {
             this.expandedItems.add(child.name);
           }
         }
@@ -156,7 +156,7 @@ export class SidebarStateService {
     const stack: INavData[] = [...items];
     while (stack.length) {
       const item = stack.pop()!;
-      if (item.name === 'Roles y Permisos' && item.children && item.children.length > 0) {
+      if (item.name === 'MENU.ROLES_AND_PERMISSIONS' && item.children && item.children.length > 0) {
         this.expandedItems.add(item.name);
         return;
       }

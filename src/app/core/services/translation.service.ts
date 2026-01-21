@@ -32,7 +32,7 @@ export class TranslationService {
       this.languageService.currentLang$
         .pipe(
           switchMap((lang) => {
-            if (lang === this.DEFAULT_LANG) {
+            if (lang === this.DEFAULT_LANG && Object.keys(this.defaultTranslations).length > 0) {
               return of(this.defaultTranslations);
             }
             return this.loadLanguage(lang);

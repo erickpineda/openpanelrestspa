@@ -300,6 +300,7 @@
       "SUBTITLE": "Estas son las entradas que se guardaron temporalmente durante cierres de sesión.",
       "NEW_ENTRY": "Nueva Entrada",
       "NO_ENTRIES": "No hay entradas temporales guardadas",
+      "NO_ENTRIES_DESC": "No tienes entradas temporales guardadas en este momento.",
       "SAVED_AT": "Guardado:",
       "RECOVER": "Recuperar",
       "VIEW": "Ver",

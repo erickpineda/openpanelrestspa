@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">62.5% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>20/32</span>
+                <span class='fraction'>20/35</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">35.71% </span>
+                <span class="strong">29.41% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/14</span>
+                <span class='fraction'>5/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">55.55% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/27</span>
+                <span class='fraction'>15/30</span>
             </div>
         
             
@@ -156,7 +156,25 @@
 <a name='L91'></a><a href='#L91'>91</a>
 <a name='L92'></a><a href='#L92'>92</a>
 <a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -216,6 +234,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -239,6 +263,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -267,7 +303,7 @@ export interface AsociacionEtiquetaDTO {
   providedIn: 'root',
 })
 export class EtiquetaService extends CrudService&lt;Etiqueta, number&gt; {
-  protected endpoint = '/etiquetas';
+  protected endpoint = OPConstants.Methods.ETIQUETAS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 &nbsp;
   override <span class="fstat-no" title="function not covered" >listarPagina(</span>pageNo?: number, pageSize?: number): Observable&lt;any&gt; {
@@ -282,22 +318,22 @@ export class EtiquetaService extends CrudService&lt;Etiqueta, number&gt; {
   }
 &nbsp;
   override <span class="fstat-no" title="function not covered" >crear(</span>etiqueta: Etiqueta): Observable&lt;any&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.post&lt;any&gt;(`${this.endpoint}/crear`, etiqueta);</span>
+<span class="cstat-no" title="statement not covered" >    return this.post&lt;any&gt;(OPConstants.Methods.ETIQUETAS.CREAR, etiqueta);</span>
   }
 &nbsp;
   override <span class="fstat-no" title="function not covered" >actualizar(</span>id: number, etiqueta: Etiqueta): Observable&lt;any&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.put&lt;any&gt;(`${this.endpoint}/${id}`, etiqueta);</span>
+<span class="cstat-no" title="statement not covered" >    return this.put&lt;any&gt;(OPConstants.Methods.ETIQUETAS.ACTUALIZAR(id), etiqueta);</span>
   }
 &nbsp;
   override <span class="fstat-no" title="function not covered" >borrar(</span>id: number): Observable&lt;any&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.delete&lt;any&gt;(`${this.endpoint}/${id}`);</span>
+<span class="cstat-no" title="statement not covered" >    return this.delete&lt;any&gt;(OPConstants.Methods.ETIQUETAS.ELIMINAR(id));</span>
   }
 &nbsp;
   buscar(payload: any, pageNo?: number, pageSize?: number): Observable&lt;any&gt; {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
-    return this.post&lt;any&gt;(`${this.endpoint}/buscar`, payload, params);
+    return this.post&lt;any&gt;(OPConstants.Methods.ETIQUETAS.BUSCAR, payload, params);
   }
 &nbsp;
   buscarSinGlobalLoader(payload: any, pageNo?: number, pageSize?: number): Observable&lt;any&gt; {
@@ -305,7 +341,13 @@ export class EtiquetaService extends CrudService&lt;Etiqueta, number&gt; {
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
-    return this.post&lt;any&gt;(`${this.endpoint}/buscar`, payload, params, undefined, context);
+    return this.post&lt;any&gt;(
+      OPConstants.Methods.ETIQUETAS.BUSCAR,
+      payload,
+      params,
+      undefined,
+      context
+    );
   }
 &nbsp;
   asociarConEntrada(etiquetaId: number, entradaId: number): Observable&lt;any&gt; {
@@ -341,6 +383,18 @@ export class EtiquetaService extends CrudService&lt;Etiqueta, number&gt; {
 <span class="fstat-no" title="function not covered" >  obtenerEtiquetasPorCategoria(</span>categoriaId: number): Observable&lt;any&gt; {
 <span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(`${this.endpoint}/porCategoria/${categoriaId}`);</span>
   }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  obtenerPorCodigo(</span>codigo: string): Observable&lt;any&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(OPConstants.Methods.ETIQUETAS.OBTENER_POR_CODIGO(codigo));</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  actualizarPorCodigo(</span>codigo: string, etiqueta: Etiqueta): Observable&lt;any&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.put&lt;any&gt;(OPConstants.Methods.ETIQUETAS.ACTUALIZAR_POR_CODIGO(codigo), etiqueta);</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  borrarPorCodigo(</span>codigo: string): Observable&lt;any&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.delete&lt;any&gt;(OPConstants.Methods.ETIQUETAS.BORRAR_POR_CODIGO(codigo));</span>
+  }
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -349,7 +403,7 @@ export class EtiquetaService extends CrudService&lt;Etiqueta, number&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-31T07:59:30.392Z
+                at 2026-01-21T10:55:14.395Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

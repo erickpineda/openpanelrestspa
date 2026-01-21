@@ -27,6 +27,7 @@ import { TranslationService } from '@app/core/services/translation.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
 import { OPConstants } from '@app/shared/constants/op-global.constants';
 import { EntradaFormStateService } from '../services/entrada-form-state.service';
+import { ActiveTabService } from '@app/core/services/ui/active-tab.service';
 
 @Component({
   selector: 'app-entrada-form',
@@ -82,12 +83,25 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     return this.stateService.currentState.temporaryData;
   }
 
+  compareEstados(o1: EstadoEntrada, o2: EstadoEntrada): boolean {
+    return o1 && o2 ? o1.idEstadoEntrada === o2.idEstadoEntrada : o1 === o2;
+  }
+
+  compareTipos(o1: TipoEntrada, o2: TipoEntrada): boolean {
+    return o1 && o2 ? o1.idTipoEntrada === o2.idTipoEntrada : o1 === o2;
+  }
+
+  // Bound event handlers for correct removal
+  private boundSaveBeforeLogout = this.saveBeforeLogout.bind(this);
+  private boundSaveToTemporaryStorage = this.saveToTemporaryStorage.bind(this);
+
   constructor(
     private router: Router,
     private vf: ValidationEntradaFormsService,
     private fileStorage: FileStorageService,
     private cdRef: ChangeDetectorRef,
     private temporaryStorage: TemporaryStorageService,
+    private activeTabService: ActiveTabService,
     private log: LoggerService,
     private translate: TranslationService,
     private toast: ToastService,
@@ -95,6 +109,10 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    if (!this.isEditMode) {
+      this.activeTabService.registerActiveFeature('create-entry');
+    }
+
     this.stateService.state$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.cdRef.markForCheck();
     });
@@ -130,11 +148,11 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       });
     }
 
-    window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.saveBeforeLogout.bind(this));
+    window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.boundSaveBeforeLogout);
 
     window.addEventListener(
       OPConstants.Events.SAVE_FORM_DATA,
-      this.saveToTemporaryStorage.bind(this)
+      this.boundSaveToTemporaryStorage
     );
 
     this.checkNavigationState();
@@ -142,6 +160,9 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Limpiar registro de pestaña activa
+    this.activeTabService.unregisterActiveFeature('create-entry');
+
     this.contenidoStatusSub?.unsubscribe();
     this.estadoFechaSub?.unsubscribe();
     this.destroy$.next();
@@ -149,17 +170,17 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
 
     window.removeEventListener(
       OPConstants.Events.SAVE_UNSAVED_WORK,
-      this.saveBeforeLogout.bind(this)
+      this.boundSaveBeforeLogout
     );
 
     window.removeEventListener(
       OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
-      this.saveBeforeLogout.bind(this)
+      this.boundSaveBeforeLogout
     );
 
     window.removeEventListener(
       OPConstants.Events.SAVE_FORM_DATA,
-      this.saveToTemporaryStorage.bind(this)
+      this.boundSaveToTemporaryStorage
     );
 
     const editorMain = document.querySelector('.ck-editor__main');
@@ -170,7 +191,6 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
 
   openResetConfirm() {
     if (!this.form) return;
-    if (this.form.pristine) return;
     this.resetConfirmVisible = true;
     this.cdRef.markForCheck();
   }
@@ -557,7 +577,22 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   private saveToTemporaryStorage(): void {
-    const formData = this.form.value;
+    const rawData = this.form.getRawValue();
+
+    // Asegurar que el estado es un objeto completo para que el preview funcione correctamente
+    let estadoEntrada = rawData.estadoEntrada;
+    if (
+      (typeof estadoEntrada === 'number' || typeof estadoEntrada === 'string') &&
+      this.estadosEntr?.length > 0
+    ) {
+      const found = this.estadosEntr.find((e) => e.idEstadoEntrada == estadoEntrada);
+      if (found) {
+        estadoEntrada = found;
+      }
+    }
+
+    const formData = { ...rawData, estadoEntrada };
+
     this.stateService.saveTemporaryEntry({
       formData,
       title: formData.titulo || this.translate.instant('ADMIN.ENTRIES.UNTITLED_ENTRY'),

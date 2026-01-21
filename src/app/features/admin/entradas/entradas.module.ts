@@ -13,6 +13,7 @@ import { ListadoEntradasComponent } from './listado-entradas.component';
 import { CrearEntradaComponent } from './crear/crear-entrada.component';
 import { EditarEntradaComponent } from './editar/editar-entrada.component';
 import { EntradasPendientesComponent } from './pendientes/entradas-pendientes.component';
+import { TemporaryEntriesManagerComponent } from './entradas-temporales/temporary-entries-manager.component';
 
 @NgModule({
   imports: [
@@ -34,6 +35,7 @@ import { EntradasPendientesComponent } from './pendientes/entradas-pendientes.co
     CrearEntradaComponent,
     EditarEntradaComponent,
     EntradasPendientesComponent,
+    TemporaryEntriesManagerComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

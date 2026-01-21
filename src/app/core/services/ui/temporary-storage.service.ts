@@ -90,6 +90,11 @@ export class TemporaryStorageService {
     return stored ? JSON.parse(stored) : {};
   }
 
+  hasAnyTemporaryData(): boolean {
+    const entries = this.getTemporaryEntries();
+    return Object.keys(entries).length > 0;
+  }
+
   // ✅ NUEVO: Controlar si ya se mostró la notificación
   setRecoveryNotificationShown(formId: string): void {
     const shown = this.getRecoveryNotificationsShown();

@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ListadoEntradasComponent } from './listado-entradas.component';
 import { CrearEntradaComponent } from './crear/crear-entrada.component';
 import { EditarEntradaComponent } from './editar/editar-entrada.component';
-import { TemporaryEntriesManagerComponent } from '@shared/components/temporary-entries-manager/temporary-entries-manager.component';
+import { TemporaryEntriesManagerComponent } from './entradas-temporales/temporary-entries-manager.component';
 
 const routes: Routes = [
   { path: '', component: ListadoEntradasComponent },

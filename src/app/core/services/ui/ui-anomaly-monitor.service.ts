@@ -214,7 +214,7 @@ export class UiAnomalyMonitorService {
     const hasOpenDialog = this.hasOpenDialogOrOffcanvas();
     const shouldRecover = !hasOpenDialog;
     if (!shouldRecover) {
-      this.log.warn('UiAnomalyMonitor: blockers found but dialog is open/visible', {
+      this.log.debug('UiAnomalyMonitor: blockers found but dialog is open/visible', {
         blockers,
         hasOpenDialog,
       });

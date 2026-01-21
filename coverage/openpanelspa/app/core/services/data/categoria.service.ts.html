@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">82.35% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>14/17</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>3/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">81.25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>13/13</span>
+                <span class='fraction'>13/16</span>
             </div>
         
             
@@ -116,7 +116,19 @@
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
 <a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -167,6 +179,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// core/services/data/categoria.service.ts
@@ -183,7 +207,7 @@ import { OPConstants } from 'src/app/shared/constants/op-global.constants';
   providedIn: 'root',
 })
 export class CategoriaService extends CrudService&lt;Categoria, number&gt; {
-  protected endpoint = '/categorias';
+  protected endpoint = OPConstants.Methods.CATEGORIAS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 &nbsp;
   buscarSafe(searchRequest: any, pageNo: number, size: number): Observable&lt;PaginaResponse&gt; {
@@ -192,7 +216,7 @@ export class CategoriaService extends CrudService&lt;Categoria, number&gt; {
     params[this.pageSizeParam] = size.toString();
     const context = new HttpContext();
     return this.safePostData&lt;PaginaResponse&gt;(
-      `${this.endpoint}/buscar`,
+      OPConstants.Methods.CATEGORIAS.BUSCAR,
       searchRequest,
       new PaginaResponse(),
       params,
@@ -212,7 +236,7 @@ export class CategoriaService extends CrudService&lt;Categoria, number&gt; {
     params[this.pageSizeParam] = pageSize.toString();
     const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
     return this.safePostData&lt;PaginaResponse&gt;(
-      `${this.endpoint}/buscar`,
+      OPConstants.Methods.CATEGORIAS.BUSCAR,
       searchRequest,
       new PaginaResponse(),
       params,
@@ -220,6 +244,18 @@ export class CategoriaService extends CrudService&lt;Categoria, number&gt; {
       'categorias.buscar',
       context
     );
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  obtenerPorCodigo(</span>codigo: string): Observable&lt;any&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(OPConstants.Methods.CATEGORIAS.OBTENER_POR_CODIGO(codigo));</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  actualizarPorCodigo(</span>codigo: string, categoria: Categoria): Observable&lt;any&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.put&lt;any&gt;(OPConstants.Methods.CATEGORIAS.ACTUALIZAR_POR_CODIGO(codigo), categoria);</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  borrarPorCodigo(</span>codigo: string): Observable&lt;any&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.delete&lt;any&gt;(OPConstants.Methods.CATEGORIAS.BORRAR_POR_CODIGO(codigo));</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -229,7 +265,7 @@ export class CategoriaService extends CrudService&lt;Categoria, number&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-31T07:59:30.392Z
+                at 2026-01-21T10:55:14.395Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

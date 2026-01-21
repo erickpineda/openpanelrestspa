@@ -8,7 +8,6 @@ import { InlineLoaderComponent } from './components/loading/inline-loader.compon
 import { ToastsContainerComponent } from './components/op-toast/toasts-container.component';
 import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
 import { DataRecoveryNotificationComponent } from './components/data-recovery-notification/data-recovery-notification.component';
-import { TemporaryEntriesManagerComponent } from './components/temporary-entries-manager/temporary-entries-manager.component';
 import { KpiCardComponent } from './components/kpi-card/kpi-card.component';
 import { DashboardChartComponent } from './components/dashboard-chart/dashboard-chart.component';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -33,7 +32,6 @@ import { ResponsiveNavigationComponent } from './components/responsive-navigatio
     ToastsContainerComponent,
     ConfirmationModalComponent,
     DataRecoveryNotificationComponent,
-    TemporaryEntriesManagerComponent,
     KpiCardComponent,
     DashboardChartComponent,
     ResponsiveNavigationComponent,
@@ -46,7 +44,6 @@ import { ResponsiveNavigationComponent } from './components/responsive-navigatio
     ToastsContainerComponent,
     ConfirmationModalComponent,
     DataRecoveryNotificationComponent,
-    TemporaryEntriesManagerComponent,
     KpiCardComponent,
     DashboardChartComponent,
     ResponsiveNavigationComponent,

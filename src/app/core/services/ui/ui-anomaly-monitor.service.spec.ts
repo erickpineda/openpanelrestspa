@@ -74,9 +74,11 @@ describe('UiAnomalyMonitorService', () => {
     service.setConfig({ enabled: true }, false);
     service.start();
     events$.next(new NavigationEnd(1, '/x', '/x'));
+    
+    jasmine.clock().tick(1000); // Wait for navigation debounce (500ms) + buffer
     expect(scanSpy).toHaveBeenCalledWith('navigation');
 
-    jasmine.clock().tick(1600);
+    jasmine.clock().tick(600); // +600 = 1600 total (1500 interval + 100 margin)
     expect(scanSpy).toHaveBeenCalledWith('interval');
 
     const callsAfterTick = scanSpy.calls.count();
@@ -135,6 +137,9 @@ describe('UiAnomalyMonitorService', () => {
   it('scanAndRecover no elimina backdrop si hay un modal abierto', () => {
     const modal = document.createElement('div');
     modal.className = 'modal show';
+    modal.style.width = '100px';
+    modal.style.height = '100px';
+    modal.style.display = 'block';
     document.body.appendChild(modal);
 
     const el = document.createElement('div');

@@ -43,7 +43,6 @@
               color="secondary"
               variant="ghost"
               (click)="openResetConfirm()"
-              [disabled]="form.pristine"
             >
               <svg cIcon name="cilReload" class="me-2"></svg>
               {{ 'ADMIN.ENTRIES.RESET' | translate }}
@@ -325,6 +324,7 @@
                       <select
                         cSelect
                         formControlName="estadoEntrada"
+                        [compareWith]="compareEstados"
                         [ngClass]="{
                           'is-invalid':
                             (submitted || control('estadoEntrada')?.touched) &&
@@ -358,6 +358,7 @@
                       <select
                         cSelect
                         formControlName="tipoEntrada"
+                        [compareWith]="compareTipos"
                         [ngClass]="{
                           'is-invalid':
                             (submitted || control('tipoEntrada')?.touched) &&

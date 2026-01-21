@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">95.55% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>42/42</span>
+                <span class='fraction'>43/45</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">94.11% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>16/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">95.45% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>41/41</span>
+                <span class='fraction'>42/44</span>
             </div>
         
             
@@ -174,7 +174,17 @@
 <a name='L109'></a><a href='#L109'>109</a>
 <a name='L110'></a><a href='#L110'>110</a>
 <a name='L111'></a><a href='#L111'>111</a>
-<a name='L112'></a><a href='#L112'>112</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -201,6 +211,9 @@
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
@@ -260,6 +273,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -288,6 +306,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// temporary-storage.service.ts
 import { Injectable } from '@angular/core';
 import { LoggerService } from '../logger.service';
+import { OPStorageConstants } from '@app/shared/constants/op-storage.constants';
 &nbsp;
 export interface TemporaryEntry {
   id: string; // ✅ NUEVO: ID único para cada entrada
@@ -302,30 +321,33 @@ export interface TemporaryEntry {
   providedIn: 'root',
 })
 export class TemporaryStorageService {
-  private readonly STORAGE_KEY = 'temporary-entries';
-  private readonly NOTIFICATION_SHOWN_KEY = 'recovery-notification-shown';
+  private readonly STORAGE_KEY = OPStorageConstants.TEMPORARY_ENTRIES_KEY;
+  private readonly NOTIFICATION_SHOWN_KEY = OPStorageConstants.RECOVERY_NOTIFICATION_SHOWN_KEY;
 &nbsp;
   constructor(private log: LoggerService) {}
 &nbsp;
   // ✅ NUEVO: Generar ID único
   private generateId(): string {
-    return `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `temp_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 &nbsp;
-  // ✅ MODIFICADO: Ahora acepta un objeto completo de entrada temporal
-  saveTemporaryEntry(entry: Omit&lt;TemporaryEntry, 'id'&gt;): string {
+  // ✅ MODIFICADO: Ahora acepta un objeto completo de entrada temporal y un ID opcional para actualizar
+  saveTemporaryEntry(entry: Omit&lt;TemporaryEntry, 'id'&gt;, existingId?: string): string {
     const entries = this.getTemporaryEntries();
+&nbsp;
+    // Si nos pasan un ID, lo usamos (actualización). Si no, generamos uno nuevo.
+    const id = existingId || this.generateId();
 &nbsp;
     const newEntry: TemporaryEntry = {
       ...entry,
-      id: this.generateId(),
+      id: id,
     };
 &nbsp;
-    entries[newEntry.id] = newEntry;
+    entries[id] = newEntry;
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
 &nbsp;
-    this.log.info('💾 Entrada temporal guardada:', newEntry.id, newEntry.title);
-    return newEntry.id;
+    this.log.info('💾 Entrada temporal guardada:', id, newEntry.title);
+    return id;
   }
 &nbsp;
   getTemporaryEntry(id: string): TemporaryEntry | null {
@@ -373,6 +395,11 @@ export class TemporaryStorageService {
     return stored ? JSON.parse(stored) : {};
   }
 &nbsp;
+<span class="fstat-no" title="function not covered" >  hasAnyTemporaryData(</span>): boolean {
+    const entries = <span class="cstat-no" title="statement not covered" >this.getTemporaryEntries();</span>
+<span class="cstat-no" title="statement not covered" >    return Object.keys(entries).length &gt; 0;</span>
+  }
+&nbsp;
   // ✅ NUEVO: Controlar si ya se mostró la notificación
   setRecoveryNotificationShown(formId: string): void {
     const shown = this.getRecoveryNotificationsShown();
@@ -403,7 +430,7 @@ export class TemporaryStorageService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-31T07:59:30.392Z
+                at 2026-01-21T10:55:14.395Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

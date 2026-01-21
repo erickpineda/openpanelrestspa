@@ -18,6 +18,9 @@ import {
   delay,
   take,
 } from 'rxjs/operators';
+
+declare var jasmine: any;
+
 import { IBadgeCounterService } from '../../../shared/types/navigation.types';
 import { NavigationConstants } from '../../../shared/constants/navigation.constants';
 

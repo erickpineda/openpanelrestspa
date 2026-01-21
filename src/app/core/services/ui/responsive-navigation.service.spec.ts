@@ -96,7 +96,7 @@ describe('ResponsiveNavigationService', () => {
 
       const dashboard = criticalFunctions.find((func) => func.id === 'dashboard');
       expect(dashboard).toBeDefined();
-      expect(dashboard?.name).toBe('Escritorio');
+      expect(dashboard?.name).toBe('MENU.DASHBOARD');
       expect(dashboard?.url).toBe('/admin/dashboard');
     });
   });

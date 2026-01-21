@@ -43,6 +43,13 @@ export const navItems: INavItemEnhanced[] = [
     title: true,
     name: 'MENU.CONTENT_MANAGEMENT',
     priority: 90,
+    requiredRoles: [
+      UserRole.AUTOR,
+      UserRole.EDITOR,
+      UserRole.ADMINISTRADOR,
+      UserRole.DESARROLLADOR,
+      UserRole.PROPIETARIO,
+    ],
     attributes: { id: 'nav-title-content' },
   },
   {

@@ -9,6 +9,9 @@ import {
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { RouteTrackerService } from '../../core/services/auth/route-tracker.service';
 import { PostLoginRedirectService } from '../services/auth/post-login-redirect.service';
+import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
+import { TemporaryStorageService } from '../../core/services/ui/temporary-storage.service';
+import { ActiveTabService } from '../services/ui/active-tab.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
 import { OPSessionConstants } from '../../shared/constants/op-session.constants';
 import { LoggerService } from '../services/logger.service';
@@ -33,6 +36,9 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
     private tokenStorage: TokenStorageService,
     private routeTracker: RouteTrackerService,
     private postLoginRedirect: PostLoginRedirectService,
+    private unsavedWorkService: UnsavedWorkService,
+    private temporaryStorage: TemporaryStorageService,
+    private activeTabService: ActiveTabService,
     private log: LoggerService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -69,7 +75,34 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
           return;
         }
 
+        // --- LÓGICA DE DELEGACIÓN CENTRALIZADA ---
+        // Verificamos si este componente debe ceder el control al UnsavedWorkModalComponent.
+        // Esto aplica tanto para LOGOUT (remoto/con guardado) como para SESSION_EXPIRED.
+        
+        const isCreateEntryActive = 
+          this.activeTabService.isFeatureActiveInCurrentTab('create-entry') || 
+          this.router.url.includes('/entradas/crear');
+
+        const hasUnsavedWork = this.unsavedWorkService.hasUnsavedWork();
+        const hasTemporaryData = this.temporaryStorage.hasAnyTemporaryData();
+
+        if (isCreateEntryActive) {
+          this.log.info(
+            'SessionExpiredComponent: En /entradas/crear (Tab Active). Delegando SIEMPRE a UnsavedWorkModalComponent (Prioridad Absoluta).'
+          );
+          return;
+        }
+
+        if (hasUnsavedWork || hasTemporaryData) {
+          this.log.info(
+            'SessionExpiredComponent: Detectado trabajo sin guardar/temporal. Delegando a UnsavedWorkModalComponent.'
+          );
+          return;
+        }
+        // -----------------------------------------
+
         // Si es un logout voluntario local con opción de guardado, dejamos que UnsavedWorkModal lo maneje
+        // (Aunque la lógica de arriba ya lo debería cubrir si hay trabajo, esto es por seguridad de flujo)
         if (data.type === OPSessionConstants.TYPE_LOGOUT && data.allowSave) {
           if (data.origin === 'local') {
             this.log.info(
@@ -77,7 +110,6 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
             );
             return;
           }
-          // Si es remoto, continuamos para mostrar el modal de "Sesión finalizada"
         }
 
         if (this.router.url.includes('/login')) {
@@ -85,9 +117,10 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // Si la sesión expiró, intentamos guardar trabajo pendiente automáticamente
+        // Si la sesión expiró
         if (data.type === OPSessionConstants.TYPE_SESSION_EXPIRED) {
           this.log.info('SessionExpiredComponent: Intentando auto-guardado por sesión expirada');
+          // Lanzamos el evento por si acaso algún componente no registrado quiere guardar.
           const saveEvent = new CustomEvent(OPConstants.Events.SAVE_UNSAVED_WORK);
           window.dispatchEvent(saveEvent);
           
@@ -222,26 +255,35 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
   }
 
   goToLogin(): void {
-    // 1. Ocultar modal (esto debería eliminar el backdrop, pero a veces falla en navegaciones rápidas)
+    // 1. Ocultar modal
     this.isVisible = false;
     this.sessionData = null;
+    this.cdr.detectChanges();
 
-    // 2. Forzar limpieza manual de backdrops huérfanos antes de navegar
+    // 2. Esperar cierre de animación y limpiar backdrops
     setTimeout(() => {
-      document.body.classList.remove('modal-open');
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-      const backdrops = document.querySelectorAll('.modal-backdrop');
-      backdrops.forEach((backdrop) => {
-        if (backdrop && backdrop.parentNode) {
-          backdrop.parentNode.removeChild(backdrop);
+      this.cleanupVisualArtifacts();
+      this.saveRedirectUrl();
+      
+      this.router.navigate(['/login'], { replaceUrl: true }).then((success) => {
+        if (!success) {
+          this.log.warn('SessionExpiredComponent: Navegación por Router falló, forzando recarga.');
+          window.location.href = '/login';
         }
       });
+    }, 300);
+  }
 
-      // 3. Navegar después de la limpieza
-      this.saveRedirectUrl();
-      this.router.navigate(['/login'], { replaceUrl: true });
-    }, 300); // Pequeño delay para permitir que la animación de cierre de CoreUI termine o se procese
+  private cleanupVisualArtifacts(): void {
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach((backdrop) => {
+      if (backdrop && backdrop.parentNode) {
+        backdrop.parentNode.removeChild(backdrop);
+      }
+    });
   }
 
   private saveRedirectUrl(): void {
@@ -262,18 +304,10 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
   goToHome(): void {
     this.isVisible = false;
     this.sessionData = null;
+    this.cdr.detectChanges();
 
     setTimeout(() => {
-      document.body.classList.remove('modal-open');
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-      const backdrops = document.querySelectorAll('.modal-backdrop');
-      backdrops.forEach((backdrop) => {
-        if (backdrop && backdrop.parentNode) {
-          backdrop.parentNode.removeChild(backdrop);
-        }
-      });
-
+      this.cleanupVisualArtifacts();
       this.router.navigate(['/'], { replaceUrl: true });
     }, 300);
   }

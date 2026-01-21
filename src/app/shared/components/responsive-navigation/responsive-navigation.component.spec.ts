@@ -9,6 +9,8 @@ import {
 } from '../../../core/services/ui/responsive-navigation.service';
 import { NavigationService } from '../../../core/services/ui/navigation.service';
 import { INavItemEnhanced, UserRole } from '../../types/navigation.types';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '../../../core/services/translation.service';
 
 describe('ResponsiveNavigationComponent', () => {
   let component: ResponsiveNavigationComponent;
@@ -16,6 +18,12 @@ describe('ResponsiveNavigationComponent', () => {
   let mockResponsiveNavigationService: jasmine.SpyObj<ResponsiveNavigationService>;
   let mockNavigationService: jasmine.SpyObj<NavigationService>;
   let responsiveStateSubject: BehaviorSubject<ResponsiveState>;
+
+  const translationServiceMock = {
+    translations$: new BehaviorSubject({}),
+    translate: (key: string) => key,
+    instant: (key: string) => key
+  };
 
   const mockResponsiveState: ResponsiveState = {
     isMobile: false,
@@ -92,10 +100,11 @@ describe('ResponsiveNavigationComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [ResponsiveNavigationComponent],
-      imports: [RouterTestingModule],
+      imports: [RouterTestingModule, TranslatePipe],
       providers: [
         { provide: ResponsiveNavigationService, useValue: responsiveNavSpy },
         { provide: NavigationService, useValue: navSpy },
+        { provide: TranslationService, useValue: translationServiceMock }
       ],
     }).compileComponents();
 

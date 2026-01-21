@@ -66,7 +66,10 @@ export class GlobalErrorHandlerService implements ErrorHandler {
       this.errorCount++;
 
       if (this.errorCount > this.maxErrors) {
-        this.log.error('🛑 Demasiados errores, evitando notificaciones');
+        // Evitar bucle infinito si el logger falla
+        if (this.errorCount === this.maxErrors + 1) {
+          console.error('🛑 [GLOBAL HANDLER] Demasiados errores, evitando notificaciones y logs adicionales.');
+        }
         return;
       }
 

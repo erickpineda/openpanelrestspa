@@ -14,11 +14,20 @@ import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from '../../../shared/components/icons/icon-subset';
 import { DefaultHeaderComponent } from './default-header.component';
 import { RouterTestingModule } from '@angular/router/testing';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../../core/services/translation.service';
+import { BehaviorSubject } from 'rxjs';
 
 describe('DefaultHeaderComponent', () => {
   let component: DefaultHeaderComponent;
   let fixture: ComponentFixture<DefaultHeaderComponent>;
   let iconSetService: IconSetService;
+
+  const translationServiceMock = {
+    translations$: new BehaviorSubject({}),
+    translate: (key: string) => key,
+    instant: (key: string) => key
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -33,8 +42,12 @@ describe('DefaultHeaderComponent', () => {
         BreadcrumbModule,
         RouterTestingModule,
         SidebarModule,
+        TranslatePipe
       ],
-      providers: [IconSetService],
+      providers: [
+        IconSetService,
+        { provide: TranslationService, useValue: translationServiceMock }
+      ],
     }).compileComponents();
   });
 

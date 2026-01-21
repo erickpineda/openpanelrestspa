@@ -2,15 +2,24 @@ import { TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 import { ListadoCategoriasComponent } from './listado-categorias.component';
 import { CategoriaService } from '@app/core/services/data/categoria.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import { SearchUtilService } from '@app/core/services/utils/search-util.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { TranslationService } from '@app/core/services/translation.service';
 
 describe('ListadoCategoriasComponent Spinner', () => {
   let component: ListadoCategoriasComponent;
   let fixture: any;
   let mockService: any;
+
+  const translationServiceMock = {
+    translations$: new BehaviorSubject({}),
+    translate: (key: string) => key,
+    instant: (key: string) => key
+  };
 
   beforeEach(() => {
     mockService = {
@@ -24,7 +33,7 @@ describe('ListadoCategoriasComponent Spinner', () => {
     TestBed.configureTestingModule({
       declarations: [ListadoCategoriasComponent],
       schemas: [NO_ERRORS_SCHEMA],
-      imports: [CommonModule],
+      imports: [CommonModule, TranslatePipe],
       providers: [
         { provide: Router, useValue: { navigate: () => {} } },
         { provide: CategoriaService, useValue: mockService },
@@ -38,6 +47,7 @@ describe('ListadoCategoriasComponent Spinner', () => {
           },
         },
         { provide: SearchUtilService, useValue: { buildSingle: () => ({}) } },
+        { provide: TranslationService, useValue: translationServiceMock }
       ],
     });
     fixture = TestBed.createComponent(ListadoCategoriasComponent);

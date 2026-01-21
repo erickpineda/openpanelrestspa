@@ -1,15 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 import { OpPaginationComponent } from './op-pagination.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '@app/core/services/translation.service';
 
 describe('OpPaginationComponent', () => {
   let component: OpPaginationComponent;
   let fixture: ComponentFixture<OpPaginationComponent>;
 
+  const translationServiceMock = {
+    translations$: new BehaviorSubject({}),
+    translate: (key: string) => key,
+    instant: (key: string) => key
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [OpPaginationComponent],
+      imports: [TranslatePipe],
+      providers: [
+        { provide: TranslationService, useValue: translationServiceMock }
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     });
     fixture = TestBed.createComponent(OpPaginationComponent);
