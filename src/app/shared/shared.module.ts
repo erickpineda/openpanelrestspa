@@ -84,7 +84,7 @@ import { UnsavedWorkDirective } from '../core/directives/unsaved-work.directive'
     ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
-    SharedWidgetsModule,
+    // SharedWidgetsModule, // Removed
     TranslatePipe,
     AllowedDatePipe,
     UnsavedWorkDirective,

@@ -11,6 +11,7 @@ import {
   PreviaEntradaComponent,
 } from './components';
 import { EntradaFormComponent } from './entrada-form/entrada-form.component';
+import { SharedWidgetsModule } from '@shared/shared-widgets.module';
 import { MediaSharedModule } from '@features/admin/contenido/media-shared.module';
 
 @NgModule({
@@ -27,6 +28,7 @@ import { MediaSharedModule } from '@features/admin/contenido/media-shared.module
     CKEditorModule,
     SharedOPModule,
     SharedCoreUiModule,
+    SharedWidgetsModule,
     MediaSharedModule,
   ],
   exports: [
@@ -35,6 +37,7 @@ import { MediaSharedModule } from '@features/admin/contenido/media-shared.module
     ReactiveFormsModule,
     SharedOPModule,
     SharedCoreUiModule,
+    SharedWidgetsModule,
     EntradasFilterComponent,
     EntradasTableComponent,
     PreviaEntradaComponent,

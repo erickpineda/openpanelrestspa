@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedOPModule } from '@shared/shared.module';
 import { SharedCoreUiModule } from '@shared/shared-coreui.module';
+import { SharedWidgetsModule } from '@shared/shared-widgets.module';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './dashboard.component';
 import { ChartjsModule } from '@coreui/angular-chartjs';
@@ -32,6 +33,7 @@ import { DashboardSettingsModalComponent } from './components/dashboard-settings
     CommonModule,
     SharedOPModule,
     SharedCoreUiModule,
+    SharedWidgetsModule,
     ChartjsModule,
     DashboardRoutingModule,
   ],

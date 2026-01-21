@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SharedOPModule } from '@shared/shared.module';
 import { SharedCoreUiModule } from '@shared/shared-coreui.module';
+import { SharedWidgetsModule } from '@shared/shared-widgets.module';
 import { EtiquetasFeatureRoutingModule } from './etiquetas-routing.module';
 import { EtiquetasListComponent } from './listado-etiquetas.component';
 import { EtiquetaFormComponent } from './etiqueta-form/etiqueta-form.component';
@@ -20,6 +21,7 @@ import { EliminarEtiquetaComponent } from './eliminar/eliminar-etiqueta.componen
     RouterModule,
     SharedOPModule,
     SharedCoreUiModule,
+    SharedWidgetsModule,
     EtiquetasFeatureRoutingModule,
   ],
   declarations: [

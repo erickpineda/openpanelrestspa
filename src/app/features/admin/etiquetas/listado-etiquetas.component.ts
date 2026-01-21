@@ -62,6 +62,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
 
   loadEtiquetas(): void {
     this.loading = true;
+    this.searchForm.disable({ emitEvent: false });
     const nombre = (this.searchForm.get('nombre')?.value || '').trim();
     const descripcion = (this.searchForm.get('descripcion')?.value || '').trim();
     const hasFilters = !!(this.basicSearchText || nombre || descripcion);
@@ -72,6 +73,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
           takeUntil(this.destroy$),
           finalize(() => {
             this.loading = false;
+            this.searchForm.enable({ emitEvent: false });
             this.cdr.detectChanges();
           })
         )
@@ -117,6 +119,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         finalize(() => {
           this.loading = false;
+          this.searchForm.enable({ emitEvent: false });
           this.cdr.detectChanges();
         })
       )
@@ -192,6 +195,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
       return;
     }
     this.loading = true;
+    this.searchForm.disable({ emitEvent: false });
     this.etiquetasService
       .borrarPorCodigo(this.etiquetaToDelete.codigo)
       .pipe(takeUntil(this.destroy$))
@@ -207,6 +211,7 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
           this.toast.showError('Error eliminando etiqueta', 'Etiquetas');
           this.log.error('etiquetas eliminar', error);
           this.loading = false;
+          this.searchForm.enable({ emitEvent: false });
           this.showDeleteModal = false;
           this.etiquetaToDelete = null;
         },

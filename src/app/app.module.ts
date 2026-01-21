@@ -13,6 +13,7 @@ import localeEn from '@angular/common/locales/en';
 import { ModalModule, ToastModule } from '@coreui/angular';
 import { GlobalNotificationsComponent } from './shared/components/global-notifications/global-notifications.component';
 import { SharedOPModule } from './shared/shared.module';
+import { SharedWidgetsModule } from './shared/shared-widgets.module';
 import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
 
 @NgModule({
@@ -24,6 +25,7 @@ import { GlobalErrorHandlerService } from './core/errors/global-error/global-err
     BrowserAnimationsModule,
     CoreModule, // ✅ Solo servicios globales
     SharedOPModule, // ✅ Componentes compartidos
+    SharedWidgetsModule,
     ToastModule,
     ModalModule,
   ],

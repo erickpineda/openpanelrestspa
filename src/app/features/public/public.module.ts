@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { PublicRoutingModule } from './public-routing.module';
 import { PublicComponent } from './public.component';
 import { AboutComponent } from './about/containers/about.component';
@@ -11,6 +12,7 @@ import { NavBarPublicComponent } from './nav-bar-public/nav-bar-public.component
 import { IconModule } from '@coreui/icons-angular';
 import { SharedOPModule } from '@shared/shared.module';
 import { SharedCoreUiModule } from '@shared/shared-coreui.module';
+import { SharedWidgetsModule } from '@shared/shared-widgets.module';
 import { CoreModule } from '@app/core/core.module';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
@@ -25,7 +27,15 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
     ContactComponent,
     NavBarPublicComponent,
   ],
-  imports: [PublicRoutingModule, CoreModule, SharedOPModule, SharedCoreUiModule, IconModule],
+  imports: [
+    RouterModule,
+    PublicRoutingModule,
+    CoreModule,
+    SharedOPModule,
+    SharedCoreUiModule,
+    SharedWidgetsModule,
+    IconModule,
+  ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })
 export class PublicFeatureModule {}
