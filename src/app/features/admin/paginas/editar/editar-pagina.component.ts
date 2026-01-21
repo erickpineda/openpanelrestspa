@@ -57,7 +57,7 @@ export class EditarPaginaComponent implements OnInit {
 
       // Busca los objetos reales por referencia
       const estadoCorrecto = this.estadosEntr.find(
-        (e) => e.idEstadoEntrada === ent.estadoEntrada?.idEstadoEntrada
+        (e) => e.codigo === ent.estadoEntrada?.codigo
       );
       // Usamos la lista filtrada o la completa si no encontramos 'Página'
       const tipoCorrecto =

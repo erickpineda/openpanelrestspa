@@ -337,7 +337,7 @@
                         <option [ngValue]="null" disabled>
                           {{ 'AUTO.SELECCIONAR' | translate }}
                         </option>
-                        @for (e of estadosEntr; track e.idEstadoEntrada) {
+                        @for (e of estadosEntr; track e.codigo) {
                           <option [ngValue]="e">{{ e.nombre }}</option>
                         }
                       </select>

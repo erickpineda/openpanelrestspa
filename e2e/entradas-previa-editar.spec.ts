@@ -81,7 +81,7 @@ test.describe('Entradas: Previa → Editar', () => {
               categorias: [],
               publicada: false,
               borrador: true,
-              estadoEntrada: { idEstadoEntrada: 1, nombre: 'Borrador' },
+              estadoEntrada: { codigo: 'BOR', nombre: 'Borrador' },
               tipoEntrada: { idTipoEntrada: 1, nombre: 'Blog' },
             },
           ],
@@ -102,7 +102,7 @@ test.describe('Entradas: Previa → Editar', () => {
     await page.route('**/api/v1/entradas/estadosEntradas**', async (route) => {
       await fulfillJson(route, {
         result: { success: true },
-        data: { estadosEntradas: [{ idEstadoEntrada: 1, nombre: 'Borrador' }] },
+        data: { estadosEntradas: [{ codigo: 'BOR', nombre: 'Borrador' }] },
       });
     });
 
@@ -127,7 +127,7 @@ test.describe('Entradas: Previa → Editar', () => {
           contenido: '<p>Contenido</p>',
           imagenDestacada: null,
           categorias: [],
-          estadoEntrada: { idEstadoEntrada: 1, nombre: 'Borrador' },
+          estadoEntrada: { codigo: 'BOR', nombre: 'Borrador' },
           tipoEntrada: { idTipoEntrada: 1, nombre: 'Blog' },
         },
       });
