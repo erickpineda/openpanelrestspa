@@ -237,7 +237,6 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
     const raw = (data?.elements ?? (data as any)?.items ?? (data as any)?.content ?? []) as any[];
     const mapped = Array.isArray(raw)
       ? (raw.map((e: any) => ({
-          idEtiqueta: e?.idEtiqueta ?? e?.id ?? e?.id_tag ?? e?.idLabel,
           codigo: e?.codigo ?? '',
           nombre: e?.nombre ?? e?.name,
           frecuencia: e?.frecuencia ?? 0,
@@ -292,6 +291,6 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   }
 
   trackByEtiqueta(index: number, e: Etiqueta): number | string {
-    return e?.idEtiqueta ?? e?.nombre ?? index;
+    return e?.codigo ?? e?.nombre ?? index;
   }
 }

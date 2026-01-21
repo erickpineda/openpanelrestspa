@@ -141,7 +141,6 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
           );
           this.save.emit({
             ...etiquetaData,
-            idEtiqueta: this.etiqueta?.idEtiqueta,
           } as Etiqueta);
         },
         error: (error: any) => {

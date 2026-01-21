@@ -354,7 +354,6 @@
   ],
   "etiquetas": [
     {
-      "idEtiqueta": 1,
       "codigo": "EVENT",
       "nombre": "Evento",
       "frecuencia": 0,

@@ -57,18 +57,18 @@ describe('EtiquetaService request shapes', () => {
   });
 
   it('asociar y desasociar construyen rutas correctas', () => {
-    service.asociarConEntrada(1, 2).subscribe(() => {});
+    service.asociarConEntrada('tag-1', 2).subscribe(() => {});
     const a1 = httpMock.expectOne((r) => r.url.includes('/etiquetas/asociar'));
     expect(a1.request.method).toBe('POST');
     expect(a1.request.body).toEqual({
-      etiquetaId: 1,
+      etiquetaCodigo: 'tag-1',
       entidadId: 2,
       tipoEntidad: 'ENTRADA',
     });
     a1.flush({ result: { success: true } });
 
-    service.desasociarDeCategoria(3, 4).subscribe(() => {});
-    const d1 = httpMock.expectOne((r) => r.url.includes('/etiquetas/desasociar/CATEGORIA/3/4'));
+    service.desasociarDeCategoria('tag-3', 4).subscribe(() => {});
+    const d1 = httpMock.expectOne((r) => r.url.includes('/etiquetas/desasociar/CATEGORIA/tag-3/4'));
     expect(d1.request.method).toBe('DELETE');
     d1.flush({ result: { success: true } });
   });

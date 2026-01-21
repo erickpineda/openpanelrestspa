@@ -7,7 +7,7 @@ import { NetworkInterceptor } from '../../interceptor/network.interceptor';
 import { OPConstants } from 'src/app/shared/constants/op-global.constants';
 
 export interface AsociacionEtiquetaDTO {
-  etiquetaId: number;
+  etiquetaCodigo: string;
   entidadId: number;
   tipoEntidad: 'ENTRADA' | 'CATEGORIA';
 }
@@ -15,7 +15,7 @@ export interface AsociacionEtiquetaDTO {
 @Injectable({
   providedIn: 'root',
 })
-export class EtiquetaService extends CrudService<Etiqueta, number> {
+export class EtiquetaService extends CrudService<Etiqueta, string> {
   protected endpoint = OPConstants.Methods.ETIQUETAS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
@@ -26,20 +26,8 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
     return super.listarPagina();
   }
 
-  override obtenerPorId(id: number): Observable<any> {
-    return super.obtenerPorId(id);
-  }
-
   override crear(etiqueta: Etiqueta): Observable<any> {
     return this.post<any>(OPConstants.Methods.ETIQUETAS.CREAR, etiqueta);
-  }
-
-  override actualizar(id: number, etiqueta: Etiqueta): Observable<any> {
-    return this.put<any>(OPConstants.Methods.ETIQUETAS.ACTUALIZAR(id), etiqueta);
-  }
-
-  override borrar(id: number): Observable<any> {
-    return this.delete<any>(OPConstants.Methods.ETIQUETAS.ELIMINAR(id));
   }
 
   buscar(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
@@ -63,30 +51,30 @@ export class EtiquetaService extends CrudService<Etiqueta, number> {
     );
   }
 
-  asociarConEntrada(etiquetaId: number, entradaId: number): Observable<any> {
+  asociarConEntrada(etiquetaCodigo: string, entradaId: number): Observable<any> {
     const asociacion: AsociacionEtiquetaDTO = {
-      etiquetaId,
+      etiquetaCodigo,
       entidadId: entradaId,
       tipoEntidad: 'ENTRADA',
     };
     return this.post<any>(`${this.endpoint}/asociar`, asociacion);
   }
 
-  asociarConCategoria(etiquetaId: number, categoriaId: number): Observable<any> {
+  asociarConCategoria(etiquetaCodigo: string, categoriaId: number): Observable<any> {
     const asociacion: AsociacionEtiquetaDTO = {
-      etiquetaId,
+      etiquetaCodigo,
       entidadId: categoriaId,
       tipoEntidad: 'CATEGORIA',
     };
     return this.post<any>(`${this.endpoint}/asociar`, asociacion);
   }
 
-  desasociarDeEntrada(etiquetaId: number, entradaId: number): Observable<any> {
-    return this.delete<any>(`${this.endpoint}/desasociar/ENTRADA/${etiquetaId}/${entradaId}`);
+  desasociarDeEntrada(etiquetaCodigo: string, entradaId: number): Observable<any> {
+    return this.delete<any>(`${this.endpoint}/desasociar/ENTRADA/${etiquetaCodigo}/${entradaId}`);
   }
 
-  desasociarDeCategoria(etiquetaId: number, categoriaId: number): Observable<any> {
-    return this.delete<any>(`${this.endpoint}/desasociar/CATEGORIA/${etiquetaId}/${categoriaId}`);
+  desasociarDeCategoria(etiquetaCodigo: string, categoriaId: number): Observable<any> {
+    return this.delete<any>(`${this.endpoint}/desasociar/CATEGORIA/${etiquetaCodigo}/${categoriaId}`);
   }
 
   obtenerEtiquetasPorEntrada(entradaId: number): Observable<any> {
