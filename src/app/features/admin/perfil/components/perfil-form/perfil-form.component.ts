@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PerfilResponse } from '../../../../../core/models/perfil-response.model';
 
@@ -8,7 +8,7 @@ import { PerfilResponse } from '../../../../../core/models/perfil-response.model
   styleUrls: ['./perfil-form.component.scss'],
   standalone: false,
 })
-export class PerfilFormComponent implements OnInit {
+export class PerfilFormComponent implements OnInit, OnChanges {
   @Input() usuario: PerfilResponse | null = null;
   @Output() save = new EventEmitter<any>();
 
@@ -25,6 +25,16 @@ export class PerfilFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.updateForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['usuario'] && !changes['usuario'].firstChange) {
+      this.updateForm();
+    }
+  }
+
+  private updateForm(): void {
     if (this.usuario) {
       this.form.patchValue({
         nombre: this.usuario.nombre,

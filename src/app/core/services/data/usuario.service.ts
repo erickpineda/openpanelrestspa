@@ -102,6 +102,10 @@ export class UsuarioService extends CrudService<Usuario, number> {
     );
   }
 
+  changePassword(changePasswordDTO: any): Observable<OpenpanelApiResponse<any>> {
+    return this.post<any>(`${this.endpoint}/changePassword`, changePasswordDTO);
+  }
+
   // ✅ Implementación mínima requerida
   protected createDefaultEntity(): Usuario {
     return {} as Usuario;

@@ -305,21 +305,6 @@ export const navItems: INavItemEnhanced[] = [
       },
     ],
   },
-  {
-    name: 'MENU.CHANGE_PASSWORD',
-    url: '/admin/control/gestion/changepassword',
-    iconComponent: { name: 'cil-lock-locked' },
-    priority: 10,
-    requiredRoles: [
-      UserRole.LECTOR,
-      UserRole.AUTOR,
-      UserRole.EDITOR,
-      UserRole.ADMINISTRADOR,
-      UserRole.DESARROLLADOR,
-      UserRole.MANTENIMIENTO,
-      UserRole.PROPIETARIO,
-    ],
-  },
 
   // System Configuration Section
   {

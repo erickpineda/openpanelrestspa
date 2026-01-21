@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { UsuarioService } from '../../../../core/services/data/usuario.service';
 import { Usuario } from '../../../../core/models/usuario.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
@@ -16,6 +16,7 @@ export class PerfilComponent implements OnInit {
   usuario: PerfilResponse | null = null;
   loading = false;
   uploading = false;
+  activeTab = 0; // Track active tab
 
   constructor(
     private usuarioService: UsuarioService,
@@ -26,6 +27,24 @@ export class PerfilComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarPerfil();
+  }
+
+  // Keyboard Shortcuts (Ctrl+1, Ctrl+2, etc.)
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.ctrlKey && !event.shiftKey && !event.altKey) {
+      const key = event.key;
+      const tabIndex = parseInt(key, 10) - 1; // 1-based to 0-based
+      if (tabIndex >= 0 && tabIndex <= 3) { // Assuming 4 tabs
+        event.preventDefault();
+        this.setActiveTab(tabIndex);
+      }
+    }
+  }
+
+  setActiveTab(index: number) {
+    this.activeTab = index;
+    this.cdr.markForCheck();
   }
 
   cargarPerfil() {

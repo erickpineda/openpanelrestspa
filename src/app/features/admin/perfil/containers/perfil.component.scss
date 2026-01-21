@@ -1,0 +1,122 @@
+
+// Variables
+$transition-duration: 0.3s;
+$primary-color: var(--cui-primary, #0d6efd);
+$hover-bg: rgba($primary-color, 0.05);
+
+:host {
+  display: block;
+}
+
+// Nav Tabs Styling
+::ng-deep .nav-tabs {
+  border-bottom: 2px solid #e9ecef;
+  
+  .nav-link {
+    border: none;
+    color: #6c757d;
+    padding: 1rem 1.5rem;
+    transition: all $transition-duration ease;
+    position: relative;
+    cursor: pointer;
+    font-weight: 500;
+    
+    // Hover Effect
+    &:hover {
+      color: $primary-color;
+      background-color: $hover-bg;
+      border-color: transparent;
+    }
+    
+    // Active State
+    &.active {
+      color: $primary-color;
+      background-color: transparent;
+      font-weight: 600;
+      
+      // Bottom Indicator
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -2px; // Align with border-bottom
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: $primary-color;
+        transform: scaleX(1);
+        transition: transform $transition-duration ease;
+      }
+    }
+    
+    // Initial state for indicator animation
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: $primary-color;
+      transform: scaleX(0);
+      transition: transform $transition-duration ease;
+    }
+  }
+}
+
+// Tab Content Transitions
+::ng-deep .tab-content {
+  position: relative;
+  min-height: 300px; // Prevent collapse during transition if needed
+  
+  .tab-pane {
+    opacity: 0;
+    transition: opacity $transition-duration ease-in-out;
+    display: none; // Default hidden
+    
+    &.active {
+      display: block; // Show active
+      // We use a small delay or requestAnimationFrame trick via CSS animations if we wanted slide,
+      // but simple opacity requires display:block first.
+      // CoreUI adds 'show' class which handles opacity.
+      // We just ensure transition is smooth.
+    }
+    
+    &.show {
+      opacity: 1;
+    }
+  }
+}
+
+// Mobile Tactile Feedback (Ripple-like)
+@media (max-width: 768px) {
+  .nav-link:active {
+    background-color: rgba($primary-color, 0.1);
+  }
+}
+
+// Placeholder / Skeleton Loading Fallback
+// (In case Bootstrap utilities are not fully loaded or need override)
+.placeholder-glow {
+  .placeholder {
+    animation: placeholder-glow 2s ease-in-out infinite;
+  }
+}
+
+@keyframes placeholder-glow {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.placeholder {
+  display: inline-block;
+  min-height: 1em;
+  vertical-align: middle;
+  cursor: wait;
+  background-color: currentColor;
+  opacity: 0.5;
+  
+  &.bg-secondary {
+    background-color: #6c757d !important;
+  }
+}

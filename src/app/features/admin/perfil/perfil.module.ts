@@ -10,6 +10,7 @@ import { PerfilComponent } from './containers/perfil.component';
 import { PerfilFormComponent } from './components/perfil-form/perfil-form.component';
 import { PerfilPreferencesComponent } from './components/perfil-preferences/perfil-preferences.component';
 import { PerfilActivityComponent } from './components/perfil-activity/perfil-activity.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
 
 @NgModule({
   imports: [
@@ -27,6 +28,7 @@ import { PerfilActivityComponent } from './components/perfil-activity/perfil-act
     PerfilFormComponent,
     PerfilPreferencesComponent,
     PerfilActivityComponent,
+    ChangePasswordComponent,
   ],
 })
 export class PerfilFeatureModule {}

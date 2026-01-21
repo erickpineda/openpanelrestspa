@@ -9,7 +9,6 @@ import { PrivilegioFormComponent } from './privilegios/form/privilegio-form.comp
 import { EliminarPrivilegioComponent } from './privilegios/eliminar/eliminar-privilegio.component';
 import { EliminarRolComponent } from './roles/eliminar/eliminar-rol.component';
 import { MiPerfilComponent } from './perfil/mi-perfil.component';
-import { ChangePasswordComponent } from './password/change-password.component';
 
 const routes: Routes = [
   { path: 'usuarios', component: UsuariosListComponent },
@@ -24,7 +23,6 @@ const routes: Routes = [
   { path: 'privilegios/eliminar/:id', component: EliminarPrivilegioComponent },
   { path: 'roles/eliminar/:id', component: EliminarRolComponent },
   { path: 'perfil', component: MiPerfilComponent },
-  { path: 'password', component: ChangePasswordComponent },
   { path: '', redirectTo: 'usuarios', pathMatch: 'full' },
 ];
 

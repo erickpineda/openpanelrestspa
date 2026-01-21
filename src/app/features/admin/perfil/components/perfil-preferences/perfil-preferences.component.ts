@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { PerfilResponse } from '../../../../../core/models/perfil-response.model';
 
@@ -8,7 +8,7 @@ import { PerfilResponse } from '../../../../../core/models/perfil-response.model
   styleUrls: ['./perfil-preferences.component.scss'],
   standalone: false,
 })
-export class PerfilPreferencesComponent implements OnInit {
+export class PerfilPreferencesComponent implements OnInit, OnChanges {
   @Input() usuario: PerfilResponse | null = null;
   @Output() save = new EventEmitter<any>();
 
@@ -23,6 +23,16 @@ export class PerfilPreferencesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.updateForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['usuario'] && !changes['usuario'].firstChange) {
+      this.updateForm();
+    }
+  }
+
+  private updateForm(): void {
     if (this.usuario && this.usuario.infouser) {
       try {
         const prefs = JSON.parse(this.usuario.infouser);

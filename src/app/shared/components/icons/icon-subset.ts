@@ -137,7 +137,10 @@ import {
   cilResizeWidth,
   cilCompress,
   cilThumbUp,
-  cilFindInPage
+  cilFindInPage,
+  cilPhone,
+  cilGlobeAlt,
+  cilLanguage
 } from '@coreui/icons';
 
 export const iconSubset = {
@@ -281,7 +284,10 @@ export const iconSubset = {
   cilZoom,
   cilResizeWidth,
   cilCompress,
-  cilFindInPage
+  cilFindInPage,
+  cilPhone,
+  cilGlobeAlt,
+  cilLanguage
 };
 
 export enum IconSubset {
@@ -424,4 +430,7 @@ export enum IconSubset {
   cilResizeWidth = 'cilResizeWidth',
   cilCompress = 'cilCompress',
   cilFindInPage = 'cilFindInPage',
+  cilPhone = 'cilPhone',
+  cilGlobeAlt = 'cilGlobeAlt',
+  cilLanguage = 'cilLanguage',
 }
