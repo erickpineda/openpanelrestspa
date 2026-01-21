@@ -71,7 +71,7 @@ import './app/features/public/about/containers/about.component.spec';
 import './app/features/public/contact/containers/contact.component.spec';
 import './app/shared/components/buscador-avanzado/buscador-avanzado.component.spec';
 import './app/shared/components/dashboard-chart/dashboard-chart.component.spec';
-import './app/shared/components/icons/icon-subset.spec';
+import './app/shared/components/icons/coreui-icons.spec';
 import './app/shared/components/kpi-card/kpi-card.component.spec';
 import './app/shared/components/op-pagination/op-pagination.component.spec';
 import './app/shared/components/responsive-navigation/responsive-navigation.component.spec';

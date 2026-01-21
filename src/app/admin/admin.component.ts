@@ -12,7 +12,7 @@ import { DashboardApiService } from '../core/services/dashboard-api.service';
 import { TranslationService } from '../core/services/translation.service';
 import { LanguageService } from '../core/services/language.service';
 
-import { iconSubset } from '../shared/components/icons/icon-subset';
+import { iconSubset } from '../shared/components/icons/coreui-icons';
 import { navItems } from './default-layout/_nav';
 import { TemporaryStorageService } from '../core/services/ui/temporary-storage.service';
 import { LoggerService } from '../core/services/logger.service';
