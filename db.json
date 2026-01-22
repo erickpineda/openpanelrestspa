@@ -19,7 +19,7 @@
   "usuarios": [
     {
       "idUsuario": 1,
-      "idRol": 1,
+      "rolCodigo": "PROPIETARIO",
       "username": "openpanel",
       "nombre": "Maestro",
       "apellido": null,
@@ -39,7 +39,7 @@
     },
     {
       "idUsuario": 2,
-      "idRol": 2,
+      "rolCodigo": "ADMINISTRADOR",
       "username": "optimusprime",
       "nombre": "Admin",
       "apellido": null,
@@ -75,7 +75,7 @@
     },
     {
       "idUsuario": 3,
-      "idRol": 3,
+      "rolCodigo": "MANTENIMIENTO",
       "username": "mantenimientoprueba",
       "nombre": "mantenimientoprueba",
       "apellido": null,
@@ -95,7 +95,7 @@
     },
     {
       "idUsuario": 4,
-      "idRol": 4,
+      "rolCodigo": "EDITOR",
       "username": "editorprueba",
       "nombre": "editorprueba",
       "apellido": null,
@@ -115,7 +115,7 @@
     },
     {
       "idUsuario": 5,
-      "idRol": 5,
+      "rolCodigo": "AUTOR",
       "username": "autorprueba",
       "nombre": "autorprueba",
       "apellido": null,
@@ -135,7 +135,7 @@
     },
     {
       "idUsuario": 6,
-      "idRol": 6,
+      "rolCodigo": "LECTOR",
       "username": "lectorprueba",
       "nombre": "lectorprueba",
       "apellido": null,
