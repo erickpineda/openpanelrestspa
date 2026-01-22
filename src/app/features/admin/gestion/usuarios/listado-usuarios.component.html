@@ -122,7 +122,7 @@
                 }}</label>
                 <select cSelect size="sm" [(ngModel)]="filtroRolCodigo" [disabled]="loading">
                   <option [ngValue]="null">{{ 'ADMIN.USERS.ALL_ROLES' | translate }}</option>
-                  @for (r of roles; track r.idRol ?? $index) {
+                  @for (r of roles; track r.codigo ?? $index) {
                     <option [value]="r.codigo">{{ r.nombre }}</option>
                   }
                 </select>

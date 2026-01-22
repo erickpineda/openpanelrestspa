@@ -141,8 +141,8 @@ test.describe('Entradas: Previa → Editar', () => {
     await page.waitForSelector('[data-testid="admin-root"]', { state: 'visible', timeout: 30000 });
     await page.goto('/#/admin/control/entradas?e2e=1', { waitUntil: 'domcontentloaded' });
 
-    await expect.poll(() => definicionesHits).toBeGreaterThan(0, { timeout: 30000 });
-    await expect.poll(() => buscarHits).toBeGreaterThan(0, { timeout: 30000 });
+    await expect.poll(() => definicionesHits, { timeout: 30000 }).toBeGreaterThan(0);
+    await expect.poll(() => buscarHits, { timeout: 30000 }).toBeGreaterThan(0);
 
     const previewBtn = page.locator('button[aria-label^="Vista previa de"]').first();
     await expect(previewBtn).toBeVisible({ timeout: 30000 });

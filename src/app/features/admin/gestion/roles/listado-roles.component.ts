@@ -418,7 +418,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
   }
 
   trackByRol(index: number, r: Rol): number | string {
-    return r?.idRol ?? r?.codigo ?? index;
+    return r?.codigo ?? index;
   }
 
   trackByPrivilegio(index: number, p: Privilegio): number | string {

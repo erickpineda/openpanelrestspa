@@ -308,14 +308,6 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
     const rawValue = this.form.getRawValue();
     const payload: Usuario = { ...rawValue } as Usuario;
 
-    // Fix: Ensure idRol is set based on rolCodigo
-    if (payload.rolCodigo && this.roles.length > 0) {
-      const selectedRole = this.roles.find((r) => r.codigo === payload.rolCodigo);
-      if (selectedRole) {
-        payload.idRol = selectedRole.idRol;
-      }
-    }
-
     this.onSave.emit(payload);
   }
 }

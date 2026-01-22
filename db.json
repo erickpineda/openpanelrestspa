@@ -156,32 +156,32 @@
   ],
   "roles": [
     {
-      "idRol": 1,
+      "codigo": "PROPIETARIO",
       "nombre": "PROPIETARIO",
       "descripcion": "Usuario propietario (es único) de la app, tiene funciones especiales"
     },
     {
-      "idRol": 2,
+      "codigo": "ADMINISTRADOR",
       "nombre": "ADMINISTRADOR",
       "descripcion": "Administrador, tiene acceso a toda la app"
     },
     {
-      "idRol": 3,
+      "codigo": "MANTENIMIENTO",
       "nombre": "MANTENIMIENTO",
       "descripcion": "Mantenimiento, es usado para labores de mantenimiento en la app"
     },
     {
-      "idRol": 4,
+      "codigo": "EDITOR",
       "nombre": "EDITOR",
       "descripcion": "Editor, puede editar entradas de otros, revisarlas y aprobarlas, al igual que puede crear entradas"
     },
     {
-      "idRol": 5,
+      "codigo": "AUTOR",
       "nombre": "AUTOR",
       "descripcion": "Autor, puede crear y editar sus propias entradas"
     },
     {
-      "idRol": 6,
+      "codigo": "LECTOR",
       "nombre": "LECTOR",
       "descripcion": "Lector, usuarios simples que pueden comentar en entradas"
     }
