@@ -19,6 +19,21 @@ export function parseAllowedDate(input: string | Date | number | null | undefine
     return isNaN(d.getTime()) ? null : d;
   }
 
+  if (Array.isArray(input)) {
+    // Soporte para array [yyyy, MM, dd, HH, mm, ss]
+    if (input.length >= 3) {
+      const yyyy = input[0];
+      const MM = input[1];
+      const dd = input[2];
+      const HH = input[3] || 0;
+      const mm = input[4] || 0;
+      const ss = input[5] || 0;
+      const d = new Date(yyyy, MM - 1, dd, HH, mm, ss);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
+  }
+
   const s = String(input).trim();
   if (!s) return null;
 

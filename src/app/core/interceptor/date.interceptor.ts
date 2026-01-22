@@ -5,12 +5,13 @@ import { formatForBackend } from '../../shared/utils/date-utils';
 
 @Injectable()
 export class DateInterceptor implements HttpInterceptor {
-  // Regex para detectar strings que parecen fechas ISO o datetime-local
+  // Regex para detectar strings que parecen fechas ISO, datetime-local o formato backend (espacio)
   // Ejemplos:
   // 2025-01-01T12:00 (datetime-local)
   // 2025-01-01T12:00:00.000Z (ISO)
   // 2025-01-01 (date)
-  private dateRegex = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d{3})?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+  // 2025-01-01 12:00:00 (backend)
+  private dateRegex = /^\d{4}-\d{2}-\d{2}([T\s]\d{2}:\d{2}(:\d{2}(\.\d{3})?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
 
   constructor() {}
 

@@ -5,6 +5,7 @@ import { ComentarioFacadeService } from './srv/comentario-facade.service';
 import { Entrada } from '@app/core/models/entrada.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { formatForBackend } from '../../../../shared/utils/date-utils';
 
 @Component({
   selector: 'app-comentario-form',
@@ -64,7 +65,15 @@ export class ComentarioFormComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['comentario'] && this.comentario) {
-      this.form.patchValue(this.comentario);
+      const data = { ...this.comentario };
+      // Asegurar formato backend para fechas antes de poner en el form
+      if (data.fechaCreacion) {
+        data.fechaCreacion = formatForBackend(data.fechaCreacion) as any;
+      }
+      if (data.fechaEdicion) {
+        data.fechaEdicion = formatForBackend(data.fechaEdicion) as any;
+      }
+      this.form.patchValue(data);
     }
 
     if (changes['nombreUsuario'] && this.nombreUsuario) {

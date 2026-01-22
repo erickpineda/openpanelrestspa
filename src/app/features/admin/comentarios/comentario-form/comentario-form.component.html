@@ -116,7 +116,7 @@
         </span>
         <input
           cFormControl
-          formControlName="fechaEdicion"
+          [value]="f['fechaEdicion'].value | allowedDate: 'medium'"
           type="text"
           class="border-start-0"
           readonly
