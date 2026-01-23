@@ -156,7 +156,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     );
 
     this.checkNavigationState();
-    this.stateService.checkForTemporaryData(this.isEditMode || !!this.entrada?.idEntrada);
+    this.stateService.checkForTemporaryData(this.entrada?.idEntrada);
   }
 
   ngOnDestroy(): void {
@@ -217,7 +217,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       arr.removeAt(0);
     }
 
-    this.form.patchValue({ imagenDestacada: null });
+    this.form.patchValue({ imagenDestacada: null, imagenDestacadaUuid: null });
 
     this.form.markAsPristine();
     this.form.markAsUntouched();
@@ -267,7 +267,9 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   hasCategoria(c: Categoria): boolean {
-    return this.categoriasArray?.value?.some((x: any) => x?.codigo === c?.codigo);
+    const values = this.categoriasArray?.value;
+    if (!Array.isArray(values)) return false;
+    return values.some((x: any) => x && c && x.codigo === c.codigo);
   }
 
   onCategoriaToggle(c: Categoria, checked: boolean) {
@@ -342,7 +344,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
           return;
         }
         const dataUrl = `data:${mime};base64,${b64}`;
-        this.form.patchValue({ imagenDestacada: dataUrl });
+        this.form.patchValue({ imagenDestacada: dataUrl, imagenDestacadaUuid: item.uuid });
         this.form.markAsDirty();
         this.cerrarSelectorImagen();
       },
@@ -605,7 +607,15 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
 
     if (this.form.valid) {
       this.log.info('💾 Intentando guardar entrada...');
-      const clean = this.sanitizeHtmlFields(this.form.getRawValue());
+      
+      const rawValue = this.form.getRawValue();
+      
+      // Si tenemos UUID, eliminamos el campo imagenDestacada para no enviarlo (ni siquiera como null)
+      if (rawValue.imagenDestacadaUuid) {
+        delete rawValue.imagenDestacada;
+      }
+
+      const clean = this.sanitizeHtmlFields(rawValue);
       this.submitForm.emit(clean as Entrada);
 
       this.stateService.removeCurrentTemporaryEntry();
@@ -668,6 +678,20 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       toRemove.forEach((e) => e.remove());
       return tpl.innerHTML;
     };
+
+    // Clean base64 image if present (remove data:image/...;base64, prefix)
+    // Only if it wasn't deleted previously
+    if (
+      val.imagenDestacada &&
+      typeof val.imagenDestacada === 'string' &&
+      val.imagenDestacada.startsWith('data:image/')
+    ) {
+      const commaIndex = val.imagenDestacada.indexOf(',');
+      if (commaIndex !== -1) {
+        val.imagenDestacada = val.imagenDestacada.substring(commaIndex + 1);
+      }
+    }
+
     return {
       ...val,
       contenido: sanitize(val?.contenido),

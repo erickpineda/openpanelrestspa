@@ -76,6 +76,7 @@ export class CrearPaginaComponent implements OnInit {
       },
       error: (error) => {
         this.log.error('Error creando página:', error);
+        this.toastService.showError('Error al crear la página.', 'Error');
       },
     });
   }

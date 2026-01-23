@@ -14,6 +14,8 @@ import { ToastService } from '@app/core/services/ui/toast.service';
 import { UsuarioFormComponent } from '../form/usuario-form.component';
 import { Rol } from '@app/core/models/rol.model';
 import { TranslationService } from '@app/core/services/translation.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '@app/core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-crear-usuario',
@@ -56,7 +58,8 @@ export class CrearUsuarioComponent implements OnChanges {
 
   guardar(usuario: Usuario) {
     this.loading = true;
-    this.usuarioService.crear(usuario).subscribe({
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    this.usuarioService.crear(usuario, context).subscribe({
       next: () => {
         this.loading = false;
         this.toastService.showSuccess(

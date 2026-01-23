@@ -4,7 +4,7 @@ import { CrudService } from '../../_utils/crud.service';
 import { TipoEntrada } from '../../models/tipo-entrada.model';
 import { OPConstants } from 'src/app/shared/constants/op-global.constants';
 import { HttpContext } from '@angular/common/http';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +24,7 @@ export class TipoEntradaService extends CrudService<TipoEntrada, number> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     params[this.pageSizeParam] = String(pageSize);
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.get<any>(this.endpoint, params, undefined, context);
   }
 

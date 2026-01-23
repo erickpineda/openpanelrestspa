@@ -4,6 +4,8 @@ import { ComentarioFacadeService } from '../comentario-form/srv/comentario-facad
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
 import { ComentarioFormComponent } from '../comentario-form/comentario-form.component';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '@app/core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-crear-comentario',
@@ -48,7 +50,8 @@ export class CrearComentarioComponent implements OnInit {
   }
 
   guardar(comentario: Comentario) {
-    this.facade.crearComentario(comentario).subscribe({
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    this.facade.crearComentario(comentario, context).subscribe({
       next: () => {
         this.toastService.showSuccess(
           'El comentario se ha creado correctamente.',

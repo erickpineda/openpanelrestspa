@@ -52,11 +52,12 @@ export class CrearEntradaComponent implements OnInit {
 
     this.facade.crearEntrada(ent).subscribe({
       next: () => {
-        this.toastService.showInfo('Se ha creado la entrada correctamente', 'Entrada creada');
+        this.toastService.showSuccess('Se ha creado la entrada correctamente', 'Entrada creada');
         this.router.navigateByUrl('/admin/control/entradas');
       },
       error: (error) => {
         this.log.error('Error creando entrada:', error);
+        this.toastService.showError('Error al crear la entrada.', 'Error');
       },
     });
   }

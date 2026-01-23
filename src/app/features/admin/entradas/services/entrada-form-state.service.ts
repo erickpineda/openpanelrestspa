@@ -91,27 +91,34 @@ export class EntradaFormStateService {
     this.updateState({ currentTemporaryEntryId: null });
   }
 
-  checkForTemporaryData(estaEditando: boolean): void {
-    if (estaEditando) {
-      return;
-    }
-
+  checkForTemporaryData(currentEntradaId?: number | null): void {
     const entries = this.temporaryStorage.getTemporaryEntriesByType('entrada');
     if (!entries || entries.length === 0) {
       return;
     }
 
-    const latest = entries.sort(
+    // Sort by timestamp descending (newest first)
+    const sortedEntries = entries.sort(
       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )[0];
+    );
 
-    this.updateState({
-      showRecoveryNotification: true,
-      temporaryData: latest,
-      // No asignamos el ID inmediatamente para evitar sobrescribir la entrada existente
-      // si el usuario decide ignorar la recuperación y empezar de cero.
-      // currentTemporaryEntryId: latest.id, 
-    });
+    let match: any = null;
+
+    if (currentEntradaId) {
+      // If editing, look for a matching ID in the form data
+      match = sortedEntries.find((e) => e.formData?.idEntrada == currentEntradaId);
+    } else {
+      // If creating, look for the latest entry that DOES NOT have an ID (or assume latest draft)
+      // Usually drafts for creation don't have idEntrada yet.
+      match = sortedEntries.find((e) => !e.formData?.idEntrada) || sortedEntries[0];
+    }
+
+    if (match) {
+      this.updateState({
+        showRecoveryNotification: true,
+        temporaryData: match,
+      });
+    }
   }
 
   dismissRecoveryNotification(): void {

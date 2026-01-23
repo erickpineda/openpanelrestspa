@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { UsuarioService } from '../../../../../core/services/data/usuario.service';
 import { ToastService } from '../../../../../core/services/ui/toast.service';
 import { PerfilResponse } from '../../../../../core/models/perfil-response.model';
 import { ChangePasswordDTO } from '../../../../../core/models/usuario.model';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../../core/interceptor/error.interceptor';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -70,9 +72,11 @@ export class ChangePasswordComponent implements OnInit {
       username: this.usuario.username,
       password: this.form.value.newPassword,
     };
+    
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
 
     this.usuarioService
-      .changePassword(changePasswordDTO)
+      .changePassword(changePasswordDTO, context)
       .pipe(
         finalize(() => {
           this.loading = false;

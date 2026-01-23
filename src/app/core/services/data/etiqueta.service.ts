@@ -3,7 +3,7 @@ import { Etiqueta } from '../../models/etiqueta.model';
 import { CrudService } from '../../_utils/crud.service';
 import { Observable } from 'rxjs';
 import { HttpContext } from '@angular/common/http';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 import { OPConstants } from 'src/app/shared/constants/op-global.constants';
 
 export interface AsociacionEtiquetaDTO {
@@ -26,8 +26,8 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
     return super.listarPagina();
   }
 
-  override crear(etiqueta: Etiqueta): Observable<any> {
-    return this.post<any>(OPConstants.Methods.ETIQUETAS.CREAR, etiqueta);
+  override crear(etiqueta: Etiqueta, context?: HttpContext): Observable<any> {
+    return this.post<any>(OPConstants.Methods.ETIQUETAS.CREAR, etiqueta, undefined, undefined, context);
   }
 
   buscar(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
@@ -41,7 +41,7 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.post<any>(
       OPConstants.Methods.ETIQUETAS.BUSCAR,
       payload,
@@ -89,11 +89,26 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
     return this.get<any>(OPConstants.Methods.ETIQUETAS.OBTENER_POR_CODIGO(codigo));
   }
 
-  actualizarPorCodigo(codigo: string, etiqueta: Etiqueta): Observable<any> {
-    return this.put<any>(OPConstants.Methods.ETIQUETAS.ACTUALIZAR_POR_CODIGO(codigo), etiqueta);
+  actualizarPorCodigo(
+    codigo: string,
+    etiqueta: Etiqueta,
+    context?: HttpContext
+  ): Observable<any> {
+    return this.put<any>(
+      OPConstants.Methods.ETIQUETAS.ACTUALIZAR_POR_CODIGO(codigo),
+      etiqueta,
+      undefined,
+      undefined,
+      context
+    );
   }
 
-  borrarPorCodigo(codigo: string): Observable<any> {
-    return this.delete<any>(OPConstants.Methods.ETIQUETAS.BORRAR_POR_CODIGO(codigo));
+  borrarPorCodigo(codigo: string, context?: HttpContext): Observable<any> {
+    return this.delete<any>(
+      OPConstants.Methods.ETIQUETAS.BORRAR_POR_CODIGO(codigo),
+      undefined,
+      undefined,
+      context
+    );
   }
 }

@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
 import { TemasService } from '../../../../core/services/data/temas.service';
 import { Tema } from '../../../../core/models/tema.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { TranslationService } from '../../../../core/services/translation.service';
@@ -117,9 +119,10 @@ export class TemasComponent implements OnInit, OnDestroy {
       activo: this.form.value.activo === 'true',
       esquemaColor: this.form.value.esquemaColor,
     };
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     const op = this.editItem?.id
-      ? this.temasService.actualizarSafe(this.editItem.id, payload)
-      : this.temasService.crearSafe(payload);
+      ? this.temasService.actualizarSafe(this.editItem.id, payload, context)
+      : this.temasService.crearSafe(payload, context);
     op.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.toast.showSuccess(
@@ -156,8 +159,9 @@ export class TemasComponent implements OnInit, OnDestroy {
   confirmDelete(): void {
     if (!this.itemToDelete || !this.itemToDelete.id) return;
     this.loading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.temasService
-      .eliminarSafe(this.itemToDelete.id)
+      .eliminarSafe(this.itemToDelete.id, context)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

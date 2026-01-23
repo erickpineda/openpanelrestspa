@@ -62,7 +62,8 @@ describe('EntradaFormComponent', () => {
     },
     checkForTemporaryData: jasmine.createSpy('checkForTemporaryData'),
     toggleFullWidth: jasmine.createSpy('toggleFullWidth'),
-    toggleFullScreen: jasmine.createSpy('toggleFullScreen')
+    toggleFullScreen: jasmine.createSpy('toggleFullScreen'),
+    removeCurrentTemporaryEntry: jasmine.createSpy('removeCurrentTemporaryEntry')
   };
 
   beforeEach(async () => {
@@ -169,6 +170,51 @@ describe('EntradaFormComponent', () => {
       expect(component.form.patchValue).toHaveBeenCalledWith({ imagenDestacada: null });
       expect(component.form.markAsPristine).toHaveBeenCalled();
       expect(component.form.markAsUntouched).toHaveBeenCalled();
+    });
+  });
+
+  describe('Form submission', () => {
+    it('should strip data URI prefix from imagenDestacada on submit', () => {
+      // Arrange
+      const base64Content = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+      const dataUri = `data:image/png;base64,${base64Content}`;
+      
+      component.form.patchValue({
+        titulo: 'Test Entry',
+        imagenDestacada: dataUri,
+        contenido: 'Content'
+      });
+      
+      spyOn(component.submitForm, 'emit');
+
+      // Act
+      component.onSubmit();
+
+      // Assert
+      expect(component.submitForm.emit).toHaveBeenCalled();
+      const emittedData = (component.submitForm.emit as jasmine.Spy).calls.mostRecent().args[0];
+      expect(emittedData.imagenDestacada).toBe(base64Content);
+    });
+
+    it('should keep imagenDestacada as is if it is a URL', () => {
+      // Arrange
+      const url = 'http://example.com/image.jpg';
+      
+      component.form.patchValue({
+        titulo: 'Test Entry',
+        imagenDestacada: url,
+        contenido: 'Content'
+      });
+      
+      spyOn(component.submitForm, 'emit');
+
+      // Act
+      component.onSubmit();
+
+      // Assert
+      expect(component.submitForm.emit).toHaveBeenCalled();
+      const emittedData = (component.submitForm.emit as jasmine.Spy).calls.mostRecent().args[0];
+      expect(emittedData.imagenDestacada).toBe(url);
     });
   });
 });

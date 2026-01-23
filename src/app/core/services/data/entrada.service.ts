@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpContext } from '@angular/common/http';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 import { map } from 'rxjs/operators';
 import { Entrada } from '../../models/entrada.model';
 import { TipoEntrada } from '../../models/tipo-entrada.model';
@@ -63,7 +63,7 @@ export class EntradaService extends CrudService<Entrada, number> {
    */
   buscarSafe(searchRequest: any, page: number, size: number): Observable<BuscarResponse> {
     const params = { pageNo: page.toString(), pageSize: size.toString() };
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.safePostData<BuscarResponse>(
       `${this.endpoint}/buscar`,
       searchRequest,
@@ -79,7 +79,7 @@ export class EntradaService extends CrudService<Entrada, number> {
    * Obtiene definiciones del buscador de forma segura
    */
   obtenerDefinicionesBuscadorSafe(): Observable<any> {
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.safeGetData<any>(
       `${this.endpoint}/buscar/definicionesBuscador`,
       {},

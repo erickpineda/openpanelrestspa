@@ -4,7 +4,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { UsuarioService } from './usuario.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 import { of, throwError } from 'rxjs';
 
 describe('UsuarioService request shapes', () => {
@@ -49,7 +49,7 @@ describe('UsuarioService request shapes', () => {
     expect(req.request.method).toBe('POST');
     expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe('0');
     expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe('10');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [], totalPages: 0 } });
   });
 

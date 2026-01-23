@@ -9,6 +9,7 @@ import { EstadoEntrada } from '@app/core/models/estado-entrada.model';
 import { Categoria } from '@app/core/models/categoria.model';
 import { ToastService } from '@app/core/services/ui/toast.service';
 import { formatForDateTimeLocal, parseAllowedDate } from '@shared/utils/date-utils';
+import { FileStorageService } from '@app/core/services/file-storage.service';
 
 @Component({
   selector: 'app-editar-entrada',
@@ -45,7 +46,8 @@ export class EditarEntradaComponent implements OnInit {
     private vf: ValidationEntradaFormsService,
     private facade: EntradaFacadeService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private fileStorage: FileStorageService
   ) {}
 
   async ngOnInit() {
@@ -69,30 +71,51 @@ export class EditarEntradaComponent implements OnInit {
         (t) => t.codigo === ent.tipoEntrada?.codigo
       );
 
-      this.entradaForm.patchValue(
-        {
-          ...ent,
-          estadoEntrada: estadoCorrecto ?? null,
-          tipoEntrada: tipoCorrecto ?? null,
-          fechaPublicacionProgramada: formatForDateTimeLocal(ent.fechaPublicacionProgramada),
-        },
-        { emitEvent: false }
-      );
+      const patchAndFinalize = (imagenB64: string | null) => {
+        this.entradaForm.patchValue(
+          {
+            ...ent,
+            estadoEntrada: estadoCorrecto ?? null,
+            tipoEntrada: tipoCorrecto ?? null,
+            fechaPublicacionProgramada: formatForDateTimeLocal(ent.fechaPublicacionProgramada),
+            imagenDestacada: imagenB64,
+          },
+          { emitEvent: false }
+        );
 
-      const arr = this.entradaForm.get('categorias') as UntypedFormArray;
-      arr.clear();
+        const arr = this.entradaForm.get('categorias') as UntypedFormArray;
+        arr.clear();
 
-      if (ent.categorias && Array.isArray(ent.categorias)) {
-        ent.categorias.forEach((cat: any) => arr.push(new UntypedFormControl(cat)));
-      }
+        if (ent.categorias && Array.isArray(ent.categorias)) {
+          ent.categorias.forEach((cat: any) => arr.push(new UntypedFormControl(cat)));
+        }
 
-      if (this.modoLectura) {
-        this.entradaForm.disable({ emitEvent: false });
+        if (this.modoLectura) {
+          this.entradaForm.disable({ emitEvent: false });
+        } else {
+          this.entradaForm.enable({ emitEvent: false });
+        }
+
+        this.entradaForm.markAsPristine();
+      };
+
+      if (ent.imagenDestacadaUuid) {
+        this.fileStorage.obtenerDatosFichero(ent.imagenDestacadaUuid).subscribe({
+          next: (datos: any) => {
+            let b64 = null;
+            if (datos?.contenido) {
+              const mime = datos.tipo || 'image/jpeg';
+              b64 = `data:${mime};base64,${datos.contenido}`;
+            }
+            patchAndFinalize(b64);
+          },
+          error: () => {
+            patchAndFinalize(null);
+          },
+        });
       } else {
-        this.entradaForm.enable({ emitEvent: false });
+        patchAndFinalize(null);
       }
-
-      this.entradaForm.markAsPristine();
     });
 
     this.entradaForm.valueChanges.subscribe(() => {
@@ -115,12 +138,18 @@ export class EditarEntradaComponent implements OnInit {
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuarioEditado = usuario?.idUsuario ?? null;
 
-    this.facade.actualizarEntrada(this.idEntrada, ent).subscribe(() => {
-      this.toastService.showSuccess(
-        'La entrada se ha actualizado correctamente.',
-        'Entrada actualizada'
-      );
-      this.router.navigateByUrl('/admin/control/entradas');
+    this.facade.actualizarEntrada(this.idEntrada, ent).subscribe({
+      next: () => {
+        this.toastService.showSuccess(
+          'La entrada se ha actualizado correctamente.',
+          'Entrada actualizada'
+        );
+        this.router.navigateByUrl('/admin/control/entradas');
+      },
+      error: (error) => {
+        console.error('Error actualizando entrada:', error);
+        this.toastService.showError('Error al actualizar la entrada.', 'Error');
+      },
     });
   }
 

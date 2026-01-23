@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
 import { AjustesService } from '../../../../core/services/data/ajustes.service';
 import { Ajustes } from '../../../../core/models/ajustes.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { TranslationService } from '../../../../core/services/translation.service';
@@ -113,9 +115,10 @@ export class AjustesComponent implements OnInit, OnDestroy {
     if (this.form.invalid) return;
     this.loading = true;
     const payload: Ajustes = { ...this.form.value };
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     const op = this.editItem?.id
-      ? this.ajustesService.actualizarSafe(this.editItem.id, payload)
-      : this.ajustesService.crearSafe(payload);
+      ? this.ajustesService.actualizarSafe(this.editItem.id, payload, context)
+      : this.ajustesService.crearSafe(payload, context);
 
     op.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
@@ -153,7 +156,8 @@ export class AjustesComponent implements OnInit, OnDestroy {
   confirmDelete(): void {
     if (!this.itemToDelete || !this.itemToDelete.id) return;
     this.loading = true;
-    this.ajustesService.eliminarSafe(this.itemToDelete.id).subscribe({
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    this.ajustesService.eliminarSafe(this.itemToDelete.id, context).subscribe({
       next: () => {
         this.toast.showSuccess(
           this.translate.instant('ADMIN.SETTINGS.SUCCESS.DELETE'),

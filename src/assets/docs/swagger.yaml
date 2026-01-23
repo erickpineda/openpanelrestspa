@@ -27,6 +27,8 @@ tags:
     description: Operaciones relacionadas con las herramientas auxiliares.
   - name: Dashboard
     description: Operaciones relacionadas con el dashboard y estadísticas.
+  - name: FileStorage
+    description: Operaciones relacionadas ficheros e imagenes.
 paths:
   /entradas:
     get:
@@ -1851,7 +1853,7 @@ paths:
     post:
       summary: Subir fichero
       tags:
-        - HerramientasAuxiliar
+        - FileStorage
       requestBody:
         required: true
         content:
@@ -2155,8 +2157,129 @@ paths:
             application/json:
               schema:
                 type: object
+  /usuarios/obtenerPorUsername/{username}:
+    get:
+      summary: Obtener usuario por username
+      tags:
+        - Usuarios
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseUsuario'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /filestorage/ficheros:
+    get:
+      summary: Listar ficheros
+      tags:
+        - FileStorage
+      responses:
+        '200':
+          description: Lista de ficheros
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseFileStorageList'
+  /filestorage/ficheros/obtenerDatos/{uuid}:
+    get:
+      summary: Obtener metadatos de fichero por UUID
+      tags:
+        - FileStorage
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadatos del fichero
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseFileStorage'
+        '404':
+          description: Fichero no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /filestorage/ficheros/descargar/{uuid}:
+    get:
+      summary: Descargar fichero por UUID
+      tags:
+        - FileStorage
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Fichero descargado
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Fichero no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+# Esquemas de respuesta para FileStorage
 components:
   schemas:
+    FileStorageDTO:
+      type: object
+      properties:
+        uuidFileStorage:
+          type: string
+        nombre:
+          type: string
+        tipo:
+          type: string
+        tamano:
+          type: integer
+        fechaCreacion:
+          type: string
+          format: date-time
+    OpenpanelApiResponseFileStorage:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/FileStorageDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseFileStorageList:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileStorageDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
     EntradaDTO:
       type: object
       properties:
@@ -2197,9 +2320,8 @@ components:
           format: date-time
         permitirComentario:
           type: boolean
-        imagenDestacada:
+        imagenDestacadaUuid:
           type: string
-          format: byte
         votos:
           type: integer
         cantidadComentarios:

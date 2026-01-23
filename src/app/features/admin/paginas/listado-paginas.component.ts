@@ -24,6 +24,8 @@ import { Router } from '@angular/router';
 import { TranslationService } from '../../../core/services/translation.service';
 import { parseAllowedDate } from '../../../shared/utils/date-utils';
 import { DatePipe } from '@angular/common';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-listado-paginas',
@@ -404,8 +406,9 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
 
   confirmarBorrado(): void {
     if (this.entradaABorrar) {
+      const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
       this.entradaService
-        .borrar(this.entradaABorrar.idEntrada)
+        .borrar(this.entradaABorrar.idEntrada, context)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {

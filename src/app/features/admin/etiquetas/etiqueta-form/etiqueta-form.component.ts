@@ -13,6 +13,9 @@ import { Etiqueta } from '../../../../core/models/etiqueta.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/skip-global-error.token';
+
 @Component({
   selector: 'app-etiqueta-form',
   templateUrl: './etiqueta-form.component.html',
@@ -128,10 +131,11 @@ export class EtiquetaFormComponent implements OnInit, OnChanges {
     if (this.form.valid) {
       this.loading = true;
       const etiquetaData: Etiqueta = { ...this.form.getRawValue() } as Etiqueta;
+      const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
       const operation =
         this.isEdit && this.etiqueta?.codigo
-          ? this.etiquetasService.actualizarPorCodigo(this.etiqueta.codigo, etiquetaData)
-          : this.etiquetasService.crear(etiquetaData);
+          ? this.etiquetasService.actualizarPorCodigo(this.etiqueta.codigo, etiquetaData, context)
+          : this.etiquetasService.crear(etiquetaData, context);
       operation.subscribe({
         next: () => {
           this.loading = false;

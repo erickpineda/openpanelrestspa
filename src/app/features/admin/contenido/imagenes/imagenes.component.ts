@@ -18,6 +18,8 @@ import { MediaItem } from '../../../../core/models/media-item.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { parseAllowedDate } from '../../../../shared/utils/date-utils';
 import saveAs from 'file-saver';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/skip-global-error.token';
+import { HttpContext } from '@angular/common/http';
 
 @Component({
   selector: 'app-imagenes',
@@ -201,7 +203,8 @@ export class ImagenesComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!input?.files || input.files.length === 0) return;
     const file = input.files[0];
     this.uploading = true;
-    this.fileStorage.uploadFile(file).subscribe({
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    this.fileStorage.uploadFile(file, undefined, context).subscribe({
       next: () => {
         this.uploading = false;
         this.toast.showSuccess('Imagen subida', 'Imágenes');

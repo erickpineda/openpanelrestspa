@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EntradaService } from './entrada.service';
 import { TokenStorageService } from '../auth/token-storage.service';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 
 describe('EntradaService request shapes', () => {
   let service: EntradaService;
@@ -64,7 +64,7 @@ describe('EntradaService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/entradas/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     expect(req.request.params.get('pageNo')).toBe('1');
     expect(req.request.params.get('pageSize')).toBe('10');
     req.flush({ data: { elements: [{}], totalPages: 2 } });
@@ -77,7 +77,7 @@ describe('EntradaService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/entradas/buscar/definicionesBuscador'));
     expect(req.request.method).toBe('GET');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { a: 1 } });
   });
 
@@ -86,7 +86,7 @@ describe('EntradaService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/entradas/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(false);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(false);
     expect(req.request.params.get('pageNo')).toBe('0');
     expect(req.request.params.get('pageSize')).toBe('5');
     req.flush({ result: { success: true }, data: {} });

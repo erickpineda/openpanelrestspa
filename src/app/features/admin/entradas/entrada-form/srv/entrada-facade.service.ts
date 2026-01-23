@@ -9,6 +9,8 @@ import { CategoriaService } from '@app/core/services/data/categoria.service';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 import { UsuarioService } from '@app/core/services/data/usuario.service';
 import { EtiquetaService } from '@app/core/services/data/etiqueta.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '@app/core/interceptor/skip-global-error.token';
 
 @Injectable({ providedIn: 'root' })
 export class EntradaFacadeService {
@@ -52,10 +54,12 @@ export class EntradaFacadeService {
     return this.usuarioSesion;
   }
   crearEntrada(ent: any): Observable<any> {
-    return this.entradaSrv.crear(ent);
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    return this.entradaSrv.crear(ent, context);
   }
   actualizarEntrada(id: number, ent: any): Observable<any> {
-    return this.entradaSrv.actualizar(id, ent);
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    return this.entradaSrv.actualizar(id, ent, context);
   }
   cargarEntradaPorId(id: number): Observable<Entrada> {
     return this.entradaSrv.obtenerPorId(id).pipe(map((r: any) => r?.data as Entrada));

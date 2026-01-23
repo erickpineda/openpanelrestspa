@@ -1,9 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
 import { UsuarioService } from '../../../../core/services/data/usuario.service';
 import { Usuario } from '../../../../core/models/usuario.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { PerfilResponse } from '../../../../core/models/perfil-response.model';
 import { FileStorageService } from '../../../../core/services/file-storage.service';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
 import { finalize, take } from 'rxjs/operators';
 
 @Component({
@@ -79,8 +81,9 @@ export class PerfilComponent implements OnInit {
     this.loading = true;
     this.cdr.markForCheck();
     // Cast to Usuario or compatible type if needed
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.usuarioService
-      .actualizarParcial(this.usuario.idUsuario, usuarioModificado as Usuario)
+      .actualizarParcial(this.usuario.idUsuario, usuarioModificado as Usuario, context)
       .pipe(
         finalize(() => {
           this.loading = false;

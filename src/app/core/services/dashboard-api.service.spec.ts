@@ -7,7 +7,7 @@ import { PrivilegioService } from './data/privilegio.service';
 import { FileStorageService } from './file-storage.service';
 import { TokenStorageService } from './auth/token-storage.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
-import { NetworkInterceptor } from '../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../interceptor/network.interceptor';
 
 describe('DashboardApiService force param', () => {
   let service: DashboardApiService;
@@ -81,7 +81,7 @@ describe('Data services request shapes', () => {
     expect(req.request.method).toBe('POST');
     expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe('0');
     expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe('10');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [] } });
   });
 
@@ -117,7 +117,7 @@ describe('Data services request shapes', () => {
     expect(req.request.method).toBe('POST');
     expect(req.request.params.get(OPConstants.Pagination.PAGE_NO_PARAM)).toBe('0');
     expect(req.request.params.get(OPConstants.Pagination.PAGE_SIZE_PARAM)).toBe('25');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [] } });
   });
 
@@ -225,7 +225,8 @@ describe('FileStorageService request shapes', () => {
     });
 
     const req = httpMock.expectOne((r) => r.url.includes('/fileStorage/ficheros'));
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
     req.flush({
       data: [
         {
@@ -245,7 +246,8 @@ describe('FileStorageService request shapes', () => {
     });
 
     const req = httpMock.expectOne((r) => r.url.includes('/fileStorage/ficheros/obtenerDatos/u1'));
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
     req.flush({ data: { uuid: 'u1' } });
   });
 

@@ -8,6 +8,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { GridModule, FormModule, ButtonModule, SpinnerModule } from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
 import { PerfilResponse } from '../../../../../core/models/perfil-response.model';
+import { HttpContext } from '@angular/common/http';
 
 describe('ChangePasswordComponent', () => {
   let component: ChangePasswordComponent;
@@ -96,7 +97,7 @@ describe('ChangePasswordComponent', () => {
       idUsuario: 1,
       username: 'testuser',
       password: 'newPassword123',
-    });
+    }, jasmine.any(HttpContext));
     expect(toastServiceSpy.showSuccess).toHaveBeenCalled();
   });
 

@@ -72,10 +72,15 @@ export class ToastService implements OnDestroy {
     const current = this._toasts$.getValue();
     let newList = [...current, t];
 
-    if (newList.length > this.maxVisible) {
-      newList = newList
-        .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0))
-        .slice(newList.length - this.maxVisible);
+    // Ordenar por fecha de creación (ascendente: más antiguos primero)
+    newList.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+
+    // Si excedemos el máximo, eliminamos los más antiguos
+    while (newList.length > this.maxVisible) {
+      const removed = newList.shift(); // Elimina el primero (más antiguo)
+      if (removed) {
+        this.clearTimerRecord(removed.id);
+      }
     }
 
     this.setToasts(newList);

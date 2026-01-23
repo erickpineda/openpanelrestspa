@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { MediaItem } from '../models/media-item.model';
 import { TokenStorageService } from './auth/token-storage.service';
-import { NetworkInterceptor } from '../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../interceptor/network.interceptor';
 
 @Injectable({ providedIn: 'root' })
 export class FileStorageService {
@@ -15,11 +15,11 @@ export class FileStorageService {
     private tokenStorage?: TokenStorageService
   ) {}
 
-  uploadFile(file: File, folder?: string): Observable<any> {
+  uploadFile(file: File, folder?: string, context?: HttpContext): Observable<any> {
     const form = new FormData();
     form.append('file', file);
     if (folder) form.append('folder', folder);
-    return this.http.post(`${this.base}/fileStorage/subirFichero`, form);
+    return this.http.post(`${this.base}/fileStorage/subirFichero`, form, { context });
   }
 
   listMedia(type: 'image' | 'file' = 'image', page?: number, size?: number): Observable<any> {
@@ -31,9 +31,13 @@ export class FileStorageService {
 
   listarFicheros(skipLoader: boolean = false): Observable<MediaItem[]> {
     const context = skipLoader
-      ? new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true)
+      ? new HttpContext().set(SKIP_GLOBAL_LOADER, true)
       : undefined;
-    return this.http.get<any>(`${this.base}/fileStorage/ficheros`, { context }).pipe(
+    
+    // ✅ Fix: Asegurar Content-Type válido para evitar error 415 en backend estricto
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    return this.http.get<any>(`${this.base}/fileStorage/ficheros`, { context, headers }).pipe(
       map((resp) => {
         const data = resp?.data ?? resp;
         const arr = Array.isArray(data) ? data : Array.isArray(data?.content) ? data.content : [];
@@ -52,11 +56,16 @@ export class FileStorageService {
 
   obtenerDatosFichero(uuid: string, skipLoader: boolean = false): Observable<any> {
     const context = skipLoader
-      ? new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true)
+      ? new HttpContext().set(SKIP_GLOBAL_LOADER, true)
       : undefined;
+
+    // ✅ Fix: Asegurar Content-Type válido para evitar error 415 en backend estricto
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
     return this.http
       .get<any>(`${this.base}/fileStorage/ficheros/obtenerDatos/${encodeURIComponent(uuid)}`, {
         context,
+        headers,
       })
       .pipe(map((resp) => resp?.data ?? resp));
   }
@@ -71,7 +80,7 @@ export class FileStorageService {
     );
   }
 
-  deleteMedia(id: string): Observable<any> {
-    return this.http.delete(`${this.base}/media/${encodeURIComponent(id)}`);
+  deleteMedia(id: string, context?: HttpContext): Observable<any> {
+    return this.http.delete(`${this.base}/media/${encodeURIComponent(id)}`, { context });
   }
 }

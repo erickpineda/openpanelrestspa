@@ -10,6 +10,8 @@ import { LoggerService } from '../../../../core/services/logger.service';
 import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
 import { OPConstants } from '../../../../shared/constants/op-global.constants';
 import { TranslationService } from '../../../../core/services/translation.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-usuarios-list',
@@ -229,8 +231,9 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       return;
     }
     this.loading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.usuarioService
-      .borrar(this.userToDelete.idUsuario)
+      .borrar(this.userToDelete.idUsuario, context)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

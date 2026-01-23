@@ -4,7 +4,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { ComentarioService } from './comentario.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 
 describe('ComentarioService request shapes', () => {
   let service: ComentarioService;
@@ -46,7 +46,7 @@ describe('ComentarioService request shapes', () => {
     service.buscarSinGlobalLoader({ q: 'x' }, 0, 10).subscribe(() => {});
 
     const req = httpMock.expectOne((r) => r.url.includes('/comentarios/buscar'));
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [], totalPages: 0 } });
   });
 });

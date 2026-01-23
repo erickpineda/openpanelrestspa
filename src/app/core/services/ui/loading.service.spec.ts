@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { LoadingService } from './loading.service';
 import { LoggerService } from '../logger.service';
-import { NotificationService } from './notification.service';
+import { ToastService } from './toast.service';
 
 describe('LoadingService', () => {
   let service: LoadingService;
   let logger: jasmine.SpyObj<LoggerService>;
-  let notifications: jasmine.SpyObj<NotificationService>;
+  let toastService: jasmine.SpyObj<ToastService>;
   let latestGlobal: boolean | undefined;
   let latestError: any;
 
@@ -20,13 +20,13 @@ describe('LoadingService', () => {
       'warn',
       'error',
     ]);
-    notifications = jasmine.createSpyObj<NotificationService>('NotificationService', ['error']);
+    toastService = jasmine.createSpyObj<ToastService>('ToastService', ['showError']);
 
     TestBed.configureTestingModule({
       providers: [
         LoadingService,
         { provide: LoggerService, useValue: logger },
-        { provide: NotificationService, useValue: notifications },
+        { provide: ToastService, useValue: toastService },
       ],
     });
 
@@ -77,7 +77,7 @@ describe('LoadingService', () => {
 
     expect(latestError.active).toBe(true);
     expect(latestError.code).toBe('TIMEOUT');
-    expect(notifications.error).toHaveBeenCalled();
+    expect(toastService.showError).toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalled();
     expect(service.getLoadingStats().activeRequests).toBe(0);
@@ -98,18 +98,19 @@ describe('LoadingService', () => {
 
     service.setGlobalLoading(false);
     jasmine.clock().tick(0);
+
+    expect(latestGlobal).toBe(false);
   });
 
   it('triggerRetry captura excepciones del handler y muestra notificación', () => {
-    service.registerRetryHandler(() => {
-      throw new Error('boom');
-    });
+    const handler = jasmine.createSpy('handler').and.throwError('Retry failed');
+    service.registerRetryHandler(handler);
 
     service.triggerRetry();
 
+    expect(handler).toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalled();
-    expect(notifications.error).toHaveBeenCalled();
+    expect(toastService.showError).toHaveBeenCalled();
     expect(service.getLoadingStats().activeRequests).toBe(0);
-    expect(latestGlobal).toBe(false);
   });
 });

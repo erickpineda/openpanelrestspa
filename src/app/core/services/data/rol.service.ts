@@ -3,7 +3,7 @@ import { Rol } from '../../models/rol.model';
 import { CrudService } from '../../_utils/crud.service';
 import { HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 @Injectable({
@@ -16,7 +16,7 @@ export class RolService extends CrudService<Rol, string> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.post<any>(`${this.endpoint}/buscar`, searchRequest, params, undefined, context);
   }
 
@@ -33,16 +33,27 @@ export class RolService extends CrudService<Rol, string> {
   }
 
   // Overrides for code-based endpoints
-  override obtenerPorId(id: string): Observable<any> {
-    return this.get<any>(`${this.endpoint}/obtenerPorCodigo/${id}`);
+  override obtenerPorId(id: string, context?: HttpContext): Observable<any> {
+    return this.get<any>(`${this.endpoint}/obtenerPorCodigo/${id}`, undefined, undefined, context);
   }
 
-  override actualizar(id: string, entity: Rol): Observable<any> {
-    return this.put<any>(`${this.endpoint}/actualizarPorCodigo/${id}`, entity);
+  override actualizar(id: string, entity: Rol, context?: HttpContext): Observable<any> {
+    return this.put<any>(
+      `${this.endpoint}/actualizarPorCodigo/${id}`,
+      entity,
+      undefined,
+      undefined,
+      context
+    );
   }
 
-  override borrar(id: string): Observable<any> {
-    return this.delete<any>(`${this.endpoint}/borrarPorCodigo/${id}`);
+  override borrar(id: string, context?: HttpContext): Observable<any> {
+    return this.delete<any>(
+      `${this.endpoint}/borrarPorCodigo/${id}`,
+      undefined,
+      undefined,
+      context
+    );
   }
 
   // Safe overrides

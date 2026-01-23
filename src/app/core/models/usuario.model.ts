@@ -29,9 +29,9 @@ export class Usuario {
 }
 
 export interface Usuario {
+  username: string;
   idUsuario: number;
   rolCodigo: string;
-  username: string;
   password: string;
   nombre: string;
   apellido: string;

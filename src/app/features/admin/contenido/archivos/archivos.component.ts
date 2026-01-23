@@ -4,6 +4,8 @@ import { MediaItem } from '../../../../core/models/media-item.model';
 import { saveAs } from 'file-saver';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { Subject, takeUntil, finalize } from 'rxjs';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '@core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-archivos',
@@ -111,8 +113,9 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     if (!this.itemToDelete || !this.itemToDelete.uuid) return;
 
     this.loading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.fileStorage
-      .deleteMedia(this.itemToDelete.uuid)
+      .deleteMedia(this.itemToDelete.uuid, context)
       .pipe(
         finalize(() => {
           this.loading = false;
@@ -162,7 +165,8 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     if (!input?.files || input.files.length === 0) return;
     const file = input.files[0];
     this.uploading = true;
-    this.fileStorage.uploadFile(file).subscribe({
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    this.fileStorage.uploadFile(file, undefined, context).subscribe({
       next: () => {
         this.uploading = false;
         this.toast.showSuccess('Archivo subido', 'Archivos');

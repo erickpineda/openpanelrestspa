@@ -14,6 +14,8 @@ import { OPConstants } from '../../../../../shared/constants/op-global.constants
 import { UsuarioService } from '../../../../../core/services/data/usuario.service';
 import { ToastService } from '../../../../../core/services/ui/toast.service';
 import { TranslationService } from '../../../../../core/services/translation.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../../core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-usuario-form',
@@ -165,7 +167,9 @@ export class UsuarioFormComponent implements OnInit, OnChanges {
     const username = usernameControl.value;
     this.checkUsernameLoading = true;
 
-    this.usuarioService.checkUsernameAvailability(username).subscribe({
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+
+    this.usuarioService.checkUsernameAvailability(username, context).subscribe({
       next: (response) => {
         this.checkUsernameLoading = false;
         // Backend returns "true" string if exists (taken), "false" if not exists (available)

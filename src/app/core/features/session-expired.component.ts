@@ -84,7 +84,6 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
           this.router.url.includes('/entradas/crear');
 
         const hasUnsavedWork = this.unsavedWorkService.hasUnsavedWork();
-        const hasTemporaryData = this.temporaryStorage.hasAnyTemporaryData();
 
         if (isCreateEntryActive) {
           this.log.info(
@@ -93,9 +92,9 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
           return;
         }
 
-        if (hasUnsavedWork || hasTemporaryData) {
+        if (hasUnsavedWork) {
           this.log.info(
-            'SessionExpiredComponent: Detectado trabajo sin guardar/temporal. Delegando a UnsavedWorkModalComponent.'
+            'SessionExpiredComponent: Detectado trabajo sin guardar. Delegando a UnsavedWorkModalComponent.'
           );
           return;
         }
@@ -264,6 +263,10 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.cleanupVisualArtifacts();
       this.saveRedirectUrl();
+
+      // LIMPIEZA CRÍTICA: Asegurar que el token inválido se elimine antes de navegar
+      this.tokenStorage.signOut();
+      this.activeTabService.clearCurrentTab();
       
       this.router.navigate(['/login'], { replaceUrl: true }).then((success) => {
         if (!success) {
@@ -271,7 +274,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
           window.location.href = '/login';
         }
       });
-    }, 300);
+    }, 500);
   }
 
   private cleanupVisualArtifacts(): void {
@@ -308,6 +311,11 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.cleanupVisualArtifacts();
+      
+      // LIMPIEZA CRÍTICA: Asegurar que el token inválido se elimine antes de navegar
+      this.tokenStorage.signOut();
+      this.activeTabService.clearCurrentTab();
+
       this.router.navigate(['/'], { replaceUrl: true });
     }, 300);
   }

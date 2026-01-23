@@ -1,3 +1,5 @@
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '@core/interceptor/skip-global-error.token';
 import { Injectable } from '@angular/core';
 import {
   BehaviorSubject,
@@ -126,7 +128,8 @@ export class ListadoEntradasStateService {
 
   deleteEntrada(id: number): Observable<void> {
     this.updateState({ loading: true, error: null });
-    return this.entradaService.borrar(id).pipe(
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    return this.entradaService.borrar(id, context).pipe(
       switchMap(() => this.reloadCurrentPage()),
       map(() => void 0),
       catchError((error) => {

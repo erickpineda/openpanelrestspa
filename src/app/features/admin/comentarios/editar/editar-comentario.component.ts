@@ -12,6 +12,8 @@ import { ComentarioFacadeService } from '../comentario-form/srv/comentario-facad
 import { ToastService } from '@app/core/services/ui/toast.service';
 import { ComentarioFormComponent } from '../comentario-form/comentario-form.component';
 import { Router } from '@angular/router';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '@app/core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-editar-comentario',
@@ -57,7 +59,14 @@ export class EditarComentarioComponent implements OnChanges {
 
     if (!this.comentario) return;
 
-    if (this.comentario.idUsuario) {
+    if (this.comentario.username) {
+      this.nombreUsuario = this.comentario.username;
+      this.facade.obtenerUsuarioPorUsername(this.comentario.username).subscribe((usuario) => {
+        if (usuario) {
+          this.emailUsuario = usuario.email;
+        }
+      });
+    } else if (this.comentario.idUsuario) {
       this.facade.obtenerUsuarioPorId(this.comentario.idUsuario).subscribe((usuario) => {
         if (usuario) {
           this.nombreUsuario = usuario.username;
@@ -95,7 +104,8 @@ export class EditarComentarioComponent implements OnChanges {
     if (!comentario.idComentario) return;
 
     this.submitted = true;
-    this.facade.actualizarComentario(comentario.idComentario, comentario).subscribe({
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    this.facade.actualizarComentario(comentario.idComentario, comentario, context).subscribe({
       next: () => {
         this.toastService.showSuccess(
           'El comentario se ha actualizado correctamente.',

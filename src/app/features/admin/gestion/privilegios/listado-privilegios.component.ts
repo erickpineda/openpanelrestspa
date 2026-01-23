@@ -7,6 +7,8 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
 import { TranslationService } from '../../../../core/services/translation.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-privilegios-list',
@@ -162,9 +164,10 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     if (!privilegio) return;
     this.loading = true;
     this.editPrivilegio = privilegio;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     const op$ = this.isEditing
-      ? this.privilegioService.actualizar(privilegio.codigo, privilegio)
-      : this.privilegioService.crear(privilegio);
+      ? this.privilegioService.actualizar(privilegio.codigo, privilegio, context)
+      : this.privilegioService.crear(privilegio, context);
     op$.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.toast.showSuccess(
@@ -204,8 +207,9 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
       return;
     }
     this.loading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.privilegioService
-      .borrar(this.privilegioToDelete.codigo)
+      .borrar(this.privilegioToDelete.codigo, context)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

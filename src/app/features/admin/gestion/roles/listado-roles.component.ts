@@ -9,6 +9,8 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SearchUtilService } from '../../../../core/services/utils/search-util.service';
 import { OPConstants } from '../../../../shared/constants/op-global.constants';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-roles-list',
@@ -343,9 +345,10 @@ export class RolesListComponent implements OnInit, OnDestroy {
       }
     }
     const privilegios = [...rol.privilegios];
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     const op$ = this.isEditing
-      ? this.rolService.actualizar(rol.codigo, rol)
-      : this.rolService.crear(rol);
+      ? this.rolService.actualizar(rol.codigo, rol, context)
+      : this.rolService.crear(rol, context);
     op$
       .pipe(
         takeUntil(this.destroy$),
@@ -396,8 +399,9 @@ export class RolesListComponent implements OnInit, OnDestroy {
       return;
     }
     this.loading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.rolService
-      .borrar(this.rolToDelete.codigo)
+      .borrar(this.rolToDelete.codigo, context)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

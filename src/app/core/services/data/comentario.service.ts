@@ -7,9 +7,9 @@ import { CrudService } from '../../_utils/crud.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { PaginaResponse } from '../../models/pagina-response.model';
 import { HttpContext } from '@angular/common/http';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
-import { OPConstants } from 'src/app/shared/constants/op-global.constants';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +42,7 @@ export class ComentarioService extends CrudService<Comentario, number> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = page.toString();
     params[this.pageSizeParam] = size.toString();
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.safePostData<PaginaResponse>(
       OPConstants.Methods.COMENTARIOS.BUSCAR,
       searchRequest,

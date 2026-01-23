@@ -215,7 +215,11 @@
 <a name='L150'></a><a href='#L150'>150</a>
 <a name='L151'></a><a href='#L151'>151</a>
 <a name='L152'></a><a href='#L152'>152</a>
-<a name='L153'></a><a href='#L153'>153</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -285,7 +289,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -323,7 +329,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -374,7 +382,7 @@ import { BaseService } from './base.service';
 import { OpenpanelApiResponse } from '../models/openpanel-api-response.model';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { HttpClient, HttpContext } from '@angular/common/http';
-import { NetworkInterceptor } from '../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../interceptor/network.interceptor';
 import { OPConstants } from '../../shared/constants/op-global.constants';
 &nbsp;
 @Injectable({
@@ -410,7 +418,7 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
 &nbsp;
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.safeGetList&lt;T&gt;(
       this.endpoint,
       params,
@@ -423,36 +431,38 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
   /**
    * Obtiene un elemento por ID de forma segura, retornando null en caso de error
    */
-<span class="fstat-no" title="function not covered" >  obtenerPorIdSafe(</span>id: ID): Observable&lt;T&gt; {
+<span class="fstat-no" title="function not covered" >  obtenerPorIdSafe(</span>id: ID, context?: HttpContext): Observable&lt;T&gt; {
 <span class="cstat-no" title="statement not covered" >    return this.safeGetData&lt;T&gt;(</span>
       `${this.endpoint}/obtenerPorId/${id}`,
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
-      `${this.endpoint}.obtenerPorId`
+      `${this.endpoint}.obtenerPorId`,
+      context
     );
   }
 &nbsp;
   /**
    * Crea un elemento de forma segura, retornando null en caso de error
    */
-<span class="fstat-no" title="function not covered" >  crearSafe(</span>entity: T): Observable&lt;T&gt; {
+<span class="fstat-no" title="function not covered" >  crearSafe(</span>entity: T, context?: HttpContext): Observable&lt;T&gt; {
 <span class="cstat-no" title="statement not covered" >    return this.safePostData&lt;T&gt;(</span>
       `${this.endpoint}/crear`,
       entity,
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
-      `${this.endpoint}.crear`
+      `${this.endpoint}.crear`,
+      context
     );
   }
 &nbsp;
   /**
    * Crear elemento con estado
    */
-  crearConEstado(entity: T): Observable&lt;{ success: boolean; data?: T; error?: any }&gt; {
+  crearConEstado(entity: T, context?: HttpContext): Observable&lt;{ success: boolean; data?: T; error?: any }&gt; {
     return this.safeOperationWithState&lt;T&gt;(
-      this.post&lt;T&gt;(`${this.endpoint}/crear`, entity),
+      this.post&lt;T&gt;(`${this.endpoint}/crear`, entity, undefined, undefined, context),
       `${this.endpoint}.crear`
     );
   }
@@ -460,26 +470,28 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
   /**
    * Actualiza un elemento de forma segura, retornando null en caso de error
    */
-<span class="fstat-no" title="function not covered" >  actualizarSafe(</span>id: ID, entity: T): Observable&lt;T&gt; {
+<span class="fstat-no" title="function not covered" >  actualizarSafe(</span>id: ID, entity: T, context?: HttpContext): Observable&lt;T&gt; {
 <span class="cstat-no" title="statement not covered" >    return this.safePutData&lt;T&gt;(</span>
       `${this.endpoint}/${id}`,
       entity,
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
-      `${this.endpoint}.actualizar`
+      `${this.endpoint}.actualizar`,
+      context
     );
   }
 &nbsp;
   /**
    * Elimina un elemento de forma segura, retornando false en caso de error
    */
-  eliminarSafe(id: ID): Observable&lt;boolean&gt; {
+  eliminarSafe(id: ID, context?: HttpContext): Observable&lt;boolean&gt; {
     return this.safeDeleteOperation(
       `${this.endpoint}/${id}`,
       undefined,
       undefined,
-      `${this.endpoint}.eliminar`
+      `${this.endpoint}.eliminar`,
+      context
     );
   }
 &nbsp;
@@ -499,24 +511,24 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
     const params: any = <span class="cstat-no" title="statement not covered" >{};</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (pageNo != null) <span class="cstat-no" title="statement not covered" >params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);</span></span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (pageSize != null) <span class="cstat-no" title="statement not covered" >params[this.pageSizeParam] = String(pageSize);</span></span>
-    const context = <span class="cstat-no" title="statement not covered" >new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);</span>
+    const context = <span class="cstat-no" title="statement not covered" >new HttpContext().set(SKIP_GLOBAL_LOADER, true);</span>
 <span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(this.endpoint, params, undefined, context);</span>
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  obtenerPorId(</span>id: ID): Observable&lt;OpenpanelApiResponse&lt;any&gt;&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(`${this.endpoint}/obtenerPorId/${id}`);</span>
+<span class="fstat-no" title="function not covered" >  obtenerPorId(</span>id: ID, context?: HttpContext): Observable&lt;OpenpanelApiResponse&lt;any&gt;&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(`${this.endpoint}/obtenerPorId/${id}`, undefined, undefined, context);</span>
   }
 &nbsp;
-  crear(entity: T): Observable&lt;any&gt; {
-    return this.post&lt;any&gt;(`${this.endpoint}/crear`, entity);
+  crear(entity: T, context?: HttpContext): Observable&lt;any&gt; {
+    return this.post&lt;any&gt;(`${this.endpoint}/crear`, entity, undefined, undefined, context);
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  actualizar(</span>id: ID, entity: T): Observable&lt;OpenpanelApiResponse&lt;any&gt;&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.put&lt;any&gt;(`${this.endpoint}/${id}`, entity);</span>
+<span class="fstat-no" title="function not covered" >  actualizar(</span>id: ID, entity: T, context?: HttpContext): Observable&lt;OpenpanelApiResponse&lt;any&gt;&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.put&lt;any&gt;(`${this.endpoint}/${id}`, entity, undefined, undefined, context);</span>
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  borrar(</span>id: ID): Observable&lt;OpenpanelApiResponse&lt;any&gt;&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.delete&lt;any&gt;(`${this.endpoint}/${id}`);</span>
+<span class="fstat-no" title="function not covered" >  borrar(</span>id: ID, context?: HttpContext): Observable&lt;OpenpanelApiResponse&lt;any&gt;&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.delete&lt;any&gt;(`${this.endpoint}/${id}`, undefined, undefined, context);</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -526,7 +538,7 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-22T07:08:54.025Z
+                at 2026-01-23T10:19:19.860Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

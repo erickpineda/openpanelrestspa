@@ -100,12 +100,18 @@ export class EditarPaginaComponent implements OnInit {
     if (this.entradaForm.invalid) return;
     const usuario = await this.facade.getUsuarioSesion();
     ent.idUsuarioEditado = usuario?.idUsuario ?? null;
-    this.facade.actualizarEntrada(this.idEntrada, ent).subscribe(() => {
-      this.toastService.showSuccess(
-        'La página se ha actualizado correctamente.',
-        'Página actualizada'
-      );
-      this.router.navigateByUrl('/admin/control/paginas');
+    this.facade.actualizarEntrada(this.idEntrada, ent).subscribe({
+      next: () => {
+        this.toastService.showSuccess(
+          'La página se ha actualizado correctamente.',
+          'Página actualizada'
+        );
+        this.router.navigateByUrl('/admin/control/paginas');
+      },
+      error: (error) => {
+        console.error('Error actualizando página:', error);
+        this.toastService.showError('Error al actualizar la página.', 'Error');
+      },
     });
   }
 

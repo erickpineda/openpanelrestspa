@@ -11,6 +11,8 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { GlobalErrorHandlerService } from '../errors/global-error/global-error-handler.service';
 import { LoggerService } from '../services/logger.service';
+import { SKIP_GLOBAL_ERROR_HANDLING } from './skip-global-error.token';
+export { SKIP_GLOBAL_ERROR_HANDLING };
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
@@ -32,8 +34,13 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         this.log.info('🔍 [INTERCEPTOR] Error capturado:', httpError);
 
-        // El GlobalErrorHandlerService se encargará de mostrar la notificación
-        this.errorHandler.handleError(httpError);
+        // Verificar si se debe saltar el manejo global
+        if (request.context.get(SKIP_GLOBAL_ERROR_HANDLING)) {
+          this.log.info('⏩ [INTERCEPTOR] Saltando manejo global de error por contexto');
+        } else {
+          // El GlobalErrorHandlerService se encargará de mostrar la notificación
+          this.errorHandler.handleError(httpError);
+        }
 
         // Propagar el error para que los componentes puedan manejarlo también
         return throwError(() => httpError);

@@ -4,7 +4,7 @@ import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/
 import { CrudService } from './crud.service';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { OPConstants } from '../../shared/constants/op-global.constants';
-import { NetworkInterceptor } from '../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../interceptor/network.interceptor';
 
 class TestCrudService extends CrudService<any, string> {
   protected override endpoint = '/things';
@@ -56,7 +56,7 @@ describe('CrudService base behaviors', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/things'));
     expect(req.request.method).toBe('GET');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [] } });
   });
 

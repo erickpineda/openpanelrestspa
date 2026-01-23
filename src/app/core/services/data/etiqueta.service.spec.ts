@@ -4,7 +4,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { EtiquetaService } from './etiqueta.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 
 describe('EtiquetaService request shapes', () => {
   let service: EtiquetaService;
@@ -52,7 +52,7 @@ describe('EtiquetaService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/etiquetas/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ result: { success: true }, data: {} });
   });
 

@@ -66,7 +66,8 @@ export class ValidationEntradaFormsService {
       password: [initial?.password || ''],
       privado: [!!initial?.privado],
       permitirComentario: [initial?.permitirComentario ?? true],
-      imagenDestacada: [initial?.imagenDestacada ?? null],
+      imagenDestacada: [null],
+      imagenDestacadaUuid: [initial?.imagenDestacadaUuid ?? null],
       fechaPublicacion: [initial?.fechaPublicacion || null],
       fechaEdicion: [initial?.fechaEdicion || null],
       fechaPublicacionProgramada: [

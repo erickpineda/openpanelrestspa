@@ -13,6 +13,8 @@ import { ToastService } from '@app/core/services/ui/toast.service';
 import { UsuarioFormComponent } from '../form/usuario-form.component';
 import { Rol } from '@app/core/models/rol.model';
 import { TranslationService } from '@app/core/services/translation.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '@app/core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-editar-usuario',
@@ -73,7 +75,8 @@ export class EditarUsuarioComponent implements OnChanges {
       // Ensure ID is there
       usuarioData.idUsuario = this.usuario.idUsuario;
 
-      this.usuarioService.actualizarParcial(this.usuario.idUsuario, usuarioData).subscribe({
+      const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+      this.usuarioService.actualizarParcial(this.usuario.idUsuario, usuarioData, context).subscribe({
         next: () => {
           this.loading = false;
           this.toastService.showSuccess(

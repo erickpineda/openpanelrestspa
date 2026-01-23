@@ -1,4 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '@app/core/interceptor/skip-global-error.token';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -234,7 +236,8 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
       return;
     }
     this.cargando = true;
-    const obs = this.categoriaService.borrarPorCodigo(this.categoriaToDelete.codigo);
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
+    const obs = this.categoriaService.borrarPorCodigo(this.categoriaToDelete.codigo, context);
     obs
       .pipe(
         takeUntil(this.destroy$),
@@ -247,11 +250,13 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
         next: () => {
           this.showDeleteModal = false;
           this.categoriaToDelete = null;
+          this.toastService.showSuccess('Categoría eliminada correctamente', 'Éxito');
           this.obtenerListaCategorias();
         },
         error: (err: any) => {
           this.log.error('categorias borrar', err);
           this.errorMsg = 'Error al borrar la categoría';
+          this.toastService.showError('Error al borrar la categoría', 'Error');
           this.showDeleteModal = false;
           this.categoriaToDelete = null;
         },

@@ -14,6 +14,8 @@ import { OpenpanelApiResponse } from '@app/core/models/openpanel-api-response.mo
 import { LoggerService } from '@app/core/services/logger.service';
 import { TranslationService } from '@app/core/services/translation.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '@core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-listado-comentarios',
@@ -307,8 +309,9 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     if (!this.comentarioToDelete?.idComentario) return;
 
     this.cargando = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.comentarioService
-      .borrar(this.comentarioToDelete.idComentario)
+      .borrar(this.comentarioToDelete.idComentario, context)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {

@@ -8,6 +8,8 @@ import { ToastService } from '../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../core/services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SearchUtilService } from '../../../core/services/utils/search-util.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../core/interceptor/skip-global-error.token';
 
 @Component({
   selector: 'app-etiquetas-list',
@@ -196,8 +198,9 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
     }
     this.loading = true;
     this.searchForm.disable({ emitEvent: false });
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.etiquetasService
-      .borrarPorCodigo(this.etiquetaToDelete.codigo)
+      .borrarPorCodigo(this.etiquetaToDelete.codigo, context)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

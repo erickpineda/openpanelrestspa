@@ -6,12 +6,14 @@ import {
   Output,
   SimpleChanges,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { UntypedFormGroup } from '@angular/forms';
 import { Entrada } from '@app/core/models/entrada.model';
 import { Categoria } from '@app/core/models/categoria.model';
 import { parseAllowedDate } from '@shared/utils/date-utils';
+import { FileStorageService } from '@app/core/services/file-storage.service';
 
 @Component({
   selector: 'app-previa-entrada',
@@ -42,7 +44,11 @@ export class PreviaEntradaComponent implements OnChanges {
   estadoIcon: string = '';
   estadoColor: string = '';
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(
+    private sanitizer: DomSanitizer,
+    private fileStorage: FileStorageService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['form'] || changes['entrada'] || changes['categoriasMeta']) {
@@ -62,8 +68,22 @@ export class PreviaEntradaComponent implements OnChanges {
     if (this.form && this.form.get('imagenDestacada')) {
       const val = this.form.get('imagenDestacada')?.value;
       this.imagenMostrar = typeof val === 'string' ? val : null;
-    } else if (this.entrada && this.entrada.imagenDestacada) {
-      this.imagenMostrar = this.entrada.imagenDestacada;
+    } else if ((this.entrada as any)?.imagenDestacada) {
+      this.imagenMostrar = (this.entrada as any).imagenDestacada;
+    } else if (this.entrada?.imagenDestacadaUuid) {
+      this.fileStorage.obtenerDatosFichero(this.entrada.imagenDestacadaUuid).subscribe({
+        next: (res) => {
+          if (res?.contenido) {
+            const mime = res.tipo || 'image/jpeg';
+            this.imagenMostrar = `data:${mime};base64,${res.contenido}`;
+            this.cdr.markForCheck();
+          }
+        },
+        error: () => {
+          this.imagenMostrar = null;
+          this.cdr.markForCheck();
+        },
+      });
     } else {
       this.imagenMostrar = null;
     }

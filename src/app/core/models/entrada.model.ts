@@ -24,7 +24,7 @@ export class Entrada {
   estadoEntrada: EstadoEntrada = new EstadoEntrada();
   fechaPublicacionProgramada: Date = new Date();
   permitirComentario: boolean = true;
-  imagenDestacada: string = '';
+  imagenDestacadaUuid?: string;
   votos: number = 0;
   cantidadComentarios: number = 0;
   categorias: Categoria[] = [];
@@ -58,7 +58,7 @@ export interface Entrada {
   estadoEntrada: EstadoEntrada;
   fechaPublicacionProgramada: Date;
   permitirComentario: boolean;
-  imagenDestacada: string;
+  imagenDestacadaUuid?: string;
   votos: number;
   cantidadComentarios: number;
 

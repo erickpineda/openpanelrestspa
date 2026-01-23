@@ -258,6 +258,7 @@
                       size="sm"
                       class="position-absolute top-0 end-0 m-2 shadow-sm rounded-circle"
                       (click)="onQuitarImagen()"
+                      [disabled]="!form.enabled"
                       [cTooltip]="'ADMIN.ENTRIES.TOOLTIP.REMOVE_IMAGE' | translate"
                     >
                       <svg cIcon name="cilTrash"></svg>
@@ -293,6 +294,7 @@
                       type="button"
                       class="w-100"
                       (click)="onQuitarImagen()"
+                      [disabled]="!form.enabled"
                     >
                       <svg cIcon name="cilTrash" class="me-2"></svg>
                       {{ 'COMMON.REMOVE' | translate }}
@@ -473,18 +475,19 @@
                       </div>
                       <div class="d-flex flex-column gap-2">
                         @for (c of categorias; track c.codigo) {
-                          <c-form-check>
-                            <input
-                              cFormCheckInput
-                              type="checkbox"
-                              [id]="'cat-' + c.codigo"
-                              [checked]="hasCategoria(c)"
-                              (change)="onCategoriaToggle(c, $any($event.target).checked)"
-                            />
-                            <label cFormCheckLabel [for]="'cat-' + c.codigo" class="small">
-                              {{ c.nombre }}
-                            </label>
-                          </c-form-check>
+                        <c-form-check>
+                          <input
+                            cFormCheckInput
+                            type="checkbox"
+                            [id]="'cat-' + c.codigo"
+                            [checked]="hasCategoria(c)"
+                            (change)="onCategoriaToggle(c, $any($event.target).checked)"
+                            [disabled]="!form.enabled"
+                          />
+                          <label cFormCheckLabel [for]="'cat-' + c.codigo" class="small">
+                            {{ c.nombre }}
+                          </label>
+                        </c-form-check>
                         }
                       </div>
                     } @else {
