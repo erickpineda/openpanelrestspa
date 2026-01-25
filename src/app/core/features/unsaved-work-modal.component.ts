@@ -55,7 +55,8 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
         const hasUnsavedWork = this.unsavedWorkService.hasUnsavedWork();
         const hasTemporaryData = this.temporaryStorage.hasAnyTemporaryData();
 
-        const shouldShowModal = isCreateEntryActive || hasUnsavedWork || (isCreateEntryActive && hasTemporaryData);
+        // Exclusivo para pantalla de creación: solo mostrar si está activa
+        const shouldShowModal = isCreateEntryActive;
 
         // Caso 1: LOGOUT (Remote) con allowSave
         if (isLogoutWithSave && data.origin === 'remote') {
@@ -133,9 +134,8 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
   startSaveProcess(): void {
     this.saveInProgress = true;
 
-    // Disparar evento para que los componentes guarden
-    const saveEvent = new CustomEvent(OPConstants.Events.SAVE_UNSAVED_WORK);
-    window.dispatchEvent(saveEvent);
+    const saveTempEvent = new CustomEvent(OPConstants.Events.SAVE_FORM_DATA);
+    window.dispatchEvent(saveTempEvent);
 
     // Esperar un poco para que se complete el guardado temporal
     setTimeout(() => {

@@ -3,7 +3,7 @@ import { Etiqueta } from '../../models/etiqueta.model';
 import { CrudService } from '../../_utils/crud.service';
 import { Observable } from 'rxjs';
 import { HttpContext } from '@angular/common/http';
-import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER, SKIP_GLOBAL_NOTIFY } from '../../interceptor/network.interceptor';
 import { OPConstants } from 'src/app/shared/constants/op-global.constants';
 
 export interface AsociacionEtiquetaDTO {
@@ -41,7 +41,9 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
-    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext()
+      .set(SKIP_GLOBAL_LOADER, true)
+      .set(SKIP_GLOBAL_NOTIFY, true);
     return this.post<any>(
       OPConstants.Methods.ETIQUETAS.BUSCAR,
       payload,

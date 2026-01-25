@@ -162,6 +162,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
       // ✅ MODIFICADO: Siempre mostrar notificación múltiple, incluso con una sola entrada
       this.showGlobalRecoveryNotification = true;
+      this.tasksCount = this.temporaryEntriesCount;
+      this.cdr.markForCheck();
     }
   }
 

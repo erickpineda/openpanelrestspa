@@ -164,6 +164,11 @@ export class SessionManagerService {
     const hasUnsaved = this.unsavedWorkService.hasUnsavedWork();
     const hasUnsavedBackup = this.checkUnsavedWorkBackup();
 
+    if (payload.origin === 'remote' && payload.allowSave) {
+      this.sessionExpiredSubject.next(payload);
+      return;
+    }
+
     if ((hasUnsaved || hasUnsavedBackup) && payload.allowSave) {
       // Emitimos para que el componente UI muestre modal de "guardar antes de salir"
       this.sessionExpiredSubject.next(payload);

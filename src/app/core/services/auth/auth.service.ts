@@ -110,17 +110,10 @@ export class AuthService {
 
   // Forzar logout local (limpia storage, notifica sync y actualiza estado)
   public forceLogoutDueToExpiredToken(): void {
+    // En vez de redirigir de inmediato, emitimos evento de expiración
+    // para permitir que pantallas críticas (crear entrada) guarden trabajo temporal.
     try {
-      this.tokenStorage.signOut();
-      this.userSubject.next(null);
-      // Notifica a otras pestañas que se ha hecho logout
-      this.authSync.notifyLogout();
-      // Disparar evento para que UI reaccione si hace falta
-      window.dispatchEvent(new Event(OPConstants.Events.AUTH_STATE_CHANGED));
-    } finally {
-      // Redirigir al login con recarga completa (evita problemas de estado parcial)
-      // Ajusta la ruta si tu login no está en '/login'
-      window.location.href = '/login';
-    }
+      this.sessionManager.notifySessionExpired();
+    } catch {}
   }
 }

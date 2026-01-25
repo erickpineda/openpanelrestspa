@@ -14,9 +14,12 @@ import { LoadingService } from '../services/ui/loading.service';
 import { ToastService } from '../services/ui/toast.service';
 import { LoggerService } from '../services/logger.service';
 import { Router } from '@angular/router';
+import { SessionManagerService } from '../services/auth/session-manager.service';
 
 // Token para saltar el loading global
 export const SKIP_GLOBAL_LOADER = new HttpContextToken<boolean>(() => false);
+// Token para saltar las notificaciones globales del interceptor
+export const SKIP_GLOBAL_NOTIFY = new HttpContextToken<boolean>(() => false);
 
 @Injectable()
 export class NetworkInterceptor implements HttpInterceptor {
@@ -27,7 +30,8 @@ export class NetworkInterceptor implements HttpInterceptor {
     private loadingService: LoadingService,
     private toastService: ToastService,
     private log: LoggerService,
-    private router: Router
+    private router: Router,
+    private sessionManager: SessionManagerService
   ) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -53,7 +57,10 @@ export class NetworkInterceptor implements HttpInterceptor {
         }
       }),
       catchError((error: HttpErrorResponse) => {
-        this.handleNetworkError(error);
+        const skipNotify = request.context.get(SKIP_GLOBAL_NOTIFY) === true;
+        if (!skipNotify) {
+          this.handleNetworkError(error);
+        }
         return throwError(() => error);
       }),
       finalize(() => {
@@ -66,7 +73,12 @@ export class NetworkInterceptor implements HttpInterceptor {
 
   private handleNetworkError(error: HttpErrorResponse): void {
     // No notificar si es 401 (AuthInterceptor lo maneja)
-    if (error.status === 401) return;
+    if (error.status === 401) {
+      try {
+        this.sessionManager.notifySessionExpired();
+      } catch {}
+      return;
+    }
 
     // No notificar errores de validación (400) si tienen estructura de dominio
     // (estos los maneja el componente o GlobalErrorHandler)
