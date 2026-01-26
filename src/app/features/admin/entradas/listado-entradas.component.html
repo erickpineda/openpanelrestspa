@@ -16,6 +16,19 @@
             <svg cIcon name="cilPrint" class="me-1"></svg>
             {{ 'ADMIN.ENTRIES.PRINT' | translate }}
           </button>
+          <c-dropdown variant="btn-group">
+            <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+              <svg cIcon name="cilSortAlphaDown" class="me-1"></svg>
+              Ordenar
+            </button>
+            <ul cDropdownMenu>
+              <li><button cDropdownItem (click)="ordenar('fechaPublicacion', 'DESC')">Más recientes</button></li>
+              <li><button cDropdownItem (click)="ordenar('fechaPublicacion', 'ASC')">Más antiguos</button></li>
+              <li><hr cDropdownDivider></li>
+              <li><button cDropdownItem (click)="ordenar('titulo', 'ASC')">Título (A-Z)</button></li>
+              <li><button cDropdownItem (click)="ordenar('titulo', 'DESC')">Título (Z-A)</button></li>
+            </ul>
+          </c-dropdown>
           <app-entradas-pendientes></app-entradas-pendientes>
           <button cButton color="primary" size="sm" routerLink="crear" class="shadow-sm">
             <svg cIcon name="cilPlus" class="me-1"></svg>

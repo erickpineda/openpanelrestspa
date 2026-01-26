@@ -200,6 +200,11 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     this.visible = true;
     this.cdr.markForCheck();
   }
+
+  ordenar(field: string, direction: 'ASC' | 'DESC'): void {
+    this.stateService.setSort(field, direction).subscribe();
+  }
+
   confirmarBorrado(): void {
     if (this.entradaABorrar) {
       this.stateService.deleteEntrada(this.entradaABorrar.idEntrada).subscribe({

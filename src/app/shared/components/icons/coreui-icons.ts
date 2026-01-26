@@ -140,10 +140,14 @@ import {
   cilFindInPage,
   cilPhone,
   cilGlobeAlt,
-  cilLanguage
+  cilLanguage,
+  cilSortAlphaDown,
+  cilSortAlphaUp
 } from '@coreui/icons';
 
 export const iconSubset = {
+  cilSortAlphaDown,
+  cilSortAlphaUp,
   cilThumbUp,
   cilAsterisk,
   cibCcAmex,

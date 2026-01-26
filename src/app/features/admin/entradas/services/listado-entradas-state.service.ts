@@ -35,6 +35,8 @@ export interface ListState {
   allEntradasClientCache: Entrada[];
   isServerPaging: boolean;
   lastSearchParams: SearchParams | null;
+  sortField?: string;
+  sortDirection?: 'ASC' | 'DESC';
 }
 
 const INITIAL_STATE: ListState = {
@@ -48,6 +50,8 @@ const INITIAL_STATE: ListState = {
   allEntradasClientCache: [],
   isServerPaging: true,
   lastSearchParams: null,
+  sortField: undefined,
+  sortDirection: undefined,
 };
 
 @Injectable({
@@ -71,6 +75,21 @@ export class ListadoEntradasStateService {
     private entradaService: EntradaService,
     private log: LoggerService
   ) {}
+
+  setSort(field: string, direction: 'ASC' | 'DESC'): Observable<void> {
+    const current = this.state.value;
+    if (current.sortField !== field || current.sortDirection !== direction) {
+      this.updateState({ sortField: field, sortDirection: direction });
+      if (!current.isServerPaging && current.allEntradasClientCache.length > 0) {
+        this.sortClientCache();
+        this.applyClientPaging(current.allEntradasClientCache, 0, current.pageSize);
+        return of(void 0);
+      } else {
+        return this.reloadCurrentPage();
+      }
+    }
+    return of(void 0);
+  }
 
   setPageSize(size: number): Observable<void> {
     const current = this.state.value;
@@ -201,8 +220,37 @@ export class ListadoEntradasStateService {
         totalPages,
         isServerPaging: false,
       });
-      this.applyClientPaging(elementos, pageRequest, pageSize);
+      // Sort if needed before applying paging
+      if (this.state.value.sortField) {
+        this.sortClientCache();
+      }
+      this.applyClientPaging(this.state.value.allEntradasClientCache, pageRequest, pageSize);
     }
+  }
+
+  private sortClientCache() {
+    const { sortField, sortDirection, allEntradasClientCache } = this.state.value;
+    if (!sortField || !allEntradasClientCache.length) return;
+
+    allEntradasClientCache.sort((a: any, b: any) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+
+      // Handle nulls/undefined
+      if (valA === valB) return 0;
+      if (valA === null || valA === undefined) return 1; // Nulls last
+      if (valB === null || valB === undefined) return -1;
+
+      // Handle dates or strings
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return sortDirection === 'ASC' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'ASC' ? 1 : -1;
+      return 0;
+    });
   }
 
   private applyClientPaging(allEntries: Entrada[], page: number, pageSize: number) {

@@ -100,8 +100,20 @@ export class EntradaService extends CrudService<Entrada, number> {
     return this.get(`${this.endpoint}/estadosEntradas`);
   }
 
-  buscar(searchRequest: any, page: number, size: number): Observable<any> {
-    const params = { pageNo: page.toString(), pageSize: size.toString() };
+  buscar(
+    searchRequest: any,
+    page: number,
+    size: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<any> {
+    let params: any = { pageNo: page.toString(), pageSize: size.toString() };
+    if (sortField) {
+      params['sortBy'] = sortField;
+    }
+    if (sortDirection) {
+      params['sortDirection'] = sortDirection;
+    }
     return this.post(`${this.endpoint}/buscar`, searchRequest, params);
   }
 
