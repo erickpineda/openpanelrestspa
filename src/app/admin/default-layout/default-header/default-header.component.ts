@@ -6,7 +6,10 @@ import { Subscription } from 'rxjs';
 
 import { ClassToggleService, HeaderComponent } from '@coreui/angular';
 import { LanguageService, Language } from '../../../core/services/language.service';
+import { TranslationService } from '../../../core/services/translation.service';
 import { SessionManagerService } from '../../../core/services/auth/session-manager.service';
+import { TemporaryStorageService, TemporaryEntry } from '../../../core/services/ui/temporary-storage.service';
+import { NotificationItem } from '../../../shared/components/notifications-dropdown/notifications-dropdown.component';
 
 interface IBreadcrumb {
   label: string;
@@ -52,6 +55,10 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
 
   public userMenuOpen = false;
   currentLang: Language = 'es';
+  notifications: NotificationItem[] = [];
+  unreadNotifications = 0;
+  private translationsSubscription: Subscription | undefined;
+  private tempEntriesSubscription: Subscription | undefined;
 
   get messagesCount(): number {
     return this.userCounts?.messages ?? this.newMessages.length;
@@ -71,7 +78,9 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     private router: Router,
     private route: ActivatedRoute,
     public languageService: LanguageService,
-    private sessionManager: SessionManagerService
+    private sessionManager: SessionManagerService,
+    private temporaryStorage: TemporaryStorageService,
+    private translationService: TranslationService
   ) {
     super();
   }
@@ -87,6 +96,15 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
       this.currentLang = lang;
     });
 
+    this.buildNotifications();
+    this.tempEntriesSubscription = this.temporaryStorage.entriesChanged$.subscribe(() => {
+      this.buildNotifications();
+    });
+
+    this.translationsSubscription = this.translationService.translations$.subscribe(() => {
+      this.buildNotifications();
+    });
+
     this.routerSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
@@ -98,10 +116,56 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
+    if (this.translationsSubscription) {
+      this.translationsSubscription.unsubscribe();
+    }
+    if (this.tempEntriesSubscription) {
+      this.tempEntriesSubscription.unsubscribe();
+    }
   }
 
   toggleLanguage(): void {
     this.languageService.toggleLanguage();
+  }
+
+  private buildNotifications(): void {
+    const temps: TemporaryEntry[] = this.temporaryStorage.getAllTemporaryEntries();
+    const tempItems: NotificationItem[] = temps.map((t) => ({
+      id: t.id,
+      type: 'temporary',
+      title: t.title || this.translationService.instant('ADMIN.RECOVERY.GLOBAL_TITLE'),
+      message: this.translationService.instant('ADMIN.RECOVERY.STATUS'),
+      timestamp: Date.parse(t.timestamp) || Date.now(),
+      unread: !this.temporaryStorage.isRecoveryNotificationShown(t.id),
+    }));
+    this.notifications = tempItems;
+    this.unreadNotifications = tempItems.filter((x) => x.unread).length;
+  }
+
+  onMarkAllRead(): void {
+    this.notifications.forEach((n) => {
+      if (n.type === 'temporary') {
+        this.temporaryStorage.setRecoveryNotificationShown(n.id);
+      }
+    });
+    this.notifications = this.notifications.map((n) => ({ ...n, unread: false }));
+    this.unreadNotifications = 0;
+  }
+
+  onItemMarkedRead(id: string): void {
+    this.temporaryStorage.setRecoveryNotificationShown(id);
+    this.notifications = this.notifications.filter((n) => n.id !== id);
+    this.unreadNotifications = this.notifications.filter((x) => x.unread).length;
+  }
+
+  onItemDismissed(id: string): void {
+    // Para temporales, descartar equivale a limpiar la entrada temporal
+    this.temporaryStorage.removeTemporaryEntry(id);
+    this.buildNotifications();
+  }
+
+  onViewAllNotifications(): void {
+    this.router.navigate(['/admin/control/entradas/entradas-temporales']);
   }
 
   private createBreadcrumbs(

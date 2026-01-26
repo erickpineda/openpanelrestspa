@@ -6,7 +6,12 @@
     "ADMIN": "Admin",
     "LOGIN": "Login",
     "LOGOUT": "Logout",
-    "PROFILE": "Profile"
+    "PROFILE": "Profile",
+    "NOTIFICATIONS": "Notifications",
+    "NO_NOTIFICATIONS": "No notifications",
+    "MARK_ALL_READ": "Mark all as read",
+    "MARK_READ": "Mark as read",
+    "VIEW_ALL": "View all"
   },
   "COMMON": {
     "LOADING": "Loading...",
@@ -318,11 +323,16 @@
       "CLEAR_ALL_TITLE": "Clear All"
     },
     "RECOVERY": {
-      "GLOBAL_TITLE": "Unsaved Entries",
+      "GLOBAL_TITLE": "Drafts",
       "GLOBAL_MESSAGE": "You have {{ count }} unsaved entry(ies) from previous sessions",
+      "PENDING_MSG": "“{{title}}” pending recovery",
+      "GENERIC_MSG": "You have unsaved temporary data",
+      "STATUS": "Recovery pending",
       "GO_TO_LIST": "View Temporary Entries",
       "IGNORE_ALL": "Later",
-      "DISCARD_ALL": "Discard All"
+      "DISCARD_ALL": "Discard All",
+      "CONFIRM_TITLE": "Confirm Recovery",
+      "CONFIRM_MESSAGE": "Are you sure you want to recover this draft? Previously saved data will be loaded."
     },
     "CATEGORIES": {
       "TITLE": "Categories",

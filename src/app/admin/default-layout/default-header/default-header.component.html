@@ -42,11 +42,17 @@
         </a>
       </c-nav-item>
 
-      <c-nav-item>
-        <a routerLink="./" cNavLink aria-label="Notificaciones">
-          <svg cIcon name="cilBell" size="lg"></svg>
-        </a>
-      </c-nav-item>
+      <app-notifications-dropdown
+        [items]="notifications"
+        [unreadCount]="unreadNotifications"
+        [labelHeader]="'HEADER.NOTIFICATIONS' | translate"
+        [labelMarkAll]="'HEADER.MARK_ALL_READ' | translate"
+        [labelViewAll]="'HEADER.VIEW_ALL' | translate"
+        (markAllRead)="onMarkAllRead()"
+        (itemMarkedRead)="onItemMarkedRead($event)"
+        (itemDismissed)="onItemDismissed($event)"
+        (viewAll)="onViewAllNotifications()"
+      ></app-notifications-dropdown>
       <c-nav-item>
         <a routerLink="./" cNavLink aria-label="Tareas">
           <svg cIcon name="cilList" size="lg"></svg>

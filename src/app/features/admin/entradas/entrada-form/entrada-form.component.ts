@@ -57,6 +57,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   editorLoading = false;
   resetConfirmVisible = false;
   modalSeleccionVisible = false;
+  confirmRecoveryVisible = false;
 
   private editorInstance: any;
   private contenidoStatusSub?: Subscription;
@@ -156,7 +157,11 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     );
 
     this.checkNavigationState();
-    this.stateService.checkForTemporaryData(this.entrada?.idEntrada);
+    // La recuperación automática se ha deshabilitado a petición del usuario.
+    // Solo se mostrará si viene explícitamente desde "Entradas Temporales".
+    // if (!this.isEditMode) {
+    //   this.stateService.checkForTemporaryData(this.entrada?.idEntrada);
+    // }
   }
 
   ngOnDestroy(): void {
@@ -445,21 +450,17 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   }
 
   private checkNavigationState(): void {
-    // Usar history.state es más fiable en ngOnInit que router.getCurrentNavigation()
     const state = history.state;
 
     if (state?.temporaryEntry && state?.recoverData) {
-      this.log.info('🔄 Recibiendo entrada temporal desde navegación:', state.temporaryEntry);
-
-      // Usamos setTimeout para asegurar que la directiva appUnsavedWork haya inicializado
-      // y capturado el estado "vacío" del formulario antes de parchearlo.
       setTimeout(() => {
-        this.stateService.setRecoveringFromNavigation(true);
-
-        this.recoverTemporaryData(state.temporaryEntry.formData);
-
-        // No eliminamos la entrada aquí para permitir que el usuario decida si guardar o no
-        // Solo limpiamos el estado de navegación
+        this.stateService.updateState({
+          showRecoveryNotification: true,
+          temporaryData: state.temporaryEntry,
+          isRecoveringFromNavigation: true,
+          currentTemporaryEntryId: state.temporaryEntry.id,
+        });
+        this.cdRef.markForCheck();
         this.router.navigate([], {
           replaceUrl: true,
           state: { ...state, temporaryEntry: null, recoverData: null },
@@ -473,7 +474,19 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       this.stateService.dismissRecoveryNotification();
       return;
     }
-    
+    // Mostrar modal de confirmación antes de recuperar
+    this.confirmRecoveryVisible = true;
+    this.cdRef.markForCheck();
+  }
+
+  onConfirmRecovery(): void {
+    this.confirmRecoveryVisible = false;
+
+    if (!this.temporaryData) {
+      this.stateService.dismissRecoveryNotification();
+      return;
+    }
+
     // Almacenar referencias antes de ocultar la notificación
     const dataToRecover = this.temporaryData.formData;
     const entryId = this.temporaryData.id;
@@ -485,6 +498,8 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     // Esto evita bloqueos de UI o problemas de renderizado ("pantalla seminegra")
     setTimeout(() => {
       this.recoverTemporaryData(dataToRecover);
+      // No eliminamos la entrada temporal inmediatamente, esperamos a que el usuario guarde
+      // Pero si queremos seguir la lógica anterior:
       this.temporaryStorage.removeTemporaryEntry(entryId);
       this.cdRef.markForCheck();
     }, 100);

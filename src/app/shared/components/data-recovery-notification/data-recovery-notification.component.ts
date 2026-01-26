@@ -12,8 +12,16 @@ export class DataRecoveryNotificationComponent {
   @Input() recoverText = 'Recuperar';
   @Input() ignoreText = 'Ignorar';
   @Input() discardText = 'Descartar';
+  @Input() visible = true;
 
   @Output() onRecover = new EventEmitter<void>();
   @Output() onIgnore = new EventEmitter<void>();
   @Output() onDiscard = new EventEmitter<void>();
+
+  handleVisibleChange(next: boolean): void {
+    if (!next) {
+      this.onIgnore.emit();
+    }
+    this.visible = next;
+  }
 }

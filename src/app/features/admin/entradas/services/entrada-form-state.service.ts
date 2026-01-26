@@ -91,6 +91,14 @@ export class EntradaFormStateService {
     this.updateState({ currentTemporaryEntryId: null });
   }
 
+  setTemporaryData(entry: any): void {
+    this.updateState({
+      showRecoveryNotification: true,
+      temporaryData: entry,
+      currentTemporaryEntryId: entry.id,
+    });
+  }
+
   checkForTemporaryData(currentEntradaId?: number | null): void {
     const entries = this.temporaryStorage.getTemporaryEntriesByType('entrada');
     if (!entries || entries.length === 0) {

@@ -636,6 +636,18 @@
         (confirm)="onConfirmReset()"
         (cancel)="onCancelReset()"
       ></app-confirmation-modal>
+
+      <!-- Recovery Confirmation Modal -->
+      <app-confirmation-modal
+        [visible]="confirmRecoveryVisible"
+        [title]="'ADMIN.RECOVERY.CONFIRM_TITLE' | translate"
+        [message]="'ADMIN.RECOVERY.CONFIRM_MESSAGE' | translate"
+        [type]="'info'"
+        [confirmText]="'ADMIN.TEMP_ENTRIES.RECOVER' | translate"
+        [cancelText]="'COMMON.CANCEL' | translate"
+        (visibleChange)="confirmRecoveryVisible = $event"
+        (confirm)="onConfirmRecovery()"
+      ></app-confirmation-modal>
     </c-card-body>
   </c-card>
   <!-- Image Selector Modal -->

@@ -28,6 +28,7 @@ import { SharedWidgetsModule } from './shared-widgets.module';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { AllowedDatePipe } from './pipes/allowed-date.pipe';
 import { UnsavedWorkDirective } from '../core/directives/unsaved-work.directive';
+import { NotificationsDropdownComponent } from './components/notifications-dropdown/notifications-dropdown.component';
 
 @NgModule({
   imports: [
@@ -60,6 +61,7 @@ import { UnsavedWorkDirective } from '../core/directives/unsaved-work.directive'
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
     UnsavedWorkDirective,
+    NotificationsDropdownComponent,
   ],
   exports: [
     CommonModule,
@@ -88,6 +90,7 @@ import { UnsavedWorkDirective } from '../core/directives/unsaved-work.directive'
     TranslatePipe,
     AllowedDatePipe,
     UnsavedWorkDirective,
+    NotificationsDropdownComponent,
   ],
 })
 export class SharedOPModule {}

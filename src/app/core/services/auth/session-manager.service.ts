@@ -10,6 +10,7 @@ import { PostLoginRedirectService } from './post-login-redirect.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
 import { OPSessionConstants } from '../../../shared/constants/op-session.constants';
 import { UiAnomalyMonitorService } from '../ui/ui-anomaly-monitor.service';
+import { AuthSyncService } from './auth-sync.service';
 
 export interface SessionExpirationData {
   type: 'LOGOUT' | 'SESSION_EXPIRED' | 'ANOTHER_DEVICE';
@@ -36,7 +37,8 @@ export class SessionManagerService {
     private router: Router,
     private log: LoggerService,
     private postLoginRedirect: PostLoginRedirectService,
-    private uiMonitor: UiAnomalyMonitorService
+    private uiMonitor: UiAnomalyMonitorService,
+    private authSync: AuthSyncService
   ) {
     this.log.info('SessionManagerService: Instancia creada');
     this.setupListeners();
@@ -142,8 +144,27 @@ export class SessionManagerService {
       timestamp: Date.now(),
       isManual: false,
     };
-    // Emitimos directamente para que SessionExpiredComponent lo capture
+    const loc = window.location.pathname + window.location.hash;
+    const isOnAdmin = loc.includes('/admin');
+    if (!isOnAdmin) {
+      this.performLogout(payload);
+      try {
+        this.authSync.notifyLogout({
+          originTabId: this.tokenStorage.getOrCreateTabId(),
+          reason: OPSessionConstants.TYPE_SESSION_EXPIRED,
+          isManual: false,
+        });
+      } catch {}
+      return;
+    }
     this.sessionExpiredSubject.next(payload);
+    try {
+      this.authSync.notifyLogout({
+        originTabId: this.tokenStorage.getOrCreateTabId(),
+        reason: OPSessionConstants.TYPE_SESSION_EXPIRED,
+        isManual: false,
+      });
+    } catch {}
   }
 
   public logout(): void {
@@ -155,18 +176,33 @@ export class SessionManagerService {
       timestamp: Date.now(),
       isManual: true,
     };
+    try {
+      this.authSync.notifyLogout({
+        originTabId: this.tokenStorage.getOrCreateTabId(),
+        isManual: true,
+      });
+    } catch {}
     this.handleLogout(payload);
   }
 
   private handleLogout(payload: SessionExpirationData): void {
     this.log.info('SessionManager: manejando logout', payload);
 
+    const loc = window.location.pathname + window.location.hash;
+    const isOnAdmin = loc.includes('/admin');
+    if (!isOnAdmin) {
+      this.performLogout(payload);
+      return;
+    }
+
     const hasUnsaved = this.unsavedWorkService.hasUnsavedWork();
     const hasUnsavedBackup = this.checkUnsavedWorkBackup();
 
-    if (payload.origin === 'remote' && payload.allowSave) {
-      this.sessionExpiredSubject.next(payload);
-      return;
+    if (payload.origin === 'remote') {
+      if (payload.allowSave) {
+        this.sessionExpiredSubject.next(payload);
+        return;
+      }
     }
 
     if ((hasUnsaved || hasUnsavedBackup) && payload.allowSave) {
@@ -235,11 +271,19 @@ export class SessionManagerService {
 
     // Redirección según tipo y origen
     if (data.type === 'LOGOUT' && data.origin === 'remote') {
-      this.log.info(
-        'SessionManager: Logout remoto (manual o auto) -> Emitir evento para modal y NO redirigir'
-      );
-      this.sessionExpiredSubject.next(data);
-      return;
+      const loc = window.location.pathname + window.location.hash;
+      const isOnAdmin = loc.includes('/admin');
+      if (!isOnAdmin) {
+        this.log.info('SessionManager: Logout remoto en zona pública -> Redirigir a Home');
+        this.router.navigate(['/'], { replaceUrl: true });
+        return;
+      } else {
+        this.log.info(
+          'SessionManager: Logout remoto (manual o auto) en admin -> Emitir evento para modal'
+        );
+        this.sessionExpiredSubject.next(data);
+        return;
+      }
     }
 
     if (data.type === 'LOGOUT' && data.origin === 'local') {

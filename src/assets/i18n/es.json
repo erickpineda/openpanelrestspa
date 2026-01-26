@@ -6,7 +6,12 @@
     "ADMIN": "Admin",
     "LOGIN": "Iniciar Sesión",
     "LOGOUT": "Cerrar Sesión",
-    "PROFILE": "Perfil"
+    "PROFILE": "Perfil",
+    "NOTIFICATIONS": "Notificaciones",
+    "NO_NOTIFICATIONS": "No hay notificaciones",
+    "MARK_ALL_READ": "Marcar todas como leídas",
+    "MARK_READ": "Marcar como leída",
+    "VIEW_ALL": "Ver todas"
   },
   "COMMON": {
     "LOADING": "Cargando...",
@@ -321,11 +326,16 @@
       "CLEAR_ALL_TITLE": "Limpiar Todo"
     },
     "RECOVERY": {
-      "GLOBAL_TITLE": "Entradas no guardadas",
+      "GLOBAL_TITLE": "Borradores",
       "GLOBAL_MESSAGE": "Tienes {{ count }} entrada(s) no guardada(s) de sesiones anteriores",
+      "PENDING_MSG": "“{{title}}” pendiente de recuperación",
+      "GENERIC_MSG": "Tienes datos temporales sin recuperar",
+      "STATUS": "Recuperación pendiente",
       "GO_TO_LIST": "Ver entradas temporales",
       "IGNORE_ALL": "Más tarde",
-      "DISCARD_ALL": "Descartar todas"
+      "DISCARD_ALL": "Descartar todas",
+      "CONFIRM_TITLE": "Confirmar Recuperación",
+      "CONFIRM_MESSAGE": "¿Estás seguro de que deseas recuperar este borrador? Se cargarán los datos guardados previamente."
     },
     "CATEGORIES": {
       "TITLE": "Categorías",

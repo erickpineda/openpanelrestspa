@@ -1,8 +1,9 @@
 <c-alert
   color="warning"
   dismissible
-  visible="true"
-  class="shadow-sm mb-0 w-100 h-100 d-flex flex-column justify-content-center"
+  [(visible)]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  class="shadow-sm mb-0 w-100 d-flex flex-column justify-content-center"
   role="alert"
 >
   <div class="d-flex align-items-start w-100">

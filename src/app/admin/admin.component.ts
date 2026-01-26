@@ -22,6 +22,7 @@ import { TokenStorageService } from '../core/services/auth/token-storage.service
 import { AuthService } from '../core/services/auth/auth.service';
 import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
 import { UserRole } from '../shared/types/navigation.types';
+import { OPStorageConstants } from '@app/shared/constants/op-storage.constants';
 
 // ... imports existentes
 
@@ -143,15 +144,35 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.sidebarState.updateNavItems(this.navItems, this.router.url);
     this.router.events.subscribe(() => {
       this.sidebarState.updateNavItems(this.navItems, this.router.url);
+      this.checkForTemporaryData();
+      this.cdr.markForCheck();
+    });
+
+    // Escuchar cambios en localStorage para actualizar el banner inmediatamente
+    window.addEventListener('storage', this.onStorageChange as any);
+
+    this.temporaryStorage.entriesChanged$.subscribe(() => {
+      this.checkForTemporaryData();
       this.cdr.markForCheck();
     });
   }
 
   ngAfterViewInit(): void {
     try {
+      this.checkForTemporaryData();
       this.cdr.detectChanges();
     } catch {}
   }
+
+  private onStorageChange = (ev: StorageEvent) => {
+    try {
+      if (!ev || !ev.key) return;
+      if (ev.key === OPStorageConstants.TEMPORARY_ENTRIES_KEY) {
+        this.checkForTemporaryData();
+        this.cdr.markForCheck();
+      }
+    } catch {}
+  };
 
   private checkForTemporaryData(): void {
     const temporaryEntries = this.temporaryStorage.getAllTemporaryEntries();
@@ -160,10 +181,13 @@ export class AdminComponent implements OnInit, AfterViewInit {
     if (this.temporaryEntriesCount > 0) {
       this.log.info('📥 Datos temporales encontrados en admin:', temporaryEntries);
 
-      // ✅ MODIFICADO: Siempre mostrar notificación múltiple, incluso con una sola entrada
-      this.showGlobalRecoveryNotification = true;
+      // Estrategia nueva: usar dropdown de notificaciones en el header, sin banner global
+      this.showGlobalRecoveryNotification = false;
       this.tasksCount = this.temporaryEntriesCount;
       this.cdr.markForCheck();
+    } else {
+      this.showGlobalRecoveryNotification = false;
+      this.tasksCount = 0;
     }
   }
 
@@ -312,5 +336,11 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.sidebarNarrow = !this.sidebarNarrow;
     this.writeSidebarNarrowToStorage(this.sidebarNarrow);
     this.cdr.markForCheck();
+  }
+
+  ngOnDestroy(): void {
+    try {
+      window.removeEventListener('storage', this.onStorageChange as any);
+    } catch {}
   }
 }

@@ -1,5 +1,6 @@
 // temporary-storage.service.ts
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 import { LoggerService } from '../logger.service';
 import { OPStorageConstants } from '@app/shared/constants/op-storage.constants';
 
@@ -18,6 +19,8 @@ export interface TemporaryEntry {
 export class TemporaryStorageService {
   private readonly STORAGE_KEY = OPStorageConstants.TEMPORARY_ENTRIES_KEY;
   private readonly NOTIFICATION_SHOWN_KEY = OPStorageConstants.RECOVERY_NOTIFICATION_SHOWN_KEY;
+  private entriesChangedSubject = new Subject<void>();
+  public entriesChanged$ = this.entriesChangedSubject.asObservable();
 
   constructor(private log: LoggerService) {}
 
@@ -42,6 +45,7 @@ export class TemporaryStorageService {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
 
     this.log.info('💾 Entrada temporal guardada:', id, newEntry.title);
+    this.entriesChangedSubject.next();
     return id;
   }
 
@@ -66,11 +70,13 @@ export class TemporaryStorageService {
     delete entries[id];
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
     this.log.info('🧹 Entrada temporal removida:', id);
+    this.entriesChangedSubject.next();
   }
 
   clearAllTemporaryEntries(): void {
     localStorage.removeItem(this.STORAGE_KEY);
     this.log.info('🧹 Todas las entradas temporales limpiadas');
+    this.entriesChangedSubject.next();
   }
 
   // ✅ NUEVO: Limpiar entradas por tipo
@@ -83,6 +89,7 @@ export class TemporaryStorageService {
     });
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
     this.log.info(`🧹 Entradas temporales de tipo ${formType} limpiadas`);
+    this.entriesChangedSubject.next();
   }
 
   private getTemporaryEntries(): { [key: string]: TemporaryEntry } {
