@@ -1,0 +1,21 @@
+<div class="input-group">
+  <span class="input-group-text bg-white border-end-0 text-secondary">
+    <svg cIcon name="cilSearch"></svg>
+  </span>
+  <input
+    type="text"
+    cFormControl
+    [placeholder]="placeholder"
+    [(ngModel)]="term"
+    (ngModelChange)="setTerm($event)"
+    (keyup.enter)="search()"
+  />
+  <button cButton color="secondary" variant="ghost" size="sm" (click)="clear()">
+    <svg cIcon name="cilX" class="me-1"></svg>
+    Limpiar
+  </button>
+  <button cButton color="primary" size="sm" (click)="search()">
+    <svg cIcon name="cilSearch" class="me-1"></svg>
+    Buscar
+  </button>
+</div>

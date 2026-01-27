@@ -168,6 +168,8 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Evento que se emite en cada cambio de filtro (si autoTrigger está activo).
    */
   @Output() filtroChanged = new EventEmitter<any>();
+  @Output() onSearch = new EventEmitter<SingleFilter | AdvancedSearchParams>();
+  @Output() onClear = new EventEmitter<void>();
 
   // =================== Propiedades públicas ===================
   /**
@@ -346,6 +348,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
       operacion: this.operacionSeleccionada,
       valor: this.valorBusqueda,
     });
+    this.onClear.emit();
   }
 
   /**
@@ -424,6 +427,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
             dataOption: this.dataOption,
           };
     this.filtroSeleccionado.emit(payload);
+    this.onSearch.emit(payload);
   }
 
   /**
