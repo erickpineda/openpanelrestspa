@@ -200,7 +200,7 @@ export class EntradasListFacadeService {
     }));
     return this.stateService.searchAdvanced(
       { dataOption: payload.dataOption, searchCriteriaList: mapped },
-      page
+      page ?? 0
     );
   }
 }
