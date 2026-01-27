@@ -24,7 +24,7 @@ export interface SearchParams {
   operation: string;
   dataOption: string;
 }
-import { AdvancedSearchParams } from '@app/shared/models/search.models';
+import { AdvancedSearchParams, DataOption } from '@app/shared/models/search.models';
 
 export interface ListState {
   entradas: EntradaVM[];
@@ -40,7 +40,7 @@ export interface ListState {
   sortField?: string;
   sortDirection?: 'ASC' | 'DESC';
   lastAdvancedCriteriaList?: AdvancedSearchParams['searchCriteriaList'] | null;
-  lastAdvancedDataOption?: string | null;
+  lastAdvancedDataOption?: DataOption | null;
 }
 
 const INITIAL_STATE: ListState = {

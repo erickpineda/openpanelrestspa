@@ -6,6 +6,7 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { DatePipe, AsyncPipe } from '@angular/common';
 import { SharedOPModule } from '@shared/shared.module';
 import { SharedCoreUiModule } from '@shared/shared-coreui.module';
+import { SharedSearchModule } from '@shared/search/search.module';
 import { MediaSharedModule } from '@features/admin/contenido/media-shared.module';
 import { EntradasRoutingModule } from './entradas-routing.module';
 import { EntradasSharedModule } from './entradas-shared.module';
@@ -26,6 +27,7 @@ import { TemporaryEntriesManagerComponent } from './entradas-temporales/temporar
     SharedOPModule,
     CKEditorModule,
     SharedCoreUiModule,
+    SharedSearchModule,
     MediaSharedModule,
     DatePipe,
     AsyncPipe,

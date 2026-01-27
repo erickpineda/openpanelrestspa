@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { SharedOPModule } from '@shared/shared.module';
 import { SharedCoreUiModule } from '@shared/shared-coreui.module';
+import { SharedSearchModule } from '@shared/search/search.module';
 import {
   EntradasFilterComponent,
   EntradasTableComponent,
@@ -32,6 +33,7 @@ import { MediaSharedModule } from '@features/admin/contenido/media-shared.module
     SharedOPModule,
     SharedCoreUiModule,
     SharedWidgetsModule,
+    SharedSearchModule,
     MediaSharedModule,
   ],
   exports: [
@@ -41,6 +43,7 @@ import { MediaSharedModule } from '@features/admin/contenido/media-shared.module
     SharedOPModule,
     SharedCoreUiModule,
     SharedWidgetsModule,
+    SharedSearchModule,
     EntradasFilterComponent,
     EntradasTableComponent,
     PreviaEntradaComponent,
