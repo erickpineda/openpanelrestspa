@@ -30,17 +30,45 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
     return this.post<any>(OPConstants.Methods.ETIQUETAS.CREAR, etiqueta, undefined, undefined, context);
   }
 
-  buscar(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
+  override listarPaginaSinGlobalLoader(
+    pageNo: number,
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<any> {
+    const params: any = {};
+    params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
+    params[this.pageSizeParam] = pageSize.toString();
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    return this.get<any>(this.endpoint, params, undefined, context);
+  }
+
+  buscar(payload: any, pageNo?: number, pageSize?: number, sortField?: string, sortDirection?: string): Observable<any> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     return this.post<any>(OPConstants.Methods.ETIQUETAS.BUSCAR, payload, params);
   }
 
-  buscarSinGlobalLoader(payload: any, pageNo?: number, pageSize?: number): Observable<any> {
+  buscarSinGlobalLoader(
+    payload: any,
+    pageNo?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<any> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     const context = new HttpContext()
       .set(SKIP_GLOBAL_LOADER, true)
       .set(SKIP_GLOBAL_NOTIFY, true);

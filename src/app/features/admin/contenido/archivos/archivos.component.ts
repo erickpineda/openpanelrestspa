@@ -30,6 +30,9 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   uploading = false;
   private destroy$ = new Subject<void>();
 
+  currentSortField: string | null = null;
+  currentSortDirection: string | null = null;
+
   // Patrón de toolbar/búsqueda
   showAdvanced: boolean = false;
   basicSearchText: string = '';
@@ -92,8 +95,58 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     this.fechaDesde = '';
     this.fechaHasta = '';
     this.basicSearchText = '';
+    this.currentSortField = null;
+    this.currentSortDirection = null;
     this.pageNo = 0;
     this.load();
+  }
+
+  ordenar(field: string, direction: string) {
+    if (this.currentSortField === field && this.currentSortDirection === direction) {
+      this.currentSortField = null;
+      this.currentSortDirection = null;
+    } else {
+      this.currentSortField = field;
+      this.currentSortDirection = direction;
+    }
+    this.pageNo = 0;
+    this.load();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.currentSortField !== field) {
+      return 'cilSortAlphaDown';
+    }
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaDown' : 'cilSortAlphaUp';
+  }
+
+  isSortActive(field: string, direction: string): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
+  }
+
+  private sortItems(items: MediaItem[]) {
+    if (!items || items.length === 0) return;
+    if (!this.currentSortField || !this.currentSortDirection) return;
+
+    const direction = this.currentSortDirection === 'ASC' ? 1 : -1;
+    const field = this.currentSortField;
+
+    items.sort((a: any, b: any) => {
+      let valA = a[field];
+      let valB = b[field];
+
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+
+      if (typeof valA === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return -1 * direction;
+      if (valA > valB) return 1 * direction;
+      return 0;
+    });
   }
 
   onPageChange(page: number): void {

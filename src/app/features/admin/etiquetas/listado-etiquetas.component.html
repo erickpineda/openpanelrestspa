@@ -73,6 +73,30 @@
             </button>
           </div>
 
+          <div>
+            <c-dropdown variant="btn-group">
+              <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+                <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
+                Ordenar
+              </button>
+              <ul cDropdownMenu>
+                <li><button cDropdownItem (click)="ordenar('nombre', 'ASC')">
+                  <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 fw-bold">✓</span> Nombre (A-Z)
+                </button></li>
+                <li><button cDropdownItem (click)="ordenar('nombre', 'DESC')">
+                  <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 fw-bold">✓</span> Nombre (Z-A)
+                </button></li>
+                <li><hr cDropdownDivider></li>
+                <li><button cDropdownItem (click)="ordenar('frecuencia', 'DESC')">
+                  <span *ngIf="isSortActive('frecuencia', 'DESC')" class="me-1 fw-bold">✓</span> Más usadas
+                </button></li>
+                <li><button cDropdownItem (click)="ordenar('frecuencia', 'ASC')">
+                  <span *ngIf="isSortActive('frecuencia', 'ASC')" class="me-1 fw-bold">✓</span> Menos usadas
+                </button></li>
+              </ul>
+            </c-dropdown>
+          </div>
+          
           <!-- Selector de Registros por Página -->
           <div>
             <label class="form-label small text-muted fw-bold mb-1">{{

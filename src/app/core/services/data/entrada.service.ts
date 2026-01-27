@@ -61,8 +61,23 @@ export class EntradaService extends CrudService<Entrada, number> {
   /**
    * Busca entradas de forma segura
    */
-  buscarSafe(searchRequest: any, page: number, size: number): Observable<BuscarResponse> {
-    const params = { pageNo: page.toString(), pageSize: size.toString() };
+  buscarSafe(
+    searchRequest: any,
+    page: number,
+    size: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<BuscarResponse> {
+    let params: any = { pageNo: page.toString(), pageSize: size.toString() };
+    if (sortField) {
+      params['sortBy'] = sortField;
+      // Also add standard spring sort
+      params['sort'] = `${sortField},${sortDirection || 'ASC'}`;
+    }
+    if (sortDirection) {
+      params['sortDirection'] = sortDirection;
+    }
+
     const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.safePostData<BuscarResponse>(
       `${this.endpoint}/buscar`,

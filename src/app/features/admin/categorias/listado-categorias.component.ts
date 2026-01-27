@@ -40,6 +40,11 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
   visibleModalEditar = false;
   categoriaSeleccionada?: Categoria;
   categoryStats: Map<string, number> = new Map();
+
+  // Sorting
+  currentSortField?: string;
+  currentSortDirection?: 'ASC' | 'DESC';
+
   constructor(
     private router: Router,
     private categoriaService: CategoriaService,
@@ -163,11 +168,64 @@ export class ListadoCategoriasComponent implements OnInit, OnDestroy {
       this.totalElements = this.allCategorias.length;
       this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.pageSize));
       if (this.pageNo >= this.totalPages) this.pageNo = Math.max(0, this.totalPages - 1);
+      this.sortClientCache();
       this.applyPaging();
     }
     this.applyStats();
     this.cdr.detectChanges();
   }
+
+  ordenar(field: string, direction: 'ASC' | 'DESC'): void {
+    if (this.currentSortField !== field || this.currentSortDirection !== direction) {
+      this.currentSortField = field;
+      this.currentSortDirection = direction;
+
+      // Si tenemos todos los datos en local (allCategorias tiene algo),
+      // podemos ordenar en cliente y repaginar.
+      // Si estamos en modo "server paging" (allCategorias vacío),
+      // disparamos la búsqueda de nuevo.
+      if (this.allCategorias.length > 0) {
+        this.sortClientCache();
+        this.applyPaging();
+      } else {
+        this.obtenerListaCategorias();
+      }
+    }
+  }
+
+  private sortClientCache() {
+    if (!this.currentSortField || !this.allCategorias.length) return;
+
+    this.allCategorias.sort((a: any, b: any) => {
+      let valA = a[this.currentSortField!];
+      let valB = b[this.currentSortField!];
+
+      // Manejo de nulos/undefined
+      if (valA === valB) return 0;
+      if (valA === null || valA === undefined) return 1; // Nulos al final
+      if (valB === null || valB === undefined) return -1;
+
+      // Si son strings, comparar en minúsculas
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return this.currentSortDirection === 'ASC' ? -1 : 1;
+      if (valA > valB) return this.currentSortDirection === 'ASC' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  getSortIcon(): string {
+    if (!this.currentSortField) return 'cilSortAlphaDown';
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaDown' : 'cilSortAlphaUp';
+  }
+
+  isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
+  }
+
   private applyPaging(): void {
     if (this.allCategorias.length > 0) {
       const start = this.pageNo * this.pageSize;

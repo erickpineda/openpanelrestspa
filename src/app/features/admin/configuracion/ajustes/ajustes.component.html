@@ -66,6 +66,36 @@
                 {{ showAdvanced ? ('COMMON.ACTIVE' | translate) : '' }}</span
               >
             </button>
+            <c-dropdown variant="btn-group" class="ms-2">
+              <button cButton cDropdownToggle color="secondary" variant="outline" [cTooltip]="'Ordenar listado'" [disabled]="loading">
+                <svg cIcon [name]="getSortIcon('categoria')" class="me-1"></svg>
+              </button>
+              <ul cDropdownMenu>
+                <li><h6 cDropdownHeader class="dropdown-header small">Por Categoría</h6></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('categoria', 'ASC')">
+                    <span *ngIf="isSortActive('categoria', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('categoria', 'DESC')">
+                    <span *ngIf="isSortActive('categoria', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                  </button>
+                </li>
+                <li><hr cDropdownDivider></li>
+                <li><h6 cDropdownHeader class="dropdown-header small">Por Clave</h6></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('clave', 'ASC')">
+                    <span *ngIf="isSortActive('clave', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('clave', 'DESC')">
+                    <span *ngIf="isSortActive('clave', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                  </button>
+                </li>
+              </ul>
+            </c-dropdown>
           </div>
           <div class="d-flex align-items-end ms-auto">
             <label class="form-label small text-muted fw-bold mb-1 me-2">{{

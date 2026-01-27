@@ -10,7 +10,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Observable, Subject, catchError, finalize, throwError } from 'rxjs';
+import { Observable, Subject, catchError, finalize, throwError, takeUntil } from 'rxjs';
 import { EntradaCatalogService } from '@app/core/services/data/entrada-catalog.service';
 import { Entrada } from '@app/core/models/entrada.model';
 import { EntradaService } from '@app/core/services/data/entrada.service';
@@ -46,6 +46,8 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   entradaABorrar: Entrada | null = null;
   previewEntrada?: Entrada;
   previewVisible: boolean = false;
+  currentSortField?: string;
+  currentSortDirection?: 'ASC' | 'DESC';
   @ViewChild('previewCloseBtn') previewCloseBtn?: ElementRef<HTMLButtonElement>;
   private destroy$ = new Subject<void>();
   private readonly boundaryId = 'listado-entradas-main';
@@ -64,6 +66,12 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     private datePipe: DatePipe
   ) {}
   ngOnInit(): void {
+    this.stateService.state$.pipe(takeUntil(this.destroy$)).subscribe((state) => {
+      this.currentSortField = state.sortField;
+      this.currentSortDirection = state.sortDirection;
+      this.cdr.markForCheck();
+    });
+
     this.cargarDefinicionesBuscador();
     this.busquedaService.iniciarBusqueda(
       (term, page) => this.realizarBusquedaEntradas(term, page),
@@ -203,6 +211,15 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   ordenar(field: string, direction: 'ASC' | 'DESC'): void {
     this.stateService.setSort(field, direction).subscribe();
+  }
+
+  getSortIcon(): string {
+    if (!this.currentSortField) return 'cilSortAlphaDown';
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaUp' : 'cilSortAlphaDown';
+  }
+
+  isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
   }
 
   confirmarBorrado(): void {

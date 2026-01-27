@@ -44,6 +44,10 @@ export class RolesListComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   rolToDelete: Rol | null = null;
 
+  // Sorting
+  currentSortField?: string | null;
+  currentSortDirection?: string | null;
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -201,8 +205,64 @@ export class RolesListComponent implements OnInit, OnDestroy {
   reset(): void {
     this.filtroNombre = '';
     this.basicSearchText = '';
+    this.currentSortField = null;
+    this.currentSortDirection = null;
     this.pageNo = 0;
     this.load();
+  }
+
+  ordenar(field: string, direction: string) {
+    if (this.currentSortField === field && this.currentSortDirection === direction) {
+      this.currentSortField = null;
+      this.currentSortDirection = null;
+    } else {
+      this.currentSortField = field;
+      this.currentSortDirection = direction;
+    }
+    this.pageNo = 0;
+    this.load();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.currentSortField !== field) {
+      return 'cilSortAlphaDown'; // Default icon
+    }
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaDown' : 'cilSortAlphaUp';
+  }
+
+  isSortActive(field: string, direction: string): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
+  }
+
+  private sortClientCache() {
+    if (!this.roles || this.roles.length === 0) return;
+    if (!this.currentSortField || !this.currentSortDirection) return;
+
+    const direction = this.currentSortDirection === 'ASC' ? 1 : -1;
+    const field = this.currentSortField;
+
+    this.roles.sort((a: any, b: any) => {
+      let valA = a[field];
+      let valB = b[field];
+
+      if (field.includes('.')) {
+        const parts = field.split('.');
+        valA = parts.reduce((obj: any, key: string) => obj?.[key], a);
+        valB = parts.reduce((obj: any, key: string) => obj?.[key], b);
+      }
+
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+
+      if (typeof valA === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return -1 * direction;
+      if (valA > valB) return 1 * direction;
+      return 0;
+    });
   }
 
   onPageSizeChange(size: number): void {

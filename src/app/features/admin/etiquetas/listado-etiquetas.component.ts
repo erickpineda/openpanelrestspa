@@ -36,6 +36,8 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
   showCreateModal = false;
   showEditModal = false;
   selectedEtiqueta: Etiqueta | null = null;
+  currentSortField?: string;
+  currentSortDirection?: 'ASC' | 'DESC';
 
   private destroy$ = new Subject<void>();
 
@@ -271,12 +273,58 @@ export class EtiquetasListComponent implements OnInit, OnDestroy {
       this.totalItems = total;
       this.totalPages = Math.max(1, Math.ceil(total / this.pageSize));
       if (this.pageNo >= this.totalPages) this.pageNo = Math.max(0, this.totalPages - 1);
+      this.sortClientCache();
       const start = this.pageNo * this.pageSize;
       const end = start + this.pageSize;
       this.pagedEtiquetas = this.allEtiquetas.slice(start, end);
       this.numberOfElements = this.pagedEtiquetas.length;
       this.etiquetas = this.pagedEtiquetas;
     }
+  }
+
+  ordenar(field: string, direction: 'ASC' | 'DESC'): void {
+    if (this.currentSortField !== field || this.currentSortDirection !== direction) {
+      this.currentSortField = field;
+      this.currentSortDirection = direction;
+
+      if (this.allEtiquetas.length > 0) {
+        this.sortClientCache();
+        this.applyPaging();
+      } else {
+        this.loadEtiquetas();
+      }
+    }
+  }
+
+  private sortClientCache() {
+    if (!this.currentSortField || !this.allEtiquetas.length) return;
+
+    this.allEtiquetas.sort((a: any, b: any) => {
+      let valA = a[this.currentSortField!];
+      let valB = b[this.currentSortField!];
+
+      if (valA === valB) return 0;
+      if (valA === null || valA === undefined) return 1;
+      if (valB === null || valB === undefined) return -1;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return this.currentSortDirection === 'ASC' ? -1 : 1;
+      if (valA > valB) return this.currentSortDirection === 'ASC' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  getSortIcon(): string {
+    if (!this.currentSortField) return 'cilSortAlphaDown';
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaDown' : 'cilSortAlphaUp';
+  }
+
+  isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
   }
 
   private applyPaging(): void {

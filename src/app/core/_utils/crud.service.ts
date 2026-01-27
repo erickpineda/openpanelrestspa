@@ -120,20 +120,33 @@ export abstract class CrudService<T, ID> extends BaseService {
 
   // ✅ MÉTODOS ORIGINALES (mantener exactamente como están)
 
-  public listarPagina(pageNo?: number, pageSize?: number): Observable<OpenpanelApiResponse<any>> {
+  public listarPagina(
+    pageNo?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<OpenpanelApiResponse<any>> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     return this.get<any>(this.endpoint, params);
   }
 
   public listarPaginaSinGlobalLoader(
     pageNo: number,
-    pageSize: number
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
   ): Observable<OpenpanelApiResponse<any>> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.get<any>(this.endpoint, params, undefined, context);
   }

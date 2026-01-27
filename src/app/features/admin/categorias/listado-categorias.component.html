@@ -73,6 +73,36 @@
             </button>
           </div>
           <div>
+            <c-dropdown variant="btn-group">
+              <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+                <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
+                Ordenar
+              </button>
+              <ul cDropdownMenu>
+                <li><button cDropdownItem (click)="ordenar('id', 'DESC')">
+                  <span *ngIf="isSortActive('id', 'DESC')" class="me-1 fw-bold">✓</span> Más recientes (ID)
+                </button></li>
+                <li><button cDropdownItem (click)="ordenar('id', 'ASC')">
+                  <span *ngIf="isSortActive('id', 'ASC')" class="me-1 fw-bold">✓</span> Más antiguos (ID)
+                </button></li>
+                <li><hr cDropdownDivider></li>
+                <li><button cDropdownItem (click)="ordenar('nombre', 'ASC')">
+                  <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 fw-bold">✓</span> Nombre (A-Z)
+                </button></li>
+                <li><button cDropdownItem (click)="ordenar('nombre', 'DESC')">
+                  <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 fw-bold">✓</span> Nombre (Z-A)
+                </button></li>
+                <li><hr cDropdownDivider></li>
+                <li><button cDropdownItem (click)="ordenar('cantidadEntradas', 'DESC')">
+                  <span *ngIf="isSortActive('cantidadEntradas', 'DESC')" class="me-1 fw-bold">✓</span> Más usadas
+                </button></li>
+                <li><button cDropdownItem (click)="ordenar('cantidadEntradas', 'ASC')">
+                  <span *ngIf="isSortActive('cantidadEntradas', 'ASC')" class="me-1 fw-bold">✓</span> Menos usadas
+                </button></li>
+              </ul>
+            </c-dropdown>
+          </div>
+          <div>
             <label class="form-label small text-muted fw-bold mb-1">{{
               'COMMON.SHOW' | translate
             }}</label>

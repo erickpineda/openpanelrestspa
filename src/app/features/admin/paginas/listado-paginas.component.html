@@ -12,6 +12,27 @@
           </small>
         </div>
         <div class="d-flex gap-2">
+          <c-dropdown variant="btn-group">
+            <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+              <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
+              Ordenar
+            </button>
+            <ul cDropdownMenu>
+              <li><button cDropdownItem (click)="ordenar('fechaPublicacion', 'DESC')">
+                <span *ngIf="isSortActive('fechaPublicacion', 'DESC')" class="me-1 fw-bold">✓</span> Más recientes
+              </button></li>
+              <li><button cDropdownItem (click)="ordenar('fechaPublicacion', 'ASC')">
+                <span *ngIf="isSortActive('fechaPublicacion', 'ASC')" class="me-1 fw-bold">✓</span> Más antiguos
+              </button></li>
+              <li><hr cDropdownDivider></li>
+              <li><button cDropdownItem (click)="ordenar('titulo', 'ASC')">
+                <span *ngIf="isSortActive('titulo', 'ASC')" class="me-1 fw-bold">✓</span> Título (A-Z)
+              </button></li>
+              <li><button cDropdownItem (click)="ordenar('titulo', 'DESC')">
+                <span *ngIf="isSortActive('titulo', 'DESC')" class="me-1 fw-bold">✓</span> Título (Z-A)
+              </button></li>
+            </ul>
+          </c-dropdown>
           <button
             cButton
             color="secondary"

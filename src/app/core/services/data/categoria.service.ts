@@ -15,10 +15,19 @@ export class CategoriaService extends CrudService<Categoria, number> {
   protected endpoint = OPConstants.Methods.CATEGORIAS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
-  buscarSafe(searchRequest: any, pageNo: number, size: number): Observable<PaginaResponse> {
+  buscarSafe(
+    searchRequest: any,
+    pageNo: number,
+    size: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = size.toString();
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     const context = new HttpContext();
     return this.safePostData<PaginaResponse>(
       OPConstants.Methods.CATEGORIAS.BUSCAR,
@@ -34,11 +43,16 @@ export class CategoriaService extends CrudService<Categoria, number> {
   buscarSinGlobalLoader(
     searchRequest: any,
     pageNo: number,
-    pageSize: number
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
   ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.safePostData<PaginaResponse>(
       OPConstants.Methods.CATEGORIAS.BUSCAR,
@@ -49,6 +63,22 @@ export class CategoriaService extends CrudService<Categoria, number> {
       'categorias.buscar',
       context
     );
+  }
+
+  override listarPaginaSinGlobalLoader(
+    pageNo: number,
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<any> {
+    const params: any = {};
+    params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
+    params[this.pageSizeParam] = pageSize.toString();
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    return this.get<any>(this.endpoint, params, undefined, context);
   }
 
   obtenerPorCodigo(codigo: string, context?: HttpContext): Observable<any> {

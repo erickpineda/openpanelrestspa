@@ -68,6 +68,8 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
   // Preview State
   previewEntrada?: Entrada;
   previewVisible: boolean = false;
+  currentSortField?: string;
+  currentSortDirection?: 'ASC' | 'DESC';
   @ViewChild('previewCloseBtn') previewCloseBtn?: ElementRef<HTMLButtonElement>;
 
   // System
@@ -209,7 +211,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     };
 
     const pageToUse = page !== undefined ? page : this.currentPage;
-    return this.entradaService.buscarSafe(searchRequest, pageToUse, this.pageSize).pipe(
+    return this.entradaService.buscarSafe(searchRequest, pageToUse, this.pageSize, this.currentSortField, this.currentSortDirection).pipe(
       takeUntil(this.destroy$),
       finalize(() => {
         this.cargandoTabla = false;
@@ -313,6 +315,52 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
   }> => {
     return this.entradaCatalogService.obtenerCatalogosEntrada();
   };
+
+  ordenar(field: string, direction: 'ASC' | 'DESC'): void {
+    if (this.currentSortField !== field || this.currentSortDirection !== direction) {
+      this.currentSortField = field;
+      this.currentSortDirection = direction;
+      
+      if (this.allEntradas.length > 0) {
+        this.sortClientCache();
+        this.applyPaging();
+      } else {
+        this.busquedaService.triggerBusqueda(this.valorBusqueda);
+      }
+    }
+  }
+
+  getSortIcon(): string {
+    if (!this.currentSortField) return 'cilSortAlphaDown';
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaUp' : 'cilSortAlphaDown';
+  }
+
+  isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
+  }
+
+  private sortClientCache() {
+    if (!this.currentSortField || !this.allEntradas.length) return;
+    this.allEntradas.sort((a: any, b: any) => {
+      let valA = a[this.currentSortField!];
+      let valB = b[this.currentSortField!];
+
+      // Handle nulls/undefined
+      if (valA === valB) return 0;
+      if (valA === null || valA === undefined) return 1; // Nulls last
+      if (valB === null || valB === undefined) return -1;
+
+      // Handle dates or strings
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return this.currentSortDirection === 'ASC' ? -1 : 1;
+      if (valA > valB) return this.currentSortDirection === 'ASC' ? 1 : -1;
+      return 0;
+    });
+  }
 
   // #endregion
 

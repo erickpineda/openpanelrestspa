@@ -203,7 +203,7 @@ export class ListadoEntradasStateService {
         data.totalPages || Math.ceil(totalElements / this.state.value.pageSize) || 1
       );
       this.updateState({
-        entradas: elementos,
+        entradas: this.sortElements(elementos, this.state.value.sortField, this.state.value.sortDirection),
         totalElements,
         totalPages,
         currentPage: pageRequest,
@@ -226,6 +226,30 @@ export class ListadoEntradasStateService {
       }
       this.applyClientPaging(this.state.value.allEntradasClientCache, pageRequest, pageSize);
     }
+  }
+
+  private sortElements(elements: Entrada[], sortField?: string, sortDirection?: 'ASC' | 'DESC'): Entrada[] {
+    if (!sortField || !elements.length) return elements;
+    
+    return [...elements].sort((a: any, b: any) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+
+      // Handle nulls/undefined
+      if (valA === valB) return 0;
+      if (valA === null || valA === undefined) return 1;
+      if (valB === null || valB === undefined) return -1;
+
+      // Handle dates or strings
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return sortDirection === 'ASC' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'ASC' ? 1 : -1;
+      return 0;
+    });
   }
 
   private sortClientCache() {

@@ -12,10 +12,19 @@ import { OPConstants } from '../../../shared/constants/op-global.constants';
 export class PrivilegioService extends CrudService<Privilegio, string> {
   protected override endpoint = '/privilegios';
 
-  buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<any> {
+  buscarSinGlobalLoader(
+    searchRequest: any,
+    pageNo: number,
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<any> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.post<any>(`${this.endpoint}/buscar`, searchRequest, params, undefined, context);
   }

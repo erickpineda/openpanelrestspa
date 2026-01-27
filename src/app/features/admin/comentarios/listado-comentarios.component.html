@@ -36,6 +36,8 @@
         [totalElements]="totalElements"
         [pageSize]="pageSize"
         [cargando]="cargando"
+        [currentSortField]="currentSortField"
+        [currentSortDirection]="currentSortDirection"
         (basicSearchChange)="onBasicSearchTextChange($event)"
         (toggleAdvanced)="toggleAdvanced()"
         (filtroUsuarioChange)="filtroUsuario = $event"
@@ -44,6 +46,7 @@
         (pageSizeChange)="onPageSizeChange($event)"
         (reset)="reset()"
         (search)="search()"
+        (sortChange)="ordenar($event)"
       ></app-comentarios-filter>
 
       <app-comentarios-table

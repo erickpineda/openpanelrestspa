@@ -34,6 +34,9 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
   editPrivilegio: Privilegio | null = null;
   isEditing = false;
 
+  currentSortField: string | null = null;
+  currentSortDirection: string | null = null;
+
   showDeleteModal = false;
   privilegioToDelete: Privilegio | null = null;
 
@@ -67,6 +70,9 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
       this.privilegios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
       this.numberOfElements = list.length;
+      if (this.currentSortField) {
+        this.sortClientCache();
+      }
     };
     const handleError = (err: any) => {
       this.error = 'Error cargando privilegios';
@@ -74,7 +80,12 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
     };
     if (!hasFilters) {
       this.privilegioService
-        .listarPaginaSinGlobalLoader(pageNo, this.pageSize)
+        .listarPaginaSinGlobalLoader(
+          pageNo,
+          this.pageSize,
+          this.currentSortField || undefined,
+          this.currentSortDirection || undefined
+        )
         .pipe(
           takeUntil(this.destroy$),
           finalize(() => {
@@ -93,7 +104,13 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
         });
       const payload = this.searchUtil.buildRequest('Privilegio', criteria, 'ALL');
       this.privilegioService
-        .buscarSinGlobalLoader(payload, pageNo, this.pageSize)
+        .buscarSinGlobalLoader(
+          payload,
+          pageNo,
+          this.pageSize,
+          this.currentSortField || undefined,
+          this.currentSortDirection || undefined
+        )
         .pipe(
           takeUntil(this.destroy$),
           finalize(() => {
@@ -126,8 +143,64 @@ export class PrivilegiosListComponent implements OnInit, OnDestroy {
   reset(): void {
     this.filtroNombre = '';
     this.basicSearchText = '';
+    this.currentSortField = null;
+    this.currentSortDirection = null;
     this.pageNo = 0;
     this.load();
+  }
+
+  ordenar(field: string, direction: string) {
+    if (this.currentSortField === field && this.currentSortDirection === direction) {
+      this.currentSortField = null;
+      this.currentSortDirection = null;
+    } else {
+      this.currentSortField = field;
+      this.currentSortDirection = direction;
+    }
+    this.pageNo = 0;
+    this.load();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.currentSortField !== field) {
+      return 'cilSortAlphaDown'; // Default icon
+    }
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaDown' : 'cilSortAlphaUp';
+  }
+
+  isSortActive(field: string, direction: string): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
+  }
+
+  private sortClientCache() {
+    if (!this.privilegios || this.privilegios.length === 0) return;
+    if (!this.currentSortField || !this.currentSortDirection) return;
+
+    const direction = this.currentSortDirection === 'ASC' ? 1 : -1;
+    const field = this.currentSortField;
+
+    this.privilegios.sort((a: any, b: any) => {
+      let valA = a[field];
+      let valB = b[field];
+
+      if (field.includes('.')) {
+        const parts = field.split('.');
+        valA = parts.reduce((obj: any, key: string) => obj?.[key], a);
+        valB = parts.reduce((obj: any, key: string) => obj?.[key], b);
+      }
+
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+
+      if (typeof valA === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return -1 * direction;
+      if (valA > valB) return 1 * direction;
+      return 0;
+    });
   }
 
   onPageSizeChange(size: number): void {

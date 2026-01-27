@@ -29,6 +29,10 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   pageSize = 10;
   totalElements = 0;
   numberOfElements = 0;
+  
+  currentSortField?: string;
+  currentSortDirection?: 'ASC' | 'DESC';
+
   showAdvanced = false;
   basicSearchText = '';
 
@@ -86,6 +90,10 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       this.usuarios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
       this.numberOfElements = list.length;
+      
+      if (this.currentSortField) {
+        this.sortClientCache();
+      }
     };
 
     const handleError = (err: any) => {
@@ -95,7 +103,12 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
     if (!hasFilters) {
       this.usuarioService
-        .listarPaginaSinGlobalLoader(pageNo, this.pageSize)
+        .listarPaginaSinGlobalLoader(
+          pageNo,
+          this.pageSize,
+          this.currentSortField,
+          this.currentSortDirection
+        )
         .pipe(
           takeUntil(this.destroy$),
           finalize(() => {
@@ -127,7 +140,13 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
       const payload = this.searchUtil.buildRequest('Usuario', criteria, 'ALL');
       this.usuarioService
-        .buscarSinGlobalLoader(payload, pageNo, this.pageSize)
+        .buscarSinGlobalLoader(
+          payload,
+          pageNo,
+          this.pageSize,
+          this.currentSortField,
+          this.currentSortDirection
+        )
         .pipe(
           takeUntil(this.destroy$),
           finalize(() => {
@@ -137,6 +156,53 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
         )
         .subscribe({ next: handleResponse, error: handleError });
     }
+  }
+
+  ordenar(field: string, direction: 'ASC' | 'DESC') {
+    this.currentSortField = field;
+    this.currentSortDirection = direction;
+    this.load();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.currentSortField !== field) return 'cilSortAlphaDown';
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaDown' : 'cilSortAlphaUp';
+  }
+
+  isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
+  }
+
+  private sortClientCache() {
+    if (!this.usuarios || this.usuarios.length === 0) return;
+    if (!this.currentSortField || !this.currentSortDirection) return;
+
+    const direction = this.currentSortDirection === 'ASC' ? 1 : -1;
+    const field = this.currentSortField;
+
+    this.usuarios.sort((a: any, b: any) => {
+      let valA = a[field];
+      let valB = b[field];
+
+      // Handle nested properties if needed (e.g. rol.nombre)
+      if (field.includes('.')) {
+        const parts = field.split('.');
+        valA = parts.reduce((obj: any, key: string) => obj?.[key], a);
+        valB = parts.reduce((obj: any, key: string) => obj?.[key], b);
+      }
+
+      if (valA == null) return 1; // nulls last
+      if (valB == null) return -1;
+
+      if (typeof valA === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return -1 * direction;
+      if (valA > valB) return 1 * direction;
+      return 0;
+    });
   }
 
   loadRoles(): void {

@@ -75,6 +75,36 @@
                 <svg cIcon name="cilFilter" class="me-1"></svg>
                 {{ 'COMMON.FILTERS' | translate }}
               </button>
+              <c-dropdown variant="btn-group" class="ms-2">
+                <button cButton cDropdownToggle color="secondary" variant="outline" [cTooltip]="'Ordenar listado'" [disabled]="loading">
+                  <svg cIcon [name]="getSortIcon('nombre')" class="me-1"></svg>
+                </button>
+                <ul cDropdownMenu>
+                  <li><h6 cDropdownHeader class="dropdown-header small">Por Nombre</h6></li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('nombre', 'ASC')">
+                      <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                    </button>
+                  </li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('nombre', 'DESC')">
+                      <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                    </button>
+                  </li>
+                  <li><hr cDropdownDivider></li>
+                  <li><h6 cDropdownHeader class="dropdown-header small">Por Código</h6></li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('codigo', 'ASC')">
+                      <span *ngIf="isSortActive('codigo', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                    </button>
+                  </li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('codigo', 'DESC')">
+                      <span *ngIf="isSortActive('codigo', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                    </button>
+                  </li>
+                </ul>
+              </c-dropdown>
             </div>
           </c-col>
         </c-row>

@@ -18,15 +18,43 @@
           </button>
           <c-dropdown variant="btn-group">
             <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
-              <svg cIcon name="cilSortAlphaDown" class="me-1"></svg>
+              <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
               Ordenar
             </button>
             <ul cDropdownMenu>
-              <li><button cDropdownItem (click)="ordenar('fechaPublicacion', 'DESC')">Más recientes</button></li>
-              <li><button cDropdownItem (click)="ordenar('fechaPublicacion', 'ASC')">Más antiguos</button></li>
+              <li>
+                <button cDropdownItem (click)="ordenar('fechaPublicacion', 'DESC')" [active]="isSortActive('fechaPublicacion', 'DESC')">
+                  <span class="d-flex justify-content-between align-items-center w-100">
+                    Más recientes
+                    <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('fechaPublicacion', 'DESC')"></svg>
+                  </span>
+                </button>
+              </li>
+              <li>
+                <button cDropdownItem (click)="ordenar('fechaPublicacion', 'ASC')" [active]="isSortActive('fechaPublicacion', 'ASC')">
+                  <span class="d-flex justify-content-between align-items-center w-100">
+                    Más antiguos
+                    <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('fechaPublicacion', 'ASC')"></svg>
+                  </span>
+                </button>
+              </li>
               <li><hr cDropdownDivider></li>
-              <li><button cDropdownItem (click)="ordenar('titulo', 'ASC')">Título (A-Z)</button></li>
-              <li><button cDropdownItem (click)="ordenar('titulo', 'DESC')">Título (Z-A)</button></li>
+              <li>
+                <button cDropdownItem (click)="ordenar('titulo', 'ASC')" [active]="isSortActive('titulo', 'ASC')">
+                  <span class="d-flex justify-content-between align-items-center w-100">
+                    Título (A-Z)
+                    <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('titulo', 'ASC')"></svg>
+                  </span>
+                </button>
+              </li>
+              <li>
+                <button cDropdownItem (click)="ordenar('titulo', 'DESC')" [active]="isSortActive('titulo', 'DESC')">
+                  <span class="d-flex justify-content-between align-items-center w-100">
+                    Título (Z-A)
+                    <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('titulo', 'DESC')"></svg>
+                  </span>
+                </button>
+              </li>
             </ul>
           </c-dropdown>
           <app-entradas-pendientes></app-entradas-pendientes>

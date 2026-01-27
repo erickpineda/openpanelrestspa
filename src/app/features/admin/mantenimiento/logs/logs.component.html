@@ -41,6 +41,36 @@
               >
                 <svg cIcon name="cilX" size="sm"></svg>
               </button>
+              <c-dropdown variant="btn-group" class="ms-2">
+                <button cButton cDropdownToggle color="secondary" variant="outline" [cTooltip]="'Ordenar listado'" [disabled]="loading">
+                  <svg cIcon [name]="getSortIcon('level')" class="me-1"></svg>
+                </button>
+                <ul cDropdownMenu>
+                  <li><h6 cDropdownHeader class="dropdown-header small">Por Nivel</h6></li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('level', 'ASC')">
+                      <span *ngIf="isSortActive('level', 'ASC')" class="me-1 text-success fw-bold">✓</span> Ascendente
+                    </button>
+                  </li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('level', 'DESC')">
+                      <span *ngIf="isSortActive('level', 'DESC')" class="me-1 text-success fw-bold">✓</span> Descendente
+                    </button>
+                  </li>
+                  <li><hr cDropdownDivider></li>
+                  <li><h6 cDropdownHeader class="dropdown-header small">Por Fecha</h6></li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('timestamp', 'ASC')">
+                      <span *ngIf="isSortActive('timestamp', 'ASC')" class="me-1 text-success fw-bold">✓</span> Más antiguos
+                    </button>
+                  </li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('timestamp', 'DESC')">
+                      <span *ngIf="isSortActive('timestamp', 'DESC')" class="me-1 text-success fw-bold">✓</span> Más recientes
+                    </button>
+                  </li>
+                </ul>
+              </c-dropdown>
             </div>
             <div class="d-flex align-items-end ms-auto gap-2">
               <button

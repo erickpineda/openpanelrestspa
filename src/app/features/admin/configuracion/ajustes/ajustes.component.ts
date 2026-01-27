@@ -41,6 +41,10 @@ export class AjustesComponent implements OnInit, OnDestroy {
   filteredAjustes: Ajustes[] = [];
   pagedAjustes: Ajustes[] = [];
 
+  // Sorting
+  currentSortField?: string;
+  currentSortDirection?: 'ASC' | 'DESC';
+
   constructor(
     private ajustesService: AjustesService,
     private fb: FormBuilder,
@@ -80,7 +84,6 @@ export class AjustesComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (list: Ajustes[]) => {
           this.ajustes = Array.isArray(list) ? list : [];
-          this.totalElements = this.ajustes.length;
           this.search();
         },
         error: (err) => {
@@ -210,8 +213,53 @@ export class AjustesComponent implements OnInit, OnDestroy {
       return mBasic && mCat && mClave;
     });
     this.totalElements = this.filteredAjustes.length;
+    
+    if (this.currentSortField) {
+      this.sortClientCache();
+    }
+
     this.pageNo = 0;
     this.updatePage();
+  }
+
+  ordenar(field: string, direction: 'ASC' | 'DESC') {
+    this.currentSortField = field;
+    this.currentSortDirection = direction;
+    this.search();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.currentSortField !== field) return 'cilSortAlphaDown';
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaDown' : 'cilSortAlphaUp';
+  }
+
+  isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
+  }
+
+  private sortClientCache() {
+    if (!this.filteredAjustes || this.filteredAjustes.length === 0) return;
+    if (!this.currentSortField || !this.currentSortDirection) return;
+
+    const direction = this.currentSortDirection === 'ASC' ? 1 : -1;
+    const field = this.currentSortField;
+
+    this.filteredAjustes.sort((a: any, b: any) => {
+      let valA = a[field];
+      let valB = b[field];
+
+      if (valA == null) return 1; // nulls last
+      if (valB == null) return -1;
+
+      if (typeof valA === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return -1 * direction;
+      if (valA > valB) return 1 * direction;
+      return 0;
+    });
   }
 
   reset(): void {

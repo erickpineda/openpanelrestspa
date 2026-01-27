@@ -47,6 +47,9 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
   visibleModalEditar = false;
   comentarioSeleccionado?: Comentario;
 
+  currentSortField?: string;
+  currentSortDirection?: 'ASC' | 'DESC';
+
   estaVacio: boolean = false;
   cargando: boolean = false;
   private destroy$ = new Subject<void>();
@@ -344,5 +347,12 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
   cancelDelete(): void {
     this.showDeleteModal = false;
     this.comentarioToDelete = null;
+  }
+
+  ordenar(data: { field: string; direction: 'ASC' | 'DESC' }) {
+    this.currentSortField = data.field;
+    this.currentSortDirection = data.direction;
+    this.pageNo = 0;
+    this.obtenerListaComentarios();
   }
 }

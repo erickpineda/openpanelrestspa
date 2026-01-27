@@ -19,6 +19,11 @@ export class LogsComponent implements OnInit, OnDestroy {
   pageSize = 10;
   totalPages = 0;
   totalElements = 0;
+
+  // Sorting
+  currentSortField?: string;
+  currentSortDirection?: 'ASC' | 'DESC';
+
   private sub?: Subscription;
   private interval: any;
 
@@ -55,6 +60,22 @@ export class LogsComponent implements OnInit, OnDestroy {
     this.pageNo = 1;
     this.applyFilter();
   }
+
+  ordenar(field: string, direction: 'ASC' | 'DESC') {
+    this.currentSortField = field;
+    this.currentSortDirection = direction;
+    this.applyFilter();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.currentSortField !== field) return 'cilSortAlphaDown';
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaDown' : 'cilSortAlphaUp';
+  }
+
+  isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
+  }
+
   clear(): void {
     this.buffer.clear();
   }
@@ -85,6 +106,26 @@ export class LogsComponent implements OnInit, OnDestroy {
         (e) => e.message.toLowerCase().includes(f) || e.level.toLowerCase().includes(f)
       );
     }
+
+    if (this.currentSortField && this.currentSortDirection) {
+      const direction = this.currentSortDirection === 'ASC' ? 1 : -1;
+      const field = this.currentSortField;
+      this.filtered.sort((a: any, b: any) => {
+        let valA = a[field];
+        let valB = b[field];
+        if (field === 'timestamp') {
+           valA = new Date(valA).getTime();
+           valB = new Date(valB).getTime();
+        } else if (typeof valA === 'string') {
+          valA = valA.toLowerCase();
+          valB = valB.toLowerCase();
+        }
+        if (valA < valB) return -1 * direction;
+        if (valA > valB) return 1 * direction;
+        return 0;
+      });
+    }
+
     this.totalElements = this.filtered.length;
     this.totalPages = Math.ceil(this.totalElements / this.pageSize);
     if (this.pageNo > this.totalPages && this.totalPages > 0) {

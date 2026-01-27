@@ -17,6 +17,8 @@ export class ComentariosFilterComponent {
   @Input() totalElements: number = 0;
   @Input() pageSize: number = 10;
   @Input() cargando: boolean = false;
+  @Input() currentSortField?: string;
+  @Input() currentSortDirection?: 'ASC' | 'DESC';
 
   @Output() basicSearchChange = new EventEmitter<string>();
   @Output() toggleAdvanced = new EventEmitter<void>();
@@ -28,6 +30,7 @@ export class ComentariosFilterComponent {
   @Output() pageSizeChange = new EventEmitter<number>();
   @Output() reset = new EventEmitter<void>();
   @Output() search = new EventEmitter<void>();
+  @Output() sortChange = new EventEmitter<{ field: string, direction: 'ASC' | 'DESC' }>();
 
   onBasicSearchTextChange(value: string) {
     this.basicSearchChange.emit(value);
@@ -35,5 +38,18 @@ export class ComentariosFilterComponent {
 
   onPageSizeChange(value: number) {
     this.pageSizeChange.emit(Number(value));
+  }
+
+  ordenar(field: string, direction: 'ASC' | 'DESC') {
+    this.sortChange.emit({ field, direction });
+  }
+
+  getSortIcon(): string {
+    if (!this.currentSortField) return 'cilSortAlphaDown';
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaDown' : 'cilSortAlphaUp';
+  }
+
+  isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
   }
 }

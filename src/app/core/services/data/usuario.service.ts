@@ -26,10 +26,19 @@ export class UsuarioService extends CrudService<Usuario, number> {
 
   // ✅ Métodos migrados de UsuariosService
 
-  buscarSafe(searchRequest: any, pageNo: number, pageSize: number): Observable<PaginaResponse> {
+  buscarSafe(
+    searchRequest: any,
+    pageNo: number,
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     const context = new HttpContext();
     return this.safePostData<PaginaResponse>(
       `${this.endpoint}/buscar`,
@@ -42,10 +51,19 @@ export class UsuarioService extends CrudService<Usuario, number> {
     );
   }
 
-  buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<any> {
+  buscarSinGlobalLoader(
+    searchRequest: any,
+    pageNo: number,
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<any> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.post<any>(`${this.endpoint}/buscar`, searchRequest, params, undefined, context);
   }
