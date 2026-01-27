@@ -817,6 +817,13 @@
         "STATUS_REQUIRED": "El estado de la entrada es obligatorio",
         "TYPE_REQUIRED": "El tipo de entrada es obligatorio"
       },
+      "SUCCESS": {
+        "DELETE": "Entrada eliminada correctamente"
+      },
+      "ERROR": {
+        "DELETE": "Error eliminando entrada",
+        "LOAD_DEFINITIONS": "No se pudieron cargar las definiciones"
+      },
       "THEMES": {
         "TITLE": "Temas del Sistema",
         "SUBTITLE": "Personaliza la apariencia visual del sitio",

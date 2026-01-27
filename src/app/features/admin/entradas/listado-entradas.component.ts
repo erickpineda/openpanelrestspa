@@ -13,16 +13,17 @@ import { DatePipe } from '@angular/common';
 import { Observable, Subject, catchError, finalize, throwError, takeUntil } from 'rxjs';
 import { EntradaCatalogService } from '@app/core/services/data/entrada-catalog.service';
 import { Entrada } from '@app/core/models/entrada.model';
-import { EntradaService } from '@app/core/services/data/entrada.service';
+import { EntradaVM } from './models/entrada.vm';
 import { CommonFunctionalityService } from '@shared/services/common-functionality.service';
 import { parseAllowedDate } from '@shared/utils/date-utils';
-import { BusquedaService } from '@app/core/services/srv-busqueda/busqueda.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
 import { ErrorBoundaryService } from '@app/core/errors/error-boundary/error-boundary.service';
 import { ErrorBoundaryComponent } from '@shared/components/errors/error-boundary/error-boundary.component';
 import { LoggerService } from '@app/core/services/logger.service';
 import { Router } from '@angular/router';
-import { ListadoEntradasStateService, SearchParams } from './services';
+import { SearchParams } from './services';
+import { EntradasListFacadeService } from './services/entradas-list-facade.service';
+import { getPreviewStateColor as getPreviewStateColorHelper } from './utils/estado-utils';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -32,9 +33,9 @@ import { ListadoEntradasStateService, SearchParams } from './services';
   standalone: false,
 })
 export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewInit {
-  entradas$ = this.stateService.entradas$;
-  pagingInfo$ = this.stateService.pagingInfo$;
-  loading$ = this.stateService.loading$;
+  entradas$ = this.facade.entradas$;
+  pagingInfo$ = this.facade.pagingInfo$;
+  loading$ = this.facade.loading$;
   definiciones: any;
   campoSeleccionado: string = '';
   operacionSeleccionada: string = '';
@@ -43,8 +44,8 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   showAdvanced = false;
   basicSearchText = '';
   visible = false;
-  entradaABorrar: Entrada | null = null;
-  previewEntrada?: Entrada;
+  entradaABorrar: EntradaVM | null = null;
+  previewEntrada?: EntradaVM;
   previewVisible: boolean = false;
   currentSortField?: string;
   currentSortDirection?: 'ASC' | 'DESC';
@@ -53,8 +54,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   private readonly boundaryId = 'listado-entradas-main';
   constructor(
     public commonFuncService: CommonFunctionalityService,
-    private entradaService: EntradaService,
-    private busquedaService: BusquedaService,
+    private facade: EntradasListFacadeService,
     private toastService: ToastService,
     private errorBoundaryService: ErrorBoundaryService,
     private log: LoggerService,
@@ -62,19 +62,18 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     private entradaCatalogService: EntradaCatalogService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private stateService: ListadoEntradasStateService,
     private datePipe: DatePipe
   ) {}
   ngOnInit(): void {
-    this.stateService.state$.pipe(takeUntil(this.destroy$)).subscribe((state) => {
+    this.facade.state$.pipe(takeUntil(this.destroy$)).subscribe((state) => {
       this.currentSortField = state.sortField;
       this.currentSortDirection = state.sortDirection;
       this.cdr.markForCheck();
     });
 
     this.cargarDefinicionesBuscador();
-    this.busquedaService.iniciarBusqueda(
-      (term, page) => this.realizarBusquedaEntradas(term, page),
+    this.facade.iniciarBusqueda(
+      (term, page) => this.facade.searchByCurrent(term, page),
       () => {}
     );
   }
@@ -87,15 +86,15 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     this.destroy$.next();
     this.destroy$.complete();
     this.errorBoundaryService.unregisterBoundary(this.boundaryId);
-    this.busquedaService.limpiarBusqueda();
+    this.facade.limpiarBusqueda();
   }
   onBoundaryInit(boundary: ErrorBoundaryComponent): void {
     this.errorBoundaryService.registerBoundary(this.boundaryId, boundary);
   }
   private cargarDefinicionesBuscador(): void {
     this.cdr.markForCheck();
-    this.entradaService
-      .obtenerDefinicionesBuscadorSafe()
+    this.facade
+      .loadSearchDefinitionsWithFeedback()
       .pipe(
         finalize(() => {
           this.cdr.detectChanges();
@@ -113,6 +112,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
         next: (response) => {
           if (response) {
             this.definiciones = response;
+            this.facade.setDefinitions(response);
             this.inicializarCamposBusqueda();
           }
           this.cdr.markForCheck();
@@ -124,19 +124,12 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       });
   }
   private inicializarCamposBusqueda(): void {
-    const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]) || [];
-    const camposOrdenados = [
-      ...campos.filter((k) => k === 'titulo'),
-      ...campos.filter((k) => k !== 'titulo').sort((a, b) => a.localeCompare(b)),
-    ];
-    this.campoSeleccionado = camposOrdenados[0] || '';
-    const operaciones = this.definiciones.operationPermitido?.[this.campoSeleccionado];
-    this.operacionSeleccionada = Array.isArray(operaciones) ? operaciones[0] : '';
+    this.facade.setDefaultsFromDefinitions();
+    this.campoSeleccionado = this.facade.getCurrentField() || '';
+    this.operacionSeleccionada = this.facade.getCurrentOperation() || '';
     this.valorBusqueda = '';
     if (this.campoSeleccionado && this.operacionSeleccionada) {
-      this.zone.run(() =>
-        setTimeout(() => this.busquedaService.triggerBusqueda(this.valorBusqueda), 0)
-      );
+      this.zone.run(() => setTimeout(() => this.facade.triggerBusqueda(this.valorBusqueda), 0));
     }
   }
   private realizarBusquedaEntradas(term: string, page?: number): Observable<any> {
@@ -146,7 +139,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       operation: this.operacionSeleccionada,
       dataOption: this.dataOptionSeleccionada,
     };
-    return this.stateService.search(searchParams, page);
+    return this.facade.search(searchParams, page);
   }
   obtenerListaEntradas(page: number): void {
     const searchParams: SearchParams = {
@@ -155,67 +148,111 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       operation: this.operacionSeleccionada,
       dataOption: this.dataOptionSeleccionada,
     };
-    this.stateService.goToPage(page, searchParams).subscribe();
+    this.facade.goToPage(page, searchParams).subscribe();
   }
   refrescarDatos(): void {
-    this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    this.facade.refresh().subscribe();
   }
   public cargarCatalogosEntrada = (): Observable<{ [key: string]: string[] }> => {
     return this.entradaCatalogService.obtenerCatalogosEntrada();
   };
   onPageSizeChange(size: number): void {
-    this.stateService.setPageSize(size).subscribe();
+    this.facade.setPageSize(size).subscribe();
   }
   onNext(): void {
-    this.stateService.nextPage().subscribe();
+    this.facade.nextPage().subscribe();
   }
   onPrev(): void {
-    this.stateService.prevPage().subscribe();
+    this.facade.prevPage().subscribe();
   }
   public toggleAdvanced(): void {
     this.showAdvanced = !this.showAdvanced;
   }
   public onBasicSearchTextChange(text: string): void {
     this.basicSearchText = text;
-    this.campoSeleccionado = 'titulo';
-    const operaciones = this.definiciones?.operationPermitido?.['titulo'];
-    this.operacionSeleccionada =
-      Array.isArray(operaciones) && operaciones.length > 0 ? operaciones[0] : 'CONTAINS';
+    this.facade.setBasicSearchText(text);
+    this.campoSeleccionado = this.facade.getCurrentField() || 'titulo';
+    this.operacionSeleccionada = this.facade.getCurrentOperation() || 'CONTAINS';
     this.valorBusqueda = text;
-    this.busquedaService.triggerBusqueda(text);
   }
   public aplicarFiltro(filtro: any): void {
-    this.campoSeleccionado = filtro.campo;
-    this.operacionSeleccionada = filtro.operacion;
-    this.valorBusqueda = filtro.valor;
-    this.cdr.markForCheck();
-    if (this.campoSeleccionado && this.operacionSeleccionada) {
-      this.busquedaService.triggerBusqueda(this.valorBusqueda);
+    if (Array.isArray(filtro?.searchCriteriaList)) {
+      if (filtro.dataOption) {
+        this.dataOptionSeleccionada = filtro.dataOption;
+        this.facade.setDataOption(filtro.dataOption);
+      }
+      this.facade.applyAdvancedFilters({
+        dataOption: (filtro.dataOption as 'AND' | 'OR') || (this.dataOptionSeleccionada as 'AND' | 'OR'),
+        searchCriteriaList: filtro.searchCriteriaList,
+      }).subscribe();
+      const first = filtro.searchCriteriaList[0];
+      this.campoSeleccionado = first?.filterKey || this.campoSeleccionado;
+      this.operacionSeleccionada = first?.operation || this.operacionSeleccionada;
+      this.valorBusqueda = String(first?.value ?? this.valorBusqueda);
+    } else {
+      this.facade.applyFilter({
+        campo: filtro.campo,
+        operacion: filtro.operacion,
+        valor: filtro.valor,
+        dataOption: this.dataOptionSeleccionada,
+      });
+      this.campoSeleccionado = this.facade.getCurrentField() || filtro.campo;
+      this.operacionSeleccionada = this.facade.getCurrentOperation() || filtro.operacion;
+      this.valorBusqueda = filtro.valor;
     }
+    this.cdr.markForCheck();
   }
   public onFiltroChanged(filtro: any): void {
-    this.campoSeleccionado = filtro.campo;
-    this.operacionSeleccionada = filtro.operacion;
-    this.valorBusqueda = filtro.valor;
+    if (Array.isArray(filtro?.searchCriteriaList)) {
+      if (filtro.dataOption) {
+        this.dataOptionSeleccionada = filtro.dataOption;
+        this.facade.setDataOption(filtro.dataOption);
+      }
+      const first = filtro.searchCriteriaList[0];
+      this.campoSeleccionado = first?.filterKey || this.campoSeleccionado;
+      this.operacionSeleccionada = first?.operation || this.operacionSeleccionada;
+      this.valorBusqueda = String(first?.value ?? this.valorBusqueda);
+    } else {
+      this.facade.updateFilterState({
+        campo: filtro.campo,
+        operacion: filtro.operacion,
+        valor: filtro.valor,
+        dataOption: this.dataOptionSeleccionada,
+      });
+      this.campoSeleccionado = this.facade.getCurrentField() || filtro.campo;
+      this.operacionSeleccionada = this.facade.getCurrentOperation() || filtro.operacion;
+      this.valorBusqueda = filtro.valor;
+    }
   }
-  abrirModalEliminar(entrada: Entrada): void {
+  abrirModalEliminar(entrada: EntradaVM): void {
     this.entradaABorrar = entrada;
     this.visible = true;
     this.cdr.markForCheck();
   }
-  borrarEntrada(entrada: Entrada): void {
+  borrarEntrada(entrada: EntradaVM): void {
     this.entradaABorrar = entrada;
     this.visible = true;
     this.cdr.markForCheck();
   }
 
   ordenar(field: string, direction: 'ASC' | 'DESC'): void {
-    this.stateService.setSort(field, direction).subscribe();
+    this.facade.setSort(field, direction).subscribe();
+  }
+
+  setDataOption(option: 'AND' | 'OR'): void {
+    this.dataOptionSeleccionada = option;
+    this.facade.setDataOption(option);
+    this.facade.refresh().subscribe();
+    this.cdr.markForCheck();
   }
 
   getSortIcon(): string {
     if (!this.currentSortField) return 'cilSortAlphaDown';
     return this.currentSortDirection === 'ASC' ? 'cilSortAlphaUp' : 'cilSortAlphaDown';
+  }
+
+  getDataOptionLabel(): string {
+    return this.dataOptionSeleccionada === 'AND' ? 'Coincidir con todas' : 'Coincidir con alguna';
   }
 
   isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
@@ -224,19 +261,14 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   confirmarBorrado(): void {
     if (this.entradaABorrar) {
-      this.stateService.deleteEntrada(this.entradaABorrar.idEntrada).subscribe({
+      this.facade.deleteEntrada(this.entradaABorrar.idEntrada).subscribe({
         next: () => {
           this.entradaABorrar = null;
           this.visible = false;
-          this.toastService.showSuccess(
-            'La entrada se ha eliminado correctamente.',
-            'Entrada eliminada'
-          );
           this.cdr.markForCheck();
         },
         error: (error) => {
           this.visible = false;
-          this.toastService.showError('Error al eliminar la entrada', 'Error');
           this.cdr.markForCheck();
         },
       });
@@ -259,7 +291,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       this.cdr.detectChanges();
     } catch {}
   }
-  openPreview(entrada: Entrada): void {
+  openPreview(entrada: EntradaVM): void {
     this.previewEntrada = entrada;
     this.previewVisible = true;
     setTimeout(() => {
@@ -269,30 +301,8 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     }, 50);
   }
 
-  getPreviewStateColor(entrada?: Entrada): string {
-    if (!entrada?.estadoEntrada?.nombre) return 'primary';
-
-    switch (entrada.estadoEntrada.nombre.toUpperCase()) {
-      case 'PUBLICADA':
-        return 'success';
-      case 'NO PUBLICADA':
-        return 'danger';
-      case 'GUARDADA':
-      case 'BORRADOR':
-        return 'secondary';
-      case 'PENDIENTE REVISION':
-        return 'warning';
-      case 'EN REVISION':
-        return 'info';
-      case 'REVISADA':
-        return 'primary';
-      case 'HISTORICA':
-        return 'dark';
-      case 'PROGRAMADA':
-        return 'info';
-      default:
-        return 'secondary';
-    }
+  getPreviewStateColor(entrada?: EntradaVM): string {
+    return getPreviewStateColorHelper(entrada);
   }
 
   closePreview(): void {

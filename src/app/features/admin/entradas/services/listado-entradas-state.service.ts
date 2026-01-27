@@ -13,9 +13,10 @@ import {
   switchMap,
 } from 'rxjs';
 import { Entrada } from '@app/core/models/entrada.model';
-import { Categoria } from '@app/core/models/categoria.model';
 import { EntradaService } from '@app/core/services/data/entrada.service';
+import { mapEntradasComputed } from '../mappers/entrada.mapper';
 import { LoggerService } from '@app/core/services/logger.service';
+import { EntradaVM } from '../models/entrada.vm';
 
 export interface SearchParams {
   term: string;
@@ -23,20 +24,26 @@ export interface SearchParams {
   operation: string;
   dataOption: string;
 }
+export interface AdvancedSearchParams {
+  dataOption: string;
+  searchCriteriaList: Array<{ filterKey: string; value: any; operation: string; clazzName: string }>;
+}
 
 export interface ListState {
-  entradas: Entrada[];
+  entradas: EntradaVM[];
   totalElements: number;
   totalPages: number;
   currentPage: number;
   pageSize: number;
   loading: boolean;
   error: any | null;
-  allEntradasClientCache: Entrada[];
+  allEntradasClientCache: EntradaVM[];
   isServerPaging: boolean;
   lastSearchParams: SearchParams | null;
   sortField?: string;
   sortDirection?: 'ASC' | 'DESC';
+  lastAdvancedCriteriaList?: AdvancedSearchParams['searchCriteriaList'] | null;
+  lastAdvancedDataOption?: string | null;
 }
 
 const INITIAL_STATE: ListState = {
@@ -52,6 +59,8 @@ const INITIAL_STATE: ListState = {
   lastSearchParams: null,
   sortField: undefined,
   sortDirection: undefined,
+  lastAdvancedCriteriaList: null,
+  lastAdvancedDataOption: null,
 };
 
 @Injectable({
@@ -108,13 +117,23 @@ export class ListadoEntradasStateService {
   goToPage(page: number, searchParams?: SearchParams): Observable<void> {
     const current = this.state.value;
     if (current.isServerPaging) {
-      const params = searchParams || current.lastSearchParams;
-      if (params) {
-        return this.search(params, page).pipe(map(() => void 0));
-      } else {
-        this.log.warn('Intentando paginar en servidor sin parámetros de búsqueda');
-        return of(void 0);
+      if (searchParams) {
+        return this.search(searchParams, page).pipe(map(() => void 0));
       }
+      if (current.lastAdvancedCriteriaList && current.lastAdvancedDataOption) {
+        return this.searchAdvanced(
+          {
+            dataOption: current.lastAdvancedDataOption,
+            searchCriteriaList: current.lastAdvancedCriteriaList,
+          },
+          page
+        ).pipe(map(() => void 0));
+      }
+      if (current.lastSearchParams) {
+        return this.search(current.lastSearchParams, page).pipe(map(() => void 0));
+      }
+      this.log.warn('Intentando paginar en servidor sin parámetros de búsqueda');
+      return of(void 0);
     } else {
       this.applyClientPaging(current.allEntradasClientCache, page, current.pageSize);
       return of(void 0);
@@ -123,6 +142,15 @@ export class ListadoEntradasStateService {
 
   reloadCurrentPage(): Observable<void> {
     const current = this.state.value;
+    if (current.lastAdvancedCriteriaList && current.lastAdvancedDataOption) {
+      return this.searchAdvanced(
+        {
+          dataOption: current.lastAdvancedDataOption,
+          searchCriteriaList: current.lastAdvancedCriteriaList,
+        },
+        current.currentPage
+      ).pipe(map(() => void 0));
+    }
     if (current.lastSearchParams) {
       return this.search(current.lastSearchParams, current.currentPage).pipe(map(() => void 0));
     }
@@ -184,17 +212,38 @@ export class ListadoEntradasStateService {
     );
   }
 
+  searchAdvanced(params: AdvancedSearchParams, page: number = 0) {
+    this.updateState({
+      loading: true,
+      error: null,
+      lastAdvancedCriteriaList: params.searchCriteriaList,
+      lastAdvancedDataOption: params.dataOption,
+      lastSearchParams: null,
+    });
+    const searchRequest = {
+      dataOption: params.dataOption,
+      searchCriteriaList: params.searchCriteriaList,
+    };
+    return this.entradaService.buscarSafe(searchRequest, page, this.state.value.pageSize).pipe(
+      tap((response) => this.processResponse(response, page)),
+      catchError((error) => {
+        this.log.error('Error searching entradas (advanced)', error);
+        this.updateState({ loading: false, error });
+        return throwError(() => error);
+      }),
+      finalize(() => this.updateState({ loading: false }))
+    );
+  }
+
   private processResponse(data: any, pageRequest: number) {
     const raw =
       data?.elements ??
       (data as any)?.items ??
       (data as any)?.content ??
       (Array.isArray(data) ? data : []);
-    let elementos: Entrada[] = Array.isArray(raw) ? raw : [];
-    elementos = elementos.map((entrada: Entrada) => ({
-      ...entrada,
-      categoriasConComas: entrada.categorias?.map((e: Categoria) => e.nombre).join(', ') || '',
-    }));
+    const elementos: EntradaVM[] = mapEntradasComputed(
+      Array.isArray(raw) ? raw : []
+    );
     const hasServerPaging =
       typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
     if (hasServerPaging) {
@@ -228,7 +277,7 @@ export class ListadoEntradasStateService {
     }
   }
 
-  private sortElements(elements: Entrada[], sortField?: string, sortDirection?: 'ASC' | 'DESC'): Entrada[] {
+  private sortElements(elements: EntradaVM[], sortField?: string, sortDirection?: 'ASC' | 'DESC'): EntradaVM[] {
     if (!sortField || !elements.length) return elements;
     
     return [...elements].sort((a: any, b: any) => {
@@ -277,7 +326,7 @@ export class ListadoEntradasStateService {
     });
   }
 
-  private applyClientPaging(allEntries: Entrada[], page: number, pageSize: number) {
+  private applyClientPaging(allEntries: EntradaVM[], page: number, pageSize: number) {
     const totalPages = Math.max(1, Math.ceil(allEntries.length / pageSize));
     const validPage = Math.max(0, Math.min(page, totalPages - 1));
     const start = validPage * pageSize;

@@ -4,7 +4,7 @@
     class="d-print-none sidebar sidebar-fixed"
     id="sidebar"
     colorScheme="dark"
-    visible
+    [(visible)]="sidebarVisible"
     [unfoldable]="sidebarNarrow"
   >
     <c-sidebar-header class="border-bottom">
@@ -39,6 +39,13 @@
       ></button>
     </c-sidebar-footer>
   </c-sidebar>
+  @if (sidebarVisible) {
+    <div
+      class="admin-mobile-overlay d-lg-none"
+      aria-label="Cerrar barra lateral"
+      (click)="sidebarVisible = false"
+    ></div>
+  }
   <div
     class="wrapper admin-shell d-flex flex-column min-vh-100 bg-light dark:bg-transparent"
     data-testid="admin-root"

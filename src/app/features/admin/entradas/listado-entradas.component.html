@@ -1,8 +1,8 @@
 <c-container fluid class="px-0">
   <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
     <c-card-header class="bg-white p-4 border-bottom">
-      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div>
+      <c-row class="align-items-center g-3">
+        <c-col xs="12" md="6">
           <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
             <svg cIcon name="cilList" class="text-primary"></svg>
             {{ 'ADMIN.ENTRIES.TITLE' | translate }}
@@ -10,60 +10,62 @@
           <small class="text-body-secondary">
             {{ 'ADMIN.ENTRIES.SUBTITLE' | translate }}
           </small>
-        </div>
-        <div class="d-flex gap-2">
-          <button cButton color="secondary" variant="ghost" size="sm" aria-label="Imprimir listado">
-            <svg cIcon name="cilPrint" class="me-1"></svg>
-            {{ 'ADMIN.ENTRIES.PRINT' | translate }}
-          </button>
-          <c-dropdown variant="btn-group">
-            <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
-              <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
-              Ordenar
+        </c-col>
+        <c-col xs="12" md="6">
+          <div class="d-flex gap-2 flex-wrap justify-content-start justify-content-md-end">
+            <button cButton color="secondary" variant="ghost" size="sm" aria-label="Imprimir listado">
+              <svg cIcon name="cilPrint" class="me-1"></svg>
+              {{ 'ADMIN.ENTRIES.PRINT' | translate }}
             </button>
-            <ul cDropdownMenu>
-              <li>
-                <button cDropdownItem (click)="ordenar('fechaPublicacion', 'DESC')" [active]="isSortActive('fechaPublicacion', 'DESC')">
-                  <span class="d-flex justify-content-between align-items-center w-100">
-                    Más recientes
-                    <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('fechaPublicacion', 'DESC')"></svg>
-                  </span>
-                </button>
-              </li>
-              <li>
-                <button cDropdownItem (click)="ordenar('fechaPublicacion', 'ASC')" [active]="isSortActive('fechaPublicacion', 'ASC')">
-                  <span class="d-flex justify-content-between align-items-center w-100">
-                    Más antiguos
-                    <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('fechaPublicacion', 'ASC')"></svg>
-                  </span>
-                </button>
-              </li>
-              <li><hr cDropdownDivider></li>
-              <li>
-                <button cDropdownItem (click)="ordenar('titulo', 'ASC')" [active]="isSortActive('titulo', 'ASC')">
-                  <span class="d-flex justify-content-between align-items-center w-100">
-                    Título (A-Z)
-                    <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('titulo', 'ASC')"></svg>
-                  </span>
-                </button>
-              </li>
-              <li>
-                <button cDropdownItem (click)="ordenar('titulo', 'DESC')" [active]="isSortActive('titulo', 'DESC')">
-                  <span class="d-flex justify-content-between align-items-center w-100">
-                    Título (Z-A)
-                    <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('titulo', 'DESC')"></svg>
-                  </span>
-                </button>
-              </li>
-            </ul>
-          </c-dropdown>
-          <app-entradas-pendientes></app-entradas-pendientes>
-          <button cButton color="primary" size="sm" routerLink="crear" class="shadow-sm">
-            <svg cIcon name="cilPlus" class="me-1"></svg>
-            {{ 'ADMIN.ENTRIES.NEW_ENTRY' | translate }}
-          </button>
-        </div>
-      </div>
+            <c-dropdown variant="btn-group">
+              <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+                <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
+                Ordenar
+              </button>
+              <ul cDropdownMenu>
+                <li>
+                  <button cDropdownItem (click)="ordenar('fechaPublicacion', 'DESC')" [active]="isSortActive('fechaPublicacion', 'DESC')">
+                    <span class="d-flex justify-content-between align-items-center w-100">
+                      Más recientes
+                      <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('fechaPublicacion', 'DESC')"></svg>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('fechaPublicacion', 'ASC')" [active]="isSortActive('fechaPublicacion', 'ASC')">
+                    <span class="d-flex justify-content-between align-items-center w-100">
+                      Más antiguos
+                      <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('fechaPublicacion', 'ASC')"></svg>
+                    </span>
+                  </button>
+                </li>
+                <li><hr cDropdownDivider></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('titulo', 'ASC')" [active]="isSortActive('titulo', 'ASC')">
+                    <span class="d-flex justify-content-between align-items-center w-100">
+                      Título (A-Z)
+                      <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('titulo', 'ASC')"></svg>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('titulo', 'DESC')" [active]="isSortActive('titulo', 'DESC')">
+                    <span class="d-flex justify-content-between align-items-center w-100">
+                      Título (Z-A)
+                      <svg cIcon name="cilCheck" size="sm" *ngIf="isSortActive('titulo', 'DESC')"></svg>
+                    </span>
+                  </button>
+                </li>
+              </ul>
+            </c-dropdown>
+            <app-entradas-pendientes></app-entradas-pendientes>
+            <button cButton color="primary" size="sm" routerLink="crear" class="shadow-sm">
+              <svg cIcon name="cilPlus" class="me-1"></svg>
+              {{ 'ADMIN.ENTRIES.NEW_ENTRY' | translate }}
+            </button>
+          </div>
+        </c-col>
+      </c-row>
     </c-card-header>
     <div class="section-divider" aria-hidden="true"></div>
     <c-card-body class="p-4">

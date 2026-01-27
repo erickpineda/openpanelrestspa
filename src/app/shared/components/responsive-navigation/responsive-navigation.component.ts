@@ -7,6 +7,7 @@ import {
   OnDestroy,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  HostListener,
 } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -247,6 +248,16 @@ export class ResponsiveNavigationComponent implements OnInit, OnDestroy {
     if (key === 'enter' || key === ' ') {
       event.preventDefault();
       this.toggleSidebar();
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  public onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key.toLowerCase() === 'escape') {
+      const state = this.responsiveNavigationService.getCurrentState();
+      if (!state.sidebarCollapsed) {
+        this.collapseSidebar();
+      }
     }
   }
 }

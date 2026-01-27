@@ -799,6 +799,13 @@
         "STATUS_REQUIRED": "Entry status is required",
         "TYPE_REQUIRED": "Entry type is required"
       },
+      "SUCCESS": {
+        "DELETE": "Entry deleted successfully"
+      },
+      "ERROR": {
+        "DELETE": "Error deleting entry",
+        "LOAD_DEFINITIONS": "Could not load definitions"
+      },
       "THEMES": {
         "TITLE": "Temas del Sistema",
         "SUBTITLE": "Personaliza la apariencia visual del sitio",
