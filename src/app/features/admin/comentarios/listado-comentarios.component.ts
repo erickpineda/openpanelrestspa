@@ -15,6 +15,7 @@ import { LoggerService } from '@app/core/services/logger.service';
 import { TranslationService } from '@app/core/services/translation.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
 import { HttpContext } from '@angular/common/http';
+import { AdvancedSearchParams } from '@shared/models/search.models';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '@core/interceptor/skip-global-error.token';
 
 @Component({
@@ -132,9 +133,9 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
           error: (err: any) => this.handlePageError(err),
         });
     } else {
-      const payload: any = this.buildSearchPayload();
+      const payload: AdvancedSearchParams = this.buildAdvancedSearchPayload();
       this.comentarioService
-        .buscarSinGlobalLoader(payload, this.pageNo, this.pageSize)
+        .buscarSinGlobalLoader(payload, this.pageNo, this.pageSize, this.currentSortField, this.currentSortDirection)
         .pipe(
           takeUntil(this.destroy$),
           finalize(() => {
@@ -265,13 +266,44 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     );
   }
 
-  private buildSearchPayload(): any {
-    const payload: any = {};
-    if (this.basicSearchText) payload['term'] = this.basicSearchText;
-    if (this.filtroUsuario) payload['username'] = this.filtroUsuario;
-    if (this.filtroAprobado !== null) payload['aprobado'] = this.filtroAprobado;
-    if (this.filtroCuarentena !== null) payload['cuarentena'] = this.filtroCuarentena;
-    return payload;
+  private buildAdvancedSearchPayload(): AdvancedSearchParams {
+    const list: AdvancedSearchParams['searchCriteriaList'] = [];
+    if (this.basicSearchText) {
+      list.push({
+        filterKey: 'contenido',
+        value: this.basicSearchText,
+        operation: 'CONTAINS',
+        clazzName: 'Comentario',
+      });
+    }
+    if (this.filtroUsuario) {
+      list.push({
+        filterKey: 'username',
+        value: this.filtroUsuario,
+        operation: 'CONTAINS',
+        clazzName: 'Comentario',
+      });
+    }
+    if (this.filtroAprobado !== null) {
+      list.push({
+        filterKey: 'aprobado',
+        value: this.filtroAprobado,
+        operation: 'EQUAL',
+        clazzName: 'Comentario',
+      });
+    }
+    if (this.filtroCuarentena !== null) {
+      list.push({
+        filterKey: 'cuarentena',
+        value: this.filtroCuarentena,
+        operation: 'EQUAL',
+        clazzName: 'Comentario',
+      });
+    }
+    return {
+      dataOption: 'AND',
+      searchCriteriaList: list,
+    };
   }
 
   private handlePageError(err: any): void {
