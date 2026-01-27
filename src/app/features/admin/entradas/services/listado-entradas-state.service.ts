@@ -24,10 +24,7 @@ export interface SearchParams {
   operation: string;
   dataOption: string;
 }
-export interface AdvancedSearchParams {
-  dataOption: string;
-  searchCriteriaList: Array<{ filterKey: string; value: any; operation: string; clazzName: string }>;
-}
+import { AdvancedSearchParams } from '@app/shared/models/search.models';
 
 export interface ListState {
   entradas: EntradaVM[];

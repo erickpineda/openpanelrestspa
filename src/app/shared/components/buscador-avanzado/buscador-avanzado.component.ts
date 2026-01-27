@@ -98,6 +98,7 @@ import {
   BuscadorCampoDef,
 } from '../../utils/buscador-definiciones.util';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
+import { AdvancedSearchParams, SingleFilter } from '../../models/search.models';
 
 @Component({
   selector: 'app-buscador-avanzado',
@@ -162,7 +163,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   /**
    * Evento que se emite cuando se selecciona o ejecuta un filtro de búsqueda.
    */
-  @Output() filtroSeleccionado = new EventEmitter<any>();
+  @Output() filtroSeleccionado = new EventEmitter<SingleFilter | AdvancedSearchParams>();
   /**
    * Evento que se emite en cada cambio de filtro (si autoTrigger está activo).
    */
@@ -354,7 +355,9 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   public onValorChange(v: string): void {
     this.valorBusqueda = v;
     if (this.autoTrigger) {
-      const payload =
+      const payload:
+        | AdvancedSearchParams
+        | SingleFilter =
         this.criterios.length > 0
           ? {
               dataOption: this.dataOption,
@@ -401,7 +404,9 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Emite el filtro seleccionado actual al padre.
    */
   private emitirFiltro(): void {
-    const payload =
+    const payload:
+      | AdvancedSearchParams
+      | SingleFilter =
       this.criterios.length > 0
         ? {
             dataOption: this.dataOption,

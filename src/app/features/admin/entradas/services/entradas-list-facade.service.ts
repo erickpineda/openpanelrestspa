@@ -4,6 +4,7 @@ import { tap, catchError, throwError } from 'rxjs';
 import { Entrada } from '@app/core/models/entrada.model';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 import { ListadoEntradasStateService, SearchParams } from './listado-entradas-state.service';
+import { AdvancedSearchParams } from '@app/shared/models/search.models';
 import { BusquedaService } from '@app/core/services/srv-busqueda/busqueda.service';
 import { TranslationService } from '@app/core/services/translation.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
@@ -183,7 +184,7 @@ export class EntradasListFacadeService {
     this.currentDataOption = option;
   }
 
-  applyAdvancedFilters(payload: { dataOption: 'AND' | 'OR'; searchCriteriaList: Array<{ filterKey: string; operation: string; value: any; clazzName?: string }> }, page?: number): Observable<any> {
+  applyAdvancedFilters(payload: AdvancedSearchParams, page?: number): Observable<any> {
     this.currentDataOption = payload.dataOption;
     const first = payload.searchCriteriaList?.[0];
     if (first) {
