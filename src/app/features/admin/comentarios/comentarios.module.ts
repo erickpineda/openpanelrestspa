@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SharedOPModule } from '@shared/shared.module';
 import { SharedCoreUiModule } from '@shared/shared-coreui.module';
 import { SharedWidgetsModule } from '@shared/shared-widgets.module';
+import { SharedSearchModule } from '@shared/search/search.module';
 import { ComentariosRoutingModule } from './comentarios-routing.module';
 import { ComentariosFilterComponent, ComentariosTableComponent } from './components';
 import { ListadoComentariosComponent } from './listado-comentarios.component';
@@ -25,6 +26,7 @@ import { EditarComentarioComponent } from './editar/editar-comentario.component'
     SharedCoreUiModule,
     ComentariosRoutingModule,
     SharedWidgetsModule,
+    SharedSearchModule,
   ],
 })
 export class ComentariosFeatureModule {}

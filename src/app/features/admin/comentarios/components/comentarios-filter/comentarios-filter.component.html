@@ -46,36 +46,27 @@
       </c-dropdown>
     </c-col>
 
-    <c-col xs="12" md="6">
-      <div class="input-group">
-        <span class="input-group-text bg-white border-end-0 text-secondary">
-          <svg cIcon name="cilSearch"></svg>
-        </span>
-        <input
-          cFormControl
-          type="text"
-          [value]="basicSearchText"
-          (input)="onBasicSearchTextChange($any($event.target).value)"
-          [placeholder]="'ADMIN.COMMENTS.SEARCH_PLACEHOLDER' | translate"
-          class="border-start-0 ps-0"
-          [disabled]="cargando"
-        />
-        <button
-          cButton
-          color="secondary"
-          variant="outline"
-          (click)="toggleAdvanced.emit()"
-          [active]="showAdvanced"
-          [disabled]="cargando"
-        >
-          <svg cIcon name="cilFilter" class="me-1"></svg>
-          {{
-            showAdvanced
-              ? ('ADMIN.COMMENTS.FILTERS.HIDE_ADVANCED' | translate)
-              : ('ADMIN.COMMENTS.FILTERS.SHOW_ADVANCED' | translate)
-          }}
-        </button>
-      </div>
+    <c-col xs="12" md="6" class="d-flex gap-2 align-items-center">
+      <op-search-basic
+        [placeholder]="'ADMIN.COMMENTS.SEARCH_PLACEHOLDER' | translate"
+        (onSearch)="onBasicSearchTextChange($event)"
+        (onClear)="onBasicSearchTextChange('')"
+      ></op-search-basic>
+      <button
+        cButton
+        color="secondary"
+        variant="outline"
+        (click)="toggleAdvanced.emit()"
+        [active]="showAdvanced"
+        [disabled]="cargando"
+      >
+        <svg cIcon name="cilFilter" class="me-1"></svg>
+        {{
+          showAdvanced
+            ? ('ADMIN.COMMENTS.FILTERS.HIDE_ADVANCED' | translate)
+            : ('ADMIN.COMMENTS.FILTERS.SHOW_ADVANCED' | translate)
+        }}
+      </button>
     </c-col>
   </c-row>
 
