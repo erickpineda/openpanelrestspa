@@ -9,12 +9,13 @@
     [(ngModel)]="term"
     (ngModelChange)="setTerm($event)"
     (keyup.enter)="search()"
+    [disabled]="disabled"
   />
-  <button cButton color="secondary" variant="ghost" size="sm" (click)="clear()">
+  <button cButton color="secondary" variant="ghost" size="sm" (click)="clear()" [disabled]="disabled">
     <svg cIcon name="cilX" class="me-1"></svg>
     Limpiar
   </button>
-  <button cButton color="primary" size="sm" (click)="search()">
+  <button cButton color="primary" size="sm" (click)="search()" [disabled]="disabled">
     <svg cIcon name="cilSearch" class="me-1"></svg>
     Buscar
   </button>

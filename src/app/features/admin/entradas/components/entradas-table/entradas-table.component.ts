@@ -13,8 +13,7 @@ import { parseAllowedDate } from '@shared/utils/date-utils';
 export class EntradasTableComponent {
   @Input() entradas: EntradaVM[] = [];
   @Input() loading: boolean = false;
-  @Input() pagingInfo: { page: number; total: number; pages: number; pageSize: number } | null =
-    null;
+  @Input() pagingInfo: { page: number; total: number; pages: number; pageSize: number } | null = null;
   @Input() baseRoute: string = '/admin/control/entradas';
 
   @Output() pageChange = new EventEmitter<number>();

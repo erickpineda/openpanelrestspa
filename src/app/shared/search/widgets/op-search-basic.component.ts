@@ -10,6 +10,7 @@ import { SearchStoreService } from '../search-store.service';
 export class OpSearchBasicComponent {
   @Input() placeholder: string = '';
   @Input() autoTrigger: boolean = false;
+  @Input() disabled: boolean = false;
   @Output() onSearch = new EventEmitter<string>();
   @Output() onClear = new EventEmitter<void>();
   term: string = '';

@@ -60,4 +60,29 @@ describe('ListadoEntradasStateService', () => {
       });
     });
   });
+
+  it('goToPage sin parámetros usa criterios avanzados previos', (done) => {
+    const mockResponse = { elements: [], totalPages: 5, totalElements: 100 };
+    entradaServiceSpy.buscarSafe.and.returnValue(of(mockResponse as any));
+    const params: AdvancedSearchParams = {
+      dataOption: 'AND',
+      searchCriteriaList: [
+        { filterKey: 'titulo', operation: 'CONTAINS', value: 'algo', clazzName: 'Entrada' },
+      ],
+    };
+    service.searchAdvanced(params, 0).subscribe({
+      next: () => {
+        service.goToPage(3).subscribe({
+          next: () => {
+            expect(entradaServiceSpy.buscarSafe).toHaveBeenCalledTimes(2);
+            const args = entradaServiceSpy.buscarSafe.calls.mostRecent().args;
+            expect(args[1]).toBe(3);
+            done();
+          },
+          error: done.fail,
+        });
+      },
+      error: done.fail,
+    });
+  });
 });

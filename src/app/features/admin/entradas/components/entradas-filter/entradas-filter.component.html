@@ -24,6 +24,7 @@
         [placeholder]="'ADMIN.ENTRIES.FILTER_PLACEHOLDER' | translate"
         (onSearch)="onBasicSearchTextChange($event)"
         (onClear)="onBasicSearchTextChange('')"
+        [disabled]="showAdvanced"
       ></op-search-basic>
       <button
         cButton
