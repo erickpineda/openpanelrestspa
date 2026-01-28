@@ -45,6 +45,13 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.log.info('SessionExpiredComponent: Inicializando...');
+    const hasSession = this.hasActiveSession();
+    const onAdmin = this.router.url.includes('/admin');
+    if (!hasSession && onAdmin) {
+      this.hideModal();
+      this.router.navigate(['/login'], { replaceUrl: true });
+      return;
+    }
     // Si estamos en login, no hacemos nada
     if (this.router.url.includes('/login')) {
       this.log.info('SessionExpiredComponent: En login, no se activa');
@@ -59,7 +66,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
       null;
 
     // Si ya hay sessionData al montar, mostramos el modal
-    if (this.sessionData) {
+    if (this.sessionData && this.hasActiveSession()) {
       this.log.info('SessionExpiredComponent: Datos encontrados al iniciar', this.sessionData);
       this.showModal();
     }
@@ -68,6 +75,9 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
     this.subs.add(
       this.sessionManager.sessionExpired$.subscribe((data: SessionExpirationData) => {
         this.log.info('SessionExpiredComponent: Evento recibido', data);
+        if (!this.hasActiveSession()) {
+          return;
+        }
 
         // Verificación crítica: Si es cierre manual LOCAL, nunca mostrar modal.
         if (data.isManual && data.origin === 'local') {
@@ -168,7 +178,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
            const nav = this.router.getCurrentNavigation();
            const state = nav?.extras?.state || window.history.state;
            
-           if (state?.sessionData) {
+           if (state?.sessionData && this.hasActiveSession()) {
              this.log.info('SessionExpiredComponent: sessionData detectado en NavigationEnd', state.sessionData);
              this.sessionData = state.sessionData;
              this.showModal();
@@ -318,5 +328,11 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
       this.router.navigate(['/'], { replaceUrl: true });
     }, 300);
+  }
+
+  private hasActiveSession(): boolean {
+    const token = this.tokenStorage.getToken();
+    const user = this.tokenStorage.getUser();
+    return !!token && !!user;
   }
 }

@@ -186,7 +186,13 @@ export class ListadoEntradasStateService {
   }
 
   search(params: SearchParams, page: number = 0) {
-    this.updateState({ loading: true, error: null, lastSearchParams: params });
+    this.updateState({
+      loading: true,
+      error: null,
+      lastSearchParams: params,
+      lastAdvancedCriteriaList: null,
+      lastAdvancedDataOption: null,
+    });
     const searchRequest = {
       dataOption: params.dataOption,
       searchCriteriaList: [

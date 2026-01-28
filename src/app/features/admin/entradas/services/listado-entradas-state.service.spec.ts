@@ -85,4 +85,41 @@ describe('ListadoEntradasStateService', () => {
       error: done.fail,
     });
   });
+
+  it('reloadCurrentPage uses basic search params after switching from advanced to basic', (done) => {
+    const mockResponse = { elements: [], totalPages: 1 };
+    entradaServiceSpy.buscarSafe.and.returnValue(of(mockResponse as any));
+
+    // 1. Advanced Search
+    const advancedParams: AdvancedSearchParams = {
+      dataOption: 'AND',
+      searchCriteriaList: [
+        { filterKey: 'titulo', operation: 'CONTAINS', value: 'advanced', clazzName: 'Entrada' },
+      ],
+    };
+
+    service.searchAdvanced(advancedParams, 0).subscribe(() => {
+      // 2. Basic Search
+      const basicParams: any = {
+        term: 'basic',
+        field: 'titulo',
+        operation: 'CONTAINS',
+        dataOption: 'AND',
+      };
+      service.search(basicParams, 0).subscribe(() => {
+        // Reset spy to clear previous calls
+        entradaServiceSpy.buscarSafe.calls.reset();
+
+        // 3. Reload Page
+        service.reloadCurrentPage().subscribe(() => {
+          expect(entradaServiceSpy.buscarSafe).toHaveBeenCalled();
+          const args = entradaServiceSpy.buscarSafe.calls.mostRecent().args;
+          const searchRequest = args[0];
+          // Should be 'basic' value, not 'advanced'
+          expect(searchRequest.searchCriteriaList[0].value).toBe('basic');
+          done();
+        });
+      });
+    });
+  });
 });

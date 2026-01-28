@@ -4,7 +4,6 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   ChangeDetectionStrategy,
-  HostListener,
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -51,7 +50,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
   public isAuthed: boolean = false;
   public ready: boolean = false;
   public sidebarNarrow: boolean = false;
-  public sidebarVisible: boolean = true;
 
   // Propiedades para el componente de recuperación
   showRecoveryNotification = false;
@@ -140,11 +138,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
     // Estado inicial del sidebar (persistencia)
     this.sidebarNarrow = this.readSidebarNarrowFromStorage();
-    // Visibilidad inicial del sidebar según breakpoint
-    try {
-      const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
-      this.sidebarVisible = !isMobile;
-    } catch {}
     this.cdr.markForCheck();
 
     // Actualizar estado de sidebar en inicio y en cambios de ruta
@@ -168,25 +161,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
     try {
       this.checkForTemporaryData();
       this.cdr.detectChanges();
-    } catch {}
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  public onDocumentKeydown(event: KeyboardEvent): void {
-    if (event.key.toLowerCase() === 'escape' && this.sidebarVisible) {
-      this.sidebarVisible = false;
-      this.cdr.markForCheck();
-    }
-  }
-
-  @HostListener('window:resize')
-  public onWindowResize(): void {
-    try {
-      const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
-      if (isMobile && this.sidebarVisible) {
-        this.sidebarVisible = false;
-        this.cdr.markForCheck();
-      }
     } catch {}
   }
 
