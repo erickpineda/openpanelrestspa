@@ -22,9 +22,10 @@ import { ErrorBoundaryComponent } from '@shared/components/errors/error-boundary
 import { CommonFunctionalityService } from '@shared/services/common-functionality.service';
 import { parseAllowedDate } from '@shared/utils/date-utils';
 import { EntradaVM } from './models/entrada.vm';
-import { SearchParams } from './services';
+import { SearchParams } from './models/search-params.model';
 import { EntradasListFacadeService } from './services/entradas-list-facade.service';
 import { getPreviewStateColor as getPreviewStateColorHelper } from './utils/estado-utils';
+import { OPConstants } from '@app/shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -45,7 +46,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   campoSeleccionado: string = '';
   operacionSeleccionada: string = '';
   valorBusqueda: string = '';
-  dataOptionSeleccionada: string = 'AND';
+  dataOptionSeleccionada: string = OPConstants.App.Admin.Entradas.DEFAULT_DATA_OPTION;
   showAdvanced = false;
   basicSearchText = '';
   visible = false;
@@ -61,7 +62,7 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
 
   // Private Properties
   private destroy$ = new Subject<void>();
-  private readonly boundaryId = 'listado-entradas-main';
+  private readonly boundaryId = OPConstants.App.Admin.Entradas.BOUNDARY_ID;
   private advancedActive: boolean = false;
 
   constructor(

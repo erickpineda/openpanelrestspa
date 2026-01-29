@@ -9,6 +9,7 @@ import { EstadoEntrada } from '@app/core/models/estado-entrada.model';
 import { Categoria } from '@app/core/models/categoria.model';
 import { LoggerService } from '@app/core/services/logger.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
+import { OPConstants } from '@app/shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-crear-entrada',
@@ -53,7 +54,7 @@ export class CrearEntradaComponent implements OnInit {
     this.facade.crearEntrada(ent).subscribe({
       next: () => {
         this.toastService.showSuccess('Se ha creado la entrada correctamente', 'Entrada creada');
-        this.router.navigateByUrl('/admin/control/entradas');
+        this.router.navigateByUrl(OPConstants.App.Admin.Entradas.ROUTE);
       },
       error: (error) => {
         this.log.error('Error creando entrada:', error);
@@ -86,6 +87,6 @@ export class CrearEntradaComponent implements OnInit {
   }
 
   onCancelar() {
-    this.router.navigateByUrl('/admin/control/entradas');
+    this.router.navigateByUrl(OPConstants.App.Admin.Entradas.ROUTE);
   }
 }

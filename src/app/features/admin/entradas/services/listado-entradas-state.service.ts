@@ -17,42 +17,21 @@ import { EntradaService } from '@app/core/services/data/entrada.service';
 import { mapEntradasComputed } from '../mappers/entrada.mapper';
 import { LoggerService } from '@app/core/services/logger.service';
 import { EntradaVM } from '../models/entrada.vm';
-
-export interface SearchParams {
-  term: string;
-  field: string;
-  operation: string;
-  dataOption: string;
-}
 import { AdvancedSearchParams, DataOption } from '@app/shared/models/search.models';
-
-export interface ListState {
-  entradas: EntradaVM[];
-  totalElements: number;
-  totalPages: number;
-  currentPage: number;
-  pageSize: number;
-  loading: boolean;
-  error: any | null;
-  allEntradasClientCache: EntradaVM[];
-  isServerPaging: boolean;
-  lastSearchParams: SearchParams | null;
-  sortField?: string;
-  sortDirection?: 'ASC' | 'DESC';
-  lastAdvancedCriteriaList?: AdvancedSearchParams['searchCriteriaList'] | null;
-  lastAdvancedDataOption?: DataOption | null;
-}
+import { OPConstants } from '@app/shared/constants/op-global.constants';
+import { ListState } from '../models/list-state.model';
+import { SearchParams } from '../models/search-params.model';
 
 const INITIAL_STATE: ListState = {
   entradas: [],
   totalElements: 0,
   totalPages: 0,
   currentPage: 0,
-  pageSize: 20,
+  pageSize: OPConstants.App.Admin.Entradas.PAGE_SIZE,
   loading: false,
   error: null,
   allEntradasClientCache: [],
-  isServerPaging: true,
+  isServerPaging: OPConstants.App.Admin.Entradas.SERVER_PAGING,
   lastSearchParams: null,
   sortField: undefined,
   sortDirection: undefined,

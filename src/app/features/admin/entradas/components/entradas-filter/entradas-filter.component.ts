@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Observable } from 'rxjs';
+import { PagingInfo } from '../../models/paging-info.model';
 
 @Component({
   selector: 'app-entradas-filter',
@@ -12,7 +13,7 @@ export class EntradasFilterComponent {
   @Input() showAdvanced: boolean = false;
   @Input() definiciones: any[] = [];
   @Input() cargarCatalogosFn!: () => Observable<any>;
-  @Input() pagingInfo: { page: number; total: number; pages: number; pageSize: number } | null =
+  @Input() pagingInfo: PagingInfo | null =
     null;
 
   @Output() basicSearchChange = new EventEmitter<string>();

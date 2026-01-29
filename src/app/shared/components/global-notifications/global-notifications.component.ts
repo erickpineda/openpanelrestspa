@@ -6,111 +6,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-global-notifications',
-  template: `
-    <c-toaster placement="top-end" class="p-3" position="fixed">
-      @for (toast of toasts$ | async; track toast) {
-        <c-toast
-          [visible]="true"
-          [autohide]="toast.autohide ?? true"
-          [delay]="toast.delay"
-          (visibleChange)="onVisibleChange($event, toast)"
-          (mouseenter)="onMouseEnter(toast)"
-          (mouseleave)="onMouseLeave(toast)"
-          class="toast-modern mb-3 border-0 bg-transparent"
-        >
-          <div class="toast-content d-flex overflow-hidden bg-white shadow-lg rounded-3 position-relative">
-            <!-- Indicador lateral -->
-            <div class="toast-indicator" [style.background-color]="getIndicatorColor(toast)"></div>
-            
-            <!-- Icono -->
-            <div class="toast-icon-wrapper d-flex align-items-center justify-content-center px-3" 
-                 [style.color]="getIndicatorColor(toast)"
-                 [style.background-color]="getIconBgColor(toast)">
-               <div [innerHTML]="getIcon(toast)"></div>
-            </div>
-
-            <!-- Cuerpo -->
-            <div class="toast-body-content py-3 ps-2 pe-5 flex-grow-1">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <strong class="text-dark fw-bold">{{ toast.title || getDefaultTitle(toast) }}</strong>
-                <small class="text-muted ms-2" style="font-size: 0.75rem;">{{ dateAsString(toast.createdAt) }}</small>
-              </div>
-              <div class="text-secondary small message-text">
-                @if (toast.html) {
-                  <div [innerHTML]="toast.body"></div>
-                } @else {
-                  {{ toast.body }}
-                }
-              </div>
-            </div>
-
-            <!-- Botón cerrar -->
-            <button
-              type="button"
-              class="btn-close position-absolute top-0 end-0 m-3"
-              style="font-size: 0.7rem;"
-              aria-label="Close"
-              (click)="$event.stopPropagation(); onClose(toast)"
-            ></button>
-            
-            <!-- Barra de progreso (opcional) -->
-            <div *ngIf="toast.autohide && toast.delay" 
-                 class="progress-bar-timer" 
-                 [style.background-color]="getIndicatorColor(toast)"
-                 [style.animation-duration.ms]="toast.delay">
-            </div>
-          </div>
-        </c-toast>
-      }
-    </c-toaster>
-  `,
-  styles: [`
-    .toast-modern {
-      min-width: 320px;
-      max-width: 450px;
-      animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .toast-content {
-      border: 1px solid rgba(0,0,0,0.03);
-      min-height: 80px;
-    }
-
-    .toast-indicator {
-      width: 5px;
-      flex-shrink: 0;
-    }
-
-    .toast-icon-wrapper {
-      min-width: 60px;
-    }
-
-    .message-text {
-      line-height: 1.4;
-      font-size: 0.9rem;
-    }
-
-    .progress-bar-timer {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 3px;
-      width: 100%;
-      transform-origin: left;
-      animation: progress linear forwards;
-      opacity: 0.5;
-    }
-
-    @keyframes progress {
-      from { transform: scaleX(1); }
-      to { transform: scaleX(0); }
-    }
-
-    @keyframes slideInRight {
-      from { transform: translateX(120%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-  `],
+  templateUrl: './global-notifications.component.html',
+  styleUrls: ['./global-notifications.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
@@ -148,9 +45,12 @@ export class GlobalNotificationsComponent {
 
   dateAsString(fecha: number): string {
     const date = new Date(fecha);
+    const day = String(date.getDate()).padStart(2, '0');
+    const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const month = months[date.getMonth()];
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
+    return `${day}-${month} ${hours}:${minutes}`;
   }
 
   getIndicatorColor(toast: ToastMessage): string {

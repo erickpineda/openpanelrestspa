@@ -3,6 +3,8 @@ import { Entrada } from '@app/core/models/entrada.model';
 import { EntradaVM } from '../../models/entrada.vm';
 import { getEstadoInfo as getEstadoInfoHelper } from '../../utils/estado-utils';
 import { parseAllowedDate } from '@shared/utils/date-utils';
+import { OPConstants } from '@app/shared/constants/op-global.constants';
+import { PagingInfo } from '../../models/paging-info.model';
 
 @Component({
   selector: 'app-entradas-table',
@@ -13,8 +15,8 @@ import { parseAllowedDate } from '@shared/utils/date-utils';
 export class EntradasTableComponent {
   @Input() entradas: EntradaVM[] = [];
   @Input() loading: boolean = false;
-  @Input() pagingInfo: { page: number; total: number; pages: number; pageSize: number } | null = null;
-  @Input() baseRoute: string = '/admin/control/entradas';
+  @Input() pagingInfo: PagingInfo | null = null;
+  @Input() baseRoute: string = OPConstants.App.Admin.Entradas.ROUTE;
 
   @Output() pageChange = new EventEmitter<number>();
   @Output() preview = new EventEmitter<EntradaVM>();

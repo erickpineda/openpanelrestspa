@@ -1,24 +1,28 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 import JSZip from 'jszip';
 import saveAs from 'file-saver';
-import { EntradaService } from '@app/core/services/data/entrada.service';
-import { UsuarioService } from '@app/core/services/data/usuario.service';
-import { Subscription } from 'rxjs';
-import { LoggerService } from '@app/core/services/logger.service';
+
+// Services
+import { AuthSyncService } from '@app/core/services/auth/auth-sync.service';
 import { DashboardApiService } from '@app/core/services/dashboard-api.service';
 import { DashboardFacadeService } from './srv/dashboard-facade.service';
 import { LoadingService } from '@app/core/services/ui/loading.service';
+import { LoggerService } from '@app/core/services/logger.service';
+import { ToastService } from '@app/core/services/ui/toast.service';
+
+// Models
 import {
   ActivityPointDTO,
+  ContentStatsDTO,
+  StorageDTO,
   SummaryDTO,
   SummaryEntryDTO,
   TopItemDTO,
-  StorageDTO,
-  ContentStatsDTO,
 } from '@shared/models/dashboard.models';
-import { ToastService } from '@app/core/services/ui/toast.service';
+
+// Constants & Environment
 import { environment } from '../../../../environments/environment';
-import { AuthSyncService } from '@app/core/services/auth/auth-sync.service';
 import { OPConstants } from '@shared/constants/op-global.constants';
 
 @Component({
@@ -28,64 +32,14 @@ import { OPConstants } from '@shared/constants/op-global.constants';
   standalone: false,
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  errorSummary: string | null = null;
-  errorSplitEstadoNombre: string | null = null;
-  getKpiPorEstado(estado: string): number {
-    if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
-      const ds = this.seriesEntriesSplitData.datasets.find((d: any) => d.label === estado);
-      if (ds && Array.isArray(ds.data)) {
-        return ds.data.reduce((acc: number, v: number) => acc + (Number(v) || 0), 0);
-      }
-    }
-    return 0;
-  }
-  getKpiExceptoEstado(estado: string): number {
-    if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
-      return this.seriesEntriesSplitData.datasets
-        .filter((d: any) => d.label !== estado)
-        .reduce(
-          (acc: number, ds: any) =>
-            acc +
-            (Array.isArray(ds.data)
-              ? ds.data.reduce((a: number, v: number) => a + (Number(v) || 0), 0)
-              : 0),
-          0
-        );
-    }
-    return 0;
-  }
-  get kpiPublicadas(): number {
-    if (this.contentStats && this.contentStats.entradasByEstado) {
-      const keys = Object.keys(this.contentStats.entradasByEstado);
-      const key = keys.find((k) => k.trim().toUpperCase() === 'PUBLICADA');
-      return key ? Number(this.contentStats.entradasByEstado[key]) || 0 : 0;
-    }
-    return 0;
-  }
-  get kpiNoPublicadas(): number {
-    if (this.contentStats && this.contentStats.entradasByEstado) {
-      return Object.entries(this.contentStats.entradasByEstado)
-        .filter(([k]) => k.trim().toUpperCase() !== 'PUBLICADA')
-        .reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
-    }
-    return 0;
-  }
-  cantidadUsuariosActivos: number = 0;
-  totalEntradas: number = 0;
-  entradasMesPublicadas: number[] = Array(12).fill(0);
-  entradasMesNoPublicadas: number[] = Array(12).fill(0);
-  latestEntries: SummaryEntryDTO[] = [];
-  recentItems: any[] = [];
-  recentPage = 0;
-  recentSize = 5;
-  recentTotalPages = 0;
-  topUsers: TopItemDTO[] = [];
-  topCategories: TopItemDTO[] = [];
-  topTags: TopItemDTO[] = [];
-  topLimit = 10;
-  storage?: StorageDTO;
-  contentStats?: ContentStatsDTO;
-  contentStatsChartData: any;
+  // #region State & UI Flags
+  metricsExpanded = false;
+  forceFromDb = false;
+  showSettingsModal = false;
+  exportingZip = false;
+  // #endregion
+
+  // #region Loading Flags
   loadingSummary = false;
   loadingSeries = false;
   loadingTopUsers = false;
@@ -96,6 +50,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadingRecent = false;
   loadingSplitEstado = false;
   loadingSplitEstadoNombre = false;
+  // #endregion
+
+  // #region Error Flags
+  errorSummary: string | null = null;
   errorRecent: string | null = null;
   errorTopUsers: string | null = null;
   errorTopCategories: string | null = null;
@@ -103,39 +61,46 @@ export class DashboardComponent implements OnInit, OnDestroy {
   errorStorage: string | null = null;
   errorContentStats: string | null = null;
   errorSplitEstado: string | null = null;
+  errorSplitEstadoNombre: string | null = null;
+  exportError: string | null = null;
+  clearFeedback: string | null = null;
+  // #endregion
+
+  // #region Data Containers
+  totalEntradas = 0;
+  cantidadUsuariosActivos = 0;
+  latestEntries: SummaryEntryDTO[] = [];
+  recentItems: any[] = [];
+  topUsers: TopItemDTO[] = [];
+  topCategories: TopItemDTO[] = [];
+  topTags: TopItemDTO[] = [];
+  storage?: StorageDTO;
+  contentStats?: ContentStatsDTO;
+  // #endregion
+
+  // #region Chart Data & Options
   data: any = { labels: [], datasets: [] };
-  private dataRawLabels: string[] = [];
-  private colorPalette: string[] = [
-    '#4e79a7',
-    '#f28e2b',
-    '#e15759',
-    '#76b7b2',
-    '#59a14f',
-    '#edc948',
-    '#b07aa1',
-    '#ff9da7',
-    '#9c755f',
-    '#bab0ab',
-    '#1f77b4',
-    '#d62728',
-  ];
-  private colorForLabel(label: string, i: number = 0): string {
-    let h = 0;
-    for (let k = 0; k < label.length; k++) h = (h * 31 + label.charCodeAt(k)) >>> 0;
-    const idx = (h + i) % this.colorPalette.length;
-    return this.colorPalette[idx];
-  }
-  seriesDays = 30;
-  seriesGranularity: 'hour' | 'day' | 'week' | 'month' = 'day';
   seriesEntriesSplitData: any;
   seriesEntriesSplitEstadoNombreData: any;
-  estadoNominalChartType: 'line' | 'bar' = 'bar';
-  estadoNominalStacked = true;
+  contentStatsChartData: any;
+  
   estadoNominalChartOptions: any;
   estadoSplitChartOptions: any;
-  seriesChartOptions: any;
+  estadoNominalChartType: 'line' | 'bar' = 'bar';
+  estadoNominalStacked = true;
+  // #endregion
+
+  // #region Configuration
+  seriesDays = 30;
+  seriesGranularity: 'hour' | 'day' | 'week' | 'month' = 'day';
+  topLimit = 10;
   topPeriodDays = 30;
-  showSettingsModal = false;
+  topCustomStartDate?: string;
+  topCustomEndDate?: string;
+  recentPage = 0;
+  recentSize = 5;
+  recentTotalPages = 0;
+  
   settings: {
     seriesDays: number;
     seriesGranularity: 'hour' | 'day' | 'week' | 'month';
@@ -149,28 +114,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
     topLimit: this.topLimit,
     topPeriodDays: this.topPeriodDays,
   };
-  private settingsInitial: {
-    seriesDays: number;
-    seriesGranularity: 'hour' | 'day' | 'week' | 'month';
-    topLimit: number;
-    topPeriodDays: number;
-    topStartDate?: string;
-    topEndDate?: string;
-  } | null = null;
-  clearFeedback: string | null = null;
-  topCustomStartDate?: string;
-  topCustomEndDate?: string;
-  exportingZip = false;
-  exportError: string | null = null;
-  private subscription: Subscription = new Subscription();
+  // #endregion
+
+  // #region Performance
   perf: Record<string, number> = {};
   perfUpdatedAt: Date | null = null;
-  metricsExpanded: boolean = false;
-  forceFromDb: boolean = false;
+  // #endregion
+
+  // #region Private Properties
+  private subscription = new Subscription();
   private onAuthChangedHandler?: (ev: any) => void;
+  private dataRawLabels: string[] = [];
+  private settingsInitial: typeof this.settings | null = null;
+  private colorPalette: string[] = [
+    '#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc948',
+    '#b07aa1', '#ff9da7', '#9c755f', '#bab0ab', '#1f77b4', '#d62728',
+  ];
+  // #endregion
+
   constructor(
-    private usuarioService: UsuarioService,
-    private entradaService: EntradaService,
     private cdr: ChangeDetectorRef,
     private log: LoggerService,
     private dashboardApi: DashboardApiService,
@@ -179,28 +141,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private authSync: AuthSyncService
   ) {}
-  private initDefaultData(): void {
-    const labels: string[] = [];
-    const rawLabels: string[] = [];
-    const now = new Date();
-    for (let i = this.seriesDays - 1; i >= 0; i--) {
-      const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-      d.setUTCDate(d.getUTCDate() - i);
-      const s = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-      labels.push(this.formatLabelFromDate(s, 'day', false));
-      rawLabels.push(s);
-    }
-    const zeros = Array(labels.length).fill(0);
-    this.data = {
-      labels,
-      datasets: [
-        { label: 'Entradas', backgroundColor: '#007bff', data: [...zeros] },
-        { label: 'Comentarios', backgroundColor: '#ff7f0e', data: [...zeros] },
-        { label: 'Usuarios', backgroundColor: '#2ca02c', data: [...zeros] },
-      ],
-    };
-    this.dataRawLabels = rawLabels;
-  }
+
+  // #region Lifecycle Hooks
   async ngOnInit(): Promise<void> {
     this.initDefaultData();
     try {
@@ -212,6 +154,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (f === '1') this.forceFromDb = true;
       else if (f === '0') this.forceFromDb = false;
     } catch {}
+    
     this.refreshDashboard();
     this.loadRecentActivity();
 
@@ -230,77 +173,132 @@ export class DashboardComponent implements OnInit, OnDestroy {
       window.addEventListener(OPConstants.Events.AUTH_CHANGED, this.onAuthChangedHandler as any);
     } catch {}
   }
-  private markPerf(t0: number, name: string): void {
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
     try {
-      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
-      const elapsed = Math.round(now - t0);
-      this.perf[name] = elapsed;
-      this.perfUpdatedAt = new Date();
+      if (this.onAuthChangedHandler)
+        window.removeEventListener(
+          OPConstants.Events.AUTH_CHANGED,
+          this.onAuthChangedHandler as any
+        );
     } catch {}
   }
-  metricsVisible(): boolean {
+  // #endregion
+
+  // #region Getters (KPIs)
+  get kpiPublicadas(): number {
+    if (this.contentStats && this.contentStats.entradasByEstado) {
+      const keys = Object.keys(this.contentStats.entradasByEstado);
+      const key = keys.find((k) => k.trim().toUpperCase() === 'PUBLICADA');
+      return key ? Number(this.contentStats.entradasByEstado[key]) || 0 : 0;
+    }
+    return 0;
+  }
+
+  get kpiNoPublicadas(): number {
+    if (this.contentStats && this.contentStats.entradasByEstado) {
+      return Object.entries(this.contentStats.entradasByEstado)
+        .filter(([k]) => k.trim().toUpperCase() !== 'PUBLICADA')
+        .reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
+    }
+    return 0;
+  }
+
+  get sumEntradasSerie(): number {
     try {
-      const win = typeof window !== 'undefined' ? window : null;
-      const searchFlag = win
-        ? new URLSearchParams(win.location.search).get('metrics') === '1'
-        : false;
-      const hash = win ? win.location.hash || '' : '';
-      const qm = hash.indexOf('?');
-      const hashFlag =
-        qm >= 0 ? new URLSearchParams(hash.substring(qm + 1)).get('metrics') === '1' : false;
-      const urlFlag = searchFlag || hashFlag;
-      return this.isLocalEnv() && (this.metricsExpanded || urlFlag);
+      const arr =
+        this.data &&
+        this.data.datasets &&
+        this.data.datasets[0] &&
+        Array.isArray(this.data.datasets[0].data)
+          ? (this.data.datasets[0].data as number[])
+          : [];
+      return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
     } catch {
-      return false;
+      return 0;
     }
   }
-  metricsToggle(): void {
-    if (!this.isLocalEnv()) return;
-    this.metricsExpanded = !this.metricsExpanded;
+
+  get sumComentarios(): number {
     try {
-      sessionStorage.setItem(
-        OPConstants.Storage.DASH_METRICS_EXPANDED_KEY,
-        this.metricsExpanded ? '1' : '0'
-      );
-    } catch {}
+      const arr =
+        this.data &&
+        this.data.datasets &&
+        this.data.datasets[1] &&
+        Array.isArray(this.data.datasets[1].data)
+          ? (this.data.datasets[1].data as number[])
+          : [];
+      return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
+    } catch {
+      return 0;
+    }
   }
-  toggleForceFromDb(): void {
-    this.forceFromDb = !this.forceFromDb;
+
+  get sumUsuarios(): number {
     try {
-      sessionStorage.setItem(OPConstants.Storage.DASH_FORCE_DB_KEY, this.forceFromDb ? '1' : '0');
-    } catch {}
-    try {
-      this.authSync.notifyChanged({
-        key: OPConstants.Storage.DASH_FORCE_DB_KEY,
-        value: this.forceFromDb ? '1' : '0',
-      });
-    } catch {}
+      const arr =
+        this.data &&
+        this.data.datasets &&
+        this.data.datasets[2] &&
+        Array.isArray(this.data.datasets[2].data)
+          ? (this.data.datasets[2].data as number[])
+          : [];
+      return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
+    } catch {
+      return 0;
+    }
   }
-  async copyPerfToClipboard(): Promise<void> {
-    try {
-      const payload = {
-        updatedAt: this.perfUpdatedAt ? this.perfUpdatedAt.toISOString() : null,
-        perf: this.perf,
-      };
-      const text = JSON.stringify(payload, null, 2);
-      if (navigator && (navigator as any).clipboard && (navigator as any).clipboard.writeText) {
-        await (navigator as any).clipboard.writeText(text);
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
+
+  get contentEstadoRows(): { estado: string; total: number; porcentaje: number }[] {
+    const entries =
+      this.contentStats && (this.contentStats as any).entradasByEstado
+        ? Object.entries((this.contentStats as any).entradasByEstado)
+        : [];
+    const total =
+      (this.contentStats as any)?.totalEntradas ||
+      entries.reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
+    return entries
+      .map(([k, v]) => {
+        const count = Number(v) || 0;
+        const pct = total > 0 ? Math.round((count * 1000) / total) / 10 : 0;
+        return { estado: k, total: count, porcentaje: pct };
+      })
+      .sort((a, b) => b.total - a.total);
+  }
+
+  getKpiPorEstado(estado: string): number {
+    if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
+      const ds = this.seriesEntriesSplitData.datasets.find((d: any) => d.label === estado);
+      if (ds && Array.isArray(ds.data)) {
+        return ds.data.reduce((acc: number, v: number) => acc + (Number(v) || 0), 0);
       }
-      this.toastService.showSuccess('Métricas copiadas', 'Dashboard');
-    } catch {
-      this.toastService.showError('No se pudieron copiar las métricas', 'Dashboard');
     }
+    return 0;
   }
-  isLocalEnv(): boolean {
-    return (environment as any).production === false;
+
+  getKpiExceptoEstado(estado: string): number {
+    if (this.seriesEntriesSplitData && Array.isArray(this.seriesEntriesSplitData.datasets)) {
+      return this.seriesEntriesSplitData.datasets
+        .filter((d: any) => d.label !== estado)
+        .reduce(
+          (acc: number, ds: any) =>
+            acc +
+            (Array.isArray(ds.data)
+              ? ds.data.reduce((a: number, v: number) => a + (Number(v) || 0), 0)
+              : 0),
+          0
+        );
+    }
+    return 0;
   }
+  // #endregion
+
+  // #region Data Loading Methods
+  refreshDashboard(): void {
+    this.loadAllDashboardData(this.forceFromDb === true);
+  }
+
   private loadAllDashboardData(force: boolean = true): void {
     const t0 = Date.now();
     this.loadingService.registerRetryHandler(() => this.loadAllDashboardData(true));
@@ -393,34 +391,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
     this.subscription.add(sub);
   }
-  refreshDashboard(): void {
-    this.loadAllDashboardData(this.forceFromDb === true);
-  }
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-    try {
-      if (this.onAuthChangedHandler)
-        window.removeEventListener(
-          OPConstants.Events.AUTH_CHANGED,
-          this.onAuthChangedHandler as any
-        );
-    } catch {}
-  }
-  cargarEstadisticas(): void {
-    this.loadingService.setGlobalLoading(true);
-    this.dashboardApi.getSummary().subscribe({
-      next: (summary: SummaryDTO) => {
-        this.totalEntradas = summary.totalEntradas || 0;
-        this.cantidadUsuariosActivos = summary.totalUsuarios || 0;
-        this.latestEntries = summary.ultimasEntradas || [];
-        this.cdr.detectChanges();
-        this.loadingService.setGlobalLoading(false);
-      },
-      error: () => {
-        this.errorSummary = 'Error obteniendo summary';
-      },
-    });
-  }
+
   loadTopWidgets(): void {
     this.loadingTopUsers = true;
     this.loadingTopCategories = true;
@@ -433,7 +404,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ? { startDate: this.topCustomStartDate, endDate: this.topCustomEndDate }
         : this.getPeriodDates(this.topPeriodDays);
     const subTopUsers = this.dashboardFacade
-      .getTop('users', this.topLimit, false, startDate, endDate)
+      .getTop('users', this.topLimit, this.forceFromDb, startDate, endDate)
       .subscribe({
         next: (items: TopItemDTO[]) => {
           this.topUsers = items || [];
@@ -446,7 +417,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         },
       });
     const subTopCategories = this.dashboardFacade
-      .getTop('categories', this.topLimit, false, startDate, endDate)
+      .getTop('categories', this.topLimit, this.forceFromDb, startDate, endDate)
       .subscribe({
         next: (items: TopItemDTO[]) => {
           this.topCategories = items || [];
@@ -459,7 +430,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         },
       });
     const subTopTags = this.dashboardFacade
-      .getTop('tags', this.topLimit, false, startDate, endDate)
+      .getTop('tags', this.topLimit, this.forceFromDb, startDate, endDate)
       .subscribe({
         next: (items: TopItemDTO[]) => {
           this.topTags = items || [];
@@ -475,6 +446,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subscription.add(subTopCategories);
     this.subscription.add(subTopTags);
   }
+
   loadStorage(): void {
     this.loadingStorage = true;
     this.errorStorage = null;
@@ -491,6 +463,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
     this.subscription.add(sub);
   }
+
   loadContentStats(): void {
     this.loadingContentStats = true;
     this.errorContentStats = null;
@@ -508,6 +481,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
     this.subscription.add(sub);
   }
+
   loadRecentActivity(): void {
     this.loadingRecent = true;
     this.errorRecent = null;
@@ -540,24 +514,113 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
     this.subscription.add(sub);
   }
-  onRecentPageChange(page: number): void {
-    this.recentPage = page;
-    this.loadRecentActivity();
+
+  loadSeriesEntriesSplitEstado(): void {
+    this.loadingSplitEstado = true;
+    this.errorSplitEstado = null;
+    const sub = this.dashboardFacade
+      .getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, true)
+      .subscribe({
+        next: (arr: any[]) => {
+          const labels = Array.isArray(arr)
+            ? arr.map((p) => this.formatLabelFromDate(p?.date))
+            : [];
+          const hasNested =
+            Array.isArray(arr) && arr.some((p) => p && typeof p.entradasByEstado === 'object');
+          if (hasNested) {
+            const estados = Array.from(
+              new Set(arr.flatMap((p) => Object.keys(p.entradasByEstado || {})))
+            );
+            const datasets = estados.map((estado, i) => ({
+              label: estado,
+              backgroundColor: this.colorForLabel(estado, i),
+              data: arr.map((p) => Number(p.entradasByEstado?.[estado]) || 0),
+            }));
+            this.seriesEntriesSplitData = { labels, datasets };
+          } else {
+            const keys = Array.from(
+              new Set(arr.flatMap((p) => Object.keys(p || {}).filter((k) => k !== 'date')))
+            );
+            const datasets = keys.map((k, i) => ({
+              label: String(k).toUpperCase(),
+              backgroundColor: this.colorForLabel(k, i),
+              data: arr.map((p) => Number(p?.[k] || 0)),
+            }));
+            this.seriesEntriesSplitData = { labels, datasets };
+          }
+          try {
+            setTimeout(() => {
+              this.seriesEntriesSplitData = {
+                labels: [...labels],
+                datasets: (this.seriesEntriesSplitData.datasets || []).map((d: any) => ({
+                  ...d,
+                  data: [...d.data],
+                })),
+              };
+              this.cdr.detectChanges();
+            }, 0);
+          } catch {}
+          this.loadingSplitEstado = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.loadingSplitEstado = false;
+          this.errorSplitEstado = 'Error obteniendo series por estado';
+        },
+      });
+    this.subscription.add(sub);
   }
-  onRecentSizeChange(size: number): void {
-    const s = Math.max(1, Math.min(200, Number(size) || 5));
-    this.recentSize = s;
-    this.recentPage = 0;
-    this.loadRecentActivity();
+
+  loadSeriesEntriesSplitEstadoNombre(): void {
+    this.errorSplitEstadoNombre = null;
+    const sub = this.dashboardFacade
+      .getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, true)
+      .subscribe({
+        next: (arr: any[]) => {
+          const flatArr = Array.isArray(arr)
+            ? arr.map((p) =>
+                p && typeof p.entradasByEstado === 'object'
+                  ? { date: p.date, ...p.entradasByEstado }
+                  : p
+              )
+            : [];
+          const labels = flatArr.map((p) => this.formatLabelFromDate(p?.date));
+          const estadosSet = new Set<string>();
+          flatArr.forEach((p) =>
+            Object.keys(p || {}).forEach((k) => k !== 'date' && estadosSet.add(k))
+          );
+          const estados = Array.from(estadosSet);
+          const datasets = estados.map((e, i) => ({
+            label: String(e),
+            backgroundColor: this.colorForLabel(e, i),
+            borderColor: this.colorForLabel(e, i),
+            fill: false,
+            tension: 0.2,
+            data: flatArr.map((r) => Number(r?.[e] || 0)),
+          }));
+          const chart = { labels, datasets };
+          this.seriesEntriesSplitEstadoNombreData = chart;
+          this.updateEstadoNominalOptions();
+          try {
+            setTimeout(() => {
+              this.seriesEntriesSplitEstadoNombreData = {
+                labels: [...labels],
+                datasets: datasets.map((d) => ({ ...d, data: [...d.data] })),
+              };
+              this.cdr.detectChanges();
+            }, 0);
+          } catch {}
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.errorSplitEstadoNombre = 'Error obteniendo series pivot por estado';
+        },
+      });
+    this.subscription.add(sub);
   }
-  formatBytes(bytes?: number): string {
-    const b = Number(bytes) || 0;
-    if (b === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(b) / Math.log(k));
-    return `${(b / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
-  }
+  // #endregion
+
+  // #region UI Action Methods
   changeSeriesDays(days: number): void {
     const d = Math.max(1, Math.min(365, Number(days) || 30));
     this.seriesDays = d;
@@ -593,10 +656,106 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadSeriesEntriesSplitEstadoNombre();
     this.updateEstadoNominalOptions();
   }
+
   changeSeriesGranularity(g: 'hour' | 'day' | 'week' | 'month'): void {
     this.seriesGranularity = g;
     this.changeSeriesDays(this.seriesDays);
   }
+
+  onChangeTopLimit(limit: number): void {
+    const l = Math.max(1, Math.min(200, Number(limit) || 10));
+    this.topLimit = l;
+    this.loadTopWidgets();
+  }
+
+  onRecentPageChange(page: number): void {
+    this.recentPage = page;
+    this.loadRecentActivity();
+  }
+
+  onRecentSizeChange(size: number): void {
+    const s = Math.max(1, Math.min(200, Number(size) || 5));
+    this.recentSize = s;
+    this.recentPage = 0;
+    this.loadRecentActivity();
+  }
+
+  setEstadoNominalChartType(t: 'line' | 'bar'): void {
+    this.estadoNominalChartType = t;
+    this.updateEstadoNominalOptions();
+  }
+
+  toggleEstadoNominalStacked(): void {
+    this.estadoNominalStacked = !this.estadoNominalStacked;
+    this.updateEstadoNominalOptions();
+  }
+
+  toggleForceFromDb(): void {
+    this.forceFromDb = !this.forceFromDb;
+    try {
+      sessionStorage.setItem(OPConstants.Storage.DASH_FORCE_DB_KEY, this.forceFromDb ? '1' : '0');
+    } catch {}
+    try {
+      this.authSync.notifyChanged({
+        key: OPConstants.Storage.DASH_FORCE_DB_KEY,
+        value: this.forceFromDb ? '1' : '0',
+      });
+    } catch {}
+  }
+
+  metricsToggle(): void {
+    if (!this.isLocalEnv()) return;
+    this.metricsExpanded = !this.metricsExpanded;
+    try {
+      sessionStorage.setItem(
+        OPConstants.Storage.DASH_METRICS_EXPANDED_KEY,
+        this.metricsExpanded ? '1' : '0'
+      );
+    } catch {}
+  }
+
+  metricsVisible(): boolean {
+    try {
+      const win = typeof window !== 'undefined' ? window : null;
+      const searchFlag = win
+        ? new URLSearchParams(win.location.search).get('metrics') === '1'
+        : false;
+      const hash = win ? win.location.hash || '' : '';
+      const qm = hash.indexOf('?');
+      const hashFlag =
+        qm >= 0 ? new URLSearchParams(hash.substring(qm + 1)).get('metrics') === '1' : false;
+      const urlFlag = searchFlag || hashFlag;
+      return this.isLocalEnv() && (this.metricsExpanded || urlFlag);
+    } catch {
+      return false;
+    }
+  }
+
+  async copyPerfToClipboard(): Promise<void> {
+    try {
+      const payload = {
+        updatedAt: this.perfUpdatedAt ? this.perfUpdatedAt.toISOString() : null,
+        perf: this.perf,
+      };
+      const text = JSON.stringify(payload, null, 2);
+      if (navigator && (navigator as any).clipboard && (navigator as any).clipboard.writeText) {
+        await (navigator as any).clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      this.toastService.showSuccess('Métricas copiadas', 'Dashboard');
+    } catch {
+      this.toastService.showError('No se pudieron copiar las métricas', 'Dashboard');
+    }
+  }
+  // #endregion
+
+  // #region Settings Modal Methods
   openSettings(): void {
     this.settings = {
       seriesDays: this.seriesDays,
@@ -610,9 +769,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.clearFeedback = null;
     this.showSettingsModal = true;
   }
+
   closeSettings(): void {
     this.showSettingsModal = false;
   }
+
   applySettings(): void {
     const sd = Math.max(1, Math.min(365, Number(this.settings.seriesDays) || this.seriesDays));
     const tl = Math.max(1, Math.min(200, Number(this.settings.topLimit) || this.topLimit));
@@ -650,6 +811,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
     this.showSettingsModal = false;
   }
+
   resetSettings(): void {
     this.settings = {
       seriesDays: 30,
@@ -662,15 +824,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.clearFeedback = 'Campos restablecidos a valores por defecto';
     this.cdr.detectChanges();
   }
-  private isValidDateRange(s: string, e: string): boolean {
-    try {
-      const sd = new Date(s + 'T00:00:00Z');
-      const ed = new Date(e + 'T00:00:00Z');
-      return !isNaN(sd.getTime()) && !isNaN(ed.getTime()) && sd.getTime() <= ed.getTime();
-    } catch {
-      return false;
-    }
-  }
+  // #endregion
+
+  // #region Export & Download Methods
   downloadCurrentData(): void {
     try {
       const payload: any = {
@@ -697,17 +853,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       saveAs(blob, `dashboard_export_${new Date().toISOString()}.json`);
     } catch {}
   }
-  private csvEscape(v: any): string {
-    const s = String(v ?? '');
-    const needsQuotes = /[",\n]/.test(s);
-    const escaped = s.replace(/"/g, '""');
-    return needsQuotes ? `"${escaped}"` : escaped;
-  }
-  private buildCsv(headers: string[], rows: any[][]): string {
-    const head = headers.map((h) => this.csvEscape(h)).join(',');
-    const body = rows.map((r) => r.map((c) => this.csvEscape(c)).join(',')).join('\n');
-    return `${head}\n${body}\n`;
-  }
+
   downloadCsv(): void {
     try {
       const now = new Date();
@@ -730,6 +876,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     } catch {}
   }
+
   async downloadZip(): Promise<void> {
     try {
       this.exportError = null;
@@ -868,16 +1015,94 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
   }
+  // #endregion
+
+  // #region Helper & Utility Methods
+  formatBytes(bytes?: number): string {
+    const b = Number(bytes) || 0;
+    if (b === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(b) / Math.log(k));
+    return `${(b / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+  }
+
+  formatLabelFromDate(
+    dateStr: string,
+    granularity: 'hour' | 'day' | 'week' | 'month' = this.seriesGranularity,
+    short = true
+  ): string {
+    try {
+      const d = new Date(dateStr + 'T00:00:00Z');
+      const opts: Intl.DateTimeFormatOptions =
+        granularity === 'month'
+          ? { month: 'short' }
+          : granularity === 'week'
+            ? { day: '2-digit', month: 'short' }
+            : { day: '2-digit', month: 'short' };
+      return new Intl.DateTimeFormat('es-ES', opts).format(d);
+    } catch {
+      return dateStr;
+    }
+  }
+
   getPeriodDates(days: number): { startDate: string; endDate: string } {
     const now = new Date();
-    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    // Use tomorrow as end date to include today in <= queries
+    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
     const start = new Date(end);
     start.setUTCDate(start.getUTCDate() - Math.max(1, Math.min(365, Number(days) || 30)));
     const fmt = (d: Date) =>
       `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
     return { startDate: fmt(start), endDate: fmt(end) };
   }
-  updateContentStatsChart(cs: ContentStatsDTO): void {
+  // #endregion
+
+  // #region Private Helpers
+  private initDefaultData(): void {
+    const labels: string[] = [];
+    const rawLabels: string[] = [];
+    const now = new Date();
+    for (let i = this.seriesDays - 1; i >= 0; i--) {
+      const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+      d.setUTCDate(d.getUTCDate() - i);
+      const s = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+      labels.push(this.formatLabelFromDate(s, 'day', false));
+      rawLabels.push(s);
+    }
+    const zeros = Array(labels.length).fill(0);
+    this.data = {
+      labels,
+      datasets: [
+        { label: 'Entradas', backgroundColor: '#007bff', data: [...zeros] },
+        { label: 'Comentarios', backgroundColor: '#ff7f0e', data: [...zeros] },
+        { label: 'Usuarios', backgroundColor: '#2ca02c', data: [...zeros] },
+      ],
+    };
+    this.dataRawLabels = rawLabels;
+  }
+
+  private markPerf(t0: number, name: string): void {
+    try {
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      const elapsed = Math.round(now - t0);
+      this.perf[name] = elapsed;
+      this.perfUpdatedAt = new Date();
+    } catch {}
+  }
+
+  public isLocalEnv(): boolean {
+    return (environment as any).production === false;
+  }
+
+  private colorForLabel(label: string, i: number = 0): string {
+    let h = 0;
+    for (let k = 0; k < label.length; k++) h = (h * 31 + label.charCodeAt(k)) >>> 0;
+    const idx = (h + i) % this.colorPalette.length;
+    return this.colorPalette[idx];
+  }
+
+  private updateContentStatsChart(cs: ContentStatsDTO): void {
     const labels = Object.keys(cs.entradasByEstado || {});
     const data = labels.map((k) => Number(cs.entradasByEstado?.[k]) || 0);
     const chart = {
@@ -898,130 +1123,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }, 0);
     } catch {}
   }
-  get contentEstadoRows(): { estado: string; total: number; porcentaje: number }[] {
-    const entries =
-      this.contentStats && (this.contentStats as any).entradasByEstado
-        ? Object.entries((this.contentStats as any).entradasByEstado)
-        : [];
-    const total =
-      (this.contentStats as any)?.totalEntradas ||
-      entries.reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
-    return entries
-      .map(([k, v]) => {
-        const count = Number(v) || 0;
-        const pct = total > 0 ? Math.round((count * 1000) / total) / 10 : 0;
-        return { estado: k, total: count, porcentaje: pct };
-      })
-      .sort((a, b) => b.total - a.total);
-  }
-  onChangeTopLimit(limit: number): void {
-    const l = Math.max(1, Math.min(200, Number(limit) || 10));
-    this.topLimit = l;
-    this.loadTopWidgets();
-  }
-  loadSeriesEntriesSplitEstado(): void {
-    this.loadingSplitEstado = true;
-    this.errorSplitEstado = null;
-    const sub = this.dashboardFacade
-      .getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, true)
-      .subscribe({
-        next: (arr: any[]) => {
-          const labels = Array.isArray(arr)
-            ? arr.map((p) => this.formatLabelFromDate(p?.date))
-            : [];
-          const hasNested =
-            Array.isArray(arr) && arr.some((p) => p && typeof p.entradasByEstado === 'object');
-          if (hasNested) {
-            const estados = Array.from(
-              new Set(arr.flatMap((p) => Object.keys(p.entradasByEstado || {})))
-            );
-            const datasets = estados.map((estado, i) => ({
-              label: estado,
-              backgroundColor: this.colorForLabel(estado, i),
-              data: arr.map((p) => Number(p.entradasByEstado?.[estado]) || 0),
-            }));
-            this.seriesEntriesSplitData = { labels, datasets };
-          } else {
-            const keys = Array.from(
-              new Set(arr.flatMap((p) => Object.keys(p || {}).filter((k) => k !== 'date')))
-            );
-            const datasets = keys.map((k, i) => ({
-              label: String(k).toUpperCase(),
-              backgroundColor: this.colorForLabel(k, i),
-              data: arr.map((p) => Number(p?.[k] || 0)),
-            }));
-            this.seriesEntriesSplitData = { labels, datasets };
-          }
-          try {
-            setTimeout(() => {
-              this.seriesEntriesSplitData = {
-                labels: [...labels],
-                datasets: (this.seriesEntriesSplitData.datasets || []).map((d: any) => ({
-                  ...d,
-                  data: [...d.data],
-                })),
-              };
-              this.cdr.detectChanges();
-            }, 0);
-          } catch {}
-          this.loadingSplitEstado = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.loadingSplitEstado = false;
-          this.errorSplitEstado = 'Error obteniendo series por estado';
-        },
-      });
-    this.subscription.add(sub);
-  }
-  loadSeriesEntriesSplitEstadoNombre(): void {
-    this.errorSplitEstadoNombre = null;
-    const sub = this.dashboardFacade
-      .getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, true)
-      .subscribe({
-        next: (arr: any[]) => {
-          const flatArr = Array.isArray(arr)
-            ? arr.map((p) =>
-                p && typeof p.entradasByEstado === 'object'
-                  ? { date: p.date, ...p.entradasByEstado }
-                  : p
-              )
-            : [];
-          const labels = flatArr.map((p) => this.formatLabelFromDate(p?.date));
-          const estadosSet = new Set<string>();
-          flatArr.forEach((p) =>
-            Object.keys(p || {}).forEach((k) => k !== 'date' && estadosSet.add(k))
-          );
-          const estados = Array.from(estadosSet);
-          const datasets = estados.map((e, i) => ({
-            label: String(e),
-            backgroundColor: this.colorForLabel(e, i),
-            borderColor: this.colorForLabel(e, i),
-            fill: false,
-            tension: 0.2,
-            data: flatArr.map((r) => Number(r?.[e] || 0)),
-          }));
-          const chart = { labels, datasets };
-          this.seriesEntriesSplitEstadoNombreData = chart;
-          this.updateEstadoNominalOptions();
-          try {
-            setTimeout(() => {
-              this.seriesEntriesSplitEstadoNombreData = {
-                labels: [...labels],
-                datasets: datasets.map((d) => ({ ...d, data: [...d.data] })),
-              };
-              this.cdr.detectChanges();
-            }, 0);
-          } catch {}
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.errorSplitEstadoNombre = 'Error obteniendo series pivot por estado';
-        },
-      });
-    this.subscription.add(sub);
-  }
-  updateEstadoNominalOptions(): void {
+
+  private updateEstadoNominalOptions(): void {
     this.estadoNominalChartOptions = {
       maintainAspectRatio: false,
       plugins: { legend: { position: 'top' } },
@@ -1032,72 +1135,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
           : {},
     };
   }
-  setEstadoNominalChartType(t: 'line' | 'bar'): void {
-    this.estadoNominalChartType = t;
-    this.updateEstadoNominalOptions();
-  }
-  toggleEstadoNominalStacked(): void {
-    this.estadoNominalStacked = !this.estadoNominalStacked;
-    this.updateEstadoNominalOptions();
-  }
-  formatLabelFromDate(
-    dateStr: string,
-    granularity: 'hour' | 'day' | 'week' | 'month' = this.seriesGranularity,
-    short = true
-  ): string {
+
+  private isValidDateRange(s: string, e: string): boolean {
     try {
-      const d = new Date(dateStr + 'T00:00:00Z');
-      const opts: Intl.DateTimeFormatOptions =
-        granularity === 'month'
-          ? { month: 'short' }
-          : granularity === 'week'
-            ? { day: '2-digit', month: 'short' }
-            : { day: '2-digit', month: 'short' };
-      return new Intl.DateTimeFormat('es-ES', opts).format(d);
+      const sd = new Date(s + 'T00:00:00Z');
+      const ed = new Date(e + 'T00:00:00Z');
+      return !isNaN(sd.getTime()) && !isNaN(ed.getTime()) && sd.getTime() <= ed.getTime();
     } catch {
-      return dateStr;
+      return false;
     }
   }
-  get sumEntradasSerie(): number {
-    try {
-      const arr =
-        this.data &&
-        this.data.datasets &&
-        this.data.datasets[0] &&
-        Array.isArray(this.data.datasets[0].data)
-          ? (this.data.datasets[0].data as number[])
-          : [];
-      return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
-    } catch {
-      return 0;
-    }
+
+  private csvEscape(v: any): string {
+    const s = String(v ?? '');
+    const needsQuotes = /[",\n]/.test(s);
+    const escaped = s.replace(/"/g, '""');
+    return needsQuotes ? `"${escaped}"` : escaped;
   }
-  get sumComentarios(): number {
-    try {
-      const arr =
-        this.data &&
-        this.data.datasets &&
-        this.data.datasets[1] &&
-        Array.isArray(this.data.datasets[1].data)
-          ? (this.data.datasets[1].data as number[])
-          : [];
-      return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
-    } catch {
-      return 0;
-    }
+
+  private buildCsv(headers: string[], rows: any[][]): string {
+    const head = headers.map((h) => this.csvEscape(h)).join(',');
+    const body = rows.map((r) => r.map((c) => this.csvEscape(c)).join(',')).join('\n');
+    return `${head}\n${body}\n`;
   }
-  get sumUsuarios(): number {
-    try {
-      const arr =
-        this.data &&
-        this.data.datasets &&
-        this.data.datasets[2] &&
-        Array.isArray(this.data.datasets[2].data)
-          ? (this.data.datasets[2].data as number[])
-          : [];
-      return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
-    } catch {
-      return 0;
-    }
-  }
+  // #endregion
 }

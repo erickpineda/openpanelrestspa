@@ -10,6 +10,7 @@ import { Categoria } from '@app/core/models/categoria.model';
 import { ToastService } from '@app/core/services/ui/toast.service';
 import { formatForDateTimeLocal, parseAllowedDate } from '@shared/utils/date-utils';
 import { FileStorageService } from '@app/core/services/file-storage.service';
+import { OPConstants } from '@app/shared/constants/op-global.constants';
 
 @Component({
   selector: 'app-editar-entrada',
@@ -31,7 +32,7 @@ export class EditarEntradaComponent implements OnInit {
 
   get esPublicada(): boolean {
     const nombreEstado = this.entrada?.estadoEntrada?.nombre?.toUpperCase();
-    return nombreEstado === 'PUBLICADA';
+    return nombreEstado === OPConstants.App.Common.Estado.PUBLICADA;
   }
 
   get fechaPublicacionMostrar(): Date | null {
@@ -144,7 +145,7 @@ export class EditarEntradaComponent implements OnInit {
           'La entrada se ha actualizado correctamente.',
           'Entrada actualizada'
         );
-        this.router.navigateByUrl('/admin/control/entradas');
+        this.router.navigateByUrl(OPConstants.App.Admin.Entradas.ROUTE);
       },
       error: (error) => {
         console.error('Error actualizando entrada:', error);
@@ -177,6 +178,6 @@ export class EditarEntradaComponent implements OnInit {
   }
 
   onCancelar() {
-    this.router.navigateByUrl('/admin/control/entradas');
+    this.router.navigateByUrl(OPConstants.App.Admin.Entradas.ROUTE);
   }
 }

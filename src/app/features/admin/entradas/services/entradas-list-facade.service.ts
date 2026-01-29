@@ -3,11 +3,13 @@ import { Observable } from 'rxjs';
 import { tap, catchError, throwError } from 'rxjs';
 import { Entrada } from '@app/core/models/entrada.model';
 import { EntradaService } from '@app/core/services/data/entrada.service';
-import { ListadoEntradasStateService, SearchParams } from './listado-entradas-state.service';
+import { ListadoEntradasStateService } from './listado-entradas-state.service';
+import { SearchParams } from '../models/search-params.model';
 import { AdvancedSearchParams } from '@app/shared/models/search.models';
 import { BusquedaService } from '@app/core/services/srv-busqueda/busqueda.service';
 import { TranslationService } from '@app/core/services/translation.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
+import { OPConstants } from '@app/shared/constants/op-global.constants';
 
 @Injectable({ providedIn: 'root' })
 export class EntradasListFacadeService {
@@ -18,7 +20,7 @@ export class EntradasListFacadeService {
   private defs: any;
   private currentField?: string;
   private currentOperation?: string;
-  private currentDataOption: string = 'AND';
+  private currentDataOption: string = OPConstants.App.Admin.Entradas.DEFAULT_DATA_OPTION;
   private currentTerm: string = '';
 
   constructor(
