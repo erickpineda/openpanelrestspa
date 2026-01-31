@@ -54,7 +54,7 @@
       color="secondary"
       variant="ghost"
       size="sm"
-      (click)="downloadCsv.emit()"
+      (click)="onDownloadClick()"
       [title]="'COMMON.DOWNLOAD_CSV' | translate"
       [attr.aria-label]="'COMMON.DOWNLOAD_CSV' | translate"
       [attr.data-testid]="csvDataTestId || null"

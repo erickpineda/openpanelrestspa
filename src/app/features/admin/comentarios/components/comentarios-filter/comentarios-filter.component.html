@@ -1,6 +1,6 @@
 <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
   <c-row class="align-items-center g-3">
-    <c-col xs="12" md="3" class="d-flex align-items-center gap-3">
+    <c-col xs="12" md="4" class="d-flex align-items-center gap-3">
       <div class="text-nowrap fw-semibold text-secondary">
         {{ totalElements }} {{ 'COMMON.RECORDS' | translate }}
       </div>
@@ -23,30 +23,9 @@
           {{ 'ADMIN.COMMENTS.X_RECORDS' | translate: { count: 50 } }}
         </option>
       </select>
-      
-      <c-dropdown variant="btn-group">
-        <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
-          <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
-        </button>
-        <ul cDropdownMenu>
-          <li><button cDropdownItem (click)="ordenar('fechaCreacion', 'DESC')">
-            <span *ngIf="isSortActive('fechaCreacion', 'DESC')" class="me-1 fw-bold">✓</span> Más recientes
-          </button></li>
-          <li><button cDropdownItem (click)="ordenar('fechaCreacion', 'ASC')">
-            <span *ngIf="isSortActive('fechaCreacion', 'ASC')" class="me-1 fw-bold">✓</span> Más antiguos
-          </button></li>
-          <li><hr cDropdownDivider></li>
-          <li><button cDropdownItem (click)="ordenar('usuario.nombre', 'ASC')">
-            <span *ngIf="isSortActive('usuario.nombre', 'ASC')" class="me-1 fw-bold">✓</span> Usuario (A-Z)
-          </button></li>
-          <li><button cDropdownItem (click)="ordenar('usuario.nombre', 'DESC')">
-            <span *ngIf="isSortActive('usuario.nombre', 'DESC')" class="me-1 fw-bold">✓</span> Usuario (Z-A)
-          </button></li>
-        </ul>
-      </c-dropdown>
     </c-col>
 
-    <c-col xs="12" md="6" class="d-flex gap-2 align-items-center">
+    <c-col xs="12" md="8" class="d-flex gap-2 align-items-center">
       <op-search-basic
         [placeholder]="'ADMIN.COMMENTS.SEARCH_PLACEHOLDER' | translate"
         (onSearch)="onBasicSearchTextChange($event)"
@@ -67,6 +46,27 @@
             : ('ADMIN.COMMENTS.FILTERS.SHOW_ADVANCED' | translate)
         }}
       </button>
+
+      <c-dropdown variant="btn-group">
+        <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+          <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
+        </button>
+        <ul cDropdownMenu>
+          <li><button cDropdownItem (click)="ordenar('fechaCreacion', 'DESC')">
+            <span *ngIf="isSortActive('fechaCreacion', 'DESC')" class="me-1 fw-bold">✓</span> Más recientes
+          </button></li>
+          <li><button cDropdownItem (click)="ordenar('fechaCreacion', 'ASC')">
+            <span *ngIf="isSortActive('fechaCreacion', 'ASC')" class="me-1 fw-bold">✓</span> Más antiguos
+          </button></li>
+          <li><hr cDropdownDivider></li>
+          <li><button cDropdownItem (click)="ordenar('usuario.nombre', 'ASC')">
+            <span *ngIf="isSortActive('usuario.nombre', 'ASC')" class="me-1 fw-bold">✓</span> Usuario (A-Z)
+          </button></li>
+          <li><button cDropdownItem (click)="ordenar('usuario.nombre', 'DESC')">
+            <span *ngIf="isSortActive('usuario.nombre', 'DESC')" class="me-1 fw-bold">✓</span> Usuario (Z-A)
+          </button></li>
+        </ul>
+      </c-dropdown>
     </c-col>
   </c-row>
 

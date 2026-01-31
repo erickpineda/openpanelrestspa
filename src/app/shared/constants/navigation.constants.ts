@@ -111,6 +111,7 @@ export const NavigationConstants = {
     NORMAL: 30000, // 30 segundos
     SLOW: 60000, // 1 minuto
     VERY_SLOW: 300000, // 5 minutos
+    TOO_SLOW: 3600000, // 1 hora
   } as const,
 
   /**

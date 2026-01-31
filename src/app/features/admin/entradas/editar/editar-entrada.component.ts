@@ -88,7 +88,26 @@ export class EditarEntradaComponent implements OnInit {
         arr.clear();
 
         if (ent.categorias && Array.isArray(ent.categorias)) {
-          ent.categorias.forEach((cat: any) => arr.push(new UntypedFormControl(cat)));
+          ent.categorias.forEach((cat: any) => {
+            let match = this.categorias.find((c) => c.codigo === cat.codigo);
+            // Fallback: match by name if code is missing (e.g. backend issue)
+            if (!match && cat.nombre) {
+              match = this.categorias.find(
+                (c) => c.nombre?.toLowerCase() === cat.nombre?.toLowerCase()
+              );
+            }
+            arr.push(new UntypedFormControl(match || cat));
+          });
+        }
+
+        const tagsArr = this.entradaForm.get('etiquetas') as UntypedFormArray;
+        if (tagsArr) {
+          tagsArr.clear();
+          if (ent.etiquetas && Array.isArray(ent.etiquetas)) {
+            ent.etiquetas.forEach((tag: any) => {
+              tagsArr.push(new UntypedFormControl(tag));
+            });
+          }
         }
 
         if (this.modoLectura) {

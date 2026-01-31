@@ -11,4 +11,8 @@ export class DashboardStoragePanelComponent {
   @Input() storage: any;
   @Input() formatBytesFn?: (n?: number) => string;
   @Output() downloadCsv = new EventEmitter<void>();
+
+  onDownloadClick(): void {
+    this.downloadCsv.emit();
+  }
 }

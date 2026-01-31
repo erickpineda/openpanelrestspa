@@ -216,7 +216,31 @@
         "SUMMARY": "Summary",
         "SERIES": "Series",
         "CONTENT": "Content",
-        "RECENT": "Recent"
+        "RECENT": "Recent",
+        "COPIED": "Metrics copied",
+        "COPY_ERROR": "Could not copy metrics"
+      },
+      "DOWNLOAD": {
+        "NO_DATA_SERIES": "No series data to download",
+        "ERROR_SERIES": "Error downloading series CSV",
+        "NO_DATA_RECENT": "No recent activity to download",
+        "ERROR_RECENT": "Error downloading recent activity CSV",
+        "NO_DATA_SPLIT": "No series by status data to download",
+        "ERROR_SPLIT": "Error downloading series by status CSV",
+        "NO_DATA_NOMINAL": "No series by nominal status data to download",
+        "ERROR_NOMINAL": "Error downloading series by nominal status CSV",
+        "NO_DATA_STORAGE": "No storage data to download",
+        "ERROR_STORAGE": "Error downloading storage CSV",
+        "NO_DATA_CONTENT": "No content stats to download",
+        "ERROR_CONTENT": "Error downloading content stats CSV",
+        "NO_DATA_CONTENT_STATUS": "No content status data to download",
+        "ERROR_CONTENT_STATUS": "Error downloading content status CSV",
+        "NO_DATA_TOP_USERS": "No top users data to download",
+        "ERROR_TOP_USERS": "Error downloading top users CSV",
+        "NO_DATA_TOP_CATEGORIES": "No top categories data to download",
+        "ERROR_TOP_CATEGORIES": "Error downloading top categories CSV",
+        "NO_DATA_TOP_TAGS": "No top tags data to download",
+        "ERROR_TOP_TAGS": "Error downloading top tags CSV"
       },
       "COMMENTS": "Comments",
       "FILES": "Files",
@@ -249,7 +273,23 @@
         "RANGE_HELP_TEXT": "If a range is set, it will be used for Tops instead of the period.",
         "RESET_TITLE": "Reset fields to initial values",
         "RESET_ARIA_LABEL": "Clear fields",
-        "RESET": "Reset"
+        "RESET": "Reset",
+        "RESET_FEEDBACK": "Configuration reset to defaults"
+      },
+      "SUCCESS": {
+        "UPDATED": "Data updated"
+      },
+      "ERROR": {
+        "REFRESH_DASHBOARD": "Error refreshing dashboard",
+        "TOP_USERS": "Error fetching Top Users",
+        "TOP_CATEGORIES": "Error fetching Top Categories",
+        "TOP_TAGS": "Error fetching Top Tags",
+        "STORAGE": "Error fetching storage",
+        "CONTENT_STATS": "Error fetching content stats",
+        "RECENT_ACTIVITY": "Error fetching recent activity",
+        "SERIES_BY_STATUS": "Error fetching series by status",
+        "SERIES_PIVOT": "Error fetching pivot series by status",
+        "ZIP_GENERATION": "Error generating ZIP"
       },
       "TOOLBAR": {
         "GENERATING_ZIP": "Generating ZIP...",

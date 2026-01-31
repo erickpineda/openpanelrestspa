@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { INavData } from '@coreui/angular';
+import { NavigationUtils } from '../../../shared/utils/navigation.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -32,11 +33,11 @@ export class SidebarStateService {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(Array.from(this.expandedItems)));
   }
 
-  public toggleItem(name: string, isOpen: boolean): void {
+  public toggleItem(itemId: string, isOpen: boolean): void {
     if (isOpen) {
-      this.expandedItems.add(name);
+      this.expandedItems.add(itemId);
     } else {
-      this.expandedItems.delete(name);
+      this.expandedItems.delete(itemId);
     }
     this.saveState();
   }
@@ -71,8 +72,9 @@ export class SidebarStateService {
       }
 
       if (isItemActive || childActive) {
-        if (item.children && item.children.length > 0 && item.name) {
-          this.expandedItems.add(item.name);
+        if (item.children && item.children.length > 0) {
+          const id = NavigationUtils.generateItemId(item as any);
+          this.expandedItems.add(id);
           this.expandChildGroups(item);
         }
         hasActiveChild = true;
@@ -85,7 +87,8 @@ export class SidebarStateService {
   private applyStateToItems(items: INavData[]): void {
     for (const item of items) {
       if (item.children && item.children.length > 0) {
-        if (item.name && this.expandedItems.has(item.name)) {
+        const id = NavigationUtils.generateItemId(item as any);
+        if (this.expandedItems.has(id)) {
           (item as any).open = true;
         } else {
           (item as any).open = false;
@@ -103,8 +106,9 @@ export class SidebarStateService {
 
   private expandAllGroups(items: INavData[]): void {
     for (const item of items) {
-      if (item.children && item.children.length > 0 && item.name) {
-        this.expandedItems.add(item.name);
+      if (item.children && item.children.length > 0) {
+        const id = NavigationUtils.generateItemId(item as any);
+        this.expandedItems.add(id);
         this.expandAllGroups(item.children);
       }
     }
@@ -113,8 +117,9 @@ export class SidebarStateService {
   private expandChildGroups(item: INavData): void {
     if (!item.children || item.children.length === 0) return;
     for (const child of item.children) {
-      if (child.children && child.children.length > 0 && child.name) {
-        this.expandedItems.add(child.name);
+      if (child.children && child.children.length > 0) {
+        const id = NavigationUtils.generateItemId(child as any);
+        this.expandedItems.add(id);
         this.expandChildGroups(child);
       }
     }
@@ -132,11 +137,13 @@ export class SidebarStateService {
     const stack: INavData[] = [...items];
     while (stack.length) {
       const item = stack.pop()!;
-      if (item.name === 'MENU.ENTRIES' && item.children && item.children.length > 0) {
-        this.expandedItems.add(item.name);
+      if (typeof item.url === 'string' && item.url === '/admin/control/entradas' && item.children && item.children.length > 0) {
+        const id = NavigationUtils.generateItemId(item as any);
+        this.expandedItems.add(id);
         for (const child of item.children) {
-          if (child.name === 'MENU.TAXONOMY') {
-            this.expandedItems.add(child.name);
+          if (typeof child.url === 'string' && child.url === '/admin/control/taxonomia') {
+            const childId = NavigationUtils.generateItemId(child as any);
+            this.expandedItems.add(childId);
           }
         }
       }
@@ -156,8 +163,9 @@ export class SidebarStateService {
     const stack: INavData[] = [...items];
     while (stack.length) {
       const item = stack.pop()!;
-      if (item.name === 'MENU.ROLES_AND_PERMISSIONS' && item.children && item.children.length > 0) {
-        this.expandedItems.add(item.name);
+      if (typeof item.url === 'string' && item.url === '/admin/control/gestion/roles' && item.children && item.children.length > 0) {
+        const id = NavigationUtils.generateItemId(item as any);
+        this.expandedItems.add(id);
         return;
       }
       if (item.children && item.children.length > 0) {

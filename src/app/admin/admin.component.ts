@@ -2,15 +2,19 @@ import {
   Component,
   OnInit,
   AfterViewInit,
+  OnDestroy,
   ChangeDetectorRef,
   ChangeDetectionStrategy,
+  HostListener,
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { IconSetService } from '@coreui/icons-angular';
 import { DashboardApiService } from '../core/services/dashboard-api.service';
 import { TranslationService } from '../core/services/translation.service';
 import { LanguageService } from '../core/services/language.service';
+import { Subscription, Subject } from 'rxjs';
+import { takeUntil, filter } from 'rxjs/operators';
 
 import { iconSubset } from '../shared/components/icons/coreui-icons';
 import { navItems } from './default-layout/_nav';
@@ -21,7 +25,8 @@ import { ToastService } from '../core/services/ui/toast.service';
 import { TokenStorageService } from '../core/services/auth/token-storage.service';
 import { AuthService } from '../core/services/auth/auth.service';
 import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
-import { UserRole } from '../shared/types/navigation.types';
+import { NavigationService } from '../core/services/ui/navigation.service';
+import { UserRole, INavItemEnhanced } from '../shared/types/navigation.types';
 import { OPStorageConstants } from '@app/shared/constants/op-storage.constants';
 
 // ... imports existentes
@@ -33,12 +38,14 @@ import { OPStorageConstants } from '@app/shared/constants/op-storage.constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
-export class AdminComponent implements OnInit, AfterViewInit {
+export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   // ✅ NUEVO: Propiedades para controlar la notificación
   showGlobalRecoveryNotification = false;
   temporaryEntriesCount = 0;
 
-  public navItems = navItems;
+  public navItems: INavItemEnhanced[] = navItems;
+  private navSubscription: Subscription | undefined;
+  private destroy$ = new Subject<void>();
   public userRole: UserRole = UserRole.LECTOR;
   public cargaFinalizada: boolean = false;
   public projectsCount: number = 0;
@@ -50,6 +57,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
   public isAuthed: boolean = false;
   public ready: boolean = false;
   public sidebarNarrow: boolean = false;
+  public sidebarVisible: boolean = true;
+  public sidebarBackdrop: boolean = false;
 
   // Propiedades para el componente de recuperación
   showRecoveryNotification = false;
@@ -68,6 +77,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     private tokenStorage: TokenStorageService,
     private authService: AuthService,
     private sidebarState: SidebarStateService,
+    private navigationService: NavigationService,
     private translationService: TranslationService,
     private languageService: LanguageService
   ) {
@@ -101,60 +111,96 @@ export class AdminComponent implements OnInit, AfterViewInit {
     // Establecer rol del usuario para la navegación usando el servicio centralizado
     this.userRole = this.tokenStorage.getUserRole();
 
-    // Filtrar items según rol antes de cualquier traducción (ESTABLECER ESTRUCTURA INICIAL UNA ÚNICA VEZ)
-    this.navItems = this.filterItemsByRole(navItems, this.userRole);
+    // Inicializar NavigationService con los items base
+    this.navigationService.setNavigationItems(navItems);
 
-    // Aplicar traducciones iniciales sobre la estructura ya creada
-    this.applyTranslationsInPlace(this.navItems);
+    // Suscribirse a los items procesados (filtrados y con badges)
+    this.navSubscription = this.navigationService
+      .getNavigationItems(this.userRole)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((items) => {
+        this.navItems = items;
+        this.applyTranslationsInPlace(this.navItems);
+        this.sidebarState.updateNavItems(this.navItems, this.router.url);
+        this.cdr.markForCheck();
+      });
 
     this.checkForTemporaryData();
     this.cargaFinalizada = true;
 
     // Suscribirse a cambios en las traducciones (se dispara cuando se carga el idioma o cambia)
-    this.translationService.translations$.subscribe(() => {
-      this.updateTranslations();
-      // Actualizar traducciones IN-PLACE para no romper referencias
-      this.applyTranslationsInPlace(this.navItems);
-      this.sidebarState.updateNavItems(this.navItems, this.router.url);
-      this.cdr.markForCheck();
-    });
+    this.translationService.translations$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.updateTranslations();
+        // Actualizar traducciones IN-PLACE para no romper referencias
+        this.refreshSidebar();
+      });
 
     const isDashboardRoute =
       this.router.url.includes('/admin/dashboard') || this.router.url.includes('/admin/control');
     if (isDashboardRoute) {
-      this.dashboardApi.getContentStats().subscribe((stats) => {
-        this.projectsCount = Number(stats?.totalEntradas) || 0;
-        this.commentsCount = Number(stats?.totalComentarios) || 0;
-        this.messagesCount = this.commentsCount;
+      this.dashboardApi.getContentStats()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((stats) => {
+          this.projectsCount = Number(stats?.totalEntradas) || 0;
+          this.commentsCount = Number(stats?.totalComentarios) || 0;
+          this.messagesCount = this.commentsCount;
+          this.cdr.markForCheck();
+        });
+    }
+    this.toastService.toasts$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((list) => {
+        this.notificationsCount = Array.isArray(list) ? list.length : 0;
         this.cdr.markForCheck();
       });
-    }
-    this.toastService.toasts$.subscribe((list) => {
-      this.notificationsCount = Array.isArray(list) ? list.length : 0;
-      this.cdr.markForCheck();
-    });
     this.tasksCount = this.temporaryEntriesCount;
     this.cdr.markForCheck();
 
     // Estado inicial del sidebar (persistencia)
     this.sidebarNarrow = this.readSidebarNarrowFromStorage();
+
+    // Check viewport for initial sidebar visibility on mobile
+    const currentWidth = window.innerWidth;
+    if (currentWidth < 992) {
+      this.sidebarVisible = false;
+      this.sidebarBackdrop = true;
+    } else {
+      this.sidebarVisible = true;
+      this.sidebarBackdrop = false;
+    }
+
     this.cdr.markForCheck();
 
     // Actualizar estado de sidebar en inicio y en cambios de ruta
     this.sidebarState.updateNavItems(this.navItems, this.router.url);
-    this.router.events.subscribe(() => {
-      this.sidebarState.updateNavItems(this.navItems, this.router.url);
-      this.checkForTemporaryData();
-      this.cdr.markForCheck();
-    });
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.sidebarState.updateNavItems(this.navItems, this.router.url);
+        this.checkForTemporaryData();
+
+        // Close sidebar on mobile after navigation
+        if (window.innerWidth < 992) {
+          this.sidebarVisible = false;
+        }
+
+        this.cdr.markForCheck();
+      });
 
     // Escuchar cambios en localStorage para actualizar el banner inmediatamente
     window.addEventListener('storage', this.onStorageChange as any);
 
-    this.temporaryStorage.entriesChanged$.subscribe(() => {
-      this.checkForTemporaryData();
-      this.cdr.markForCheck();
-    });
+    this.temporaryStorage.entriesChanged$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.checkForTemporaryData();
+        this.cdr.markForCheck();
+      });
   }
 
   ngAfterViewInit(): void {
@@ -231,46 +277,51 @@ export class AdminComponent implements OnInit, AfterViewInit {
   private updateNavItems(): void {
     // MÉTODO DEPRECADO EN FAVOR DE applyTranslationsInPlace
     // Se mantiene por compatibilidad si es llamado desde otro lugar, pero ahora usa la lógica in-place
-    this.applyTranslationsInPlace(this.navItems);
-    this.sidebarState.updateNavItems(this.navItems, this.router.url);
+    this.refreshSidebar();
   }
 
   /**
    * Aplica traducciones mutando directamente los objetos existentes para preservar referencias.
-   * Esto evita el error NG0956 (recreación de colección) en componentes CoreUI.
+   * Traduce nombres y badges usando la clave persistida.
    */
   private applyTranslationsInPlace(items: any[]): void {
     items.forEach((item) => {
-      // 1. Persistir clave de nombre original la primera vez
       if (!item.translationKey) {
         item.translationKey = item.name;
       }
-
-      // 2. Traducir nombre usando la clave persistida
+      
+      // Traducir nombre
       if (item.translationKey) {
-        item.name = this.translationService.translate(item.translationKey);
+        const translated = this.translationService.translate(item.translationKey);
+        // Solo actualizar si la traducción es diferente a la clave o si es un título que requiere traducción
+        if (translated !== item.translationKey || item.title) {
+          item.name = translated;
+        }
       }
-
-      // 3. Persistir y traducir Badge
+      
       if (item.badge) {
         if (!item.badge.translationKey) {
           item.badge.translationKey = item.badge.text;
         }
-
         const key = item.badge.translationKey;
-        // Lógica específica para badges conocidos
         if (key === 'MENU.BADGE_PENDING' || key === 'Pend') {
           item.badge.text = this.translationService.translate('MENU.BADGE_PENDING');
         } else {
           item.badge.text = this.translationService.translate(key);
         }
       }
-
-      // 4. Recursividad para hijos
       if (item.children) {
         this.applyTranslationsInPlace(item.children);
       }
     });
+  }
+
+  private refreshSidebar(): void {
+    this.applyTranslationsInPlace(this.navItems);
+    // Forzar actualización de referencia para detectar cambios en OnPush
+    this.navItems = [...this.navItems];
+    this.sidebarState.updateNavItems(this.navItems, this.router.url);
+    this.cdr.markForCheck();
   }
 
   private filterItemsByRole(items: any[], role: UserRole): any[] {
@@ -338,7 +389,59 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.cdr.markForCheck();
   }
 
+  public onVisibleChange(visible: boolean) {
+    this.sidebarVisible = visible;
+    this.cdr.markForCheck();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    const width = event.target.innerWidth;
+    const isMobile = width < 992;
+    
+    // Actualizar estado de backdrop
+    this.sidebarBackdrop = isMobile;
+
+    if (isMobile && this.sidebarVisible) {
+       this.sidebarVisible = false;
+       this.cdr.markForCheck();
+    } else if (!isMobile && !this.sidebarVisible) {
+       this.sidebarVisible = true;
+       this.cdr.markForCheck();
+    } else {
+       // Asegurar actualización de vista si solo cambia backdrop
+       this.cdr.markForCheck();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    try {
+      const width = window.innerWidth || document.documentElement.clientWidth;
+      const isMobile = width < 992;
+      if (!isMobile || !this.sidebarVisible) return;
+      const sidebarEl = document.getElementById('sidebar');
+      const target = event.target as Node | null;
+      if (sidebarEl && target && !sidebarEl.contains(target)) {
+        // Verificar si el click fue en el botón toggle para evitar cierre inmediato
+        const toggler = document.querySelector('.header-toggler');
+        if (toggler && toggler.contains(target)) {
+           return;
+        }
+
+        this.sidebarVisible = false;
+        this.cdr.markForCheck();
+      }
+    } catch {}
+  }
+
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    if (this.navSubscription) {
+      this.navSubscription.unsubscribe();
+    }
     try {
       window.removeEventListener('storage', this.onStorageChange as any);
     } catch {}

@@ -45,7 +45,7 @@
       }
       <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
         <c-row class="align-items-center g-3">
-          <c-col xs="12" md="3" class="d-flex align-items-center gap-3">
+          <c-col xs="12" md="4" class="d-flex align-items-center gap-3">
             <div class="text-nowrap fw-semibold text-secondary">
               {{ totalElements }} {{ 'ADMIN.USERS.USERS_LABEL' | translate }}
             </div>
@@ -71,7 +71,7 @@
               </option>
             </select>
           </c-col>
-          <c-col xs="12" md="6">
+          <c-col xs="12" md="8" class="d-flex gap-2 align-items-center">
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0 text-secondary">
                 <svg cIcon name="cilSearch"></svg>
@@ -96,51 +96,51 @@
                 <svg cIcon name="cilFilter" class="me-1"></svg>
                 {{ 'ADMIN.USERS.FILTERS' | translate }}
               </button>
-              
-              <!-- Sort Dropdown -->
-              <c-dropdown variant="btn-group" class="ms-2">
-                <button cButton cDropdownToggle color="secondary" variant="outline" [cTooltip]="'Ordenar listado'" [disabled]="loading">
-                  <svg cIcon [name]="getSortIcon('username')" class="me-1"></svg>
-                </button>
-                <ul cDropdownMenu>
-                  <li><h6 cDropdownHeader class="dropdown-header small">Por Usuario</h6></li>
-                  <li>
-                    <button cDropdownItem (click)="ordenar('username', 'ASC')">
-                      <span *ngIf="isSortActive('username', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
-                    </button>
-                  </li>
-                  <li>
-                    <button cDropdownItem (click)="ordenar('username', 'DESC')">
-                      <span *ngIf="isSortActive('username', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
-                    </button>
-                  </li>
-                  <li><hr cDropdownDivider></li>
-                  <li><h6 cDropdownHeader class="dropdown-header small">Por Nombre</h6></li>
-                  <li>
-                    <button cDropdownItem (click)="ordenar('nombre', 'ASC')">
-                      <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
-                    </button>
-                  </li>
-                  <li>
-                    <button cDropdownItem (click)="ordenar('nombre', 'DESC')">
-                      <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
-                    </button>
-                  </li>
-                  <li><hr cDropdownDivider></li>
-                  <li><h6 cDropdownHeader class="dropdown-header small">Por Rol</h6></li>
-                  <li>
-                    <button cDropdownItem (click)="ordenar('rol.codigo', 'ASC')">
-                      <span *ngIf="isSortActive('rol.codigo', 'ASC')" class="me-1 text-success fw-bold">✓</span> Rol Ascendente
-                    </button>
-                  </li>
-                  <li>
-                    <button cDropdownItem (click)="ordenar('rol.codigo', 'DESC')">
-                      <span *ngIf="isSortActive('rol.codigo', 'DESC')" class="me-1 text-success fw-bold">✓</span> Rol Descendente
-                    </button>
-                  </li>
-                </ul>
-              </c-dropdown>
             </div>
+              
+            <!-- Sort Dropdown -->
+            <c-dropdown variant="btn-group">
+              <button cButton cDropdownToggle color="secondary" variant="outline" [cTooltip]="'Ordenar listado'" [disabled]="loading">
+                <svg cIcon [name]="getSortIcon('username')" class="me-1"></svg>
+              </button>
+              <ul cDropdownMenu>
+                <li><h6 cDropdownHeader class="dropdown-header small">Por Usuario</h6></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('username', 'ASC')">
+                    <span *ngIf="isSortActive('username', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('username', 'DESC')">
+                    <span *ngIf="isSortActive('username', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                  </button>
+                </li>
+                <li><hr cDropdownDivider></li>
+                <li><h6 cDropdownHeader class="dropdown-header small">Por Nombre</h6></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('nombre', 'ASC')">
+                    <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('nombre', 'DESC')">
+                    <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                  </button>
+                </li>
+                <li><hr cDropdownDivider></li>
+                <li><h6 cDropdownHeader class="dropdown-header small">Por Rol</h6></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('rol.codigo', 'ASC')">
+                    <span *ngIf="isSortActive('rol.codigo', 'ASC')" class="me-1 text-success fw-bold">✓</span> Rol Ascendente
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('rol.codigo', 'DESC')">
+                    <span *ngIf="isSortActive('rol.codigo', 'DESC')" class="me-1 text-success fw-bold">✓</span> Rol Descendente
+                  </button>
+                </li>
+              </ul>
+            </c-dropdown>
           </c-col>
         </c-row>
         @if (showAdvanced) {

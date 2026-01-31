@@ -24,7 +24,7 @@
         color="secondary"
         variant="ghost"
         size="sm"
-        (click)="downloadCsv.emit()"
+        (click)="onDownloadClick()"
         [title]="'ADMIN.DASHBOARD.RECENT.DOWNLOAD_CSV' | translate"
         [attr.aria-label]="'ADMIN.DASHBOARD.RECENT.DOWNLOAD_CSV' | translate"
         data-testid="btn-csv-recent"

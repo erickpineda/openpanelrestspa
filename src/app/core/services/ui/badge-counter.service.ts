@@ -29,6 +29,10 @@ import { ComentarioService } from '../data/comentario.service';
 import { EntradaService } from '../data/entrada.service';
 import { UsuarioService } from '../data/usuario.service';
 
+import { TemporaryStorageService } from './temporary-storage.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
+
 /**
  * Códigos de error específicos para el servicio de contadores
  */
@@ -71,7 +75,8 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
   constructor(
     private comentarioService: ComentarioService,
     private entradaService: EntradaService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private temporaryStorage: TemporaryStorageService
   ) {
     // Inicializar contadores solo si no estamos en un entorno de pruebas
     if (typeof jasmine === 'undefined') {
@@ -83,7 +88,7 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
    * Obtiene el contador de comentarios sin moderar con manejo robusto de errores
    */
   getUnmoderatedCommentsCount(): Observable<number> {
-    return this.comentarioService.listarSafe().pipe(
+    return this.comentarioService.listarSafeSinGlobalLoader().pipe(
       map((comentarios: any[]) => {
         if (!Array.isArray(comentarios)) {
           this.logError(
@@ -107,7 +112,8 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
       catchError((error) => {
         this.logError('unmoderated-comments', BadgeCounterErrorCodes.SERVICE_UNAVAILABLE, error);
         return of(this.getFallbackValue('unmoderated-comments'));
-      })
+      }),
+      startWith(0)
     );
   }
 
@@ -115,25 +121,12 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
    * Obtiene el contador de entradas en borrador con manejo robusto de errores
    */
   getDraftEntriesCount(): Observable<number> {
-    return this.entradaService.listarSafe().pipe(
-      map((entradas: any[]) => {
-        if (!Array.isArray(entradas)) {
-          this.logError(
-            'draft-entries',
-            BadgeCounterErrorCodes.INVALID_COUNTER_ID,
-            'Invalid response format for entries'
-          );
-          return this.fallbackConfig.defaultValue;
-        }
-
-        // Filtrar entradas en estado borrador
-        return entradas.filter(
-          (entrada: any) => entrada.estado === 'BORRADOR' || entrada.estado === 'TEMPORAL'
-        ).length;
-      }),
-      retry({
-        count: this.fallbackConfig.maxRetries,
-        delay: this.fallbackConfig.retryDelayMs,
+    return this.temporaryStorage.entriesChanged$.pipe(
+      take(1),
+      startWith(null),
+      map(() => {
+        const entries = this.temporaryStorage.getTemporaryEntriesByType('entrada');
+        return entries.length;
       }),
       catchError((error) => {
         this.logError('draft-entries', BadgeCounterErrorCodes.SERVICE_UNAVAILABLE, error);
@@ -146,7 +139,7 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
    * Obtiene el contador de usuarios pendientes de aprobación con manejo robusto de errores
    */
   getPendingUsersCount(): Observable<number> {
-    return this.usuarioService.listarSafe().pipe(
+    return this.usuarioService.listarSafeSinGlobalLoader().pipe(
       map((usuarios: any[]) => {
         if (!Array.isArray(usuarios)) {
           this.logError(
@@ -169,7 +162,43 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
       catchError((error) => {
         this.logError('pending-users', BadgeCounterErrorCodes.SERVICE_UNAVAILABLE, error);
         return of(this.getFallbackValue('pending-users'));
-      })
+      }),
+      startWith(0)
+    );
+  }
+
+  /**
+   * Obtiene el contador de borradores del usuario actual
+   */
+  getMyDraftsCount(): Observable<number> {
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    return this.usuarioService.obtenerDatosSesionActualSafe(context).pipe(
+      switchMap((perfil: any) => {
+        if (!perfil || !perfil.username) {
+          return of(0);
+        }
+        return this.entradaService.listarSafeSinGlobalLoader().pipe(
+          map((entradas: any[]) => {
+            if (!Array.isArray(entradas)) {
+              return 0;
+            }
+            return entradas.filter(
+              (entrada: any) =>
+                (entrada.autor?.username === perfil.username || entrada.usuarioNombre === perfil.username) &&
+                (entrada.estado === 'BORRADOR' || entrada.estado === 'TEMPORAL')
+            ).length;
+          })
+        );
+      }),
+      retry({
+        count: this.fallbackConfig.maxRetries,
+        delay: this.fallbackConfig.retryDelayMs,
+      }),
+      catchError((error) => {
+        this.logError('my-drafts', BadgeCounterErrorCodes.SERVICE_UNAVAILABLE, error);
+        return of(this.getFallbackValue('my-drafts'));
+      }),
+      startWith(0)
     );
   }
 
@@ -218,6 +247,7 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
     this.updateCounter('draft-entries', this.getDraftEntriesCount());
     this.updateCounter('pending-users', this.getPendingUsersCount());
     this.updateCounter('system-alerts', this.getSystemAlertsCount());
+    this.updateCounter('my-drafts', this.getMyDraftsCount());
   }
 
   /**
@@ -242,7 +272,7 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
   setupAutoRefreshCounter(
     counterId: string,
     counterObservable: Observable<number>,
-    intervalMs: number = NavigationConstants.REFRESH_INTERVALS.NORMAL
+    intervalMs: number = NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
   ): void {
     this.stopAutoRefresh(counterId);
 
@@ -318,25 +348,31 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
     this.setupAutoRefreshCounter(
       'unmoderated-comments',
       this.getUnmoderatedCommentsCount(),
-      NavigationConstants.REFRESH_INTERVALS.NORMAL
+      NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
     );
 
     this.setupAutoRefreshCounter(
       'draft-entries',
       this.getDraftEntriesCount(),
-      NavigationConstants.REFRESH_INTERVALS.SLOW
+      NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
     );
 
     this.setupAutoRefreshCounter(
       'pending-users',
       this.getPendingUsersCount(),
-      NavigationConstants.REFRESH_INTERVALS.SLOW
+      NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
     );
 
     this.setupAutoRefreshCounter(
       'system-alerts',
       this.getSystemAlertsCount(),
-      NavigationConstants.REFRESH_INTERVALS.FAST
+      NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
+    );
+
+    this.setupAutoRefreshCounter(
+      'my-drafts',
+      this.getMyDraftsCount(),
+      NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
     );
   }
 
@@ -397,6 +433,7 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
       'draft-entries': 0,
       'pending-users': 0,
       'system-alerts': 0,
+      'my-drafts': 0,
     };
 
     return fallbackValues[counterId] ?? this.fallbackConfig.defaultValue;

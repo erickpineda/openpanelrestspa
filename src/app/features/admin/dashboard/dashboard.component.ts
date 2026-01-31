@@ -1,17 +1,16 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
-import JSZip from 'jszip';
-import saveAs from 'file-saver';
+import { TranslationService } from '@app/core/services/translation.service';
 
-// Services
 import { AuthSyncService } from '@app/core/services/auth/auth-sync.service';
-import { DashboardApiService } from '@app/core/services/dashboard-api.service';
 import { DashboardFacadeService } from './srv/dashboard-facade.service';
+import { DashboardExportService } from './srv/dashboard-export.service';
+import { DashboardChartService } from './srv/dashboard-chart.service';
+import { DashboardConfigService } from './srv/dashboard-config.service';
 import { LoadingService } from '@app/core/services/ui/loading.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
 
-// Models
 import {
   ActivityPointDTO,
   ContentStatsDTO,
@@ -21,10 +20,20 @@ import {
   TopItemDTO,
 } from '@shared/models/dashboard.models';
 
-// Constants & Environment
 import { environment } from '../../../../environments/environment';
 import { OPConstants } from '@shared/constants/op-global.constants';
 
+/**
+ * Componente principal del Dashboard de Administración.
+ *
+ * Responsabilidades:
+ * - Orquestar la carga de datos (Resumen, Series, Tops, Almacenamiento, Estadísticas).
+ * - Gestionar la interacción del usuario (Filtros de fechas, granularidad, configuración).
+ * - Delegar la lógica de negocio a `DashboardFacadeService`.
+ * - Delegar la generación de gráficas a `DashboardChartService`.
+ * - Delegar la exportación de datos a `DashboardExportService`.
+ * - Delegar la configuración inicial a `DashboardConfigService`.
+ */
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -33,6 +42,7 @@ import { OPConstants } from '@shared/constants/op-global.constants';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   // #region State & UI Flags
+  // Internal UI state flags - Not candidates for external config
   metricsExpanded = false;
   forceFromDb = false;
   showSettingsModal = false;
@@ -40,6 +50,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Loading Flags
+  // Transient loading states - Not candidates for external config
   loadingSummary = false;
   loadingSeries = false;
   loadingTopUsers = false;
@@ -53,6 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Error Flags
+  // Transient error states - Not candidates for external config
   errorSummary: string | null = null;
   errorRecent: string | null = null;
   errorTopUsers: string | null = null;
@@ -67,6 +79,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Data Containers
+  // Dynamic data containers - Not candidates for external config
   totalEntradas = 0;
   cantidadUsuariosActivos = 0;
   latestEntries: SummaryEntryDTO[] = [];
@@ -86,19 +99,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   
   estadoNominalChartOptions: any;
   estadoSplitChartOptions: any;
-  estadoNominalChartType: 'line' | 'bar' = 'bar';
-  estadoNominalStacked = true;
+  
+  estadoNominalChartType: 'line' | 'bar';
+  estadoNominalStacked: boolean;
   // #endregion
 
   // #region Configuration
-  seriesDays = 30;
-  seriesGranularity: 'hour' | 'day' | 'week' | 'month' = 'day';
-  topLimit = 10;
-  topPeriodDays = 30;
+  // Initialized from DashboardConfigService
+  seriesDays: number;
+  seriesGranularity: 'hour' | 'day' | 'week' | 'month';
+  topLimit: number;
+  topPeriodDays: number;
+  recentSize: number;
+
   topCustomStartDate?: string;
   topCustomEndDate?: string;
   recentPage = 0;
-  recentSize = 5;
   recentTotalPages = 0;
   
   settings: {
@@ -108,11 +124,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     topPeriodDays: number;
     topStartDate?: string;
     topEndDate?: string;
-  } = {
-    seriesDays: this.seriesDays,
-    seriesGranularity: this.seriesGranularity,
-    topLimit: this.topLimit,
-    topPeriodDays: this.topPeriodDays,
   };
   // #endregion
 
@@ -124,23 +135,37 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // #region Private Properties
   private subscription = new Subscription();
   private onAuthChangedHandler?: (ev: any) => void;
-  private dataRawLabels: string[] = [];
   private settingsInitial: typeof this.settings | null = null;
-  private colorPalette: string[] = [
-    '#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc948',
-    '#b07aa1', '#ff9da7', '#9c755f', '#bab0ab', '#1f77b4', '#d62728',
-  ];
   // #endregion
 
   constructor(
     private cdr: ChangeDetectorRef,
     private log: LoggerService,
-    private dashboardApi: DashboardApiService,
     private dashboardFacade: DashboardFacadeService,
+    private dashboardExport: DashboardExportService,
+    private chartService: DashboardChartService,
+    private configService: DashboardConfigService,
     private loadingService: LoadingService,
     private toastService: ToastService,
-    private authSync: AuthSyncService
-  ) {}
+    private authSync: AuthSyncService,
+    private translate: TranslationService
+  ) {
+    const config = this.configService.config;
+    this.seriesDays = config.seriesDays;
+    this.seriesGranularity = config.seriesGranularity;
+    this.topLimit = config.topLimit;
+    this.topPeriodDays = config.topPeriodDays;
+    this.recentSize = config.recentSize;
+    this.estadoNominalChartType = config.estadoNominalChartType;
+    this.estadoNominalStacked = config.estadoNominalStacked;
+
+    this.settings = {
+      seriesDays: this.seriesDays,
+      seriesGranularity: this.seriesGranularity,
+      topLimit: this.topLimit,
+      topPeriodDays: this.topPeriodDays,
+    };
+  }
 
   // #region Lifecycle Hooks
   async ngOnInit(): Promise<void> {
@@ -188,83 +213,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // #region Getters (KPIs)
   get kpiPublicadas(): number {
-    if (this.contentStats && this.contentStats.entradasByEstado) {
-      const keys = Object.keys(this.contentStats.entradasByEstado);
-      const key = keys.find((k) => k.trim().toUpperCase() === 'PUBLICADA');
-      return key ? Number(this.contentStats.entradasByEstado[key]) || 0 : 0;
-    }
-    return 0;
+    return this.chartService.calculateKpiPublicadas(this.contentStats);
   }
 
   get kpiNoPublicadas(): number {
-    if (this.contentStats && this.contentStats.entradasByEstado) {
-      return Object.entries(this.contentStats.entradasByEstado)
-        .filter(([k]) => k.trim().toUpperCase() !== 'PUBLICADA')
-        .reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
-    }
-    return 0;
+    return this.chartService.calculateKpiNoPublicadas(this.contentStats);
   }
 
   get sumEntradasSerie(): number {
-    try {
-      const arr =
-        this.data &&
-        this.data.datasets &&
-        this.data.datasets[0] &&
-        Array.isArray(this.data.datasets[0].data)
-          ? (this.data.datasets[0].data as number[])
-          : [];
-      return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
-    } catch {
-      return 0;
-    }
+    return this.chartService.calculateSumSeries(this.data, 0);
   }
 
   get sumComentarios(): number {
-    try {
-      const arr =
-        this.data &&
-        this.data.datasets &&
-        this.data.datasets[1] &&
-        Array.isArray(this.data.datasets[1].data)
-          ? (this.data.datasets[1].data as number[])
-          : [];
-      return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
-    } catch {
-      return 0;
-    }
+    return this.chartService.calculateSumSeries(this.data, 1);
   }
 
   get sumUsuarios(): number {
-    try {
-      const arr =
-        this.data &&
-        this.data.datasets &&
-        this.data.datasets[2] &&
-        Array.isArray(this.data.datasets[2].data)
-          ? (this.data.datasets[2].data as number[])
-          : [];
-      return arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
-    } catch {
-      return 0;
-    }
+    return this.chartService.calculateSumSeries(this.data, 2);
   }
 
   get contentEstadoRows(): { estado: string; total: number; porcentaje: number }[] {
-    const entries =
-      this.contentStats && (this.contentStats as any).entradasByEstado
-        ? Object.entries((this.contentStats as any).entradasByEstado)
-        : [];
-    const total =
-      (this.contentStats as any)?.totalEntradas ||
-      entries.reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
-    return entries
-      .map(([k, v]) => {
-        const count = Number(v) || 0;
-        const pct = total > 0 ? Math.round((count * 1000) / total) / 10 : 0;
-        return { estado: k, total: count, porcentaje: pct };
-      })
-      .sort((a, b) => b.total - a.total);
+    return this.chartService.calculateContentEstadoRows(this.contentStats);
   }
 
   getKpiPorEstado(estado: string): number {
@@ -307,10 +276,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.errorSummary = null;
     if (!force) {
       try {
-        this.dashboardApi.evictSummary();
-        this.dashboardApi.evictSeries(this.seriesDays);
-        this.dashboardApi.evictTop();
-        this.dashboardApi.evictContentStats();
+        this.dashboardFacade.evictSummary();
+        this.dashboardFacade.evictSeries(this.seriesDays);
+        this.dashboardFacade.evictTop();
+        this.dashboardFacade.evictContentStats();
       } catch {}
     }
     const start = typeof performance !== 'undefined' ? performance.now() : Date.now();
@@ -340,27 +309,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             }
             if (Array.isArray(series)) {
               const points = series as ActivityPointDTO[];
-              this.data = {
-                labels: points.map((p) => this.formatLabelFromDate(p.date)),
-                datasets: [
-                  {
-                    label: 'Entradas',
-                    backgroundColor: '#007bff',
-                    data: points.map((p) => p.entradas),
-                  },
-                  {
-                    label: 'Comentarios',
-                    backgroundColor: '#ff7f0e',
-                    data: points.map((p) => p.comentarios),
-                  },
-                  {
-                    label: 'Usuarios',
-                    backgroundColor: '#2ca02c',
-                    data: points.map((p) => p.usuarios),
-                  },
-                ],
-              };
-              this.dataRawLabels = (series as ActivityPointDTO[]).map((p) => String(p.date || ''));
+              this.data = this.chartService.generateMainSeriesChart(points);
             }
             this.topUsers = Array.isArray(topUsers) ? topUsers : this.topUsers;
             this.topCategories = Array.isArray(topCategories) ? topCategories : this.topCategories;
@@ -368,11 +317,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.storage = storage as StorageDTO;
             this.contentStats = contentStats as ContentStatsDTO;
             if (contentStats && (contentStats as ContentStatsDTO).entradasByEstado) {
-              this.updateContentStatsChart(contentStats as ContentStatsDTO);
+              this.contentStatsChartData = this.chartService.generateContentStatsChart(contentStats as ContentStatsDTO);
             }
             this.loadSeriesEntriesSplitEstado();
             this.loadSeriesEntriesSplitEstadoNombre();
-            this.toastService.showSuccess('Datos actualizados', 'Dashboard');
+            this.toastService.showSuccess(
+              this.translate.instant('ADMIN.DASHBOARD.SUCCESS.UPDATED'),
+              this.translate.instant('MENU.DASHBOARD')
+            );
             this.cdr.detectChanges();
           } finally {
             this.loadingSeries = false;
@@ -383,7 +335,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           }
         },
         error: (err) => {
-          this.errorSummary = 'Error refrescando dashboard';
+          this.errorSummary = this.translate.instant('ADMIN.DASHBOARD.ERROR.REFRESH_DASHBOARD');
           this.log.error('Error refrescando dashboard', err);
           this.loadingSeries = false;
           this.loadingService.forceStopLoading();
@@ -399,52 +351,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.errorTopUsers = null;
     this.errorTopCategories = null;
     this.errorTopTags = null;
-    const { startDate, endDate } =
-      this.topCustomStartDate && this.topCustomEndDate
-        ? { startDate: this.topCustomStartDate, endDate: this.topCustomEndDate }
-        : this.getPeriodDates(this.topPeriodDays);
-    const subTopUsers = this.dashboardFacade
-      .getTop('users', this.topLimit, this.forceFromDb, startDate, endDate)
+    const { startDate, endDate } = this.getEffectiveTopDateRange();
+    
+    const sub = this.dashboardFacade
+      .refreshTopWidgets(this.topLimit, this.forceFromDb, startDate, endDate)
       .subscribe({
-        next: (items: TopItemDTO[]) => {
-          this.topUsers = items || [];
+        next: ([users, categories, tags]) => {
+          this.topUsers = users || [];
+          this.topCategories = categories || [];
+          this.topTags = tags || [];
           this.loadingTopUsers = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.loadingTopUsers = false;
-          this.errorTopUsers = 'Error obteniendo Top Usuarios';
-        },
-      });
-    const subTopCategories = this.dashboardFacade
-      .getTop('categories', this.topLimit, this.forceFromDb, startDate, endDate)
-      .subscribe({
-        next: (items: TopItemDTO[]) => {
-          this.topCategories = items || [];
           this.loadingTopCategories = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.loadingTopCategories = false;
-          this.errorTopCategories = 'Error obteniendo Top Categorías';
-        },
-      });
-    const subTopTags = this.dashboardFacade
-      .getTop('tags', this.topLimit, this.forceFromDb, startDate, endDate)
-      .subscribe({
-        next: (items: TopItemDTO[]) => {
-          this.topTags = items || [];
           this.loadingTopTags = false;
           this.cdr.detectChanges();
         },
         error: () => {
+          this.loadingTopUsers = false;
+          this.loadingTopCategories = false;
           this.loadingTopTags = false;
-          this.errorTopTags = 'Error obteniendo Top Tags';
+          this.errorTopUsers = this.translate.instant('ADMIN.DASHBOARD.ERROR.TOP_USERS');
+          this.errorTopCategories = this.translate.instant('ADMIN.DASHBOARD.ERROR.TOP_CATEGORIES');
+          this.errorTopTags = this.translate.instant('ADMIN.DASHBOARD.ERROR.TOP_TAGS');
         },
       });
-    this.subscription.add(subTopUsers);
-    this.subscription.add(subTopCategories);
-    this.subscription.add(subTopTags);
+    this.subscription.add(sub);
   }
 
   loadStorage(): void {
@@ -458,7 +388,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.loadingStorage = false;
-        this.errorStorage = 'Error obteniendo almacenamiento';
+        this.errorStorage = this.translate.instant('ADMIN.DASHBOARD.ERROR.STORAGE');
       },
     });
     this.subscription.add(sub);
@@ -470,13 +400,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const sub = this.dashboardFacade.getContentStats().subscribe({
       next: (cs: ContentStatsDTO) => {
         this.contentStats = cs;
-        this.updateContentStatsChart(cs);
+        this.contentStatsChartData = this.chartService.generateContentStatsChart(cs);
         this.loadingContentStats = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.loadingContentStats = false;
-        this.errorContentStats = 'Error obteniendo estadísticas de contenido';
+        this.errorContentStats = this.translate.instant('ADMIN.DASHBOARD.ERROR.CONTENT_STATS');
       },
     });
     this.subscription.add(sub);
@@ -508,7 +438,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: () => {
-        this.errorRecent = 'Error obteniendo actividad reciente';
+        this.errorRecent = this.translate.instant('ADMIN.DASHBOARD.ERROR.RECENT_ACTIVITY');
         this.loadingRecent = false;
       },
     });
@@ -522,36 +452,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .getSeriesEntriesSplitEstado(this.seriesDays, this.seriesGranularity, true)
       .subscribe({
         next: (arr: any[]) => {
-          const labels = Array.isArray(arr)
-            ? arr.map((p) => this.formatLabelFromDate(p?.date))
-            : [];
-          const hasNested =
-            Array.isArray(arr) && arr.some((p) => p && typeof p.entradasByEstado === 'object');
-          if (hasNested) {
-            const estados = Array.from(
-              new Set(arr.flatMap((p) => Object.keys(p.entradasByEstado || {})))
-            );
-            const datasets = estados.map((estado, i) => ({
-              label: estado,
-              backgroundColor: this.colorForLabel(estado, i),
-              data: arr.map((p) => Number(p.entradasByEstado?.[estado]) || 0),
-            }));
-            this.seriesEntriesSplitData = { labels, datasets };
-          } else {
-            const keys = Array.from(
-              new Set(arr.flatMap((p) => Object.keys(p || {}).filter((k) => k !== 'date')))
-            );
-            const datasets = keys.map((k, i) => ({
-              label: String(k).toUpperCase(),
-              backgroundColor: this.colorForLabel(k, i),
-              data: arr.map((p) => Number(p?.[k] || 0)),
-            }));
-            this.seriesEntriesSplitData = { labels, datasets };
-          }
+          const chart = this.chartService.transformSplitEstado(arr);
+          this.seriesEntriesSplitData = chart;
           try {
             setTimeout(() => {
               this.seriesEntriesSplitData = {
-                labels: [...labels],
+                labels: [...chart.labels],
                 datasets: (this.seriesEntriesSplitData.datasets || []).map((d: any) => ({
                   ...d,
                   data: [...d.data],
@@ -565,7 +471,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.loadingSplitEstado = false;
-          this.errorSplitEstado = 'Error obteniendo series por estado';
+          this.errorSplitEstado = this.translate.instant('ADMIN.DASHBOARD.ERROR.SERIES_BY_STATUS');
         },
       });
     this.subscription.add(sub);
@@ -577,35 +483,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .getSeriesEntriesSplitEstadoNombre(this.seriesDays, this.seriesGranularity, true)
       .subscribe({
         next: (arr: any[]) => {
-          const flatArr = Array.isArray(arr)
-            ? arr.map((p) =>
-                p && typeof p.entradasByEstado === 'object'
-                  ? { date: p.date, ...p.entradasByEstado }
-                  : p
-              )
-            : [];
-          const labels = flatArr.map((p) => this.formatLabelFromDate(p?.date));
-          const estadosSet = new Set<string>();
-          flatArr.forEach((p) =>
-            Object.keys(p || {}).forEach((k) => k !== 'date' && estadosSet.add(k))
-          );
-          const estados = Array.from(estadosSet);
-          const datasets = estados.map((e, i) => ({
-            label: String(e),
-            backgroundColor: this.colorForLabel(e, i),
-            borderColor: this.colorForLabel(e, i),
-            fill: false,
-            tension: 0.2,
-            data: flatArr.map((r) => Number(r?.[e] || 0)),
-          }));
-          const chart = { labels, datasets };
+          const chart = this.chartService.transformSplitEstadoNombre(arr);
           this.seriesEntriesSplitEstadoNombreData = chart;
-          this.updateEstadoNominalOptions();
+          this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(this.estadoNominalStacked);
           try {
             setTimeout(() => {
               this.seriesEntriesSplitEstadoNombreData = {
-                labels: [...labels],
-                datasets: datasets.map((d) => ({ ...d, data: [...d.data] })),
+                labels: [...chart.labels],
+                datasets: chart.datasets.map((d: any) => ({ ...d, data: [...d.data] })),
               };
               this.cdr.detectChanges();
             }, 0);
@@ -613,7 +498,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         },
         error: () => {
-          this.errorSplitEstadoNombre = 'Error obteniendo series pivot por estado';
+          this.errorSplitEstadoNombre = this.translate.instant('ADMIN.DASHBOARD.ERROR.SERIES_PIVOT');
         },
       });
     this.subscription.add(sub);
@@ -622,39 +507,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // #region UI Action Methods
   changeSeriesDays(days: number): void {
-    const d = Math.max(1, Math.min(365, Number(days) || 30));
+    const d = Math.max(1, Math.min(365, Number(days) || this.configService.config.seriesDays));
     this.seriesDays = d;
     const sub = this.dashboardFacade
       .getSeries(this.seriesDays, true, this.seriesGranularity)
       .subscribe({
         next: (points: ActivityPointDTO[]) => {
-          this.data = {
-            labels: points.map((p) => this.formatLabelFromDate(p.date)),
-            datasets: [
-              {
-                label: 'Entradas',
-                backgroundColor: '#007bff',
-                data: points.map((p) => p.entradas),
-              },
-              {
-                label: 'Comentarios',
-                backgroundColor: '#ff7f0e',
-                data: points.map((p) => p.comentarios),
-              },
-              {
-                label: 'Usuarios',
-                backgroundColor: '#2ca02c',
-                data: points.map((p) => p.usuarios),
-              },
-            ],
-          };
+          this.data = this.chartService.generateMainSeriesChart(points);
           this.cdr.detectChanges();
         },
       });
     this.subscription.add(sub);
     this.loadSeriesEntriesSplitEstado();
     this.loadSeriesEntriesSplitEstadoNombre();
-    this.updateEstadoNominalOptions();
+    this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(this.estadoNominalStacked);
   }
 
   changeSeriesGranularity(g: 'hour' | 'day' | 'week' | 'month'): void {
@@ -663,7 +529,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   onChangeTopLimit(limit: number): void {
-    const l = Math.max(1, Math.min(200, Number(limit) || 10));
+    const l = Math.max(1, Math.min(200, Number(limit) || this.configService.config.topLimit));
     this.topLimit = l;
     this.loadTopWidgets();
   }
@@ -674,7 +540,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   onRecentSizeChange(size: number): void {
-    const s = Math.max(1, Math.min(200, Number(size) || 5));
+    const s = Math.max(1, Math.min(200, Number(size) || this.configService.config.recentSize));
     this.recentSize = s;
     this.recentPage = 0;
     this.loadRecentActivity();
@@ -682,12 +548,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   setEstadoNominalChartType(t: 'line' | 'bar'): void {
     this.estadoNominalChartType = t;
-    this.updateEstadoNominalOptions();
+    this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(this.estadoNominalStacked);
   }
 
   toggleEstadoNominalStacked(): void {
     this.estadoNominalStacked = !this.estadoNominalStacked;
-    this.updateEstadoNominalOptions();
+    this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(this.estadoNominalStacked);
   }
 
   toggleForceFromDb(): void {
@@ -738,19 +604,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
         perf: this.perf,
       };
       const text = JSON.stringify(payload, null, 2);
-      if (navigator && (navigator as any).clipboard && (navigator as any).clipboard.writeText) {
-        await (navigator as any).clipboard.writeText(text);
+      if (navigator && navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+        this.toastService.showSuccess(
+          this.translate.instant('ADMIN.DASHBOARD.METRICS.COPIED'),
+          this.translate.instant('MENU.DASHBOARD')
+        );
       } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
+        throw new Error('Clipboard API not available');
       }
-      this.toastService.showSuccess('Métricas copiadas', 'Dashboard');
     } catch {
-      this.toastService.showError('No se pudieron copiar las métricas', 'Dashboard');
+      this.toastService.showError(
+        this.translate.instant('ADMIN.DASHBOARD.METRICS.COPY_ERROR'),
+        this.translate.instant('MENU.DASHBOARD')
+      );
     }
   }
   // #endregion
@@ -813,20 +680,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   resetSettings(): void {
+    const config = this.configService.config;
     this.settings = {
-      seriesDays: 30,
-      seriesGranularity: 'day',
-      topLimit: 10,
-      topPeriodDays: 30,
+      seriesDays: config.seriesDays,
+      seriesGranularity: config.seriesGranularity,
+      topLimit: config.topLimit,
+      topPeriodDays: config.topPeriodDays,
       topStartDate: undefined,
       topEndDate: undefined,
     };
-    this.clearFeedback = 'Campos restablecidos a valores por defecto';
+    this.clearFeedback = this.translate.instant('ADMIN.DASHBOARD.SETTINGS_MODAL.RESET_FEEDBACK');
     this.cdr.detectChanges();
   }
   // #endregion
 
   // #region Export & Download Methods
+  private safeDownload<T>(
+    data: T | undefined | null,
+    isValid: (d: T) => boolean,
+    action: (d: T) => void,
+    warningMsg: string,
+    errorMsg: string
+  ): void {
+    try {
+      if (data && isValid(data)) {
+        action(data);
+      } else {
+        this.toastService.showWarning(warningMsg, this.translate.instant('MENU.DASHBOARD'));
+      }
+      this.cdr.detectChanges();
+    } catch (e) {
+      console.error(`Dashboard: ${errorMsg}`, e);
+      this.toastService.showError(errorMsg, this.translate.instant('MENU.DASHBOARD'));
+    }
+  }
+
   downloadCurrentData(): void {
     try {
       const payload: any = {
@@ -849,32 +737,108 @@ export class DashboardComponent implements OnInit, OnDestroy {
         contentStats: this.contentStats,
         latestEntries: this.latestEntries,
       };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      saveAs(blob, `dashboard_export_${new Date().toISOString()}.json`);
+      this.dashboardExport.downloadCurrentData(payload);
     } catch {}
   }
 
   downloadCsv(): void {
-    try {
-      const now = new Date();
-      const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-      if (this.data && Array.isArray(this.data.labels) && Array.isArray(this.data.datasets)) {
-        const headers = [
-          'date',
-          ...this.data.datasets.map((ds: any) => String(ds.label || 'serie')),
-        ];
-        const rows: any[][] = (this.data.labels as string[]).map((d: string, i: number) => [
-          d,
-          ...this.data.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
-          ),
-        ]);
-        const csv = this.buildCsv(headers, rows);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-        saveAs(blob, `dashboard_series_${datePart}_${timePart}.csv`);
-      }
-    } catch {}
+    this.safeDownload(
+      this.data,
+      (d) => d && d.labels && d.labels.length > 0,
+      (d) => this.dashboardExport.downloadCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_SERIES'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_SERIES')
+    );
+  }
+
+  downloadRecentCsv(): void {
+    this.safeDownload(
+      this.recentItems,
+      (d) => d && d.length > 0,
+      (d) => this.dashboardExport.downloadRecentActivityCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_RECENT'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_RECENT')
+    );
+  }
+
+  downloadSplitEstadoCsv(): void {
+    this.safeDownload(
+      this.seriesEntriesSplitData,
+      (d) => d && d.labels && d.labels.length > 0,
+      (d) => this.dashboardExport.downloadSeriesSplitEstadoCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_SPLIT'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_SPLIT')
+    );
+  }
+
+  downloadSplitEstadoNombreCsv(): void {
+    this.safeDownload(
+      this.seriesEntriesSplitEstadoNombreData,
+      (d) => d && d.labels && d.labels.length > 0,
+      (d) => this.dashboardExport.downloadSeriesSplitEstadoNombreCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_NOMINAL'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_NOMINAL')
+    );
+  }
+
+  downloadStorageCsv(): void {
+    this.safeDownload(
+      this.storage,
+      (d) => !!d,
+      (d) => this.dashboardExport.downloadStorageCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_STORAGE'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_STORAGE')
+    );
+  }
+
+  downloadContentStatsCsv(): void {
+    this.safeDownload(
+      this.contentStats,
+      (d) => !!d,
+      (d) => this.dashboardExport.downloadContentStatsCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_CONTENT'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_CONTENT')
+    );
+  }
+
+  downloadContentStatsEstadosCsv(): void {
+    this.safeDownload(
+      this.contentStats,
+      (d) => !!(d && d.entradasByEstado),
+      (d) => this.dashboardExport.downloadContentStatsEstadosCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_CONTENT_STATUS'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_CONTENT_STATUS')
+    );
+  }
+
+  downloadTopUsuariosCsv(): void {
+    this.safeDownload(
+      this.topUsers,
+      (d) => d && d.length > 0,
+      (d) => this.dashboardExport.downloadTopUsersCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_TOP_USERS'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_TOP_USERS')
+    );
+  }
+
+  downloadTopCategoriasCsv(): void {
+    this.safeDownload(
+      this.topCategories,
+      (d) => d && d.length > 0,
+      (d) => this.dashboardExport.downloadTopCategoriesCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_TOP_CATEGORIES'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_TOP_CATEGORIES')
+    );
+  }
+
+  downloadTopTagsCsv(): void {
+    this.safeDownload(
+      this.topTags,
+      (d) => d && d.length > 0,
+      (d) => this.dashboardExport.downloadTopTagsCsv(d),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.NO_DATA_TOP_TAGS'),
+      this.translate.instant('ADMIN.DASHBOARD.DOWNLOAD.ERROR_TOP_TAGS')
+    );
   }
 
   async downloadZip(): Promise<void> {
@@ -882,206 +846,46 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.exportError = null;
       this.exportingZip = true;
       this.cdr.detectChanges();
-      const zip = new JSZip();
-      const now = new Date();
-      const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-      const folder = zip.folder(`dashboard_${datePart}_${timePart}`) as JSZip;
-      const addFile = (name: string, content: string) => {
-        if (folder) folder.file(name, content);
-      };
-      if (this.data && Array.isArray(this.data.labels) && Array.isArray(this.data.datasets)) {
-        const headers = [
-          'date',
-          ...this.data.datasets.map((ds: any) => String(ds.label || 'serie')),
-        ];
-        const rows: any[][] = (this.data.labels as string[]).map((d: string, i: number) => [
-          d,
-          ...this.data.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
-          ),
-        ]);
-        addFile('series.csv', this.buildCsv(headers, rows));
-      }
-      if (
-        this.seriesEntriesSplitData &&
-        Array.isArray(this.seriesEntriesSplitData.labels) &&
-        Array.isArray(this.seriesEntriesSplitData.datasets)
-      ) {
-        const headers = [
-          'date',
-          ...this.seriesEntriesSplitData.datasets.map((ds: any) => String(ds.label || 'valor')),
-        ];
-        const rows: any[][] = (this.seriesEntriesSplitData.labels as string[]).map(
-          (d: string, i: number) => [
-            d,
-            ...this.seriesEntriesSplitData.datasets.map((ds: any) =>
-              Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
-            ),
-          ]
-        );
-        addFile('series_split_estado.csv', this.buildCsv(headers, rows));
-      }
-      if (
-        this.seriesEntriesSplitEstadoNombreData &&
-        Array.isArray(this.seriesEntriesSplitEstadoNombreData.labels) &&
-        Array.isArray(this.seriesEntriesSplitEstadoNombreData.datasets)
-      ) {
-        const headers = [
-          'date',
-          ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
-            String(ds.label || 'estado')
-          ),
-        ];
-        const rows: any[][] = (this.seriesEntriesSplitEstadoNombreData.labels as string[]).map(
-          (d: string, i: number) => [
-            d,
-            ...this.seriesEntriesSplitEstadoNombreData.datasets.map((ds: any) =>
-              Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
-            ),
-          ]
-        );
-        addFile('series_split_estado_nombre.csv', this.buildCsv(headers, rows));
-      }
-      if (Array.isArray(this.topUsers) && this.topUsers.length) {
-        addFile(
-          'top_users.csv',
-          this.buildCsv(
-            ['name', 'count'],
-            this.topUsers.map((t) => [t?.name ?? '', t?.count ?? 0])
-          )
-        );
-      }
-      if (Array.isArray(this.topCategories) && this.topCategories.length) {
-        addFile(
-          'top_categories.csv',
-          this.buildCsv(
-            ['name', 'count'],
-            this.topCategories.map((t) => [t?.name ?? '', t?.count ?? 0])
-          )
-        );
-      }
-      if (Array.isArray(this.topTags) && this.topTags.length) {
-        addFile(
-          'top_tags.csv',
-          this.buildCsv(
-            ['name', 'count'],
-            this.topTags.map((t) => [t?.name ?? '', t?.count ?? 0])
-          )
-        );
-      }
-      if (this.contentStats) {
-        addFile(
-          'content_stats.csv',
-          this.buildCsv(
-            ['metric', 'value'],
-            [
-              ['totalUsuarios', this.contentStats.totalUsuarios ?? 0],
-              ['totalEntradas', this.contentStats.totalEntradas ?? 0],
-              ['totalComentarios', this.contentStats.totalComentarios ?? 0],
-              ['totalFicheros', this.contentStats.totalFicheros ?? 0],
-              ['storageBytes', this.contentStats.storageBytes ?? 0],
-            ]
-          )
-        );
-        if (this.contentStats.entradasByEstado) {
-          const headers = ['estado', 'count'];
-          const rows = Object.entries(this.contentStats.entradasByEstado).map(([k, v]) => [
-            k,
-            Number(v) || 0,
-          ]);
-          addFile('content_stats_estados.csv', this.buildCsv(headers, rows));
-        }
-      }
-      if (this.storage) {
-        addFile(
-          'storage.csv',
-          this.buildCsv(
-            ['metric', 'value'],
-            [
-              ['totalFiles', this.storage.totalFiles ?? 0],
-              ['storageBytes', this.storage.storageBytes ?? 0],
-            ]
-          )
-        );
-      }
-      const blob = await zip.generateAsync({ type: 'blob' });
-      saveAs(blob, `dashboard_${datePart}_${timePart}.zip`);
+      await this.dashboardExport.downloadZip(
+        this.data,
+        this.seriesEntriesSplitData,
+        this.seriesEntriesSplitEstadoNombreData,
+        this.topUsers,
+        this.topCategories,
+        this.topTags,
+        this.contentStats,
+        this.storage
+      );
       this.exportingZip = false;
       this.cdr.detectChanges();
     } catch (e: any) {
-      this.exportError = 'Error generando ZIP';
+      this.exportError = this.translate.instant('ADMIN.DASHBOARD.ERROR.ZIP_GENERATION');
       this.exportingZip = false;
       this.cdr.detectChanges();
     }
   }
   // #endregion
 
-  // #region Helper & Utility Methods
+  // #region Helpers
+  /** Formatea bytes a una cadena legible (e.g., "1.5 MB") */
   formatBytes(bytes?: number): string {
-    const b = Number(bytes) || 0;
-    if (b === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(b) / Math.log(k));
-    return `${(b / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+    return this.chartService.formatBytes(bytes);
   }
 
-  formatLabelFromDate(
-    dateStr: string,
-    granularity: 'hour' | 'day' | 'week' | 'month' = this.seriesGranularity,
-    short = true
-  ): string {
-    try {
-      const d = new Date(dateStr + 'T00:00:00Z');
-      const opts: Intl.DateTimeFormatOptions =
-        granularity === 'month'
-          ? { month: 'short' }
-          : granularity === 'week'
-            ? { day: '2-digit', month: 'short' }
-            : { day: '2-digit', month: 'short' };
-      return new Intl.DateTimeFormat('es-ES', opts).format(d);
-    } catch {
-      return dateStr;
+  /** Determina el rango de fechas efectivo para los widgets Top */
+  private getEffectiveTopDateRange(): { startDate: string; endDate: string } {
+    if (this.topCustomStartDate && this.topCustomEndDate) {
+      return { startDate: this.topCustomStartDate, endDate: this.topCustomEndDate };
     }
+    return this.chartService.getPeriodDates(this.topPeriodDays);
   }
 
-  getPeriodDates(days: number): { startDate: string; endDate: string } {
-    const now = new Date();
-    // Use tomorrow as end date to include today in <= queries
-    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-    const start = new Date(end);
-    start.setUTCDate(start.getUTCDate() - Math.max(1, Math.min(365, Number(days) || 30)));
-    const fmt = (d: Date) =>
-      `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-    return { startDate: fmt(start), endDate: fmt(end) };
-  }
-  // #endregion
-
-  // #region Private Helpers
+  /** Inicializa la gráfica principal con datos vacíos */
   private initDefaultData(): void {
-    const labels: string[] = [];
-    const rawLabels: string[] = [];
-    const now = new Date();
-    for (let i = this.seriesDays - 1; i >= 0; i--) {
-      const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-      d.setUTCDate(d.getUTCDate() - i);
-      const s = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-      labels.push(this.formatLabelFromDate(s, 'day', false));
-      rawLabels.push(s);
-    }
-    const zeros = Array(labels.length).fill(0);
-    this.data = {
-      labels,
-      datasets: [
-        { label: 'Entradas', backgroundColor: '#007bff', data: [...zeros] },
-        { label: 'Comentarios', backgroundColor: '#ff7f0e', data: [...zeros] },
-        { label: 'Usuarios', backgroundColor: '#2ca02c', data: [...zeros] },
-      ],
-    };
-    this.dataRawLabels = rawLabels;
+    this.data = this.chartService.generateEmptyMainSeriesChart(this.seriesDays);
   }
 
+  /** Registra métricas de rendimiento internas */
   private markPerf(t0: number, name: string): void {
     try {
       const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
@@ -1091,51 +895,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } catch {}
   }
 
+  /** Verifica si el entorno actual es desarrollo local */
   public isLocalEnv(): boolean {
     return (environment as any).production === false;
   }
 
-  private colorForLabel(label: string, i: number = 0): string {
-    let h = 0;
-    for (let k = 0; k < label.length; k++) h = (h * 31 + label.charCodeAt(k)) >>> 0;
-    const idx = (h + i) % this.colorPalette.length;
-    return this.colorPalette[idx];
-  }
-
-  private updateContentStatsChart(cs: ContentStatsDTO): void {
-    const labels = Object.keys(cs.entradasByEstado || {});
-    const data = labels.map((k) => Number(cs.entradasByEstado?.[k]) || 0);
-    const chart = {
-      labels,
-      datasets: [
-        {
-          label: 'Entradas por estado',
-          backgroundColor: labels.map((l, i) => this.colorForLabel(l, i)),
-          data,
-        },
-      ],
-    };
-    this.contentStatsChartData = chart;
-    try {
-      setTimeout(() => {
-        this.contentStatsChartData = { ...chart };
-        this.cdr.detectChanges();
-      }, 0);
-    } catch {}
-  }
-
-  private updateEstadoNominalOptions(): void {
-    this.estadoNominalChartOptions = {
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'top' } },
-      responsive: true,
-      scales:
-        this.estadoNominalChartType === 'bar'
-          ? { x: { stacked: this.estadoNominalStacked }, y: { stacked: this.estadoNominalStacked } }
-          : {},
-    };
-  }
-
+  /** Valida que el rango de fechas sea lógico (start <= end) */
   private isValidDateRange(s: string, e: string): boolean {
     try {
       const sd = new Date(s + 'T00:00:00Z');
@@ -1144,19 +909,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } catch {
       return false;
     }
-  }
-
-  private csvEscape(v: any): string {
-    const s = String(v ?? '');
-    const needsQuotes = /[",\n]/.test(s);
-    const escaped = s.replace(/"/g, '""');
-    return needsQuotes ? `"${escaped}"` : escaped;
-  }
-
-  private buildCsv(headers: string[], rows: any[][]): string {
-    const head = headers.map((h) => this.csvEscape(h)).join(',');
-    const body = rows.map((r) => r.map((c) => this.csvEscape(c)).join(',')).join('\n');
-    return `${head}\n${body}\n`;
   }
   // #endregion
 }

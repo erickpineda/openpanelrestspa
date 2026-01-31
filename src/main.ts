@@ -15,7 +15,6 @@ platformBrowserDynamic()
     applicationProviders: [provideZoneChangeDetection()],
   })
   .then(() => {
-    const endTime = performance.now();
-    console.log(`🚀 Application bootstrapped in ${(endTime - startTime).toFixed(2)}ms`);
+    // Application bootstrapped
   })
   .catch((err: any) => console.error(err));

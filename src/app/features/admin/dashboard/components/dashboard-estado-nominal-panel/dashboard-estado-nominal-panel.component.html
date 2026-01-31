@@ -52,7 +52,7 @@
         variant="outline"
         size="sm"
         class="shadow-sm"
-        (click)="downloadCsv.emit()"
+        (click)="onDownloadClick()"
         [title]="'COMMON.DOWNLOAD_CSV' | translate"
         [attr.aria-label]="'COMMON.DOWNLOAD_CSV' | translate"
         data-testid="btn-csv-split-estado-nombre"

@@ -1,10 +1,13 @@
 @if (ready && isAuthed) {
   <c-sidebar
     #sidebar="cSidebar"
-    class="d-print-none sidebar sidebar-fixed"
+    class="d-print-none sidebar"
+    position="fixed"
     id="sidebar"
     colorScheme="dark"
-    visible
+    [visible]="sidebarVisible"
+    (visibleChange)="onVisibleChange($event)"
+    [backdrop]="sidebarBackdrop"
     [unfoldable]="sidebarNarrow"
   >
     <c-sidebar-header class="border-bottom">
@@ -22,6 +25,16 @@
           height="46"
         />
       </c-sidebar-brand>
+      <!-- Botón de cierre explícito (X) visible solo en móvil -->
+      @if (sidebarBackdrop) {
+        <button
+          cSidebarToggle="sidebar"
+          type="button"
+          class="btn-close btn-close-white d-lg-none position-absolute end-0 top-0 m-2"
+          aria-label="Close"
+          style="z-index: 1050;"
+        ></button>
+      }
     </c-sidebar-header>
 
     <ng-scrollbar pointerEventsMethod="scrollbar" visibility="hover">
@@ -94,6 +107,7 @@
     <!-- Footer -->
     <app-default-footer></app-default-footer>
   </div>
+  <app-right-sidebar></app-right-sidebar>
 } @else {
   <div class="d-flex justify-content-center align-items-center min-vh-100">
     <app-op-loader></app-op-loader>

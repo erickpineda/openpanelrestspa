@@ -73,13 +73,14 @@ export class UsuarioService extends CrudService<Usuario, number> {
   /**
    * Método seguro principal para obtener datos de sesión
    */
-  obtenerDatosSesionActualSafe(): Observable<PerfilResponse> {
+  obtenerDatosSesionActualSafe(context?: HttpContext): Observable<PerfilResponse> {
     return this.safeGetData<PerfilResponse>(
       `${this.endpoint}/perfil/yo`,
       {} as PerfilResponse,
       undefined,
       undefined,
-      'usuarios.obtenerDatosSesionActual'
+      'usuarios.obtenerDatosSesionActual',
+      context
     );
   }
 

@@ -21,4 +21,8 @@ export class DashboardTopPanelComponent {
   @Output() changePeriod = new EventEmitter<number>();
   @Output() downloadCsv = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
+
+  onDownloadClick(): void {
+    this.downloadCsv.emit();
+  }
 }

@@ -33,20 +33,37 @@ export class DashboardFacadeService {
   > {
     const summary$ = this.api.getSummary(force);
     const series$ = this.api.getSeriesActivity(seriesDays, force, granularity);
-    const topUsers$ = this.api.getTop('users', topLimit, force, topStartDate, topEndDate);
-    const topCategories$ = this.api.getTop('categories', topLimit, force, topStartDate, topEndDate);
-    const topTags$ = this.api.getTop('tags', topLimit, force, topStartDate, topEndDate);
+    const topWidgets$ = this.refreshTopWidgets(topLimit, force, topStartDate, topEndDate);
     const storage$ = this.api.getStorage();
     const contentStats$ = this.api.getContentStats();
-    return forkJoin([
-      summary$,
-      series$,
-      topUsers$,
-      topCategories$,
-      topTags$,
-      storage$,
-      contentStats$,
-    ]);
+    
+    return new Observable((observer) => {
+      forkJoin([
+        summary$,
+        series$,
+        topWidgets$,
+        storage$,
+        contentStats$,
+      ]).subscribe({
+        next: ([summary, series, [users, categories, tags], storage, contentStats]) => {
+          observer.next([summary, series, users, categories, tags, storage, contentStats]);
+          observer.complete();
+        },
+        error: (err) => observer.error(err)
+      });
+    });
+  }
+
+  refreshTopWidgets(
+    limit: number,
+    force = false,
+    startDate?: string,
+    endDate?: string
+  ): Observable<[TopItemDTO[], TopItemDTO[], TopItemDTO[]]> {
+    const users$ = this.api.getTop('users', limit, force, startDate, endDate);
+    const categories$ = this.api.getTop('categories', limit, force, startDate, endDate);
+    const tags$ = this.api.getTop('tags', limit, force, startDate, endDate);
+    return forkJoin([users$, categories$, tags$]);
   }
 
   getSeries(

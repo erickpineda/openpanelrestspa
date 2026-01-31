@@ -16,4 +16,8 @@ export class DashboardEstadoNominalPanelComponent {
   @Output() toggleStacked = new EventEmitter<void>();
   @Output() downloadCsv = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
+
+  onDownloadClick(): void {
+    this.downloadCsv.emit();
+  }
 }

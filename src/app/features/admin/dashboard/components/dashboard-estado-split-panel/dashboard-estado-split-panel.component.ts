@@ -12,4 +12,8 @@ export class DashboardEstadoSplitPanelComponent {
   @Input() errorSplitEstado: string | null = null;
   @Output() downloadCsv = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
+
+  onDownloadClick(): void {
+    this.downloadCsv.emit();
+  }
 }

@@ -81,7 +81,7 @@
                     class="ms-auto dynamic-badge nav-badge"
                     [ngClass]="['badge-' + (item.badge?.color || 'info')]"
                   >
-                    <span class="badge-counter">0</span>
+                    <span class="badge-counter">{{ item.badge?.text || '0' }}</span>
                   </c-badge>
                 }
               </c-nav-link>

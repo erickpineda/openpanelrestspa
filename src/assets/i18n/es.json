@@ -215,6 +215,8 @@
         "TITLE": "Métricas",
         "SHOW_HIDE": "Mostrar/Ocultar métricas",
         "COPY": "Copiar",
+        "COPIED": "Métricas copiadas",
+        "COPY_ERROR": "No se pudieron copiar las métricas",
         "PERFORMANCE_DEV": "Rendimiento (dev) — Actualizado: {{ time }}",
         "SUMMARY": "Resumen",
         "SERIES": "Series",
@@ -253,6 +255,20 @@
         "RESET_TITLE": "Restablecer campos a valores iniciales",
         "RESET_ARIA_LABEL": "Limpiar campos",
         "RESET": "Limpiar"
+      },
+      "SUCCESS": {
+        "UPDATED": "Datos actualizados"
+      },
+      "ERROR": {
+        "REFRESH_DASHBOARD": "Error refrescando dashboard",
+        "TOP_USERS": "Error obteniendo Top Usuarios",
+        "TOP_CATEGORIES": "Error obteniendo Top Categorías",
+        "TOP_TAGS": "Error obteniendo Top Tags",
+        "STORAGE": "Error obteniendo almacenamiento",
+        "CONTENT_STATS": "Error obteniendo estadísticas de contenido",
+        "RECENT_ACTIVITY": "Error obteniendo actividad reciente",
+        "SERIES_BY_STATUS": "Error obteniendo series por estado",
+        "SERIES_PIVOT": "Error obteniendo series pivot por estado"
       },
       "TOOLBAR": {
         "GENERATING_ZIP": "Generando ZIP...",
@@ -298,6 +314,28 @@
         "BAR": "Barras",
         "STACKED": "Apiladas",
         "NOT_STACKED": "No apiladas"
+      },
+      "DOWNLOAD": {
+        "NO_DATA_SERIES": "No hay datos de series para descargar",
+        "ERROR_SERIES": "Error descargando CSV de series",
+        "NO_DATA_RECENT": "No hay actividad reciente para descargar",
+        "ERROR_RECENT": "Error descargando CSV de actividad reciente",
+        "NO_DATA_SPLIT": "No hay datos de series por estado para descargar",
+        "ERROR_SPLIT": "Error descargando CSV de series por estado",
+        "NO_DATA_NOMINAL": "No hay datos de series por estado nominal para descargar",
+        "ERROR_NOMINAL": "Error descargando CSV de series por estado nominal",
+        "NO_DATA_STORAGE": "No hay datos de almacenamiento para descargar",
+        "ERROR_STORAGE": "Error descargando CSV de almacenamiento",
+        "NO_DATA_CONTENT": "No hay estadísticas de contenido para descargar",
+        "ERROR_CONTENT": "Error descargando CSV de estadísticas de contenido",
+        "NO_DATA_CONTENT_STATUS": "No hay datos de estados de contenido para descargar",
+        "ERROR_CONTENT_STATUS": "Error descargando CSV de estados de contenido",
+        "NO_DATA_TOP_USERS": "No hay datos de usuarios top para descargar",
+        "ERROR_TOP_USERS": "Error descargando CSV de usuarios top",
+        "NO_DATA_TOP_CATEGORIES": "No hay datos de categorías top para descargar",
+        "ERROR_TOP_CATEGORIES": "Error descargando CSV de categorías top",
+        "NO_DATA_TOP_TAGS": "No hay datos de tags top para descargar",
+        "ERROR_TOP_TAGS": "Error descargando CSV de tags top"
       }
     },
     "TEMP_ENTRIES": {
