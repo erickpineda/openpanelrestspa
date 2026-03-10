@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { ListadoEntradasStateService } from './listado-entradas-state.service';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 import { AdvancedSearchParams } from '@app/shared/models/search.models';
@@ -32,7 +33,7 @@ describe('ListadoEntradasStateService', () => {
     service.searchAdvanced(params, 0).subscribe({
       next: () => {
         expect(entradaServiceSpy.buscarSafe).toHaveBeenCalled();
-        service.pagingInfo$.subscribe((pi) => {
+        service.pagingInfo$.pipe(take(1)).subscribe((pi: any) => {
           expect(pi.pages).toBe(1);
           done();
         });

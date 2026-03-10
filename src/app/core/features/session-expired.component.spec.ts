@@ -41,7 +41,9 @@ describe('SessionExpiredComponent', () => {
     };
 
     tokenStorageMock = {
-      signOut: jasmine.createSpy('signOut')
+      signOut: jasmine.createSpy('signOut'),
+      getToken: jasmine.createSpy('getToken').and.returnValue('mock-token'),
+      getUser: jasmine.createSpy('getUser').and.returnValue({ name: 'test' })
     };
 
     activeTabServiceMock = {

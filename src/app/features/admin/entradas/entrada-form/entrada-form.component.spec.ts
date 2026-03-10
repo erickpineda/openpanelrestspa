@@ -167,7 +167,7 @@ describe('EntradaFormComponent', () => {
       expect(component.form.reset).toHaveBeenCalled();
       // Expect categories to be cleared (removeAt called twice)
       expect(removeAtSpy).toHaveBeenCalledTimes(2);
-      expect(component.form.patchValue).toHaveBeenCalledWith({ imagenDestacada: null });
+      expect(component.form.patchValue).toHaveBeenCalledWith({ imagenDestacada: null, imagenDestacadaUuid: null });
       expect(component.form.markAsPristine).toHaveBeenCalled();
       expect(component.form.markAsUntouched).toHaveBeenCalled();
     });

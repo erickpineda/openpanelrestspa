@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { SharedCoreUiModule } from '../../shared-coreui.module';
 import { BuscadorAvanzadoComponent } from './buscador-avanzado.component';
 
@@ -9,7 +10,7 @@ describe('BuscadorAvanzadoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormsModule, SharedCoreUiModule],
+      imports: [FormsModule, SharedCoreUiModule, TranslateModule.forRoot()],
       declarations: [BuscadorAvanzadoComponent],
     }).compileComponents();
 

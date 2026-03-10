@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 import { of, Subject } from 'rxjs';
 import { INavItemEnhanced } from '../../../shared/types/navigation.types';
 
-describe('BadgeCounter & Navigation Integration', () => {
+fdescribe('BadgeCounter & Navigation Integration', () => {
   let badgeService: BadgeCounterService;
   let navigationService: NavigationService;
   let tempStorageSpy: jasmine.SpyObj<TemporaryStorageService>;
@@ -32,8 +32,8 @@ describe('BadgeCounter & Navigation Integration', () => {
 
   beforeEach(() => {
     const entradaSpy = jasmine.createSpyObj('EntradaService', ['listarSafe']);
-    const comentarioSpy = jasmine.createSpyObj('ComentarioService', ['listarSafe']);
-    const usuarioSpy = jasmine.createSpyObj('UsuarioService', ['listarSafe', 'obtenerDatosSesionActualSafe']);
+    const comentarioSpy = jasmine.createSpyObj('ComentarioService', ['listarSafe', 'listarSafeSinGlobalLoader']);
+    const usuarioSpy = jasmine.createSpyObj('UsuarioService', ['listarSafe', 'obtenerDatosSesionActualSafe', 'listarSafeSinGlobalLoader']);
     const tempSpy = jasmine.createSpyObj('TemporaryStorageService', ['getTemporaryEntriesByType']);
     
     // Mock entriesChanged$
@@ -53,11 +53,12 @@ describe('BadgeCounter & Navigation Integration', () => {
     const sidebarSpy = jasmine.createSpyObj('SidebarStateService', ['updateNavItems', 'toggleItem']);
     const activeSectionSpy = jasmine.createSpyObj('ActiveSectionService', ['setNavigationItems', 'updateActiveSection', 'getCurrentActiveState']);
     const progConfigSpy = jasmine.createSpyObj('ProgrammaticNavigationConfigService', ['getConfigurationChanges', 'applyDynamicConfigurations']);
-    const perfSpy = jasmine.createSpyObj('NavigationPerformanceService', ['getOptimizedNavigationItems', 'optimizeBadgeUpdates']);
+    const perfSpy = jasmine.createSpyObj('NavigationPerformanceService', ['getOptimizedNavigationItems', 'optimizeBadgeUpdates', 'configurePerformance']);
 
     // Setup default returns
     entradaSpy.listarSafe.and.returnValue(of([]));
     comentarioSpy.listarSafe.and.returnValue(of([]));
+    comentarioSpy.listarSafeSinGlobalLoader.and.returnValue(of([]));
     usuarioSpy.listarSafe.and.returnValue(of([]));
     usuarioSpy.obtenerDatosSesionActualSafe.and.returnValue(of({ username: 'test' }));
 

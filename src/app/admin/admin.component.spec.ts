@@ -6,8 +6,10 @@ import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { IconSetService } from '@coreui/icons-angular';
 import { DashboardApiService } from '../core/services/dashboard-api.service';
+import { BadgeCounterService } from '../core/services/ui/badge-counter.service';
 import { TranslationService } from '../core/services/translation.service';
 import { LanguageService } from '../core/services/language.service';
+import { ComentarioService } from '../core/services/data/comentario.service';
 import { TemporaryStorageService } from '../core/services/ui/temporary-storage.service';
 import { LoggerService } from '../core/services/logger.service';
 import { LoadingService } from '../core/services/ui/loading.service';
@@ -63,7 +65,8 @@ fdescribe('AdminComponent', () => {
           provide: TokenStorageService,
           useValue: {
             isLoggedIn: () => true,
-            getUserRole: () => UserRole.ADMINISTRADOR
+            getUserRole: () => UserRole.ADMINISTRADOR,
+            getToken: () => 'mock-token'
           }
         },
         { provide: AuthService, useValue: { isTokenValid: () => true } },
@@ -81,13 +84,23 @@ fdescribe('AdminComponent', () => {
           }
         },
         {
+          provide: BadgeCounterService,
+          useValue: { initializeCounters: jasmine.createSpy('initializeCounters') }
+        },
+        {
           provide: TranslationService,
           useValue: {
             translate: (key: string) => key,
             translations$: of({})
           }
         },
-        { provide: LanguageService, useValue: {} }
+        { provide: LanguageService, useValue: {} },
+        {
+          provide: ComentarioService,
+          useValue: {
+            listarSafeSinGlobalLoader: () => of([])
+          }
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">18.18% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/11</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">10% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -124,33 +124,33 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core';
@@ -168,34 +168,34 @@ export interface NotificationOptions {
 }
 &nbsp;
 @Injectable({ providedIn: 'root' })
-export <span class="fstat-no" title="function not covered" >class N</span>otificationService {
-  private <span class="cstat-no" title="statement not covered" >notificationSubject = new Subject&lt;NotificationOptions&gt;();</span>
-  public <span class="cstat-no" title="statement not covered" >notification$ = this.notificationSubject.asObservable();</span>
+export class NotificationService {
+  private notificationSubject = new Subject&lt;NotificationOptions&gt;();
+  public notification$ = this.notificationSubject.asObservable();
 &nbsp;
-  private <span class="cstat-no" title="statement not covered" >defaultDuration = 5000;</span>
+  private defaultDuration = 5000;
 &nbsp;
-<span class="fstat-no" title="function not covered" >  show(</span>options: NotificationOptions): void {
-    const notification = <span class="cstat-no" title="statement not covered" >{</span>
+  show(options: NotificationOptions): void {
+    const notification = {
       duration: this.defaultDuration,
       ...options,
     };
-<span class="cstat-no" title="statement not covered" >    this.notificationSubject.next(notification);</span>
+    this.notificationSubject.next(notification);
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  success(</span>message: string, title?: string): void {
-<span class="cstat-no" title="statement not covered" >    this.show({ type: 'success', message, title });</span>
+  success(message: string, title?: string): void {
+    this.show({ type: 'success', message, title });
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  error(</span>message: string, title?: string): void {
-<span class="cstat-no" title="statement not covered" >    this.show({ type: 'error', message, title });</span>
+  error(message: string, title?: string): void {
+    this.show({ type: 'error', message, title });
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  warning(</span>message: string, title?: string): void {
-<span class="cstat-no" title="statement not covered" >    this.show({ type: 'warning', message, title });</span>
+  warning(message: string, title?: string): void {
+    this.show({ type: 'warning', message, title });
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  info(</span>message: string, title?: string): void {
-<span class="cstat-no" title="statement not covered" >    this.show({ type: 'info', message, title });</span>
+  info(message: string, title?: string): void {
+    this.show({ type: 'info', message, title });
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -205,7 +205,7 @@ export <span class="fstat-no" title="function not covered" >class N</span>otific
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-30T09:55:34.971Z
+                at 2026-01-31T09:23:33.566Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

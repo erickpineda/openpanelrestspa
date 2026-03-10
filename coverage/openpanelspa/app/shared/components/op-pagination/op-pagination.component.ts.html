@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">5.88% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/17</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">71.42% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>5/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">6.25% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/16</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -115,37 +115,37 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -157,38 +157,38 @@
   styleUrls: ['./op-pagination.component.scss'],
   standalone: false,
 })
-export <span class="fstat-no" title="function not covered" >class O</span>pPaginationComponent implements OnChanges {
-  @Input() <span class="cstat-no" title="statement not covered" >totalPages: number = 0;</span>
-  @Input() <span class="cstat-no" title="statement not covered" >currentPage: number = 0;</span>
-  @Input() <span class="cstat-no" title="statement not covered" >paginasRange: number = 4;</span>
+export class OpPaginationComponent implements OnChanges {
+  @Input() totalPages: number = 0;
+  @Input() currentPage: number = 0;
+  @Input() paginasRange: number = 4;
 &nbsp;
   // Definir el tipo correcto para la alineación
-  @Input() <span class="cstat-no" title="statement not covered" >align: '' | 'start' | 'center' | 'end' = 'end';</span>
+  @Input() align: '' | 'start' | 'center' | 'end' = 'end';
 &nbsp;
-  @Output() <span class="cstat-no" title="statement not covered" >pageChange: EventEmitter&lt;number&gt; = new EventEmitter&lt;number&gt;();</span>
+  @Output() pageChange: EventEmitter&lt;number&gt; = new EventEmitter&lt;number&gt;();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  paginasVisibles: number[] = [];</span>
+  paginasVisibles: number[] = [];
 &nbsp;
-<span class="fstat-no" title="function not covered" >  ngOnChanges(</span>changes: SimpleChanges): void {
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (changes['totalPages'] || changes['currentPage'] || changes['align']) {</span>
-<span class="cstat-no" title="statement not covered" >      this.actualizarPaginasVisibles();</span>
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['totalPages'] || <span class="branch-1 cbranch-no" title="branch not covered" >changes['currentPage'] </span>|| <span class="branch-2 cbranch-no" title="branch not covered" >changes['align'])</span> {
+      this.actualizarPaginasVisibles();
     }
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  actualizarPaginasVisibles(</span>): void {
-    const middle = <span class="cstat-no" title="statement not covered" >Math.floor(this.paginasRange / 2);</span>
-    const start = <span class="cstat-no" title="statement not covered" >Math.max(</span>
+  actualizarPaginasVisibles(): void {
+    const middle = Math.floor(this.paginasRange / 2);
+    const start = Math.max(
       0,
       Math.min(this.currentPage - middle, this.totalPages - this.paginasRange)
     );
-    const end = <span class="cstat-no" title="statement not covered" >Math.min(this.totalPages, start + this.paginasRange);</span>
-<span class="cstat-no" title="statement not covered" >    this.paginasVisibles = Array.from({ length: end - start }, <span class="fstat-no" title="function not covered" >(_</span>, i) =&gt; <span class="cstat-no" title="statement not covered" >start + i)</span>;</span>
+    const end = Math.min(this.totalPages, start + this.paginasRange);
+    this.paginasVisibles = Array.from({ length: end - start }, (_, i) =&gt; start + i);
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  cambiarPagina(</span>incremento: number): void {
-    const nuevaPagina = <span class="cstat-no" title="statement not covered" >this.currentPage + incremento;</span>
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (nuevaPagina &gt;= 0 &amp;&amp; nuevaPagina &lt; this.totalPages) {</span>
-<span class="cstat-no" title="statement not covered" >      this.pageChange.emit(nuevaPagina);</span>
+  cambiarPagina(incremento: number): void {
+    const nuevaPagina = this.currentPage + incremento;
+    if (nuevaPagina &gt;= 0 &amp;&amp; nuevaPagina &lt; this.totalPages) {
+      this.pageChange.emit(nuevaPagina);
     }
   }
 }
@@ -199,7 +199,7 @@ export <span class="fstat-no" title="function not covered" >class O</span>pPagin
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-30T09:55:34.971Z
+                at 2026-01-31T09:23:33.566Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

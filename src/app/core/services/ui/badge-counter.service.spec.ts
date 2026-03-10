@@ -15,9 +15,9 @@ fdescribe('BadgeCounterService', () => {
   let mockTemporaryStorage: jasmine.SpyObj<TemporaryStorageService>;
 
   beforeEach(() => {
-    const comentarioSpy = jasmine.createSpyObj('ComentarioService', ['listarSafe']);
+    const comentarioSpy = jasmine.createSpyObj('ComentarioService', ['listarSafe', 'listarSafeSinGlobalLoader']);
     const entradaSpy = jasmine.createSpyObj('EntradaService', ['listarSafe']);
-    const usuarioSpy = jasmine.createSpyObj('UsuarioService', ['listarSafe', 'obtenerDatosSesionActualSafe']);
+    const usuarioSpy = jasmine.createSpyObj('UsuarioService', ['listarSafe', 'obtenerDatosSesionActualSafe', 'listarSafeSinGlobalLoader']);
     const tempSpy = jasmine.createSpyObj('TemporaryStorageService', ['getTemporaryEntriesByType']);
     (tempSpy as any).entriesChanged$ = new Subject<void>();
     
