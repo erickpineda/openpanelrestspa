@@ -115,7 +115,7 @@ export class UsuarioService extends CrudService<Usuario, number> {
   }
 
   actualizarParcial(
-    id: number,
+    username: string,
     modificado: Usuario,
     context?: HttpContext
   ): Observable<OpenpanelApiResponse<any>> {
@@ -123,7 +123,13 @@ export class UsuarioService extends CrudService<Usuario, number> {
     const headers = this.setHeaders({
       'Content-Type': 'application/json-patch+json',
     });
-    return this.patch<any>(`${this.endpoint}/perfil/${id}`, modificado, undefined, headers, context);
+    return this.patch<any>(
+      `${this.endpoint}/perfil/${username}`,
+      modificado,
+      undefined,
+      headers,
+      context
+    );
   }
 
   checkUsernameAvailability(

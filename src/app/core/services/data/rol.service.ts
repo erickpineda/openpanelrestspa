@@ -42,13 +42,13 @@ export class RolService extends CrudService<Rol, string> {
   }
 
   // Overrides for code-based endpoints
-  override obtenerPorId(id: string, context?: HttpContext): Observable<any> {
-    return this.get<any>(`${this.endpoint}/obtenerPorCodigo/${id}`, undefined, undefined, context);
+  override obtenerPorId(codigo: string, context?: HttpContext): Observable<any> {
+    return this.get<any>(`${this.endpoint}/obtenerPorCodigo/${codigo}`, undefined, undefined, context);
   }
 
-  override actualizar(id: string, entity: Rol, context?: HttpContext): Observable<any> {
+  override actualizar(codigo: string, entity: Rol, context?: HttpContext): Observable<any> {
     return this.put<any>(
-      `${this.endpoint}/actualizarPorCodigo/${id}`,
+      `${this.endpoint}/actualizarPorCodigo/${codigo}`,
       entity,
       undefined,
       undefined,
@@ -56,9 +56,9 @@ export class RolService extends CrudService<Rol, string> {
     );
   }
 
-  override borrar(id: string, context?: HttpContext): Observable<any> {
+  override borrar(codigo: string, context?: HttpContext): Observable<any> {
     return this.delete<any>(
-      `${this.endpoint}/borrarPorCodigo/${id}`,
+      `${this.endpoint}/borrarPorCodigo/${codigo}`,
       undefined,
       undefined,
       context
@@ -66,9 +66,9 @@ export class RolService extends CrudService<Rol, string> {
   }
 
   // Safe overrides
-  override obtenerPorIdSafe(id: string): Observable<Rol> {
+  override obtenerPorIdSafe(codigo: string): Observable<Rol> {
     return this.safeGetData<Rol>(
-      `${this.endpoint}/obtenerPorCodigo/${id}`,
+      `${this.endpoint}/obtenerPorCodigo/${codigo}`,
       {} as Rol,
       undefined,
       undefined,
@@ -76,9 +76,9 @@ export class RolService extends CrudService<Rol, string> {
     );
   }
 
-  override actualizarSafe(id: string, entity: Rol): Observable<Rol> {
+  override actualizarSafe(codigo: string, entity: Rol): Observable<Rol> {
     return this.safePutData<Rol>(
-      `${this.endpoint}/actualizarPorCodigo/${id}`,
+      `${this.endpoint}/actualizarPorCodigo/${codigo}`,
       entity,
       {} as Rol,
       undefined,
@@ -87,9 +87,9 @@ export class RolService extends CrudService<Rol, string> {
     );
   }
 
-  override eliminarSafe(id: string): Observable<boolean> {
+  override eliminarSafe(codigo: string): Observable<boolean> {
     return this.safeDeleteOperation(
-      `${this.endpoint}/borrarPorCodigo/${id}`,
+      `${this.endpoint}/borrarPorCodigo/${codigo}`,
       undefined,
       undefined,
       `${this.endpoint}.borrarPorCodigo`

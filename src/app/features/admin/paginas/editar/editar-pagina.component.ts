@@ -40,7 +40,9 @@ export class EditarPaginaComponent implements OnInit {
   async ngOnInit() {
     this.entradaForm = this.vf.buildForm(this.entrada);
     this.entradaForm.disable(); // Deshabilitar por defecto
-    this.idEntrada = this.route.snapshot.params['idEntrada'];
+    const slug: string | undefined = this.route.snapshot.params['slug'];
+    const idParam: any = this.route.snapshot.params['idEntrada'];
+    this.idEntrada = idParam ? Number(idParam) : 0;
 
     const data = await this.facade.loadInitData();
     this.estadosEntr = data.estados;
@@ -50,10 +52,16 @@ export class EditarPaginaComponent implements OnInit {
     const tipoPagina = data.tipos.find((t) => t.nombre === 'Página');
     this.tiposEntr = tipoPagina ? [tipoPagina] : data.tipos;
 
-    // Cargar entrada
-    this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: Entrada) => {
+    // Cargar entrada por slug o por id
+    const fuente$ = slug
+      ? this.facade.cargarEntradaPorSlug(slug)
+      : this.facade.cargarEntradaPorId(this.idEntrada);
+    fuente$.subscribe((ent: Entrada) => {
       if (!ent) return;
       this.entrada = ent;
+      if (slug && ent?.idEntrada) {
+        this.idEntrada = ent.idEntrada;
+      }
 
       // Busca los objetos reales por referencia
       const estadoCorrecto = this.estadosEntr.find(

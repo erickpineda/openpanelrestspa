@@ -71,12 +71,11 @@ export class EditarUsuarioComponent implements OnChanges {
     // Let's look at what was there.
     // In search results: "should use partial update for existing users" test.
 
-    if (this.usuario && this.usuario.idUsuario) {
-      // Ensure ID is there
-      usuarioData.idUsuario = this.usuario.idUsuario;
+    if (this.usuario && this.usuario.username) {
+      usuarioData.username = this.usuario.username;
 
       const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
-      this.usuarioService.actualizarParcial(this.usuario.idUsuario, usuarioData, context).subscribe({
+      this.usuarioService.actualizarParcial(this.usuario.username, usuarioData, context).subscribe({
         next: () => {
           this.loading = false;
           this.toastService.showSuccess(

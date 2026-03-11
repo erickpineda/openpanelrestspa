@@ -55,15 +55,27 @@ export class EditarEntradaComponent implements OnInit {
     this.entradaForm = this.vf.buildForm(this.entrada);
     this.entradaForm.disable({ emitEvent: false });
 
-    this.idEntrada = this.route.snapshot.params['idEntrada'];
+    const slug: string | undefined = this.route.snapshot.params['slug'];
+    const idParam: any = this.route.snapshot.params['idEntrada'];
+    this.idEntrada = idParam ? Number(idParam) : 0;
     const data = await this.facade.loadInitData();
     this.tiposEntr = data.tipos;
     this.estadosEntr = data.estados;
     this.categorias = data.categorias;
 
-    this.facade.cargarEntradaPorId(this.idEntrada).subscribe((ent: Entrada) => {
+    const fuente$ = slug
+      ? this.facade.cargarEntradaPorSlug(slug)
+      : this.facade.cargarEntradaPorId(this.idEntrada);
+    this.facadeSubs(fuente$);
+  }
+
+  private facadeSubs(obs: any) {
+    obs.subscribe((ent: Entrada) => {
       if (!ent) return;
       this.entrada = ent;
+      if (ent?.idEntrada) {
+        this.idEntrada = ent.idEntrada;
+      }
 
       const estadoCorrecto = this.estadosEntr.find(
         (e) => e.codigo === ent.estadoEntrada?.codigo
@@ -137,7 +149,6 @@ export class EditarEntradaComponent implements OnInit {
         patchAndFinalize(null);
       }
     });
-
     this.entradaForm.valueChanges.subscribe(() => {
       if (this.entradaForm.pristine && !this.entradaForm.disabled) {
         this.entradaForm.markAsDirty();

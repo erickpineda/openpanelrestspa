@@ -83,7 +83,7 @@ export class PerfilComponent implements OnInit {
     // Cast to Usuario or compatible type if needed
     const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.usuarioService
-      .actualizarParcial(this.usuario.idUsuario, usuarioModificado as Usuario, context)
+      .actualizarParcial(this.usuario.username, usuarioModificado as Usuario, context)
       .pipe(
         finalize(() => {
           this.loading = false;

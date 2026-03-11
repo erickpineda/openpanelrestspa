@@ -528,8 +528,13 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   onEditarDesdePreview(): void {
-    if (this.previewEntrada && this.previewEntrada.idEntrada) {
-      this.router.navigate(['/admin/control/paginas/editar', this.previewEntrada.idEntrada]);
+    if (this.previewEntrada) {
+      const slug = (this.previewEntrada as any)?.slug;
+      if (slug) {
+        this.router.navigate(['/admin/control/paginas/editar/slug', slug]);
+      } else if (this.previewEntrada.idEntrada) {
+        this.router.navigate(['/admin/control/paginas/editar', this.previewEntrada.idEntrada]);
+      }
       this.closePreview();
     }
   }

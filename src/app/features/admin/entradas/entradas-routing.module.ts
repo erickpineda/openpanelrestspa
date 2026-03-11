@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { EntradaIdRedirectGuard } from './guards/entrada-id-redirect.guard';
 import { ListadoEntradasComponent } from './listado-entradas.component';
 import { CrearEntradaComponent } from './crear/crear-entrada.component';
 import { EditarEntradaComponent } from './editar/editar-entrada.component';
@@ -9,8 +10,14 @@ const routes: Routes = [
   { path: '', component: ListadoEntradasComponent },
   { path: 'crear', component: CrearEntradaComponent, data: { title: 'MENU.CREATE_ENTRY' } },
   {
+    path: 'editar/slug/:slug',
+    component: EditarEntradaComponent,
+    data: { title: 'MENU.EDIT_ENTRY' },
+  },
+  {
     path: 'editar/:idEntrada',
     component: EditarEntradaComponent,
+    canActivate: [EntradaIdRedirectGuard],
     data: { title: 'MENU.EDIT_ENTRY' },
   },
   {

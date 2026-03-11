@@ -64,4 +64,7 @@ export class EntradaFacadeService {
   cargarEntradaPorId(id: number): Observable<Entrada> {
     return this.entradaSrv.obtenerPorId(id).pipe(map((r: any) => r?.data as Entrada));
   }
+  cargarEntradaPorSlug(slug: string): Observable<Entrada> {
+    return this.entradaSrv.obtenerPorSlug(slug).pipe(map((r: any) => r?.data as Entrada));
+  }
 }

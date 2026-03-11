@@ -302,8 +302,14 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onEditarDesdePreview(): void {
+    const slug = (this.previewEntrada as any)?.slug;
     const idEntrada = this.previewEntrada?.idEntrada;
-    if (idEntrada) {
+    if (slug) {
+      this.closePreview();
+      setTimeout(() => {
+        this.router.navigate(['/admin/control/entradas/editar/slug', slug]);
+      }, 350);
+    } else if (idEntrada) {
       this.closePreview();
       setTimeout(() => {
         this.router.navigate(['/admin/control/entradas/editar', idEntrada]);

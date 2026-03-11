@@ -21,6 +21,9 @@ export const OPRestMethods: any = {
     OBTENER_POR_ID: (id: number) => `/roles/obtenerPorId/${id}`,
     ACTUALIZAR: (id: number) => `/roles/${id}`,
     ELIMINAR: (id: number) => `/roles/${id}`,
+    OBTENER_POR_CODIGO: (codigo: string) => `/roles/obtenerPorCodigo/${codigo}`,
+    ACTUALIZAR_POR_CODIGO: (codigo: string) => `/roles/actualizarPorCodigo/${codigo}`,
+    BORRAR_POR_CODIGO: (codigo: string) => `/roles/borrarPorCodigo/${codigo}`,
   },
   PRIVILEGIOS: {
     BASE: '/privilegios',
@@ -28,6 +31,9 @@ export const OPRestMethods: any = {
     OBTENER_POR_ID: (id: number) => `/privilegios/obtenerPorId/${id}`,
     ACTUALIZAR: (id: number) => `/privilegios/${id}`,
     ELIMINAR: (id: number) => `/privilegios/${id}`,
+    OBTENER_POR_CODIGO: (codigo: string) => `/privilegios/obtenerPorCodigo/${codigo}`,
+    ACTUALIZAR_POR_CODIGO: (codigo: string) => `/privilegios/actualizarPorCodigo/${codigo}`,
+    BORRAR_POR_CODIGO: (codigo: string) => `/privilegios/borrarPorCodigo/${codigo}`,
   },
   USUARIOS: {
     BASE: '/usuarios',
@@ -35,6 +41,10 @@ export const OPRestMethods: any = {
     OBTENER_POR_ID: (id: number) => `/usuarios/obtenerPorId/${id}`,
     ACTUALIZAR: (id: number) => `/usuarios/${id}`,
     ELIMINAR: (id: number) => `/usuarios/${id}`,
+    OBTENER_POR_USERNAME: (username: string) => `/usuarios/obtenerPorUsername/${username}`,
+    ACTUALIZAR_POR_USERNAME: (username: string) =>
+      `/usuarios/actualizarPorUsername/${username}`,
+    BORRAR_POR_USERNAME: (username: string) => `/usuarios/borrarPorUsername/${username}`,
   },
   COMENTARIOS: {
     BASE: '/comentarios',

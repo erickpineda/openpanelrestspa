@@ -71,9 +71,9 @@ describe('UsuarioService request shapes', () => {
   });
 
   it('actualizarParcial uses PATCH with json-patch content-type', () => {
-    service.actualizarParcial(5, { username: 'x' } as any).subscribe(() => {});
+    service.actualizarParcial('u', { username: 'x' } as any).subscribe(() => {});
 
-    const req = httpMock.expectOne((r) => r.url.includes('/usuarios/perfil/5'));
+    const req = httpMock.expectOne((r) => r.url.includes('/usuarios/perfil/u'));
     expect(req.request.method).toBe('PATCH');
     expect(req.request.headers.get('Content-Type')).toBe('application/json-patch+json');
     req.flush({ result: { success: true }, data: {} });
