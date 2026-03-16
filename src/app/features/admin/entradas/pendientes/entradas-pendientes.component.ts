@@ -130,7 +130,11 @@ export class EntradasPendientesComponent implements OnInit, OnDestroy {
   irAEditar(id: number): void {
     this.visible = false;
     setTimeout(() => {
-      this.router.navigate(['/admin/control/entradas/editar', id]);
+      const entrada = this.entradas.find((e) => e.idEntrada === id);
+      const slug = entrada?.slug;
+      if (slug) {
+        this.router.navigate(['/admin/control/entradas/editar/slug', slug]);
+      }
     }, 350);
   }
 }

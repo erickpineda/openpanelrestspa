@@ -79,6 +79,8 @@ export class EditarComentarioComponent implements OnChanges {
       this.facade.obtenerEntradaPorId(this.comentario.idEntrada).subscribe((entrada) => {
         if (entrada) {
           this.tituloEntrada = entrada.titulo;
+          (this.comentario as any).entradaSlug = entrada.slug;
+          (this.comentario as any).slugEntrada = entrada.slug;
         }
       });
     }
@@ -96,7 +98,10 @@ export class EditarComentarioComponent implements OnChanges {
   irAEntrada(idEntrada: number) {
     this.cerrarModal();
     setTimeout(() => {
-      this.router.navigate(['/admin/control/entradas/editar', idEntrada]);
+      const slug = (this.comentario as any)?.slugEntrada || (this.comentario as any)?.entradaSlug;
+      if (slug) {
+        this.router.navigate(['/admin/control/entradas/editar/slug', slug]);
+      }
     }, 350);
   }
 

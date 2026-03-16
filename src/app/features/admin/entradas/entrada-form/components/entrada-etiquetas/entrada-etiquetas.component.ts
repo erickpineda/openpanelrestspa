@@ -9,7 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { UntypedFormGroup, UntypedFormControl, UntypedFormArray } from '@angular/forms';
-import { Subject, Observable, of } from 'rxjs';
+import { Subject, Observable, of, forkJoin } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -46,6 +46,7 @@ export class EntradaEtiquetasComponent implements OnInit, OnDestroy {
   errorMsg: string | null = null;
   
   private destroy$ = new Subject<void>();
+  private triedHydrate = false;
 
   constructor(
     private etiquetaService: EtiquetaService,
@@ -95,7 +96,7 @@ export class EntradaEtiquetasComponent implements OnInit, OnDestroy {
               nombre: e?.nombre ?? e?.name ?? e?.texto ?? e?.title ?? e?.codigo ?? '',
               frecuencia: e?.frecuencia ?? e?.frequency ?? 0,
               descripcion: e?.descripcion ?? e?.description ?? '',
-              colorHex: e?.colorHex ?? e?.color ?? '#6c757d'
+              colorHex: this.normalizeColorHex(e?.colorHex ?? e?.color ?? '#6c757d')
             })) as Etiqueta[];
           }),
           catchError(() => {
@@ -116,6 +117,14 @@ export class EntradaEtiquetasComponent implements OnInit, OnDestroy {
         this.cdRef.markForCheck();
       })
     ).subscribe();
+
+    const arr = this.etiquetasArray;
+    arr.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.cdRef.markForCheck();
+      this.hydrateEtiquetaColorsIfNeeded();
+    });
+
+    this.hydrateEtiquetaColorsIfNeeded();
   }
 
   ngOnDestroy(): void {
@@ -137,7 +146,7 @@ export class EntradaEtiquetasComponent implements OnInit, OnDestroy {
       this.clearSearch();
       return;
     }
-    etiqueta.colorHex = etiqueta.colorHex || '#6c757d';
+    etiqueta.colorHex = this.normalizeColorHex(etiqueta.colorHex || '#6c757d');
 
     this.etiquetasArray.push(new UntypedFormControl(etiqueta));
     this.clearSearch();
@@ -213,7 +222,7 @@ export class EntradaEtiquetasComponent implements OnInit, OnDestroy {
   }
   getChipStyle(index: number): { [key: string]: string } {
     const e = this.getEtiquetaValue(index);
-    const col = (e?.colorHex || '#6c757d').trim();
+    const col = this.normalizeColorHex(e?.colorHex || '#6c757d').trim();
     const bg = this.toAlphaColor(col, 0.12);
     return {
       'border-left': `3px solid ${col}`,
@@ -383,5 +392,70 @@ export class EntradaEtiquetasComponent implements OnInit, OnDestroy {
   getEtiquetaValue(index: number): Etiqueta | null {
       const control = this.etiquetasArray.at(index);
       return control ? control.value : null;
+  }
+
+  private hydrateEtiquetaColorsIfNeeded(): void {
+    const current = (this.etiquetasArray?.value || []) as Etiqueta[];
+    if (!Array.isArray(current) || current.length === 0) return;
+    const missingNames = Array.from(
+      new Set(
+        current
+          .filter(e => !e?.colorHex || e.colorHex.trim().length === 0)
+          .map(e => (e?.nombre || '').trim())
+          .filter(Boolean)
+          .map(n => n.toLowerCase())
+      )
+    );
+    if (missingNames.length === 0) return;
+    if (this.triedHydrate) return;
+    this.triedHydrate = true;
+
+    const requests = missingNames.map(n => {
+      const req = this.searchUtil.buildRequest('Etiqueta', [{ filterKey: 'nombre', value: n, operation: 'EQUAL' }], 'AND');
+      return this.etiquetaService.buscarSinGlobalLoader(req, 0, 10).pipe(
+        map((resp: any) => {
+          const data = resp?.data ?? resp;
+          const raw = (data?.elements ?? data?.items ?? data?.content ?? []) as any[];
+          const list = Array.isArray(raw) ? raw : [];
+          const found = list.find((e: any) => String(e?.nombre ?? e?.name ?? '').toLowerCase() === n);
+          if (!found) return null;
+          const item: Etiqueta = {
+            codigo: found?.codigo ?? found?.code ?? '',
+            nombre: found?.nombre ?? found?.name ?? '',
+            frecuencia: found?.frecuencia ?? found?.frequency ?? 0,
+            descripcion: found?.descripcion ?? found?.description ?? '',
+            colorHex: this.normalizeColorHex(found?.colorHex ?? found?.color ?? '#6c757d')
+          };
+          return item;
+        }),
+        catchError(() => of(null))
+      );
+    });
+
+    forkJoin(requests).pipe(takeUntil(this.destroy$)).subscribe(results => {
+      const byName = new Map<string, Etiqueta>();
+      (results || []).filter((x: any) => !!x).forEach((etq: any) => {
+        byName.set(String(etq.nombre).toLowerCase(), etq);
+      });
+      for (let i = 0; i < this.etiquetasArray.length; i++) {
+        const ctrl = this.etiquetasArray.at(i) as UntypedFormControl;
+        const val = ctrl.value as Etiqueta;
+        if (!val) continue;
+        if (val.colorHex && val.colorHex.trim().length > 0) continue;
+        const match = val.nombre ? byName.get(String(val.nombre).toLowerCase()) : null;
+        if (match) {
+          ctrl.patchValue({
+            codigo: match.codigo || val.codigo,
+            nombre: match.nombre || val.nombre,
+            descripcion: match.descripcion || val.descripcion,
+            frecuencia: match.frecuencia ?? val.frecuencia,
+            colorHex: this.normalizeColorHex(match.colorHex || val.colorHex || '#6c757d')
+          }, { emitEvent: false });
+        }
+      }
+      this.cdRef.markForCheck();
+      const stillMissing = (this.etiquetasArray.value as Etiqueta[]).some(e => !e?.colorHex || e.colorHex.trim().length === 0);
+      if (stillMissing) this.triedHydrate = false;
+    });
   }
 }

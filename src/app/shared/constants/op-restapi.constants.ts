@@ -45,6 +45,8 @@ export const OPRestMethods: any = {
     ACTUALIZAR_POR_USERNAME: (username: string) =>
       `/usuarios/actualizarPorUsername/${username}`,
     BORRAR_POR_USERNAME: (username: string) => `/usuarios/borrarPorUsername/${username}`,
+    PERFIL_YO: `/usuarios/perfil/yo`,
+    PERFIL_POR_USERNAME: (username: string) => `/usuarios/perfil/${username}`,
   },
   COMENTARIOS: {
     BASE: '/comentarios',

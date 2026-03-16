@@ -17,6 +17,8 @@ export class Comentario {
   username: string = '';
   tituloEntrada: string = '';
   fechaCreacionParseada: string = '';
+  entradaSlug?: string;
+  slugEntrada?: string;
 
   constructor() {}
 }
@@ -37,4 +39,6 @@ export interface Comentario {
   username: string;
   tituloEntrada: string;
   fechaCreacionParseada: string;
+  entradaSlug?: string;
+  slugEntrada?: string;
 }

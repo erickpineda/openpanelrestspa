@@ -1060,21 +1060,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenpanelApiResponseRespuesta'
-  /usuarios/perfil/{id}:
+  /usuarios/perfil/{username}:
     patch:
       summary: Actualizar perfil por lotes
       tags:
         - Usuarios
       parameters:
-        - name: id
+        - name: username
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       requestBody:
         required: true
         content:
-          application/json:
+          application/json-patch+json:
             schema:
               $ref: '#/components/schemas/PerfilDTO'
       responses:
@@ -1084,6 +1084,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenpanelApiResponsePerfil'
+        default:
+          $ref: '#/components/responses/ApiErrorResponse'
   /usuarios/changePassword:
     post:
       summary: Cambiar contraseña de usuario
@@ -3475,6 +3477,8 @@ components:
           type: integer
         idRol:
           type: integer
+        rolCodigo:
+          type: string
         username:
           type: string
         password:
@@ -3501,6 +3505,8 @@ components:
           format: byte
         infouser:
           type: string
+        habilitado:
+          type: boolean
     CheckUsernameDTO:
       type: object
       properties:
