@@ -1,4 +1,3 @@
-// auth.guard.ts
 import { Injectable } from '@angular/core';
 import {
   CanActivate,
@@ -16,6 +15,7 @@ import { environment } from '../../../environments/environment';
 import { AuthSyncService } from '../services/auth/auth-sync.service';
 import { LoggerService } from '../services/logger.service';
 import { AuthService } from '../services/auth/auth.service';
+import { OPSessionConstants } from '../../shared/constants/op-session.constants';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +33,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
   ) {}
 
   // Common check reused by the three guards
-  private checkAuth(): boolean {
+  checkAuth(): boolean | UrlTree {
     if (environment && (environment as any).mock) {
       return true;
     }
@@ -53,13 +53,25 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
 
     if (!token || !user) {
       this.log.info('🔐 AuthGuard - No hay token o usuario -> redirigiendo');
-      return false;
+      return this.router.parseUrl('/login');
     }
 
     if (!this.authService.isTokenValid(this.EXPIRY_MARGIN_SECONDS)) {
       this.log.info(
-        '🔐 AuthGuard - Token caducado o a punto de caducar -> redirigiendo (sin emitir logout)'
+        '🔐 AuthGuard - Token caducado o a punto de caducar -> redirigiendo con sessionData'
       );
+      // Pasamos sessionData en el state para que SessionExpiredComponent lo recoja.
+      // Usamos navigate() + return false porque createUrlTree() no soporta state.
+      this.router.navigate(['/login'], {
+        state: { 
+          sessionData: { 
+            type: OPSessionConstants.TYPE_SESSION_EXPIRED, 
+            message: 'Su sesión ha caducado. Por favor, inicie sesión de nuevo.',
+            allowSave: true, 
+            timestamp: Date.now() 
+          } 
+        }
+      });
       return false;
     }
 
@@ -76,8 +88,16 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
         return true;
       }
     } catch {}
-    if (!this.checkAuth()) {
-      return this.router.parseUrl('/login');
+    
+    const check = this.checkAuth();
+    if (check instanceof UrlTree) {
+      return check;
+    }
+    if (!check) {
+      // Si checkAuth retornó false, asumimos que ya manejó la redirección (expired)
+      // o que se denegó el acceso (aunque !token devuelve UrlTree ahora).
+      // En cualquier caso, retornamos false para detener la navegación actual.
+      return false;
     }
 
     // comprobación de roles (si la ruta la requiere)
@@ -101,14 +121,21 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
   }
 
   canLoad(route: Route, segments: UrlSegment[]): boolean | UrlTree {
-    // canLoad no provee ActivatedRouteSnapshot con data roles,
-    // así que solo verificamos autenticación; si necesitas roles hay que
-    // manejarlo en la ruta con canActivate o comprobar route.data aquí.
-    return this.checkAuth() ? true : this.router.parseUrl('/login');
+    const check = this.checkAuth();
+    if (check instanceof UrlTree) {
+      return check;
+    }
+    // Si check es false, retornamos false para cancelar la carga.
+    // Si check es true, retornamos true.
+    return check;
   }
 
   canMatch(route: Route, segments: UrlSegment[]): boolean | UrlTree {
-    return this.checkAuth() ? true : this.router.parseUrl('/login');
+    const check = this.checkAuth();
+    if (check instanceof UrlTree) {
+      return check;
+    }
+    return check;
   }
 
   private redirectToLogin(): void {

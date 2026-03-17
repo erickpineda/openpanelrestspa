@@ -25,6 +25,7 @@ import {
   TemplateIdDirective,
   TooltipModule,
   ButtonGroupModule,
+  OffcanvasModule,
 } from '@coreui/angular';
 
 @NgModule({
@@ -56,6 +57,7 @@ import {
     TemplateIdDirective,
     TooltipModule,
     ButtonGroupModule,
+    OffcanvasModule,
   ],
   exports: [
     CommonModule,
@@ -85,6 +87,7 @@ import {
     TemplateIdDirective,
     TooltipModule,
     ButtonGroupModule,
+    OffcanvasModule,
   ],
 })
 export class SharedCoreUiModule {}

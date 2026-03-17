@@ -1,0 +1,1 @@
+export * from './contenido.module';

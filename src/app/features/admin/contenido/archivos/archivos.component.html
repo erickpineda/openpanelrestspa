@@ -1,0 +1,391 @@
+<c-container class="container-fluid">
+  <c-card class="mb-4 shadow-sm border-0" aria-live="polite">
+    <c-card-header class="bg-white border-bottom py-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <div class="bg-primary bg-opacity-10 p-2 rounded">
+            <svg cIcon name="cilFolderOpen" size="lg" class="text-primary"></svg>
+          </div>
+          <div>
+            <h5 class="mb-0 text-primary fw-bold">{{ 'AUTO.GESTI_N_DE_ARCHIVOS' | translate }}</h5>
+            <small class="text-muted">{{
+              'AUTO.ADMINISTRA_LOS_RECURSOS_Y_DOCU' | translate
+            }}</small>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <input
+            type="file"
+            #fileInput
+            (change)="onFileSelected($event)"
+            [disabled]="uploading"
+            hidden
+          />
+          <button
+            cButton
+            color="primary"
+            class="text-white shadow-sm"
+            (click)="openUpload(fileInput)"
+            [disabled]="uploading"
+          >
+            <svg cIcon name="cilCloudUpload" class="me-2"></svg>
+            {{ uploading ? 'Subiendo...' : 'Subir Archivo' }}
+          </button>
+        </div>
+      </div>
+    </c-card-header>
+
+    <c-card-body class="p-4" [attr.aria-busy]="loading ? 'true' : null">
+      @if (error) {
+        <c-alert
+          color="danger"
+          class="d-flex align-items-center justify-content-between mb-4 shadow-sm border-0"
+        >
+          <div class="d-flex align-items-center gap-2">
+            <svg cIcon name="cilWarning" class="flex-shrink-0"></svg>
+            <span>{{ error }}</span>
+          </div>
+          <button cButton color="danger" variant="outline" size="sm" (click)="load()">
+            {{ 'AUTO.REINTENTAR' | translate }}
+          </button>
+        </c-alert>
+      }
+
+      <div class="d-flex flex-column gap-4">
+        <!-- Toolbar y Filtros -->
+        <div class="bg-light p-3 rounded border">
+          <c-row class="g-3 align-items-center">
+            <c-col xs="12" md="4">
+              <div class="text-muted fw-medium small">
+                Total: <span class="text-primary fw-bold">{{ totalElements }}</span> archivos
+              </div>
+            </c-col>
+            <c-col
+              xs="12"
+              md="8"
+              class="d-flex flex-wrap justify-content-md-end gap-2 align-items-center"
+            >
+              <div class="position-relative flex-grow-1 flex-md-grow-0" style="min-width: 250px">
+                <svg
+                  cIcon
+                  name="cilSearch"
+                  class="text-muted position-absolute top-50 start-0 translate-middle-y ms-3"
+                  size="sm"
+                ></svg>
+                <input
+                  cFormControl
+                  type="text"
+                  [value]="basicSearchText"
+                  (input)="onBasicSearchTextChange($any($event.target).value)"
+                  placeholder="Buscar por nombre..."
+                  class="ps-5"
+                  [disabled]="loading"
+                />
+              </div>
+              <select
+                cSelect
+                [ngModel]="pageSize"
+                (ngModelChange)="onPageSizeChange($event)"
+                name="pageSizeSelect"
+                style="width: auto"
+                [disabled]="loading"
+              >
+                <option [ngValue]="5">{{ 'AUTO.5_FILAS' | translate }}</option>
+                <option [ngValue]="10">{{ 'AUTO.10_FILAS' | translate }}</option>
+                <option [ngValue]="20">{{ 'AUTO.20_FILAS' | translate }}</option>
+              </select>
+              <button
+                cButton
+                color="secondary"
+                variant="ghost"
+                (click)="toggleAdvanced()"
+                [active]="showAdvanced"
+                [disabled]="loading"
+                cTooltip="Filtros avanzados"
+              >
+                <svg cIcon name="cilFilter"></svg>
+              </button>
+              <c-dropdown variant="btn-group" class="ms-2">
+                <button cButton cDropdownToggle color="secondary" variant="outline" [cTooltip]="'Ordenar listado'" [disabled]="loading">
+                  <svg cIcon [name]="getSortIcon('nombre')" class="me-1"></svg>
+                </button>
+                <ul cDropdownMenu>
+                  <li><h6 cDropdownHeader class="dropdown-header small">Por Nombre</h6></li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('nombre', 'ASC')">
+                      <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                    </button>
+                  </li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('nombre', 'DESC')">
+                      <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                    </button>
+                  </li>
+                  <li><hr cDropdownDivider></li>
+                  <li><h6 cDropdownHeader class="dropdown-header small">Por Fecha</h6></li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('fechaCreacion', 'DESC')">
+                      <span *ngIf="isSortActive('fechaCreacion', 'DESC')" class="me-1 text-success fw-bold">✓</span> Más recientes
+                    </button>
+                  </li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('fechaCreacion', 'ASC')">
+                      <span *ngIf="isSortActive('fechaCreacion', 'ASC')" class="me-1 text-success fw-bold">✓</span> Más antiguos
+                    </button>
+                  </li>
+                  <li><hr cDropdownDivider></li>
+                  <li><h6 cDropdownHeader class="dropdown-header small">Por Tamaño</h6></li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('tamano', 'DESC')">
+                      <span *ngIf="isSortActive('tamano', 'DESC')" class="me-1 text-success fw-bold">✓</span> Mayor a menor
+                    </button>
+                  </li>
+                  <li>
+                    <button cDropdownItem (click)="ordenar('tamano', 'ASC')">
+                      <span *ngIf="isSortActive('tamano', 'ASC')" class="me-1 text-success fw-bold">✓</span> Menor a mayor
+                    </button>
+                  </li>
+                </ul>
+              </c-dropdown>
+            </c-col>
+          </c-row>
+
+          @if (showAdvanced) {
+            <div class="mt-3 pt-3 border-top animate__animated animate__fadeIn">
+              <c-row class="g-3 align-items-end">
+                <c-col xs="12" md="4">
+                  <label class="form-label small text-muted fw-bold mb-1">{{
+                    'AUTO.TIPO_MIME' | translate
+                  }}</label>
+                  <select
+                    cSelect
+                    class="form-select-sm"
+                    [(ngModel)]="filtroMime"
+                    [disabled]="loading"
+                  >
+                    <option value="">{{ 'AUTO.TODOS_LOS_TIPOS' | translate }}</option>
+                    <option value="application/pdf">{{ 'AUTO.PDF' | translate }}</option>
+                    <option value="application/zip">{{ 'AUTO.ZIP_ARCHIVE' | translate }}</option>
+                    <option value="text/plain">{{ 'AUTO.TEXTO_PLANO' | translate }}</option>
+                  </select>
+                </c-col>
+                <c-col xs="6" md="3">
+                  <label class="form-label small text-muted fw-bold mb-1">{{
+                    'AUTO.DESDE' | translate
+                  }}</label>
+                  <input
+                    cFormControl
+                    class="form-control-sm"
+                    type="date"
+                    [(ngModel)]="fechaDesde"
+                    [disabled]="loading"
+                  />
+                </c-col>
+                <c-col xs="6" md="3">
+                  <label class="form-label small text-muted fw-bold mb-1">{{
+                    'AUTO.HASTA' | translate
+                  }}</label>
+                  <input
+                    cFormControl
+                    class="form-control-sm"
+                    type="date"
+                    [(ngModel)]="fechaHasta"
+                    [disabled]="loading"
+                  />
+                </c-col>
+                <c-col xs="12" md="2" class="d-flex justify-content-end gap-2">
+                  <button
+                    cButton
+                    size="sm"
+                    color="primary"
+                    class="text-white"
+                    (click)="search()"
+                    [disabled]="loading"
+                  >
+                    Aplicar
+                  </button>
+                  <button
+                    cButton
+                    size="sm"
+                    color="secondary"
+                    variant="ghost"
+                    (click)="reset()"
+                    [disabled]="loading"
+                  >
+                    Limpiar
+                  </button>
+                </c-col>
+              </c-row>
+            </div>
+          }
+        </div>
+
+        <!-- Tabla -->
+        <div class="position-relative border rounded overflow-hidden">
+          @if (loading) {
+            <div
+              class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-white bg-opacity-75"
+              style="z-index: 10"
+            >
+              <c-spinner color="primary"></c-spinner>
+              <small class="text-primary mt-2 fw-medium">{{
+                'AUTO.CARGANDO_ARCHIVOS' | translate
+              }}</small>
+            </div>
+          }
+
+          <div class="table-responsive">
+            <table cTable hover striped class="mb-0 align-middle" aria-label="Tabla de archivos">
+              <thead class="bg-light">
+                <tr>
+                  <th
+                    scope="col"
+                    class="border-0 py-3 ps-4 text-secondary small fw-bold text-uppercase"
+                    style="min-width: 200px"
+                  >
+                    {{ 'AUTO.NOMBRE' | translate }}
+                  </th>
+                  <th
+                    scope="col"
+                    class="border-0 py-3 text-secondary small fw-bold text-uppercase text-end"
+                    style="min-width: 120px"
+                  >
+                    {{ 'AUTO.TAMA_O' | translate }}
+                  </th>
+                  <th
+                    scope="col"
+                    class="border-0 py-3 text-secondary small fw-bold text-uppercase text-center"
+                    style="min-width: 160px"
+                  >
+                    {{ 'AUTO.FECHA' | translate }}
+                  </th>
+                  <th
+                    scope="col"
+                    class="border-0 py-3 pe-4 text-secondary small fw-bold text-uppercase text-center"
+                    style="min-width: 110px"
+                  >
+                    {{ 'AUTO.ACCIONES' | translate }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="border-top-0">
+                @for (f of items; track trackByMediaItem($index, f)) {
+                  <tr>
+                    <td class="ps-4">
+                      <div class="d-flex align-items-center gap-2">
+                        <svg cIcon name="cilFile" class="text-secondary"></svg>
+                        <span
+                          class="fw-medium text-dark text-truncate d-inline-block"
+                          style="max-width: 320px"
+                          [title]="f.nombre"
+                          >{{ f.nombre }}</span
+                        >
+                      </div>
+                    </td>
+                    <td class="text-end font-monospace small">{{ f.tamano | number }} B</td>
+                    <td class="text-center text-muted small">
+                      {{ f.fechaCreacion | date: 'dd/MM/yyyy HH:mm' }}
+                    </td>
+                    <td class="pe-4 text-center">
+                      <div class="d-flex justify-content-center gap-2">
+                        <button
+                          cButton
+                          color="info"
+                          variant="ghost"
+                          size="sm"
+                          class="btn-icon rounded-circle"
+                          (click)="download(f)"
+                          [disabled]="!f.uuid && !f.url"
+                          cTooltip="Descargar"
+                        >
+                          <svg cIcon name="cilCloudDownload" size="sm"></svg>
+                        </button>
+                        <button
+                          cButton
+                          color="danger"
+                          variant="ghost"
+                          size="sm"
+                          class="btn-icon rounded-circle"
+                          (click)="deleteItem(f)"
+                          cTooltip="Eliminar"
+                        >
+                          <svg cIcon name="cilTrash" size="sm"></svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+
+                @if (items.length === 0 && !loading) {
+                  <tr>
+                    <td colspan="4" class="text-center py-5">
+                      <div
+                        class="d-flex flex-column align-items-center justify-content-center opacity-50"
+                      >
+                        <svg cIcon name="cilFolderOpen" size="4xl" class="text-muted mb-3"></svg>
+                        <h6 class="text-muted fw-bold">
+                          {{ 'AUTO.NO_SE_ENCONTRARON_ARCHIVOS' | translate }}
+                        </h6>
+                        <p class="text-muted small mb-0">
+                          {{ 'AUTO.INTENTA_SUBIR_UN_ARCHIVO_O_AJU' | translate }}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </c-card-body>
+    @if (totalElements > 0) {
+      <c-card-footer class="bg-white border-top-0 py-3">
+        <div
+          class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3"
+        >
+          <div class="text-muted small order-2 order-md-1">
+            Mostrando {{ items.length }} de {{ totalElements }} archivos
+          </div>
+          <div class="order-1 order-md-2 w-100 w-md-auto d-flex justify-content-center">
+            <app-op-pagination
+              [totalPages]="totalPages"
+              [currentPage]="pageNo"
+              (pageChange)="onPageChange($event)"
+            >
+            </app-op-pagination>
+          </div>
+        </div>
+      </c-card-footer>
+    }
+  </c-card>
+</c-container>
+
+<c-modal
+  [visible]="confirmationModalVisible"
+  (visibleChange)="confirmationModalVisible = $event"
+  backdrop="static"
+>
+  <c-modal-header class="border-bottom-0">
+    <h5 cModalTitle class="fw-bold text-danger">{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="text-center py-3">
+      <svg cIcon name="cilTrash" size="4xl" class="text-danger mb-3 opacity-75"></svg>
+      <p class="mb-1">{{ 'COMMON.VERIFY_DELETE' | translate }}</p>
+      <h4 class="fw-bold text-dark">{{ itemToDelete?.nombre }}</h4>
+      <p class="text-muted small mt-2">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</p>
+    </div>
+  </c-modal-body>
+  <c-modal-footer class="border-top-0 justify-content-center pb-4">
+    <button cButton color="secondary" variant="ghost" (click)="cancelDelete()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+    <button cButton color="danger" class="px-4" (click)="confirmDelete()" [disabled]="loading">
+      @if (loading) {
+        <c-spinner size="sm" class="me-2"></c-spinner>
+      }
+      {{ 'COMMON.DELETE' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>

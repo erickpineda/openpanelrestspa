@@ -56,4 +56,13 @@
   ::ng-deep .admin-shell .pagination .page-link {
     border-radius: 999px;
   }
+  ::ng-deep .global-recovery-container {
+    position: sticky;
+    top: 0;
+    z-index: 2000;
+  }
+  ::ng-deep .admin-recovery-wrapper {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
 }

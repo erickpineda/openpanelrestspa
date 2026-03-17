@@ -50,11 +50,26 @@ export class GlobalErrorHandlerService implements ErrorHandler {
   }
 
   handleError(error: any): void {
+    // ✅ Ignorar errores benignos de DOM (Node.removeChild)
+    // Estos ocurren cuando Angular intenta remover un elemento que ya fue eliminado manualmente (por UiAnomalyMonitor o SessionExpiredComponent)
+    const errorMsg = error?.message || (typeof error === 'string' ? error : '');
+    if (
+      errorMsg.includes('Node.removeChild') ||
+      errorMsg.includes('not a child of this node') ||
+      errorMsg.includes('NotFoundError')
+    ) {
+      this.log.info('🧹 [GLOBAL HANDLER] Ignorando error de limpieza DOM benigno:', errorMsg);
+      return;
+    }
+
     this.ngZone.run(() => {
       this.errorCount++;
 
       if (this.errorCount > this.maxErrors) {
-        this.log.error('🛑 Demasiados errores, evitando notificaciones');
+        // Evitar bucle infinito si el logger falla
+        if (this.errorCount === this.maxErrors + 1) {
+          console.error('🛑 [GLOBAL HANDLER] Demasiados errores, evitando notificaciones y logs adicionales.');
+        }
         return;
       }
 
@@ -179,6 +194,9 @@ export class GlobalErrorHandlerService implements ErrorHandler {
     }
 
     // Si no es validación, mostrar mensaje genérico
+    // Evitar mostrar "Error al crear la etiqueta" (mensaje genérico) si ya se mostró uno específico
+    // Esto se controla mediante el filtrado de severidad y tipo, pero aquí aseguramos que solo un mensaje relevante salga.
+    
     switch (error.severity) {
       case 'critical':
       case 'high':
@@ -195,14 +213,16 @@ export class GlobalErrorHandlerService implements ErrorHandler {
 
   private showValidationErrors(error: AppError, toastService: ToastService): void {
     if (error.validationErrors && error.validationErrors.length > 0) {
-      if (error.validationErrors.length === 1) {
+      // Usar un Set para eliminar mensajes duplicados exactos
+      const uniqueErrors = Array.from(new Set(error.validationErrors.map(msg => this.cleanValidationMessage(msg))));
+      
+      if (uniqueErrors.length === 1) {
         // Un solo error - mostrar directamente
-        const cleanMessage = this.cleanValidationMessage(error.validationErrors[0]);
-        toastService.showError(cleanMessage, 'Error de Validación');
+        toastService.showError(uniqueErrors[0], 'Error de Validación');
       } else {
         // Múltiples errores
-        const mainError = this.cleanValidationMessage(error.validationErrors[0]);
-        const additionalCount = error.validationErrors.length - 1;
+        const mainError = uniqueErrors[0];
+        const additionalCount = uniqueErrors.length - 1;
         const message =
           additionalCount > 0
             ? `${mainError} (+${additionalCount} error${additionalCount > 1 ? 'es' : ''} más)`
@@ -211,7 +231,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
         toastService.showError(message, 'Errores de Validación');
 
         if (this.isDevelopment()) {
-          this.log.warn('📋 Todos los errores de validación:', error.validationErrors);
+          this.log.warn('📋 Todos los errores de validación:', uniqueErrors);
         }
       }
     }

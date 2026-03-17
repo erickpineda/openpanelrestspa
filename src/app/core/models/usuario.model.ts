@@ -4,7 +4,6 @@ import { Rol } from './rol.model';
 
 export class Usuario {
   idUsuario: number = 0;
-  idRol: number = 0;
   rolCodigo: string = '';
   username: string = '';
   password: string = '';
@@ -30,10 +29,9 @@ export class Usuario {
 }
 
 export interface Usuario {
-  idUsuario: number;
-  idRol: number;
-  rolCodigo: string;
   username: string;
+  idUsuario: number;
+  rolCodigo: string;
   password: string;
   nombre: string;
   apellido: string;
@@ -50,4 +48,13 @@ export interface Usuario {
   infouser: string;
   tokenExpirationDate: any;
   verifyToken: string;
+}
+
+export interface ChangePasswordDTO {
+  idUsuario?: number;
+  username?: string;
+  password?: string;
+  // Although swagger only lists these, usually current password is required for security.
+  // We will assume the frontend validates current password if possible or just sends what backend expects.
+  // If backend doesn't support current password check, we can't enforce it securely.
 }

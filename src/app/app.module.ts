@@ -11,21 +11,13 @@ import { DatePipe, registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import localeEn from '@angular/common/locales/en';
 import { ModalModule, ToastModule } from '@coreui/angular';
-import { UnsavedWorkDirective } from './core/directives/unsaved-work.directive';
-import { SessionExpiredComponent } from './core/features/session-expired.component';
-import { UnsavedWorkModalComponent } from './core/features/unsaved-work-modal.component';
 import { GlobalNotificationsComponent } from './shared/components/global-notifications/global-notifications.component';
 import { SharedOPModule } from './shared/shared.module';
+import { SharedWidgetsModule } from './shared/shared-widgets.module';
 import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    SessionExpiredComponent,
-    UnsavedWorkModalComponent,
-    UnsavedWorkDirective,
-    GlobalNotificationsComponent,
-  ],
+  declarations: [AppComponent, GlobalNotificationsComponent],
   bootstrap: [AppComponent],
   imports: [
     BrowserModule,
@@ -33,6 +25,7 @@ import { GlobalErrorHandlerService } from './core/errors/global-error/global-err
     BrowserAnimationsModule,
     CoreModule, // ✅ Solo servicios globales
     SharedOPModule, // ✅ Componentes compartidos
+    SharedWidgetsModule,
     ToastModule,
     ModalModule,
   ],

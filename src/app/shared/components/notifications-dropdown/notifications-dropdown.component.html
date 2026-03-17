@@ -1,0 +1,85 @@
+<c-dropdown variant="nav-item" [visible]="open" alignment="end">
+  <a
+    cNavLink
+    [caret]="false"
+    cDropdownToggle
+    class="nav-link nav-icon-toggle position-relative"
+    aria-label="Abrir notificaciones"
+    [attr.aria-expanded]="open ? 'true' : 'false'"
+    (click)="toggleOpen()"
+  >
+    <svg cIcon name="cilBell" size="lg"></svg>
+    @if (unreadCount > 0) {
+      <span class="notif-dot badge position-absolute bg-primary border-light rounded-circle">
+        <span class="visually-hidden">Nuevas notificaciones</span>
+      </span>
+    }
+  </a>
+  <ul cDropdownMenu class="pt-0 notif-menu">
+    <li>
+      <h6 cDropdownHeader class="fw-semibold d-flex align-items-center justify-content-between">
+        <span class="me-2">{{ labelHeader | translate }}</span>
+        <button cButton color="link" class="p-0 small" (click)="handleMarkAll()" aria-label="Marcar todas como leídas">
+          {{ labelMarkAll | translate }}
+        </button>
+      </h6>
+    </li>
+    @if (items.length === 0) {
+      <li class="px-3 py-3 text-center text-body-secondary">
+        {{ 'HEADER.NO_NOTIFICATIONS' | translate }}
+      </li>
+    } @else {
+      @for (it of items; track it.id) {
+        <li class="px-2">
+          <div class="notif-item d-flex align-items-start gap-3 p-3 rounded-2" [class.unread]="it.unread" [class.marking-read]="markingAsReadIds.has(it.id)">
+            <div class="icon d-flex align-items-center justify-content-center">
+              @switch (it.type) {
+                @case ('temporary') {
+                  <svg cIcon name="cilClock" class="text-warning"></svg>
+                }
+                @case ('critical') {
+                  <svg cIcon name="cilWarning" class="text-danger"></svg>
+                }
+                @case ('system') {
+                  <svg cIcon name="cilShieldAlt" class="text-info"></svg>
+                }
+                @default {
+                  <svg cIcon name="cilInfo" class="text-primary"></svg>
+                }
+              }
+            </div>
+            <div class="flex-fill">
+              <div class="d-flex align-items-center justify-content-between">
+                <strong class="me-2" [title]="it.title">{{ it.title.length > 30 ? (it.title | slice:0:30) + '...' : it.title }}</strong>
+                <div class="d-flex align-items-center gap-2">
+                  @if (it.type === 'temporary') {
+                    <span class="notif-tag badge rounded-pill text-bg-warning">Temporal</span>
+                  }
+                  @if (it.unread) {
+                    <span class="badge rounded-pill text-bg-primary">Nuevo</span>
+                  }
+                  <small class="small time">{{ timeAgo(it.timestamp) }}</small>
+                </div>
+              </div>
+              <div class="small text-body mt-1">{{ it.message }}</div>
+              <div class="mt-3 d-flex gap-2">
+                <button cButton color="secondary" size="sm" variant="outline" (click)="$event.stopPropagation(); handleMarkRead(it.id)" [cTooltip]="'HEADER.MARK_READ' | translate" aria-label="Marcar notificación como leída">
+                  <svg cIcon name="cilCheck"></svg>
+                </button>
+                <button cButton color="danger" size="sm" variant="outline" (click)="handleDismiss(it.id)" aria-label="Descartar notificación">
+                  <svg cIcon name="cilX"></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </li>
+      }
+    }
+    <li>
+      <hr cDropdownDivider />
+    </li>
+    <li class="px-2 pb-2 d-flex justify-content-between">
+      <a cButton color="link" class="p-0" (click)="viewAll.emit()" aria-label="Ver todas las notificaciones"> {{ labelViewAll | translate }} </a>
+    </li>
+  </ul>
+</c-dropdown>

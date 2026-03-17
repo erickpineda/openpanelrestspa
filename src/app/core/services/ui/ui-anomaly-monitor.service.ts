@@ -8,7 +8,6 @@ import {
 } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
 import { LoggerService } from '../logger.service';
 import { LoadingService } from './loading.service';
 
@@ -115,7 +114,8 @@ export class UiAnomalyMonitorService {
         )
         .subscribe((e) => {
           if (e instanceof NavigationEnd) {
-            this.scanAndRecover('navigation');
+            // Delay scan to allow animations/cleanups to finish
+            setTimeout(() => this.scanAndRecover('navigation'), 500);
           }
         });
 
@@ -191,6 +191,8 @@ export class UiAnomalyMonitorService {
   scanAndRecover(trigger: UiAnomalyTrigger = 'manual'): void {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
+    if (!this.config.enabled && trigger !== 'manual') return;
+
     const blockers = this.findViewportBlockers();
     if (blockers.length === 0) return;
 
@@ -212,7 +214,7 @@ export class UiAnomalyMonitorService {
     const hasOpenDialog = this.hasOpenDialogOrOffcanvas();
     const shouldRecover = !hasOpenDialog;
     if (!shouldRecover) {
-      this.log.warn('UiAnomalyMonitor: blockers found but dialog is open/visible', {
+      this.log.debug('UiAnomalyMonitor: blockers found but dialog is open/visible', {
         blockers,
         hasOpenDialog,
       });
@@ -240,7 +242,7 @@ export class UiAnomalyMonitorService {
   forceCleanupForLogout(): void {
     this.log.info('UiAnomalyMonitor: Force cleanup for logout');
     try {
-      this.loading.forceStopLoading();
+      this.loading.forceStopLoading(true);
     } catch {}
     this.recoverFromBlockers({ removeLoaderOverlay: true });
   }
@@ -290,9 +292,7 @@ export class UiAnomalyMonitorService {
     if (!doc) return false;
 
     const candidates = Array.from(
-      doc.querySelectorAll(
-        '.modal.show, .offcanvas.show, [role="dialog"][aria-modal="true"]'
-      )
+      doc.querySelectorAll('.modal.show, .offcanvas.show, [role="dialog"][aria-modal="true"]')
     ) as HTMLElement[];
 
     // Consider open only if it is actually visible in the layout
@@ -536,7 +536,9 @@ export class UiAnomalyMonitorService {
     const toRemove = Array.from(doc.querySelectorAll(selectors)) as HTMLElement[];
     for (const el of toRemove) {
       try {
-        el.remove();
+        if (el && el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
       } catch {}
     }
 
@@ -544,7 +546,9 @@ export class UiAnomalyMonitorService {
       const toRemoveLoader = Array.from(doc.querySelectorAll(loaderSelectors)) as HTMLElement[];
       for (const el of toRemoveLoader) {
         try {
-          el.remove();
+          if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+          }
         } catch {}
       }
     }

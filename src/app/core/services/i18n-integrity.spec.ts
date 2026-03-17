@@ -9,21 +9,21 @@ describe('Sistema de Internacionalización (I18N)', () => {
   let httpMock: HttpTestingController;
 
   const mockEs = {
-    "MENU": {
-      "HOME": "Inicio"
+    MENU: {
+      HOME: 'Inicio',
     },
-    "AUTO": {
-      "HELLO": "Hola"
-    }
+    AUTO: {
+      HELLO: 'Hola',
+    },
   };
 
   const mockEn = {
-    "MENU": {
-      "HOME": "Home"
+    MENU: {
+      HOME: 'Home',
     },
-    "AUTO": {
-      "HELLO": "Hello"
-    }
+    AUTO: {
+      HELLO: 'Hello',
+    },
   };
 
   beforeEach(() => {
@@ -32,7 +32,7 @@ describe('Sistema de Internacionalización (I18N)', () => {
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [TranslationService, LanguageService]
+      providers: [TranslationService, LanguageService],
     });
 
     translationService = TestBed.inject(TranslationService);
@@ -87,10 +87,10 @@ describe('Sistema de Internacionalización (I18N)', () => {
   });
 
   it('debe interpolar parámetros correctamente', () => {
-     // Carga inicial
-     const req = httpMock.expectOne('assets/i18n/es.json');
-     req.flush({ "GREETING": "Hola {{name}}" });
+    // Carga inicial
+    const req = httpMock.expectOne('assets/i18n/es.json');
+    req.flush({ GREETING: 'Hola {{name}}' });
 
-     expect(translationService.translate('GREETING', { name: 'Juan' })).toBe('Hola Juan');
+    expect(translationService.translate('GREETING', { name: 'Juan' })).toBe('Hola Juan');
   });
 });

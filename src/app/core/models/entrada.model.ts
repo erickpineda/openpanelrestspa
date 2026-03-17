@@ -10,6 +10,7 @@ export class Entrada {
   idUsuarioEditado: number = 0;
   titulo: string = '';
   subtitulo: string = '';
+  slug: string = '';
   contenido: string = '';
   notas: string = '';
   tipoEntrada: TipoEntrada = new TipoEntrada();
@@ -23,7 +24,7 @@ export class Entrada {
   estadoEntrada: EstadoEntrada = new EstadoEntrada();
   fechaPublicacionProgramada: Date = new Date();
   permitirComentario: boolean = true;
-  imagenDestacada: string = '';
+  imagenDestacadaUuid?: string;
   votos: number = 0;
   cantidadComentarios: number = 0;
   categorias: Categoria[] = [];
@@ -43,6 +44,7 @@ export interface Entrada {
   idUsuarioEditado: number;
   titulo: string;
   subtitulo: string;
+  slug: string;
   contenido: string;
   notas: string;
   tipoEntrada: TipoEntrada;
@@ -56,7 +58,7 @@ export interface Entrada {
   estadoEntrada: EstadoEntrada;
   fechaPublicacionProgramada: Date;
   permitirComentario: boolean;
-  imagenDestacada: string;
+  imagenDestacadaUuid?: string;
   votos: number;
   cantidadComentarios: number;
 

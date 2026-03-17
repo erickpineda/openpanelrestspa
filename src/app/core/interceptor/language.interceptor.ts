@@ -1,10 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-} from '@angular/common/http';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LanguageService } from '../services/language.service';
 
@@ -16,10 +11,10 @@ export class LanguageInterceptor implements HttpInterceptor {
     // Solo agregar el parámetro a llamadas API
     if (request.url.includes('/api/')) {
       const currentLang = this.languageService.getCurrentLanguage();
-      
+
       // Clonar la petición y agregar el parámetro
       const modifiedRequest = request.clone({
-        params: request.params.set('lang', currentLang)
+        params: request.params.set('lang', currentLang),
       });
 
       return next.handle(modifiedRequest);

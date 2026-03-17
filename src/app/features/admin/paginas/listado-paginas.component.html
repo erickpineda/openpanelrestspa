@@ -1,0 +1,125 @@
+<c-container fluid class="px-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <c-card-header class="bg-white p-4 border-bottom">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilFile" class="text-primary"></svg>
+            {{ 'ADMIN.PAGES.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.PAGES.SUBTITLE' | translate }}
+          </small>
+        </div>
+        <div class="d-flex gap-2">
+          <c-dropdown variant="btn-group">
+            <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+              <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
+              Ordenar
+            </button>
+            <ul cDropdownMenu>
+              <li><button cDropdownItem (click)="ordenar('fechaPublicacion', 'DESC')">
+                <span *ngIf="isSortActive('fechaPublicacion', 'DESC')" class="me-1 fw-bold">✓</span> Más recientes
+              </button></li>
+              <li><button cDropdownItem (click)="ordenar('fechaPublicacion', 'ASC')">
+                <span *ngIf="isSortActive('fechaPublicacion', 'ASC')" class="me-1 fw-bold">✓</span> Más antiguos
+              </button></li>
+              <li><hr cDropdownDivider></li>
+              <li><button cDropdownItem (click)="ordenar('titulo', 'ASC')">
+                <span *ngIf="isSortActive('titulo', 'ASC')" class="me-1 fw-bold">✓</span> Título (A-Z)
+              </button></li>
+              <li><button cDropdownItem (click)="ordenar('titulo', 'DESC')">
+                <span *ngIf="isSortActive('titulo', 'DESC')" class="me-1 fw-bold">✓</span> Título (Z-A)
+              </button></li>
+            </ul>
+          </c-dropdown>
+          <button
+            cButton
+            color="secondary"
+            variant="ghost"
+            size="sm"
+            [cTooltip]="'ADMIN.PAGES.PRINT_TOOLTIP' | translate"
+          >
+            <svg cIcon name="cilPrint" class="me-1"></svg>
+            {{ 'ADMIN.ENTRIES.PRINT' | translate }}
+          </button>
+          <button cButton color="primary" size="sm" routerLink="crear" class="shadow-sm">
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            {{ 'ADMIN.PAGES.NEW_PAGE' | translate }}
+          </button>
+        </div>
+      </div>
+    </c-card-header>
+
+    <div class="section-divider" aria-hidden="true"></div>
+
+    <c-card-body class="p-4">
+      <!-- Toolbar: Buscador y Filtros -->
+      <app-entradas-filter
+        [basicSearchText]="basicSearchText"
+        [showAdvanced]="showAdvanced"
+        [definiciones]="definiciones"
+        [cargarCatalogosFn]="cargarCatalogosEntrada"
+        [pagingInfo]="pagingInfoObject"
+        (basicSearchChange)="onBasicSearchTextChange($event)"
+        (toggleAdvanced)="toggleAdvanced()"
+        (filtroSeleccionado)="aplicarFiltro($event)"
+        (filtroChanged)="onFiltroChanged($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      ></app-entradas-filter>
+
+      <!-- Tabla de Resultados -->
+      <app-entradas-table
+        [entradas]="listaEntradas"
+        [loading]="cargandoTabla"
+        [pagingInfo]="pagingInfoObject"
+        [baseRoute]="'/admin/control/paginas'"
+        (pageChange)="obtenerListaEntradas($event)"
+        (preview)="openPreview($event)"
+        (delete)="borrarEntrada($event)"
+      ></app-entradas-table>
+    </c-card-body>
+  </c-card>
+</c-container>
+
+<app-confirmation-modal
+  [visible]="visible"
+  [title]="'ADMIN.PAGES.CONFIRM_DELETE_TITLE' | translate"
+  [message]="
+    ('ADMIN.PAGES.CONFIRM_DELETE_MSG' | translate) +
+    (entradaABorrar ? ' (' + entradaABorrar.titulo + ')' : '')
+  "
+  [confirmText]="'ADMIN.PAGES.DELETE_PAGE' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'danger'"
+  [loading]="cargando"
+  (visibleChange)="onVisibleModalChange($event)"
+  (confirm)="confirmarBorrado()"
+></app-confirmation-modal>
+
+<c-modal
+  #previewModal
+  id="previewModal"
+  [visible]="previewVisible"
+  (visibleChange)="onPreviewVisibleChange($event)"
+  size="xl"
+>
+  <c-modal-header>
+    <h5 cModalTitle>{{ 'ADMIN.PAGES.PREVIEW_TITLE' | translate }}: {{ previewEntrada?.titulo }}</h5>
+    <button (click)="closePreview()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    @if (previewEntrada) {
+      <app-previa-entrada
+        [entrada]="previewEntrada"
+        [mostrarBotonesAccion]="false"
+        [mostrarTitulo]="false"
+      ></app-previa-entrada>
+    }
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="closePreview()" cButton color="secondary">
+      {{ 'AUTO.CERRAR' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>

@@ -8,8 +8,13 @@ if (environment.production) {
   enableProdMode();
 }
 
+const startTime = performance.now();
+
 platformBrowserDynamic()
   .bootstrapModule(AppModule, {
     applicationProviders: [provideZoneChangeDetection()],
+  })
+  .then(() => {
+    // Application bootstrapped
   })
   .catch((err: any) => console.error(err));

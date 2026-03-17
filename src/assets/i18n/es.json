@@ -1,8 +1,4 @@
 {
-  "AUTO": {
-    "NO_SE_ENCONTRARON_USUARIOS": "No se encontraron usuarios",
-    "INTENTA_AJUSTAR_LOS_FILTROS_DE": "Intenta ajustar los filtros de búsqueda"
-  },
   "HEADER": {
     "HOME": "Inicio",
     "ABOUT": "Acerca de",
@@ -10,18 +6,27 @@
     "ADMIN": "Admin",
     "LOGIN": "Iniciar Sesión",
     "LOGOUT": "Cerrar Sesión",
-    "PROFILE": "Perfil"
+    "PROFILE": "Perfil",
+    "NOTIFICATIONS": "Notificaciones",
+    "NO_NOTIFICATIONS": "No hay notificaciones",
+    "MARK_ALL_READ": "Marcar todas como leídas",
+    "MARK_READ": "Marcar como leída",
+    "VIEW_ALL": "Ver todas"
   },
   "COMMON": {
     "LOADING": "Cargando...",
     "ERROR": "Error",
+    "WARNING": "Advertencia",
     "SUCCESS": "Éxito",
     "RETRY": "Reintentar",
     "ALL": "Todos",
     "SEARCH": "Buscar",
     "SHOW": "Mostrar",
+    "HIDE": "Ocultar",
     "ACTIONS": "Acciones",
     "NAME": "Nombre",
+    "PASSWORD": "Contraseña",
+    "GENERATE": "Generar",
     "DESCRIPTION": "Descripción",
     "SAVE": "Guardar",
     "SAVE_CHANGES": "Guardar Cambios",
@@ -30,6 +35,7 @@
     "CLEAN": "Limpiar",
     "ID": "ID",
     "NO_DESCRIPTION": "Sin descripción",
+    "NO_RESULTS": "No se encontraron resultados",
     "PAGINATION_INFO": "Mostrando {{ current }} de {{ total }} registros",
     "VERIFY_DELETE": "¿Estás seguro de que deseas eliminar este elemento?",
     "BASIC_INFO": "Información básica",
@@ -40,14 +46,19 @@
     "CHARACTERS": "caracteres",
     "CONFIRM_DELETE": "Confirmar eliminación",
     "DELETE": "Eliminar",
+    "REMOVE": "Eliminar",
     "YES_DELETE": "Sí, eliminar",
     "ACTION_CANNOT_BE_UNDONE": "Esta acción no se puede deshacer.",
     "RECORDS": "registros",
     "EDIT": "Editar",
     "AUTHOR": "Autor",
     "DATE": "Fecha",
+    "TITLE": "Título",
+    "SUBTITLE": "Subtítulo",
     "TITLE_LABEL": "Título",
     "STATUS": "Estado",
+    "SLUG": "Slug",
+    "GENERATED_AUTO": "Generado automáticamente",
     "CATEGORY": "Categoría",
     "CREATED": "Creada",
     "USER": "Usuario",
@@ -60,12 +71,9 @@
     "CLOSING_SESSION": "Cerrando...",
     "REFRESH": "Refrescar",
     "DOWNLOAD_CSV": "Descargar CSV",
-    "RETRY": "Reintentar",
     "CSV": "CSV",
     "ON": "On",
     "OFF": "Off",
-    "CANCEL": "Cancelar",
-    "APPLY": "Aplicar",
     "RESET": "Limpiar",
     "UNPUBLISHED": "No Publicada",
     "FILTERS": "Filtros",
@@ -74,7 +82,14 @@
       "REQUIRED": "Este campo es obligatorio",
       "EMAIL_INVALID": "Correo electrónico inválido",
       "MIN_LENGTH": "Mínimo {{ min }} caracteres",
-      "MAX_LENGTH": "Máximo {{ max }} caracteres"
+      "MAX_LENGTH": "Máximo {{ max }} caracteres",
+      "PASSWORD_PATTERN": "La contraseña debe tener entre 8 y 20 caracteres, mayúsculas, minúsculas, números y caracteres especiales (@#$%&-+=!.çÇ()).",
+      "USERNAME_PATTERN": "El usuario debe tener entre 5 y 31 caracteres alfanuméricos.",
+      "CHECK_USERNAME_ERROR": "Error al verificar usuario",
+      "CREATE_SUCCESS": "Usuario creado correctamente",
+      "CREATE_ERROR": "Error al crear usuario",
+      "UPDATE_SUCCESS": "Usuario actualizado correctamente",
+      "UPDATE_ERROR": "Error al actualizar usuario"
     }
   },
   "MENU": {
@@ -96,8 +111,8 @@
     "USERS": "Usuarios",
     "ROLES_AND_PERMISSIONS": "Roles y Permisos",
     "ROLES": "Roles",
-      "PRIVILEGES": "Privilegios",
-      "MY_ACCOUNT": "Mi Cuenta",
+    "PRIVILEGES": "Privilegios",
+    "MY_ACCOUNT": "Mi Cuenta",
     "MY_PROFILE": "Mi Perfil",
     "CHANGE_PASSWORD": "Cambiar Contraseña",
     "SYSTEM_CONFIGURATION": "Config. del Sistema",
@@ -200,6 +215,8 @@
         "TITLE": "Métricas",
         "SHOW_HIDE": "Mostrar/Ocultar métricas",
         "COPY": "Copiar",
+        "COPIED": "Métricas copiadas",
+        "COPY_ERROR": "No se pudieron copiar las métricas",
         "PERFORMANCE_DEV": "Rendimiento (dev) — Actualizado: {{ time }}",
         "SUMMARY": "Resumen",
         "SERIES": "Series",
@@ -238,6 +255,20 @@
         "RESET_TITLE": "Restablecer campos a valores iniciales",
         "RESET_ARIA_LABEL": "Limpiar campos",
         "RESET": "Limpiar"
+      },
+      "SUCCESS": {
+        "UPDATED": "Datos actualizados"
+      },
+      "ERROR": {
+        "REFRESH_DASHBOARD": "Error refrescando dashboard",
+        "TOP_USERS": "Error obteniendo Top Usuarios",
+        "TOP_CATEGORIES": "Error obteniendo Top Categorías",
+        "TOP_TAGS": "Error obteniendo Top Tags",
+        "STORAGE": "Error obteniendo almacenamiento",
+        "CONTENT_STATS": "Error obteniendo estadísticas de contenido",
+        "RECENT_ACTIVITY": "Error obteniendo actividad reciente",
+        "SERIES_BY_STATUS": "Error obteniendo series por estado",
+        "SERIES_PIVOT": "Error obteniendo series pivot por estado"
       },
       "TOOLBAR": {
         "GENERATING_ZIP": "Generando ZIP...",
@@ -283,6 +314,28 @@
         "BAR": "Barras",
         "STACKED": "Apiladas",
         "NOT_STACKED": "No apiladas"
+      },
+      "DOWNLOAD": {
+        "NO_DATA_SERIES": "No hay datos de series para descargar",
+        "ERROR_SERIES": "Error descargando CSV de series",
+        "NO_DATA_RECENT": "No hay actividad reciente para descargar",
+        "ERROR_RECENT": "Error descargando CSV de actividad reciente",
+        "NO_DATA_SPLIT": "No hay datos de series por estado para descargar",
+        "ERROR_SPLIT": "Error descargando CSV de series por estado",
+        "NO_DATA_NOMINAL": "No hay datos de series por estado nominal para descargar",
+        "ERROR_NOMINAL": "Error descargando CSV de series por estado nominal",
+        "NO_DATA_STORAGE": "No hay datos de almacenamiento para descargar",
+        "ERROR_STORAGE": "Error descargando CSV de almacenamiento",
+        "NO_DATA_CONTENT": "No hay estadísticas de contenido para descargar",
+        "ERROR_CONTENT": "Error descargando CSV de estadísticas de contenido",
+        "NO_DATA_CONTENT_STATUS": "No hay datos de estados de contenido para descargar",
+        "ERROR_CONTENT_STATUS": "Error descargando CSV de estados de contenido",
+        "NO_DATA_TOP_USERS": "No hay datos de usuarios top para descargar",
+        "ERROR_TOP_USERS": "Error descargando CSV de usuarios top",
+        "NO_DATA_TOP_CATEGORIES": "No hay datos de categorías top para descargar",
+        "ERROR_TOP_CATEGORIES": "Error descargando CSV de categorías top",
+        "NO_DATA_TOP_TAGS": "No hay datos de tags top para descargar",
+        "ERROR_TOP_TAGS": "Error descargando CSV de tags top"
       }
     },
     "TEMP_ENTRIES": {
@@ -290,6 +343,7 @@
       "SUBTITLE": "Estas son las entradas que se guardaron temporalmente durante cierres de sesión.",
       "NEW_ENTRY": "Nueva Entrada",
       "NO_ENTRIES": "No hay entradas temporales guardadas",
+      "NO_ENTRIES_DESC": "No tienes entradas temporales guardadas en este momento.",
       "SAVED_AT": "Guardado:",
       "RECOVER": "Recuperar",
       "VIEW": "Ver",
@@ -309,6 +363,18 @@
       "DELETE_TITLE": "Eliminar Entrada Temporal",
       "CLEAR_ALL_TITLE": "Limpiar Todo"
     },
+    "RECOVERY": {
+      "GLOBAL_TITLE": "Borradores",
+      "GLOBAL_MESSAGE": "Tienes {{ count }} entrada(s) no guardada(s) de sesiones anteriores",
+      "PENDING_MSG": "“{{title}}” pendiente de recuperación",
+      "GENERIC_MSG": "Tienes datos temporales sin recuperar",
+      "STATUS": "Recuperación pendiente",
+      "GO_TO_LIST": "Ver entradas temporales",
+      "IGNORE_ALL": "Más tarde",
+      "DISCARD_ALL": "Descartar todas",
+      "CONFIRM_TITLE": "Confirmar Recuperación",
+      "CONFIRM_MESSAGE": "¿Estás seguro de que deseas recuperar este borrador? Se cargarán los datos guardados previamente."
+    },
     "CATEGORIES": {
       "TITLE": "Categorías",
       "SUBTITLE": "Organiza el contenido en secciones",
@@ -319,8 +385,13 @@
       "ADVANCED_FILTERS": "Filtros Avanzados",
       "HIDE_FILTERS": "Ocultar Filtros",
       "TABLE": {
-        "ENTRIES_COUNT": "Nº Entradas"
+        "ENTRIES_COUNT": "Nº Entradas",
+        "CODE": "Código"
       },
+      "CODE": "Código",
+      "CODE_REQUIRED": "El código es obligatorio.",
+      "CODE_REQUIRED_MAX_5_CHARS": "Código obligatorio (máx 5 caracteres)",
+      "CODE_AUTO_GENERATED_IF_EMPTY": "Se generará automáticamente si se deja vacío",
       "NAME_REQUIRED": "El nombre es obligatorio.",
       "DESCRIPTION_HELP": "Breve descripción de la categoría.",
       "NO_CATEGORIES": "No hay categorías para mostrar",
@@ -336,6 +407,13 @@
       "DELETE_TAG": "Eliminar Etiqueta",
       "SEARCH_PLACEHOLDER": "Buscar etiqueta...",
       "SEARCH_BY_DESCRIPTION": "Buscar por descripción...",
+      "TABLE": {
+        "CODE": "Código"
+      },
+      "CODE": "Código",
+      "CODE_REQUIRED_MAX_5_CHARS": "Código obligatorio (máx 5 caracteres)",
+      "CODE_AUTO_GENERATED_IF_EMPTY": "Se generará automáticamente si se deja vacío",
+      "CODE_PLACEHOLDER_TEXT": "Código (ej. TAG01)",
       "NAME_REQUIRED": "El nombre es obligatorio",
       "NAME_MAX_LENGTH": "El nombre no puede exceder 50 caracteres",
       "DESCRIPTION_MAX_LENGTH": "La descripción no puede exceder 200 caracteres",
@@ -404,7 +482,9 @@
         "QUARANTINE_HELP": "Marcar si el comentario está en cuarentena",
         "CONTENT_UNCENSORED": "Contenido sin censura",
         "EDIT_DATE": "F. Edición",
-        "CONTENT_CENSORED": "Contenido censurado"
+        "CONTENT_CENSORED": "Contenido censurado",
+        "GO_TO_ENTRY": "Ir a la entrada",
+        "ENTRY_PLACEHOLDER": "Escribe el título de la entrada para buscar..."
       },
       "SUCCESS": {
         "CREATE": "Comentario creado correctamente",
@@ -421,6 +501,12 @@
     "USERS": {
       "TITLE": "Gestión de Usuarios",
       "SUBTITLE": "Administra los usuarios, roles y permisos de acceso al sistema",
+      "STATUS": {
+        "ACTIVE": "Activo",
+        "INACTIVE": "Inactivo",
+        "VERIFIED": "Verificado",
+        "PENDING": "Pendiente"
+      },
       "PRINT": "Imprimir",
       "UNVERIFIED": "Sin verificar",
       "NEW_USER": "Nuevo Usuario",
@@ -440,10 +526,19 @@
       "EMAIL_PLACEHOLDER": "correo@ejemplo.com",
       "FIRST_NAME_PLACEHOLDER": "Nombres",
       "LAST_NAME_PLACEHOLDER": "Apellidos",
+      "PASSWORD_PLACEHOLDER_NEW": "Ingresa una contraseña segura",
+      "PASSWORD_PLACEHOLDER_EDIT": "Deja en blanco para mantener la actual",
+      "PASSWORD_HELP_EDIT": "Solo ingresa una contraseña si deseas cambiarla",
       "ASSIGNED_ROLE": "Rol Asignado",
       "OWNER_ROLE_IMMUTABLE": "Rol de Propietario inmutable.",
+      "CHECK_AVAILABILITY": "Verificar disponibilidad",
+      "USERNAME_AVAILABLE": "El nombre de usuario está disponible",
+      "USERNAME_TAKEN": "El nombre de usuario ya está en uso",
+      "CHECK_USERNAME_ERROR": "Error al verificar usuario",
+      "EDIT_DISABLED_WARNING": "Habilite la edición para usar esta función",
       "USER_ENABLED": "Usuario Habilitado",
       "USER_ENABLED_HELP": "Permite el acceso al sistema",
+      "EMAIL_CONFIRMED_HELP": "Indica si el correo electrónico ha sido verificado",
       "SAVE_USER": "Guardar Usuario",
       "DELETE_WARNING": "Esta acción es irreversible y podría afectar al contenido creado por este usuario.",
       "DELETE_PERMANENTLY": "Eliminar Definitivamente",
@@ -470,22 +565,9 @@
         "DELETE": "Error eliminando usuario"
       }
     },
-    "ROLES": {
-        "TITLE": "Roles",
-        "SUBTITLE": "Gestión de roles de usuario",
-        "NEW_ROLE": "Nuevo Rol",
-        "FILTER_PLACEHOLDER": "Filtrar por nombre...",
-        "ROLE_NAME": "Nombre del Rol",
-        "FILTER_BY_NAME": "Filtrar por nombre",
-        "PROPIETARIO": "Propietario",
-        "ADMINISTRADOR": "Administrador",
-        "EDITOR": "Editor",
-        "AUTOR": "Autor",
-        "LECTOR": "Lector",
-        "SIN_ROL": "Sin Rol"
-    },
     "SETTINGS": {
       "TITLE": "Ajustes del Sistema",
+      "SUBTITLE": "Configuración general del sistema",
       "NEW_SETTING": "Nuevo Ajuste",
       "EDIT_SETTING": "Editar Ajuste",
       "DELETE_SETTING": "Eliminar Ajuste",
@@ -582,7 +664,6 @@
       "ROLE_NAME": "Nombre del Rol",
       "FILTER_BY_NAME": "Filtrar por nombre...",
       "NAME_PLACEHOLDER": "Ej. Editor de Contenido",
-      "CODE_PLACEHOLDER": "Ej. EDIT",
       "DESC_PLACEHOLDER": "Descripción opcional del rol...",
       "NAME_PROTECTED": "Nombre protegido",
       "PERMISSIONS_COUNT": "{{ count }} permisos",
@@ -647,7 +728,7 @@
       "NO_PRIVILEGES_FOUND": "No se encontraron privilegios",
       "ADJUST_FILTERS_HELP": "Intenta ajustar los criterios de búsqueda",
       "NAME_PLACEHOLDER": "Ej. Gestionar Usuarios",
-      "CODE_PLACEHOLDER": "Ej. USERS_MANAGE",
+      "CODE_PLACEHOLDER": "Ej. GESTIONAR_USUARIOS",
       "DESC_PLACEHOLDER": "Descripción opcional del privilegio...",
       "CODE_HELP": "Se genera automáticamente si se deja vacío.",
       "TABLE": {
@@ -682,6 +763,7 @@
       "SEARCH_PLACEHOLDER": "Buscar página por título...",
       "PRINT_TOOLTIP": "Imprimir listado",
       "UNREVIEWED": "Sin revisar",
+      "NO_UNREVIEWED": "No hay páginas pendientes de revisión",
       "ALL_PAGES": "Todas las páginas",
       "FILTER_BY_TITLE": "Filtrar por título...",
       "SHOW_ADVANCED_FILTERS": "Filtros Avanzados",
@@ -733,7 +815,17 @@
       "FILTERS": "Filtros",
       "PUBLISH": "Publicar Entrada",
       "SAVE_CHANGES": "Guardar Cambios",
+      "SUBTITLE_LABEL": "Subtítulo",
       "SUBTITLE_PLACEHOLDER": "Un breve subtítulo descriptivo (opcional)",
+      "NOTES_LABEL": "Notas Internas",
+      "NOTES_PLACEHOLDER": "Anotaciones privadas sobre esta entrada...",
+      "SCHEDULED_DATE_LABEL": "Programar Publicación",
+      "SCHEDULED_DATE_HELP": "Si el estado es PROGRAMADA, la fecha es obligatoria",
+      "SCHEDULED_DATE_ERROR_PAST": "La fecha no puede ser anterior a la actual",
+      "SCHEDULED_DATE_ERROR_MARGIN": "Debe haber al menos 30 minutos de margen",
+      "SCHEDULED_DATE_ERROR_REQUIRED_WHEN_SCHEDULED": "La fecha es obligatoria cuando el estado es PROGRAMADA",
+      "RESET_CONFIRM_TITLE": "Restablecer formulario",
+      "RESET_CONFIRM_MESSAGE": "Vas a descartar los cambios no guardados de esta entrada. ¿Seguro que quieres restablecer el formulario?",
       "SELECT_LIBRARY": "Seleccionar de Librería",
       "UPLOAD_LOCAL": "Subir Local",
       "SUMMARY_PLACEHOLDER": "Un breve resumen para SEO y listados...",
@@ -758,7 +850,17 @@
       "VALIDATION": {
         "TITLE_REQUIRED": "El título es obligatorio",
         "TITLE_LENGTH": "Entre 1 y 100 caracteres",
-        "TITLE_PLACEHOLDER": "Escribe un título atractivo..."
+        "TITLE_PLACEHOLDER": "Escribe un título atractivo...",
+        "CONTENT_REQUIRED": "El contenido es obligatorio",
+        "STATUS_REQUIRED": "El estado de la entrada es obligatorio",
+        "TYPE_REQUIRED": "El tipo de entrada es obligatorio"
+      },
+      "SUCCESS": {
+        "DELETE": "Entrada eliminada correctamente"
+      },
+      "ERROR": {
+        "DELETE": "Error eliminando entrada",
+        "LOAD_DEFINITIONS": "No se pudieron cargar las definiciones"
       },
       "THEMES": {
         "TITLE": "Temas del Sistema",
@@ -851,29 +953,31 @@
     },
     "ABOUT": {
       "TITLE": "Acerca de nosotros"
-    },
-    "CONTACT": {
-      "TITLE": "Contáctanos",
-      "DESCRIPTION": "¿Quieres contactarnos? Completa el formulario a continuación para enviarme un mensaje y te responderé lo antes posible!",
-      "NAME_PLACEHOLDER": "Introduzca su nombre...",
-      "NAME_LABEL": "Nombre",
-      "NAME_REQUIRED": "El nombre es obligatorio.",
-      "EMAIL_PLACEHOLDER": "Introduzca su email...",
-      "EMAIL_LABEL": "Email",
-      "EMAIL_REQUIRED": "El email es obligatorio.",
-      "EMAIL_INVALID": "Email no válido.",
-      "PHONE_PLACEHOLDER": "Introduzca su teléfono...",
-      "PHONE_LABEL": "Teléfono",
-      "PHONE_REQUIRED": "El teléfono es obligatorio.",
-      "MESSAGE_PLACEHOLDER": "Introduzca su mensaje aquí...",
-      "MESSAGE_LABEL": "Mensaje",
-      "MESSAGE_REQUIRED": "El mensaje es obligatorio.",
-      "SUCCESS_MESSAGE": "¡Formulario enviado con éxito!",
-      "ERROR_MESSAGE": "Error enviando mensaje",
-      "SEND_BUTTON": "Enviar"
     }
   },
+  "CONTACT": {
+    "TITLE": "Contáctanos",
+    "DESCRIPTION": "¿Quieres contactarnos? Completa el formulario a continuación para enviarme un mensaje y te responderé lo antes posible!",
+    "NAME_PLACEHOLDER": "Introduzca su nombre...",
+    "NAME_LABEL": "Nombre",
+    "NAME_REQUIRED": "El nombre es obligatorio.",
+    "EMAIL_PLACEHOLDER": "Introduzca su email...",
+    "EMAIL_LABEL": "Email",
+    "EMAIL_REQUIRED": "El email es obligatorio.",
+    "EMAIL_INVALID": "Email no válido.",
+    "PHONE_PLACEHOLDER": "Introduzca su teléfono...",
+    "PHONE_LABEL": "Teléfono",
+    "PHONE_REQUIRED": "El teléfono es obligatorio.",
+    "MESSAGE_PLACEHOLDER": "Introduzca su mensaje aquí...",
+    "MESSAGE_LABEL": "Mensaje",
+    "MESSAGE_REQUIRED": "El mensaje es obligatorio.",
+    "SUCCESS_MESSAGE": "¡Formulario enviado con éxito!",
+    "ERROR_MESSAGE": "Error enviando mensaje",
+    "SEND_BUTTON": "Enviar"
+  },
   "AUTO": {
+    "LA_SESION_SE_CERRO_DESDE_OTRO_DISPOSITIVO": "La sesión se cerró desde otro dispositivo.",
+    "SU_SESION_HA_CADUCADO_POR_INACTIVIDAD": "Su sesión ha caducado por inactividad.",
     "10": "10",
     "20": "20",
     "30": "30",
@@ -1023,8 +1127,8 @@
     "TIPO_DE_ENTRADA": "Tipo de Entrada",
     "SELECCIONAR_TODAS": "Seleccionar Todas",
     "NO_HAY_CATEGOR_AS_DISPONIBLES": "No hay categorías disponibles",
-    "DESTACADA": "Destacada",
-    "MOSTRAR_EN_SECCI_N_DESTACADA": "Mostrar en sección destacada",
+    "DESTACADA": "Top",
+    "MOSTRAR_EN_SECCI_N_DESTACADA": "Mostrar en sección Top",
     "PRIVADA": "Privada",
     "SOLO_VISIBLE_PARA_AUTORES": "Solo visible para autores",
     "COMENTARIOS": "Comentarios",
@@ -1057,6 +1161,12 @@
     "INTENTA_AJUSTAR_LOS_FILTROS_O_": "Intenta ajustar los filtros o crea una nueva etiqueta",
     "CAMBIAR_CONTRASE_A": "Cambiar Contraseña",
     "ACTUALIZA_TU_CLAVE_DE_ACCESO": "Actualiza tu clave de acceso",
+    "CONTRASE_A_ACTUAL": "Contraseña Actual",
+    "NUEVA_CONTRASE_A": "Nueva Contraseña",
+    "CONFIRMAR_CONTRASE_A": "Confirmar Contraseña",
+    "LAS_CONTRASE_AS_NO_COINCIDEN": "Las contraseñas no coinciden",
+    "CONTRASE_A_ACTUALIZADA": "Contraseña actualizada correctamente",
+    "ERROR_AL_ACTUALIZAR_CONTRASE_A": "Error al actualizar la contraseña",
     "FUNCIONALIDAD_EN_DESARROLLO": "Funcionalidad en Desarrollo",
     "EL_FORMULARIO_DE_CAMBIO_DE_CON": "El formulario de cambio de contraseña estará disponible pronto.",
     "MI_PERFIL": "Mi Perfil",

@@ -259,11 +259,8 @@ export class NavigationPerformanceService {
   ): Observable<INavItemEnhanced[]> {
     const startTime = performance.now();
 
-    return combineLatest([
-      this.createNavigationChunks(items),
-      timer(0, 1000).pipe(startWith(0)), // Trigger para actualizaciones periódicas
-    ]).pipe(
-      map(([chunks]) => {
+    return this.createNavigationChunks(items).pipe(
+      map((chunks) => {
         // Filtrar solo chunks cargados
         const loadedChunks = chunks.filter((chunk) => chunk.loaded);
 
@@ -285,9 +282,28 @@ export class NavigationPerformanceService {
         return filteredItems;
       }),
       debounceTime(this.config.renderDebounce),
-      distinctUntilChanged(),
+      distinctUntilChanged((prev, curr) => this.areNavigationItemsEqual(prev, curr)),
       shareReplay(1)
     );
+  }
+
+  /**
+   * Compara dos arrays de elementos de navegación para determinar si son iguales
+   * Utiliza comparación superficial de referencias para optimizar rendimiento
+   */
+  private areNavigationItemsEqual(prev: INavItemEnhanced[], curr: INavItemEnhanced[]): boolean {
+    if (prev === curr) return true;
+    if (prev.length !== curr.length) return false;
+
+    for (let i = 0; i < prev.length; i++) {
+      // Comparación por referencia es suficiente ya que NavigationService
+      // preserva las referencias de los objetos que no han cambiado
+      if (prev[i] !== curr[i]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -532,6 +548,15 @@ export class NavigationPerformanceService {
   private updateRenderTime(renderTime: number): void {
     // Calcular promedio móvil simple
     this.stats.averageRenderTime = (this.stats.averageRenderTime + renderTime) / 2;
+
+    // Log de advertencia si el renderizado es muy lento (> 1000ms)
+    // Aumentado a 1s para evitar falsos positivos en desarrollo
+    if (renderTime > 1000) {
+      console.warn('[NavigationPerformanceService] Slow render detected:', {
+        renderTime,
+        averageRenderTime: this.stats.averageRenderTime,
+      });
+    }
   }
 
   /**
@@ -601,18 +626,6 @@ export class NavigationPerformanceService {
     // Monitorear el uso de memoria cada minuto
     timer(0, 60000).subscribe(() => {
       this.updateMemoryStats();
-
-      // Log de estadísticas si el rendimiento se degrada
-      if (this.stats.averageRenderTime > 100) {
-        // > 100ms
-        console.warn('[NavigationPerformanceService] Slow render detected:', {
-          averageRenderTime: this.stats.averageRenderTime,
-          cacheHitRate:
-            this.stats.permissionCacheHits /
-            (this.stats.permissionCacheHits + this.stats.permissionCacheMisses),
-          memoryUsage: this.stats.memoryUsage,
-        });
-      }
     });
   }
 

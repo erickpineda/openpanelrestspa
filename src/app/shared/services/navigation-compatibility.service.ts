@@ -99,7 +99,6 @@ export class NavigationCompatibilityService {
     const newUrl = this.handleLegacyRouteRedirect(legacyUrl);
 
     if (newUrl) {
-      console.log(`Redirecting legacy route: ${legacyUrl} -> ${newUrl}`);
       return this.router.navigateByUrl(newUrl);
     }
 

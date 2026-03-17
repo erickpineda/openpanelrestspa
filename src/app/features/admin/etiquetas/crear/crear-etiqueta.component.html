@@ -1,0 +1,43 @@
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  size="lg"
+  backdrop="static"
+  alignment="center"
+>
+  <c-modal-header>
+    <h5 cModalTitle class="d-flex align-items-center gap-2">
+      <svg cIcon name="cilTag" class="text-primary"></svg>
+      {{ 'ADMIN.TAGS.NEW_TAG' | translate }}
+    </h5>
+    <button (click)="cerrarModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body class="p-4">
+    @if (visible) {
+      <app-etiqueta-form
+        [isEdit]="false"
+        (save)="onGuardar()"
+        (cancel)="cerrarModal()"
+      ></app-etiqueta-form>
+    }
+  </c-modal-body>
+  <c-modal-footer class="bg-light bg-opacity-10">
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+    <button
+      cButton
+      color="primary"
+      [disabled]="formComponent?.loading || formComponent?.form?.invalid"
+      (click)="triggerSave()"
+    >
+      @if (formComponent?.loading) {
+        <c-spinner size="sm" class="me-1"></c-spinner>
+      }
+      @if (!formComponent?.loading) {
+        <svg cIcon name="cilSave" class="me-1"></svg>
+      }
+      {{ 'COMMON.CREATE' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>

@@ -1,5 +1,11 @@
-<div class="kpi-card h-100" [class.p-0]="variant === 'simple'" [class.cursor-pointer]="!!route" 
-     [routerLink]="route" [cTooltip]="tooltip" #kpiBody>
+<div
+  class="kpi-card h-100"
+  [class.p-0]="variant === 'simple'"
+  [class.cursor-pointer]="!!route"
+  [routerLink]="route"
+  [cTooltip]="tooltip"
+  #kpiBody
+>
   @if (variant === 'simple') {
     <c-widget-stat-b
       class="mb-0 h-100"

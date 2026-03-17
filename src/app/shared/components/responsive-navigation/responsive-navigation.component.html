@@ -3,8 +3,8 @@
   <div class="responsive-navigation-container" [ngClass]="getNavigationClasses(state)">
     <!-- CoreUI Toggle Button for Mobile/Tablet -->
     @if (shouldShowToggleButton(state)) {
-      <c-button
-        variant="ghost"
+      <button
+        type="button"
         class="sidebar-toggle-btn"
         [class.mobile]="state.isMobile"
         [class.tablet]="state.isTablet"
@@ -17,7 +17,7 @@
             {{ getToggleButtonText(state) }}
           </span>
         }
-      </c-button>
+      </button>
     }
     <!-- CoreUI Navigation Menu -->
     <c-sidebar-nav
@@ -26,7 +26,6 @@
       [class.mobile-menu]="state.isMobile"
       [class.tablet-menu]="state.isTablet"
       [class.desktop-menu]="state.isDesktop"
-      [perfectScrollbar]="true"
     >
       <!-- Mobile Overlay -->
       @if (state.isMobile && !state.sidebarCollapsed) {
@@ -37,9 +36,9 @@
         @if (shouldShowItem(item, state)) {
           <!-- Section Title using CoreUI -->
           @if (item.title) {
-            <c-nav-title class="nav-section-title" [class.mobile-hidden]="state.isMobile">
-              {{ item.name }}
-            </c-nav-title>
+            <div class="nav-section-title" [class.mobile-hidden]="state.isMobile">
+              {{ item.name || '' | translate }}
+            </div>
           }
           <!-- Navigation Item using CoreUI -->
           @if (!item.title) {
@@ -50,7 +49,7 @@
                 [routerLinkActiveOptions]="{ exact: false }"
                 class="nav-link"
                 [class.touch-target]="state.touchEnabled"
-                [attr.aria-label]="item.name"
+                [attr.aria-label]="item.name || '' | translate"
                 [attr.data-testid]="toTestId(item.name || '')"
                 (click)="onNavigationItemClick(item)"
               >
@@ -63,7 +62,7 @@
                 }
                 <!-- Text -->
                 @if (!state.sidebarCollapsed || state.isMobile) {
-                  {{ item.name }}
+                  {{ item.name || '' | translate }}
                 }
                 <!-- CoreUI Badge -->
                 @if (item.badge) {
@@ -72,7 +71,7 @@
                     class="ms-auto nav-badge"
                     [ngClass]="getBadgeClasses(item.badge)"
                   >
-                    {{ item.badge.text }}
+                    {{ item.badge.text | translate }}
                   </c-badge>
                 }
                 <!-- Dynamic Badge using CoreUI -->
@@ -82,45 +81,43 @@
                     class="ms-auto dynamic-badge nav-badge"
                     [ngClass]="['badge-' + (item.badge?.color || 'info')]"
                   >
-                    <span class="badge-counter">0</span>
+                    <span class="badge-counter">{{ item.badge?.text || '0' }}</span>
                   </c-badge>
                 }
               </c-nav-link>
               <!-- CoreUI Submenu -->
               @if (item.children && item.children.length > 0 && !state.isMobile) {
-                <c-nav-group [compact]="state.sidebarCollapsed">
-                  <div class="nav-section-content">
-                    @for (child of item.children; track trackByNavItem($index, child)) {
-                      <c-nav-item>
-                        <c-nav-link
-                          [routerLink]="child.url"
-                          routerLinkActive="active"
-                          class="nav-sublink"
-                          [class.touch-target]="state.touchEnabled"
-                          [attr.aria-label]="child.name"
-                          [attr.data-testid]="toTestId(child.name || '')"
-                          (click)="onNavigationItemClick(child)"
-                        >
-                          @if (child.icon) {
-                            <svg cIcon [name]="child.icon" class="nav-subicon"></svg>
-                          }
-                          @if (!state.sidebarCollapsed) {
-                            {{ child.name }}
-                          }
-                          @if (child.badge) {
-                            <c-badge
-                              [color]="child.badge.color"
-                              class="ms-auto nav-subbadge"
-                              [ngClass]="['badge-' + child.badge.color]"
-                            >
-                              {{ child.badge.text }}
-                            </c-badge>
-                          }
-                        </c-nav-link>
-                      </c-nav-item>
-                    }
-                  </div>
-                </c-nav-group>
+                <div class="nav-section-content">
+                  @for (child of item.children; track trackByNavItem($index, child)) {
+                    <c-nav-item>
+                      <c-nav-link
+                        [routerLink]="child.url"
+                        routerLinkActive="active"
+                        class="nav-sublink"
+                        [class.touch-target]="state.touchEnabled"
+                        [attr.aria-label]="child.name || '' | translate"
+                        [attr.data-testid]="toTestId(child.name || '')"
+                        (click)="onNavigationItemClick(child)"
+                      >
+                        @if (child.icon) {
+                          <svg cIcon [name]="child.icon" class="nav-subicon"></svg>
+                        }
+                        @if (!state.sidebarCollapsed) {
+                          {{ child.name || '' | translate }}
+                        }
+                        @if (child.badge) {
+                          <c-badge
+                            [color]="child.badge.color"
+                            class="ms-auto nav-subbadge"
+                            [ngClass]="['badge-' + child.badge.color]"
+                          >
+                            {{ child.badge.text }}
+                          </c-badge>
+                        }
+                      </c-nav-link>
+                    </c-nav-item>
+                  }
+                </div>
               }
             </c-nav-item>
           }
@@ -128,14 +125,16 @@
       }
       <!-- Critical Functions Quick Access (Mobile Only) using CoreUI -->
       @if (state.isMobile && state.sidebarCollapsed) {
-        <c-nav-group class="critical-functions-bar">
-          <c-nav-title>{{ 'AUTO.ACCESO_R_PIDO' | translate }}</c-nav-title>
+        <div class="critical-functions-bar">
+          <div class="nav-section-title">
+            {{ 'AUTO.ACCESO_R_PIDO' | translate }}
+          </div>
           @for (func of criticalFunctions.slice(0, 4); track func.url) {
             <c-nav-item>
               <c-nav-link
                 [routerLink]="func.url"
                 class="critical-function-btn"
-                [attr.aria-label]="func.name"
+                [attr.aria-label]="func.name | translate"
                 (click)="
                   onNavigationItemClick({
                     name: func.name,
@@ -145,11 +144,11 @@
                 "
               >
                 <svg cIcon [name]="func.icon"></svg>
-                {{ func.name }}
+                {{ func.name | translate }}
               </c-nav-link>
             </c-nav-item>
           }
-        </c-nav-group>
+        </div>
       }
     </c-sidebar-nav>
     <!-- Bottom toggle control -->

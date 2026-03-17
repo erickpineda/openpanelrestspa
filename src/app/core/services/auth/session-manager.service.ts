@@ -8,13 +8,17 @@ import { LoggerService } from '../logger.service';
 import { RouteTrackerService } from './route-tracker.service';
 import { PostLoginRedirectService } from './post-login-redirect.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
+import { OPSessionConstants } from '../../../shared/constants/op-session.constants';
 import { UiAnomalyMonitorService } from '../ui/ui-anomaly-monitor.service';
+import { AuthSyncService } from './auth-sync.service';
 
 export interface SessionExpirationData {
   type: 'LOGOUT' | 'SESSION_EXPIRED' | 'ANOTHER_DEVICE';
   message: string;
   allowSave?: boolean;
   timestamp: number;
+  origin?: 'local' | 'remote';
+  isManual?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,6 +26,10 @@ export class SessionManagerService {
   private sessionExpiredSubject = new Subject<SessionExpirationData>();
   public sessionExpired$: Observable<SessionExpirationData> =
     this.sessionExpiredSubject.asObservable();
+  
+  // Observable para notificar restauración de sesión
+  private sessionRestoredSubject = new Subject<void>();
+  public sessionRestored$: Observable<void> = this.sessionRestoredSubject.asObservable();
 
   constructor(
     private tokenStorage: TokenStorageService,
@@ -29,8 +37,10 @@ export class SessionManagerService {
     private router: Router,
     private log: LoggerService,
     private postLoginRedirect: PostLoginRedirectService,
-    private uiMonitor: UiAnomalyMonitorService
+    private uiMonitor: UiAnomalyMonitorService,
+    private authSync: AuthSyncService
   ) {
+    this.log.info('SessionManagerService: Instancia creada');
     this.setupListeners();
   }
 
@@ -39,6 +49,14 @@ export class SessionManagerService {
     window.addEventListener(OPConstants.Events.AUTH_LOGOUT as string, (ev: Event) => {
       const evC = ev as CustomEvent;
       this.log.info('SessionManager: auth:logout recibido', evC.detail);
+
+      // IMPORTANTE: Ignorar eventos originados en esta misma pestaña para evitar bucles o tratamiento incorrecto
+      const currentTabId = this.tokenStorage.getOrCreateTabId();
+      if (evC.detail?.originTabId === currentTabId) {
+        this.log.info('SessionManager: Ignorando evento auth:logout propio (local)');
+        return;
+      }
+
       // Intentar guardar inmediatamente el post-login redirect PARA ESTA pestaña
       // antes de que cualquier navegación (local o remota) cambie la URL.
       try {
@@ -61,6 +79,9 @@ export class SessionManagerService {
     window.addEventListener(OPConstants.Events.AUTH_LOGIN as string, (ev: Event) => {
       const evC = ev as CustomEvent;
       this.log.info('SessionManager: auth:login recibido', evC.detail);
+
+      // Notificar que la sesión se ha restaurado (para cerrar modales en otras pestañas)
+      this.sessionRestoredSubject.next();
 
       try {
         // Solo actuamos si ya hay token en esta pestaña (sincronizado por AuthSyncService/TokenStorage)
@@ -106,18 +127,83 @@ export class SessionManagerService {
     this.log.info('SessionManager: handleLogoutFromSync', data);
     const payload: SessionExpirationData = {
       type: 'LOGOUT',
+      origin: 'remote',
       message: 'Se ha cerrado la sesión desde otra pestaña o dispositivo',
       allowSave: true,
       timestamp: data?.timestamp || Date.now(),
+      isManual: data?.isManual || false, // Propagamos si fue manual
     };
+    this.handleLogout(payload);
+  }
+
+  public notifySessionExpired(): void {
+    const payload: SessionExpirationData = {
+      type: OPSessionConstants.TYPE_SESSION_EXPIRED as 'SESSION_EXPIRED',
+      message: 'Su sesión ha caducado por inactividad',
+      allowSave: true, // Permitimos intentar guardar (localmente) si es posible
+      timestamp: Date.now(),
+      isManual: false,
+    };
+    const loc = window.location.pathname + window.location.hash;
+    const isOnAdmin = loc.includes('/admin');
+    if (!isOnAdmin) {
+      this.performLogout(payload);
+      try {
+        this.authSync.notifyLogout({
+          originTabId: this.tokenStorage.getOrCreateTabId(),
+          reason: OPSessionConstants.TYPE_SESSION_EXPIRED,
+          isManual: false,
+        });
+      } catch {}
+      return;
+    }
+    this.sessionExpiredSubject.next(payload);
+    try {
+      this.authSync.notifyLogout({
+        originTabId: this.tokenStorage.getOrCreateTabId(),
+        reason: OPSessionConstants.TYPE_SESSION_EXPIRED,
+        isManual: false,
+      });
+    } catch {}
+  }
+
+  public logout(): void {
+    const payload: SessionExpirationData = {
+      type: 'LOGOUT',
+      origin: 'local',
+      message: 'Sesión cerrada por el usuario',
+      allowSave: true,
+      timestamp: Date.now(),
+      isManual: true,
+    };
+    try {
+      this.authSync.notifyLogout({
+        originTabId: this.tokenStorage.getOrCreateTabId(),
+        isManual: true,
+      });
+    } catch {}
     this.handleLogout(payload);
   }
 
   private handleLogout(payload: SessionExpirationData): void {
     this.log.info('SessionManager: manejando logout', payload);
 
+    const loc = window.location.pathname + window.location.hash;
+    const isOnAdmin = loc.includes('/admin');
+    if (!isOnAdmin) {
+      this.performLogout(payload);
+      return;
+    }
+
     const hasUnsaved = this.unsavedWorkService.hasUnsavedWork();
     const hasUnsavedBackup = this.checkUnsavedWorkBackup();
+
+    if (payload.origin === 'remote') {
+      if (payload.allowSave) {
+        this.sessionExpiredSubject.next(payload);
+        return;
+      }
+    }
 
     if ((hasUnsaved || hasUnsavedBackup) && payload.allowSave) {
       // Emitimos para que el componente UI muestre modal de "guardar antes de salir"
@@ -183,9 +269,34 @@ export class SessionManagerService {
     // limpiar token/session (NO borra post-login-redirect-{tabId} porque signOut respeta eso)
     this.tokenStorage.signOut();
 
-    // Navegar a pantalla de sesión caducada
-    this.router.navigate([OPConstants.Session.ROUTE_SESSION_EXPIRED], {
-      state: { sessionData: data },
+    // Redirección según tipo y origen
+    if (data.type === 'LOGOUT' && data.origin === 'remote') {
+      const loc = window.location.pathname + window.location.hash;
+      const isOnAdmin = loc.includes('/admin');
+      if (!isOnAdmin) {
+        this.log.info('SessionManager: Logout remoto en zona pública -> Redirigir a Home');
+        this.router.navigate(['/'], { replaceUrl: true });
+        return;
+      } else {
+        this.log.info(
+          'SessionManager: Logout remoto (manual o auto) en admin -> Emitir evento para modal'
+        );
+        this.sessionExpiredSubject.next(data);
+        return;
+      }
+    }
+
+    if (data.type === 'LOGOUT' && data.origin === 'local') {
+      this.log.info(
+        'SessionManager: Logout local -> Redirigir silenciosamente a Home'
+      );
+      this.router.navigate(['/'], { replaceUrl: true });
+      return;
+    }
+
+    // Navegar a login directamente para cumplir redirecciones esperadas por E2E
+    this.router.navigate([OPConstants.Session.ROUTE_LOGIN], {
+      replaceUrl: true,
     });
   }
 }

@@ -19,7 +19,7 @@
   "usuarios": [
     {
       "idUsuario": 1,
-      "idRol": 1,
+      "rolCodigo": "PROPIETARIO",
       "username": "openpanel",
       "nombre": "Maestro",
       "apellido": null,
@@ -39,7 +39,7 @@
     },
     {
       "idUsuario": 2,
-      "idRol": 2,
+      "rolCodigo": "ADMINISTRADOR",
       "username": "optimusprime",
       "nombre": "Admin",
       "apellido": null,
@@ -75,7 +75,7 @@
     },
     {
       "idUsuario": 3,
-      "idRol": 3,
+      "rolCodigo": "MANTENIMIENTO",
       "username": "mantenimientoprueba",
       "nombre": "mantenimientoprueba",
       "apellido": null,
@@ -95,7 +95,7 @@
     },
     {
       "idUsuario": 4,
-      "idRol": 4,
+      "rolCodigo": "EDITOR",
       "username": "editorprueba",
       "nombre": "editorprueba",
       "apellido": null,
@@ -115,7 +115,7 @@
     },
     {
       "idUsuario": 5,
-      "idRol": 5,
+      "rolCodigo": "AUTOR",
       "username": "autorprueba",
       "nombre": "autorprueba",
       "apellido": null,
@@ -135,7 +135,7 @@
     },
     {
       "idUsuario": 6,
-      "idRol": 6,
+      "rolCodigo": "LECTOR",
       "username": "lectorprueba",
       "nombre": "lectorprueba",
       "apellido": null,
@@ -156,39 +156,39 @@
   ],
   "roles": [
     {
-      "idRol": 1,
+      "codigo": "PROPIETARIO",
       "nombre": "PROPIETARIO",
       "descripcion": "Usuario propietario (es único) de la app, tiene funciones especiales"
     },
     {
-      "idRol": 2,
+      "codigo": "ADMINISTRADOR",
       "nombre": "ADMINISTRADOR",
       "descripcion": "Administrador, tiene acceso a toda la app"
     },
     {
-      "idRol": 3,
+      "codigo": "MANTENIMIENTO",
       "nombre": "MANTENIMIENTO",
       "descripcion": "Mantenimiento, es usado para labores de mantenimiento en la app"
     },
     {
-      "idRol": 4,
+      "codigo": "EDITOR",
       "nombre": "EDITOR",
       "descripcion": "Editor, puede editar entradas de otros, revisarlas y aprobarlas, al igual que puede crear entradas"
     },
     {
-      "idRol": 5,
+      "codigo": "AUTOR",
       "nombre": "AUTOR",
       "descripcion": "Autor, puede crear y editar sus propias entradas"
     },
     {
-      "idRol": 6,
+      "codigo": "LECTOR",
       "nombre": "LECTOR",
       "descripcion": "Lector, usuarios simples que pueden comentar en entradas"
     }
   ],
   "categorias": [
     {
-      "idCategoria": 1,
+      "codigo": "SIN_CAT",
       "nombre": "Sin categoria",
       "descripcion": "Categoria por defecto"
     }
@@ -290,44 +290,44 @@
   ],
   "estados": [
     {
-      "idEstadoEntrada": 1,
       "nombre": "PUBLICADA",
-      "descripcion": "Entrada/Página en estado publicada"
+      "descripcion": "Entrada/Página en estado publicada",
+      "codigo": "PUB"
     },
     {
-      "idEstadoEntrada": 2,
       "nombre": "NO PUBLICADA",
-      "descripcion": "Entrada/Página sin publicar"
+      "descripcion": "Entrada/Página sin publicar",
+      "codigo": "NOP"
     },
     {
-      "idEstadoEntrada": 3,
       "nombre": "GUARDADA",
-      "descripcion": "Entrada/Página que ha sido guardada o puesta en borrador"
+      "descripcion": "Entrada/Página que ha sido guardada o puesta en borrador",
+      "codigo": "GUA"
     },
     {
-      "idEstadoEntrada": 4,
       "nombre": "PENDIENTE REVISION",
-      "descripcion": "Entrada/Página que está pendiente de revisión, bien sea por parte de un Editor"
+      "descripcion": "Entrada/Página que está pendiente de revisión, bien sea por parte de un Editor",
+      "codigo": "PDR"
     },
     {
-      "idEstadoEntrada": 5,
       "nombre": "EN REVISION",
-      "descripcion": "Entrada/Página que está siendo revisada"
+      "descripcion": "Entrada/Página que está siendo revisada",
+      "codigo": "ER"
     },
     {
-      "idEstadoEntrada": 6,
       "nombre": "REVISADA",
-      "descripcion": "Entrada/Página que ha sido revisada"
+      "descripcion": "Entrada/Página que ha sido revisada",
+      "codigo": "REV"
     },
     {
-      "idEstadoEntrada": 7,
-      "nombre": "HISTORICA",
-      "descripcion": "Entrada/Página historica y no activa"
-    },
-    {
-      "idEstadoEntrada": 8,
       "nombre": "PROGRAMADA",
-      "descripcion": "Entrada/Página que ha sido programada, para que sea publicada a cierta fecha y hora"
+      "descripcion": "Entrada/Página que ha sido programada, para que sea publicada a cierta fecha y hora",
+      "codigo": "PRO"
+    },
+    {
+      "nombre": "HISTORICA",
+      "descripcion": "Entrada/Página historica y no activa",
+      "codigo": "HIS"
     }
   ],
   "ficheros": [
@@ -354,10 +354,11 @@
   ],
   "etiquetas": [
     {
-      "idEtiqueta": 1,
+      "codigo": "EVENT",
       "nombre": "Evento",
-      "frecuencia": null,
-      "descripcion": "Etiquetas para eventos"
+      "frecuencia": 0,
+      "descripcion": "Etiquetas para eventos",
+      "colorHex": "#4ECDC4"
     }
   ],
   "herramientas": [

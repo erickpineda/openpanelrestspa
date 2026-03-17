@@ -5,6 +5,7 @@ import { take } from 'rxjs/operators';
 import { NavigationService } from './navigation.service';
 import { SidebarStateService } from './sidebar-state.service';
 import { ActiveSectionService } from './active-section.service';
+import { BadgeCounterService } from './badge-counter.service';
 import {
   UserRole,
   NavigationConfig,
@@ -17,6 +18,7 @@ describe('NavigationService', () => {
   let mockRouter: jasmine.SpyObj<Router>;
   let mockSidebarStateService: jasmine.SpyObj<SidebarStateService>;
   let mockActiveSectionService: jasmine.SpyObj<ActiveSectionService>;
+  let mockBadgeCounterService: jasmine.SpyObj<BadgeCounterService>;
 
   beforeEach(() => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate'], {
@@ -27,6 +29,12 @@ describe('NavigationService', () => {
       'toggleItem',
       'updateNavItems',
     ]);
+
+    const badgeCounterSpy = jasmine.createSpyObj('BadgeCounterService', [
+      'initializeCounters',
+      'getAllCounters',
+    ]);
+    badgeCounterSpy.getAllCounters.and.returnValue(of(new Map<string, number>()));
 
     const activeSectionSpy = jasmine.createSpyObj(
       'ActiveSectionService',
@@ -66,6 +74,7 @@ describe('NavigationService', () => {
         { provide: Router, useValue: routerSpy },
         { provide: SidebarStateService, useValue: sidebarStateSpy },
         { provide: ActiveSectionService, useValue: activeSectionSpy },
+        { provide: BadgeCounterService, useValue: badgeCounterSpy },
       ],
     });
 
@@ -77,6 +86,9 @@ describe('NavigationService', () => {
     mockActiveSectionService = TestBed.inject(
       ActiveSectionService
     ) as jasmine.SpyObj<ActiveSectionService>;
+    mockBadgeCounterService = TestBed.inject(
+      BadgeCounterService
+    ) as jasmine.SpyObj<BadgeCounterService>;
   });
 
   it('should be created', () => {
@@ -706,6 +718,12 @@ describe('NavigationService', () => {
 
       expect(result).toBe('test-section');
       expect(mockActiveSectionService.getCurrentActiveState).toHaveBeenCalled();
+    });
+  });
+
+  describe('Dynamic Badge Integration', () => {
+    it('should initialize badge counters on service creation', () => {
+      expect(mockBadgeCounterService.initializeCounters).toHaveBeenCalled();
     });
   });
 });

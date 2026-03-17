@@ -1,0 +1,29 @@
+<c-modal
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  id="deleteRolModal"
+  backdrop="static"
+>
+  <c-modal-header class="border-bottom-0">
+    <h5 cModalTitle class="fw-bold text-danger">{{ 'ADMIN.ROLES.DELETE_TITLE' | translate }}</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="text-center py-3">
+      <svg cIcon name="cilTrash" size="4xl" class="text-danger mb-3 opacity-75"></svg>
+      <p class="mb-1">{{ 'ADMIN.ROLES.DELETE_CONFIRMATION' | translate }}</p>
+      <h4 class="fw-bold text-dark">{{ rol?.nombre }}</h4>
+      <p class="text-muted small mt-2">{{ 'ADMIN.ROLES.DELETE_WARNING' | translate }}</p>
+    </div>
+  </c-modal-body>
+  <c-modal-footer class="border-top-0 justify-content-center pb-4">
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()" [disabled]="loading">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+    <button cButton color="danger" class="px-4" (click)="confirmar()" [disabled]="loading">
+      @if (loading) {
+        <c-spinner size="sm" class="me-2"></c-spinner>
+      }
+      {{ 'COMMON.YES_DELETE' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>

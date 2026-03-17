@@ -11,6 +11,7 @@ import { Observable, EMPTY, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { AuthSyncService } from '../services/auth/auth-sync.service';
+import { SessionManagerService } from '../services/auth/session-manager.service';
 import { isJwtExpired } from '../_utils/jwt.utils';
 
 const TOKEN_HEADER_KEY = 'Authorization';
@@ -19,8 +20,9 @@ const TOKEN_HEADER_KEY = 'Authorization';
 export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private tokenStorage: TokenStorageService,
-    private authSync: AuthSyncService
-  ) { }
+    private authSync: AuthSyncService,
+    private sessionManager: SessionManagerService
+  ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.tokenStorage.getToken();
@@ -35,16 +37,11 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    // Si hay token pero está caducado: forzar logout y cancelar la petición
+    // Si hay token pero está caducado: Notificar sesión expirada (esto abre el modal)
     if (token && isJwtExpired(token, 0)) {
-      try {
-        this.tokenStorage.signOut();
-        this.authSync.notifyLogout();
-      } catch (e) {
-        /* swallow */
-      }
-
-      window.location.href = '/#/login';
+      // Importante: No redirigimos directamente a /login, sino que mostramos el modal
+      // para que el usuario sepa qué pasó y pueda intentar guardar (si aplica).
+      this.sessionManager.notifySessionExpired();
       return EMPTY;
     }
 
@@ -60,13 +57,8 @@ export class AuthInterceptor implements HttpInterceptor {
         if (err instanceof HttpErrorResponse) {
           // Ignorar 401/403 si viene de un endpoint de auth (login) para permitir que el componente maneje "credenciales inválidas"
           if ((err.status === 401 || err.status === 403) && !isAuthEndpoint) {
-            try {
-              this.tokenStorage.signOut();
-              this.authSync.notifyLogout();
-            } catch (e) {
-              /* swallow */
-            }
-            window.location.href = '/#/login';
+            // Token rechazado por el backend: Notificar sesión expirada
+            this.sessionManager.notifySessionExpired();
             return EMPTY;
           }
         }

@@ -7,6 +7,8 @@ import { ResponsiveNavigationComponent } from './responsive-navigation.component
 import { ResponsiveNavigationService } from '../../../core/services/ui/responsive-navigation.service';
 import { NavigationService } from '../../../core/services/ui/navigation.service';
 import { INavItemEnhanced, UserRole } from '../../types/navigation.types';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '../../../core/services/translation.service';
 
 /**
  * Pruebas de integración para componentes visuales de navegación
@@ -20,6 +22,12 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
   type RS = import('../../../core/services/ui/responsive-navigation.service').ResponsiveState;
   let responsiveStateSubject: BehaviorSubject<RS>;
   let navigationItemsSubject: BehaviorSubject<INavItemEnhanced[]>;
+
+  const translationServiceMock = {
+    translations$: new BehaviorSubject({}),
+    translate: (key: string) => key,
+    instant: (key: string) => key
+  };
 
   // Mock data
   const mockNavigationItems: INavItemEnhanced[] = [
@@ -107,12 +115,14 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
 
     await TestBed.configureTestingModule({
       declarations: [ResponsiveNavigationComponent],
+      imports: [TranslatePipe],
       providers: [
         {
           provide: ResponsiveNavigationService,
           useValue: responsiveServiceSpy,
         },
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: TranslationService, useValue: translationServiceMock }
       ],
     }).compileComponents();
 

@@ -5,7 +5,6 @@ import { CrudService } from '../../_utils/crud.service';
 import { Ajustes } from '../../models/ajustes.model';
 import { HttpClient } from '@angular/common/http';
 import { TokenStorageService } from '../auth/token-storage.service';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
 
 @Injectable({ providedIn: 'root' })
 export class AjustesService extends CrudService<Ajustes, number> {

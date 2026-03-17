@@ -1,49 +1,35 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SharedCoreUiModule } from '../shared/shared-coreui.module';
 
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminComponent } from './admin.component';
 import { DefaultFooterComponent, DefaultHeaderComponent } from './default-layout';
+import { RightSidebarComponent } from './default-layout/right-sidebar/right-sidebar.component';
 
 // Módulos externos
 import { NgScrollbarModule } from 'ngx-scrollbar';
-import { SidebarModule, GridModule, HeaderModule, NavModule, AvatarModule, BadgeModule, BreadcrumbModule, DropdownModule, ListGroupModule, FooterModule } from '@coreui/angular';
-// Dashboard moved to lazy DashboardModule (includes Chartjs)
 
 // Shared Module
-    import { SharedOPModule } from '../shared/shared.module';
-    import { SharedCoreUiModule } from '../shared/shared-coreui.module';
-    import { SharedWidgetsModule } from '../shared/shared-widgets.module';
+import { SharedOPModule } from '../shared/shared.module';
 
-    const APP_CONTAINERS = [DefaultFooterComponent, DefaultHeaderComponent, AdminComponent];
+const APP_CONTAINERS = [DefaultFooterComponent, DefaultHeaderComponent, AdminComponent, RightSidebarComponent];
 
-    @NgModule({
-      declarations: [...APP_CONTAINERS],
-      imports: [
-        CommonModule,
-        AdminRoutingModule,
-        ReactiveFormsModule,
+@NgModule({
+  declarations: [...APP_CONTAINERS],
+  imports: [
+    CommonModule,
+    AdminRoutingModule,
+    ReactiveFormsModule,
+    SharedCoreUiModule,
 
-        // CoreUI Modules Explicit Import (to resolve linter errors)
-        SidebarModule,
-        GridModule,
-        HeaderModule,
-        NavModule,
-        AvatarModule,
-        BadgeModule,
-        BreadcrumbModule,
-        DropdownModule,
-        ListGroupModule,
-        FooterModule,
+    // Shared Modules (SharedOPModule exports SharedWidgetsModule & SharedCoreUiModule)
+    SharedOPModule,
 
-        // Shared Modules
-        SharedOPModule,
-        SharedCoreUiModule,
-        SharedWidgetsModule,
-
-        // Módulos específicos de Admin (Dashboard/Chartjs se cargan en su propio módulo)
-        NgScrollbarModule,
-      ],
-    })
+    // Módulos específicos de Admin
+    NgScrollbarModule,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
 export class AdminModule {}

@@ -1,0 +1,93 @@
+<c-container fluid class="px-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <c-card-header class="bg-white p-4 border-bottom">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilSpeech" class="text-primary"></svg>
+            {{ 'ADMIN.COMMENTS.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.COMMENTS.SUBTITLE' | translate }}
+          </small>
+        </div>
+        <div class="d-flex gap-2">
+          <button
+            cButton
+            color="primary"
+            size="sm"
+            class="shadow-sm"
+            (click)="visibleModalCrear = true"
+          >
+            <svg cIcon name="cilPlus" class="me-1"></svg>
+            {{ 'ADMIN.COMMENTS.NEW_COMMENT' | translate }}
+          </button>
+        </div>
+      </div>
+    </c-card-header>
+
+    <c-card-body class="p-4">
+      <app-comentarios-filter
+        [basicSearchText]="basicSearchText"
+        [showAdvanced]="showAdvanced"
+        [filtroUsuario]="filtroUsuario"
+        [filtroAprobado]="filtroAprobado"
+        [filtroCuarentena]="filtroCuarentena"
+        [totalElements]="totalElements"
+        [pageSize]="pageSize"
+        [cargando]="cargando"
+        [currentSortField]="currentSortField"
+        [currentSortDirection]="currentSortDirection"
+        (basicSearchChange)="onBasicSearchTextChange($event)"
+        (toggleAdvanced)="toggleAdvanced()"
+        (filtroUsuarioChange)="filtroUsuario = $event"
+        (filtroAprobadoChange)="filtroAprobado = $event"
+        (filtroCuarentenaChange)="filtroCuarentena = $event"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (reset)="reset()"
+        (search)="search()"
+        (sortChange)="ordenar($event)"
+      ></app-comentarios-filter>
+
+      <app-comentarios-table
+        [pagedComentarios]="pagedComentarios"
+        [cargando]="cargando"
+        [totalElements]="totalElements"
+        [numberOfElements]="numberOfElements"
+        [pageNo]="pageNo"
+        [pageSize]="pageSize"
+        [totalPages]="getTotalPages()"
+        (pageChange)="onPageChange($event)"
+        (edit)="openEdit($event)"
+        (delete)="deleteComentario($event)"
+      ></app-comentarios-table>
+    </c-card-body>
+  </c-card>
+</c-container>
+
+<app-crear-comentario
+  [visible]="visibleModalCrear"
+  (visibleChange)="visibleModalCrear = $event"
+  (onSuccess)="onSuccessSave()"
+></app-crear-comentario>
+
+<app-editar-comentario
+  [visible]="visibleModalEditar"
+  [comentario]="comentarioSeleccionado"
+  (visibleChange)="visibleModalEditar = $event"
+  (onSuccess)="onSuccessSave()"
+></app-editar-comentario>
+
+<app-confirmation-modal
+  [visible]="showDeleteModal"
+  [title]="'ADMIN.COMMENTS.DELETE_COMMENT' | translate"
+  [message]="'ADMIN.COMMENTS.VERIFY_DELETE' | translate"
+  [itemName]="truncateContent(comentarioToDelete?.contenido || '')"
+  [warningText]="'COMMON.ACTION_CANNOT_BE_UNDONE' | translate"
+  [confirmText]="'ADMIN.COMMENTS.DELETE_COMMENT' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'danger'"
+  [loading]="cargando"
+  (visibleChange)="showDeleteModal = $event"
+  (confirm)="confirmDelete()"
+></app-confirmation-modal>

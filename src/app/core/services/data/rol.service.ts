@@ -3,7 +3,7 @@ import { Rol } from '../../models/rol.model';
 import { CrudService } from '../../_utils/crud.service';
 import { HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
 
 @Injectable({
@@ -12,11 +12,20 @@ import { OPConstants } from '../../../shared/constants/op-global.constants';
 export class RolService extends CrudService<Rol, string> {
   protected override endpoint = '/roles';
 
-  buscarSinGlobalLoader(searchRequest: any, pageNo: number, pageSize: number): Observable<any> {
+  buscarSinGlobalLoader(
+    searchRequest: any,
+    pageNo: number,
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<any> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.post<any>(`${this.endpoint}/buscar`, searchRequest, params, undefined, context);
   }
 
@@ -33,22 +42,33 @@ export class RolService extends CrudService<Rol, string> {
   }
 
   // Overrides for code-based endpoints
-  override obtenerPorId(id: string): Observable<any> {
-    return this.get<any>(`${this.endpoint}/obtenerPorCodigo/${id}`);
+  override obtenerPorId(codigo: string, context?: HttpContext): Observable<any> {
+    return this.get<any>(`${this.endpoint}/obtenerPorCodigo/${codigo}`, undefined, undefined, context);
   }
 
-  override actualizar(id: string, entity: Rol): Observable<any> {
-    return this.put<any>(`${this.endpoint}/actualizarPorCodigo/${id}`, entity);
+  override actualizar(codigo: string, entity: Rol, context?: HttpContext): Observable<any> {
+    return this.put<any>(
+      `${this.endpoint}/actualizarPorCodigo/${codigo}`,
+      entity,
+      undefined,
+      undefined,
+      context
+    );
   }
 
-  override borrar(id: string): Observable<any> {
-    return this.delete<any>(`${this.endpoint}/borrarPorCodigo/${id}`);
+  override borrar(codigo: string, context?: HttpContext): Observable<any> {
+    return this.delete<any>(
+      `${this.endpoint}/borrarPorCodigo/${codigo}`,
+      undefined,
+      undefined,
+      context
+    );
   }
 
   // Safe overrides
-  override obtenerPorIdSafe(id: string): Observable<Rol> {
+  override obtenerPorIdSafe(codigo: string): Observable<Rol> {
     return this.safeGetData<Rol>(
-      `${this.endpoint}/obtenerPorCodigo/${id}`,
+      `${this.endpoint}/obtenerPorCodigo/${codigo}`,
       {} as Rol,
       undefined,
       undefined,
@@ -56,9 +76,9 @@ export class RolService extends CrudService<Rol, string> {
     );
   }
 
-  override actualizarSafe(id: string, entity: Rol): Observable<Rol> {
+  override actualizarSafe(codigo: string, entity: Rol): Observable<Rol> {
     return this.safePutData<Rol>(
-      `${this.endpoint}/actualizarPorCodigo/${id}`,
+      `${this.endpoint}/actualizarPorCodigo/${codigo}`,
       entity,
       {} as Rol,
       undefined,
@@ -67,9 +87,9 @@ export class RolService extends CrudService<Rol, string> {
     );
   }
 
-  override eliminarSafe(id: string): Observable<boolean> {
+  override eliminarSafe(codigo: string): Observable<boolean> {
     return this.safeDeleteOperation(
-      `${this.endpoint}/borrarPorCodigo/${id}`,
+      `${this.endpoint}/borrarPorCodigo/${codigo}`,
       undefined,
       undefined,
       `${this.endpoint}.borrarPorCodigo`

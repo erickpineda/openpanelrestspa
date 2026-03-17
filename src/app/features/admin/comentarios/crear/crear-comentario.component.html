@@ -1,0 +1,34 @@
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  size="lg"
+  backdrop="static"
+  alignment="center"
+>
+  <c-modal-header>
+    <h5 cModalTitle class="d-flex align-items-center gap-2">
+      <svg cIcon name="cilSpeech" class="text-primary"></svg>
+      {{ 'ADMIN.COMMENTS.NEW_COMMENT' | translate }}
+    </h5>
+    <button (click)="cerrarModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body class="p-4">
+    <app-comentario-form
+      [comentario]="comentario"
+      [nombreUsuario]="nombreUsuario"
+      [emailUsuario]="emailUsuario"
+      [isEditMode]="false"
+      (submitComentario)="guardar($event)"
+      (cancel)="cerrarModal()"
+    ></app-comentario-form>
+  </c-modal-body>
+  <c-modal-footer class="bg-light bg-opacity-10">
+    <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+    <button cButton color="primary" (click)="onGuardarClick()">
+      <svg cIcon name="cilSave" class="me-1"></svg>
+      {{ 'COMMON.SAVE' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>

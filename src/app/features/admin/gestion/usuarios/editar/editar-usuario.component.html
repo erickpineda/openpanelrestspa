@@ -1,0 +1,41 @@
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  id="editUserModal"
+  backdrop="static"
+  size="lg"
+  scrollable
+>
+  <c-modal-header>
+    <h5 cModalTitle class="d-flex align-items-center gap-2">
+      <svg cIcon name="cilPen" class="text-primary"></svg>
+      {{ 'ADMIN.USERS.EDIT_USER_TITLE' | translate }}
+    </h5>
+    <button (click)="cerrarModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body class="p-4">
+    <app-usuario-form
+      [usuario]="usuario"
+      [roles]="roles"
+      [loading]="loading"
+      (onSave)="guardar($event)"
+      (onEditEnabled)="handleEditEnabled()"
+    >
+    </app-usuario-form>
+  </c-modal-body>
+  @if (isEditing) {
+    <c-modal-footer class="bg-light bg-opacity-10">
+      <button cButton color="secondary" variant="ghost" (click)="cerrarModal()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button cButton color="primary" (click)="onGuardarClick()" [disabled]="loading">
+        @if (loading) {
+          <c-spinner size="sm" class="me-1"></c-spinner>
+        } @else {
+          <svg cIcon name="cilSave" class="me-1"></svg>
+        }
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </c-modal-footer>
+  }
+</c-modal>

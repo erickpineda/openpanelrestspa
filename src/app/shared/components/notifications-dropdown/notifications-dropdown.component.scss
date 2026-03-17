@@ -1,0 +1,198 @@
+:host {
+  display: contents;
+}
+
+.nav-link {
+  line-height: 1;
+}
+
+.nav-link.nav-icon-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-link.nav-icon-toggle svg {
+  display: block;
+}
+
+/* Indicador (dot) sobre la campana */
+.notif-dot {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.15rem;
+  width: 8px;
+  height: 8px;
+  background-color: var(--cui-primary);
+  border: 2px solid var(--cui-light);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
+  padding: 0 !important;
+}
+
+/* Panel del dropdown */
+.notif-menu {
+  min-width: 340px;
+  max-width: 420px;
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+}
+
+/* Encabezado */
+.notif-menu .dropdown-header {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cui-body-color);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.075);
+  padding: 0.75rem 0.75rem;
+  text-decoration: none;
+}
+.notif-menu .dropdown-header * {
+  text-decoration: none;
+}
+.notif-menu .dropdown-header button {
+  color: var(--cui-primary);
+  text-decoration: none;
+  font-size: 0.75rem;
+}
+.notif-menu .dropdown-header button:hover,
+.notif-menu .dropdown-header button:focus {
+  color: var(--cui-primary);
+  opacity: 0.8;
+}
+
+/* Ítems */
+.notif-item {
+  position: relative;
+  background-color: var(--cui-body-bg);
+  border: 1px solid rgba(0, 0, 0, 0.065);
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+
+  /* Franja indicadora (pseudo-elemento) para asegurar alineación idéntica */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 3px;
+    background-color: transparent;
+    transition: background-color 0.2s ease;
+    z-index: 1;
+  }
+
+  /* Estilo para notificaciones no leídas */
+  &.unread {
+    background-color: rgba(50, 31, 219, 0.03); /* Fondo sutil */
+    /* El borde izquierdo se maneja con el pseudo-elemento */
+    
+    &::before {
+      background-color: var(--cui-primary);
+    }
+  }
+
+  &.marking-read {
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+    max-height: 0;
+     overflow: hidden;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border: none;
+  }
+}
+.notif-item:hover,
+.notif-item:focus-within {
+  background-color: var(--cui-light);
+  border-color: rgba(0, 0, 0, 0.085);
+}
+
+.notif-item .icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.notif-item strong {
+  font-size: 0.95rem;
+  color: var(--cui-body-color);
+}
+.notif-item .text-body,
+.notif-item .small {
+  color: var(--cui-secondary);
+}
+
+.notif-item .small.time {
+  color: var(--cui-secondary);
+}
+
+.notif-item .d-flex .btn {
+  border-radius: 999px;
+}
+.notif-item .btn:hover,
+.notif-item .btn:focus {
+  filter: brightness(0.97);
+}
+
+.notif-tag {
+  align-self: flex-start;
+}
+
+/* Pie */
+.notif-menu .dropdown-divider {
+  margin: 0.5rem 0;
+}
+.notif-menu .btn-link {
+  color: var(--cui-primary);
+  text-decoration: none;
+}
+.notif-menu .btn-link:hover,
+.notif-menu .btn-link:focus {
+  color: var(--cui-primary);
+  opacity: 0.8;
+}
+.notif-menu .btn-link:visited {
+  color: var(--cui-primary);
+}
+
+/* Tipografía y cortes de texto */
+.notif-item .text-body {
+  word-break: break-word;
+}
+
+/* Estados del toggle (campana) */
+.nav-link:focus,
+.nav-link:hover {
+  opacity: 0.85;
+}
+
+/* Scrollbar (webkit) */
+.notif-menu::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.notif-menu::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.15);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.notif-menu::-webkit-scrollbar-track {
+  background-color: rgba(0,0,0,0.05);
+}
+
+/* Responsivo */
+@media (max-width: 576px) {
+  .notif-menu {
+    min-width: 280px;
+    max-width: 90vw;
+  }
+  .notif-item .mt-2 {
+    flex-wrap: wrap;
+  }
+}

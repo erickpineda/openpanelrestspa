@@ -1,11 +1,13 @@
 @if (ready && isAuthed) {
-  <app-toasts-container></app-toasts-container>
   <c-sidebar
     #sidebar="cSidebar"
-    class="d-print-none sidebar sidebar-fixed"
+    class="d-print-none sidebar"
+    position="fixed"
     id="sidebar"
     colorScheme="dark"
-    visible
+    [visible]="sidebarVisible"
+    (visibleChange)="onVisibleChange($event)"
+    [backdrop]="sidebarBackdrop"
     [unfoldable]="sidebarNarrow"
   >
     <c-sidebar-header class="border-bottom">
@@ -23,6 +25,16 @@
           height="46"
         />
       </c-sidebar-brand>
+      <!-- Botón de cierre explícito (X) visible solo en móvil -->
+      @if (sidebarBackdrop) {
+        <button
+          cSidebarToggle="sidebar"
+          type="button"
+          class="btn-close btn-close-white d-lg-none position-absolute end-0 top-0 m-2"
+          aria-label="Close"
+          style="z-index: 1050;"
+        ></button>
+      }
     </c-sidebar-header>
 
     <ng-scrollbar pointerEventsMethod="scrollbar" visibility="hover">
@@ -45,19 +57,19 @@
     data-testid="admin-root"
   >
     @if (showGlobalRecoveryNotification) {
-      <div class="container mt-3">
-        <app-data-recovery-notification
-          title="📥 Entradas no guardadas"
-          [message]="
-            'Tienes ' + temporaryEntriesCount + ' entrada(s) no guardada(s) de sesiones anteriores'
-          "
-          recoverText="Ver entradas temporales"
-          ignoreText="Más tarde"
-          discardText="Descartar todas"
-          (onRecover)="onGlobalRecover()"
-          (onIgnore)="onGlobalIgnore()"
-          (onDiscard)="onGlobalDiscard()"
-        ></app-data-recovery-notification>
+      <div class="px-3 pt-3 global-recovery-container">
+        <div class="admin-recovery-wrapper">
+          <app-data-recovery-notification
+            [title]="'ADMIN.RECOVERY.GLOBAL_TITLE' | translate"
+            [message]="'ADMIN.RECOVERY.GLOBAL_MESSAGE' | translate: { count: temporaryEntriesCount }"
+            [recoverText]="'ADMIN.RECOVERY.GO_TO_LIST' | translate"
+            [ignoreText]="'ADMIN.RECOVERY.IGNORE_ALL' | translate"
+            [discardText]="'ADMIN.RECOVERY.DISCARD_ALL' | translate"
+            (onRecover)="onGlobalRecover()"
+            (onIgnore)="onGlobalIgnore()"
+            (onDiscard)="onGlobalDiscard()"
+          ></app-data-recovery-notification>
+        </div>
       </div>
     }
     <!-- Header -->
@@ -95,6 +107,7 @@
     <!-- Footer -->
     <app-default-footer></app-default-footer>
   </div>
+  <app-right-sidebar></app-right-sidebar>
 } @else {
   <div class="d-flex justify-content-center align-items-center min-vh-100">
     <app-op-loader></app-op-loader>

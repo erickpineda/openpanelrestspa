@@ -81,8 +81,8 @@ test.describe('Entradas: Previa → Editar', () => {
               categorias: [],
               publicada: false,
               borrador: true,
-              estadoEntrada: { idEstadoEntrada: 1, nombre: 'Borrador' },
-              tipoEntrada: { idTipoEntrada: 1, nombre: 'Blog' },
+              estadoEntrada: { codigo: 'BOR', nombre: 'Borrador' },
+              tipoEntrada: { codigo: 'BLOG', nombre: 'Blog' },
             },
           ],
           totalPages: 1,
@@ -95,14 +95,14 @@ test.describe('Entradas: Previa → Editar', () => {
     await page.route('**/api/v1/entradas/tiposEntradas**', async (route) => {
       await fulfillJson(route, {
         result: { success: true },
-        data: { tiposEntradas: [{ idTipoEntrada: 1, nombre: 'Blog' }] },
+        data: { tiposEntradas: [{ codigo: 'BLOG', nombre: 'Blog' }] },
       });
     });
 
     await page.route('**/api/v1/entradas/estadosEntradas**', async (route) => {
       await fulfillJson(route, {
         result: { success: true },
-        data: { estadosEntradas: [{ idEstadoEntrada: 1, nombre: 'Borrador' }] },
+        data: { estadosEntradas: [{ codigo: 'BOR', nombre: 'Borrador' }] },
       });
     });
 
@@ -127,8 +127,8 @@ test.describe('Entradas: Previa → Editar', () => {
           contenido: '<p>Contenido</p>',
           imagenDestacada: null,
           categorias: [],
-          estadoEntrada: { idEstadoEntrada: 1, nombre: 'Borrador' },
-          tipoEntrada: { idTipoEntrada: 1, nombre: 'Blog' },
+          estadoEntrada: { codigo: 'BOR', nombre: 'Borrador' },
+          tipoEntrada: { codigo: 'BLOG', nombre: 'Blog' },
         },
       });
     });
@@ -141,8 +141,8 @@ test.describe('Entradas: Previa → Editar', () => {
     await page.waitForSelector('[data-testid="admin-root"]', { state: 'visible', timeout: 30000 });
     await page.goto('/#/admin/control/entradas?e2e=1', { waitUntil: 'domcontentloaded' });
 
-    await expect.poll(() => definicionesHits).toBeGreaterThan(0, { timeout: 30000 });
-    await expect.poll(() => buscarHits).toBeGreaterThan(0, { timeout: 30000 });
+    await expect.poll(() => definicionesHits, { timeout: 30000 }).toBeGreaterThan(0);
+    await expect.poll(() => buscarHits, { timeout: 30000 }).toBeGreaterThan(0);
 
     const previewBtn = page.locator('button[aria-label^="Vista previa de"]').first();
     await expect(previewBtn).toBeVisible({ timeout: 30000 });

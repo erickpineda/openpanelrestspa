@@ -98,6 +98,7 @@ import {
   BuscadorCampoDef,
 } from '../../utils/buscador-definiciones.util';
 import { BusquedaService } from '../../../core/services/srv-busqueda/busqueda.service';
+import { AdvancedSearchParams, SingleFilter } from '../../models/search.models';
 
 @Component({
   selector: 'app-buscador-avanzado',
@@ -162,11 +163,13 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   /**
    * Evento que se emite cuando se selecciona o ejecuta un filtro de búsqueda.
    */
-  @Output() filtroSeleccionado = new EventEmitter<any>();
+  @Output() filtroSeleccionado = new EventEmitter<SingleFilter | AdvancedSearchParams>();
   /**
    * Evento que se emite en cada cambio de filtro (si autoTrigger está activo).
    */
   @Output() filtroChanged = new EventEmitter<any>();
+  @Output() onSearch = new EventEmitter<SingleFilter | AdvancedSearchParams>();
+  @Output() onClear = new EventEmitter<void>();
 
   // =================== Propiedades públicas ===================
   /**
@@ -193,6 +196,22 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Valor actual del input de búsqueda.
    */
   public valorBusqueda: string = '';
+  /**
+   * Lista de criterios avanzados (múltiples).
+   */
+  public criterios: Array<{ campo: string; operacion: string; valor: any }> = [];
+  /**
+   * Operador global de combinación de criterios.
+   */
+  public dataOption: 'AND' | 'OR' = 'AND';
+  /**
+   * Panel de herramientas compacto para XS.
+   */
+  public showToolsPanel: boolean = false;
+  /**
+   * Última acción activada para mostrar texto en XS.
+   */
+  public ultimaAccionLabel: string = '';
   /**
    * Mensaje de error si falla la carga de catálogos.
    */
@@ -315,6 +334,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
         ? initialOp
         : ops[0] || '';
     this.valorBusqueda = '';
+    this.criterios = [];
     if (this.autoTrigger) {
       this.filtroChanged.emit({
         campo: this.campoSeleccionado,
@@ -328,6 +348,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
       operacion: this.operacionSeleccionada,
       valor: this.valorBusqueda,
     });
+    this.onClear.emit();
   }
 
   /**
@@ -337,11 +358,26 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   public onValorChange(v: string): void {
     this.valorBusqueda = v;
     if (this.autoTrigger) {
-      this.filtroChanged.emit({
-        campo: this.campoSeleccionado,
-        operacion: this.operacionSeleccionada,
-        valor: this.valorBusqueda,
-      });
+      const payload:
+        | AdvancedSearchParams
+        | SingleFilter =
+        this.criterios.length > 0
+          ? {
+              dataOption: this.dataOption,
+              searchCriteriaList: this.criterios.map((c) => ({
+                filterKey: c.campo,
+                operation: c.operacion,
+                value: c.valor,
+                clazzName: 'Entrada',
+              })),
+            }
+          : {
+              campo: this.campoSeleccionado,
+              operacion: this.operacionSeleccionada,
+              valor: this.valorBusqueda,
+              dataOption: this.dataOption,
+            };
+      this.filtroChanged.emit(payload);
       this.busquedaService.triggerBusqueda(this.valorBusqueda);
     }
   }
@@ -371,11 +407,27 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Emite el filtro seleccionado actual al padre.
    */
   private emitirFiltro(): void {
-    this.filtroSeleccionado.emit({
-      campo: this.campoSeleccionado,
-      operacion: this.operacionSeleccionada,
-      valor: this.valorBusqueda,
-    });
+    const payload:
+      | AdvancedSearchParams
+      | SingleFilter =
+      this.criterios.length > 0
+        ? {
+            dataOption: this.dataOption,
+            searchCriteriaList: this.criterios.map((c) => ({
+              filterKey: c.campo,
+              operation: c.operacion,
+              value: c.valor,
+              clazzName: 'Entrada',
+            })),
+          }
+        : {
+            campo: this.campoSeleccionado,
+            operacion: this.operacionSeleccionada,
+            valor: this.valorBusqueda,
+            dataOption: this.dataOption,
+          };
+    this.filtroSeleccionado.emit(payload);
+    this.onSearch.emit(payload);
   }
 
   /**
@@ -457,6 +509,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     // Guardar el estado inicial para que "Limpiar" pueda restaurarlo
     this.initialCampoSeleccionado = this.campoSeleccionado;
     this.initialOperacionSeleccionada = this.operacionSeleccionada;
+    this.criterios = [];
   }
 
   /**
@@ -476,5 +529,68 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
     this.operacionesDisponibles = operacionesCampo;
     this.operacionSeleccionada =
       this.operacionesDisponibles[0]?.valor || this.operacionSeleccionada || '';
+  }
+
+  /**
+   * Añade un criterio avanzado a la lista.
+   */
+  public addCriterion(): void {
+    const campo = this.campoSeleccionado || this.camposDisponibles[0]?.valor || '';
+    const operacion = this.operacionSeleccionada || this.operacionesDisponibles[0]?.valor || '';
+    const valor = this.valorBusqueda || '';
+    if (campo && operacion) {
+      this.criterios = [...this.criterios, { campo, operacion, valor }];
+      this.ultimaAccionLabel = 'Añadido criterio';
+    }
+  }
+
+  /**
+   * Elimina un criterio por índice.
+   */
+  public removeCriterion(index: number): void {
+    if (index >= 0 && index < this.criterios.length) {
+      this.criterios = this.criterios.filter((_, i) => i !== index);
+      this.ultimaAccionLabel = 'Quitado criterio';
+    }
+  }
+
+  /**
+   * Cambia la opción de combinación AND/OR.
+   */
+  public setDataOption(option: 'AND' | 'OR'): void {
+    this.dataOption = option;
+    this.ultimaAccionLabel = option === 'AND' ? 'Lógica: AND' : 'Lógica: OR';
+    if (this.autoTrigger) {
+      this.emitirFiltro();
+    }
+  }
+
+  /**
+   * Alterna visibilidad del panel compacto de herramientas (XS).
+   */
+  public toggleToolsPanel(): void {
+    this.showToolsPanel = !this.showToolsPanel;
+  }
+
+  /**
+   * Aplica una plantilla de filtros predefinida.
+   */
+  public applyPreset(preset: 'PUBLICADAS_AND_TITULO' | 'BORRADORES_OR_SIN_PUBLICAR'): void {
+    if (preset === 'PUBLICADAS_AND_TITULO') {
+      this.dataOption = 'AND';
+      this.criterios = [
+        { campo: 'estadoEntrada.nombre', operacion: 'EQUAL', valor: 'Publicada' },
+        { campo: 'titulo', operacion: 'CONTAINS', valor: this.valorBusqueda || '' },
+      ];
+      this.ultimaAccionLabel = 'Plantilla: Publicadas AND Título contiene';
+    } else if (preset === 'BORRADORES_OR_SIN_PUBLICAR') {
+      this.dataOption = 'OR';
+      this.criterios = [
+        { campo: 'estadoEntrada.nombre', operacion: 'EQUAL', valor: 'Guardada' },
+        { campo: 'estadoEntrada.nombre', operacion: 'EQUAL', valor: 'No publicada' },
+      ];
+      this.ultimaAccionLabel = 'Plantilla: Borradores OR No publicada';
+    }
+    this.emitirFiltro();
   }
 }

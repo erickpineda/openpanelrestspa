@@ -1,0 +1,38 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="mb-3">
+    <label cLabel for="theme">{{ 'AUTO.TEMA' | translate }}</label>
+    <c-input-group>
+      <span cInputGroupText><svg cIcon name="cilMoon"></svg></span>
+      <select cSelect id="theme" formControlName="theme">
+        <option value="light">{{ 'AUTO.CLARO' | translate }}</option>
+        <option value="dark">{{ 'AUTO.OSCURO' | translate }}</option>
+      </select>
+    </c-input-group>
+  </div>
+
+  <div class="mb-3">
+    <label cLabel for="language">{{ 'AUTO.IDIOMA' | translate }}</label>
+    <c-input-group>
+      <span cInputGroupText><svg cIcon name="cilLanguage"></svg></span>
+      <select cSelect id="language" formControlName="language">
+        <option value="es">{{ 'AUTO.ESPA_OL' | translate }}</option>
+        <option value="en">{{ 'AUTO.INGL_S' | translate }}</option>
+      </select>
+    </c-input-group>
+  </div>
+
+  <div class="mb-3">
+    <c-form-check>
+      <input cFormCheckInput type="checkbox" id="notifications" formControlName="notifications" />
+      <label cFormCheckLabel for="notifications">{{
+        'AUTO.RECIBIR_NOTIFICACIONES_POR_COR' | translate
+      }}</label>
+    </c-form-check>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button cButton color="primary" type="submit">
+      {{ 'AUTO.GUARDAR_PREFERENCIAS' | translate }}
+    </button>
+  </div>
+</form>

@@ -4,7 +4,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { EtiquetaService } from './etiqueta.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 
 describe('EtiquetaService request shapes', () => {
   let service: EtiquetaService;
@@ -52,23 +52,23 @@ describe('EtiquetaService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/etiquetas/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ result: { success: true }, data: {} });
   });
 
   it('asociar y desasociar construyen rutas correctas', () => {
-    service.asociarConEntrada(1, 2).subscribe(() => {});
+    service.asociarConEntrada('tag-1', 2).subscribe(() => {});
     const a1 = httpMock.expectOne((r) => r.url.includes('/etiquetas/asociar'));
     expect(a1.request.method).toBe('POST');
     expect(a1.request.body).toEqual({
-      etiquetaId: 1,
+      etiquetaCodigo: 'tag-1',
       entidadId: 2,
       tipoEntidad: 'ENTRADA',
     });
     a1.flush({ result: { success: true } });
 
-    service.desasociarDeCategoria(3, 4).subscribe(() => {});
-    const d1 = httpMock.expectOne((r) => r.url.includes('/etiquetas/desasociar/CATEGORIA/3/4'));
+    service.desasociarDeCategoria('tag-3', 4).subscribe(() => {});
+    const d1 = httpMock.expectOne((r) => r.url.includes('/etiquetas/desasociar/CATEGORIA/tag-3/4'));
     expect(d1.request.method).toBe('DELETE');
     d1.flush({ result: { success: true } });
   });

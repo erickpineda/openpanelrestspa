@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, combineLatest, of } from 'rxjs';
-import { map, distinctUntilChanged, catchError, switchMap } from 'rxjs/operators';
+import { map, distinctUntilChanged, catchError, switchMap, debounceTime } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import {
   INavigationService,
@@ -17,6 +17,7 @@ import { SidebarStateService } from './sidebar-state.service';
 import { ActiveSectionService } from './active-section.service';
 import { ProgrammaticNavigationConfigService } from './programmatic-navigation-config.service';
 import { NavigationPerformanceService } from './navigation-performance.service';
+import { BadgeCounterService } from './badge-counter.service';
 
 /**
  * Códigos de error específicos para el servicio de navegación
@@ -55,10 +56,69 @@ export class NavigationService implements INavigationService {
     private sidebarStateService: SidebarStateService,
     private activeSectionService: ActiveSectionService,
     private programmaticConfigService: ProgrammaticNavigationConfigService,
-    private performanceService: NavigationPerformanceService
+    private performanceService: NavigationPerformanceService,
+    private badgeCounterService: BadgeCounterService
   ) {
     this.initializeNavigation();
     this.initializePerformanceOptimizations();
+    this.initializeBadgeCounters();
+  }
+
+  /**
+   * Inicializa y conecta el servicio de contadores de badges
+   */
+  private initializeBadgeCounters(): void {
+    // Inicializar los contadores en el servicio origen
+    this.badgeCounterService.initializeCounters();
+
+    // Suscribirse a cambios en los contadores y mapearlos a los items de navegación
+    combineLatest([
+      this.badgeCounterService.getAllCounters(),
+      this.navigationItemsSubject.asObservable()
+    ]).pipe(
+      debounceTime(200)
+    ).subscribe(([counters, items]) => {
+      const newBadgeCounts = new Map<string, number>();
+
+      const processItems = (navItems: INavItemEnhanced[]) => {
+        for (const item of navItems) {
+          if (item.dynamicBadge) {
+            const itemId = NavigationUtils.generateItemId(item);
+            const serviceKey = this.mapMethodToKey(item.dynamicBadge.method);
+            
+            if (serviceKey && counters.has(serviceKey)) {
+              const count = counters.get(serviceKey)!;
+              newBadgeCounts.set(itemId, count);
+            }
+          }
+          
+          if (item.children && item.children.length > 0) {
+            processItems(item.children);
+          }
+        }
+      };
+
+      processItems(items);
+      
+      // Solo actualizar si hay cambios para evitar bucles infinitos
+      // (aunque distinctUntilChanged downstream debería manejarlo)
+      this.badgeCountsSubject.next(newBadgeCounts);
+    });
+  }
+
+  /**
+   * Mapea el nombre del método de configuración a la clave interna del servicio de badges
+   */
+  private mapMethodToKey(methodName: string): string | null {
+    const mapping: { [key: string]: string } = {
+      'getDraftEntriesCount': 'draft-entries',
+      'getPendingUsersCount': 'pending-users',
+      'getUnmoderatedCommentsCount': 'unmoderated-comments',
+      'getSystemAlertsCount': 'system-alerts',
+      'getMyDraftsCount': 'my-drafts'
+    };
+    
+    return mapping[methodName] || null;
   }
 
   /**
@@ -266,6 +326,13 @@ export class NavigationService implements INavigationService {
   }
 
   /**
+   * Actualiza los elementos de navegación directamente
+   */
+  public setNavigationItems(items: INavItemEnhanced[]): void {
+    this.navigationItemsSubject.next(items);
+  }
+
+  /**
    * Actualiza los elementos de navegación basado en la configuración actual
    */
   private updateNavigationItems(): void {
@@ -340,43 +407,87 @@ export class NavigationService implements INavigationService {
 
   /**
    * Aplica contenido dinámico (badges y acciones contextuales) a los elementos
+   * Optimizada para preservar referencias de objetos si no hay cambios
    */
   private applyDynamicContent(
     items: INavItemEnhanced[],
     badgeCounts: Map<string, number>,
     contextualActions: Map<string, IContextualAction[]>
   ): INavItemEnhanced[] {
-    return items.map((item) => {
-      const itemId = NavigationUtils.generateItemId(item);
-      const updatedItem = { ...item };
+    let hasChanges = false;
 
-      // Aplicar contador de badge dinámico
+    const newItems = items.map((item) => {
+      const itemId = NavigationUtils.generateItemId(item);
+      let itemChanged = false;
+      let newBadge = item.badge;
+      let newActions = item.contextualActions;
+      let newChildren = item.children;
+
+      // 1. Badge Logic
       if (item.dynamicBadge && badgeCounts.has(itemId)) {
         const count = badgeCounts.get(itemId)!;
-        if (count > 0 || item.dynamicBadge.refreshInterval) {
-          updatedItem.badge = {
+        if (count > 0) {
+          const calculatedBadge = {
             color: this.getBadgeColorByCount(count),
             text: count.toString(),
           };
+          // Comparar si el badge realmente cambió
+          if (
+            !item.badge ||
+            item.badge.text !== calculatedBadge.text ||
+            item.badge.color !== calculatedBadge.color
+          ) {
+            newBadge = calculatedBadge;
+            itemChanged = true;
+          }
+        } else {
+          // Si el contador es 0, ocultar el badge
+          if (item.badge) {
+            newBadge = undefined;
+            itemChanged = true;
+          }
         }
       }
 
-      // Aplicar acciones contextuales
+      // 2. Contextual Actions Logic
       if (contextualActions.has(itemId)) {
-        updatedItem.contextualActions = contextualActions.get(itemId);
+        const actions = contextualActions.get(itemId);
+        if (item.contextualActions !== actions) {
+          newActions = actions;
+          itemChanged = true;
+        }
       }
 
-      // Aplicar recursivamente a children
+      // 3. Children Logic (Recursive)
       if (item.children && item.children.length > 0) {
-        updatedItem.children = this.applyDynamicContent(
+        const updatedChildren = this.applyDynamicContent(
           item.children,
           badgeCounts,
           contextualActions
         );
+        if (updatedChildren !== item.children) {
+          newChildren = updatedChildren;
+          itemChanged = true;
+        }
       }
 
-      return updatedItem;
+      if (itemChanged) {
+        hasChanges = true;
+        const updatedItem = { ...item };
+        if (newBadge) updatedItem.badge = newBadge;
+        else delete updatedItem.badge;
+
+        if (newActions) updatedItem.contextualActions = newActions;
+
+        if (newChildren) updatedItem.children = newChildren;
+
+        return updatedItem;
+      }
+
+      return item;
     });
+
+    return hasChanges ? newItems : items;
   }
 
   /**

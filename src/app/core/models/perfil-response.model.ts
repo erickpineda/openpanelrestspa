@@ -1,6 +1,6 @@
 export class PerfilResponse {
   idUsuario: number = 0;
-  idRol: number = 0;
+  rolCodigo: string = '';
   username: string = '';
   password: string = '';
   nombre: string = '';
@@ -17,7 +17,7 @@ export class PerfilResponse {
 
 export interface PerfilResponse {
   idUsuario: number;
-  idRol: number;
+  rolCodigo: string;
   username: string;
   password: string;
   nombre: string;

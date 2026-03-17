@@ -26,6 +26,9 @@ import { GlobalErrorComponent } from './components/errors/global/global-error.co
 import { ErrorBoundaryComponent } from './components/errors/error-boundary/error-boundary.component';
 import { SharedWidgetsModule } from './shared-widgets.module';
 import { TranslatePipe } from './pipes/translate.pipe';
+import { AllowedDatePipe } from './pipes/allowed-date.pipe';
+import { UnsavedWorkDirective } from '../core/directives/unsaved-work.directive';
+import { NotificationsDropdownComponent } from './components/notifications-dropdown/notifications-dropdown.component';
 
 @NgModule({
   imports: [
@@ -49,6 +52,7 @@ import { TranslatePipe } from './pipes/translate.pipe';
     TooltipModule,
     SharedWidgetsModule,
     TranslatePipe,
+    AllowedDatePipe,
   ],
   declarations: [
     GlobalErrorComponent,
@@ -56,6 +60,8 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
+    UnsavedWorkDirective,
+    NotificationsDropdownComponent,
   ],
   exports: [
     CommonModule,
@@ -80,8 +86,11 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ErrorBoundaryComponent,
     BuscadorAvanzadoComponent,
     OpPaginationComponent,
-    SharedWidgetsModule,
+    // SharedWidgetsModule, // Removed
     TranslatePipe,
+    AllowedDatePipe,
+    UnsavedWorkDirective,
+    NotificationsDropdownComponent,
   ],
 })
-export class SharedOPModule { }
+export class SharedOPModule {}

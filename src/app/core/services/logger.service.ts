@@ -11,6 +11,11 @@ export class LoggerService {
   // Niveles de log
   private levels = ['debug', 'info', 'warn', 'error'] as const;
   private minLevel: (typeof this.levels)[number] = this.isProduction ? 'warn' : 'debug';
+
+  // Guardias contra recursión
+  private logDepth = 0;
+  private readonly MAX_LOG_DEPTH = 3;
+
   constructor(private buffer: LoggerBufferService) {}
 
   private shouldLog(level: (typeof this.levels)[number]): boolean {
@@ -20,32 +25,41 @@ export class LoggerService {
   }
 
   log(level: (typeof this.levels)[number], message: string, ...args: any[]): void {
-    if (!this.shouldLog(level)) return;
-
-    const timestamp = new Date().toISOString();
-    const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
-
-    switch (level) {
-      case 'debug':
-        console.debug(prefix, message, ...args);
-        break;
-      case 'info':
-        console.info(prefix, message, ...args);
-        break;
-      case 'warn':
-        console.warn(prefix, message, ...args);
-        break;
-      case 'error':
-        console.error(prefix, message, ...args);
-        break;
+    if (this.logDepth > this.MAX_LOG_DEPTH) {
+      return;
     }
-    try {
-      this.buffer.record(level, message, args);
-    } catch {}
 
-    // En producción, enviar errores a servicio de tracking
-    if (this.isProduction && level === 'error') {
-      this.sendToTrackingService(message, args);
+    this.logDepth++;
+    try {
+      if (!this.shouldLog(level)) return;
+
+      const timestamp = new Date().toISOString();
+      const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
+
+      switch (level) {
+        case 'debug':
+          console.debug(prefix, message, ...args);
+          break;
+        case 'info':
+          console.info(prefix, message, ...args);
+          break;
+        case 'warn':
+          console.warn(prefix, message, ...args);
+          break;
+        case 'error':
+          console.error(prefix, message, ...args);
+          break;
+      }
+      try {
+        this.buffer.record(level, message, args);
+      } catch {}
+
+      // En producción, enviar errores a servicio de tracking
+      if (this.isProduction && level === 'error') {
+        this.sendToTrackingService(message, args);
+      }
+    } finally {
+      this.logDepth--;
     }
   }
 

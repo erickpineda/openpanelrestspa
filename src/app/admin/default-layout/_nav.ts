@@ -43,6 +43,13 @@ export const navItems: INavItemEnhanced[] = [
     title: true,
     name: 'MENU.CONTENT_MANAGEMENT',
     priority: 90,
+    requiredRoles: [
+      UserRole.AUTOR,
+      UserRole.EDITOR,
+      UserRole.ADMINISTRADOR,
+      UserRole.DESARROLLADOR,
+      UserRole.PROPIETARIO,
+    ],
     attributes: { id: 'nav-title-content' },
   },
   {
@@ -88,10 +95,6 @@ export const navItems: INavItemEnhanced[] = [
           service: 'BadgeCounterService',
           method: 'getDraftEntriesCount',
           refreshInterval: 30000,
-        },
-        badge: {
-          color: 'warning',
-          text: 'MENU.BADGE_PENDING',
         },
       },
       {
@@ -208,10 +211,6 @@ export const navItems: INavItemEnhanced[] = [
       method: 'getUnmoderatedCommentsCount',
       refreshInterval: 15000,
     },
-    badge: {
-      color: 'danger',
-      text: 'Pend',
-    },
     attributes: { id: 'nav-comments' },
   },
 
@@ -233,10 +232,6 @@ export const navItems: INavItemEnhanced[] = [
       service: 'BadgeCounterService',
       method: 'getPendingUsersCount',
       refreshInterval: 60000,
-    },
-    badge: {
-      color: 'info',
-      text: '+',
     },
     attributes: { id: 'nav-users' },
   },
@@ -285,32 +280,19 @@ export const navItems: INavItemEnhanced[] = [
       UserRole.MANTENIMIENTO,
       UserRole.PROPIETARIO,
     ],
-    badge: {
-      color: 'info',
-      text: 'Yo',
+    dynamicBadge: {
+      service: 'BadgeCounterService',
+      method: 'getMyDraftsCount',
+      refreshInterval: 60000,
     },
+    attributes: { id: 'nav-profile' },
     contextualActions: [
       {
         name: 'Editar Perfil',
         icon: 'cil-pencil',
-        action: () => console.log('Editar perfil'),
+        action: () => {},
         tooltip: 'Editar información del perfil',
       },
-    ],
-  },
-  {
-    name: 'MENU.CHANGE_PASSWORD',
-    url: '/admin/control/gestion/changepassword',
-    iconComponent: { name: 'cil-lock-locked' },
-    priority: 10,
-    requiredRoles: [
-      UserRole.LECTOR,
-      UserRole.AUTOR,
-      UserRole.EDITOR,
-      UserRole.ADMINISTRADOR,
-      UserRole.DESARROLLADOR,
-      UserRole.MANTENIMIENTO,
-      UserRole.PROPIETARIO,
     ],
   },
 

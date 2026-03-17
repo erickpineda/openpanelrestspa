@@ -1,0 +1,161 @@
+<c-container fluid class="px-0">
+  <c-card class="mb-4 border-top-3 border-top-primary shadow-sm">
+    <c-card-header class="bg-white p-4 border-bottom">
+      <c-row class="align-items-center g-3">
+        <c-col xs="12" md="6">
+          <h4 class="mb-1 text-primary d-flex align-items-center gap-2">
+            <svg cIcon name="cilList" class="text-primary"></svg>
+            {{ 'ADMIN.ENTRIES.TITLE' | translate }}
+          </h4>
+          <small class="text-body-secondary">
+            {{ 'ADMIN.ENTRIES.SUBTITLE' | translate }}
+          </small>
+        </c-col>
+        <c-col xs="12" md="6">
+          <div class="d-flex gap-2 flex-wrap justify-content-start justify-content-md-end">
+            <button cButton color="secondary" variant="ghost" size="sm" aria-label="Imprimir listado">
+              <svg cIcon name="cilPrint" class="me-1"></svg>
+              {{ 'ADMIN.ENTRIES.PRINT' | translate }}
+            </button>
+            <c-dropdown variant="btn-group">
+              <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+                <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
+                Ordenar
+              </button>
+              <ul cDropdownMenu>
+                <li>
+                  <button cDropdownItem (click)="ordenar('fechaPublicacion', 'DESC')" [active]="isSortActive('fechaPublicacion', 'DESC')">
+                    <span class="d-flex justify-content-between align-items-center w-100">
+                      Más recientes
+                      @if (isSortActive('fechaPublicacion', 'DESC')) {
+                        <svg cIcon name="cilCheck" size="sm"></svg>
+                      }
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('fechaPublicacion', 'ASC')" [active]="isSortActive('fechaPublicacion', 'ASC')">
+                    <span class="d-flex justify-content-between align-items-center w-100">
+                      Más antiguos
+                      @if (isSortActive('fechaPublicacion', 'ASC')) {
+                        <svg cIcon name="cilCheck" size="sm"></svg>
+                      }
+                    </span>
+                  </button>
+                </li>
+                <li><hr cDropdownDivider></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('titulo', 'ASC')" [active]="isSortActive('titulo', 'ASC')">
+                    <span class="d-flex justify-content-between align-items-center w-100">
+                      Título (A-Z)
+                      @if (isSortActive('titulo', 'ASC')) {
+                        <svg cIcon name="cilCheck" size="sm"></svg>
+                      }
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('titulo', 'DESC')" [active]="isSortActive('titulo', 'DESC')">
+                    <span class="d-flex justify-content-between align-items-center w-100">
+                      Título (Z-A)
+                      @if (isSortActive('titulo', 'DESC')) {
+                        <svg cIcon name="cilCheck" size="sm"></svg>
+                      }
+                    </span>
+                  </button>
+                </li>
+              </ul>
+            </c-dropdown>
+            <app-entradas-pendientes></app-entradas-pendientes>
+            <button cButton color="primary" size="sm" routerLink="crear" class="shadow-sm">
+              <svg cIcon name="cilPlus" class="me-1"></svg>
+              {{ 'ADMIN.ENTRIES.NEW_ENTRY' | translate }}
+            </button>
+          </div>
+        </c-col>
+      </c-row>
+    </c-card-header>
+    <div class="section-divider" aria-hidden="true"></div>
+    <c-card-body class="p-4">
+      <app-entradas-filter
+        [basicSearchText]="basicSearchText"
+        [showAdvanced]="showAdvanced"
+        [definiciones]="definiciones"
+        [cargarCatalogosFn]="cargarCatalogosEntrada"
+        [pagingInfo]="pagingInfo$ | async"
+        (basicSearchChange)="onBasicSearchTextChange($event)"
+        (toggleAdvanced)="toggleAdvanced()"
+        (filtroSeleccionado)="aplicarFiltro($event)"
+        (filtroChanged)="onFiltroChanged($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      ></app-entradas-filter>
+      <app-entradas-table
+        [entradas]="(entradas$ | async) || []"
+        [loading]="(loading$ | async) || false"
+        [pagingInfo]="pagingInfo$ | async"
+        (pageChange)="obtenerListaEntradas($event)"
+        (preview)="openPreview($event)"
+        (delete)="abrirModalEliminar($event)"
+      ></app-entradas-table>
+    </c-card-body>
+  </c-card>
+</c-container>
+<c-modal
+  [visible]="visible"
+  (visibleChange)="onVisibleModalChange($event)"
+  id="modalBorrar"
+  backdrop="static"
+>
+  <c-modal-header class="border-bottom-0">
+    <h5 cModalTitle class="fw-bold text-danger">{{ 'AUTO.CONFIRMAR_ELIMINACI_N' | translate }}</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="text-center py-3">
+      <svg cIcon name="cilTrash" size="4xl" class="text-danger mb-3 opacity-75"></svg>
+      <p class="mb-1">{{ 'COMMON.VERIFY_DELETE' | translate }}</p>
+      <h4 class="fw-bold text-dark">{{ entradaABorrar?.titulo }}</h4>
+      <p class="text-muted small mt-2">{{ 'AUTO.ESTA_ACCI_N_NO_SE_PUEDE_DESHAC' | translate }}</p>
+    </div>
+  </c-modal-body>
+  <c-modal-footer class="border-top-0 justify-content-center pb-4">
+    <button cButton color="secondary" variant="ghost" (click)="toggleModal()">
+      {{ 'AUTO.CANCELAR' | translate }}
+    </button>
+    <button cButton color="danger" class="px-4" (click)="confirmarBorrado()">
+      {{ 'AUTO.ELIMINAR' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>
+<c-modal
+  [visible]="previewVisible"
+  (visibleChange)="onPreviewVisibleChange($event)"
+  size="xl"
+  scrollable
+  id="modalPreview"
+  backdrop="static"
+>
+  <c-modal-header>
+    <h5 cModalTitle>
+      {{ 'ADMIN.ENTRIES.VIEW_PREVIEW' | translate }}: {{ previewEntrada?.titulo }}
+    </h5>
+    <button #previewCloseBtn (click)="closePreview()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    @if (previewEntrada) {
+      <app-previa-entrada
+        [entrada]="previewEntrada"
+        [mostrarBotonesAccion]="false"
+        [mostrarTitulo]="false"
+      ></app-previa-entrada>
+    }
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="closePreview()" cButton color="secondary">
+      {{ 'AUTO.CERRAR' | translate }}
+    </button>
+    <button (click)="onEditarDesdePreview()" cButton color="primary">
+      <svg cIcon name="cilPen" class="me-1"></svg>
+      {{ 'COMMON.EDIT' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>

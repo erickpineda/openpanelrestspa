@@ -51,6 +51,6 @@ export class AppComponent implements OnInit {
     // Safety check: ensure no stale backdrops or overlays are blocking the UI on startup
     setTimeout(() => {
       this.uiMonitor.scanAndRecover('startup_safety');
-    }, 500);
+    }, 2000);
   }
 }

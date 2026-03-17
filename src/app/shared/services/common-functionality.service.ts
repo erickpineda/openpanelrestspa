@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { parseAllowedDate, formatForBackend, isAllowedDateString } from '../utils/date-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -12,31 +13,16 @@ export class CommonFunctionalityService {
   ) {}
 
   transformaFecha(fecha: Date | any, formato: string, flag: boolean): string {
-    if (fecha instanceof Date) {
-      if (isNaN(fecha.getTime())) return '';
-      // Si es un Date válido, usarlo directamente (ignorar flag=false si se pasó por error para un Date real)
-      return this.datePipe.transform(fecha, formato) || '';
-    }
-    
-    let resultado;
-    if (fecha && !flag) {
-      const str = fecha.toString();
-      const [dateComponents, timeComponents] = str.split(' ');
-      const [day, month, year] = dateComponents.split('-');
-      const [hours, minutes, seconds] = timeComponents.split(':');
-      const fechaObtenida = new Date(+year, +month - 1, +day, +hours, +minutes, +seconds);
-      resultado = this.datePipe.transform(fechaObtenida, formato);
-    } else if (fecha && flag) {
-      resultado = this.datePipe.transform(fecha, formato);
-    }
-    return resultado ? resultado : '';
+    const d = parseAllowedDate(fecha);
+    if (!d) return '';
+    return this.datePipe.transform(d, formato) || '';
   }
 
   reloadComponent(self: boolean, urlToNavigateTo?: string) {
     const url = self ? this.router.url : urlToNavigateTo;
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       this.router.navigate([`/${url}`]).then(() => {
-        console.log(`After navigation I am on: ${this.router.url}`);
+        // Navigation completed
       });
     });
   }
@@ -50,5 +36,18 @@ export class CommonFunctionalityService {
 
   reloadPage() {
     window.location.reload();
+  }
+
+  // Wrappers para mantener compatibilidad si alguien sigue inyectando el servicio
+  parseAllowedDate(input: string | Date | number | null | undefined): Date | null {
+    return parseAllowedDate(input);
+  }
+
+  formatForBackend(input: string | Date, withTime: boolean = true): string | null {
+    return formatForBackend(input, withTime);
+  }
+
+  isAllowedDateString(input: string | null | undefined): boolean {
+    return isAllowedDateString(input);
   }
 }

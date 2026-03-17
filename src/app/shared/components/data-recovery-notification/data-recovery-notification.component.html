@@ -1,20 +1,45 @@
-<c-alert color="warning" dismissible visible="true" class="shadow-sm" role="alert">
-  <div class="d-flex align-items-start">
+<c-alert
+  color="warning"
+  dismissible
+  [(visible)]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  class="shadow-sm mb-0 w-100 d-flex flex-column justify-content-center"
+  role="alert"
+>
+  <div class="d-flex align-items-start w-100">
     <i class="fas fa-exclamation-triangle fa-lg text-warning me-2 mt-1"></i>
-    <div class="flex-fill">
+    <div class="flex-fill w-100">
       <strong>{{ title }}</strong>
-      <p class="mb-3">{{ message }}</p>
+      <p class="mb-2">{{ message }}</p>
 
-      <div class="d-flex gap-2 flex-wrap">
-        <button cButton color="success" size="sm" (click)="onRecover.emit()">
+      <div class="d-flex gap-2 flex-wrap w-100">
+        <button
+          cButton
+          color="success"
+          size="sm"
+          (click)="onRecover.emit()"
+          class="flex-grow-1 flex-md-grow-0"
+        >
           <i class="fas fa-download me-1"></i> {{ recoverText }}
         </button>
 
-        <button cButton color="secondary" size="sm" (click)="onIgnore.emit()">
+        <button
+          cButton
+          color="secondary"
+          size="sm"
+          (click)="onIgnore.emit()"
+          class="flex-grow-1 flex-md-grow-0"
+        >
           <i class="fas fa-times me-1"></i> {{ ignoreText }}
         </button>
 
-        <button cButton color="danger" size="sm" (click)="onDiscard.emit()">
+        <button
+          cButton
+          color="danger"
+          size="sm"
+          (click)="onDiscard.emit()"
+          class="flex-grow-1 flex-md-grow-0"
+        >
           <i class="fas fa-trash me-1"></i> {{ discardText }}
         </button>
       </div>

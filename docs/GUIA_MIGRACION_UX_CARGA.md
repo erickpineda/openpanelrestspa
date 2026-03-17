@@ -20,14 +20,14 @@ Para evitar que el interceptor global muestre el spinner de pantalla completa, s
 
 ```typescript
 import { HttpClient, HttpContext } from '@angular/common/http';
-import { NetworkInterceptor } from '../../interceptors/network.interceptor'; // Ajustar ruta según ubicación
+import { SKIP_GLOBAL_LOADER } from '../../interceptors/network.interceptor'; // Ajustar ruta según ubicación
 
 // ...
 
 listarPaginaSinGlobalLoader(page: number, size: number): Observable<any> {
   return this.http.get<any>(`${this.apiUrl}/pagina`, {
     params: { page: page.toString(), size: size.toString() },
-    context: new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true)
+    context: new HttpContext().set(SKIP_GLOBAL_LOADER, true)
   });
 }
 ```

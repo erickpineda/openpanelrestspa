@@ -4,7 +4,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { CategoriaService } from './categoria.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 
 describe('CategoriaService request shapes', () => {
   let service: CategoriaService;
@@ -48,7 +48,7 @@ describe('CategoriaService request shapes', () => {
 
     const req = httpMock.expectOne((r) => r.url.includes('/categorias/buscar'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.context.get(NetworkInterceptor.SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
     req.flush({ data: { elements: [], totalPages: 0 } });
   });
 });

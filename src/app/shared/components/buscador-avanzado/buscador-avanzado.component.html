@@ -1,5 +1,12 @@
 <div class="buscador-avanzado">
-  <c-row class="g-2 align-items-end flex-column flex-md-row">
+  <div class="d-flex justify-content-between align-items-center mb-2 text-secondary small">
+    <span class="fw-semibold">Criterio</span>
+    <div class="d-flex align-items-center gap-3">
+      <span class="micro-divider"></span>
+      <span class="fw-semibold">Herramientas</span>
+    </div>
+  </div>
+  <c-row class="g-3 align-items-end flex-column flex-md-row">
     <c-col xs="12" md="3">
       <select
         cSelect
@@ -90,15 +97,185 @@
         }
       }
     </c-col>
-    @if (debeMostrarBotonBusqueda() || showClearButton) {
-      <c-col xs="12" md="2" class="d-flex gap-1 justify-content-md-end mt-2 mt-md-0">
-        @if (debeMostrarBotonBusqueda()) {
-          <button cButton color="primary" (click)="buscar()">{{ 'AUTO.BUSCAR' | translate }}</button>
-        }
-        @if (showClearButton) {
-          <button cButton color="secondary" (click)="limpiar()">{{ 'AUTO.LIMPIAR' | translate }}</button>
-        }
+  </c-row>
+  <c-row class="g-2 align-items-center mt-2">
+    <c-col xs="12" md="6" class="d-flex align-items-center gap-2">
+      <button cButton color="secondary" variant="ghost" size="sm" (click)="addCriterion()">
+        <svg cIcon name="cilPlus" class="me-1"></svg>
+        Añadir criterio
+      </button>
+    </c-col>
+    <c-col xs="12" md="6" class="d-none d-md-flex flex-wrap gap-2 justify-content-md-end">
+      <div class="btn-group" role="group" aria-label="Conmutador lógica">
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          size="sm"
+          [active]="dataOption === 'AND'"
+          (click)="setDataOption('AND')"
+          [cTooltip]="'Lógica: AND'"
+        >
+          AND
+        </button>
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          size="sm"
+          [active]="dataOption === 'OR'"
+          (click)="setDataOption('OR')"
+          [cTooltip]="'Lógica: OR'"
+        >
+          OR
+        </button>
+      </div>
+      <span class="micro-divider"></span>
+      <c-dropdown variant="btn-group">
+        <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm">
+          <svg cIcon name="cilApplicationsSettings" class="me-1"></svg>
+          Plantillas
+        </button>
+        <ul cDropdownMenu>
+          <li>
+            <button cDropdownItem (click)="applyPreset('PUBLICADAS_AND_TITULO')">
+              <span class="d-flex align-items-center gap-2">
+                <svg cIcon name="cilCheckAlt"></svg>
+                Publicadas AND Título contiene
+              </span>
+            </button>
+          </li>
+          <li>
+            <button cDropdownItem (click)="applyPreset('BORRADORES_OR_SIN_PUBLICAR')">
+              <span class="d-flex align-items-center gap-2">
+                <svg cIcon name="cilCheckAlt"></svg>
+                Borradores OR No publicada
+              </span>
+            </button>
+          </li>
+        </ul>
+      </c-dropdown>
+      <span class="micro-divider"></span>
+      @if (debeMostrarBotonBusqueda()) {
+        <button
+          cButton
+          [color]="autoTrigger ? 'secondary' : 'primary'"
+          [variant]="autoTrigger ? 'ghost' : undefined"
+          size="sm"
+          (click)="buscar()"
+        >
+          <svg cIcon name="cilSearch" class="me-1"></svg>
+          {{ 'AUTO.BUSCAR' | translate }}
+        </button>
+      }
+      @if (showClearButton) {
+        <button cButton color="secondary" size="sm" variant="ghost" (click)="limpiar()">
+          <svg cIcon name="cilX" class="me-1"></svg>
+          {{ 'AUTO.LIMPIAR' | translate }}
+        </button>
+      }
+    </c-col>
+  </c-row>
+  <c-row class="mt-2 d-md-none">
+    <c-col xs="12" class="d-flex justify-content-end">
+      <c-dropdown>
+        <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm">
+          <svg cIcon name="cilOptions" class="me-1"></svg>
+          Más
+        </button>
+        <ul cDropdownMenu>
+          <li>
+            <button cDropdownItem (click)="addCriterion()">
+              <span class="d-flex align-items-center gap-2">
+                <svg cIcon name="cilPlus"></svg>
+                Añadir criterio
+              </span>
+            </button>
+          </li>
+          <li><hr cDropdownDivider></li>
+          <li>
+            <button cDropdownItem (click)="setDataOption('AND')" [active]="dataOption === 'AND'">
+              <span class="d-flex align-items-center gap-2">
+                <svg cIcon name="cilFilter"></svg>
+                Lógica: AND
+              </span>
+            </button>
+          </li>
+          <li>
+            <button cDropdownItem (click)="setDataOption('OR')" [active]="dataOption === 'OR'">
+              <span class="d-flex align-items-center gap-2">
+                <svg cIcon name="cilFilter"></svg>
+                Lógica: OR
+              </span>
+            </button>
+          </li>
+          <li><hr cDropdownDivider></li>
+          <li>
+            <button cDropdownItem (click)="buscar()">
+              <span class="d-flex align-items-center gap-2">
+                <svg cIcon name="cilSearch"></svg>
+                Buscar
+              </span>
+            </button>
+          </li>
+          <li>
+            <button cDropdownItem (click)="limpiar()">
+              <span class="d-flex align-items-center gap-2">
+                <svg cIcon name="cilX"></svg>
+                Limpiar
+              </span>
+            </button>
+          </li>
+        </ul>
+      </c-dropdown>
+    </c-col>
+  </c-row>
+  <c-row class="mt-2 d-md-none">
+    <c-col xs="12" class="d-flex align-items-center gap-3 justify-content-center">
+      <button cButton variant="ghost" size="sm" (click)="addCriterion()" [cTooltip]="'Añadir criterio'">
+        <svg cIcon name="cilPlus"></svg>
+      </button>
+      <button cButton variant="ghost" size="sm" (click)="setDataOption('AND')" [active]="dataOption==='AND'" [cTooltip]="'Lógica: AND'">
+        AND
+      </button>
+      <button cButton variant="ghost" size="sm" (click)="setDataOption('OR')" [active]="dataOption==='OR'" [cTooltip]="'Lógica: OR'">
+        OR
+      </button>
+      <button cButton variant="ghost" size="sm" (click)="buscar()" [cTooltip]="'Buscar'">
+        <svg cIcon name="cilSearch"></svg>
+      </button>
+      <button cButton variant="ghost" size="sm" (click)="limpiar()" [cTooltip]="'Limpiar'">
+        <svg cIcon name="cilX"></svg>
+      </button>
+    </c-col>
+    @if (ultimaAccionLabel) {
+      <c-col xs="12" class="text-center text-secondary small mt-1">
+        {{ ultimaAccionLabel }}
       </c-col>
     }
   </c-row>
+  @if (criterios.length > 0) {
+    <div class="mt-2 d-flex flex-wrap gap-2">
+      @for (c of criterios; track c) {
+        <span class="badge rounded-pill bg-light border text-secondary d-inline-flex align-items-center gap-2 px-3 py-2">
+          <svg cIcon name="cilFilter" class="text-secondary"></svg>
+          <span class="fw-semibold">{{ c.campo }}</span>
+          <span class="opacity-75">{{ c.operacion }}</span>
+          <span class="font-monospace">{{ c.valor }}</span>
+          <button
+            cButton
+            color="secondary"
+            variant="ghost"
+            size="sm"
+            class="ms-2 p-0 px-1"
+            (click)="removeCriterion($index)"
+            [cTooltip]="'Quitar criterio'"
+            aria-label="Quitar criterio"
+          >
+            <svg cIcon name="cilXCircle"></svg>
+          </button>
+        </span>
+      }
+    </div>
+  }
 </div>

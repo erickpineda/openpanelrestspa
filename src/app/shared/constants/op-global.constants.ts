@@ -5,6 +5,7 @@ import { OPEventsConstants } from './op-events.constants';
 import { OPSyncConstants } from './op-sync.constants';
 import { OPPaginationConstants } from './op-pagination.constants';
 import { OPRolesConstants } from './op-roles.constants';
+import { OPAppConstants } from './op-app.constants';
 
 /**
  * OPConstants
@@ -22,4 +23,5 @@ export const OPConstants = {
   Sync: OPSyncConstants,
   Pagination: OPPaginationConstants,
   Roles: OPRolesConstants,
+  App: OPAppConstants,
 } as const;

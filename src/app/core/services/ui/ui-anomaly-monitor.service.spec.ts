@@ -74,9 +74,11 @@ describe('UiAnomalyMonitorService', () => {
     service.setConfig({ enabled: true }, false);
     service.start();
     events$.next(new NavigationEnd(1, '/x', '/x'));
+    
+    jasmine.clock().tick(1000); // Wait for navigation debounce (500ms) + buffer
     expect(scanSpy).toHaveBeenCalledWith('navigation');
 
-    jasmine.clock().tick(1600);
+    jasmine.clock().tick(600); // +600 = 1600 total (1500 interval + 100 margin)
     expect(scanSpy).toHaveBeenCalledWith('interval');
 
     const callsAfterTick = scanSpy.calls.count();
@@ -135,6 +137,9 @@ describe('UiAnomalyMonitorService', () => {
   it('scanAndRecover no elimina backdrop si hay un modal abierto', () => {
     const modal = document.createElement('div');
     modal.className = 'modal show';
+    modal.style.width = '100px';
+    modal.style.height = '100px';
+    modal.style.display = 'block';
     document.body.appendChild(modal);
 
     const el = document.createElement('div');
@@ -223,5 +228,31 @@ describe('UiAnomalyMonitorService', () => {
     expect(document.querySelectorAll('.loading-overlay.full-screen').length).toBe(1);
     expect(loading.forceStopLoading).not.toHaveBeenCalled();
     expect(log.warn).not.toHaveBeenCalled();
+  });
+
+  it('scanAndRecover no se ejecuta si enabled es false y el trigger no es manual', () => {
+    service.setConfig({ enabled: false }, false);
+
+    const el = document.createElement('div');
+    el.className = 'modal-backdrop fade show';
+    el.style.position = 'fixed';
+    el.style.top = '0';
+    el.style.left = '0';
+    el.style.width = '100vw';
+    el.style.height = '100vh';
+    el.style.zIndex = '1040';
+    el.style.background = 'rgba(0,0,0,.5)';
+    document.body.appendChild(el);
+    document.body.classList.add('modal-open');
+
+    service.scanAndRecover('startup_safety');
+
+    expect(document.querySelectorAll('.modal-backdrop').length).toBe(1);
+    expect(log.warn).not.toHaveBeenCalled();
+
+    service.scanAndRecover('manual');
+
+    expect(document.querySelectorAll('.modal-backdrop').length).toBe(0);
+    expect(log.warn).toHaveBeenCalled();
   });
 });

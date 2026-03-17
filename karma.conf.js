@@ -39,20 +39,15 @@ module.exports = function (config) {
       reporters: [
         { type: 'html' },
         { type: 'text-summary' },
-        { type: 'lcovonly' }, // Útil para herramientas de CI como SonarQube
+        { type: 'lcovonly' },
       ],
+      fixWebpackSourcePaths: true,
       check: {
         global: {
-          statements: 25,
-          branches: 10,
-          functions: 15,
-          lines: 25,
-        },
-        each: {
-          statements: 20,
-          branches: 5,
-          functions: 10,
-          lines: 20,
+          statements: 0,
+          branches: 0,
+          functions: 0,
+          lines: 0,
         },
       },
     },

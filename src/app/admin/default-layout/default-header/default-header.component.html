@@ -32,18 +32,29 @@
     <c-header-nav class="d-none d-lg-flex" role="navigation" aria-label="Acciones rápidas">
       <!-- Selector de Idioma -->
       <c-nav-item>
-        <a cNavLink (click)="toggleLanguage()" style="cursor: pointer" [attr.aria-label]="currentLang === 'es' ? 'Cambiar a Inglés' : 'Switch to Spanish'">
+        <a
+          cNavLink
+          (click)="toggleLanguage()"
+          style="cursor: pointer"
+          [attr.aria-label]="currentLang === 'es' ? 'Cambiar a Inglés' : 'Switch to Spanish'"
+        >
           {{ currentLang === 'es' ? 'EN' : 'ES' }}
         </a>
       </c-nav-item>
 
+      <app-notifications-dropdown
+        [items]="notifications"
+        [unreadCount]="unreadNotifications"
+        [labelHeader]="'HEADER.NOTIFICATIONS' | translate"
+        [labelMarkAll]="'HEADER.MARK_ALL_READ' | translate"
+        [labelViewAll]="'HEADER.VIEW_ALL' | translate"
+        (markAllRead)="onMarkAllRead()"
+        (itemMarkedRead)="onItemMarkedRead($event)"
+        (itemDismissed)="onItemDismissed($event)"
+        (viewAll)="onViewAllNotifications()"
+      ></app-notifications-dropdown>
       <c-nav-item>
-        <a routerLink="./" cNavLink aria-label="Notificaciones">
-          <svg cIcon name="cilBell" size="lg"></svg>
-        </a>
-      </c-nav-item>
-      <c-nav-item>
-        <a routerLink="./" cNavLink aria-label="Tareas">
+        <a cNavLink aria-label="Tareas" style="cursor: pointer" (click)="toggleRightSidebar()" [attr.aria-expanded]="rightSidebarService.visible$ | async">
           <svg cIcon name="cilList" size="lg"></svg>
         </a>
       </c-nav-item>
@@ -148,7 +159,7 @@
       </li>
       <li></li>
       <li>
-        <a routerLink="/admin/control/gestion/miperfil" cDropdownItem>
+        <a routerLink="/admin/control/perfil" cDropdownItem>
           <svg cIcon class="me-2" name="cilUser"></svg>
           {{ labelProfile }}
         </a>
@@ -173,7 +184,7 @@
         <hr cDropdownDivider />
       </li>
       <li>
-        <a routerLink="/login" cDropdownItem>
+        <a cDropdownItem (click)="logout()" style="cursor: pointer">
           <svg cIcon class="me-2" name="cilLockLocked"></svg>
           {{ labelLockAccount }}
         </a>

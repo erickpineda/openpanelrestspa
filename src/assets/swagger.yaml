@@ -6,6 +6,9 @@ info:
 servers:
   - url: /api/v1
 
+security:
+  - bearerAuth: []
+
 tags:
   - name: Entradas
     description: Operaciones relacionadas con las entradas.
@@ -27,6 +30,12 @@ tags:
     description: Operaciones relacionadas con las herramientas auxiliares.
   - name: Dashboard
     description: Operaciones relacionadas con el dashboard y estadísticas.
+  - name: FileStorage
+    description: Operaciones relacionadas ficheros e imagenes.
+  - name: Autenticación
+    description: Operaciones de login, registro, refresh y logout.
+  - name: Literales
+    description: Operaciones relacionadas con literales.
 paths:
   /entradas:
     get:
@@ -380,6 +389,647 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenpanelApiResponseCriterioBusquedaEntrada'
+  /entradas/obtenerPorSlug/{slug}:
+    get:
+      summary: Obtener entrada por slug
+      tags:
+        - Entradas
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Entrada encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEntrada'
+  /comentarios/listarPorIdEntrada/{idEntrada}:
+    get:
+      summary: Listar comentarios por entrada
+      tags:
+        - Comentarios
+      parameters:
+        - name: idEntrada
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de comentarios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /comentarios/buscar:
+    post:
+      summary: Buscar comentarios por criterios
+      tags:
+        - Comentarios
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequestDTO'
+      responses:
+        '200':
+          description: Resultados de búsqueda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /categorias/buscar:
+    post:
+      summary: Buscar categorías por criterios
+      tags:
+        - Categorias
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequestDTO'
+      responses:
+        '200':
+          description: Resultados de búsqueda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /categorias/obtenerPorCodigo/{codigo}:
+    get:
+      summary: Obtener categoría por código
+      tags:
+        - Categorias
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Categoría encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseCategoria'
+  /categorias/actualizarPorCodigo/{codigo}:
+    put:
+      summary: Actualizar categoría por código
+      tags:
+        - Categorias
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaDTO'
+      responses:
+        '200':
+          description: Categoría actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseCategoria'
+  /categorias/borrarPorCodigo/{codigo}:
+    delete:
+      summary: Borrar categoría por código
+      tags:
+        - Categorias
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /etiquetas/buscar:
+    post:
+      summary: Buscar etiquetas por criterios
+      tags:
+        - Etiquetas
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequestDTO'
+      responses:
+        '200':
+          description: Resultados de búsqueda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /etiquetas/obtenerPorCodigo/{codigo}:
+    get:
+      summary: Obtener etiqueta por código
+      tags:
+        - Etiquetas
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Etiqueta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEtiqueta'
+  /etiquetas/actualizarPorCodigo/{codigo}:
+    put:
+      summary: Actualizar etiqueta por código
+      tags:
+        - Etiquetas
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EtiquetaDTO'
+      responses:
+        '200':
+          description: Etiqueta actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEtiqueta'
+  /etiquetas/borrarPorCodigo/{codigo}:
+    delete:
+      summary: Borrar etiqueta por código
+      tags:
+        - Etiquetas
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /tiposEntradas:
+    get:
+      summary: Listar tipos de entrada
+      tags:
+        - Entradas
+      parameters:
+        - name: pageNo
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: Lista paginada de tipos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /tiposEntradas/obtenerPorId/{id}:
+    get:
+      summary: Obtener tipo de entrada por ID
+      tags:
+        - Entradas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tipo de entrada encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseTipoEntradaResponse'
+  /tiposEntradas/crear:
+    post:
+      summary: Crear tipo de entrada
+      tags:
+        - Entradas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoEntradaDTO'
+      responses:
+        '201':
+          description: Tipo de entrada creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseTipoEntradaResponse'
+  /tiposEntradas/{id}:
+    put:
+      summary: Actualizar tipo de entrada
+      tags:
+        - Entradas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoEntradaDTO'
+      responses:
+        '200':
+          description: Tipo de entrada actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseTipoEntradaResponse'
+    delete:
+      summary: Borrar tipo de entrada
+      tags:
+        - Entradas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /tiposEntradas/obtenerPorCodigo/{codigo}:
+    get:
+      summary: Obtener tipo de entrada por código
+      tags:
+        - Entradas
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tipo de entrada encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseTipoEntradaResponse'
+  /tiposEntradas/actualizarPorCodigo/{codigo}:
+    put:
+      summary: Actualizar tipo de entrada por código
+      tags:
+        - Entradas
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoEntradaDTO'
+      responses:
+        '200':
+          description: Tipo de entrada actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseTipoEntradaResponse'
+  /tiposEntradas/borrarPorCodigo/{codigo}:
+    delete:
+      summary: Borrar tipo de entrada por código
+      tags:
+        - Entradas
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /estadosEntradas/obtenerPorCodigo/{codigo}:
+    get:
+      summary: Obtener estado de entrada por código
+      tags:
+        - Entradas
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Estado de entrada encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEstadoEntradaResponse'
+  /estadosEntradas/actualizarPorCodigo/{codigo}:
+    put:
+      summary: Actualizar estado de entrada por código
+      tags:
+        - Entradas
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstadoEntradaDTO'
+      responses:
+        '200':
+          description: Estado de entrada actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEstadoEntradaResponse'
+  /estadosEntradas/borrarPorCodigo/{codigo}:
+    delete:
+      summary: Borrar estado de entrada por código
+      tags:
+        - Entradas
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /plantillaEmail/obtenerPorCodigo/{codigo}:
+    get:
+      summary: Obtener plantilla por código
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Plantilla encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePlantillaEmail'
+  /plantillaEmail/actualizarPorCodigo/{codigo}:
+    put:
+      summary: Actualizar plantilla por código
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlantillaEmailDTO'
+      responses:
+        '200':
+          description: Plantilla actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePlantillaEmail'
+  /plantillaEmail/borrarPorCodigo/{codigo}:
+    delete:
+      summary: Borrar plantilla por código
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /plantillaEmail/parametros/listarPorIdPlantilla/{idPlantillaEmail}:
+    get:
+      summary: Listar parámetros por ID de plantilla
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: idPlantillaEmail
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de parámetros
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePlantillaEmailParametroList'
+  /plantillaEmail/parametros/obtenerPorClave/{clave}:
+    get:
+      summary: Obtener parámetro por clave
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: clave
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Parámetro encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePlantillaEmailParametro'
+  /plantillaEmail/parametros/obtenerPorValor/{valor}:
+    get:
+      summary: Obtener parámetro por valor
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: valor
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Parámetro encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePlantillaEmailParametro'
+  /agravios/obtenerPorPalabra/{palabra}:
+    get:
+      summary: Obtener agravio por palabra
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: palabra
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Agravio encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseAgravio'
+  /excepciones/obtenerPorUuid/{uuid}:
+    get:
+      summary: Obtener excepción por uuid
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Excepción encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseExcepcion'
+  /sesiones/obtenerPorHashSesionToken/{hash}:
+    get:
+      summary: Obtener sesión por hash de token
+      tags:
+        - Usuarios
+      parameters:
+        - name: hash
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sesión encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseSesionUsuario'
   /usuarios/perfil/yo:
     get:
       summary: Obtener perfil del usuario actual
@@ -410,21 +1060,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenpanelApiResponseRespuesta'
-  /usuarios/perfil/{id}:
+  /usuarios/perfil/{username}:
     patch:
       summary: Actualizar perfil por lotes
       tags:
         - Usuarios
       parameters:
-        - name: id
+        - name: username
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       requestBody:
         required: true
         content:
-          application/json:
+          application/json-patch+json:
             schema:
               $ref: '#/components/schemas/PerfilDTO'
       responses:
@@ -434,6 +1084,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenpanelApiResponsePerfil'
+        default:
+          $ref: '#/components/responses/ApiErrorResponse'
   /usuarios/changePassword:
     post:
       summary: Cambiar contraseña de usuario
@@ -606,6 +1258,149 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /roles/obtenerPorCodigo/{codigoRol}:
+    get:
+      summary: Obtener rol por código
+      tags:
+        - Roles
+      parameters:
+        - name: codigoRol
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rol encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRol'
+  /roles/actualizarPorCodigo/{codigoRol}:
+    put:
+      summary: Actualizar rol por código
+      tags:
+        - Roles
+      parameters:
+        - name: codigoRol
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolDTO'
+      responses:
+        '200':
+          description: Rol actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRol'
+  /roles/borrarPorCodigo/{codigoRol}:
+    delete:
+      summary: Borrar rol por código
+      tags:
+        - Roles
+      parameters:
+        - name: codigoRol
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+  /roles/obtenerPrivilegios/{codigoRol}:
+    get:
+      summary: Obtener privilegios por código de rol
+      tags:
+        - Roles
+      parameters:
+        - name: codigoRol
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista paginada de privilegios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /roles/actualizarPrivilegios/{codigoRol}:
+    put:
+      summary: Actualizar privilegios de un rol por código
+      tags:
+        - Roles
+      parameters:
+        - name: codigoRol
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActualizarPrivilegiosRolDTO'
+      responses:
+        '200':
+          description: Rol con privilegios actualizados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRolConPrivilegios'
+  /roles/obtenerPorCodigos:
+    post:
+      summary: Obtener privilegios por múltiples códigos de rol
+      tags:
+        - Roles
+      parameters:
+        - name: pageNo
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodigosRolRequestDTO'
+      responses:
+        '200':
+          description: Lista paginada de privilegios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+  /roles/contarPrivilegiosRol/all:
+    get:
+      summary: Contar privilegios por rol (todos)
+      tags:
+        - Roles
+      responses:
+        '200':
+          description: Conteos por rol
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRolListPrivilegioCountList'
   /privilegios:
     get:
       summary: Listar privilegios
@@ -1210,7 +2005,7 @@ paths:
     post:
       summary: Subir fichero
       tags:
-        - HerramientasAuxiliar
+        - FileStorage
       requestBody:
         required: true
         content:
@@ -1514,8 +2309,900 @@ paths:
             application/json:
               schema:
                 type: object
+  /usuarios/obtenerPorUsername/{username}:
+    get:
+      summary: Obtener usuario por username
+      tags:
+        - Usuarios
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseUsuario'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /usuarios/actualizarPorUsername/{username}:
+    put:
+      summary: Actualizar usuario por username
+      tags:
+        - Usuarios
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioDTO'
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseUsuario'
+        default:
+          $ref: '#/components/responses/ApiErrorResponse'
+  /usuarios/borrarPorUsername/{username}:
+    delete:
+      summary: Borrar usuario por username
+      tags:
+        - Usuarios
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+        default:
+          $ref: '#/components/responses/ApiErrorResponse'
+  /filestorage/ficheros:
+    get:
+      summary: Listar ficheros
+      tags:
+        - FileStorage
+      responses:
+        '200':
+          description: Lista de ficheros
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseFileStorageList'
+  /filestorage/ficheros/obtenerDatos/{uuid}:
+    get:
+      summary: Obtener metadatos de fichero por UUID
+      tags:
+        - FileStorage
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadatos del fichero
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseFileStorage'
+        '404':
+          description: Fichero no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /filestorage/ficheros/descargar/{uuid}:
+    get:
+      summary: Descargar fichero por UUID
+      tags:
+        - FileStorage
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Fichero descargado
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Fichero no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /usuarios/buscar/definicionesBuscador:
+    get:
+      summary: Obtener definiciones del buscador de usuarios
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Definiciones del buscador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseCriterioBusquedaEntrada'
+
+  /usuarios/validaRegistro/confirmarRegistroUsuario:
+    get:
+      summary: Confirmar registro de usuario
+      tags:
+        - Usuarios
+      security: []
+      parameters:
+        - name: verifyToken
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Registro confirmado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseRespuesta'
+        default:
+          $ref: '#/components/responses/ApiErrorResponse'
+
+  /privilegios/obtenerPorCodigo/{codigo}:
+    get:
+      summary: Obtener privilegio por código
+      tags:
+        - Privilegios
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Privilegio encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePrivilegio'
+        '404':
+          description: Privilegio no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /privilegios/actualizarPorCodigo/{codigo}:
+    put:
+      summary: Actualizar privilegio por código
+      tags:
+        - Privilegios
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivilegioDTO'
+      responses:
+        '200':
+          description: Privilegio actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePrivilegio'
+
+  /privilegios/borrarPorCodigo/{codigo}:
+    delete:
+      summary: Borrar privilegio por código
+      tags:
+        - Privilegios
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+
+  /privilegios/actualizarRoles/{codigo}:
+    put:
+      summary: Actualizar roles de un privilegio por código
+      tags:
+        - Privilegios
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActualizarRolesPrivilegioDTO'
+      responses:
+        '200':
+          description: Privilegios actualizados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePrivilegio'
+
+  /literales/obtenerPorCodigoLiteral/{codigoLiteral}:
+    get:
+      summary: Obtener literal por código
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: codigoLiteral
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Literal encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseLiteral'
+        '404':
+          description: Literal no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /literales/obtenerPorCodigoPropiedad/{codigoPropiedad}:
+    get:
+      summary: Obtener literal por código de propiedad
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: codigoPropiedad
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Literal encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseLiteral'
+        '404':
+          description: Literal no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /herramientas/sistema/listar:
+    get:
+      summary: Listar herramientas del sistema
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: pageNo
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista paginada de herramientas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+
+  /herramientas/sistema/obtenerPorId/{id}:
+    get:
+      summary: Obtener herramienta por ID
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Herramienta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseHerramientasAuxiliar'
+
+  /herramientas/sistema/obtenerPorCodigo/{codigo}:
+    get:
+      summary: Obtener herramienta por código
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Herramienta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseHerramientasAuxiliar'
+
+  /herramientas/sistema/crear:
+    post:
+      summary: Crear herramienta del sistema
+      tags:
+        - HerramientasAuxiliar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HerramientasAuxiliarDTO'
+      responses:
+        '201':
+          description: Herramienta creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseHerramientasAuxiliar'
+
+  /herramientas/sistema/{id}:
+    put:
+      summary: Actualizar herramienta del sistema
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HerramientasAuxiliarDTO'
+      responses:
+        '200':
+          description: Herramienta actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseHerramientasAuxiliar'
+    delete:
+      summary: Borrar herramienta del sistema
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+
+  /herramientas/sistema/borrarPorCodigo/{codigo}:
+    delete:
+      summary: Borrar herramienta por código
+      tags:
+        - HerramientasAuxiliar
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+
+  /entradas/estados/flujos:
+    get:
+      summary: Listar flujos entre estados de entradas
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: pageNo
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista paginada de flujos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+
+  /entradas/estados/flujos/obtenerPorId/{id}:
+    get:
+      summary: Obtener flujo por ID
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Flujo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEstadoEntradaFlujo'
+
+  /entradas/estados/flujos/crear:
+    post:
+      summary: Crear flujo entre estados
+      tags:
+        - EstadoFlujos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstadoEntradaFlujoDTO'
+      responses:
+        '201':
+          description: Flujo creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEstadoEntradaFlujo'
+
+  /entradas/estados/flujos/{id}:
+    put:
+      summary: Actualizar flujo entre estados
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstadoEntradaFlujoDTO'
+      responses:
+        '200':
+          description: Flujo actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseEstadoEntradaFlujo'
+    delete:
+      summary: Borrar flujo entre estados
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de borrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+
+  /entradas/estados/flujos/porEstadoOrigen:
+    get:
+      summary: Listar flujos por estado origen
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: estadoOrigen
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+
+  /entradas/estados/flujos/porEstadoDestino:
+    get:
+      summary: Listar flujos por estado destino
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: estadoDestino
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+
+  /entradas/estados/flujos/porRol:
+    get:
+      summary: Listar flujos por rol
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: rol
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+
+  /entradas/estados/flujos/porRolTipoFlujo:
+    get:
+      summary: Listar flujos por rol y tipo
+      tags:
+        - EstadoFlujos
+      parameters:
+        - name: rol
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: tipo
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponsePagina'
+
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      tags:
+        - Autenticación
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDTO'
+      responses:
+        '200':
+          description: Sesión iniciada
+          headers:
+            Authorization:
+              description: Token de acceso Bearer
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseDTO'
+        default:
+          $ref: '#/components/responses/ApiErrorResponse'
+
+  /auth/registerUser:
+    post:
+      summary: Registrar usuario
+      tags:
+        - Autenticación
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequestDTO'
+      responses:
+        '200':
+          description: Usuario registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponseDTO'
+        default:
+          $ref: '#/components/responses/ApiErrorResponse'
+
+  /auth/refreshToken:
+    post:
+      summary: Refrescar token
+      tags:
+        - Autenticación
+      responses:
+        '200':
+          description: Token refrescado
+          headers:
+            Authorization:
+              description: Nuevo token de acceso Bearer
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefreshResponseDTO'
+        default:
+          $ref: '#/components/responses/ApiErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: Cerrar sesión
+      tags:
+        - Autenticación
+      responses:
+        '200':
+          description: Sesión cerrada
+        default:
+          $ref: '#/components/responses/ApiErrorResponse'
+
+  /fileStorage/subirFichero:
+    post:
+      summary: Subir fichero (camelCase)
+      tags:
+        - FileStorage
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Fichero subido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseString'
+
+  /fileStorage/ficheros:
+    get:
+      summary: Listar ficheros (camelCase)
+      tags:
+        - FileStorage
+      responses:
+        '200':
+          description: Lista de ficheros
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseFileStorageList'
+
+  /fileStorage/ficheros/obtenerDatos/{uuid}:
+    get:
+      summary: Obtener metadatos de fichero por UUID (camelCase)
+      tags:
+        - FileStorage
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadatos del fichero
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenpanelApiResponseFileStorage'
+        '404':
+          description: Fichero no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /fileStorage/ficheros/descargar/{uuid}:
+    get:
+      summary: Descargar fichero por UUID (camelCase)
+      tags:
+        - FileStorage
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Fichero descargado
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Fichero no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+# Esquemas de respuesta para FileStorage
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    ApiErrorResponse:
+      description: Error de aplicación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   schemas:
+    FileStorageDTO:
+      type: object
+      properties:
+        uuidFileStorage:
+          type: string
+        nombre:
+          type: string
+        tipo:
+          type: string
+        tamano:
+          type: integer
+        fechaCreacion:
+          type: string
+          format: date-time
+    OpenpanelApiResponseFileStorage:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/FileStorageDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseFileStorageList:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileStorageDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
     EntradaDTO:
       type: object
       properties:
@@ -1556,9 +3243,8 @@ components:
           format: date-time
         permitirComentario:
           type: boolean
-        imagenDestacada:
+        imagenDestacadaUuid:
           type: string
-          format: byte
         votos:
           type: integer
         cantidadComentarios:
@@ -1791,6 +3477,8 @@ components:
           type: integer
         idRol:
           type: integer
+        rolCodigo:
+          type: string
         username:
           type: string
         password:
@@ -1817,6 +3505,8 @@ components:
           format: byte
         infouser:
           type: string
+        habilitado:
+          type: boolean
     CheckUsernameDTO:
       type: object
       properties:
@@ -1837,11 +3527,6 @@ components:
         usernameAntiguo:
           type: string
         usernameNuevo:
-          type: string
-    ConfirmarRegistroUsuarioDTO:
-      type: object
-      properties:
-        verifyToken:
           type: string
     MetadatosPerfilDTO:
       type: object
@@ -2067,6 +3752,8 @@ components:
           type: integer
         nombre:
           type: string
+        codigo:
+          type: string
         descripcion:
           type: string
     PrivilegioDTO:
@@ -2149,5 +3836,296 @@ components:
             type: object
         storage:
           type: object
+    PlantillaEmailParametroDTO:
+      type: object
+      properties:
+        idPlantEmailParam:
+          type: integer
+        idPlantillaEmail:
+          type: integer
+        clave:
+          type: string
+        valor:
+          type: string
+        esDinamico:
+          type: boolean
+        descripcion:
+          type: string
+    PlantillaEmailDTO:
+      type: object
+      properties:
+        idPlantillaEmail:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        plantillaContenido:
+          type: string
+          format: byte
+        parametros:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlantillaEmailParametroDTO'
+        codigo:
+          type: string
+    AgravioDTO:
+      type: object
+      properties:
+        idAgravio:
+          type: integer
+        palabra:
+          type: string
+        descripcion:
+          type: string
+    ExcepcionDTO:
+      type: object
+      properties:
+        uuidExcepcion:
+          type: string
+        idExcepcionLiteral:
+          type: integer
+        status:
+          type: string
+        code:
+          type: integer
+        message:
+          type: string
+        path:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+        stacktrace:
+          type: string
+          format: byte
+        clase:
+          type: string
+        usuario:
+          type: string
+        fechaExcepcion:
+          type: string
+          format: date-time
+        rolUsuario:
+          type: string
+        accion:
+          type: string
+        resultado:
+          type: string
+        servidor:
+          type: string
+        servicio:
+          type: string
+    OpenpanelApiResponsePlantillaEmail:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/PlantillaEmailDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponsePlantillaEmailParametro:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/PlantillaEmailParametroDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponsePlantillaEmailParametroList:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlantillaEmailParametroDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseAgravio:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/AgravioDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseExcepcion:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/ExcepcionDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseSesionUsuario:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/SesionUsuarioDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    RolPrivilegioDTO:
+      type: object
+      properties:
+        idRolPrivilegio:
+          type: integer
+        idRol:
+          type: integer
+        rolNombre:
+          type: string
+        rolDescripcion:
+          type: string
+        idPrivilegio:
+          type: integer
+        privilegioNombre:
+          type: string
+        privilegioDescripcion:
+          type: string
+        privilegioCodigo:
+          type: string
+    RolConPrivilegiosResponseDTO:
+      type: object
+      properties:
+        rol:
+          $ref: '#/components/schemas/RolDTO'
+        privilegios:
+          type: array
+          items:
+            $ref: '#/components/schemas/RolPrivilegioDTO'
+    ActualizarPrivilegiosRolDTO:
+      type: object
+      properties:
+        codigosPrivilegios:
+          type: array
+          items:
+            type: string
+    CodigosRolRequestDTO:
+      type: object
+      properties:
+        codigosRol:
+          type: array
+          items:
+            type: string
+    RolListPrivilegioCountDTO:
+      type: object
+      properties:
+        rolCodigo:
+          type: string
+        privilegioCount:
+          type: integer
+    OpenpanelApiResponseRolConPrivilegios:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/RolConPrivilegiosResponseDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    OpenpanelApiResponseRolListPrivilegioCountList:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RolListPrivilegioCountDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
         contentStats:
           type: object
+    LiteralDTO:
+      type: object
+      properties:
+        idLiteral:
+          type: integer
+        codigoLiteral:
+          type: string
+        codigoPropiedad:
+          type: string
+        cantidadParametros:
+          type: integer
+        idiomaEsp:
+          type: string
+        idiomaIng:
+          type: string
+        tieneParametros:
+          type: boolean
+    OpenpanelApiResponseLiteral:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultApiResponse'
+        data:
+          $ref: '#/components/schemas/LiteralDTO'
+        error:
+          $ref: '#/components/schemas/ApiError'
+    LoginRequestDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    LoginResponseDTO:
+      type: object
+      properties:
+        jwttoken:
+          type: string
+        type:
+          type: string
+        refreshToken:
+          type: string
+        username:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+    RegisterRequestDTO:
+      type: object
+      properties:
+        nombre:
+          type: string
+        apellido:
+          type: string
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        password:
+          type: string
+    RegisterResponseDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        mensaje:
+          type: string
+    TokenRefreshResponseDTO:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenType:
+          type: string
+    ActualizarRolesPrivilegioDTO:
+      type: object
+      properties:
+        codigosRoles:
+          type: array
+          items:
+            type: string

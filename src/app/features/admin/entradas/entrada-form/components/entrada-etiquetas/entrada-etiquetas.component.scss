@@ -1,0 +1,35 @@
+.custom-close {
+  font-size: 0.6rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.suggestions-dropdown {
+  border-color: var(--cui-border-color) !important;
+  
+  .list-group-item {
+    transition: background-color 0.2s, color 0.2s;
+    
+    &:hover:not(.disabled) {
+      background-color: rgba(var(--cui-primary-rgb, 60, 110, 255), 0.08);
+      color: var(--cui-body-color);
+    }
+    
+    &.active {
+      background-color: rgba(var(--cui-primary-rgb, 60, 110, 255), 0.12);
+      color: var(--cui-body-color);
+      border-left: 3px solid var(--cui-primary);
+    }
+    
+    &.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+:host {
+  display: block;
+}

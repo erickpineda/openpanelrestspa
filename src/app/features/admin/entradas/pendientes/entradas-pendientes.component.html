@@ -1,0 +1,134 @@
+<button
+  cButton
+  color="warning"
+  variant="outline"
+  size="sm"
+  (click)="openModal()"
+  cTooltip="{{ 'ADMIN.ENTRIES.UNREVIEWED' | translate }}"
+  cTooltipPlacement="top"
+>
+  <svg cIcon name="cilWarning" class="me-1"></svg>
+  {{ 'ADMIN.ENTRIES.UNREVIEWED' | translate }}
+</button>
+
+<c-modal
+  [visible]="visible"
+  (visibleChange)="handleVisibleChange($event)"
+  size="lg"
+  backdrop="static"
+>
+  <c-modal-header>
+    <h5 cModalTitle>{{ 'ADMIN.ENTRIES.UNREVIEWED' | translate }}</h5>
+    <button (click)="visible = false" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="mb-3">
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0">
+          <svg cIcon name="cilSearch"></svg>
+        </span>
+        <input
+          cFormControl
+          type="text"
+          [placeholder]="'COMMON.SEARCH' | translate"
+          [ngModel]="searchTerm"
+          (ngModelChange)="onSearchChange($event)"
+          class="border-start-0"
+        />
+      </div>
+    </div>
+
+    @if (cargando) {
+      <div class="text-center p-5">
+        <c-spinner color="primary"></c-spinner>
+        <div class="mt-2 text-muted small">{{ 'COMMON.LOADING' | translate }}...</div>
+      </div>
+    } @else {
+      @if (entradas.length === 0) {
+        <div class="alert alert-info mb-0 d-flex align-items-center">
+          <svg cIcon name="cilInfo" class="me-2"></svg>
+          <div>
+            @if (searchTerm) {
+              {{ 'COMMON.NO_RESULTS' | translate }}
+            } @else {
+              {{ 'ADMIN.ENTRIES.NO_UNREVIEWED' | translate }}
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="table-responsive border rounded">
+          <table cTable hover class="align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th scope="col" class="border-0">{{ 'COMMON.TITLE_LABEL' | translate }}</th>
+                <th scope="col" class="border-0">{{ 'COMMON.AUTHOR' | translate }}</th>
+                <th scope="col" class="border-0">{{ 'COMMON.DATE' | translate }}</th>
+                <th scope="col" class="text-end border-0">{{ 'COMMON.ACTIONS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entrada of entradas; track entrada.idEntrada) {
+                <tr>
+                  <td>
+                    <div
+                      class="fw-semibold text-truncate"
+                      style="max-width: 250px"
+                      [title]="entrada.titulo"
+                    >
+                      {{ entrada.titulo }}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div
+                        class="bg-light rounded-circle p-1 d-flex align-items-center justify-content-center"
+                        style="width: 32px; height: 32px"
+                      >
+                        <svg cIcon name="cilUser" size="sm" class="text-secondary"></svg>
+                      </div>
+                      <span class="small">{{ entrada.usernameCreador }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <small class="text-body-secondary">
+                      {{ getBestDate(entrada) | date: 'mediumDate' }}
+                    </small>
+                  </td>
+                  <td class="text-end">
+                    <button
+                      cButton
+                      color="primary"
+                      variant="ghost"
+                      size="sm"
+                      (click)="irAEditar(entrada.idEntrada)"
+                      [cTooltip]="'COMMON.EDIT' | translate"
+                    >
+                      <svg cIcon name="cilPen"></svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="mt-3">
+            <app-op-pagination
+              [currentPage]="page"
+              [totalPages]="totalPages"
+              (pageChange)="onPageChange($event)"
+              align="center"
+            >
+            </app-op-pagination>
+          </div>
+        }
+      }
+    }
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" variant="ghost" (click)="visible = false">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>

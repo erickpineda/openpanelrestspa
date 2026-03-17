@@ -1,6 +1,8 @@
 // temporary-storage.service.ts
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 import { LoggerService } from '../logger.service';
+import { OPStorageConstants } from '@app/shared/constants/op-storage.constants';
 
 export interface TemporaryEntry {
   id: string; // ✅ NUEVO: ID único para cada entrada
@@ -15,30 +17,36 @@ export interface TemporaryEntry {
   providedIn: 'root',
 })
 export class TemporaryStorageService {
-  private readonly STORAGE_KEY = 'temporary-entries';
-  private readonly NOTIFICATION_SHOWN_KEY = 'recovery-notification-shown';
+  private readonly STORAGE_KEY = OPStorageConstants.TEMPORARY_ENTRIES_KEY;
+  private readonly NOTIFICATION_SHOWN_KEY = OPStorageConstants.RECOVERY_NOTIFICATION_SHOWN_KEY;
+  private entriesChangedSubject = new Subject<void>();
+  public entriesChanged$ = this.entriesChangedSubject.asObservable();
 
   constructor(private log: LoggerService) {}
 
   // ✅ NUEVO: Generar ID único
   private generateId(): string {
-    return `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `temp_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
-  // ✅ MODIFICADO: Ahora acepta un objeto completo de entrada temporal
-  saveTemporaryEntry(entry: Omit<TemporaryEntry, 'id'>): string {
+  // ✅ MODIFICADO: Ahora acepta un objeto completo de entrada temporal y un ID opcional para actualizar
+  saveTemporaryEntry(entry: Omit<TemporaryEntry, 'id'>, existingId?: string): string {
     const entries = this.getTemporaryEntries();
+
+    // Si nos pasan un ID, lo usamos (actualización). Si no, generamos uno nuevo.
+    const id = existingId || this.generateId();
 
     const newEntry: TemporaryEntry = {
       ...entry,
-      id: this.generateId(),
+      id: id,
     };
 
-    entries[newEntry.id] = newEntry;
+    entries[id] = newEntry;
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
 
-    this.log.info('💾 Entrada temporal guardada:', newEntry.id, newEntry.title);
-    return newEntry.id;
+    this.log.info('💾 Entrada temporal guardada:', id, newEntry.title);
+    this.entriesChangedSubject.next();
+    return id;
   }
 
   getTemporaryEntry(id: string): TemporaryEntry | null {
@@ -62,11 +70,13 @@ export class TemporaryStorageService {
     delete entries[id];
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
     this.log.info('🧹 Entrada temporal removida:', id);
+    this.entriesChangedSubject.next();
   }
 
   clearAllTemporaryEntries(): void {
     localStorage.removeItem(this.STORAGE_KEY);
     this.log.info('🧹 Todas las entradas temporales limpiadas');
+    this.entriesChangedSubject.next();
   }
 
   // ✅ NUEVO: Limpiar entradas por tipo
@@ -79,11 +89,17 @@ export class TemporaryStorageService {
     });
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(entries));
     this.log.info(`🧹 Entradas temporales de tipo ${formType} limpiadas`);
+    this.entriesChangedSubject.next();
   }
 
   private getTemporaryEntries(): { [key: string]: TemporaryEntry } {
     const stored = localStorage.getItem(this.STORAGE_KEY);
     return stored ? JSON.parse(stored) : {};
+  }
+
+  hasAnyTemporaryData(): boolean {
+    const entries = this.getTemporaryEntries();
+    return Object.keys(entries).length > 0;
   }
 
   // ✅ NUEVO: Controlar si ya se mostró la notificación

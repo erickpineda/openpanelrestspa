@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { LoggerService } from '../logger.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
+import { UserRole } from '../../../shared/types/navigation.types';
 
 export const TOKEN_KEY = OPConstants.Session.TOKEN_KEY;
 export const USER_KEY = OPConstants.Session.USER_KEY;
@@ -225,6 +226,35 @@ export class TokenStorageService {
       return JSON.parse(localUser);
     }
     return null;
+  }
+
+  /**
+   * Obtiene el rol del usuario actual basado en los datos almacenados.
+   * Realiza el mapeo dinámico de roles de Spring Security (ROLE_X) a UserRole.
+   */
+  public getUserRole(): UserRole {
+    const user = this.getUser();
+
+    // Si no hay usuario, retornamos ANONYMOUS o LECTOR según política (aquí LECTOR por defecto seguro)
+    if (!user) {
+      return UserRole.LECTOR;
+    }
+
+    if (user.roles && Array.isArray(user.roles)) {
+      // Mapeo dinámico de roles de Spring Security (ROLE_KEY) a UserRole (KEY)
+      const userRoleKeys = Object.keys(UserRole) as Array<keyof typeof UserRole>;
+
+      for (const key of userRoleKeys) {
+        if (user.roles.includes(`ROLE_${key}`)) {
+          return UserRole[key];
+        }
+      }
+    } else if (user.rolCodigo) {
+      // Fallback si viene como rolCodigo (compatibilidad antigua)
+      return user.rolCodigo as UserRole;
+    }
+
+    return UserRole.LECTOR; // Default fallback
   }
 
   public isLoggedIn(): boolean {

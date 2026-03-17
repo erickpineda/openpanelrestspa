@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Categoria } from '../../models/categoria.model';
 import { CrudService } from '../../_utils/crud.service';
 import { HttpContext } from '@angular/common/http';
-import { NetworkInterceptor } from '../../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 import { PaginaResponse } from '../../models/pagina-response.model';
 import { OPConstants } from 'src/app/shared/constants/op-global.constants';
 
@@ -12,16 +12,25 @@ import { OPConstants } from 'src/app/shared/constants/op-global.constants';
   providedIn: 'root',
 })
 export class CategoriaService extends CrudService<Categoria, number> {
-  protected endpoint = '/categorias';
+  protected endpoint = OPConstants.Methods.CATEGORIAS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
 
-  buscarSafe(searchRequest: any, pageNo: number, size: number): Observable<PaginaResponse> {
+  buscarSafe(
+    searchRequest: any,
+    pageNo: number,
+    size: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = size.toString();
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     const context = new HttpContext();
     return this.safePostData<PaginaResponse>(
-      `${this.endpoint}/buscar`,
+      OPConstants.Methods.CATEGORIAS.BUSCAR,
       searchRequest,
       new PaginaResponse(),
       params,
@@ -34,14 +43,19 @@ export class CategoriaService extends CrudService<Categoria, number> {
   buscarSinGlobalLoader(
     searchRequest: any,
     pageNo: number,
-    pageSize: number
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
   ): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
     params[this.pageSizeParam] = pageSize.toString();
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.safePostData<PaginaResponse>(
-      `${this.endpoint}/buscar`,
+      OPConstants.Methods.CATEGORIAS.BUSCAR,
       searchRequest,
       new PaginaResponse(),
       params,
@@ -49,5 +63,33 @@ export class CategoriaService extends CrudService<Categoria, number> {
       'categorias.buscar',
       context
     );
+  }
+
+  override listarPaginaSinGlobalLoader(
+    pageNo: number,
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<any> {
+    const params: any = {};
+    params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
+    params[this.pageSizeParam] = pageSize.toString();
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    return this.get<any>(this.endpoint, params, undefined, context);
+  }
+
+  obtenerPorCodigo(codigo: string, context?: HttpContext): Observable<any> {
+    return this.get<any>(OPConstants.Methods.CATEGORIAS.OBTENER_POR_CODIGO(codigo), undefined, undefined, context);
+  }
+
+  actualizarPorCodigo(codigo: string, categoria: Categoria, context?: HttpContext): Observable<any> {
+    return this.put<any>(OPConstants.Methods.CATEGORIAS.ACTUALIZAR_POR_CODIGO(codigo), categoria, undefined, undefined, context);
+  }
+
+  borrarPorCodigo(codigo: string, context?: HttpContext): Observable<any> {
+    return this.delete<any>(OPConstants.Methods.CATEGORIAS.BORRAR_POR_CODIGO(codigo), undefined, undefined, context);
   }
 }

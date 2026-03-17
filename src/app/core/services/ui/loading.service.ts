@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { NotificationService } from './notification.service';
+import { ToastService } from './toast.service';
 import { LoggerService } from '../logger.service';
 
 export interface LoadingState {
@@ -46,7 +46,7 @@ export class LoadingService {
 
   constructor(
     private logger: LoggerService,
-    private notifications: NotificationService
+    private toastService: ToastService
   ) {}
 
   setGlobalLoading(loading: boolean, requestId?: string): void {
@@ -107,7 +107,7 @@ export class LoadingService {
       if (this.httpRequestCount > 0) {
         const msg = 'Tiempo de espera agotado. El servidor no responde.';
         this.setError(msg, 'TIMEOUT');
-        this.notifications.error(msg, 'Error de conexión');
+        this.toastService.showError(msg, 'Error de conexión');
         this.logger.error('Loading global timeout alcanzado (30s): backend no responde');
         // Detener loader
         this.forceStopLoading();
@@ -147,7 +147,7 @@ export class LoadingService {
   }
 
   // Método para forzar el cierre del loading (en casos de error)
-  forceStopLoading(): void {
+  forceStopLoading(silent: boolean = false): void {
     this.httpRequestCount = 0;
     this.updateGlobalState(false);
     if (this.loadingTimeout) {
@@ -155,7 +155,9 @@ export class LoadingService {
       this.loadingTimeout = null;
     }
     this.clearMaxWaitTimer();
-    this.logger.warn('Loading forzado a detenerse');
+    if (!silent) {
+      this.logger.warn('Loading forzado a detenerse');
+    }
   }
 
   // Estado de error
@@ -186,7 +188,7 @@ export class LoadingService {
       }
     } catch (e) {
       this.logger.error('Error ejecutando retryHandler', e);
-      this.notifications.error('No se pudo reintentar la operación');
+      this.toastService.showError('No se pudo reintentar la operación');
       this.forceStopLoading();
     }
   }
@@ -196,7 +198,7 @@ export class LoadingService {
     return {
       activeRequests: this.httpRequestCount,
       trackedRequests: this.stateSubject.value.requests.size,
-      isLoading: this.httpRequestCount > 0,
+      isLoading: this.stateSubject.value.global,
     };
   }
 }

@@ -1,4 +1,16 @@
-import { Component, Input, ChangeDetectionStrategy, AfterViewInit, ElementRef, ViewChild, Renderer2, OnChanges, OnDestroy, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  ChangeDetectionStrategy,
+  AfterViewInit,
+  ElementRef,
+  ViewChild,
+  Renderer2,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  ChangeDetectorRef,
+} from '@angular/core';
 
 @Component({
   selector: 'app-kpi-card',
@@ -16,7 +28,7 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() variant: 'flat' | 'simple' = 'flat';
   @Input() route?: string | any[];
   @Input() tooltip?: string;
-  
+
   @ViewChild('kpiBody', { static: false }) kpiBody?: ElementRef<HTMLElement>;
 
   displayValue: string | number = '';
@@ -54,7 +66,10 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
     dark: '#4f5d73',
   };
 
-  constructor(private renderer: Renderer2, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private renderer: Renderer2,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngAfterViewInit(): void {
     // Slight delay to allow CoreUI to render inner structure
@@ -97,9 +112,9 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       const ease = 1 - Math.pow(1 - progress, 4);
-      
+
       const current = Math.floor(start + (end - start) * ease);
       this.displayValue = current;
       this.cdr.markForCheck();
@@ -133,18 +148,18 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   private applyAdaptiveText() {
     if (!this.kpiBody) return;
-    
+
     // 1. Identificar el elemento que tiene el color de fondo (usualmente .card dentro del widget)
     const cardEl = this.kpiBody.nativeElement.querySelector('.card') as HTMLElement;
     const targetEl = cardEl || this.kpiBody.nativeElement;
 
     // 2. Determinar el color base
     let hexColor: string | null = null;
-    
+
     // Intentar resolver por el input 'color' si es un nombre conocido
     if (this.resolvedColor && this.colorMap[this.resolvedColor]) {
       hexColor = this.colorMap[this.resolvedColor];
-    } 
+    }
     // Si no, intentar obtenerlo del estilo computado
     else {
       const bg = this.findEffectiveBackgroundColor(targetEl);
@@ -159,9 +174,10 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
     // 3. Estrategia de contraste:
     // Preferimos texto BLANCO para colores oscuros o saturados (Primary, Success, Info, Danger)
     // Preferimos texto NEGRO para colores claros (Warning, Light, Secondary-ish)
-    
-    const isLightBackground = ['warning', 'light'].includes(this.resolvedColor || '') || 
-                              (this.calculateLuminance(hexColor) > 0.5); // Umbral aproximado
+
+    const isLightBackground =
+      ['warning', 'light'].includes(this.resolvedColor || '') ||
+      this.calculateLuminance(hexColor) > 0.5; // Umbral aproximado
 
     let finalTextColor = '#ffffff';
     let finalBgColor = hexColor;
@@ -172,7 +188,7 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
       const contrast = this.getContrast(hexColor, '#000000');
       if (contrast < 4.5) {
         // Si no cumple, aclarar el fondo
-        finalBgColor = this.adjustBrightness(hexColor, 20); 
+        finalBgColor = this.adjustBrightness(hexColor, 20);
       }
     } else {
       finalTextColor = '#ffffff'; // Blanco para fondos oscuros
@@ -199,18 +215,22 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     // Aplicar color de texto al contenedor principal y forzar herencia
     this.renderer.setStyle(this.kpiBody.nativeElement, 'color', finalTextColor);
-    
+
     // Aplicar sombra para mejorar legibilidad extra (nivel AAA simulado o 'estético')
     // Sombra suave: negra para texto blanco, blanca (o nula) para texto negro
     if (finalTextColor === '#ffffff') {
-      this.renderer.setStyle(this.kpiBody.nativeElement, 'text-shadow', '0 1px 2px rgba(0,0,0,0.25)');
+      this.renderer.setStyle(
+        this.kpiBody.nativeElement,
+        'text-shadow',
+        '0 1px 2px rgba(0,0,0,0.25)'
+      );
     } else {
       this.renderer.removeStyle(this.kpiBody.nativeElement, 'text-shadow');
     }
-    
+
     // Forzar color en hijos específicos si es necesario (aunque CSS ::ng-deep debería manejarlo)
     if (cardEl) {
-        this.renderer.setStyle(cardEl, 'color', finalTextColor);
+      this.renderer.setStyle(cardEl, 'color', finalTextColor);
     }
   }
 
@@ -225,7 +245,7 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
   private calculateLuminance(hex: string): number {
     const rgb = this.hexToRgb(hex);
     if (!rgb) return 0;
-    const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(c => {
+    const [r, g, b] = [rgb.r, rgb.g, rgb.b].map((c) => {
       const s = c / 255;
       return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
     });
@@ -242,17 +262,19 @@ export class KpiCardComponent implements AfterViewInit, OnChanges, OnDestroy {
     return this.rgbToHex(r, g, b);
   }
 
-  private hexToRgb(hex: string): { r: number, g: number, b: number } | null {
+  private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : null;
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : null;
   }
 
   private rgbToHex(r: number, g: number, b: number): string {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
 
   private findEffectiveBackgroundColor(el: HTMLElement): string | null {

@@ -5,7 +5,7 @@ import { BaseService } from './base.service';
 import { OpenpanelApiResponse } from '../models/openpanel-api-response.model';
 import { TokenStorageService } from '../services/auth/token-storage.service';
 import { HttpClient, HttpContext } from '@angular/common/http';
-import { NetworkInterceptor } from '../interceptor/network.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../interceptor/network.interceptor';
 import { OPConstants } from '../../shared/constants/op-global.constants';
 
 @Injectable({
@@ -41,7 +41,7 @@ export abstract class CrudService<T, ID> extends BaseService {
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
 
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.safeGetList<T>(
       this.endpoint,
       params,
@@ -54,36 +54,38 @@ export abstract class CrudService<T, ID> extends BaseService {
   /**
    * Obtiene un elemento por ID de forma segura, retornando null en caso de error
    */
-  obtenerPorIdSafe(id: ID): Observable<T> {
+  obtenerPorIdSafe(id: ID, context?: HttpContext): Observable<T> {
     return this.safeGetData<T>(
       `${this.endpoint}/obtenerPorId/${id}`,
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
-      `${this.endpoint}.obtenerPorId`
+      `${this.endpoint}.obtenerPorId`,
+      context
     );
   }
 
   /**
    * Crea un elemento de forma segura, retornando null en caso de error
    */
-  crearSafe(entity: T): Observable<T> {
+  crearSafe(entity: T, context?: HttpContext): Observable<T> {
     return this.safePostData<T>(
       `${this.endpoint}/crear`,
       entity,
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
-      `${this.endpoint}.crear`
+      `${this.endpoint}.crear`,
+      context
     );
   }
 
   /**
    * Crear elemento con estado
    */
-  crearConEstado(entity: T): Observable<{ success: boolean; data?: T; error?: any }> {
+  crearConEstado(entity: T, context?: HttpContext): Observable<{ success: boolean; data?: T; error?: any }> {
     return this.safeOperationWithState<T>(
-      this.post<T>(`${this.endpoint}/crear`, entity),
+      this.post<T>(`${this.endpoint}/crear`, entity, undefined, undefined, context),
       `${this.endpoint}.crear`
     );
   }
@@ -91,62 +93,77 @@ export abstract class CrudService<T, ID> extends BaseService {
   /**
    * Actualiza un elemento de forma segura, retornando null en caso de error
    */
-  actualizarSafe(id: ID, entity: T): Observable<T> {
+  actualizarSafe(id: ID, entity: T, context?: HttpContext): Observable<T> {
     return this.safePutData<T>(
       `${this.endpoint}/${id}`,
       entity,
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
-      `${this.endpoint}.actualizar`
+      `${this.endpoint}.actualizar`,
+      context
     );
   }
 
   /**
    * Elimina un elemento de forma segura, retornando false en caso de error
    */
-  eliminarSafe(id: ID): Observable<boolean> {
+  eliminarSafe(id: ID, context?: HttpContext): Observable<boolean> {
     return this.safeDeleteOperation(
       `${this.endpoint}/${id}`,
       undefined,
       undefined,
-      `${this.endpoint}.eliminar`
+      `${this.endpoint}.eliminar`,
+      context
     );
   }
 
   // ✅ MÉTODOS ORIGINALES (mantener exactamente como están)
 
-  public listarPagina(pageNo?: number, pageSize?: number): Observable<OpenpanelApiResponse<any>> {
+  public listarPagina(
+    pageNo?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<OpenpanelApiResponse<any>> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
     return this.get<any>(this.endpoint, params);
   }
 
   public listarPaginaSinGlobalLoader(
     pageNo: number,
-    pageSize: number
+    pageSize: number,
+    sortField?: string,
+    sortDirection?: string
   ): Observable<OpenpanelApiResponse<any>> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
-    const context = new HttpContext().set(NetworkInterceptor.SKIP_GLOBAL_LOADER, true);
+    if (sortField) {
+      params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
+    }
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     return this.get<any>(this.endpoint, params, undefined, context);
   }
 
-  obtenerPorId(id: ID): Observable<OpenpanelApiResponse<any>> {
-    return this.get<any>(`${this.endpoint}/obtenerPorId/${id}`);
+  obtenerPorId(id: ID, context?: HttpContext): Observable<OpenpanelApiResponse<any>> {
+    return this.get<any>(`${this.endpoint}/obtenerPorId/${id}`, undefined, undefined, context);
   }
 
-  crear(entity: T): Observable<any> {
-    return this.post<any>(`${this.endpoint}/crear`, entity);
+  crear(entity: T, context?: HttpContext): Observable<any> {
+    return this.post<any>(`${this.endpoint}/crear`, entity, undefined, undefined, context);
   }
 
-  actualizar(id: ID, entity: T): Observable<OpenpanelApiResponse<any>> {
-    return this.put<any>(`${this.endpoint}/${id}`, entity);
+  actualizar(id: ID, entity: T, context?: HttpContext): Observable<OpenpanelApiResponse<any>> {
+    return this.put<any>(`${this.endpoint}/${id}`, entity, undefined, undefined, context);
   }
 
-  borrar(id: ID): Observable<OpenpanelApiResponse<any>> {
-    return this.delete<any>(`${this.endpoint}/${id}`);
+  borrar(id: ID, context?: HttpContext): Observable<OpenpanelApiResponse<any>> {
+    return this.delete<any>(`${this.endpoint}/${id}`, undefined, undefined, context);
   }
 }

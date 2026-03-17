@@ -1,0 +1,98 @@
+<div class="d-flex flex-column h-100">
+  <div class="d-flex justify-content-end mb-3 gap-2">
+    @if (showPeriodControls) {
+      <div class="d-flex align-items-center gap-1">
+        <label class="small text-muted mb-0">{{
+          'ADMIN.DASHBOARD.TOP_PANEL.TOP' | translate
+        }}</label>
+        <input
+          cFormControl
+          type="number"
+          min="1"
+          max="200"
+          [ngModel]="topLimit"
+          (ngModelChange)="changeTopLimit.emit($event)"
+          size="sm"
+          style="width: 70px"
+        />
+      </div>
+      <div class="btn-group" role="group" aria-label="Periodo">
+        <button
+          cButton
+          color="secondary"
+          variant="outline"
+          size="sm"
+          [active]="topPeriodDays === 7"
+          (click)="changePeriod.emit(7)"
+        >
+          7d
+        </button>
+        <button
+          cButton
+          color="secondary"
+          variant="outline"
+          size="sm"
+          [active]="topPeriodDays === 30"
+          (click)="changePeriod.emit(30)"
+        >
+          30d
+        </button>
+        <button
+          cButton
+          color="secondary"
+          variant="outline"
+          size="sm"
+          [active]="topPeriodDays === 90"
+          (click)="changePeriod.emit(90)"
+        >
+          90d
+        </button>
+      </div>
+    }
+    <button
+      cButton
+      color="secondary"
+      variant="ghost"
+      size="sm"
+      (click)="onDownloadClick()"
+      [title]="'COMMON.DOWNLOAD_CSV' | translate"
+      [attr.aria-label]="'COMMON.DOWNLOAD_CSV' | translate"
+      [attr.data-testid]="csvDataTestId || null"
+    >
+      <svg cIcon name="cilCloudDownload" size="sm"></svg>
+    </button>
+  </div>
+  @if (error) {
+    <c-alert color="danger" class="d-flex align-items-center justify-content-between my-2 py-2">
+      <span class="small">{{ error }}</span>
+      <button
+        cButton
+        color="danger"
+        variant="ghost"
+        size="sm"
+        [ngClass]="retryBtnClass"
+        (click)="retry.emit()"
+      >
+        {{ 'COMMON.RETRY' | translate }}
+      </button>
+    </c-alert>
+  }
+  @if (loading) {
+    <div class="d-flex justify-content-center py-4"><c-spinner color="primary"></c-spinner></div>
+  }
+  <ul class="list-group list-group-flush border rounded">
+    @for (it of items; track it.name) {
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center list-group-item-action border-start-0 border-end-0"
+      >
+        <span class="fw-medium text-dark">{{ it.name }}</span>
+        <c-badge [color]="badgeColor" shape="rounded-pill">{{ it.count }}</c-badge>
+      </li>
+    }
+    @if (!items || items.length === 0) {
+      <li class="list-group-item text-center text-muted py-4">
+        <small>{{ 'ADMIN.DASHBOARD.NO_DATA' | translate }}</small>
+      </li>
+    }
+  </ul>
+</div>
