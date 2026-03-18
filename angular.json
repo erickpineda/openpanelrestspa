@@ -56,7 +56,7 @@
             "preserveSymlinks": true,
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
-              "node_modules/@coreui/coreui/dist/css/coreui.min.css",
+              "@coreui/coreui/dist/css/coreui.min.css",
               "src/styles.scss"
             ],
             "scripts": [],

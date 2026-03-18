@@ -419,13 +419,45 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   async loadEditorBuild(): Promise<void> {
     try {
       this.editorLoading = true;
-      const mod = await import('@ckeditor/ckeditor5-build-classic');
-      this.Editor = (mod as any).default ? (mod as any).default : mod;
+      await this.tryLoadCkeditorFromAssets();
+      const w: any = window as any;
+      if (w && w.ClassicEditor) {
+        this.Editor = w.ClassicEditor;
+      } else {
+        const mod = await import('@ckeditor/ckeditor5-build-classic');
+        this.Editor = (mod as any).default ? (mod as any).default : mod;
+      }
     } catch (error) {
       console.error('Error cargando CKEditor build dinámicamente:', error);
     } finally {
       this.editorLoading = false;
     }
+  }
+
+  private tryLoadCkeditorFromAssets(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      try {
+        const url = '/assets/ckeditor5/build/ckeditor.js';
+        const existing = document.querySelector(`script[src="${url}"]`) as HTMLScriptElement | null;
+        if (existing) {
+          if ((window as any).ClassicEditor) {
+            resolve();
+            return;
+          }
+          existing.addEventListener('load', () => resolve());
+          existing.addEventListener('error', () => resolve());
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = url;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => resolve();
+        document.body.appendChild(script);
+      } catch (e) {
+        resolve();
+      }
+    });
   }
 
   onReady(editor: any): void {
