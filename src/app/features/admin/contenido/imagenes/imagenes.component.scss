@@ -5,3 +5,8 @@
   height: 70vh;
   overflow: hidden;
 }
+
+.preview-controls {
+  z-index: 1060;
+  pointer-events: auto;
+}
