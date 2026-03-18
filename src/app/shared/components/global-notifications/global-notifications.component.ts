@@ -34,7 +34,7 @@ export class GlobalNotificationsComponent {
   onMouseEnter(toast: ToastMessage) {
     if (!toast.id) return;
     this.toastService.pauseTimer(toast.id);
-    // Nota: La animación CSS no se pausa fácilmente sin JS complejo, 
+    // Nota: La animación CSS no se pausa fácilmente sin JS complejo,
     // pero funcionalmente el timer se pausa.
   }
 
@@ -46,7 +46,20 @@ export class GlobalNotificationsComponent {
   dateAsString(fecha: number): string {
     const date = new Date(fecha);
     const day = String(date.getDate()).padStart(2, '0');
-    const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const months = [
+      'ene',
+      'feb',
+      'mar',
+      'abr',
+      'may',
+      'jun',
+      'jul',
+      'ago',
+      'sep',
+      'oct',
+      'nov',
+      'dic',
+    ];
     const month = months[date.getMonth()];
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -55,39 +68,54 @@ export class GlobalNotificationsComponent {
 
   getIndicatorColor(toast: ToastMessage): string {
     switch (toast.color) {
-      case 'success': return '#2eb85c'; // CoreUI Success
-      case 'danger': return '#e55353'; // CoreUI Danger
-      case 'warning': return '#f9b115'; // CoreUI Warning
-      case 'info': return '#39f'; // CoreUI Info
-      default: return '#321fdb'; // CoreUI Primary
+      case 'success':
+        return '#2eb85c'; // CoreUI Success
+      case 'danger':
+        return '#e55353'; // CoreUI Danger
+      case 'warning':
+        return '#f9b115'; // CoreUI Warning
+      case 'info':
+        return '#39f'; // CoreUI Info
+      default:
+        return '#321fdb'; // CoreUI Primary
     }
   }
 
   getIconBgColor(toast: ToastMessage): string {
     // Versión muy clara del color principal para el fondo del icono
     switch (toast.color) {
-      case 'success': return '#f2fcf5'; 
-      case 'danger': return '#fdf4f4'; 
-      case 'warning': return '#fef9e8'; 
-      case 'info': return '#f1f8ff'; 
-      default: return '#f2f2fe'; 
+      case 'success':
+        return '#f2fcf5';
+      case 'danger':
+        return '#fdf4f4';
+      case 'warning':
+        return '#fef9e8';
+      case 'info':
+        return '#f1f8ff';
+      default:
+        return '#f2f2fe';
     }
   }
 
   getDefaultTitle(toast: ToastMessage): string {
     switch (toast.color) {
-      case 'success': return '¡Éxito!';
-      case 'danger': return 'Error';
-      case 'warning': return 'Advertencia';
-      case 'info': return 'Información';
-      default: return 'Notificación';
+      case 'success':
+        return '¡Éxito!';
+      case 'danger':
+        return 'Error';
+      case 'warning':
+        return 'Advertencia';
+      case 'info':
+        return 'Información';
+      default:
+        return 'Notificación';
     }
   }
 
   getIcon(toast: ToastMessage): SafeHtml {
     let svg = '';
     const size = '24';
-    
+
     switch (toast.color) {
       case 'success': // Check Circle
         svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;

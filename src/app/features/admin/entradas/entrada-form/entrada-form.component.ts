@@ -151,10 +151,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
 
     window.addEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.boundSaveBeforeLogout);
 
-    window.addEventListener(
-      OPConstants.Events.SAVE_FORM_DATA,
-      this.boundSaveToTemporaryStorage
-    );
+    window.addEventListener(OPConstants.Events.SAVE_FORM_DATA, this.boundSaveToTemporaryStorage);
 
     this.checkNavigationState();
     // La recuperación automática se ha deshabilitado a petición del usuario.
@@ -173,20 +170,14 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
 
-    window.removeEventListener(
-      OPConstants.Events.SAVE_UNSAVED_WORK,
-      this.boundSaveBeforeLogout
-    );
+    window.removeEventListener(OPConstants.Events.SAVE_UNSAVED_WORK, this.boundSaveBeforeLogout);
 
     window.removeEventListener(
       OPConstants.Events.SAVE_WORK_BEFORE_LOGOUT,
       this.boundSaveBeforeLogout
     );
 
-    window.removeEventListener(
-      OPConstants.Events.SAVE_FORM_DATA,
-      this.boundSaveToTemporaryStorage
-    );
+    window.removeEventListener(OPConstants.Events.SAVE_FORM_DATA, this.boundSaveToTemporaryStorage);
 
     const editorMain = document.querySelector('.ck-editor__main');
     if (editorMain) {
@@ -500,7 +491,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
 
     // 1. Ocultar notificación primero
     this.stateService.dismissRecoveryNotification();
-    
+
     // 2. Dar tiempo al ciclo de detección de cambios de Angular para eliminar el elemento del DOM
     // Esto evita bloqueos de UI o problemas de renderizado ("pantalla seminegra")
     setTimeout(() => {
@@ -629,9 +620,9 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
 
     if (this.form.valid) {
       this.log.info('💾 Intentando guardar entrada...');
-      
+
       const rawValue = this.form.getRawValue();
-      
+
       // Si tenemos UUID, eliminamos el campo imagenDestacada para no enviarlo (ni siquiera como null)
       if (rawValue.imagenDestacadaUuid) {
         delete rawValue.imagenDestacada;
@@ -643,7 +634,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       this.stateService.removeCurrentTemporaryEntry();
     } else {
       this.form.markAllAsTouched();
-      
+
       // Log errors to help debug
       const controls = this.form.controls;
       const invalidControls = [];
@@ -653,7 +644,9 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
           console.error(`Field '${name}' is invalid:`, controls[name].errors);
         }
       }
-      this.toast.showError('Por favor revise los campos marcados en rojo (' + invalidControls.join(', ') + ')');
+      this.toast.showError(
+        'Por favor revise los campos marcados en rojo (' + invalidControls.join(', ') + ')'
+      );
       this.cdRef.markForCheck();
     }
   }

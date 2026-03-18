@@ -13,18 +13,35 @@
         </c-col>
         <c-col xs="12" md="6">
           <div class="d-flex gap-2 flex-wrap justify-content-start justify-content-md-end">
-            <button cButton color="secondary" variant="ghost" size="sm" aria-label="Imprimir listado">
+            <button
+              cButton
+              color="secondary"
+              variant="ghost"
+              size="sm"
+              aria-label="Imprimir listado"
+            >
               <svg cIcon name="cilPrint" class="me-1"></svg>
               {{ 'ADMIN.ENTRIES.PRINT' | translate }}
             </button>
             <c-dropdown variant="btn-group">
-              <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+              <button
+                cButton
+                cDropdownToggle
+                color="secondary"
+                variant="ghost"
+                size="sm"
+                [cTooltip]="'Ordenar listado'"
+              >
                 <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
                 Ordenar
               </button>
               <ul cDropdownMenu>
                 <li>
-                  <button cDropdownItem (click)="ordenar('fechaPublicacion', 'DESC')" [active]="isSortActive('fechaPublicacion', 'DESC')">
+                  <button
+                    cDropdownItem
+                    (click)="ordenar('fechaPublicacion', 'DESC')"
+                    [active]="isSortActive('fechaPublicacion', 'DESC')"
+                  >
                     <span class="d-flex justify-content-between align-items-center w-100">
                       Más recientes
                       @if (isSortActive('fechaPublicacion', 'DESC')) {
@@ -34,7 +51,11 @@
                   </button>
                 </li>
                 <li>
-                  <button cDropdownItem (click)="ordenar('fechaPublicacion', 'ASC')" [active]="isSortActive('fechaPublicacion', 'ASC')">
+                  <button
+                    cDropdownItem
+                    (click)="ordenar('fechaPublicacion', 'ASC')"
+                    [active]="isSortActive('fechaPublicacion', 'ASC')"
+                  >
                     <span class="d-flex justify-content-between align-items-center w-100">
                       Más antiguos
                       @if (isSortActive('fechaPublicacion', 'ASC')) {
@@ -43,9 +64,13 @@
                     </span>
                   </button>
                 </li>
-                <li><hr cDropdownDivider></li>
+                <li><hr cDropdownDivider /></li>
                 <li>
-                  <button cDropdownItem (click)="ordenar('titulo', 'ASC')" [active]="isSortActive('titulo', 'ASC')">
+                  <button
+                    cDropdownItem
+                    (click)="ordenar('titulo', 'ASC')"
+                    [active]="isSortActive('titulo', 'ASC')"
+                  >
                     <span class="d-flex justify-content-between align-items-center w-100">
                       Título (A-Z)
                       @if (isSortActive('titulo', 'ASC')) {
@@ -55,7 +80,11 @@
                   </button>
                 </li>
                 <li>
-                  <button cDropdownItem (click)="ordenar('titulo', 'DESC')" [active]="isSortActive('titulo', 'DESC')">
+                  <button
+                    cDropdownItem
+                    (click)="ordenar('titulo', 'DESC')"
+                    [active]="isSortActive('titulo', 'DESC')"
+                  >
                     <span class="d-flex justify-content-between align-items-center w-100">
                       Título (Z-A)
                       @if (isSortActive('titulo', 'DESC')) {

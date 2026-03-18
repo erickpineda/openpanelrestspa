@@ -74,36 +74,36 @@ export class NavigationService implements INavigationService {
     // Suscribirse a cambios en los contadores y mapearlos a los items de navegación
     combineLatest([
       this.badgeCounterService.getAllCounters(),
-      this.navigationItemsSubject.asObservable()
-    ]).pipe(
-      debounceTime(200)
-    ).subscribe(([counters, items]) => {
-      const newBadgeCounts = new Map<string, number>();
+      this.navigationItemsSubject.asObservable(),
+    ])
+      .pipe(debounceTime(200))
+      .subscribe(([counters, items]) => {
+        const newBadgeCounts = new Map<string, number>();
 
-      const processItems = (navItems: INavItemEnhanced[]) => {
-        for (const item of navItems) {
-          if (item.dynamicBadge) {
-            const itemId = NavigationUtils.generateItemId(item);
-            const serviceKey = this.mapMethodToKey(item.dynamicBadge.method);
-            
-            if (serviceKey && counters.has(serviceKey)) {
-              const count = counters.get(serviceKey)!;
-              newBadgeCounts.set(itemId, count);
+        const processItems = (navItems: INavItemEnhanced[]) => {
+          for (const item of navItems) {
+            if (item.dynamicBadge) {
+              const itemId = NavigationUtils.generateItemId(item);
+              const serviceKey = this.mapMethodToKey(item.dynamicBadge.method);
+
+              if (serviceKey && counters.has(serviceKey)) {
+                const count = counters.get(serviceKey)!;
+                newBadgeCounts.set(itemId, count);
+              }
+            }
+
+            if (item.children && item.children.length > 0) {
+              processItems(item.children);
             }
           }
-          
-          if (item.children && item.children.length > 0) {
-            processItems(item.children);
-          }
-        }
-      };
+        };
 
-      processItems(items);
-      
-      // Solo actualizar si hay cambios para evitar bucles infinitos
-      // (aunque distinctUntilChanged downstream debería manejarlo)
-      this.badgeCountsSubject.next(newBadgeCounts);
-    });
+        processItems(items);
+
+        // Solo actualizar si hay cambios para evitar bucles infinitos
+        // (aunque distinctUntilChanged downstream debería manejarlo)
+        this.badgeCountsSubject.next(newBadgeCounts);
+      });
   }
 
   /**
@@ -111,13 +111,13 @@ export class NavigationService implements INavigationService {
    */
   private mapMethodToKey(methodName: string): string | null {
     const mapping: { [key: string]: string } = {
-      'getDraftEntriesCount': 'draft-entries',
-      'getPendingUsersCount': 'pending-users',
-      'getUnmoderatedCommentsCount': 'unmoderated-comments',
-      'getSystemAlertsCount': 'system-alerts',
-      'getMyDraftsCount': 'my-drafts'
+      getDraftEntriesCount: 'draft-entries',
+      getPendingUsersCount: 'pending-users',
+      getUnmoderatedCommentsCount: 'unmoderated-comments',
+      getSystemAlertsCount: 'system-alerts',
+      getMyDraftsCount: 'my-drafts',
     };
-    
+
     return mapping[methodName] || null;
   }
 

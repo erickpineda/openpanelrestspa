@@ -17,7 +17,7 @@
         </button>
       </div>
     </c-card-header>
-    
+
     <div class="section-divider" aria-hidden="true"></div>
 
     <c-card-body class="p-4">
@@ -40,36 +40,59 @@
               <c-card class="h-100 shadow-sm border-0 bg-light-subtle entry-card transition-zoom">
                 <c-card-body class="d-flex flex-column p-4 bg-white rounded-top border-bottom">
                   <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="card-title text-truncate fw-bold text-primary mb-0" [title]="entry.title">
+                    <h5
+                      class="card-title text-truncate fw-bold text-primary mb-0"
+                      [title]="entry.title"
+                    >
                       {{ entry.title || ('ADMIN.TEMP_ENTRIES.NO_TITLE' | translate) }}
                     </h5>
                     <c-badge color="info" shape="rounded-pill" class="ms-2">
                       {{ entry.formType | titlecase }}
                     </c-badge>
                   </div>
-                  
+
                   <p class="card-text text-muted small flex-grow-1 mb-3">
                     {{ entry.description || ('ADMIN.TEMP_ENTRIES.NO_SUMMARY' | translate) }}
                   </p>
-                  
+
                   <div class="d-flex align-items-center text-secondary small mb-3">
                     <svg cIcon name="cilClock" size="sm" class="me-2"></svg>
-                    {{ 'ADMIN.TEMP_ENTRIES.SAVED_AT' | translate }} 
+                    {{ 'ADMIN.TEMP_ENTRIES.SAVED_AT' | translate }}
                     <span class="fw-medium ms-1">{{ entry.timestamp | date: 'medium' }}</span>
                   </div>
                 </c-card-body>
-                
-                <c-card-footer class="bg-white border-0 p-3 rounded-bottom d-flex justify-content-between align-items-center">
-                   <button cButton color="danger" variant="ghost" size="sm" (click)="deleteEntry(entry.id)" 
-                           cTooltip="{{ 'ADMIN.TEMP_ENTRIES.DELETE' | translate }}">
+
+                <c-card-footer
+                  class="bg-white border-0 p-3 rounded-bottom d-flex justify-content-between align-items-center"
+                >
+                  <button
+                    cButton
+                    color="danger"
+                    variant="ghost"
+                    size="sm"
+                    (click)="deleteEntry(entry.id)"
+                    cTooltip="{{ 'ADMIN.TEMP_ENTRIES.DELETE' | translate }}"
+                  >
                     <svg cIcon name="cilTrash"></svg>
                   </button>
                   <div class="d-flex gap-2">
-                    <button cButton color="secondary" variant="ghost" size="sm" (click)="viewEntry(entry)">
+                    <button
+                      cButton
+                      color="secondary"
+                      variant="ghost"
+                      size="sm"
+                      (click)="viewEntry(entry)"
+                    >
                       <svg cIcon name="cilSearch" class="me-1"></svg>
                       {{ 'ADMIN.TEMP_ENTRIES.VIEW' | translate }}
                     </button>
-                    <button cButton color="primary" size="sm" (click)="recoverEntry(entry)" class="px-3">
+                    <button
+                      cButton
+                      color="primary"
+                      size="sm"
+                      (click)="recoverEntry(entry)"
+                      class="px-3"
+                    >
                       <svg cIcon name="cilCloudDownload" class="me-1"></svg>
                       {{ 'ADMIN.TEMP_ENTRIES.RECOVER' | translate }}
                     </button>
@@ -81,7 +104,13 @@
         </c-row>
 
         <div class="d-flex justify-content-center mt-5 pt-3 border-top">
-          <button cButton color="danger" variant="outline" (click)="clearAll()" class="d-flex align-items-center">
+          <button
+            cButton
+            color="danger"
+            variant="outline"
+            (click)="clearAll()"
+            class="d-flex align-items-center"
+          >
             <svg cIcon name="cilTrash" class="me-2"></svg>
             {{ 'ADMIN.TEMP_ENTRIES.CLEAR_ALL' | translate }}
           </button>
@@ -107,19 +136,19 @@
     </h5>
     <button (click)="viewModalVisible = false" cButtonClose></button>
   </c-modal-header>
-  
+
   <c-modal-body class="p-0">
     @if (selectedEntry) {
       <div class="preview-entrada-container p-4 p-lg-5 bg-white">
         <!-- Header Section -->
         <div class="text-center mb-5 max-w-800 mx-auto">
-           <!-- Imagen Destacada -->
+          <!-- Imagen Destacada -->
           @if (imagenMostrar) {
             <div class="mb-4 position-relative d-inline-block shadow-lg rounded overflow-hidden">
               <img
                 [src]="imagenMostrar"
                 class="img-fluid"
-                style="max-height: 400px; object-fit: cover;"
+                style="max-height: 400px; object-fit: cover"
                 alt="Imagen destacada"
               />
             </div>
@@ -137,10 +166,22 @@
 
           <!-- Metadata Badges -->
           <div class="d-flex justify-content-center flex-wrap gap-2 mb-4">
-             <!-- Fecha -->
+            <!-- Fecha -->
             @if (fechaMostrar) {
-              <span class="badge rounded-pill border px-3 py-2 d-flex align-items-center gap-2"
-                    [ngClass]="estadoColor ? 'bg-' + estadoColor + '-subtle text-' + estadoColor + '-emphasis border-' + estadoColor + '-subtle' : 'bg-light text-secondary'">
+              <span
+                class="badge rounded-pill border px-3 py-2 d-flex align-items-center gap-2"
+                [ngClass]="
+                  estadoColor
+                    ? 'bg-' +
+                      estadoColor +
+                      '-subtle text-' +
+                      estadoColor +
+                      '-emphasis border-' +
+                      estadoColor +
+                      '-subtle'
+                    : 'bg-light text-secondary'
+                "
+              >
                 <svg cIcon name="cilCalendar" size="sm"></svg>
                 {{ fechaMostrar | date: 'mediumDate' }}
               </span>
@@ -148,31 +189,36 @@
 
             <!-- Estado -->
             @if (estadoTooltip) {
-              <span class="badge rounded-pill px-3 py-2 d-flex align-items-center gap-2"
-                    [ngClass]="'bg-' + estadoColor + ' text-white'">
+              <span
+                class="badge rounded-pill px-3 py-2 d-flex align-items-center gap-2"
+                [ngClass]="'bg-' + estadoColor + ' text-white'"
+              >
                 <svg cIcon [name]="estadoIcon" size="sm"></svg>
                 {{ estadoTooltip }}
               </span>
             }
 
-             <!-- Categorías -->
-             @for (c of categoriasMostrar; track c) {
-               <span class="badge rounded-pill bg-light text-dark border px-3 py-2">
-                 <svg cIcon name="cilTag" size="sm" class="me-1 text-secondary"></svg>
-                 {{ c.nombre || c }}
-               </span>
-             }
+            <!-- Categorías -->
+            @for (c of categoriasMostrar; track c) {
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2">
+                <svg cIcon name="cilTag" size="sm" class="me-1 text-secondary"></svg>
+                {{ c.nombre || c }}
+              </span>
+            }
           </div>
         </div>
-        
-        <hr class="my-5 opacity-10">
+
+        <hr class="my-5 opacity-10" />
 
         <!-- Contenido -->
-        <div class="preview-content max-w-800 mx-auto fs-5 lh-lg text-break" [innerHTML]="contenidoSeguro"></div>
+        <div
+          class="preview-content max-w-800 mx-auto fs-5 lh-lg text-break"
+          [innerHTML]="contenidoSeguro"
+        ></div>
       </div>
     }
   </c-modal-body>
-  
+
   <c-modal-footer class="bg-light border-top">
     <button cButton color="secondary" variant="ghost" (click)="viewModalVisible = false">
       {{ 'AUTO.CERRAR' | translate }}

@@ -8,7 +8,10 @@ import { ClassToggleService, HeaderComponent } from '@coreui/angular';
 import { LanguageService, Language } from '../../../core/services/language.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import { SessionManagerService } from '../../../core/services/auth/session-manager.service';
-import { TemporaryStorageService, TemporaryEntry } from '../../../core/services/ui/temporary-storage.service';
+import {
+  TemporaryStorageService,
+  TemporaryEntry,
+} from '../../../core/services/ui/temporary-storage.service';
 import { NotificationItem } from '../../../shared/components/notifications-dropdown/notifications-dropdown.component';
 import { RightSidebarService } from '../../../core/services/ui/right-sidebar.service';
 

@@ -26,7 +26,7 @@ describe('DefaultHeaderComponent', () => {
   const translationServiceMock = {
     translations$: new BehaviorSubject({}),
     translate: (key: string) => key,
-    instant: (key: string) => key
+    instant: (key: string) => key,
   };
 
   beforeEach(async () => {
@@ -42,11 +42,11 @@ describe('DefaultHeaderComponent', () => {
         BreadcrumbModule,
         RouterTestingModule,
         SidebarModule,
-        TranslatePipe
+        TranslatePipe,
       ],
       providers: [
         IconSetService,
-        { provide: TranslationService, useValue: translationServiceMock }
+        { provide: TranslationService, useValue: translationServiceMock },
       ],
     }).compileComponents();
   });

@@ -68,7 +68,9 @@ export class GlobalErrorHandlerService implements ErrorHandler {
       if (this.errorCount > this.maxErrors) {
         // Evitar bucle infinito si el logger falla
         if (this.errorCount === this.maxErrors + 1) {
-          console.error('🛑 [GLOBAL HANDLER] Demasiados errores, evitando notificaciones y logs adicionales.');
+          console.error(
+            '🛑 [GLOBAL HANDLER] Demasiados errores, evitando notificaciones y logs adicionales.'
+          );
         }
         return;
       }
@@ -196,7 +198,7 @@ export class GlobalErrorHandlerService implements ErrorHandler {
     // Si no es validación, mostrar mensaje genérico
     // Evitar mostrar "Error al crear la etiqueta" (mensaje genérico) si ya se mostró uno específico
     // Esto se controla mediante el filtrado de severidad y tipo, pero aquí aseguramos que solo un mensaje relevante salga.
-    
+
     switch (error.severity) {
       case 'critical':
       case 'high':
@@ -214,8 +216,10 @@ export class GlobalErrorHandlerService implements ErrorHandler {
   private showValidationErrors(error: AppError, toastService: ToastService): void {
     if (error.validationErrors && error.validationErrors.length > 0) {
       // Usar un Set para eliminar mensajes duplicados exactos
-      const uniqueErrors = Array.from(new Set(error.validationErrors.map(msg => this.cleanValidationMessage(msg))));
-      
+      const uniqueErrors = Array.from(
+        new Set(error.validationErrors.map((msg) => this.cleanValidationMessage(msg)))
+      );
+
       if (uniqueErrors.length === 1) {
         // Un solo error - mostrar directamente
         toastService.showError(uniqueErrors[0], 'Error de Validación');

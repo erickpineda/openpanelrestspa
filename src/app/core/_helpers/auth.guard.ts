@@ -63,14 +63,14 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
       // Pasamos sessionData en el state para que SessionExpiredComponent lo recoja.
       // Usamos navigate() + return false porque createUrlTree() no soporta state.
       this.router.navigate(['/login'], {
-        state: { 
-          sessionData: { 
-            type: OPSessionConstants.TYPE_SESSION_EXPIRED, 
+        state: {
+          sessionData: {
+            type: OPSessionConstants.TYPE_SESSION_EXPIRED,
             message: 'Su sesión ha caducado. Por favor, inicie sesión de nuevo.',
-            allowSave: true, 
-            timestamp: Date.now() 
-          } 
-        }
+            allowSave: true,
+            timestamp: Date.now(),
+          },
+        },
       });
       return false;
     }
@@ -88,7 +88,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
         return true;
       }
     } catch {}
-    
+
     const check = this.checkAuth();
     if (check instanceof UrlTree) {
       return check;

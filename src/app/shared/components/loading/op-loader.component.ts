@@ -46,16 +46,14 @@ export class OpLoaderComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
     if (this.useGlobal) {
       let stream = this.loadingService.globalLoading$;
-      
+
       if (this.debounceTime > 0) {
         stream = stream.pipe(debounceTime(this.debounceTime));
       }
 
-      this.loadingSubscription = stream
-        .pipe(distinctUntilChanged())
-        .subscribe((loading) => {
-          this.loading = loading;
-        });
+      this.loadingSubscription = stream.pipe(distinctUntilChanged()).subscribe((loading) => {
+        this.loading = loading;
+      });
 
       this.errorSubscription = this.loadingService.error$
         .pipe(debounceTime(this.debounceTime), distinctUntilChanged())

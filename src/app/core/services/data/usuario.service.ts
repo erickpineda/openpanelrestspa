@@ -150,12 +150,21 @@ export class UsuarioService extends CrudService<Usuario, number> {
     );
   }
 
-  changePassword(changePasswordDTO: any, context?: HttpContext): Observable<OpenpanelApiResponse<any>> {
+  changePassword(
+    changePasswordDTO: any,
+    context?: HttpContext
+  ): Observable<OpenpanelApiResponse<any>> {
     const finalContext = context || new HttpContext();
     if (!finalContext.has(SKIP_GLOBAL_LOADER)) {
       finalContext.set(SKIP_GLOBAL_LOADER, true);
     }
-    return this.post<any>(`${this.endpoint}/changePassword`, changePasswordDTO, undefined, undefined, finalContext);
+    return this.post<any>(
+      `${this.endpoint}/changePassword`,
+      changePasswordDTO,
+      undefined,
+      undefined,
+      finalContext
+    );
   }
 
   // ✅ Implementación mínima requerida

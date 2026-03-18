@@ -37,7 +37,8 @@ export class PerfilComponent implements OnInit {
     if (event.ctrlKey && !event.shiftKey && !event.altKey) {
       const key = event.key;
       const tabIndex = parseInt(key, 10) - 1; // 1-based to 0-based
-      if (tabIndex >= 0 && tabIndex <= 3) { // Assuming 4 tabs
+      if (tabIndex >= 0 && tabIndex <= 3) {
+        // Assuming 4 tabs
         event.preventDefault();
         this.setActiveTab(tabIndex);
       }

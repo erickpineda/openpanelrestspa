@@ -42,8 +42,7 @@ export const OPRestMethods: any = {
     ACTUALIZAR: (id: number) => `/usuarios/${id}`,
     ELIMINAR: (id: number) => `/usuarios/${id}`,
     OBTENER_POR_USERNAME: (username: string) => `/usuarios/obtenerPorUsername/${username}`,
-    ACTUALIZAR_POR_USERNAME: (username: string) =>
-      `/usuarios/actualizarPorUsername/${username}`,
+    ACTUALIZAR_POR_USERNAME: (username: string) => `/usuarios/actualizarPorUsername/${username}`,
     BORRAR_POR_USERNAME: (username: string) => `/usuarios/borrarPorUsername/${username}`,
     PERFIL_YO: `/usuarios/perfil/yo`,
     PERFIL_POR_USERNAME: (username: string) => `/usuarios/perfil/${username}`,

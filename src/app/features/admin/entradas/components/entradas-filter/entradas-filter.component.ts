@@ -13,8 +13,7 @@ export class EntradasFilterComponent {
   @Input() showAdvanced: boolean = false;
   @Input() definiciones: any[] = [];
   @Input() cargarCatalogosFn!: () => Observable<any>;
-  @Input() pagingInfo: PagingInfo | null =
-    null;
+  @Input() pagingInfo: PagingInfo | null = null;
 
   @Output() basicSearchChange = new EventEmitter<string>();
   @Output() toggleAdvanced = new EventEmitter<void>();

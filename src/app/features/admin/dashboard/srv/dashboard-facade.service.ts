@@ -36,20 +36,14 @@ export class DashboardFacadeService {
     const topWidgets$ = this.refreshTopWidgets(topLimit, force, topStartDate, topEndDate);
     const storage$ = this.api.getStorage();
     const contentStats$ = this.api.getContentStats();
-    
+
     return new Observable((observer) => {
-      forkJoin([
-        summary$,
-        series$,
-        topWidgets$,
-        storage$,
-        contentStats$,
-      ]).subscribe({
+      forkJoin([summary$, series$, topWidgets$, storage$, contentStats$]).subscribe({
         next: ([summary, series, [users, categories, tags], storage, contentStats]) => {
           observer.next([summary, series, users, categories, tags, storage, contentStats]);
           observer.complete();
         },
-        error: (err) => observer.error(err)
+        error: (err) => observer.error(err),
       });
     });
   }

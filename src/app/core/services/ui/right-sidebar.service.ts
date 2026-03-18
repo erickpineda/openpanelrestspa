@@ -8,7 +8,7 @@ export interface RightSidebarConfig {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RightSidebarService {
   private _visible = new BehaviorSubject<boolean>(false);
@@ -16,7 +16,7 @@ export class RightSidebarService {
   private _config = new BehaviorSubject<RightSidebarConfig>({
     title: 'Panel Lateral',
     width: '300px',
-    backdrop: true
+    backdrop: true,
   });
 
   public readonly visible$ = this._visible.asObservable();

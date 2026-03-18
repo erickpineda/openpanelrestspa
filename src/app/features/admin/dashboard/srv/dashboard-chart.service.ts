@@ -29,7 +29,7 @@ export class DashboardChartService {
   ): string {
     if (!dateStr) return '';
     try {
-      // Append time part if missing to parse correctly as UTC or Local? 
+      // Append time part if missing to parse correctly as UTC or Local?
       // Original code used dateStr + 'T00:00:00Z' which assumes YYYY-MM-DD
       const d = new Date(dateStr.includes('T') ? dateStr : dateStr + 'T00:00:00Z');
       if (isNaN(d.getTime())) return String(dateStr);
@@ -57,12 +57,10 @@ export class DashboardChartService {
   }
 
   transformSplitEstado(arr: any[]): any {
-    const labels = Array.isArray(arr)
-      ? arr.map((p) => this.formatLabelFromDate(p?.date))
-      : [];
+    const labels = Array.isArray(arr) ? arr.map((p) => this.formatLabelFromDate(p?.date)) : [];
     const hasNested =
       Array.isArray(arr) && arr.some((p) => p && typeof p.entradasByEstado === 'object');
-    
+
     let datasets: any[] = [];
 
     if (hasNested) {
@@ -90,16 +88,12 @@ export class DashboardChartService {
   transformSplitEstadoNombre(arr: any[]): any {
     const flatArr = Array.isArray(arr)
       ? arr.map((p) =>
-          p && typeof p.entradasByEstado === 'object'
-            ? { date: p.date, ...p.entradasByEstado }
-            : p
+          p && typeof p.entradasByEstado === 'object' ? { date: p.date, ...p.entradasByEstado } : p
         )
       : [];
     const labels = flatArr.map((p) => this.formatLabelFromDate(p?.date));
     const estadosSet = new Set<string>();
-    flatArr.forEach((p) =>
-      Object.keys(p || {}).forEach((k) => k !== 'date' && estadosSet.add(k))
-    );
+    flatArr.forEach((p) => Object.keys(p || {}).forEach((k) => k !== 'date' && estadosSet.add(k)));
     const estados = Array.from(estadosSet);
     const datasets = estados.map((e, i) => ({
       label: String(e),
@@ -177,14 +171,13 @@ export class DashboardChartService {
     }
   }
 
-  calculateContentEstadoRows(cs: ContentStatsDTO | undefined): { estado: string; total: number; porcentaje: number }[] {
+  calculateContentEstadoRows(
+    cs: ContentStatsDTO | undefined
+  ): { estado: string; total: number; porcentaje: number }[] {
     const entries =
-      cs && (cs as any).entradasByEstado
-        ? Object.entries((cs as any).entradasByEstado)
-        : [];
+      cs && (cs as any).entradasByEstado ? Object.entries((cs as any).entradasByEstado) : [];
     const total =
-      (cs as any)?.totalEntradas ||
-      entries.reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
+      (cs as any)?.totalEntradas || entries.reduce((acc, [, v]) => acc + (Number(v) || 0), 0);
     return entries
       .map(([k, v]) => {
         const count = Number(v) || 0;

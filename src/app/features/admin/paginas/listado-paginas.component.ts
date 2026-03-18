@@ -211,13 +211,21 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     };
 
     const pageToUse = page !== undefined ? page : this.currentPage;
-    return this.entradaService.buscarSafe(searchRequest, pageToUse, this.pageSize, this.currentSortField, this.currentSortDirection).pipe(
-      takeUntil(this.destroy$),
-      finalize(() => {
-        this.cargandoTabla = false;
-        this.cdr.detectChanges();
-      })
-    );
+    return this.entradaService
+      .buscarSafe(
+        searchRequest,
+        pageToUse,
+        this.pageSize,
+        this.currentSortField,
+        this.currentSortDirection
+      )
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.cargandoTabla = false;
+          this.cdr.detectChanges();
+        })
+      );
   }
 
   private procesarResultadosBusqueda(response: any) {
@@ -320,7 +328,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     if (this.currentSortField !== field || this.currentSortDirection !== direction) {
       this.currentSortField = field;
       this.currentSortDirection = direction;
-      
+
       if (this.allEntradas.length > 0) {
         this.sortClientCache();
         this.applyPaging();

@@ -43,7 +43,12 @@ export class RolService extends CrudService<Rol, string> {
 
   // Overrides for code-based endpoints
   override obtenerPorId(codigo: string, context?: HttpContext): Observable<any> {
-    return this.get<any>(`${this.endpoint}/obtenerPorCodigo/${codigo}`, undefined, undefined, context);
+    return this.get<any>(
+      `${this.endpoint}/obtenerPorCodigo/${codigo}`,
+      undefined,
+      undefined,
+      context
+    );
   }
 
   override actualizar(codigo: string, entity: Rol, context?: HttpContext): Observable<any> {

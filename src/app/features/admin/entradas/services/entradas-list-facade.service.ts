@@ -167,7 +167,12 @@ export class EntradasListFacadeService {
     return this.search(params);
   }
 
-  applyFilter(filtro: { campo: string; operacion: string; valor: string; dataOption?: string }): void {
+  applyFilter(filtro: {
+    campo: string;
+    operacion: string;
+    valor: string;
+    dataOption?: string;
+  }): void {
     this.currentField = filtro.campo;
     this.currentOperation = filtro.operacion;
     this.currentTerm = filtro.valor;
@@ -175,7 +180,12 @@ export class EntradasListFacadeService {
     this.triggerBusqueda(this.currentTerm);
   }
 
-  updateFilterState(filtro: { campo: string; operacion: string; valor: string; dataOption?: string }): void {
+  updateFilterState(filtro: {
+    campo: string;
+    operacion: string;
+    valor: string;
+    dataOption?: string;
+  }): void {
     this.currentField = filtro.campo;
     this.currentOperation = filtro.operacion;
     this.currentTerm = filtro.valor;

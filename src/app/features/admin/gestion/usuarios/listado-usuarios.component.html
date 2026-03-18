@@ -97,46 +97,75 @@
                 {{ 'ADMIN.USERS.FILTERS' | translate }}
               </button>
             </div>
-              
+
             <!-- Sort Dropdown -->
             <c-dropdown variant="btn-group">
-              <button cButton cDropdownToggle color="secondary" variant="outline" [cTooltip]="'Ordenar listado'" [disabled]="loading">
+              <button
+                cButton
+                cDropdownToggle
+                color="secondary"
+                variant="outline"
+                [cTooltip]="'Ordenar listado'"
+                [disabled]="loading"
+              >
                 <svg cIcon [name]="getSortIcon('username')" class="me-1"></svg>
               </button>
               <ul cDropdownMenu>
                 <li><h6 cDropdownHeader class="dropdown-header small">Por Usuario</h6></li>
                 <li>
                   <button cDropdownItem (click)="ordenar('username', 'ASC')">
-                    <span *ngIf="isSortActive('username', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                    <span *ngIf="isSortActive('username', 'ASC')" class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    (A-Z) Ascendente
                   </button>
                 </li>
                 <li>
                   <button cDropdownItem (click)="ordenar('username', 'DESC')">
-                    <span *ngIf="isSortActive('username', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                    <span *ngIf="isSortActive('username', 'DESC')" class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    (Z-A) Descendente
                   </button>
                 </li>
-                <li><hr cDropdownDivider></li>
+                <li><hr cDropdownDivider /></li>
                 <li><h6 cDropdownHeader class="dropdown-header small">Por Nombre</h6></li>
                 <li>
                   <button cDropdownItem (click)="ordenar('nombre', 'ASC')">
-                    <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                    <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    (A-Z) Ascendente
                   </button>
                 </li>
                 <li>
                   <button cDropdownItem (click)="ordenar('nombre', 'DESC')">
-                    <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                    <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    (Z-A) Descendente
                   </button>
                 </li>
-                <li><hr cDropdownDivider></li>
+                <li><hr cDropdownDivider /></li>
                 <li><h6 cDropdownHeader class="dropdown-header small">Por Rol</h6></li>
                 <li>
                   <button cDropdownItem (click)="ordenar('rol.codigo', 'ASC')">
-                    <span *ngIf="isSortActive('rol.codigo', 'ASC')" class="me-1 text-success fw-bold">✓</span> Rol Ascendente
+                    <span
+                      *ngIf="isSortActive('rol.codigo', 'ASC')"
+                      class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    Rol Ascendente
                   </button>
                 </li>
                 <li>
                   <button cDropdownItem (click)="ordenar('rol.codigo', 'DESC')">
-                    <span *ngIf="isSortActive('rol.codigo', 'DESC')" class="me-1 text-success fw-bold">✓</span> Rol Descendente
+                    <span
+                      *ngIf="isSortActive('rol.codigo', 'DESC')"
+                      class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    Rol Descendente
                   </button>
                 </li>
               </ul>

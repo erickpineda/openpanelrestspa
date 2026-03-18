@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -111,14 +110,24 @@ export class TemporaryEntriesManagerComponent implements OnInit {
 
     // Fallback: Si no hay nombre pero hay codigo
     if (!nombreEstado && data.estadoEntrada?.codigo) {
-       const codigo = data.estadoEntrada.codigo;
-       switch(codigo) {
-          case 'BOR': nombreEstado = 'BORRADOR'; break;
-          case 'PUB': nombreEstado = 'PUBLICADA'; break;
-          case 'PDR': nombreEstado = 'PENDIENTE REVISION'; break;
-          case 'PRO': nombreEstado = 'PROGRAMADA'; break;
-          case 'NOP': nombreEstado = 'NO PUBLICADA'; break;
-       }
+      const codigo = data.estadoEntrada.codigo;
+      switch (codigo) {
+        case 'BOR':
+          nombreEstado = 'BORRADOR';
+          break;
+        case 'PUB':
+          nombreEstado = 'PUBLICADA';
+          break;
+        case 'PDR':
+          nombreEstado = 'PENDIENTE REVISION';
+          break;
+        case 'PRO':
+          nombreEstado = 'PROGRAMADA';
+          break;
+        case 'NOP':
+          nombreEstado = 'NO PUBLICADA';
+          break;
+      }
     }
 
     if (!nombreEstado) {
@@ -198,10 +207,10 @@ export class TemporaryEntriesManagerComponent implements OnInit {
       if (typeof data.categorias[0] === 'object' && 'nombre' in data.categorias[0]) {
         this.categoriasMostrar = data.categorias;
       } else {
-        // Si son IDs (esto es más complejo si no tenemos la lista meta, 
-        // pero asumiremos que el form guarda objetos si es posible, 
+        // Si son IDs (esto es más complejo si no tenemos la lista meta,
+        // pero asumiremos que el form guarda objetos si es posible,
         // o mostraremos vacío si no podemos resolver)
-        this.categoriasMostrar = []; 
+        this.categoriasMostrar = [];
       }
     } else {
       this.categoriasMostrar = [];

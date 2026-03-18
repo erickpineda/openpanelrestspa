@@ -33,8 +33,8 @@ fdescribe('AdminComponent', () => {
           useValue: {
             navigate: jasmine.createSpy('navigate'),
             url: '/admin/dashboard',
-            events: of({})
-          }
+            events: of({}),
+          },
         },
         { provide: Title, useValue: {} },
         { provide: IconSetService, useValue: { icons: {} } },
@@ -43,8 +43,8 @@ fdescribe('AdminComponent', () => {
           useValue: {
             entriesChanged$: of([]),
             getAllTemporaryEntries: () => [],
-            clearAllTemporaryEntries: jasmine.createSpy('clearAllTemporaryEntries')
-          }
+            clearAllTemporaryEntries: jasmine.createSpy('clearAllTemporaryEntries'),
+          },
         },
         {
           provide: LoggerService,
@@ -52,8 +52,8 @@ fdescribe('AdminComponent', () => {
             debug: () => {},
             info: () => {},
             error: () => {},
-            warn: () => {}
-          }
+            warn: () => {},
+          },
         },
         { provide: LoadingService, useValue: { globalLoading$: of(false) } },
         { provide: ToastService, useValue: { toasts$: of([]) } },
@@ -66,41 +66,41 @@ fdescribe('AdminComponent', () => {
           useValue: {
             isLoggedIn: () => true,
             getUserRole: () => UserRole.ADMINISTRADOR,
-            getToken: () => 'mock-token'
-          }
+            getToken: () => 'mock-token',
+          },
         },
         { provide: AuthService, useValue: { isTokenValid: () => true } },
         {
           provide: SidebarStateService,
           useValue: {
-            updateNavItems: jasmine.createSpy('updateNavItems')
-          }
+            updateNavItems: jasmine.createSpy('updateNavItems'),
+          },
         },
         {
           provide: NavigationService,
           useValue: {
             setNavigationItems: jasmine.createSpy('setNavigationItems'),
-            getNavigationItems: () => of([])
-          }
+            getNavigationItems: () => of([]),
+          },
         },
         {
           provide: BadgeCounterService,
-          useValue: { initializeCounters: jasmine.createSpy('initializeCounters') }
+          useValue: { initializeCounters: jasmine.createSpy('initializeCounters') },
         },
         {
           provide: TranslationService,
           useValue: {
             translate: (key: string) => key,
-            translations$: of({})
-          }
+            translations$: of({}),
+          },
         },
         { provide: LanguageService, useValue: {} },
         {
           provide: ComentarioService,
           useValue: {
-            listarSafeSinGlobalLoader: () => of([])
-          }
-        }
+            listarSafeSinGlobalLoader: () => of([]),
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

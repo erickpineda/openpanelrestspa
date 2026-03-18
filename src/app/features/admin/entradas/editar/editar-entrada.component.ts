@@ -77,12 +77,8 @@ export class EditarEntradaComponent implements OnInit {
         this.idEntrada = ent.idEntrada;
       }
 
-      const estadoCorrecto = this.estadosEntr.find(
-        (e) => e.codigo === ent.estadoEntrada?.codigo
-      );
-      const tipoCorrecto = this.tiposEntr.find(
-        (t) => t.codigo === ent.tipoEntrada?.codigo
-      );
+      const estadoCorrecto = this.estadosEntr.find((e) => e.codigo === ent.estadoEntrada?.codigo);
+      const tipoCorrecto = this.tiposEntr.find((t) => t.codigo === ent.tipoEntrada?.codigo);
 
       const patchAndFinalize = (imagenB64: string | null) => {
         this.entradaForm.patchValue(

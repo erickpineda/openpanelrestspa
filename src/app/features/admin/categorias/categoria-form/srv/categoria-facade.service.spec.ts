@@ -16,7 +16,7 @@ describe('CategoriaFacadeService', () => {
       'listarPagina',
       'obtenerPorCodigo',
       'crear',
-      'actualizarPorCodigo'
+      'actualizarPorCodigo',
     ]);
     const userSpy = jasmine.createSpyObj('UsuarioService', ['obtenerDatosSesionActual']);
     const entSpy = jasmine.createSpyObj('EntradaService', ['obtenerPorId']);
@@ -26,8 +26,8 @@ describe('CategoriaFacadeService', () => {
         CategoriaFacadeService,
         { provide: CategoriaService, useValue: catSpy },
         { provide: UsuarioService, useValue: userSpy },
-        { provide: EntradaService, useValue: entSpy }
-      ]
+        { provide: EntradaService, useValue: entSpy },
+      ],
     });
 
     service = TestBed.inject(CategoriaFacadeService);
@@ -41,8 +41,10 @@ describe('CategoriaFacadeService', () => {
   });
 
   it('obtenerListaCategorias should return elements on success', (done) => {
-    categoriaServiceSpy.listarPagina.and.returnValue(of({ data: { elements: [{ codigo: 'TEST' }] } } as any));
-    service.obtenerListaCategorias().subscribe(res => {
+    categoriaServiceSpy.listarPagina.and.returnValue(
+      of({ data: { elements: [{ codigo: 'TEST' }] } } as any)
+    );
+    service.obtenerListaCategorias().subscribe((res) => {
       expect(res.length).toBe(1);
       done();
     });
@@ -50,7 +52,7 @@ describe('CategoriaFacadeService', () => {
 
   it('obtenerListaCategorias should return empty array on error', (done) => {
     categoriaServiceSpy.listarPagina.and.returnValue(throwError(() => new Error('Err')));
-    service.obtenerListaCategorias().subscribe(res => {
+    service.obtenerListaCategorias().subscribe((res) => {
       expect(res).toEqual([]);
       done();
     });
@@ -58,7 +60,7 @@ describe('CategoriaFacadeService', () => {
 
   it('obtenerCategoriaPorCodigo should return data', (done) => {
     categoriaServiceSpy.obtenerPorCodigo.and.returnValue(of({ data: { codigo: 'TEST' } } as any));
-    service.obtenerCategoriaPorCodigo('TEST').subscribe(res => {
+    service.obtenerCategoriaPorCodigo('TEST').subscribe((res) => {
       expect(res).toBeTruthy();
       done();
     });

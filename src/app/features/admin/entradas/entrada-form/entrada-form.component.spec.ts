@@ -22,7 +22,7 @@ describe('EntradaFormComponent', () => {
 
   // Mocks
   const routerMock = {
-    navigate: jasmine.createSpy('navigate')
+    navigate: jasmine.createSpy('navigate'),
   };
 
   const vfMock = {
@@ -30,25 +30,25 @@ describe('EntradaFormComponent', () => {
       length: 0,
       removeAt: jasmine.createSpy('removeAt'),
       push: jasmine.createSpy('push'),
-      value: []
-    } as any)
+      value: [],
+    } as any),
   };
 
   const fileStorageMock = {};
   const temporaryStorageMock = {};
   const activeTabServiceMock = {
     registerActiveFeature: jasmine.createSpy('registerActiveFeature'),
-    unregisterActiveFeature: jasmine.createSpy('unregisterActiveFeature')
+    unregisterActiveFeature: jasmine.createSpy('unregisterActiveFeature'),
   };
   const loggerMock = {
     debug: jasmine.createSpy('debug'),
     info: jasmine.createSpy('info'),
-    error: jasmine.createSpy('error')
+    error: jasmine.createSpy('error'),
   };
   const translationServiceMock = {
     translations$: new BehaviorSubject({}),
     translate: (key: string) => key,
-    instant: (key: string) => key
+    instant: (key: string) => key,
   };
   const toastServiceMock = {};
   const entradaFormStateServiceMock = {
@@ -58,12 +58,12 @@ describe('EntradaFormComponent', () => {
       isFullScreen: false,
       showBackToTop: false,
       showRecoveryNotification: false,
-      temporaryData: null
+      temporaryData: null,
     },
     checkForTemporaryData: jasmine.createSpy('checkForTemporaryData'),
     toggleFullWidth: jasmine.createSpy('toggleFullWidth'),
     toggleFullScreen: jasmine.createSpy('toggleFullScreen'),
-    removeCurrentTemporaryEntry: jasmine.createSpy('removeCurrentTemporaryEntry')
+    removeCurrentTemporaryEntry: jasmine.createSpy('removeCurrentTemporaryEntry'),
   };
 
   beforeEach(async () => {
@@ -81,18 +81,20 @@ describe('EntradaFormComponent', () => {
         { provide: LoggerService, useValue: loggerMock },
         { provide: TranslationService, useValue: translationServiceMock },
         { provide: ToastService, useValue: toastServiceMock },
-        { provide: EntradaFormStateService, useValue: entradaFormStateServiceMock }
-      ]
+        { provide: EntradaFormStateService, useValue: entradaFormStateServiceMock },
+      ],
     })
-    .overrideComponent(EntradaFormComponent, {
-      set: { providers: [{ provide: EntradaFormStateService, useValue: entradaFormStateServiceMock }] }
-    })
-    .compileComponents();
+      .overrideComponent(EntradaFormComponent, {
+        set: {
+          providers: [{ provide: EntradaFormStateService, useValue: entradaFormStateServiceMock }],
+        },
+      })
+      .compileComponents();
 
     fb = TestBed.inject(UntypedFormBuilder);
     fixture = TestBed.createComponent(EntradaFormComponent);
     component = fixture.componentInstance;
-    
+
     // Initialize form with form builder to avoid errors
     component.form = fb.group({
       titulo: [''],
@@ -110,7 +112,7 @@ describe('EntradaFormComponent', () => {
       notas: [''],
       password: [''],
       fechaPublicacion: [null],
-      categorias: fb.array([])
+      categorias: fb.array([]),
     });
 
     fixture.detectChanges();
@@ -140,14 +142,16 @@ describe('EntradaFormComponent', () => {
       const categoriasArrayMock = {
         length: 2,
         removeAt: removeAtSpy,
-        value: [1, 2] // Simulate items
+        value: [1, 2], // Simulate items
       };
-      
+
       // Override the getter to return our mock that has items initially
       Object.defineProperty(categoriasArrayMock, 'length', {
-        get: function() { return this.value.length; }
+        get: function () {
+          return this.value.length;
+        },
       });
-      
+
       // We need to simulate the while loop behavior
       removeAtSpy.and.callFake(() => {
         categoriasArrayMock.value.shift();
@@ -167,7 +171,10 @@ describe('EntradaFormComponent', () => {
       expect(component.form.reset).toHaveBeenCalled();
       // Expect categories to be cleared (removeAt called twice)
       expect(removeAtSpy).toHaveBeenCalledTimes(2);
-      expect(component.form.patchValue).toHaveBeenCalledWith({ imagenDestacada: null, imagenDestacadaUuid: null });
+      expect(component.form.patchValue).toHaveBeenCalledWith({
+        imagenDestacada: null,
+        imagenDestacadaUuid: null,
+      });
       expect(component.form.markAsPristine).toHaveBeenCalled();
       expect(component.form.markAsUntouched).toHaveBeenCalled();
     });
@@ -176,15 +183,16 @@ describe('EntradaFormComponent', () => {
   describe('Form submission', () => {
     it('should strip data URI prefix from imagenDestacada on submit', () => {
       // Arrange
-      const base64Content = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+      const base64Content =
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
       const dataUri = `data:image/png;base64,${base64Content}`;
-      
+
       component.form.patchValue({
         titulo: 'Test Entry',
         imagenDestacada: dataUri,
-        contenido: 'Content'
+        contenido: 'Content',
       });
-      
+
       spyOn(component.submitForm, 'emit');
 
       // Act
@@ -199,13 +207,13 @@ describe('EntradaFormComponent', () => {
     it('should keep imagenDestacada as is if it is a URL', () => {
       // Arrange
       const url = 'http://example.com/image.jpg';
-      
+
       component.form.patchValue({
         titulo: 'Test Entry',
         imagenDestacada: url,
-        contenido: 'Content'
+        contenido: 'Content',
       });
-      
+
       spyOn(component.submitForm, 'emit');
 
       // Act

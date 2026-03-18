@@ -42,13 +42,16 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
       this.sessionManager.sessionExpired$.subscribe((data) => {
         this.log.info('📡 UnsavedWorkModalComponent: Evento recibido:', data);
 
-        const isLogoutWithSave = data.type === OPSessionConstants.TYPE_LOGOUT && data.allowSave === true;
-        this.log.info(`🔍 Análisis de evento: type=${data.type}, allowSave=${data.allowSave}, isLogoutWithSave=${isLogoutWithSave}, origin=${data.origin}`);
+        const isLogoutWithSave =
+          data.type === OPSessionConstants.TYPE_LOGOUT && data.allowSave === true;
+        this.log.info(
+          `🔍 Análisis de evento: type=${data.type}, allowSave=${data.allowSave}, isLogoutWithSave=${isLogoutWithSave}, origin=${data.origin}`
+        );
 
         // --- LÓGICA UNIFICADA ---
         // Determinamos si estamos en una pantalla crítica (Crear Entrada)
-        const isCreateEntryActive = 
-          this.activeTabService.isFeatureActiveInCurrentTab('create-entry') || 
+        const isCreateEntryActive =
+          this.activeTabService.isFeatureActiveInCurrentTab('create-entry') ||
           this.router.url.includes('/entradas/crear');
 
         // Determinamos si hay trabajo pendiente
@@ -71,30 +74,32 @@ export class UnsavedWorkModalComponent implements OnInit, OnDestroy {
         // Caso 2: LOGOUT (Local) con allowSave
         if (isLogoutWithSave && data.origin === 'local') {
           if (shouldShowModal) {
-             this.log.info('✅ Mostrando modal por LOGOUT LOCAL con trabajo pendiente/activo');
-             this.sessionData = data;
-             this.showModal();
-             return;
+            this.log.info('✅ Mostrando modal por LOGOUT LOCAL con trabajo pendiente/activo');
+            this.sessionData = data;
+            this.showModal();
+            return;
           } else {
-             // Si no hay trabajo, logout directo
-             this.log.info('⚠️ LOGOUT LOCAL sin trabajo pendiente. Procediendo...');
-             this.sessionManager.performLogout(data);
-             return;
+            // Si no hay trabajo, logout directo
+            this.log.info('⚠️ LOGOUT LOCAL sin trabajo pendiente. Procediendo...');
+            this.sessionManager.performLogout(data);
+            return;
           }
         }
 
         // Caso 3: SESSION_EXPIRED
         if (data.type === OPSessionConstants.TYPE_SESSION_EXPIRED) {
-           if (shouldShowModal) {
-             this.log.info('✅ Mostrando modal por SESSION_EXPIRED con trabajo pendiente/activo');
-             this.sessionData = data;
-             this.showModal();
-             return;
-           } else {
-             this.log.info('ℹ️ SESSION_EXPIRED sin trabajo pendiente, delegando a SessionExpiredComponent');
-             // No hacemos nada, SessionExpiredComponent mostrará su modal (porque su check shouldDelegate fallará)
-             return;
-           }
+          if (shouldShowModal) {
+            this.log.info('✅ Mostrando modal por SESSION_EXPIRED con trabajo pendiente/activo');
+            this.sessionData = data;
+            this.showModal();
+            return;
+          } else {
+            this.log.info(
+              'ℹ️ SESSION_EXPIRED sin trabajo pendiente, delegando a SessionExpiredComponent'
+            );
+            // No hacemos nada, SessionExpiredComponent mostrará su modal (porque su check shouldDelegate fallará)
+            return;
+          }
         }
 
         // Caso Default: Logout sin save o eventos desconocidos

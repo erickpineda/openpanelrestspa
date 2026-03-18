@@ -20,8 +20,7 @@ export class ValidationEntradaFormsService {
   private scheduledDateValidator(control: AbstractControl): ValidationErrors | null {
     const parent = control.parent as UntypedFormGroup | null;
     const estado = parent?.get('estadoEntrada')?.value as EstadoEntrada | null;
-    const isScheduled =
-      !!estado && (estado.nombre === 'PROGRAMADA' || estado.codigo === 'PRO');
+    const isScheduled = !!estado && (estado.nombre === 'PROGRAMADA' || estado.codigo === 'PRO');
 
     if (!control.value) {
       if (isScheduled) {

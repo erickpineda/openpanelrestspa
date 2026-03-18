@@ -38,7 +38,7 @@ describe('ChangePasswordComponent', () => {
         FormModule,
         ButtonModule,
         SpinnerModule,
-        IconModule
+        IconModule,
       ],
       providers: [
         { provide: UsuarioService, useValue: usuarioServiceSpy },
@@ -93,11 +93,14 @@ describe('ChangePasswordComponent', () => {
 
     component.onSubmit();
 
-    expect(usuarioServiceSpy.changePassword).toHaveBeenCalledWith({
-      idUsuario: 1,
-      username: 'testuser',
-      password: 'newPassword123',
-    }, jasmine.any(HttpContext));
+    expect(usuarioServiceSpy.changePassword).toHaveBeenCalledWith(
+      {
+        idUsuario: 1,
+        username: 'testuser',
+        password: 'newPassword123',
+      },
+      jasmine.any(HttpContext)
+    );
     expect(toastServiceSpy.showSuccess).toHaveBeenCalled();
   });
 

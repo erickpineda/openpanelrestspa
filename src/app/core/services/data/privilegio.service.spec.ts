@@ -40,7 +40,9 @@ describe('PrivilegioService', () => {
         .buscarSinGlobalLoader(searchRequest, pageNo, pageSize, sortField, sortDirection)
         .subscribe();
 
-      const req = httpMock.expectOne(`${apiUrl}/privilegios/buscar?pageNo=0&pageSize=10&sort=name,ASC`);
+      const req = httpMock.expectOne(
+        `${apiUrl}/privilegios/buscar?pageNo=0&pageSize=10&sort=name,ASC`
+      );
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(searchRequest);
       expect(req.request.context.get(SKIP_GLOBAL_LOADER)).toBeTrue();
@@ -48,33 +50,31 @@ describe('PrivilegioService', () => {
     });
 
     it('should default sort direction to ASC if not provided', () => {
-        const searchRequest = { term: 'test' };
-        const pageNo = 0;
-        const pageSize = 10;
-        const sortField = 'name';
-  
-        service
-          .buscarSinGlobalLoader(searchRequest, pageNo, pageSize, sortField)
-          .subscribe();
-  
-        const req = httpMock.expectOne(`${apiUrl}/privilegios/buscar?pageNo=0&pageSize=10&sort=name,ASC`);
-        expect(req.request.method).toBe('POST');
-        req.flush({});
-      });
+      const searchRequest = { term: 'test' };
+      const pageNo = 0;
+      const pageSize = 10;
+      const sortField = 'name';
 
-      it('should not add sort param if sortField is not provided', () => {
-        const searchRequest = { term: 'test' };
-        const pageNo = 0;
-        const pageSize = 10;
-  
-        service
-          .buscarSinGlobalLoader(searchRequest, pageNo, pageSize)
-          .subscribe();
-  
-        const req = httpMock.expectOne(`${apiUrl}/privilegios/buscar?pageNo=0&pageSize=10`);
-        expect(req.request.method).toBe('POST');
-        req.flush({});
-      });
+      service.buscarSinGlobalLoader(searchRequest, pageNo, pageSize, sortField).subscribe();
+
+      const req = httpMock.expectOne(
+        `${apiUrl}/privilegios/buscar?pageNo=0&pageSize=10&sort=name,ASC`
+      );
+      expect(req.request.method).toBe('POST');
+      req.flush({});
+    });
+
+    it('should not add sort param if sortField is not provided', () => {
+      const searchRequest = { term: 'test' };
+      const pageNo = 0;
+      const pageSize = 10;
+
+      service.buscarSinGlobalLoader(searchRequest, pageNo, pageSize).subscribe();
+
+      const req = httpMock.expectOne(`${apiUrl}/privilegios/buscar?pageNo=0&pageSize=10`);
+      expect(req.request.method).toBe('POST');
+      req.flush({});
+    });
   });
 
   describe('obtenerPorId', () => {

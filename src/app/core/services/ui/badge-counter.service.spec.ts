@@ -15,12 +15,19 @@ fdescribe('BadgeCounterService', () => {
   let mockTemporaryStorage: jasmine.SpyObj<TemporaryStorageService>;
 
   beforeEach(() => {
-    const comentarioSpy = jasmine.createSpyObj('ComentarioService', ['listarSafe', 'listarSafeSinGlobalLoader']);
+    const comentarioSpy = jasmine.createSpyObj('ComentarioService', [
+      'listarSafe',
+      'listarSafeSinGlobalLoader',
+    ]);
     const entradaSpy = jasmine.createSpyObj('EntradaService', ['listarSafe']);
-    const usuarioSpy = jasmine.createSpyObj('UsuarioService', ['listarSafe', 'obtenerDatosSesionActualSafe', 'listarSafeSinGlobalLoader']);
+    const usuarioSpy = jasmine.createSpyObj('UsuarioService', [
+      'listarSafe',
+      'obtenerDatosSesionActualSafe',
+      'listarSafeSinGlobalLoader',
+    ]);
     const tempSpy = jasmine.createSpyObj('TemporaryStorageService', ['getTemporaryEntriesByType']);
     (tempSpy as any).entriesChanged$ = new Subject<void>();
-    
+
     // Configurar mocks por defecto para evitar errores en constructor
     comentarioSpy.listarSafe.and.returnValue(of([] as any));
     entradaSpy.listarSafe.and.returnValue(of([] as any));
@@ -42,7 +49,9 @@ fdescribe('BadgeCounterService', () => {
     mockComentarioService = TestBed.inject(ComentarioService) as jasmine.SpyObj<ComentarioService>;
     mockEntradaService = TestBed.inject(EntradaService) as jasmine.SpyObj<EntradaService>;
     mockUsuarioService = TestBed.inject(UsuarioService) as jasmine.SpyObj<UsuarioService>;
-    mockTemporaryStorage = TestBed.inject(TemporaryStorageService) as jasmine.SpyObj<TemporaryStorageService>;
+    mockTemporaryStorage = TestBed.inject(
+      TemporaryStorageService
+    ) as jasmine.SpyObj<TemporaryStorageService>;
 
     service.configureFallbacks({
       retryDelayMs: 10,
@@ -70,19 +79,25 @@ fdescribe('BadgeCounterService', () => {
 
       mockComentarioService.listarSafe.and.returnValue(of(mockComentarios as any));
 
-      service.getUnmoderatedCommentsCount().pipe(skip(1)).subscribe((count) => {
-        expect(count).toBe(3); // 2 PENDIENTE + 1 REPORTADO
-        done();
-      });
+      service
+        .getUnmoderatedCommentsCount()
+        .pipe(skip(1))
+        .subscribe((count) => {
+          expect(count).toBe(3); // 2 PENDIENTE + 1 REPORTADO
+          done();
+        });
     });
 
     it('should return 0 when service fails', (done) => {
       mockComentarioService.listarSafe.and.returnValue(throwError('Service error'));
 
-      service.getUnmoderatedCommentsCount().pipe(skip(1)).subscribe((count) => {
-        expect(count).toBe(0);
-        done();
-      });
+      service
+        .getUnmoderatedCommentsCount()
+        .pipe(skip(1))
+        .subscribe((count) => {
+          expect(count).toBe(0);
+          done();
+        });
     });
   });
 
@@ -90,24 +105,30 @@ fdescribe('BadgeCounterService', () => {
     it('should return count of draft entries', (done) => {
       const mockEntries = [
         { id: '1', formType: 'entrada' },
-        { id: '2', formType: 'entrada' }
+        { id: '2', formType: 'entrada' },
       ];
 
       mockTemporaryStorage.getTemporaryEntriesByType.and.returnValue(mockEntries as any);
 
-      service.getDraftEntriesCount().pipe(take(1)).subscribe((count) => {
-        expect(count).toBe(2);
-        done();
-      });
+      service
+        .getDraftEntriesCount()
+        .pipe(take(1))
+        .subscribe((count) => {
+          expect(count).toBe(2);
+          done();
+        });
     });
 
     it('should return 0 when service fails', (done) => {
       mockTemporaryStorage.getTemporaryEntriesByType.and.throwError('Storage error');
 
-      service.getDraftEntriesCount().pipe(take(1)).subscribe((count) => {
-        expect(count).toBe(0);
-        done();
-      });
+      service
+        .getDraftEntriesCount()
+        .pipe(take(1))
+        .subscribe((count) => {
+          expect(count).toBe(0);
+          done();
+        });
     });
   });
 
@@ -121,19 +142,25 @@ fdescribe('BadgeCounterService', () => {
 
       mockUsuarioService.listarSafe.and.returnValue(of(mockUsuarios as any));
 
-      service.getPendingUsersCount().pipe(skip(1)).subscribe((count) => {
-        expect(count).toBe(2); // 1 PENDIENTE + 1 INACTIVO
-        done();
-      });
+      service
+        .getPendingUsersCount()
+        .pipe(skip(1))
+        .subscribe((count) => {
+          expect(count).toBe(2); // 1 PENDIENTE + 1 INACTIVO
+          done();
+        });
     });
 
     it('should return 0 when service fails', (done) => {
       mockUsuarioService.listarSafe.and.returnValue(throwError('Service error'));
 
-      service.getPendingUsersCount().pipe(skip(1)).subscribe((count) => {
-        expect(count).toBe(0);
-        done();
-      });
+      service
+        .getPendingUsersCount()
+        .pipe(skip(1))
+        .subscribe((count) => {
+          expect(count).toBe(0);
+          done();
+        });
     });
   });
 
@@ -149,32 +176,39 @@ fdescribe('BadgeCounterService', () => {
       mockUsuarioService.obtenerDatosSesionActualSafe.and.returnValue(of(mockUser as any));
       mockEntradaService.listarSafe.and.returnValue(of(mockEntradas as any));
 
-      service.getMyDraftsCount().pipe(take(2), toArray()).subscribe((counts) => {
-        expect(counts[1]).toBe(2);
-        done();
-      });
+      service
+        .getMyDraftsCount()
+        .pipe(take(2), toArray())
+        .subscribe((counts) => {
+          expect(counts[1]).toBe(2);
+          done();
+        });
     });
 
     it('should return 0 when user is not available', (done) => {
       mockUsuarioService.obtenerDatosSesionActualSafe.and.returnValue(of({} as any));
 
       // Use skip(1) to bypass startWith(0)
-      service.getMyDraftsCount().pipe(skip(1)).subscribe((count) => {
-        expect(count).toBe(0);
-        done();
-      });
+      service
+        .getMyDraftsCount()
+        .pipe(skip(1))
+        .subscribe((count) => {
+          expect(count).toBe(0);
+          done();
+        });
     });
 
     it('should return 0 when service fails', (done) => {
-      mockUsuarioService.obtenerDatosSesionActualSafe.and.returnValue(
-        throwError('Service error')
-      );
+      mockUsuarioService.obtenerDatosSesionActualSafe.and.returnValue(throwError('Service error'));
 
       // Use skip(1) to bypass startWith(0)
-      service.getMyDraftsCount().pipe(skip(1)).subscribe((count) => {
-        expect(count).toBe(0);
-        done();
-      });
+      service
+        .getMyDraftsCount()
+        .pipe(skip(1))
+        .subscribe((count) => {
+          expect(count).toBe(0);
+          done();
+        });
     });
   });
 
@@ -195,18 +229,21 @@ fdescribe('BadgeCounterService', () => {
         )
       );
 
-      // Note: getSystemAlertsCount combines streams. 
+      // Note: getSystemAlertsCount combines streams.
       // Comments & Users have startWith(0). Drafts emits immediately.
       // 1. [0, 25, 0] -> 1 alert
       // 2. [15, 25, 0] -> 2 alerts
       // 3. [15, 25, 8] -> 3 alerts
-      
-      service.getSystemAlertsCount().pipe(skip(1)).subscribe((count) => {
-        if (count === 3) {
-          expect(count).toBe(3);
-          done();
-        }
-      });
+
+      service
+        .getSystemAlertsCount()
+        .pipe(skip(1))
+        .subscribe((count) => {
+          if (count === 3) {
+            expect(count).toBe(3);
+            done();
+          }
+        });
     });
 
     it('should return 0 alerts when counts are below thresholds', (done) => {
@@ -225,11 +262,14 @@ fdescribe('BadgeCounterService', () => {
         )
       );
 
-      service.getSystemAlertsCount().pipe(skip(1)).subscribe((count) => {
-         // Should settle at 0
-         expect(count).toBe(0);
-         done();
-      });
+      service
+        .getSystemAlertsCount()
+        .pipe(skip(1))
+        .subscribe((count) => {
+          // Should settle at 0
+          expect(count).toBe(0);
+          done();
+        });
     });
   });
 
@@ -357,35 +397,53 @@ fdescribe('BadgeCounterService', () => {
       const expectedUsers = 2;
 
       // Use skip(1) to bypass startWith(0) for comments
-      service.getUnmoderatedCommentsCount().pipe(skip(1)).subscribe((count1) => {
-        expect(count1).toBe(expectedComments);
+      service
+        .getUnmoderatedCommentsCount()
+        .pipe(skip(1))
+        .subscribe((count1) => {
+          expect(count1).toBe(expectedComments);
 
-        service.getUnmoderatedCommentsCount().pipe(skip(1)).subscribe((count2) => {
-          expect(count2).toBe(expectedComments);
-          expect(count1).toBe(count2);
+          service
+            .getUnmoderatedCommentsCount()
+            .pipe(skip(1))
+            .subscribe((count2) => {
+              expect(count2).toBe(expectedComments);
+              expect(count1).toBe(count2);
 
-          // Test entries consistency (No skip needed as it emits immediately)
-          service.getDraftEntriesCount().pipe(take(1)).subscribe((entries1) => {
-            expect(entries1).toBe(expectedEntries);
+              // Test entries consistency (No skip needed as it emits immediately)
+              service
+                .getDraftEntriesCount()
+                .pipe(take(1))
+                .subscribe((entries1) => {
+                  expect(entries1).toBe(expectedEntries);
 
-            service.getDraftEntriesCount().pipe(take(1)).subscribe((entries2) => {
-              expect(entries2).toBe(expectedEntries);
-              expect(entries1).toBe(entries2);
+                  service
+                    .getDraftEntriesCount()
+                    .pipe(take(1))
+                    .subscribe((entries2) => {
+                      expect(entries2).toBe(expectedEntries);
+                      expect(entries1).toBe(entries2);
 
-              // Test users consistency (Use skip(1) for startWith(0))
-              service.getPendingUsersCount().pipe(skip(1)).subscribe((users1) => {
-                expect(users1).toBe(expectedUsers);
+                      // Test users consistency (Use skip(1) for startWith(0))
+                      service
+                        .getPendingUsersCount()
+                        .pipe(skip(1))
+                        .subscribe((users1) => {
+                          expect(users1).toBe(expectedUsers);
 
-                service.getPendingUsersCount().pipe(skip(1)).subscribe((users2) => {
-                  expect(users2).toBe(expectedUsers);
-                  expect(users1).toBe(users2);
-                  done();
+                          service
+                            .getPendingUsersCount()
+                            .pipe(skip(1))
+                            .subscribe((users2) => {
+                              expect(users2).toBe(expectedUsers);
+                              expect(users1).toBe(users2);
+                              done();
+                            });
+                        });
+                    });
                 });
-              });
             });
-          });
         });
-      });
     });
   });
 });

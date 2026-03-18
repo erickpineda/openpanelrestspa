@@ -88,9 +88,9 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
         // --- LÓGICA DE DELEGACIÓN CENTRALIZADA ---
         // Verificamos si este componente debe ceder el control al UnsavedWorkModalComponent.
         // Esto aplica tanto para LOGOUT (remoto/con guardado) como para SESSION_EXPIRED.
-        
-        const isCreateEntryActive = 
-          this.activeTabService.isFeatureActiveInCurrentTab('create-entry') || 
+
+        const isCreateEntryActive =
+          this.activeTabService.isFeatureActiveInCurrentTab('create-entry') ||
           this.router.url.includes('/entradas/crear');
 
         const hasUnsavedWork = this.unsavedWorkService.hasUnsavedWork();
@@ -132,7 +132,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
           // Lanzamos el evento por si acaso algún componente no registrado quiere guardar.
           const saveEvent = new CustomEvent(OPConstants.Events.SAVE_UNSAVED_WORK);
           window.dispatchEvent(saveEvent);
-          
+
           this.startTimer(data.timestamp);
         } else {
           this.stopTimer();
@@ -165,24 +165,27 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
             // no lo ocultamos, o lo dejamos para que NavigationEnd lo maneje.
             const nav = this.router.getCurrentNavigation();
             const hasSessionData = nav?.extras?.state?.['sessionData'];
-            
+
             if (!hasSessionData) {
-               this.hideModal();
+              this.hideModal();
             }
           }
         }
 
         if (event instanceof NavigationEnd) {
-           // Al terminar la navegación, verificamos si hay sessionData en el state
-           // Esto es crucial si AuthGuard nos redirigió al login con state
-           const nav = this.router.getCurrentNavigation();
-           const state = nav?.extras?.state || window.history.state;
-           
-           if (state?.sessionData && this.hasActiveSession()) {
-             this.log.info('SessionExpiredComponent: sessionData detectado en NavigationEnd', state.sessionData);
-             this.sessionData = state.sessionData;
-             this.showModal();
-           }
+          // Al terminar la navegación, verificamos si hay sessionData en el state
+          // Esto es crucial si AuthGuard nos redirigió al login con state
+          const nav = this.router.getCurrentNavigation();
+          const state = nav?.extras?.state || window.history.state;
+
+          if (state?.sessionData && this.hasActiveSession()) {
+            this.log.info(
+              'SessionExpiredComponent: sessionData detectado en NavigationEnd',
+              state.sessionData
+            );
+            this.sessionData = state.sessionData;
+            this.showModal();
+          }
         }
       })
     );
@@ -210,11 +213,11 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
   private updateTime(timestamp: number) {
     const now = Date.now();
     const diff = Math.max(0, Math.floor((now - timestamp) / 1000));
-    
+
     // Format: "Hace X minutos y Y segundos" or just "Hace X segundos"
     const minutes = Math.floor(diff / 60);
     const seconds = diff % 60;
-    
+
     if (minutes > 0) {
       this.timeSinceExpiry = `Hace ${minutes} min y ${seconds} seg`;
     } else {
@@ -223,7 +226,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
     // Force detection manually if needed, but Angular usually picks up timer changes if in zone.
     // However, since we use OnPush sometimes or detached, let's be safe if we were Detached.
     // But this component is default strategy.
-    this.cdr.detectChanges(); 
+    this.cdr.detectChanges();
   }
 
   private showModal(): void {
@@ -277,7 +280,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
       // LIMPIEZA CRÍTICA: Asegurar que el token inválido se elimine antes de navegar
       this.tokenStorage.signOut();
       this.activeTabService.clearCurrentTab();
-      
+
       this.router.navigate(['/login'], { replaceUrl: true }).then((success) => {
         if (!success) {
           this.log.warn('SessionExpiredComponent: Navegación por Router falló, forzando recarga.');
@@ -321,7 +324,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.cleanupVisualArtifacts();
-      
+
       // LIMPIEZA CRÍTICA: Asegurar que el token inválido se elimine antes de navegar
       this.tokenStorage.signOut();
       this.activeTabService.clearCurrentTab();

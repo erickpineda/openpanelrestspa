@@ -54,7 +54,13 @@
         (viewAll)="onViewAllNotifications()"
       ></app-notifications-dropdown>
       <c-nav-item>
-        <a cNavLink aria-label="Tareas" style="cursor: pointer" (click)="toggleRightSidebar()" [attr.aria-expanded]="rightSidebarService.visible$ | async">
+        <a
+          cNavLink
+          aria-label="Tareas"
+          style="cursor: pointer"
+          (click)="toggleRightSidebar()"
+          [attr.aria-expanded]="rightSidebarService.visible$ | async"
+        >
           <svg cIcon name="cilList" size="lg"></svg>
         </a>
       </c-nav-item>

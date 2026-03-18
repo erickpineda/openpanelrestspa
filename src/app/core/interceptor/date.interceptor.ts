@@ -11,7 +11,8 @@ export class DateInterceptor implements HttpInterceptor {
   // 2025-01-01T12:00:00.000Z (ISO)
   // 2025-01-01 (date)
   // 2025-01-01 12:00:00 (backend)
-  private dateRegex = /^\d{4}-\d{2}-\d{2}([T\s]\d{2}:\d{2}(:\d{2}(\.\d{3})?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+  private dateRegex =
+    /^\d{4}-\d{2}-\d{2}([T\s]\d{2}:\d{2}(:\d{2}(\.\d{3})?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
 
   constructor() {}
 

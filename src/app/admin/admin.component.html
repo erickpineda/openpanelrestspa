@@ -32,7 +32,7 @@
           type="button"
           class="btn-close btn-close-white d-lg-none position-absolute end-0 top-0 m-2"
           aria-label="Close"
-          style="z-index: 1050;"
+          style="z-index: 1050"
         ></button>
       }
     </c-sidebar-header>
@@ -61,7 +61,9 @@
         <div class="admin-recovery-wrapper">
           <app-data-recovery-notification
             [title]="'ADMIN.RECOVERY.GLOBAL_TITLE' | translate"
-            [message]="'ADMIN.RECOVERY.GLOBAL_MESSAGE' | translate: { count: temporaryEntriesCount }"
+            [message]="
+              'ADMIN.RECOVERY.GLOBAL_MESSAGE' | translate: { count: temporaryEntriesCount }
+            "
             [recoverText]="'ADMIN.RECOVERY.GO_TO_LIST' | translate"
             [ignoreText]="'ADMIN.RECOVERY.IGNORE_ALL' | translate"
             [discardText]="'ADMIN.RECOVERY.DISCARD_ALL' | translate"

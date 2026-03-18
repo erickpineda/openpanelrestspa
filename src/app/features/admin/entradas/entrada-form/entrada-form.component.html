@@ -38,12 +38,7 @@
               {{ 'COMMON.ENABLE_EDIT' | translate }}
             </button>
           } @else {
-            <button
-              cButton
-              color="secondary"
-              variant="ghost"
-              (click)="openResetConfirm()"
-            >
+            <button cButton color="secondary" variant="ghost" (click)="openResetConfirm()">
               <svg cIcon name="cilReload" class="me-2"></svg>
               {{ 'ADMIN.ENTRIES.RESET' | translate }}
             </button>
@@ -479,19 +474,19 @@
                       </div>
                       <div class="d-flex flex-column gap-2">
                         @for (c of categorias; track c.codigo) {
-                        <c-form-check>
-                          <input
-                            cFormCheckInput
-                            type="checkbox"
-                            [id]="'cat-' + c.codigo"
-                            [checked]="hasCategoria(c)"
-                            (change)="onCategoriaToggle(c, $any($event.target).checked)"
-                            [disabled]="!form.enabled"
-                          />
-                          <label cFormCheckLabel [for]="'cat-' + c.codigo" class="small">
-                            {{ c.nombre }}
-                          </label>
-                        </c-form-check>
+                          <c-form-check>
+                            <input
+                              cFormCheckInput
+                              type="checkbox"
+                              [id]="'cat-' + c.codigo"
+                              [checked]="hasCategoria(c)"
+                              (change)="onCategoriaToggle(c, $any($event.target).checked)"
+                              [disabled]="!form.enabled"
+                            />
+                            <label cFormCheckLabel [for]="'cat-' + c.codigo" class="small">
+                              {{ c.nombre }}
+                            </label>
+                          </c-form-check>
                         }
                       </div>
                     } @else {

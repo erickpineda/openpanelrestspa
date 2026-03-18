@@ -1,7 +1,11 @@
 import { EntradaVM } from '../models/entrada.vm';
 import { OPConstants } from '@app/shared/constants/op-global.constants';
 
-export function getEstadoInfo(entrada: EntradaVM): { color: string; icon: string; tooltip: string } {
+export function getEstadoInfo(entrada: EntradaVM): {
+  color: string;
+  icon: string;
+  tooltip: string;
+} {
   const nombre = entrada.estadoEntrada?.nombre?.toUpperCase();
   switch (nombre) {
     case OPConstants.App.Common.Estado.PUBLICADA:
@@ -22,7 +26,11 @@ export function getEstadoInfo(entrada: EntradaVM): { color: string; icon: string
     case OPConstants.App.Common.Estado.PROGRAMADA:
       return { color: 'info', icon: 'cilCalendar', tooltip: 'Programada' };
     default:
-      return { color: 'secondary', icon: 'cilFile', tooltip: entrada.estadoEntrada?.nombre || 'Archivada' };
+      return {
+        color: 'secondary',
+        icon: 'cilFile',
+        tooltip: entrada.estadoEntrada?.nombre || 'Archivada',
+      };
   }
 }
 

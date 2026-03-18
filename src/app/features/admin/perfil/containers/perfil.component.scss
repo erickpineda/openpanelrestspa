@@ -1,4 +1,3 @@
-
 // Variables
 $transition-duration: 0.3s;
 $primary-color: var(--cui-primary, #0d6efd);
@@ -11,7 +10,7 @@ $hover-bg: rgba($primary-color, 0.05);
 // Nav Tabs Styling
 ::ng-deep .nav-tabs {
   border-bottom: 2px solid #e9ecef;
-  
+
   .nav-link {
     border: none;
     color: #6c757d;
@@ -20,20 +19,20 @@ $hover-bg: rgba($primary-color, 0.05);
     position: relative;
     cursor: pointer;
     font-weight: 500;
-    
+
     // Hover Effect
     &:hover {
       color: $primary-color;
       background-color: $hover-bg;
       border-color: transparent;
     }
-    
+
     // Active State
     &.active {
       color: $primary-color;
       background-color: transparent;
       font-weight: 600;
-      
+
       // Bottom Indicator
       &::after {
         content: '';
@@ -47,7 +46,7 @@ $hover-bg: rgba($primary-color, 0.05);
         transition: transform $transition-duration ease;
       }
     }
-    
+
     // Initial state for indicator animation
     &::after {
       content: '';
@@ -67,12 +66,12 @@ $hover-bg: rgba($primary-color, 0.05);
 ::ng-deep .tab-content {
   position: relative;
   min-height: 300px; // Prevent collapse during transition if needed
-  
+
   .tab-pane {
     opacity: 0;
     transition: opacity $transition-duration ease-in-out;
     display: none; // Default hidden
-    
+
     &.active {
       display: block; // Show active
       // We use a small delay or requestAnimationFrame trick via CSS animations if we wanted slide,
@@ -80,7 +79,7 @@ $hover-bg: rgba($primary-color, 0.05);
       // CoreUI adds 'show' class which handles opacity.
       // We just ensure transition is smooth.
     }
-    
+
     &.show {
       opacity: 1;
     }
@@ -115,7 +114,7 @@ $hover-bg: rgba($primary-color, 0.05);
   cursor: wait;
   background-color: currentColor;
   opacity: 0.5;
-  
+
   &.bg-secondary {
     background-color: #6c757d !important;
   }

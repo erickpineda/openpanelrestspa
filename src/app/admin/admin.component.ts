@@ -129,18 +129,17 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargaFinalizada = true;
 
     // Suscribirse a cambios en las traducciones (se dispara cuando se carga el idioma o cambia)
-    this.translationService.translations$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.updateTranslations();
-        // Actualizar traducciones IN-PLACE para no romper referencias
-        this.refreshSidebar();
-      });
+    this.translationService.translations$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updateTranslations();
+      // Actualizar traducciones IN-PLACE para no romper referencias
+      this.refreshSidebar();
+    });
 
     const isDashboardRoute =
       this.router.url.includes('/admin/dashboard') || this.router.url.includes('/admin/control');
     if (isDashboardRoute) {
-      this.dashboardApi.getContentStats()
+      this.dashboardApi
+        .getContentStats()
         .pipe(takeUntil(this.destroy$))
         .subscribe((stats) => {
           this.projectsCount = Number(stats?.totalEntradas) || 0;
@@ -149,12 +148,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
           this.cdr.markForCheck();
         });
     }
-    this.toastService.toasts$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((list) => {
-        this.notificationsCount = Array.isArray(list) ? list.length : 0;
-        this.cdr.markForCheck();
-      });
+    this.toastService.toasts$.pipe(takeUntil(this.destroy$)).subscribe((list) => {
+      this.notificationsCount = Array.isArray(list) ? list.length : 0;
+      this.cdr.markForCheck();
+    });
     this.tasksCount = this.temporaryEntriesCount;
     this.cdr.markForCheck();
 
@@ -195,12 +192,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     // Escuchar cambios en localStorage para actualizar el banner inmediatamente
     window.addEventListener('storage', this.onStorageChange as any);
 
-    this.temporaryStorage.entriesChanged$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.checkForTemporaryData();
-        this.cdr.markForCheck();
-      });
+    this.temporaryStorage.entriesChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.checkForTemporaryData();
+      this.cdr.markForCheck();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -289,7 +284,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!item.translationKey) {
         item.translationKey = item.name;
       }
-      
+
       // Traducir nombre
       if (item.translationKey) {
         const translated = this.translationService.translate(item.translationKey);
@@ -298,7 +293,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
           item.name = translated;
         }
       }
-      
+
       if (item.badge) {
         if (!item.badge.translationKey) {
           item.badge.translationKey = item.badge.text;
@@ -398,19 +393,19 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   onResize(event: any) {
     const width = event.target.innerWidth;
     const isMobile = width < 992;
-    
+
     // Actualizar estado de backdrop
     this.sidebarBackdrop = isMobile;
 
     if (isMobile && this.sidebarVisible) {
-       this.sidebarVisible = false;
-       this.cdr.markForCheck();
+      this.sidebarVisible = false;
+      this.cdr.markForCheck();
     } else if (!isMobile && !this.sidebarVisible) {
-       this.sidebarVisible = true;
-       this.cdr.markForCheck();
+      this.sidebarVisible = true;
+      this.cdr.markForCheck();
     } else {
-       // Asegurar actualización de vista si solo cambia backdrop
-       this.cdr.markForCheck();
+      // Asegurar actualización de vista si solo cambia backdrop
+      this.cdr.markForCheck();
     }
   }
 
@@ -426,7 +421,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
         // Verificar si el click fue en el botón toggle para evitar cierre inmediato
         const toggler = document.querySelector('.header-toggler');
         if (toggler && toggler.contains(target)) {
-           return;
+          return;
         }
 
         this.sidebarVisible = false;

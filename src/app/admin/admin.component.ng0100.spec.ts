@@ -33,27 +33,27 @@ describe('AdminComponent NG0100 mitigation', () => {
       providers: [
         { provide: DashboardApiService, useClass: MockDashboardApiService },
         { provide: LoadingService, useValue: loading },
-        { 
-          provide: TokenStorageService, 
-          useValue: { 
+        {
+          provide: TokenStorageService,
+          useValue: {
             isLoggedIn: () => true,
-            getUserRole: () => 'ADMIN'
-          } 
+            getUserRole: () => 'ADMIN',
+          },
         },
         { provide: AuthService, useValue: { isTokenValid: () => true } },
         { provide: AuthSyncService, useValue: {} },
-        { 
-          provide: LoggerService, 
-          useValue: { 
-            debug: () => {}, 
-            info: () => {}, 
-            error: () => {}, 
-            warn: () => {} 
-          } 
+        {
+          provide: LoggerService,
+          useValue: {
+            debug: () => {},
+            info: () => {},
+            error: () => {},
+            warn: () => {},
+          },
         },
         { provide: RouteTrackerService, useValue: {} },
         { provide: GlobalErrorHandlerService, useValue: {} },
-        { provide: UiAnomalyMonitorService, useValue: {} }
+        { provide: UiAnomalyMonitorService, useValue: {} },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

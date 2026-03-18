@@ -48,23 +48,42 @@
       </button>
 
       <c-dropdown variant="btn-group">
-        <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm" [cTooltip]="'Ordenar listado'">
+        <button
+          cButton
+          cDropdownToggle
+          color="secondary"
+          variant="ghost"
+          size="sm"
+          [cTooltip]="'Ordenar listado'"
+        >
           <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
         </button>
         <ul cDropdownMenu>
-          <li><button cDropdownItem (click)="ordenar('fechaCreacion', 'DESC')">
-            <span *ngIf="isSortActive('fechaCreacion', 'DESC')" class="me-1 fw-bold">✓</span> Más recientes
-          </button></li>
-          <li><button cDropdownItem (click)="ordenar('fechaCreacion', 'ASC')">
-            <span *ngIf="isSortActive('fechaCreacion', 'ASC')" class="me-1 fw-bold">✓</span> Más antiguos
-          </button></li>
-          <li><hr cDropdownDivider></li>
-          <li><button cDropdownItem (click)="ordenar('usuario.nombre', 'ASC')">
-            <span *ngIf="isSortActive('usuario.nombre', 'ASC')" class="me-1 fw-bold">✓</span> Usuario (A-Z)
-          </button></li>
-          <li><button cDropdownItem (click)="ordenar('usuario.nombre', 'DESC')">
-            <span *ngIf="isSortActive('usuario.nombre', 'DESC')" class="me-1 fw-bold">✓</span> Usuario (Z-A)
-          </button></li>
+          <li>
+            <button cDropdownItem (click)="ordenar('fechaCreacion', 'DESC')">
+              <span *ngIf="isSortActive('fechaCreacion', 'DESC')" class="me-1 fw-bold">✓</span> Más
+              recientes
+            </button>
+          </li>
+          <li>
+            <button cDropdownItem (click)="ordenar('fechaCreacion', 'ASC')">
+              <span *ngIf="isSortActive('fechaCreacion', 'ASC')" class="me-1 fw-bold">✓</span> Más
+              antiguos
+            </button>
+          </li>
+          <li><hr cDropdownDivider /></li>
+          <li>
+            <button cDropdownItem (click)="ordenar('usuario.nombre', 'ASC')">
+              <span *ngIf="isSortActive('usuario.nombre', 'ASC')" class="me-1 fw-bold">✓</span>
+              Usuario (A-Z)
+            </button>
+          </li>
+          <li>
+            <button cDropdownItem (click)="ordenar('usuario.nombre', 'DESC')">
+              <span *ngIf="isSortActive('usuario.nombre', 'DESC')" class="me-1 fw-bold">✓</span>
+              Usuario (Z-A)
+            </button>
+          </li>
         </ul>
       </c-dropdown>
     </c-col>

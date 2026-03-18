@@ -83,7 +83,10 @@ export abstract class CrudService<T, ID> extends BaseService {
   /**
    * Crear elemento con estado
    */
-  crearConEstado(entity: T, context?: HttpContext): Observable<{ success: boolean; data?: T; error?: any }> {
+  crearConEstado(
+    entity: T,
+    context?: HttpContext
+  ): Observable<{ success: boolean; data?: T; error?: any }> {
     return this.safeOperationWithState<T>(
       this.post<T>(`${this.endpoint}/crear`, entity, undefined, undefined, context),
       `${this.endpoint}.crear`

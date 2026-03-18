@@ -137,7 +137,12 @@ export class SidebarStateService {
     const stack: INavData[] = [...items];
     while (stack.length) {
       const item = stack.pop()!;
-      if (typeof item.url === 'string' && item.url === '/admin/control/entradas' && item.children && item.children.length > 0) {
+      if (
+        typeof item.url === 'string' &&
+        item.url === '/admin/control/entradas' &&
+        item.children &&
+        item.children.length > 0
+      ) {
         const id = NavigationUtils.generateItemId(item as any);
         this.expandedItems.add(id);
         for (const child of item.children) {
@@ -163,7 +168,12 @@ export class SidebarStateService {
     const stack: INavData[] = [...items];
     while (stack.length) {
       const item = stack.pop()!;
-      if (typeof item.url === 'string' && item.url === '/admin/control/gestion/roles' && item.children && item.children.length > 0) {
+      if (
+        typeof item.url === 'string' &&
+        item.url === '/admin/control/gestion/roles' &&
+        item.children &&
+        item.children.length > 0
+      ) {
         const id = NavigationUtils.generateItemId(item as any);
         this.expandedItems.add(id);
         return;

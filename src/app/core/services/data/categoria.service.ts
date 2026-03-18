@@ -82,14 +82,34 @@ export class CategoriaService extends CrudService<Categoria, number> {
   }
 
   obtenerPorCodigo(codigo: string, context?: HttpContext): Observable<any> {
-    return this.get<any>(OPConstants.Methods.CATEGORIAS.OBTENER_POR_CODIGO(codigo), undefined, undefined, context);
+    return this.get<any>(
+      OPConstants.Methods.CATEGORIAS.OBTENER_POR_CODIGO(codigo),
+      undefined,
+      undefined,
+      context
+    );
   }
 
-  actualizarPorCodigo(codigo: string, categoria: Categoria, context?: HttpContext): Observable<any> {
-    return this.put<any>(OPConstants.Methods.CATEGORIAS.ACTUALIZAR_POR_CODIGO(codigo), categoria, undefined, undefined, context);
+  actualizarPorCodigo(
+    codigo: string,
+    categoria: Categoria,
+    context?: HttpContext
+  ): Observable<any> {
+    return this.put<any>(
+      OPConstants.Methods.CATEGORIAS.ACTUALIZAR_POR_CODIGO(codigo),
+      categoria,
+      undefined,
+      undefined,
+      context
+    );
   }
 
   borrarPorCodigo(codigo: string, context?: HttpContext): Observable<any> {
-    return this.delete<any>(OPConstants.Methods.CATEGORIAS.BORRAR_POR_CODIGO(codigo), undefined, undefined, context);
+    return this.delete<any>(
+      OPConstants.Methods.CATEGORIAS.BORRAR_POR_CODIGO(codigo),
+      undefined,
+      undefined,
+      context
+    );
   }
 }

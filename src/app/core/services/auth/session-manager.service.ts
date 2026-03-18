@@ -26,7 +26,7 @@ export class SessionManagerService {
   private sessionExpiredSubject = new Subject<SessionExpirationData>();
   public sessionExpired$: Observable<SessionExpirationData> =
     this.sessionExpiredSubject.asObservable();
-  
+
   // Observable para notificar restauración de sesión
   private sessionRestoredSubject = new Subject<void>();
   public sessionRestored$: Observable<void> = this.sessionRestoredSubject.asObservable();
@@ -287,9 +287,7 @@ export class SessionManagerService {
     }
 
     if (data.type === 'LOGOUT' && data.origin === 'local') {
-      this.log.info(
-        'SessionManager: Logout local -> Redirigir silenciosamente a Home'
-      );
+      this.log.info('SessionManager: Logout local -> Redirigir silenciosamente a Home');
       this.router.navigate(['/'], { replaceUrl: true });
       return;
     }

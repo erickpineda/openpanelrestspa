@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import JSZip from 'jszip';
 import saveAs from 'file-saver';
-import {
-  ContentStatsDTO,
-  StorageDTO,
-  TopItemDTO
-} from '@shared/models/dashboard.models';
+import { ContentStatsDTO, StorageDTO, TopItemDTO } from '@shared/models/dashboard.models';
 
 @Injectable({
   providedIn: 'root',
@@ -29,15 +25,10 @@ export class DashboardExportService {
       const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const timePart = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
       if (data && Array.isArray(data.labels) && Array.isArray(data.datasets)) {
-        const headers = [
-          'date',
-          ...data.datasets.map((ds: any) => String(ds.label || 'serie')),
-        ];
+        const headers = ['date', ...data.datasets.map((ds: any) => String(ds.label || 'serie'))];
         const rows: any[][] = (data.labels as string[]).map((d: string, i: number) => [
           d,
-          ...data.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
-          ),
+          ...data.datasets.map((ds: any) => (Array.isArray(ds.data) ? (ds.data[i] ?? '') : '')),
         ]);
         const csv = this.buildCsv(headers, rows);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
@@ -52,15 +43,10 @@ export class DashboardExportService {
   downloadSeriesSplitEstadoCsv(data: any): void {
     try {
       if (data && Array.isArray(data.labels) && Array.isArray(data.datasets)) {
-        const headers = [
-          'date',
-          ...data.datasets.map((ds: any) => String(ds.label || 'valor')),
-        ];
+        const headers = ['date', ...data.datasets.map((ds: any) => String(ds.label || 'valor'))];
         const rows: any[][] = (data.labels as string[]).map((d: string, i: number) => [
           d,
-          ...data.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
-          ),
+          ...data.datasets.map((ds: any) => (Array.isArray(ds.data) ? (ds.data[i] ?? '') : '')),
         ]);
         const csv = this.buildCsv(headers, rows);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
@@ -75,15 +61,10 @@ export class DashboardExportService {
   downloadSeriesSplitEstadoNombreCsv(data: any): void {
     try {
       if (data && Array.isArray(data.labels) && Array.isArray(data.datasets)) {
-        const headers = [
-          'date',
-          ...data.datasets.map((ds: any) => String(ds.label || 'estado')),
-        ];
+        const headers = ['date', ...data.datasets.map((ds: any) => String(ds.label || 'estado'))];
         const rows: any[][] = (data.labels as string[]).map((d: string, i: number) => [
           d,
-          ...data.datasets.map((ds: any) =>
-            Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
-          ),
+          ...data.datasets.map((ds: any) => (Array.isArray(ds.data) ? (ds.data[i] ?? '') : '')),
         ]);
         const csv = this.buildCsv(headers, rows);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
@@ -239,15 +220,10 @@ export class DashboardExportService {
     };
 
     if (data && Array.isArray(data.labels) && Array.isArray(data.datasets)) {
-      const headers = [
-        'date',
-        ...data.datasets.map((ds: any) => String(ds.label || 'serie')),
-      ];
+      const headers = ['date', ...data.datasets.map((ds: any) => String(ds.label || 'serie'))];
       const rows: any[][] = (data.labels as string[]).map((d: string, i: number) => [
         d,
-        ...data.datasets.map((ds: any) =>
-          Array.isArray(ds.data) ? (ds.data[i] ?? '') : ''
-        ),
+        ...data.datasets.map((ds: any) => (Array.isArray(ds.data) ? (ds.data[i] ?? '') : '')),
       ]);
       addFile('series.csv', this.buildCsv(headers, rows));
     }

@@ -18,7 +18,7 @@ describe('ListadoCategoriasComponent Spinner', () => {
   const translationServiceMock = {
     translations$: new BehaviorSubject({}),
     translate: (key: string) => key,
-    instant: (key: string) => key
+    instant: (key: string) => key,
   };
 
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe('ListadoCategoriasComponent Spinner', () => {
           },
         },
         { provide: SearchUtilService, useValue: { buildSingle: () => ({}) } },
-        { provide: TranslationService, useValue: translationServiceMock }
+        { provide: TranslationService, useValue: translationServiceMock },
       ],
     });
     fixture = TestBed.createComponent(ListadoCategoriasComponent);

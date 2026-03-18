@@ -48,7 +48,12 @@ describe('ListadoEntradasStateService', () => {
     const params: AdvancedSearchParams = {
       dataOption: 'OR',
       searchCriteriaList: [
-        { filterKey: 'estadoEntrada.nombre', operation: 'EQUAL', value: 'Publicada', clazzName: 'Entrada' },
+        {
+          filterKey: 'estadoEntrada.nombre',
+          operation: 'EQUAL',
+          value: 'Publicada',
+          clazzName: 'Entrada',
+        },
       ],
     };
     service.searchAdvanced(params, 0).subscribe(() => {

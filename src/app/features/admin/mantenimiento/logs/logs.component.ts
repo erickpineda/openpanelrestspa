@@ -114,8 +114,8 @@ export class LogsComponent implements OnInit, OnDestroy {
         let valA = a[field];
         let valB = b[field];
         if (field === 'timestamp') {
-           valA = new Date(valA).getTime();
-           valB = new Date(valB).getTime();
+          valA = new Date(valA).getTime();
+          valB = new Date(valB).getTime();
         } else if (typeof valA === 'string') {
           valA = valA.toLowerCase();
           valB = valB.toLowerCase();

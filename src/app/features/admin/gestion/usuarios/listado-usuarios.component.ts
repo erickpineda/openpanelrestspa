@@ -29,7 +29,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   pageSize = 10;
   totalElements = 0;
   numberOfElements = 0;
-  
+
   currentSortField?: string;
   currentSortDirection?: 'ASC' | 'DESC';
 
@@ -90,7 +90,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       this.usuarios = list;
       this.totalElements = Number(data?.totalElements || list.length || 0);
       this.numberOfElements = list.length;
-      
+
       if (this.currentSortField) {
         this.sortClientCache();
       }

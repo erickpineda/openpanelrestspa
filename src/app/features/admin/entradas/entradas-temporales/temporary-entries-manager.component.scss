@@ -1,5 +1,7 @@
 .entry-card {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
   border: 1px solid rgba(0, 0, 0, 0.05) !important;
 
   &:hover {
@@ -36,7 +38,9 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
-    h2, h3, h4 {
+    h2,
+    h3,
+    h4 {
       margin-top: 2rem;
       margin-bottom: 1rem;
       font-weight: 600;

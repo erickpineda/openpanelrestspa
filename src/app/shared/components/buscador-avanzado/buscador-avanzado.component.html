@@ -192,7 +192,7 @@
               </span>
             </button>
           </li>
-          <li><hr cDropdownDivider></li>
+          <li><hr cDropdownDivider /></li>
           <li>
             <button cDropdownItem (click)="setDataOption('AND')" [active]="dataOption === 'AND'">
               <span class="d-flex align-items-center gap-2">
@@ -209,7 +209,7 @@
               </span>
             </button>
           </li>
-          <li><hr cDropdownDivider></li>
+          <li><hr cDropdownDivider /></li>
           <li>
             <button cDropdownItem (click)="buscar()">
               <span class="d-flex align-items-center gap-2">
@@ -232,13 +232,33 @@
   </c-row>
   <c-row class="mt-2 d-md-none">
     <c-col xs="12" class="d-flex align-items-center gap-3 justify-content-center">
-      <button cButton variant="ghost" size="sm" (click)="addCriterion()" [cTooltip]="'Añadir criterio'">
+      <button
+        cButton
+        variant="ghost"
+        size="sm"
+        (click)="addCriterion()"
+        [cTooltip]="'Añadir criterio'"
+      >
         <svg cIcon name="cilPlus"></svg>
       </button>
-      <button cButton variant="ghost" size="sm" (click)="setDataOption('AND')" [active]="dataOption==='AND'" [cTooltip]="'Lógica: AND'">
+      <button
+        cButton
+        variant="ghost"
+        size="sm"
+        (click)="setDataOption('AND')"
+        [active]="dataOption === 'AND'"
+        [cTooltip]="'Lógica: AND'"
+      >
         AND
       </button>
-      <button cButton variant="ghost" size="sm" (click)="setDataOption('OR')" [active]="dataOption==='OR'" [cTooltip]="'Lógica: OR'">
+      <button
+        cButton
+        variant="ghost"
+        size="sm"
+        (click)="setDataOption('OR')"
+        [active]="dataOption === 'OR'"
+        [cTooltip]="'Lógica: OR'"
+      >
         OR
       </button>
       <button cButton variant="ghost" size="sm" (click)="buscar()" [cTooltip]="'Buscar'">
@@ -257,7 +277,9 @@
   @if (criterios.length > 0) {
     <div class="mt-2 d-flex flex-wrap gap-2">
       @for (c of criterios; track c) {
-        <span class="badge rounded-pill bg-light border text-secondary d-inline-flex align-items-center gap-2 px-3 py-2">
+        <span
+          class="badge rounded-pill bg-light border text-secondary d-inline-flex align-items-center gap-2 px-3 py-2"
+        >
           <svg cIcon name="cilFilter" class="text-secondary"></svg>
           <span class="fw-semibold">{{ c.campo }}</span>
           <span class="opacity-75">{{ c.operacion }}</span>

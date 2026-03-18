@@ -1,4 +1,9 @@
-import { parseAllowedDate, formatForBackend, isAllowedDateString, formatForDateTimeLocal } from './date-utils';
+import {
+  parseAllowedDate,
+  formatForBackend,
+  isAllowedDateString,
+  formatForDateTimeLocal,
+} from './date-utils';
 
 describe('DateUtils', () => {
   describe('parseAllowedDate', () => {

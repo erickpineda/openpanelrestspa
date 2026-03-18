@@ -19,7 +19,13 @@
     <li>
       <h6 cDropdownHeader class="fw-semibold d-flex align-items-center justify-content-between">
         <span class="me-2">{{ labelHeader | translate }}</span>
-        <button cButton color="link" class="p-0 small" (click)="handleMarkAll()" aria-label="Marcar todas como leídas">
+        <button
+          cButton
+          color="link"
+          class="p-0 small"
+          (click)="handleMarkAll()"
+          aria-label="Marcar todas como leídas"
+        >
           {{ labelMarkAll | translate }}
         </button>
       </h6>
@@ -31,7 +37,11 @@
     } @else {
       @for (it of items; track it.id) {
         <li class="px-2">
-          <div class="notif-item d-flex align-items-start gap-3 p-3 rounded-2" [class.unread]="it.unread" [class.marking-read]="markingAsReadIds.has(it.id)">
+          <div
+            class="notif-item d-flex align-items-start gap-3 p-3 rounded-2"
+            [class.unread]="it.unread"
+            [class.marking-read]="markingAsReadIds.has(it.id)"
+          >
             <div class="icon d-flex align-items-center justify-content-center">
               @switch (it.type) {
                 @case ('temporary') {
@@ -50,7 +60,9 @@
             </div>
             <div class="flex-fill">
               <div class="d-flex align-items-center justify-content-between">
-                <strong class="me-2" [title]="it.title">{{ it.title.length > 30 ? (it.title | slice:0:30) + '...' : it.title }}</strong>
+                <strong class="me-2" [title]="it.title">{{
+                  it.title.length > 30 ? (it.title | slice: 0 : 30) + '...' : it.title
+                }}</strong>
                 <div class="d-flex align-items-center gap-2">
                   @if (it.type === 'temporary') {
                     <span class="notif-tag badge rounded-pill text-bg-warning">Temporal</span>
@@ -63,10 +75,25 @@
               </div>
               <div class="small text-body mt-1">{{ it.message }}</div>
               <div class="mt-3 d-flex gap-2">
-                <button cButton color="secondary" size="sm" variant="outline" (click)="$event.stopPropagation(); handleMarkRead(it.id)" [cTooltip]="'HEADER.MARK_READ' | translate" aria-label="Marcar notificación como leída">
+                <button
+                  cButton
+                  color="secondary"
+                  size="sm"
+                  variant="outline"
+                  (click)="$event.stopPropagation(); handleMarkRead(it.id)"
+                  [cTooltip]="'HEADER.MARK_READ' | translate"
+                  aria-label="Marcar notificación como leída"
+                >
                   <svg cIcon name="cilCheck"></svg>
                 </button>
-                <button cButton color="danger" size="sm" variant="outline" (click)="handleDismiss(it.id)" aria-label="Descartar notificación">
+                <button
+                  cButton
+                  color="danger"
+                  size="sm"
+                  variant="outline"
+                  (click)="handleDismiss(it.id)"
+                  aria-label="Descartar notificación"
+                >
                   <svg cIcon name="cilX"></svg>
                 </button>
               </div>
@@ -79,7 +106,15 @@
       <hr cDropdownDivider />
     </li>
     <li class="px-2 pb-2 d-flex justify-content-between">
-      <a cButton color="link" class="p-0" (click)="viewAll.emit()" aria-label="Ver todas las notificaciones"> {{ labelViewAll | translate }} </a>
+      <a
+        cButton
+        color="link"
+        class="p-0"
+        (click)="viewAll.emit()"
+        aria-label="Ver todas las notificaciones"
+      >
+        {{ labelViewAll | translate }}
+      </a>
     </li>
   </ul>
 </c-dropdown>

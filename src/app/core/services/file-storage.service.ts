@@ -30,10 +30,8 @@ export class FileStorageService {
   }
 
   listarFicheros(skipLoader: boolean = false): Observable<MediaItem[]> {
-    const context = skipLoader
-      ? new HttpContext().set(SKIP_GLOBAL_LOADER, true)
-      : undefined;
-    
+    const context = skipLoader ? new HttpContext().set(SKIP_GLOBAL_LOADER, true) : undefined;
+
     // ✅ Fix: Asegurar Content-Type válido para evitar error 415 en backend estricto
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
@@ -55,9 +53,7 @@ export class FileStorageService {
   }
 
   obtenerDatosFichero(uuid: string, skipLoader: boolean = false): Observable<any> {
-    const context = skipLoader
-      ? new HttpContext().set(SKIP_GLOBAL_LOADER, true)
-      : undefined;
+    const context = skipLoader ? new HttpContext().set(SKIP_GLOBAL_LOADER, true) : undefined;
 
     // ✅ Fix: Asegurar Content-Type válido para evitar error 415 en backend estricto
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

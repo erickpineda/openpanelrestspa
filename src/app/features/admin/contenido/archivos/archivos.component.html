@@ -106,43 +106,72 @@
                 <svg cIcon name="cilFilter"></svg>
               </button>
               <c-dropdown variant="btn-group" class="ms-2">
-                <button cButton cDropdownToggle color="secondary" variant="outline" [cTooltip]="'Ordenar listado'" [disabled]="loading">
+                <button
+                  cButton
+                  cDropdownToggle
+                  color="secondary"
+                  variant="outline"
+                  [cTooltip]="'Ordenar listado'"
+                  [disabled]="loading"
+                >
                   <svg cIcon [name]="getSortIcon('nombre')" class="me-1"></svg>
                 </button>
                 <ul cDropdownMenu>
                   <li><h6 cDropdownHeader class="dropdown-header small">Por Nombre</h6></li>
                   <li>
                     <button cDropdownItem (click)="ordenar('nombre', 'ASC')">
-                      <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 text-success fw-bold">✓</span> (A-Z) Ascendente
+                      <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 text-success fw-bold"
+                        >✓</span
+                      >
+                      (A-Z) Ascendente
                     </button>
                   </li>
                   <li>
                     <button cDropdownItem (click)="ordenar('nombre', 'DESC')">
-                      <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 text-success fw-bold">✓</span> (Z-A) Descendente
+                      <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 text-success fw-bold"
+                        >✓</span
+                      >
+                      (Z-A) Descendente
                     </button>
                   </li>
-                  <li><hr cDropdownDivider></li>
+                  <li><hr cDropdownDivider /></li>
                   <li><h6 cDropdownHeader class="dropdown-header small">Por Fecha</h6></li>
                   <li>
                     <button cDropdownItem (click)="ordenar('fechaCreacion', 'DESC')">
-                      <span *ngIf="isSortActive('fechaCreacion', 'DESC')" class="me-1 text-success fw-bold">✓</span> Más recientes
+                      <span
+                        *ngIf="isSortActive('fechaCreacion', 'DESC')"
+                        class="me-1 text-success fw-bold"
+                        >✓</span
+                      >
+                      Más recientes
                     </button>
                   </li>
                   <li>
                     <button cDropdownItem (click)="ordenar('fechaCreacion', 'ASC')">
-                      <span *ngIf="isSortActive('fechaCreacion', 'ASC')" class="me-1 text-success fw-bold">✓</span> Más antiguos
+                      <span
+                        *ngIf="isSortActive('fechaCreacion', 'ASC')"
+                        class="me-1 text-success fw-bold"
+                        >✓</span
+                      >
+                      Más antiguos
                     </button>
                   </li>
-                  <li><hr cDropdownDivider></li>
+                  <li><hr cDropdownDivider /></li>
                   <li><h6 cDropdownHeader class="dropdown-header small">Por Tamaño</h6></li>
                   <li>
                     <button cDropdownItem (click)="ordenar('tamano', 'DESC')">
-                      <span *ngIf="isSortActive('tamano', 'DESC')" class="me-1 text-success fw-bold">✓</span> Mayor a menor
+                      <span *ngIf="isSortActive('tamano', 'DESC')" class="me-1 text-success fw-bold"
+                        >✓</span
+                      >
+                      Mayor a menor
                     </button>
                   </li>
                   <li>
                     <button cDropdownItem (click)="ordenar('tamano', 'ASC')">
-                      <span *ngIf="isSortActive('tamano', 'ASC')" class="me-1 text-success fw-bold">✓</span> Menor a mayor
+                      <span *ngIf="isSortActive('tamano', 'ASC')" class="me-1 text-success fw-bold"
+                        >✓</span
+                      >
+                      Menor a mayor
                     </button>
                   </li>
                 </ul>

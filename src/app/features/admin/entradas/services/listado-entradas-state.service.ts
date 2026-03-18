@@ -223,9 +223,7 @@ export class ListadoEntradasStateService {
       (data as any)?.items ??
       (data as any)?.content ??
       (Array.isArray(data) ? data : []);
-    const elementos: EntradaVM[] = mapEntradasComputed(
-      Array.isArray(raw) ? raw : []
-    );
+    const elementos: EntradaVM[] = mapEntradasComputed(Array.isArray(raw) ? raw : []);
     const hasServerPaging =
       typeof data?.totalPages === 'number' || typeof data?.totalElements === 'number';
     if (hasServerPaging) {
@@ -234,7 +232,11 @@ export class ListadoEntradasStateService {
         data.totalPages || Math.ceil(totalElements / this.state.value.pageSize) || 1
       );
       this.updateState({
-        entradas: this.sortElements(elementos, this.state.value.sortField, this.state.value.sortDirection),
+        entradas: this.sortElements(
+          elementos,
+          this.state.value.sortField,
+          this.state.value.sortDirection
+        ),
         totalElements,
         totalPages,
         currentPage: pageRequest,
@@ -259,9 +261,13 @@ export class ListadoEntradasStateService {
     }
   }
 
-  private sortElements(elements: EntradaVM[], sortField?: string, sortDirection?: 'ASC' | 'DESC'): EntradaVM[] {
+  private sortElements(
+    elements: EntradaVM[],
+    sortField?: string,
+    sortDirection?: 'ASC' | 'DESC'
+  ): EntradaVM[] {
     if (!sortField || !elements.length) return elements;
-    
+
     return [...elements].sort((a: any, b: any) => {
       let valA = a[sortField];
       let valB = b[sortField];

@@ -25,23 +25,30 @@ fdescribe('BadgeCounter & Navigation Integration', () => {
       dynamicBadge: {
         service: 'BadgeCounterService',
         method: 'getDraftEntriesCount',
-        refreshInterval: 1000
-      }
-    }
+        refreshInterval: 1000,
+      },
+    },
   ];
 
   beforeEach(() => {
     const entradaSpy = jasmine.createSpyObj('EntradaService', ['listarSafe']);
-    const comentarioSpy = jasmine.createSpyObj('ComentarioService', ['listarSafe', 'listarSafeSinGlobalLoader']);
-    const usuarioSpy = jasmine.createSpyObj('UsuarioService', ['listarSafe', 'obtenerDatosSesionActualSafe', 'listarSafeSinGlobalLoader']);
+    const comentarioSpy = jasmine.createSpyObj('ComentarioService', [
+      'listarSafe',
+      'listarSafeSinGlobalLoader',
+    ]);
+    const usuarioSpy = jasmine.createSpyObj('UsuarioService', [
+      'listarSafe',
+      'obtenerDatosSesionActualSafe',
+      'listarSafeSinGlobalLoader',
+    ]);
     const tempSpy = jasmine.createSpyObj('TemporaryStorageService', ['getTemporaryEntriesByType']);
-    
+
     // Mock entriesChanged$
     // Use simple object property assignment for spy
     (tempSpy as any).entriesChanged$ = new Subject<void>();
     tempSpy.getTemporaryEntriesByType.and.returnValue([
-        { id: '1', formType: 'entrada', formData: {}, timestamp: '' },
-        { id: '2', formType: 'entrada', formData: {}, timestamp: '' }
+      { id: '1', formType: 'entrada', formData: {}, timestamp: '' },
+      { id: '2', formType: 'entrada', formData: {}, timestamp: '' },
     ] as any);
 
     // Mock Router
@@ -50,10 +57,24 @@ fdescribe('BadgeCounter & Navigation Integration', () => {
     routerSpy.url = '/admin/drafts';
 
     // Mock other services
-    const sidebarSpy = jasmine.createSpyObj('SidebarStateService', ['updateNavItems', 'toggleItem']);
-    const activeSectionSpy = jasmine.createSpyObj('ActiveSectionService', ['setNavigationItems', 'updateActiveSection', 'getCurrentActiveState']);
-    const progConfigSpy = jasmine.createSpyObj('ProgrammaticNavigationConfigService', ['getConfigurationChanges', 'applyDynamicConfigurations']);
-    const perfSpy = jasmine.createSpyObj('NavigationPerformanceService', ['getOptimizedNavigationItems', 'optimizeBadgeUpdates', 'configurePerformance']);
+    const sidebarSpy = jasmine.createSpyObj('SidebarStateService', [
+      'updateNavItems',
+      'toggleItem',
+    ]);
+    const activeSectionSpy = jasmine.createSpyObj('ActiveSectionService', [
+      'setNavigationItems',
+      'updateActiveSection',
+      'getCurrentActiveState',
+    ]);
+    const progConfigSpy = jasmine.createSpyObj('ProgrammaticNavigationConfigService', [
+      'getConfigurationChanges',
+      'applyDynamicConfigurations',
+    ]);
+    const perfSpy = jasmine.createSpyObj('NavigationPerformanceService', [
+      'getOptimizedNavigationItems',
+      'optimizeBadgeUpdates',
+      'configurePerformance',
+    ]);
 
     // Setup default returns
     entradaSpy.listarSafe.and.returnValue(of([]));
@@ -82,30 +103,32 @@ fdescribe('BadgeCounter & Navigation Integration', () => {
         { provide: SidebarStateService, useValue: sidebarSpy },
         { provide: ActiveSectionService, useValue: activeSectionSpy },
         { provide: ProgrammaticNavigationConfigService, useValue: progConfigSpy },
-        { provide: NavigationPerformanceService, useValue: perfSpy }
-      ]
+        { provide: NavigationPerformanceService, useValue: perfSpy },
+      ],
     });
 
     badgeService = TestBed.inject(BadgeCounterService);
     navigationService = TestBed.inject(NavigationService);
-    tempStorageSpy = TestBed.inject(TemporaryStorageService) as jasmine.SpyObj<TemporaryStorageService>;
+    tempStorageSpy = TestBed.inject(
+      TemporaryStorageService
+    ) as jasmine.SpyObj<TemporaryStorageService>;
   });
 
   it('should call getTemporaryEntriesByType and update navigation item badge', fakeAsync(() => {
     navigationService.setNavigationItems(mockNavItems);
-    tick(0); 
+    tick(0);
 
     // Verify TemporaryStorageService was called
     expect(tempStorageSpy.getTemporaryEntriesByType).toHaveBeenCalledWith('entrada');
 
     // Verify BadgeCounterService has the correct count (2)
-    badgeService.getCounterById('draft-entries').subscribe(count => {
+    badgeService.getCounterById('draft-entries').subscribe((count) => {
       console.log('Badge Count:', count);
       expect(count).toBe(2);
     });
 
     let updatedItems: INavItemEnhanced[] = [];
-    navigationService.getNavigationItems('ADMIN' as any).subscribe(items => {
+    navigationService.getNavigationItems('ADMIN' as any).subscribe((items) => {
       updatedItems = items;
     });
 

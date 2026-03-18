@@ -184,7 +184,8 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
             }
             return entradas.filter(
               (entrada: any) =>
-                (entrada.autor?.username === perfil.username || entrada.usuarioNombre === perfil.username) &&
+                (entrada.autor?.username === perfil.username ||
+                  entrada.usuarioNombre === perfil.username) &&
                 (entrada.estado === 'BORRADOR' || entrada.estado === 'TEMPORAL')
             ).length;
           })

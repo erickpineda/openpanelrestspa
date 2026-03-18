@@ -213,7 +213,7 @@ export class AjustesComponent implements OnInit, OnDestroy {
       return mBasic && mCat && mClave;
     });
     this.totalElements = this.filteredAjustes.length;
-    
+
     if (this.currentSortField) {
       this.sortClientCache();
     }

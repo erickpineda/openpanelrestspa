@@ -32,41 +32,41 @@ describe('SessionExpiredComponent', () => {
       url: '/some/path',
       currentNavigation: jasmine.createSpy('currentNavigation').and.returnValue(null),
       events: of(),
-      getCurrentNavigation: jasmine.createSpy('getCurrentNavigation').and.returnValue(null)
+      getCurrentNavigation: jasmine.createSpy('getCurrentNavigation').and.returnValue(null),
     };
 
     sessionManagerMock = {
       sessionExpired$: new Subject(),
-      sessionRestored$: new Subject()
+      sessionRestored$: new Subject(),
     };
 
     tokenStorageMock = {
       signOut: jasmine.createSpy('signOut'),
       getToken: jasmine.createSpy('getToken').and.returnValue('mock-token'),
-      getUser: jasmine.createSpy('getUser').and.returnValue({ name: 'test' })
+      getUser: jasmine.createSpy('getUser').and.returnValue({ name: 'test' }),
     };
 
     activeTabServiceMock = {
-      clearCurrentTab: jasmine.createSpy('clearCurrentTab')
+      clearCurrentTab: jasmine.createSpy('clearCurrentTab'),
     };
 
     loggerMock = {
       info: jasmine.createSpy('info'),
       warn: jasmine.createSpy('warn'),
-      error: jasmine.createSpy('error')
+      error: jasmine.createSpy('error'),
     };
 
     // Mocks for other services to satisfy DI
     routeTrackerMock = {};
     postLoginRedirectMock = {
-      saveLastValidRoute: jasmine.createSpy('saveLastValidRoute')
+      saveLastValidRoute: jasmine.createSpy('saveLastValidRoute'),
     };
     unsavedWorkServiceMock = {};
     temporaryStorageMock = {};
 
     await TestBed.configureTestingModule({
-      declarations: [ SessionExpiredComponent ],
-      imports: [ TranslateModule.forRoot() ],
+      declarations: [SessionExpiredComponent],
+      imports: [TranslateModule.forRoot()],
       providers: [
         { provide: Router, useValue: routerMock },
         { provide: SessionManagerService, useValue: sessionManagerMock },
@@ -77,11 +77,10 @@ describe('SessionExpiredComponent', () => {
         { provide: TemporaryStorageService, useValue: temporaryStorageMock },
         { provide: ActiveTabService, useValue: activeTabServiceMock },
         { provide: LoggerService, useValue: loggerMock },
-        ChangeDetectorRef
+        ChangeDetectorRef,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    })
-    .compileComponents();
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -96,10 +95,10 @@ describe('SessionExpiredComponent', () => {
 
   it('goToLogin should call signOut, clearCurrentTab and navigate to login', fakeAsync(() => {
     component.goToLogin();
-    
+
     // Wait for setTimeout (component uses 500ms)
     tick(500);
-    
+
     expect(tokenStorageMock.signOut).toHaveBeenCalled();
     expect(activeTabServiceMock.clearCurrentTab).toHaveBeenCalled();
     expect(routerMock.navigate).toHaveBeenCalledWith(['/login'], { replaceUrl: true });
@@ -107,10 +106,10 @@ describe('SessionExpiredComponent', () => {
 
   it('goToHome should call signOut, clearCurrentTab and navigate to home', fakeAsync(() => {
     component.goToHome();
-    
+
     // Wait for setTimeout
     tick(300);
-    
+
     expect(tokenStorageMock.signOut).toHaveBeenCalled();
     expect(activeTabServiceMock.clearCurrentTab).toHaveBeenCalled();
     expect(routerMock.navigate).toHaveBeenCalledWith(['/'], { replaceUrl: true });

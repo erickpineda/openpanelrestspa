@@ -39,12 +39,17 @@ describe('DashboardComponent', () => {
         { provide: DashboardConfigService, useValue: mockConfigService },
         { provide: ChangeDetectorRef, useValue: { detectChanges: () => {} } },
         { provide: LoggerService, useValue: { debug: () => {}, error: () => {} } },
-        { provide: TranslationService, useValue: { 
-          instant: (key: string) => key, 
-          translations$: of({}),
-          translate: (key: string) => of(key) 
-        } },
-        { provide: DashboardFacadeService, useValue: { 
+        {
+          provide: TranslationService,
+          useValue: {
+            instant: (key: string) => key,
+            translations$: of({}),
+            translate: (key: string) => of(key),
+          },
+        },
+        {
+          provide: DashboardFacadeService,
+          useValue: {
             getSummary: () => of({}),
             getSeriesActivity: () => of([]),
             getTop: () => of([]),
@@ -58,10 +63,13 @@ describe('DashboardComponent', () => {
             evictSummary: () => {},
             evictSeries: () => {},
             evictTop: () => {},
-            evictContentStats: () => {}
-        } },
+            evictContentStats: () => {},
+          },
+        },
         { provide: DashboardExportService, useValue: {} },
-        { provide: DashboardChartService, useValue: {
+        {
+          provide: DashboardChartService,
+          useValue: {
             generateMainSeriesChart: () => ({ labels: [], datasets: [] }),
             generateEmptyMainSeriesChart: () => ({ labels: [], datasets: [] }),
             generateContentStatsChart: () => ({ labels: [], datasets: [] }),
@@ -73,21 +81,28 @@ describe('DashboardComponent', () => {
             calculateSumSeries: () => 0,
             calculateContentEstadoRows: () => [],
             formatBytes: () => '0 B',
-            getPeriodDates: () => ({ startDate: '2023-01-01', endDate: '2023-01-02' })
-        } },
-        { provide: LoadingService, useValue: { 
+            getPeriodDates: () => ({ startDate: '2023-01-01', endDate: '2023-01-02' }),
+          },
+        },
+        {
+          provide: LoadingService,
+          useValue: {
             setGlobalLoading: () => {},
             registerRetryHandler: () => {},
-            forceStopLoading: () => {}
-        } },
-        { provide: ToastService, useValue: { showSuccess: () => {}, showError: () => {}, showWarning: () => {} } },
+            forceStopLoading: () => {},
+          },
+        },
+        {
+          provide: ToastService,
+          useValue: { showSuccess: () => {}, showError: () => {}, showWarning: () => {} },
+        },
         { provide: AuthSyncService, useValue: { notifyChanged: () => {} } },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
-    // We don't call fixture.detectChanges() immediately to avoid ngOnInit running before we check constructor logic if we wanted, 
+    // We don't call fixture.detectChanges() immediately to avoid ngOnInit running before we check constructor logic if we wanted,
     // but constructor runs on createComponent.
   });
 
@@ -112,7 +127,7 @@ describe('DashboardComponent', () => {
     // Change settings
     component.settings.seriesDays = 123;
     component.settings.seriesGranularity = 'month';
-    
+
     // Reset
     component.resetSettings();
 

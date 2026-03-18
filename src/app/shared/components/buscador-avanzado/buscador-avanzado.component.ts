@@ -358,9 +358,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
   public onValorChange(v: string): void {
     this.valorBusqueda = v;
     if (this.autoTrigger) {
-      const payload:
-        | AdvancedSearchParams
-        | SingleFilter =
+      const payload: AdvancedSearchParams | SingleFilter =
         this.criterios.length > 0
           ? {
               dataOption: this.dataOption,
@@ -407,9 +405,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnInit, OnDestroy {
    * Emite el filtro seleccionado actual al padre.
    */
   private emitirFiltro(): void {
-    const payload:
-      | AdvancedSearchParams
-      | SingleFilter =
+    const payload: AdvancedSearchParams | SingleFilter =
       this.criterios.length > 0
         ? {
             dataOption: this.dataOption,

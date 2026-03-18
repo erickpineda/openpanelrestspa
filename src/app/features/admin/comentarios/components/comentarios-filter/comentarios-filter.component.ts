@@ -30,7 +30,7 @@ export class ComentariosFilterComponent {
   @Output() pageSizeChange = new EventEmitter<number>();
   @Output() reset = new EventEmitter<void>();
   @Output() search = new EventEmitter<void>();
-  @Output() sortChange = new EventEmitter<{ field: string, direction: 'ASC' | 'DESC' }>();
+  @Output() sortChange = new EventEmitter<{ field: string; direction: 'ASC' | 'DESC' }>();
 
   onBasicSearchTextChange(value: string) {
     this.basicSearchChange.emit(value);

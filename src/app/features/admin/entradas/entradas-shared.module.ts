@@ -11,8 +11,7 @@ import {
   EntradasTableComponent,
   PreviaEntradaComponent,
 } from './components';
-import { EntradaFormComponent,
-} from './entrada-form/entrada-form.component';
+import { EntradaFormComponent } from './entrada-form/entrada-form.component';
 import { EntradaEtiquetasComponent } from './entrada-form/components/entrada-etiquetas/entrada-etiquetas.component';
 import { SharedWidgetsModule } from '@shared/shared-widgets.module';
 import { MediaSharedModule } from '@features/admin/contenido/media-shared.module';

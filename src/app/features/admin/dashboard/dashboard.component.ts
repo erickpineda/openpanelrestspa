@@ -96,10 +96,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   seriesEntriesSplitData: any;
   seriesEntriesSplitEstadoNombreData: any;
   contentStatsChartData: any;
-  
+
   estadoNominalChartOptions: any;
   estadoSplitChartOptions: any;
-  
+
   estadoNominalChartType: 'line' | 'bar';
   estadoNominalStacked: boolean;
   // #endregion
@@ -116,7 +116,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   topCustomEndDate?: string;
   recentPage = 0;
   recentTotalPages = 0;
-  
+
   settings: {
     seriesDays: number;
     seriesGranularity: 'hour' | 'day' | 'week' | 'month';
@@ -179,7 +179,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (f === '1') this.forceFromDb = true;
       else if (f === '0') this.forceFromDb = false;
     } catch {}
-    
+
     this.refreshDashboard();
     this.loadRecentActivity();
 
@@ -317,7 +317,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.storage = storage as StorageDTO;
             this.contentStats = contentStats as ContentStatsDTO;
             if (contentStats && (contentStats as ContentStatsDTO).entradasByEstado) {
-              this.contentStatsChartData = this.chartService.generateContentStatsChart(contentStats as ContentStatsDTO);
+              this.contentStatsChartData = this.chartService.generateContentStatsChart(
+                contentStats as ContentStatsDTO
+              );
             }
             this.loadSeriesEntriesSplitEstado();
             this.loadSeriesEntriesSplitEstadoNombre();
@@ -352,7 +354,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.errorTopCategories = null;
     this.errorTopTags = null;
     const { startDate, endDate } = this.getEffectiveTopDateRange();
-    
+
     const sub = this.dashboardFacade
       .refreshTopWidgets(this.topLimit, this.forceFromDb, startDate, endDate)
       .subscribe({
@@ -485,7 +487,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         next: (arr: any[]) => {
           const chart = this.chartService.transformSplitEstadoNombre(arr);
           this.seriesEntriesSplitEstadoNombreData = chart;
-          this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(this.estadoNominalStacked);
+          this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(
+            this.estadoNominalStacked
+          );
           try {
             setTimeout(() => {
               this.seriesEntriesSplitEstadoNombreData = {
@@ -498,7 +502,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         },
         error: () => {
-          this.errorSplitEstadoNombre = this.translate.instant('ADMIN.DASHBOARD.ERROR.SERIES_PIVOT');
+          this.errorSplitEstadoNombre = this.translate.instant(
+            'ADMIN.DASHBOARD.ERROR.SERIES_PIVOT'
+          );
         },
       });
     this.subscription.add(sub);
@@ -520,7 +526,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subscription.add(sub);
     this.loadSeriesEntriesSplitEstado();
     this.loadSeriesEntriesSplitEstadoNombre();
-    this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(this.estadoNominalStacked);
+    this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(
+      this.estadoNominalStacked
+    );
   }
 
   changeSeriesGranularity(g: 'hour' | 'day' | 'week' | 'month'): void {
@@ -548,12 +556,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   setEstadoNominalChartType(t: 'line' | 'bar'): void {
     this.estadoNominalChartType = t;
-    this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(this.estadoNominalStacked);
+    this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(
+      this.estadoNominalStacked
+    );
   }
 
   toggleEstadoNominalStacked(): void {
     this.estadoNominalStacked = !this.estadoNominalStacked;
-    this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(this.estadoNominalStacked);
+    this.estadoNominalChartOptions = this.chartService.getEtatNominalOptions(
+      this.estadoNominalStacked
+    );
   }
 
   toggleForceFromDb(): void {

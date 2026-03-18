@@ -1,5 +1,7 @@
 <c-card class="mb-4 shadow-sm refined-card">
-  <c-card-header class="bg-white border-bottom py-2 d-flex justify-content-between align-items-center">
+  <c-card-header
+    class="bg-white border-bottom py-2 d-flex justify-content-between align-items-center"
+  >
     <h6 class="text-secondary fw-bold mb-0 text-uppercase small">
       {{ 'AUTO.ETIQUETAS' | translate }}
     </h6>
@@ -7,21 +9,23 @@
       {{ etiquetasArray.length }}
     </c-badge>
   </c-card-header>
-  
+
   <c-card-body class="p-3">
     <!-- Lista de etiquetas seleccionadas -->
     <div class="d-flex flex-wrap gap-2 mb-3" *ngIf="etiquetasArray.length > 0">
-      <div 
-        *ngFor="let control of etiquetasArray.controls; let i = index" 
+      <div
+        *ngFor="let control of etiquetasArray.controls; let i = index"
         class="d-flex align-items-center border rounded-pill px-3 py-1 shadow-sm"
         [ngStyle]="getChipStyle(i)"
       >
-        <span class="small fw-semibold me-2">{{ getEtiquetaValue(i)?.nombre || 'Sin nombre' }}</span>
-        <button 
+        <span class="small fw-semibold me-2">{{
+          getEtiquetaValue(i)?.nombre || 'Sin nombre'
+        }}</span>
+        <button
           *ngIf="enabled"
-          type="button" 
-          class="btn-close btn-close-sm custom-close" 
-          aria-label="Close" 
+          type="button"
+          class="btn-close btn-close-sm custom-close"
+          aria-label="Close"
           (click)="removeEtiqueta(i)"
         ></button>
       </div>
@@ -62,10 +66,10 @@
       </div>
 
       <!-- Lista de sugerencias -->
-      <div 
-        class="suggestions-dropdown shadow rounded border bg-white mt-1 position-absolute w-100" 
+      <div
+        class="suggestions-dropdown shadow rounded border bg-white mt-1 position-absolute w-100"
         *ngIf="showSuggestions"
-        style="z-index: 9999; max-height: 250px; overflow-y: auto;"
+        style="z-index: 9999; max-height: 250px; overflow-y: auto"
         role="listbox"
         id="etq-suggestions"
         [attr.aria-busy]="loading"
@@ -80,14 +84,17 @@
             </div>
           </li>
           <!-- Estado de error -->
-          <li class="list-group-item text-danger small text-center py-2" *ngIf="!loading && errorMsg">
+          <li
+            class="list-group-item text-danger small text-center py-2"
+            *ngIf="!loading && errorMsg"
+          >
             {{ errorMsg }}
           </li>
 
           <ng-container *ngIf="!loading">
             <!-- Sugerencias existentes -->
-            <li 
-              *ngFor="let tag of suggestions; let i = index" 
+            <li
+              *ngFor="let tag of suggestions; let i = index"
               class="list-group-item list-group-item-action cursor-pointer d-flex justify-content-between align-items-center"
               [class.active]="i === activeIndex"
               [class.bg-light]="i === activeIndex"
@@ -100,19 +107,23 @@
               [attr.aria-disabled]="isSelected(tag)"
             >
               <div>
-                <span 
-                  class="d-inline-block rounded-circle me-2" 
+                <span
+                  class="d-inline-block rounded-circle me-2"
                   [style.background-color]="tag.colorHex || '#6c757d'"
-                  style="width: 10px; height: 10px;"
+                  style="width: 10px; height: 10px"
                 ></span>
                 <span class="fw-semibold">{{ tag.nombre }}</span>
-                <small class="text-muted ms-2" *ngIf="tag.descripcion">- {{ tag.descripcion | slice:0:30 }}</small>
+                <small class="text-muted ms-2" *ngIf="tag.descripcion"
+                  >- {{ tag.descripcion | slice: 0 : 30 }}</small
+                >
               </div>
-              <span class="badge bg-light text-dark border" *ngIf="isSelected(tag)">Seleccionada</span>
+              <span class="badge bg-light text-dark border" *ngIf="isSelected(tag)"
+                >Seleccionada</span
+              >
             </li>
 
             <!-- Opción de crear nueva -->
-            <li 
+            <li
               class="list-group-item list-group-item-action cursor-pointer text-primary bg-light"
               (click)="createEtiqueta()"
               *ngIf="searchControl.value && searchControl.value.length >= 2"
@@ -121,19 +132,26 @@
             >
               <div class="d-flex align-items-center">
                 <svg cIcon name="cilPlus" class="me-2"></svg>
-                <span>Crear etiqueta: <strong>{{ searchControl.value }}</strong></span>
+                <span
+                  >Crear etiqueta: <strong>{{ searchControl.value }}</strong></span
+                >
               </div>
             </li>
-            
+
             <!-- Mensaje si no hay resultados y no se muestra crear -->
-            <li class="list-group-item text-muted small text-center" *ngIf="suggestions.length === 0 && (!searchControl.value || searchControl.value.length < 2)">
+            <li
+              class="list-group-item text-muted small text-center"
+              *ngIf="
+                suggestions.length === 0 && (!searchControl.value || searchControl.value.length < 2)
+              "
+            >
               Escribe para buscar...
             </li>
           </ng-container>
         </ul>
       </div>
     </div>
-    
+
     <div class="form-text small mt-1">
       Escribe para buscar etiquetas existentes o presiona en "Crear" para añadir una nueva.
     </div>

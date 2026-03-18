@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-right-sidebar',
   templateUrl: './right-sidebar.component.html',
   styleUrls: ['./right-sidebar.component.scss'],
-  standalone: false
+  standalone: false,
 })
 export class RightSidebarComponent implements OnInit, OnDestroy {
   visible = false;
@@ -16,11 +16,9 @@ export class RightSidebarComponent implements OnInit, OnDestroy {
   constructor(public rightSidebarService: RightSidebarService) {}
 
   ngOnInit(): void {
+    this.sub.add(this.rightSidebarService.visible$.subscribe((v) => (this.visible = v)));
     this.sub.add(
-      this.rightSidebarService.visible$.subscribe(v => this.visible = v)
-    );
-    this.sub.add(
-      this.rightSidebarService.config$.subscribe(c => {
+      this.rightSidebarService.config$.subscribe((c) => {
         if (c.title) this.title = c.title;
       })
     );

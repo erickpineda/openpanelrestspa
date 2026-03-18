@@ -7,7 +7,7 @@ import {
   NgZone,
   OnDestroy,
   OnInit,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -160,10 +160,13 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
         this.dataOptionSeleccionada = filtro.dataOption;
         this.facade.setDataOption(filtro.dataOption);
       }
-      this.facade.applyAdvancedFilters({
-        dataOption: (filtro.dataOption as 'AND' | 'OR') || (this.dataOptionSeleccionada as 'AND' | 'OR'),
-        searchCriteriaList: filtro.searchCriteriaList,
-      }).subscribe();
+      this.facade
+        .applyAdvancedFilters({
+          dataOption:
+            (filtro.dataOption as 'AND' | 'OR') || (this.dataOptionSeleccionada as 'AND' | 'OR'),
+          searchCriteriaList: filtro.searchCriteriaList,
+        })
+        .subscribe();
       const first = filtro.searchCriteriaList[0];
       this.campoSeleccionado = first?.filterKey || this.campoSeleccionado;
       this.operacionSeleccionada = first?.operation || this.operacionSeleccionada;
@@ -363,5 +366,4 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
       this.zone.run(() => setTimeout(() => this.facade.triggerBusqueda(this.valorBusqueda), 0));
     }
   }
-
 }

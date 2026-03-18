@@ -142,7 +142,7 @@ import {
   cilGlobeAlt,
   cilLanguage,
   cilSortAlphaDown,
-  cilSortAlphaUp
+  cilSortAlphaUp,
 } from '@coreui/icons';
 
 export const iconSubset = {
@@ -291,7 +291,7 @@ export const iconSubset = {
   cilFindInPage,
   cilPhone,
   cilGlobeAlt,
-  cilLanguage
+  cilLanguage,
 };
 
 export enum IconSubset {

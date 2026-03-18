@@ -26,7 +26,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
   const translationServiceMock = {
     translations$: new BehaviorSubject({}),
     translate: (key: string) => key,
-    instant: (key: string) => key
+    instant: (key: string) => key,
   };
 
   // Mock data
@@ -122,7 +122,7 @@ describe('ResponsiveNavigationComponent - Visual Integration Tests', () => {
           useValue: responsiveServiceSpy,
         },
         { provide: NavigationService, useValue: navigationServiceSpy },
-        { provide: TranslationService, useValue: translationServiceMock }
+        { provide: TranslationService, useValue: translationServiceMock },
       ],
     }).compileComponents();
 

@@ -74,7 +74,7 @@ describe('UiAnomalyMonitorService', () => {
     service.setConfig({ enabled: true }, false);
     service.start();
     events$.next(new NavigationEnd(1, '/x', '/x'));
-    
+
     jasmine.clock().tick(1000); // Wait for navigation debounce (500ms) + buffer
     expect(scanSpy).toHaveBeenCalledWith('navigation');
 

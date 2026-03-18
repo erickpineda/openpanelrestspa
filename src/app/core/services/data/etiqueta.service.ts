@@ -27,7 +27,13 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
   }
 
   override crear(etiqueta: Etiqueta, context?: HttpContext): Observable<any> {
-    return this.post<any>(OPConstants.Methods.ETIQUETAS.CREAR, etiqueta, undefined, undefined, context);
+    return this.post<any>(
+      OPConstants.Methods.ETIQUETAS.CREAR,
+      etiqueta,
+      undefined,
+      undefined,
+      context
+    );
   }
 
   override listarPaginaSinGlobalLoader(
@@ -46,7 +52,13 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
     return this.get<any>(this.endpoint, params, undefined, context);
   }
 
-  buscar(payload: any, pageNo?: number, pageSize?: number, sortField?: string, sortDirection?: string): Observable<any> {
+  buscar(
+    payload: any,
+    pageNo?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortDirection?: string
+  ): Observable<any> {
     const params: any = {};
     if (pageNo != null) params[OPConstants.Pagination.PAGE_NO_PARAM] = String(pageNo);
     if (pageSize != null) params[this.pageSizeParam] = String(pageSize);
@@ -69,9 +81,7 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
     if (sortField) {
       params[OPConstants.Pagination.SORT_PARAM] = `${sortField},${sortDirection || 'ASC'}`;
     }
-    const context = new HttpContext()
-      .set(SKIP_GLOBAL_LOADER, true)
-      .set(SKIP_GLOBAL_NOTIFY, true);
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true).set(SKIP_GLOBAL_NOTIFY, true);
     return this.post<any>(
       OPConstants.Methods.ETIQUETAS.BUSCAR,
       payload,
@@ -104,7 +114,9 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
   }
 
   desasociarDeCategoria(etiquetaCodigo: string, categoriaId: number): Observable<any> {
-    return this.delete<any>(`${this.endpoint}/desasociar/CATEGORIA/${etiquetaCodigo}/${categoriaId}`);
+    return this.delete<any>(
+      `${this.endpoint}/desasociar/CATEGORIA/${etiquetaCodigo}/${categoriaId}`
+    );
   }
 
   obtenerEtiquetasPorEntrada(entradaId: number): Observable<any> {
@@ -119,11 +131,7 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
     return this.get<any>(OPConstants.Methods.ETIQUETAS.OBTENER_POR_CODIGO(codigo));
   }
 
-  actualizarPorCodigo(
-    codigo: string,
-    etiqueta: Etiqueta,
-    context?: HttpContext
-  ): Observable<any> {
+  actualizarPorCodigo(codigo: string, etiqueta: Etiqueta, context?: HttpContext): Observable<any> {
     return this.put<any>(
       OPConstants.Methods.ETIQUETAS.ACTUALIZAR_POR_CODIGO(codigo),
       etiqueta,

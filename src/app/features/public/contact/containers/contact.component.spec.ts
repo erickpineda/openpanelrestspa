@@ -13,16 +13,14 @@ describe('ContactComponent', () => {
   const translationServiceMock = {
     translations$: new BehaviorSubject({}),
     translate: (key: string) => key,
-    instant: (key: string) => key
+    instant: (key: string) => key,
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ContactComponent],
       imports: [TranslatePipe],
-      providers: [
-        { provide: TranslationService, useValue: translationServiceMock }
-      ],
+      providers: [{ provide: TranslationService, useValue: translationServiceMock }],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 

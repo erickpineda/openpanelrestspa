@@ -14,7 +14,12 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 // Shared Module
 import { SharedOPModule } from '../shared/shared.module';
 
-const APP_CONTAINERS = [DefaultFooterComponent, DefaultHeaderComponent, AdminComponent, RightSidebarComponent];
+const APP_CONTAINERS = [
+  DefaultFooterComponent,
+  DefaultHeaderComponent,
+  AdminComponent,
+  RightSidebarComponent,
+];
 
 @NgModule({
   declarations: [...APP_CONTAINERS],

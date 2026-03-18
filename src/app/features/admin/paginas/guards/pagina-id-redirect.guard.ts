@@ -1,12 +1,24 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  CanActivate,
+  Router,
+  RouterStateSnapshot,
+  UrlTree,
+} from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 
 @Injectable({ providedIn: 'root' })
 export class PaginaIdRedirectGuard implements CanActivate {
-  constructor(private entradaService: EntradaService, private router: Router) {}
-  async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+  constructor(
+    private entradaService: EntradaService,
+    private router: Router
+  ) {}
+  async canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Promise<boolean | UrlTree> {
     const idParam = route.params['idEntrada'];
     const id = Number(idParam);
     if (!id || Number.isNaN(id)) return true;

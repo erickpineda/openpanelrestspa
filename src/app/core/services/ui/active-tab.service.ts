@@ -18,11 +18,11 @@ export class ActiveTabService {
   public registerActiveFeature(feature: string): void {
     const tabId = this.tokenStorage.getOrCreateTabId();
     const map = this.getMap();
-    
+
     if (!map[tabId]) {
       map[tabId] = [];
     }
-    
+
     if (!map[tabId].includes(feature)) {
       map[tabId].push(feature);
       this.saveMap(map);
@@ -36,7 +36,7 @@ export class ActiveTabService {
   public unregisterActiveFeature(feature: string): void {
     const tabId = this.tokenStorage.getOrCreateTabId();
     const map = this.getMap();
-    
+
     if (map[tabId]) {
       const index = map[tabId].indexOf(feature);
       if (index > -1) {
@@ -65,7 +65,7 @@ export class ActiveTabService {
    */
   public isFeatureActiveAnywhere(feature: string): boolean {
     const map = this.getMap();
-    return Object.values(map).some(features => features.includes(feature));
+    return Object.values(map).some((features) => features.includes(feature));
   }
 
   /**
@@ -74,7 +74,7 @@ export class ActiveTabService {
   public isFeatureActiveInOtherTab(feature: string): boolean {
     const currentTabId = this.tokenStorage.getOrCreateTabId();
     const map = this.getMap();
-    return Object.keys(map).some(tabId => tabId !== currentTabId && map[tabId].includes(feature));
+    return Object.keys(map).some((tabId) => tabId !== currentTabId && map[tabId].includes(feature));
   }
 
   /**

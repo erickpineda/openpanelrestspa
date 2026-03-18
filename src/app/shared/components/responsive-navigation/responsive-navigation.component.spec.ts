@@ -22,7 +22,7 @@ describe('ResponsiveNavigationComponent', () => {
   const translationServiceMock = {
     translations$: new BehaviorSubject({}),
     translate: (key: string) => key,
-    instant: (key: string) => key
+    instant: (key: string) => key,
   };
 
   const mockResponsiveState: ResponsiveState = {
@@ -104,7 +104,7 @@ describe('ResponsiveNavigationComponent', () => {
       providers: [
         { provide: ResponsiveNavigationService, useValue: responsiveNavSpy },
         { provide: NavigationService, useValue: navSpy },
-        { provide: TranslationService, useValue: translationServiceMock }
+        { provide: TranslationService, useValue: translationServiceMock },
       ],
     }).compileComponents();
 

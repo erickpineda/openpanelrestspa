@@ -135,7 +135,13 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     } else {
       const payload: AdvancedSearchParams = this.buildAdvancedSearchPayload();
       this.comentarioService
-        .buscarSinGlobalLoader(payload, this.pageNo, this.pageSize, this.currentSortField, this.currentSortDirection)
+        .buscarSinGlobalLoader(
+          payload,
+          this.pageNo,
+          this.pageSize,
+          this.currentSortField,
+          this.currentSortDirection
+        )
         .pipe(
           takeUntil(this.destroy$),
           finalize(() => {

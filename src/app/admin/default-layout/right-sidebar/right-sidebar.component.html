@@ -10,38 +10,47 @@
 >
   <c-offcanvas-header class="border-bottom bg-light bg-opacity-10">
     <h5 cOffcanvasTitle id="rightSidebarLabel" class="fw-bold text-primary">{{ title }}</h5>
-    <button cButtonClose class="text-reset" aria-label="Cerrar" (click)="rightSidebarService.close()"></button>
+    <button
+      cButtonClose
+      class="text-reset"
+      aria-label="Cerrar"
+      (click)="rightSidebarService.close()"
+    ></button>
   </c-offcanvas-header>
   <c-offcanvas-body>
     <ng-container *ngTemplateOutlet="rightSidebarService.content$ | async"></ng-container>
-    
+
     <!-- Default content (placeholder for demo) -->
     <div *ngIf="!(rightSidebarService.content$ | async)" class="d-flex flex-column gap-3">
-        <div class="alert alert-info d-flex align-items-center" role="alert">
-            <svg cIcon name="cilInfo" class="flex-shrink-0 me-2"></svg>
-            <div>
-              Seleccione una tarea o elemento para ver sus detalles aquí.
-            </div>
+      <div class="alert alert-info d-flex align-items-center" role="alert">
+        <svg cIcon name="cilInfo" class="flex-shrink-0 me-2"></svg>
+        <div>Seleccione una tarea o elemento para ver sus detalles aquí.</div>
+      </div>
+
+      <!-- Example Quick Actions -->
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-transparent fw-semibold">Acciones Rápidas</div>
+        <div class="list-group list-group-flush">
+          <button
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+          >
+            Crear Nueva Tarea
+            <svg cIcon name="cilPlus" size="sm" class="text-muted"></svg>
+          </button>
+          <button
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+          >
+            Ver Calendario
+            <svg cIcon name="cilCalendar" size="sm" class="text-muted"></svg>
+          </button>
+          <button
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+          >
+            Configuración
+            <svg cIcon name="cilSettings" size="sm" class="text-muted"></svg>
+          </button>
         </div>
-        
-        <!-- Example Quick Actions -->
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-transparent fw-semibold">Acciones Rápidas</div>
-            <div class="list-group list-group-flush">
-                <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    Crear Nueva Tarea
-                    <svg cIcon name="cilPlus" size="sm" class="text-muted"></svg>
-                </button>
-                <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    Ver Calendario
-                    <svg cIcon name="cilCalendar" size="sm" class="text-muted"></svg>
-                </button>
-                <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    Configuración
-                    <svg cIcon name="cilSettings" size="sm" class="text-muted"></svg>
-                </button>
-            </div>
-        </div>
+      </div>
     </div>
   </c-offcanvas-body>
 </c-offcanvas>
