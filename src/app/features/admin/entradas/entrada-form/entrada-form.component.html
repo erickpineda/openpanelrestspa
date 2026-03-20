@@ -209,6 +209,7 @@
                   <div class="editor-wrapper border rounded">
                     <ckeditor
                       [editor]="Editor"
+                      [config]="editorConfig"
                       formControlName="contenido"
                       (ready)="onReady($event)"
                       (blur)="form.get('contenido')?.markAsTouched()"

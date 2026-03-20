@@ -53,10 +53,11 @@
             "polyfills": ["src/polyfills.ts"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "preserveSymlinks": true,
+            "preserveSymlinks": false,
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
               "@coreui/coreui/dist/css/coreui.min.css",
+              "ckeditor5/ckeditor5.css",
               "src/styles.scss"
             ],
             "scripts": [],
@@ -64,7 +65,6 @@
               "chart.js",
               "@coreui/chartjs/dist/js/coreui-chartjs.js",
               "lodash",
-              "@ckeditor/ckeditor5-build-classic",
               "file-saver",
               "jszip"
             ],

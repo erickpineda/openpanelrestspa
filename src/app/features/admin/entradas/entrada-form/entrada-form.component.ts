@@ -28,6 +28,7 @@ import { ToastService } from '@app/core/services/ui/toast.service';
 import { OPConstants } from '@app/shared/constants/op-global.constants';
 import { EntradaFormStateService } from '../services/entrada-form-state.service';
 import { ActiveTabService } from '@app/core/services/ui/active-tab.service';
+import { ClassicEditor, Essentials, Paragraph, Bold, Italic } from 'ckeditor5';
 
 @Component({
   selector: 'app-entrada-form',
@@ -53,8 +54,13 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   @Output() editar = new EventEmitter<void>();
   @Output() cancelar = new EventEmitter<void>();
 
-  Editor: any = null;
-  editorLoading = false;
+  Editor: any = ClassicEditor;
+  editorConfig: any = {
+    licenseKey: 'GPL',
+    language: 'es',
+    plugins: [Essentials, Paragraph, Bold, Italic],
+    toolbar: ['undo', 'redo', '|', 'bold', 'italic']
+  };
   resetConfirmVisible = false;
   modalSeleccionVisible = false;
   confirmRecoveryVisible = false;
@@ -118,7 +124,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       this.cdRef.markForCheck();
     });
 
-    this.loadEditorBuild();
+    // CKEditor is provided by the ESM package 'ckeditor5'
 
     const contenidoCtrl = this.form?.get('contenido');
     if (contenidoCtrl) {
@@ -416,49 +422,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadEditorBuild(): Promise<void> {
-    try {
-      this.editorLoading = true;
-      await this.tryLoadCkeditorFromAssets();
-      const w: any = window as any;
-      if (w && w.ClassicEditor) {
-        this.Editor = w.ClassicEditor;
-      } else {
-        const mod = await import('@ckeditor/ckeditor5-build-classic');
-        this.Editor = (mod as any).default ? (mod as any).default : mod;
-      }
-    } catch (error) {
-      console.error('Error cargando CKEditor build dinámicamente:', error);
-    } finally {
-      this.editorLoading = false;
-    }
-  }
-
-  private tryLoadCkeditorFromAssets(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      try {
-        const url = '/assets/ckeditor5/build/ckeditor.js';
-        const existing = document.querySelector(`script[src="${url}"]`) as HTMLScriptElement | null;
-        if (existing) {
-          if ((window as any).ClassicEditor) {
-            resolve();
-            return;
-          }
-          existing.addEventListener('load', () => resolve());
-          existing.addEventListener('error', () => resolve());
-          return;
-        }
-        const script = document.createElement('script');
-        script.src = url;
-        script.async = true;
-        script.onload = () => resolve();
-        script.onerror = () => resolve();
-        document.body.appendChild(script);
-      } catch (e) {
-        resolve();
-      }
-    });
-  }
+  // No dynamic loader; using ESM 'ckeditor5' directly
 
   onReady(editor: any): void {
     this.editorInstance = editor;
