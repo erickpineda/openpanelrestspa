@@ -28,7 +28,30 @@ import { ToastService } from '@app/core/services/ui/toast.service';
 import { OPConstants } from '@app/shared/constants/op-global.constants';
 import { EntradaFormStateService } from '../services/entrada-form-state.service';
 import { ActiveTabService } from '@app/core/services/ui/active-tab.service';
-import { ClassicEditor, Essentials, Paragraph, Bold, Italic } from 'ckeditor5';
+import {
+  ClassicEditor,
+  Essentials,
+  Paragraph,
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  Heading,
+  Link,
+  List,
+  Indent,
+  BlockQuote,
+  Image,
+  ImageToolbar,
+  ImageCaption,
+  ImageStyle,
+  ImageResize,
+  Table,
+  TableToolbar,
+  PasteFromOffice,
+  MediaEmbed,
+  RemoveFormat
+} from 'ckeditor5';
 
 @Component({
   selector: 'app-entrada-form',
@@ -58,8 +81,65 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
   editorConfig: any = {
     licenseKey: 'GPL',
     language: 'es',
-    plugins: [Essentials, Paragraph, Bold, Italic],
-    toolbar: ['undo', 'redo', '|', 'bold', 'italic']
+    plugins: [
+      Essentials,
+      Paragraph,
+      Heading,
+      Bold,
+      Italic,
+      Underline,
+      Strikethrough,
+      RemoveFormat,
+      Link,
+      List,
+      Indent,
+      BlockQuote,
+      Image,
+      ImageToolbar,
+      ImageCaption,
+      ImageStyle,
+      ImageResize,
+      Table,
+      TableToolbar,
+      PasteFromOffice,
+      MediaEmbed
+    ],
+    toolbar: [
+      'undo',
+      'redo',
+      '|',
+      'heading',
+      '|',
+      'bold',
+      'italic',
+      'underline',
+      'strikethrough',
+      'removeFormat',
+      'link',
+      '|',
+      'bulletedList',
+      'numberedList',
+      'outdent',
+      'indent',
+      '|',
+      'blockQuote',
+      'insertTable',
+      'mediaEmbed'
+    ],
+    image: {
+      toolbar: [
+        'imageTextAlternative',
+        '|',
+        'imageStyle:inline',
+        'imageStyle:wrapText',
+        'imageStyle:breakText',
+        '|',
+        'resizeImage'
+      ]
+    },
+    table: {
+      contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+    }
   };
   resetConfirmVisible = false;
   modalSeleccionVisible = false;
