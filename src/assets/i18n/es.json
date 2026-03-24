@@ -13,6 +13,75 @@
     "MARK_READ": "Marcar como leída",
     "VIEW_ALL": "Ver todas"
   },
+  "PUBLIC": {
+    "HOME": {
+      "SITE_HEADING": "Mi primer Blog",
+      "SITE_SUBHEADING": "Recien empezando",
+      "LATEST_ENTRIES": "Entradas",
+      "NO_ENTRIES": "No hay entradas",
+      "NO_ENTRIES_MESSAGE": "Este blog no tiene entradas, contacta con los vagos del Blog para que publiquen algo..",
+      "READ_MORE": "Continuar leyendo...",
+      "PUBLISHED_DATE": "Fecha publicación",
+      "LOAD_ERROR": "No se pudieron cargar las entradas, intenta nuevamente más tarde."
+    },
+    "FOOTER": {
+      "COREUI": "CoreUI",
+      "COPYRIGHT": "2021 creativeLabs",
+      "POWERED_BY": "Powered by",
+      "COREUI_ANGULAR": "CoreUI for Angular"
+    },
+    "ABOUT": {
+      "TITLE": "Acerca de nosotros"
+    },
+    "CONTACT": {
+      "TITLE": "Contáctanos",
+      "DESCRIPTION": "¿Tienes alguna pregunta o comentario? Rellena el siguiente formulario y nos pondremos en contacto contigo lo antes posible.",
+      "NAME_LABEL": "Nombre completo",
+      "NAME_PLACEHOLDER": "Ingresa tu nombre...",
+      "NAME_REQUIRED": "Un nombre es requerido.",
+      "EMAIL_LABEL": "Dirección de Email",
+      "EMAIL_PLACEHOLDER": "Ingresa tu email...",
+      "EMAIL_REQUIRED": "Un correo es requerido.",
+      "EMAIL_INVALID": "El correo no es válido.",
+      "PHONE_LABEL": "Número de Teléfono",
+      "PHONE_PLACEHOLDER": "Ingresa tu teléfono...",
+      "PHONE_REQUIRED": "Un teléfono es requerido.",
+      "MESSAGE_LABEL": "Mensaje",
+      "MESSAGE_PLACEHOLDER": "Escribe tu mensaje aquí...",
+      "MESSAGE_REQUIRED": "Un mensaje es requerido.",
+      "SUCCESS_MESSAGE": "¡Mensaje enviado con éxito!",
+      "ERROR_MESSAGE": "Hubo un error al enviar tu mensaje. Intenta de nuevo.",
+      "SEND_BUTTON": "Enviar Mensaje"
+    },
+    "LOGIN": {
+      "TITLE": "Acceso al Sistema",
+      "SUBTITLE": "Inicia sesión en tu cuenta",
+      "SIGN_IN_MESSAGE": "Inicia sesión con tu cuenta",
+      "USERNAME_PLACEHOLDER": "Introduzca nombre de usuario",
+      "USERNAME_REQUIRED": "El nombre de usuario es obligatorio",
+      "PASSWORD_PLACEHOLDER": "Introduzca la contraseña",
+      "PASSWORD_REQUIRED": "La contraseña es obligatoria",
+      "PASSWORD_MIN_LENGTH": "La contraseña debe tener al menos 6 caracteres",
+      "SIGNING_IN": "Iniciando sesión...",
+      "FORGOT_PASSWORD": "¿Has olvidado la contraseña?",
+      "LOGIN_FAILED": "Error de inicio de sesión",
+      "LOGGED_IN": "Sesión iniciada con éxito",
+      "USER_ROLE_INFO": "Tus roles son"
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Recuperar contraseña",
+      "SUBTITLE": "Introduce tu usuario o email para iniciar el proceso.",
+      "IDENTIFIER_LABEL": "Usuario o email",
+      "IDENTIFIER_PLACEHOLDER": "usuario@email.com",
+      "SUBMIT": "Continuar",
+      "MODAL_TITLE": "En desarrollo",
+      "MODAL_BODY": "La recuperación de contraseña todavía no está disponible. Esta pantalla está preparada para integrarse cuando exista el endpoint.",
+      "MODAL_OK": "Entendido",
+      "BACK_TO_LOGIN": "Volver al login",
+      "CONTACT": "Contactar",
+      "BACK_LINK": "Volver a iniciar sesión"
+    }
+  },
   "COMMON": {
     "LOADING": "Cargando...",
     "ERROR": "Error",
@@ -922,7 +991,7 @@
       "DATE": "Fecha"
     }
   },
-  "PUBLIC": {
+  "PUBLIC_OLD": {
     "HOME": {
       "SITE_HEADING": "Mi primer Blog",
       "SITE_SUBHEADING": "Recien empezando",

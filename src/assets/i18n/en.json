@@ -935,6 +935,19 @@
       "FORGOT_PASSWORD": "Forgot password?",
       "USER_ROLE_INFO": "User role is"
     },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Recover password",
+      "SUBTITLE": "Enter your username or email to start the process.",
+      "IDENTIFIER_LABEL": "Username or email",
+      "IDENTIFIER_PLACEHOLDER": "user@email.com",
+      "SUBMIT": "Continue",
+      "MODAL_TITLE": "In development",
+      "MODAL_BODY": "Password recovery is not available yet. This screen is ready to be wired once the API endpoint exists.",
+      "MODAL_OK": "Got it",
+      "BACK_TO_LOGIN": "Back to login",
+      "CONTACT": "Contact",
+      "BACK_LINK": "Back to login"
+    },
     "ABOUT": {
       "TITLE": "About Us"
     },

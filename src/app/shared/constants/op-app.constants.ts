@@ -14,6 +14,13 @@ export const OPAppConstants = {
       DEFAULT_DATA_OPTION: 'AND',
     },
   },
+  Public: {
+    Comentarios: {
+      UX_STRATEGY: 'SYNCED',
+      USE_RECUENTOS_ENDPOINT: false,
+      PENDING_NOTICE_TTL_MS: 259200000,
+    },
+  },
   Common: {
     Pagination: {
       DROPDOWN_PAGE_SIZE: 50,

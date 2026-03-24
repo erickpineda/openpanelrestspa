@@ -22,6 +22,7 @@ export class NavBarPublicComponent implements OnInit {
   isShrink: boolean = false;
   isLoadingLogout = false;
   currentLang: Language = 'es';
+  visible = false;
 
   @HostListener('window:scroll', [])
   onWindowScroll() {

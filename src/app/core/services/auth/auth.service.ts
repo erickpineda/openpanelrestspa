@@ -52,6 +52,10 @@ export class AuthService {
       );
   }
 
+  register(userData: any): Observable<any> {
+    return this.http.post(this.urlBase + this.urlRegis, userData, httpOptions);
+  }
+
   logout(): Observable<any> {
     return this.http
       .post(

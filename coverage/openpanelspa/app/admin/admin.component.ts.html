@@ -507,12 +507,7 @@
 <a name='L442'></a><a href='#L442'>442</a>
 <a name='L443'></a><a href='#L443'>443</a>
 <a name='L444'></a><a href='#L444'>444</a>
-<a name='L445'></a><a href='#L445'>445</a>
-<a name='L446'></a><a href='#L446'>446</a>
-<a name='L447'></a><a href='#L447'>447</a>
-<a name='L448'></a><a href='#L448'>448</a>
-<a name='L449'></a><a href='#L449'>449</a>
-<a name='L450'></a><a href='#L450'>450</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L445'></a><a href='#L445'>445</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -644,8 +639,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -657,6 +650,7 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -664,8 +658,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -710,8 +702,6 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1092,18 +1082,17 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargaFinalizada = true;
 &nbsp;
     // Suscribirse a cambios en las traducciones (se dispara cuando se carga el idioma o cambia)
-    this.translationService.translations$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() =&gt; {
-        this.updateTranslations();
-        // Actualizar traducciones IN-PLACE para no romper referencias
-        this.refreshSidebar();
-      });
+    this.translationService.translations$.pipe(takeUntil(this.destroy$)).subscribe(() =&gt; {
+      this.updateTranslations();
+      // Actualizar traducciones IN-PLACE para no romper referencias
+      this.refreshSidebar();
+    });
 &nbsp;
     const isDashboardRoute =
       this.router.url.includes('/admin/dashboard') || <span class="branch-1 cbranch-no" title="branch not covered" >this.router.url.includes('/admin/control');</span>
     if (isDashboardRoute) {
-      this.dashboardApi.getContentStats()
+      this.dashboardApi
+        .getContentStats()
         .pipe(takeUntil(this.destroy$))
         .subscribe((stats) =&gt; {
           this.projectsCount = Number(stats?.totalEntradas) || 0;
@@ -1112,12 +1101,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
           this.cdr.markForCheck();
         });
     }
-    this.toastService.toasts$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((list) =&gt; {
-        this.notificationsCount = Array.isArray(list) ? list.length : <span class="branch-1 cbranch-no" title="branch not covered" >0;</span>
-        this.cdr.markForCheck();
-      });
+    this.toastService.toasts$.pipe(takeUntil(this.destroy$)).subscribe((list) =&gt; {
+      this.notificationsCount = Array.isArray(list) ? list.length : <span class="branch-1 cbranch-no" title="branch not covered" >0;</span>
+      this.cdr.markForCheck();
+    });
     this.tasksCount = this.temporaryEntriesCount;
     this.cdr.markForCheck();
 &nbsp;
@@ -1158,12 +1145,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     // Escuchar cambios en localStorage para actualizar el banner inmediatamente
     window.addEventListener('storage', this.onStorageChange as any);
 &nbsp;
-    this.temporaryStorage.entriesChanged$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() =&gt; {
-        this.checkForTemporaryData();
-        this.cdr.markForCheck();
-      });
+    this.temporaryStorage.entriesChanged$.pipe(takeUntil(this.destroy$)).subscribe(() =&gt; {
+      this.checkForTemporaryData();
+      this.cdr.markForCheck();
+    });
   }
 &nbsp;
   ngAfterViewInit(): void {
@@ -1252,7 +1237,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 <span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!item.translationKey) {</span>
 <span class="cstat-no" title="statement not covered" >        item.translationKey = item.name;</span>
       }
-      
+&nbsp;
       // Traducir nombre
 <span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (item.translationKey) {</span>
         const translated = <span class="cstat-no" title="statement not covered" >this.translationService.translate(item.translationKey);</span>
@@ -1261,7 +1246,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 <span class="cstat-no" title="statement not covered" >          item.name = translated;</span>
         }
       }
-      
+&nbsp;
 <span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (item.badge) {</span>
 <span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!item.badge.translationKey) {</span>
 <span class="cstat-no" title="statement not covered" >          item.badge.translationKey = item.badge.text;</span>
@@ -1361,19 +1346,19 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 <span class="fstat-no" title="function not covered" >  onResize(</span>event: any) {
     const width = <span class="cstat-no" title="statement not covered" >event.target.innerWidth;</span>
     const isMobile = <span class="cstat-no" title="statement not covered" >width &lt; 992;</span>
-    
+&nbsp;
     // Actualizar estado de backdrop
 <span class="cstat-no" title="statement not covered" >    this.sidebarBackdrop = isMobile;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (isMobile &amp;&amp; this.sidebarVisible) {</span>
-<span class="cstat-no" title="statement not covered" >       this.sidebarVisible = false;</span>
-<span class="cstat-no" title="statement not covered" >       this.cdr.markForCheck();</span>
+<span class="cstat-no" title="statement not covered" >      this.sidebarVisible = false;</span>
+<span class="cstat-no" title="statement not covered" >      this.cdr.markForCheck();</span>
     } else <span class="cstat-no" title="statement not covered" >if (!isMobile &amp;&amp; !this.sidebarVisible) {</span>
-<span class="cstat-no" title="statement not covered" >       this.sidebarVisible = true;</span>
-<span class="cstat-no" title="statement not covered" >       this.cdr.markForCheck();</span>
+<span class="cstat-no" title="statement not covered" >      this.sidebarVisible = true;</span>
+<span class="cstat-no" title="statement not covered" >      this.cdr.markForCheck();</span>
     } else {
-       // Asegurar actualización de vista si solo cambia backdrop
-<span class="cstat-no" title="statement not covered" >       this.cdr.markForCheck();</span>
+      // Asegurar actualización de vista si solo cambia backdrop
+<span class="cstat-no" title="statement not covered" >      this.cdr.markForCheck();</span>
     }
   }
 &nbsp;
@@ -1389,7 +1374,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
         // Verificar si el click fue en el botón toggle para evitar cierre inmediato
         const toggler = <span class="cstat-no" title="statement not covered" >document.querySelector('.header-toggler');</span>
 <span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (toggler &amp;&amp; toggler.contains(target)) {</span>
-<span class="cstat-no" title="statement not covered" >           return;</span>
+<span class="cstat-no" title="statement not covered" >          return;</span>
         }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        this.sidebarVisible = false;</span>
@@ -1417,7 +1402,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T17:02:13.631Z
+                at 2026-03-24T15:59:23.603Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

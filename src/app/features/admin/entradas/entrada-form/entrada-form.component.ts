@@ -50,7 +50,7 @@ import {
   TableToolbar,
   PasteFromOffice,
   MediaEmbed,
-  RemoveFormat
+  RemoveFormat,
 } from 'ckeditor5';
 
 @Component({
@@ -102,7 +102,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       Table,
       TableToolbar,
       PasteFromOffice,
-      MediaEmbed
+      MediaEmbed,
     ],
     toolbar: [
       'undo',
@@ -124,7 +124,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
       '|',
       'blockQuote',
       'insertTable',
-      'mediaEmbed'
+      'mediaEmbed',
     ],
     image: {
       toolbar: [
@@ -134,12 +134,12 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
         'imageStyle:wrapText',
         'imageStyle:breakText',
         '|',
-        'resizeImage'
-      ]
+        'resizeImage',
+      ],
     },
     table: {
-      contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
-    }
+      contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
+    },
   };
   resetConfirmVisible = false;
   modalSeleccionVisible = false;

@@ -220,3 +220,27 @@ header.masthead .post-heading .meta a {
     pointer-events: none;
   }
 }
+
+// Public UI custom utilities
+.hover-primary {
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+.hover-primary:hover {
+  color: var(--cui-primary) !important;
+  background-color: rgba(var(--cui-primary-rgb), 0.05);
+}
+
+.transition-hover {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.transition-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+.bg-light-subtle {
+  background-color: #f8f9fa !important;
+}
+.rounded-4 {
+  border-radius: 1rem !important;
+}

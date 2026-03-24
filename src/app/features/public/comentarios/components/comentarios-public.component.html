@@ -1,0 +1,110 @@
+<div class="comentarios-section mt-5">
+  <h3 class="fw-bold mb-4">
+    Comentarios
+    @if (ux.strategy === 'TOTAL_WITH_MESSAGE' && totalCount !== null) {
+      <span class="text-muted fs-5">({{ visibleCount }} / {{ totalCount }})</span>
+    } @else {
+      <span class="text-muted fs-5">({{ visibleCount }})</span>
+    }
+  </h3>
+  
+  <div class="comentarios-lista mb-5">
+    @if (visibleCount === 0) {
+      @if (ux.strategy === 'TOTAL_WITH_MESSAGE' && pendingCount > 0) {
+        <div class="alert alert-info text-center border-0 bg-light-subtle">
+          Hay {{ pendingCount }} comentario{{ pendingCount === 1 ? '' : 's' }} en espera de moderación. Sé el primero en publicar un comentario público.
+        </div>
+      } @else {
+        <div class="alert alert-light text-center border">
+          No hay comentarios aún. ¡Sé el primero en opinar!
+        </div>
+      }
+    }
+    
+    @for (c of comentarios; track c.idComentario) {
+      <div class="d-flex mb-4">
+        <div class="flex-shrink-0">
+          <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 1.2rem;">
+            {{ c.username ? c.username.charAt(0).toUpperCase() : 'U' }}
+          </div>
+        </div>
+        <div class="flex-grow-1 ms-3">
+          <div class="bg-light p-3 rounded-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="mb-0 fw-bold">{{ c.username || 'Usuario' }}</h6>
+              <small class="text-muted">{{ getFechaDate(c.fechaCreacion) | date:'short' : '' : 'es-ES' }}</small>
+            </div>
+            <p class="mb-0">{{ c.contenido }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (isLoading) {
+      <div class="text-center py-3">
+        <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+      </div>
+    }
+
+    @if (hasMore && !isLoading) {
+      <div class="d-flex justify-content-center">
+        <button type="button" class="btn btn-outline-primary rounded-pill px-4" (click)="cargarMas()">
+          Cargar más comentarios
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="comentario-form p-4 bg-white border rounded-3 shadow-sm">
+    <h5 class="mb-3">Deja un comentario</h5>
+    
+    @if (!isLoggedIn) {
+      <div class="alert alert-warning mb-0">
+        Para unirte a la conversación, por favor <a routerLink="/login" class="fw-bold alert-link">inicia sesión</a> o <a routerLink="/registro" class="fw-bold alert-link">regístrate</a>.
+      </div>
+    }
+
+    @if (isLoggedIn) {
+      @if (showMyPendingNotice) {
+        <div class="alert alert-info border-0 bg-light-subtle" role="alert">
+          Gracias, tu comentario está pendiente de moderación.
+        </div>
+      }
+      @if (successMessage) {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ successMessage }}
+          <button type="button" class="btn-close" (click)="successMessage = ''" aria-label="Close"></button>
+        </div>
+      }
+      @if (errorMessage) {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ errorMessage }}
+          <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Close"></button>
+        </div>
+      }
+      
+      <form (ngSubmit)="enviarComentario()" #commentForm="ngForm">
+        <div class="mb-3">
+          <textarea 
+            class="form-control bg-light" 
+            id="nuevoComentario" 
+            rows="4" 
+            placeholder="Escribe tu opinión aquí..."
+            [(ngModel)]="nuevoComentarioTexto" 
+            name="texto"
+            required></textarea>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-primary px-4" [disabled]="isSubmitting || !nuevoComentarioTexto.trim()">
+            @if (isSubmitting) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Enviando...
+            } @else {
+              Publicar comentario
+            }
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

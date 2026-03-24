@@ -158,7 +158,27 @@
 <a name='L93'></a><a href='#L93'>93</a>
 <a name='L94'></a><a href='#L94'>94</a>
 <a name='L95'></a><a href='#L95'>95</a>
-<a name='L96'></a><a href='#L96'>96</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -246,11 +266,31 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// core/services/data/categoria.service.ts
@@ -337,15 +377,35 @@ export <span class="fstat-no" title="function not covered" >class C</span>ategor
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  obtenerPorCodigo(</span>codigo: string, context?: HttpContext): Observable&lt;any&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(OPConstants.Methods.CATEGORIAS.OBTENER_POR_CODIGO(codigo), undefined, undefined, context);</span>
+<span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(</span>
+      OPConstants.Methods.CATEGORIAS.OBTENER_POR_CODIGO(codigo),
+      undefined,
+      undefined,
+      context
+    );
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  actualizarPorCodigo(</span>codigo: string, categoria: Categoria, context?: HttpContext): Observable&lt;any&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.put&lt;any&gt;(OPConstants.Methods.CATEGORIAS.ACTUALIZAR_POR_CODIGO(codigo), categoria, undefined, undefined, context);</span>
+<span class="fstat-no" title="function not covered" >  actualizarPorCodigo(</span>
+    codigo: string,
+    categoria: Categoria,
+    context?: HttpContext
+  ): Observable&lt;any&gt; {
+<span class="cstat-no" title="statement not covered" >    return this.put&lt;any&gt;(</span>
+      OPConstants.Methods.CATEGORIAS.ACTUALIZAR_POR_CODIGO(codigo),
+      categoria,
+      undefined,
+      undefined,
+      context
+    );
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  borrarPorCodigo(</span>codigo: string, context?: HttpContext): Observable&lt;any&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.delete&lt;any&gt;(OPConstants.Methods.CATEGORIAS.BORRAR_POR_CODIGO(codigo), undefined, undefined, context);</span>
+<span class="cstat-no" title="statement not covered" >    return this.delete&lt;any&gt;(</span>
+      OPConstants.Methods.CATEGORIAS.BORRAR_POR_CODIGO(codigo),
+      undefined,
+      undefined,
+      context
+    );
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -355,7 +415,7 @@ export <span class="fstat-no" title="function not covered" >class C</span>ategor
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T17:02:13.631Z
+                at 2026-03-24T16:09:43.829Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

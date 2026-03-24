@@ -1,9 +1,9 @@
 // core/services/data/entrada.service.ts
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { HttpContext } from '@angular/common/http';
 import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Entrada } from '../../models/entrada.model';
 import { TipoEntrada } from '../../models/tipo-entrada.model';
 import { EstadoEntrada } from '../../models/estado-entrada.model';
@@ -29,6 +29,29 @@ interface BuscarResponse {
 })
 export class EntradaService extends CrudService<Entrada, number> {
   protected endpoint = OPConstants.Methods.ENTRADAS.BASE;
+
+  votarEntrada(idEntrada: number, idUsuario?: number): Observable<boolean> {
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    const body = idUsuario ? { idUsuario } : {};
+    return this.safePostOperation(
+      `${this.endpoint}/votar/${idEntrada}`,
+      body,
+      undefined,
+      undefined,
+      'entradas.votar',
+      context
+    );
+  }
+
+  actualizarVotosEntrada(idEntrada: number, votos: number, idUsuarioEditado?: number): Observable<boolean> {
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    const body: any = { idEntrada, votos };
+    if (idUsuarioEditado) body.idUsuarioEditado = idUsuarioEditado;
+    return this.put<any>(`${this.endpoint}/${idEntrada}`, body, undefined, undefined, context).pipe(
+      map((response) => response?.result?.success === true),
+      catchError(() => of(false))
+    );
+  }
 
   // ✅ MÉTODOS SEGUROS ESPECÍFICOS (nuevos)
 

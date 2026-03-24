@@ -1,123 +1,74 @@
-<main class="container">
-  <c-card class="text-center mb-4">
-    <c-card-header>
-      <h5>{{ 'PUBLIC.HOME.LATEST_ENTRIES' | translate }}</h5>
-    </c-card-header>
-    <c-card-body>
-      @if (errorMsg) {
-        <c-alert color="danger">{{ errorMsg | translate }}</c-alert>
-      }
-      @if (!hasEntries && !errorMsg && cargaFinalizada) {
+<div class="home-container">
+  <div class="row align-items-md-stretch py-5 mt-4">
+    <div class="col-md-6 mb-4 mb-md-0">
+      <div class="h-100 p-5 bg-light-subtle border-0 rounded-4 shadow-sm d-flex flex-column justify-content-center transition-hover">
+        <h2 class="display-5 fw-bold text-dark mb-3">Bienvenido a OpenPanel</h2>
+        <p class="lead text-muted mb-4">Explora nuestras últimas publicaciones, descubre contenido interesante y mantente actualizado con la comunidad.</p>
         <div>
-          <h5 cCardTitle>{{ 'PUBLIC.HOME.NO_ENTRIES' | translate }}</h5>
-          <p cCardText>
-            {{ 'PUBLIC.HOME.NO_ENTRIES_MESSAGE' | translate }}
-          </p>
-          <button cButton href="#about" color="primary" (click)="refrescarPagina()">
-            {{ 'COMMON.REFRESH' | translate }}
-          </button>
+          <button class="btn btn-primary btn-lg px-4 rounded-pill" type="button" routerLink="/entradas">Ver Entradas</button>
         </div>
-      }
-      @if (cargaFinalizada) {
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="h-100 p-5 bg-primary text-white border-0 rounded-4 shadow d-flex flex-column justify-content-center transition-hover" style="background: linear-gradient(135deg, var(--cui-primary) 0%, #0d47a1 100%);">
+        <h2 class="display-5 fw-bold mb-3">Contenido Destacado</h2>
+        <p class="lead mb-4 text-white-50">Regístrate para dejar comentarios, guardar tus favoritos e interactuar con la comunidad.</p>
         <div>
-          @if (pagedEntradas.length > 0) {
-            <div class="large-entry mb-4">
-              <c-card>
-                <img src="/assets/img/brand/coreui-base.svg" class="card-img-top" loading="lazy" />
-                <c-card-body>
-                  <h5 cCardTitle>{{ pagedEntradas[0]?.titulo }}</h5>
-                  <p cCardText>{{ pagedEntradas[0]?.resumen }}</p>
-                  <button cButton color="primary">{{ 'PUBLIC.HOME.READ_MORE' | translate }}</button>
-                </c-card-body>
-                <c-card-footer>
-                  <small class="text-medium-emphasis">
-                    {{ 'PUBLIC.HOME.PUBLISHED_DATE' | translate }}:
-                    {{
-                      pagedEntradas[0]?.fechaPublicacion
-                        ? pagedEntradas[0]?.fechaPublicacion
-                        : ('COMMON.UNPUBLISHED' | translate)
-                    }}
-                  </small>
-                  @for (
-                    categoria of pagedEntradas[0]?.categorias;
-                    track trackByCategoria($index, categoria)
-                  ) {
-                    <div>
-                      <small class="text-medium-emphasis"
-                        >{{ 'MENU.CATEGORIES' | translate }}:
-                        <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small
-                      >
-                    </div>
-                  }
-                </c-card-footer>
-              </c-card>
+          <button class="btn btn-light btn-lg px-4 rounded-pill text-primary fw-bold" type="button" routerLink="/registro">Registrarse ahora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-end mt-5 mb-4">
+    <h3 class="fw-bold text-dark mb-0">Últimas Publicaciones</h3>
+    <a routerLink="/entradas" class="text-decoration-none text-primary fw-medium">Ver todas <svg cIcon name="cilArrowRight"></svg></a>
+  </div>
+  
+  <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+    @if (loading) {
+      <div class="col w-100 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    }
+    
+    @for (entrada of ultimasEntradas; track entrada.idEntrada) {
+      <div class="col">
+        <div class="card h-100 shadow-sm border-0 transition-hover rounded-4 overflow-hidden">
+          <div class="card-body p-4">
+            <div class="d-flex gap-2 mb-3">
+              <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2" *ngFor="let cat of entrada.categorias">
+                {{ cat.nombre }}
+              </span>
             </div>
-          }
-          <c-row>
-            @for (entrada of pagedEntradas.slice(1); track trackByEntrada($index, entrada)) {
-              <c-col [md]="4" class="mb-4">
-                <c-card>
-                  <img
-                    src="/assets/img/brand/coreui-base.svg"
-                    class="card-img-top"
-                    loading="lazy"
-                  />
-                  <c-card-body>
-                    <h5 cCardTitle>{{ entrada.titulo }}</h5>
-                    <p cCardText>{{ entrada.resumen }}</p>
-                    <button cButton color="primary">
-                      {{ 'PUBLIC.HOME.READ_MORE' | translate }}
-                    </button>
-                  </c-card-body>
-                  <c-card-footer>
-                    <small class="text-medium-emphasis">
-                      {{ 'PUBLIC.HOME.PUBLISHED_DATE' | translate }}:
-                      {{
-                        entrada.fechaPublicacion
-                          ? entrada.fechaPublicacion
-                          : ('COMMON.UNPUBLISHED' | translate)
-                      }}
-                    </small>
-                    @for (
-                      categoria of entrada.categorias;
-                      track trackByCategoria($index, categoria)
-                    ) {
-                      <div>
-                        <small class="text-medium-emphasis"
-                          >{{ 'MENU.CATEGORIES' | translate }}:
-                          <a cCardLink [routerLink]>{{ categoria.nombre }}</a></small
-                        >
-                      </div>
-                    }
-                  </c-card-footer>
-                </c-card>
-              </c-col>
-            }
-          </c-row>
+            <h5 class="card-title fw-bold mb-3">
+              <a [routerLink]="['/entradas', entrada.slug]" class="text-decoration-none text-dark stretched-link">
+                {{ entrada.titulo }}
+              </a>
+            </h5>
+            <p class="card-text text-muted">{{ entrada.resumen | slice:0:120 }}...</p>
+          </div>
+          <div class="card-footer bg-white border-top-0 p-4 pt-0 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; font-size: 14px;">
+                {{ entrada.usernameCreador ? entrada.usernameCreador.charAt(0).toUpperCase() : 'U' }}
+              </div>
+              <small class="text-muted fw-medium">{{ entrada.usernameCreador || 'Usuario' }}</small>
+            </div>
+            <small class="text-muted">{{ getFechaDate(entrada.fechaPublicacion) | date:'dd MMM, yyyy' : '' : 'es-ES' }}</small>
+          </div>
         </div>
-      }
-      @if (entradas.length > 0) {
-        <c-pagination aria-label="Paginación de entradas" size="sm">
-          <li cPageItem [active]="page === 1">
-            <a cPageLink (click)="onPageChange(page - 1)" [routerLink]
-              ><span aria-hidden="true">{{ 'AUTO.LAQUO' | translate }}</span></a
-            >
-          </li>
-          @for (p of getPages(); track p) {
-            <li cPageItem [active]="p === page">
-              <a cPageLink (click)="onPageChange(p)" [routerLink]>{{ p }}</a>
-            </li>
-          }
-          <li cPageItem [active]="page === numberOfPages">
-            <a cPageLink (click)="onPageChange(page + 1)" [routerLink]
-              ><span aria-hidden="true">{{ 'AUTO.RAQUO' | translate }}</span></a
-            >
-          </li>
-        </c-pagination>
-      }
-    </c-card-body>
-    <c-card-footer class="text-medium-emphasis">{{
-      'PUBLIC.HOME.LAST_UPDATED' | translate
-    }}</c-card-footer>
-  </c-card>
-</main>
+      </div>
+    }
+
+    @if (!loading && ultimasEntradas.length === 0) {
+      <div class="col w-100 text-center py-5 bg-light rounded-4 border border-dashed">
+        <svg cIcon name="cilFolderOpen" size="3xl" class="text-muted mb-3"></svg>
+        <h5 class="text-muted">No hay publicaciones disponibles en este momento.</h5>
+        <p class="text-muted small">Vuelve a revisar más tarde.</p>
+      </div>
+    }
+  </div>
+</div>

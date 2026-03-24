@@ -1,12 +1,12 @@
-<div class="wrapper d-flex flex-column min-vh-100 bg-light dark:bg-transparent dark-mode">
+<div class="wrapper d-flex flex-column min-vh-100 bg-body text-body" [attr.data-bs-theme]="currentTheme">
   <app-op-loader></app-op-loader>
-  <app-nav-bar-public class="navbar-fixed"></app-nav-bar-public>
-  <c-header class="mb-4 bg-primary text-white header-fullscreen">
-    <c-container
-      class="position-relative d-flex flex-column justify-content-center align-items-center h-100"
-    >
-      <c-row class="gx-4 gx-lg-5 justify-content-center align-items-center text-center">
-        <c-col md="10" lg="8" xl="7">
+  <app-nav-bar-public class="fixed-top shadow-sm w-100 bg-body" style="z-index: 1030;" role="navigation"></app-nav-bar-public>
+  
+  <header class="masthead" style="background-image: url('/assets/img/home-bg.jpg'); margin-top: 64px;" role="banner">
+    <div class="overlay"></div>
+    <c-container class="position-relative">
+      <c-row class="justify-content-center text-center">
+        <c-col md="10" lg="8">
           <div class="site-heading">
             <h1>{{ 'PUBLIC.HOME.SITE_HEADING' | translate }}</h1>
             <span class="subheading">{{ 'PUBLIC.HOME.SITE_SUBHEADING' | translate }}</span>
@@ -14,11 +14,13 @@
         </c-col>
       </c-row>
     </c-container>
-  </c-header>
-  <div class="body flex-grow-1 px-3">
-    <c-container breakpoint="lg" class="h-auto min-vh-100">
+  </header>
+
+  <main class="body flex-grow-1 py-5" role="main">
+    <c-container breakpoint="lg">
       <router-outlet></router-outlet>
     </c-container>
-  </div>
-  <app-footer-public></app-footer-public>
+  </main>
+
+  <app-footer-public role="contentinfo" class="mt-auto"></app-footer-public>
 </div>

@@ -1,0 +1,99 @@
+<div class="detalle-entrada container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      
+      @if (loading) {
+        <div class="text-center py-5 my-5">
+          <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="text-muted mt-3">Cargando publicación...</p>
+        </div>
+      }
+
+      @if (error && !loading) {
+        <div class="alert alert-danger border-0 rounded-4 shadow-sm text-center py-5">
+          <svg cIcon name="cilWarning" size="3xl" class="text-danger mb-3"></svg>
+          <h3 class="alert-heading fw-bold">Entrada no encontrada</h3>
+          <p class="text-muted fs-5 mb-4">La publicación que buscas no existe o ya no está disponible.</p>
+          <a routerLink="/entradas" class="btn btn-danger rounded-pill px-4">Volver al listado</a>
+        </div>
+      }
+
+      @if (entrada && !loading) {
+        <article class="blog-post bg-white p-md-5 p-4 rounded-4 shadow-sm">
+          <header class="mb-5 border-bottom pb-4">
+            <div class="d-flex gap-2 flex-wrap mb-4">
+              <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fs-6 fw-medium" *ngFor="let cat of entrada.categorias">
+                {{ cat.nombre }}
+              </span>
+            </div>
+            
+            <h1 class="display-4 fw-bold mb-4 text-dark lh-sm">{{ entrada.titulo }}</h1>
+            
+            @if (entrada.subtitulo) {
+              <h2 class="h4 text-secondary fw-normal lh-base mb-4">{{ entrada.subtitulo }}</h2>
+            }
+            
+            <div class="d-flex align-items-center gap-3 mt-4 pt-4 border-top">
+              <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-4" style="width: 50px; height: 50px;">
+                {{ entrada.usernameCreador ? entrada.usernameCreador.charAt(0).toUpperCase() : 'U' }}
+              </div>
+              <div>
+                <div class="fw-bold fs-5 mb-0">{{ entrada.usernameCreador || 'Usuario' }}</div>
+                <div class="text-muted small d-flex align-items-center gap-2">
+                  <span>{{ getFechaDate(entrada.fechaPublicacion) | date:'dd MMM, yyyy' : '' : 'es-ES' }}</span>
+                  <span>&bull;</span>
+                  <span><svg cIcon name="cilSpeech" size="sm"></svg> {{ comentariosCounts?.visible ?? 0 }} comentarios</span>
+                  @if(entrada.votos > 0) {
+                    <span>&bull;</span>
+                    <span class="text-success"><svg cIcon name="cilThumbUp" size="sm"></svg> {{ entrada.votos }} votos</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div class="post-content lh-lg fs-5 text-dark" style="color: #333;" [innerHTML]="entrada.contenido"></div>
+          
+          <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+            <div class="d-flex gap-3">
+              <button class="btn btn-outline-primary rounded-pill d-flex align-items-center gap-2" (click)="darMeGusta()" [disabled]="isVoting">
+                <svg cIcon name="cilThumbUp"></svg>
+                <span>Me gusta ({{ entrada.votos || 0 }})</span>
+              </button>
+              <button class="btn btn-outline-secondary rounded-pill d-flex align-items-center gap-2">
+                <svg cIcon name="cilShare"></svg>
+                <span>Compartir</span>
+              </button>
+            </div>
+            
+            <div class="d-flex gap-2">
+              <span class="badge bg-light text-dark border rounded-pill px-3 py-2" *ngFor="let tag of entrada.etiquetas">
+                #{{ tag.nombre }}
+              </span>
+            </div>
+          </div>
+          
+          <hr class="my-5 border-light border-2 opacity-75">
+
+          @if (voteError) {
+            <div class="alert alert-warning border-0 rounded-4 shadow-sm">
+              {{ voteError }}
+            </div>
+          }
+          
+          <!-- Sección de comentarios rediseñada -->
+          <div class="comentarios-section mt-5">
+            <app-comentarios-public
+              [idEntrada]="entrada.idEntrada"
+              [totalComentarios]="entrada.cantidadComentarios || 0"
+              (countsChange)="comentariosCounts = $event">
+            </app-comentarios-public>
+          </div>
+        </article>
+      }
+
+    </div>
+  </div>
+</div>
