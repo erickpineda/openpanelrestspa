@@ -80,6 +80,19 @@
       "BACK_TO_LOGIN": "Volver al login",
       "CONTACT": "Contactar",
       "BACK_LINK": "Volver a iniciar sesión"
+    },
+    "DEV_MODAL": {
+      "TITLE": "En desarrollo",
+      "OK": "Entendido",
+      "BODY_GENERIC": "Esta funcionalidad todavía no está disponible. La pantalla está preparada para integrarse cuando exista el endpoint.",
+      "BODY_VOTE": "La votación todavía no está disponible. Se activará cuando exista el endpoint.",
+      "BODY_COMMENT_COUNTS": "Los recuentos avanzados de comentarios todavía no están disponibles. Se activarán cuando exista el endpoint.",
+      "BODY_SHARE": "Compartir todavía no está disponible. Se activará cuando exista el endpoint."
+    },
+    "SHARE": {
+      "COPIED": "Enlace copiado al portapapeles.",
+      "COPY_FAILED": "No se pudo copiar el enlace.",
+      "NATIVE_FAILED": "No se pudo abrir el diálogo de compartir."
     }
   },
   "COMMON": {

@@ -5,12 +5,19 @@ import { PublicSeoService } from '../../../services/public-seo.service';
 import { parseAllowedDate } from '@shared/utils/date-utils';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
+import { OPConstants } from '@shared/constants/op-global.constants';
+import { ToastService } from '@app/core/services/ui/toast.service';
+import { TranslationService } from '@app/core/services/translation.service';
+import { RouterModule } from '@angular/router';
+import { SharedOPModule } from '@shared/shared.module';
+import { ComentariosPublicComponent } from '../../../comentarios/components/comentarios-public.component';
 
 @Component({
   selector: 'app-detalle-entrada-public',
   templateUrl: './detalle-entrada-public.component.html',
   styleUrls: ['./detalle-entrada-public.component.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [SharedOPModule, RouterModule, ComentariosPublicComponent],
 })
 export class DetalleEntradaPublicComponent implements OnInit {
   slug: string | null = null;
@@ -21,6 +28,8 @@ export class DetalleEntradaPublicComponent implements OnInit {
   voteError = '';
   isLoggedIn = false;
   comentariosCounts: { visible: number; total: number | null; pending: number } | null = null;
+  devModalVisible = false;
+  devModalBodyKey = 'PUBLIC.DEV_MODAL.BODY_GENERIC';
 
   constructor(
     private route: ActivatedRoute,
@@ -28,7 +37,9 @@ export class DetalleEntradaPublicComponent implements OnInit {
     private facade: PublicEntradasFacadeService,
     private seoService: PublicSeoService,
     private entradaService: EntradaService,
-    private tokenStorage: TokenStorageService
+    private tokenStorage: TokenStorageService,
+    private toast: ToastService,
+    private i18n: TranslationService
   ) {}
 
   ngOnInit(): void {
@@ -61,7 +72,51 @@ export class DetalleEntradaPublicComponent implements OnInit {
     return parseAllowedDate(fecha);
   }
 
+  openDevModal(bodyKey: string): void {
+    this.devModalBodyKey = bodyKey;
+    this.devModalVisible = true;
+  }
+
+  compartir(): void {
+    if (OPConstants.App.Public.Features.SHARE_ENABLED !== true) {
+      this.openDevModal('PUBLIC.DEV_MODAL.BODY_SHARE');
+      return;
+    }
+
+    const url = window.location.href;
+    const title = String(this.entrada?.titulo ?? 'OpenPanel');
+
+    const nav: any = navigator as any;
+    const nativeShare: any = nav?.share;
+
+    if (typeof nativeShare === 'function') {
+      Promise.resolve(nativeShare.call(nav, { title, url }))
+        .catch(() => {
+          this.toast.showWarning(this.i18n.translate('PUBLIC.SHARE.NATIVE_FAILED'));
+        })
+        .finally(() => {
+          return;
+        });
+      return;
+    }
+
+    const clipboard: any = nav?.clipboard;
+    const writeText: any = clipboard?.writeText;
+    if (typeof writeText === 'function') {
+      Promise.resolve(writeText.call(clipboard, url))
+        .then(() => this.toast.showSuccess(this.i18n.translate('PUBLIC.SHARE.COPIED')))
+        .catch(() => this.toast.showWarning(this.i18n.translate('PUBLIC.SHARE.COPY_FAILED')));
+      return;
+    }
+
+    this.toast.showWarning(this.i18n.translate('PUBLIC.SHARE.COPY_FAILED'));
+  }
+
   darMeGusta(): void {
+    if (OPConstants.App.Public.Features.VOTE_ENABLED !== true) {
+      this.openDevModal('PUBLIC.DEV_MODAL.BODY_VOTE');
+      return;
+    }
     if (this.isVoting) return;
     if (!this.entrada?.idEntrada) return;
 

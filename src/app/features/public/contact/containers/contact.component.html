@@ -9,14 +9,16 @@
 
         <c-card class="shadow-sm border-0">
           <c-card-body class="p-5">
-            <form id="contactForm" #contactForm="ngForm">
+            <form id="contactForm" (ngSubmit)="submit()" #contactForm="ngForm" novalidate>
               
               <div class="form-floating mb-3">
                 <input
                   class="form-control"
                   id="name"
+                  name="name"
                   type="text"
                   [placeholder]="'PUBLIC.CONTACT.NAME_PLACEHOLDER' | translate"
+                  [(ngModel)]="model.name"
                   required
                 />
                 <label for="name">{{ 'PUBLIC.CONTACT.NAME_LABEL' | translate }}</label>
@@ -26,8 +28,11 @@
                 <input
                   class="form-control"
                   id="email"
+                  name="email"
                   type="email"
                   [placeholder]="'PUBLIC.CONTACT.EMAIL_PLACEHOLDER' | translate"
+                  [(ngModel)]="model.email"
+                  email
                   required
                 />
                 <label for="email">{{ 'PUBLIC.CONTACT.EMAIL_LABEL' | translate }}</label>
@@ -37,8 +42,10 @@
                 <input
                   class="form-control"
                   id="phone"
+                  name="phone"
                   type="tel"
                   [placeholder]="'PUBLIC.CONTACT.PHONE_PLACEHOLDER' | translate"
+                  [(ngModel)]="model.phone"
                 />
                 <label for="phone">{{ 'PUBLIC.CONTACT.PHONE_LABEL' | translate }}</label>
               </div>
@@ -47,8 +54,10 @@
                 <textarea
                   class="form-control"
                   id="message"
+                  name="message"
                   [placeholder]="'PUBLIC.CONTACT.MESSAGE_PLACEHOLDER' | translate"
                   style="height: 150px"
+                  [(ngModel)]="model.message"
                   required
                 ></textarea>
                 <label for="message">{{ 'PUBLIC.CONTACT.MESSAGE_LABEL' | translate }}</label>
@@ -57,12 +66,23 @@
               <div class="d-grid">
                 <button
                   class="btn btn-primary btn-lg"
-                  type="button"
-                  [disabled]="!contactForm.valid"
+                  type="submit"
+                  [disabled]="!contactForm.valid || isSubmitting"
                 >
+                  @if (isSubmitting) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  }
                   {{ 'PUBLIC.CONTACT.SEND_BUTTON' | translate }}
                 </button>
               </div>
+
+              @if (successMessage) {
+                <div class="alert alert-success mt-4 mb-0">{{ successMessage }}</div>
+              }
+
+              @if (errorMessage) {
+                <div class="alert alert-danger mt-4 mb-0">{{ errorMessage }}</div>
+              }
               
             </form>
           </c-card-body>

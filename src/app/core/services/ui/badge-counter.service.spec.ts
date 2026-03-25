@@ -7,7 +7,7 @@ import { EntradaService } from '../data/entrada.service';
 import { UsuarioService } from '../data/usuario.service';
 import { TemporaryStorageService } from './temporary-storage.service';
 
-fdescribe('BadgeCounterService', () => {
+describe('BadgeCounterService', () => {
   let service: BadgeCounterService;
   let mockComentarioService: jasmine.SpyObj<ComentarioService>;
   let mockEntradaService: jasmine.SpyObj<EntradaService>;
@@ -19,7 +19,7 @@ fdescribe('BadgeCounterService', () => {
       'listarSafe',
       'listarSafeSinGlobalLoader',
     ]);
-    const entradaSpy = jasmine.createSpyObj('EntradaService', ['listarSafe']);
+    const entradaSpy = jasmine.createSpyObj('EntradaService', ['listarSafe', 'listarSafeSinGlobalLoader']);
     const usuarioSpy = jasmine.createSpyObj('UsuarioService', [
       'listarSafe',
       'obtenerDatosSesionActualSafe',
@@ -29,9 +29,12 @@ fdescribe('BadgeCounterService', () => {
     (tempSpy as any).entriesChanged$ = new Subject<void>();
 
     // Configurar mocks por defecto para evitar errores en constructor
-    comentarioSpy.listarSafe.and.returnValue(of([] as any));
+    comentarioSpy.listarSafeSinGlobalLoader.and.returnValue(of([] as any));
     entradaSpy.listarSafe.and.returnValue(of([] as any));
-    usuarioSpy.listarSafe.and.returnValue(of([] as any));
+    (entradaSpy as any).listarSafeSinGlobalLoader = jasmine
+      .createSpy('listarSafeSinGlobalLoader')
+      .and.returnValue(of([] as any));
+    usuarioSpy.listarSafeSinGlobalLoader.and.returnValue(of([] as any));
     usuarioSpy.obtenerDatosSesionActualSafe.and.returnValue(of({} as any));
     tempSpy.getTemporaryEntriesByType.and.returnValue([]);
 
@@ -77,7 +80,7 @@ fdescribe('BadgeCounterService', () => {
         { id: 4, estado: 'PENDIENTE', texto: 'Comment 4' },
       ];
 
-      mockComentarioService.listarSafe.and.returnValue(of(mockComentarios as any));
+      mockComentarioService.listarSafeSinGlobalLoader.and.returnValue(of(mockComentarios as any));
 
       service
         .getUnmoderatedCommentsCount()
@@ -89,7 +92,7 @@ fdescribe('BadgeCounterService', () => {
     });
 
     it('should return 0 when service fails', (done) => {
-      mockComentarioService.listarSafe.and.returnValue(throwError('Service error'));
+      mockComentarioService.listarSafeSinGlobalLoader.and.returnValue(throwError('Service error'));
 
       service
         .getUnmoderatedCommentsCount()
@@ -140,7 +143,7 @@ fdescribe('BadgeCounterService', () => {
         { id: 3, estado: 'INACTIVO', username: 'user3' },
       ];
 
-      mockUsuarioService.listarSafe.and.returnValue(of(mockUsuarios as any));
+      mockUsuarioService.listarSafeSinGlobalLoader.and.returnValue(of(mockUsuarios as any));
 
       service
         .getPendingUsersCount()
@@ -152,7 +155,7 @@ fdescribe('BadgeCounterService', () => {
     });
 
     it('should return 0 when service fails', (done) => {
-      mockUsuarioService.listarSafe.and.returnValue(throwError('Service error'));
+      mockUsuarioService.listarSafeSinGlobalLoader.and.returnValue(throwError('Service error'));
 
       service
         .getPendingUsersCount()
@@ -174,7 +177,7 @@ fdescribe('BadgeCounterService', () => {
       ];
 
       mockUsuarioService.obtenerDatosSesionActualSafe.and.returnValue(of(mockUser as any));
-      mockEntradaService.listarSafe.and.returnValue(of(mockEntradas as any));
+      (mockEntradaService as any).listarSafeSinGlobalLoader.and.returnValue(of(mockEntradas as any));
 
       service
         .getMyDraftsCount()
@@ -215,7 +218,7 @@ fdescribe('BadgeCounterService', () => {
   describe('getSystemAlertsCount', () => {
     it('should calculate system alerts based on thresholds', (done) => {
       // Mock services to return high counts
-      mockComentarioService.listarSafe.and.returnValue(
+      mockComentarioService.listarSafeSinGlobalLoader.and.returnValue(
         of(
           Array(15).fill({ estado: 'PENDIENTE' }) as any // 15 pending comments > 10 threshold
         )
@@ -223,7 +226,7 @@ fdescribe('BadgeCounterService', () => {
       mockTemporaryStorage.getTemporaryEntriesByType.and.returnValue(
         Array(25).fill({ formType: 'entrada' }) as any // 25 drafts > 20 threshold
       );
-      mockUsuarioService.listarSafe.and.returnValue(
+      mockUsuarioService.listarSafeSinGlobalLoader.and.returnValue(
         of(
           Array(8).fill({ estado: 'PENDIENTE' }) as any // 8 pending users > 5 threshold
         )
@@ -248,7 +251,7 @@ fdescribe('BadgeCounterService', () => {
 
     it('should return 0 alerts when counts are below thresholds', (done) => {
       // Mock services to return low counts
-      mockComentarioService.listarSafe.and.returnValue(
+      mockComentarioService.listarSafeSinGlobalLoader.and.returnValue(
         of(
           Array(5).fill({ estado: 'PENDIENTE' }) as any // 5 < 10 threshold
         )
@@ -256,7 +259,7 @@ fdescribe('BadgeCounterService', () => {
       mockTemporaryStorage.getTemporaryEntriesByType.and.returnValue(
         Array(10).fill({ formType: 'entrada' }) as any // 10 < 20 threshold
       );
-      mockUsuarioService.listarSafe.and.returnValue(
+      mockUsuarioService.listarSafeSinGlobalLoader.and.returnValue(
         of(
           Array(3).fill({ estado: 'PENDIENTE' }) as any // 3 < 5 threshold
         )
@@ -387,9 +390,9 @@ fdescribe('BadgeCounterService', () => {
       const mockEntries = Array(3).fill({ formType: 'entrada' });
       const mockUsuarios = Array(2).fill({ estado: 'PENDIENTE' });
 
-      mockComentarioService.listarSafe.and.returnValue(of(mockComentarios as any));
+      mockComentarioService.listarSafeSinGlobalLoader.and.returnValue(of(mockComentarios as any));
       mockTemporaryStorage.getTemporaryEntriesByType.and.returnValue(mockEntries as any);
-      mockUsuarioService.listarSafe.and.returnValue(of(mockUsuarios as any));
+      mockUsuarioService.listarSafeSinGlobalLoader.and.returnValue(of(mockUsuarios as any));
 
       // Act & Assert: Multiple calls should return consistent values
       const expectedComments = 5;

@@ -20,7 +20,7 @@ import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
 import { NavigationService } from '../core/services/ui/navigation.service';
 import { UserRole } from '../shared/types/navigation.types';
 
-fdescribe('AdminComponent', () => {
+describe('AdminComponent', () => {
   let component: AdminComponent;
   let fixture: ComponentFixture<AdminComponent>;
 

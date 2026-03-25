@@ -15,6 +15,10 @@ export const OPAppConstants = {
     },
   },
   Public: {
+    Features: {
+      VOTE_ENABLED: false,
+      SHARE_ENABLED: true,
+    },
     Comentarios: {
       UX_STRATEGY: 'SYNCED',
       USE_RECUENTOS_ENDPOINT: false,

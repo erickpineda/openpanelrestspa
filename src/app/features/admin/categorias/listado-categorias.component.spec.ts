@@ -61,12 +61,11 @@ describe('ListadoCategoriasComponent Spinner', () => {
     expect(el.querySelector('c-spinner')).toBeTruthy();
   });
 
-  it('oculta spinner cuando cargando=false', async () => {
+  it('oculta spinner cuando cargando=false', () => {
     spyOn(component, 'obtenerListaCategorias');
     component.cargando = false;
     component.pagedCategorias = [{ codigo: 'A', nombre: 'A', descripcion: '' } as any];
     fixture.detectChanges();
-    await fixture.whenStable();
     const el: HTMLElement = fixture.nativeElement;
     expect(component.cargando).toBeFalse();
     expect(el.querySelector('c-spinner')).toBeNull();

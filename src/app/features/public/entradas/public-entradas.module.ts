@@ -4,7 +4,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ListadoEntradasPublicComponent } from './containers/listado-entradas-public/listado-entradas-public.component';
 import { DetalleEntradaPublicComponent } from './containers/detalle-entrada-public/detalle-entrada-public.component';
-import { ComentariosPublicComponent } from '../comentarios/components/comentarios-public.component';
 import { SharedOPModule } from '@app/shared/shared.module';
 import { SharedCoreUiModule } from '@app/shared/shared-coreui.module';
 
@@ -16,8 +15,6 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     ListadoEntradasPublicComponent,
-    DetalleEntradaPublicComponent,
-    ComentariosPublicComponent,
   ],
   imports: [
     CommonModule,
@@ -25,6 +22,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     SharedOPModule,
     SharedCoreUiModule,
+    DetalleEntradaPublicComponent,
   ],
 })
 export class PublicEntradasModule {}

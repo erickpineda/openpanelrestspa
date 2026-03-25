@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of } from 'rxjs';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { ComentariosPublicComponent } from './comentarios-public.component';
 import { ComentarioService } from '@app/core/services/data/comentario.service';
@@ -25,7 +26,7 @@ describe('ComentariosPublicComponent', () => {
 
   it('muestra contador sincronizado por defecto (sin total)', async () => {
     await TestBed.configureTestingModule({
-      declarations: [ComentariosPublicComponent],
+      imports: [ComentariosPublicComponent, RouterTestingModule],
       providers: [
         { provide: ComentarioService, useValue: comentarioServiceMock },
         { provide: TokenStorageService, useValue: tokenStorageMock },
@@ -50,7 +51,7 @@ describe('ComentariosPublicComponent', () => {
 
   it('muestra (visibles / total) y mensaje de moderación en estrategia TOTAL_WITH_MESSAGE', async () => {
     await TestBed.configureTestingModule({
-      declarations: [ComentariosPublicComponent],
+      imports: [ComentariosPublicComponent, RouterTestingModule],
       providers: [
         {
           provide: ComentarioService,

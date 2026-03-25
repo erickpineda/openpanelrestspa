@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">4.76% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/21</span>
+                <span class='fraction'>12/21</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>1/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">4.76% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/21</span>
+                <span class='fraction'>12/21</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -144,20 +144,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -205,20 +205,20 @@ import { iconSubset } from '@shared/components/icons/coreui-icons';
   standalone: false,
 })
 export class AppComponent implements OnInit {
-<span class="cstat-no" title="statement not covered" >  title = 'openpanelspa';</span>
-<span class="cstat-no" title="statement not covered" >  loading: boolean = false;</span>
+  title = 'openpanelspa';
+  loading: boolean = false;
 &nbsp;
-<span class="fstat-no" title="function not covered" >  constructor(</span>
-    private <span class="cstat-no" title="statement not covered" >authSync: AuthSyncService,</span>
-    private <span class="cstat-no" title="statement not covered" >log: LoggerService,</span>
-    private <span class="cstat-no" title="statement not covered" >authService: AuthService,</span>
-    private <span class="cstat-no" title="statement not covered" >routeTracker: RouteTrackerService,</span> // sólo para activar el tracking
-    private <span class="cstat-no" title="statement not covered" >tokenStorage: TokenStorageService,</span>
-    private <span class="cstat-no" title="statement not covered" >globalErrorHandler: GlobalErrorHandlerService,</span>
-    private <span class="cstat-no" title="statement not covered" >uiMonitor: UiAnomalyMonitorService,</span>
-    private <span class="cstat-no" title="statement not covered" >iconSetService: IconSetService</span>
+  constructor(
+    private authSync: AuthSyncService,
+    private log: LoggerService,
+    private authService: AuthService,
+    private routeTracker: RouteTrackerService, // sólo para activar el tracking
+    private tokenStorage: TokenStorageService,
+    private globalErrorHandler: GlobalErrorHandlerService,
+    private uiMonitor: UiAnomalyMonitorService,
+    private iconSetService: IconSetService
   ) {
-<span class="cstat-no" title="statement not covered" >    this.iconSetService.icons = { ...iconSubset };</span>
+    this.iconSetService.icons = { ...iconSubset };
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  ngOnInit(</span>): void {
@@ -253,7 +253,7 @@ export class AppComponent implements OnInit {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-24T16:09:43.829Z
+                at 2026-03-25T15:49:57.261Z
             </div>
         <script src="../prettify.js"></script>
         <script>

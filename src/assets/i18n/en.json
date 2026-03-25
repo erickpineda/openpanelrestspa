@@ -948,6 +948,21 @@
       "CONTACT": "Contact",
       "BACK_LINK": "Back to login"
     },
+    "DEV_MODAL": {
+      "TITLE": "In development",
+      "OK": "Got it",
+      "BODY_GENERIC": "This feature is not available yet. The screen is ready to be integrated when the endpoint exists.",
+      "BODY_VOTE": "Voting is not available yet. It will be enabled when the endpoint exists.",
+      "BODY_COMMENT_COUNTS": "Advanced comment counts are not available yet. They will be enabled when the endpoint exists.",
+      "BODY_SHARE": "Sharing is not available yet. It will be enabled when the endpoint exists."
+    },
+    "SHARE": {
+      "COPIED": "Link copied to clipboard.",
+      "COPY_FAILED": "Could not copy the link.",
+      "NATIVE_FAILED": "Could not open the share dialog."
+    },
+    "ABOUT": {
+    "ABOUT": {
     "ABOUT": {
       "TITLE": "About Us"
     },

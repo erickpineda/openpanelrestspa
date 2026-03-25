@@ -10,6 +10,8 @@
     "ng": "ng",
     "start": "ng serve",
     "start:mem": "set NODE_OPTIONS=--max-old-space-size=4096 && ng serve",
+    "sitemap:generate": "node scripts/generate-sitemap.mjs",
+    "prebuild": "npm run sitemap:generate",
     "build": "ng build",
     "build:mem": "set NODE_OPTIONS=--max-old-space-size=4096 && ng build",
     "watch": "ng build --watch --configuration development",
@@ -17,7 +19,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,html,scss,json,md}\"",
     "test": "ng test",
     "test:firefox": "ng test --watch=false --browsers=Firefox",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox",
+    "test:ci": "ng test --watch=false --browsers=Firefox",
     "test:coverage": "ng test --watch=false --code-coverage --browsers=ChromeHeadlessNoSandbox",
     "e2e": "playwright test"
   },

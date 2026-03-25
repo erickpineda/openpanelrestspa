@@ -34,7 +34,6 @@ import { NavbarModule, CollapseModule, NavModule, ButtonModule, GridModule, Card
     HeaderPublicComponent,
     FooterPublicComponent,
     AboutComponent,
-    ContactComponent,
     NavBarPublicComponent,
   ],
   imports: [
@@ -55,7 +54,8 @@ import { NavbarModule, CollapseModule, NavModule, ButtonModule, GridModule, Card
     CardModule,
     FormModule,
     AlertModule,
-    SpinnerModule
+    SpinnerModule,
+    ContactComponent,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })

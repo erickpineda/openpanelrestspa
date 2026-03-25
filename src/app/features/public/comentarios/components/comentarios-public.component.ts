@@ -3,12 +3,16 @@ import { ComentarioService } from '@app/core/services/data/comentario.service';
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
 import { parseAllowedDate } from '@shared/utils/date-utils';
 import { PublicCommentsUxService } from '../services/public-comments-ux.service';
+import { OPConstants } from '@shared/constants/op-global.constants';
+import { RouterModule } from '@angular/router';
+import { SharedOPModule } from '@shared/shared.module';
 
 @Component({
   selector: 'app-comentarios-public',
   templateUrl: './comentarios-public.component.html',
   styleUrls: ['./comentarios-public.component.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [SharedOPModule, RouterModule],
 })
 export class ComentariosPublicComponent implements OnInit {
   @Input() idEntrada!: number;
@@ -32,6 +36,9 @@ export class ComentariosPublicComponent implements OnInit {
   pendingCount = 0;
   showMyPendingNotice = false;
 
+  devModalVisible = false;
+  devModalBodyKey = 'PUBLIC.DEV_MODAL.BODY_GENERIC';
+
   constructor(
     private comentarioService: ComentarioService,
     private tokenStorage: TokenStorageService,
@@ -48,10 +55,22 @@ export class ComentariosPublicComponent implements OnInit {
     this.cargarComentarios(true);
   }
 
+  private openDevModal(bodyKey: string): void {
+    this.devModalBodyKey = bodyKey;
+    this.devModalVisible = true;
+  }
+
   private cargarRecuentosDesdeApi() {
+    if (OPConstants.App.Public.Comentarios.USE_RECUENTOS_ENDPOINT !== true) {
+      this.openDevModal('PUBLIC.DEV_MODAL.BODY_COMMENT_COUNTS');
+      return;
+    }
     if (!this.idEntrada) return;
     this.comentarioService.obtenerRecuentosPorIdEntradaCached(this.idEntrada).subscribe((rec) => {
-      if (!rec) return;
+      if (!rec) {
+        this.openDevModal('PUBLIC.DEV_MODAL.BODY_COMMENT_COUNTS');
+        return;
+      }
       const visibles = Number(rec.visibles ?? 0);
       const totales = Number(rec.totales ?? 0);
       const pendientes = Number(rec.pendientes ?? Math.max(totales - visibles, 0));
