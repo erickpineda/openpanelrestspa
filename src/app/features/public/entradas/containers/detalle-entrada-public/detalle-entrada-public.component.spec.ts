@@ -10,6 +10,8 @@ describe('DetalleEntradaPublicComponent', () => {
     const tokenStorage: any = { isLoggedIn: () => false, getUser: () => null };
     const toast: any = { showSuccess: () => undefined, showWarning: () => undefined };
     const i18n: any = { translate: (k: string) => k };
+    const analytics: any = { track: () => undefined };
+    const bookmarks: any = { isBookmarked: () => false, toggle: () => ({ bookmarked: false }) };
 
     return new DetalleEntradaPublicComponent(
       route,
@@ -19,7 +21,9 @@ describe('DetalleEntradaPublicComponent', () => {
       entradaService,
       tokenStorage,
       toast,
-      i18n
+      i18n,
+      analytics,
+      bookmarks
     );
   };
 
@@ -42,4 +46,3 @@ describe('DetalleEntradaPublicComponent', () => {
     Object.defineProperty(navigator, 'clipboard', { value: originalClipboard, configurable: true });
   });
 });
-

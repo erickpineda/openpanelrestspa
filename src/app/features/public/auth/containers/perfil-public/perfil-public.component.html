@@ -1,4 +1,139 @@
-<div class="perfil-public" *ngIf="user">
-  <h2>Perfil de {{ user.username }}</h2>
-  <!-- Profile info here -->
+<div class="perfil-public container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-8">
+      <ng-container *ngIf="user; else noSession">
+        <!-- Header del perfil -->
+        <div class="d-flex align-items-center gap-4 mb-5">
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold display-4 flex-shrink-0" style="width: 80px; height: 80px;">
+            {{ user.username ? user.username.charAt(0).toUpperCase() : 'U' }}
+          </div>
+          <div class="flex-grow-1">
+            <h2 class="mb-1 fw-bold text-dark">Hola, {{ user.username }}</h2>
+            <div class="text-muted d-flex align-items-center gap-2 flex-wrap">
+              <span>Tus guardados y accesos rápidos</span>
+              <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill fw-normal" *ngFor="let r of (user.roles || [])">
+                {{ r.replace('ROLE_', '') | titlecase }}
+              </span>
+            </div>
+          </div>
+          <div class="d-none d-md-flex gap-2">
+            <a routerLink="/admin/control/perfil" class="btn btn-outline-secondary rounded-pill px-3 d-flex align-items-center gap-2">
+              <svg cIcon name="cilCog"></svg>
+              <span>Cuenta</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Accesos rápidos / Enlaces rápidos -->
+        <div class="row g-4 mb-5">
+          <div class="col-12 col-md-6">
+            <a routerLink="/admin" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none hover-elevate transition-all">
+              <div class="card-body p-4 d-flex align-items-center gap-3">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 d-flex align-items-center justify-content-center">
+                  <svg cIcon name="cilLayers" size="xl"></svg>
+                </div>
+                <div>
+                  <h6 class="fw-bold text-dark mb-1">Panel de Administración</h6>
+                  <p class="text-muted small mb-0">Gestiona el contenido y la plataforma</p>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-12 col-md-6">
+            <a routerLink="/admin/control/perfil" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none hover-elevate transition-all">
+              <div class="card-body p-4 d-flex align-items-center gap-3">
+                <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle p-3 d-flex align-items-center justify-content-center">
+                  <svg cIcon name="cilUser" size="xl"></svg>
+                </div>
+                <div>
+                  <h6 class="fw-bold text-dark mb-1">Configuración de cuenta</h6>
+                  <p class="text-muted small mb-0">Actualiza tu contraseña e información</p>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Bookmarks Section -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+          <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
+              <svg cIcon name="cilBookmark" size="lg" class="text-primary"></svg>
+              Tus entradas guardadas
+            </h4>
+            <div class="d-flex gap-2">
+              <button *ngIf="bookmarks.length > 0" class="btn btn-sm btn-outline-danger rounded-pill px-3" (click)="clearAllBookmarks()">Limpiar todo</button>
+              <a routerLink="/entradas" class="btn btn-sm btn-outline-primary rounded-pill px-3">Explorar más</a>
+            </div>
+          </div>
+          
+          <div class="card-body p-4">
+            <div *ngIf="bookmarks.length === 0" class="text-center py-5">
+              <div class="text-muted mb-3">
+                <svg cIcon name="cilBookmark" size="3xl" class="opacity-25"></svg>
+              </div>
+              <h5 class="fw-semibold text-dark">Aún no has guardado nada</h5>
+              <p class="text-muted mb-4">Guarda los artículos que más te gusten para leerlos más tarde.</p>
+              <a routerLink="/entradas" class="btn btn-primary rounded-pill px-4">Descubrir contenido</a>
+            </div>
+
+            <div *ngIf="bookmarks.length > 0">
+              <div class="list-group list-group-flush gap-2 mb-4">
+                <div
+                  *ngFor="let b of paginatedBookmarks"
+                  class="list-group-item list-group-item-action border rounded-4 p-3 d-flex align-items-center justify-content-between gap-3 shadow-sm hover-elevate transition-all position-relative"
+                >
+                  <a [routerLink]="['/entradas', b.slug]" class="stretched-link text-decoration-none text-dark min-w-0 flex-grow-1">
+                    <h6 class="fw-bold mb-1 text-truncate">{{ b.titulo || b.slug }}</h6>
+                    <p class="text-muted small mb-0 text-truncate" style="max-width: 500px;">{{ b.resumen || 'Sin resumen disponible' }}</p>
+                  </a>
+                  <div class="flex-shrink-0 d-flex gap-2 position-relative z-1">
+                    <button class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px;" (click)="removeBookmark(b.idEntrada, $event)" title="Quitar de guardados">
+                      <svg cIcon name="cilTrash" class="text-danger"></svg>
+                    </button>
+                    <a [routerLink]="['/entradas', b.slug]" class="btn bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                      <svg cIcon name="cilArrowRight"></svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Paginación y Selector -->
+              <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 border-top pt-3">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="text-muted small">Mostrar:</span>
+                  <select class="form-select form-select-sm" style="width: auto;" [value]="itemsPerPage" (change)="changeItemsPerPage($event)">
+                    <option *ngFor="let option of itemsPerPageOptions" [value]="option">{{ option }}</option>
+                  </select>
+                  <span class="text-muted small">Total: {{ bookmarks.length }}</span>
+                </div>
+
+                <nav *ngIf="totalPages > 1" aria-label="Navegación de páginas">
+                  <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                      <a class="page-link" href="#" (click)="changePage(currentPage - 1, $event)">Anterior</a>
+                    </li>
+                    <li class="page-item" *ngFor="let p of [].constructor(totalPages); let i = index" [class.active]="currentPage === i + 1">
+                      <a class="page-link" href="#" (click)="changePage(i + 1, $event)">{{ i + 1 }}</a>
+                    </li>
+                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                      <a class="page-link" href="#" (click)="changePage(currentPage + 1, $event)">Siguiente</a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noSession>
+        <div class="text-center py-5">
+          <h3 class="fw-bold mb-3">No hay sesión activa</h3>
+          <p class="text-muted mb-4">Inicia sesión para ver tu perfil y tus entradas guardadas.</p>
+          <a routerLink="/login" class="btn btn-primary rounded-pill px-4">Iniciar sesión</a>
+        </div>
+      </ng-template>
+    </div>
+  </div>
 </div>

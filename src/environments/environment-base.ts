@@ -6,6 +6,9 @@ export let base = {
   getApiConsumerCredentials: false,
   apiConsumerCredentials: null,
   users: null,
+  analytics: {
+    gtmId: '',
+  },
   backend: {
     host: 'http://localhost:8080',
     uri: '/api/v1',

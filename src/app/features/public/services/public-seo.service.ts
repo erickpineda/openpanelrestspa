@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Inject, Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { parseAllowedDate } from '@shared/utils/date-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -7,7 +9,8 @@ import { Title, Meta } from '@angular/platform-browser';
 export class PublicSeoService {
   constructor(
     private title: Title,
-    private meta: Meta
+    private meta: Meta,
+    @Inject(DOCUMENT) private document: Document
   ) {}
 
   updateTitle(title: string) {
@@ -22,10 +25,76 @@ export class PublicSeoService {
     this.meta.updateTag({ property, content });
   }
 
+  updateTwitter(name: string, content: string) {
+    this.meta.updateTag({ name, content });
+  }
+
+  setCanonicalUrl(url: string) {
+    const href = String(url || '').trim();
+    if (!href) return;
+    const head = this.document.head;
+    let link = head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!link) {
+      link = this.document.createElement('link');
+      link.setAttribute('rel', 'canonical');
+      head.appendChild(link);
+    }
+    link.setAttribute('href', href);
+  }
+
+  setJsonLd(id: string, data: unknown) {
+    const scriptId = String(id || '').trim();
+    if (!scriptId) return;
+    const head = this.document.head;
+    let el = head.querySelector<HTMLScriptElement>(`script#${CSS.escape(scriptId)}`);
+    if (!el) {
+      el = this.document.createElement('script');
+      el.type = 'application/ld+json';
+      el.id = scriptId;
+      head.appendChild(el);
+    }
+    el.text = JSON.stringify(data);
+  }
+
   setEntradaSeo(entrada: any) {
-    this.updateTitle(entrada.titulo);
-    this.updateMeta('description', entrada.resumen || entrada.titulo);
-    this.updateOpenGraph('og:title', entrada.titulo);
-    this.updateOpenGraph('og:description', entrada.resumen || entrada.titulo);
+    const titulo = String(entrada?.titulo ?? 'OpenPanel');
+    const resumen = String(entrada?.resumen ?? titulo);
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const image = String(entrada?.imagenDestacadaUrl ?? `${origin}/assets/img/home-bg.jpg`);
+
+    this.updateTitle(titulo);
+    this.updateMeta('description', resumen);
+    this.setCanonicalUrl(url);
+
+    this.updateOpenGraph('og:title', titulo);
+    this.updateOpenGraph('og:description', resumen);
+    this.updateOpenGraph('og:url', url);
+    this.updateOpenGraph('og:type', 'article');
+    this.updateOpenGraph('og:image', image);
+
+    this.updateTwitter('twitter:card', 'summary_large_image');
+    this.updateTwitter('twitter:title', titulo);
+    this.updateTwitter('twitter:description', resumen);
+    this.updateTwitter('twitter:image', image);
+
+    const publishedDate = parseAllowedDate(entrada?.fechaPublicacion ?? null);
+    const modifiedDate = parseAllowedDate(entrada?.fechaEdicion ?? null);
+    const published = publishedDate ? publishedDate.toISOString() : null;
+    const modified = modifiedDate ? modifiedDate.toISOString() : null;
+
+    this.setJsonLd('op-public-jsonld', {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: titulo,
+      description: resumen,
+      image: [image],
+      url,
+      datePublished: published,
+      dateModified: modified || published,
+      author: entrada?.usernameCreador
+        ? { '@type': 'Person', name: String(entrada.usernameCreador) }
+        : undefined,
+    });
   }
 }

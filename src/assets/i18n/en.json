@@ -7,6 +7,7 @@
     "LOGIN": "Login",
     "LOGOUT": "Logout",
     "PROFILE": "Profile",
+    "BOOKMARKS": "Bookmarks",
     "NOTIFICATIONS": "Notifications",
     "NO_NOTIFICATIONS": "No notifications",
     "MARK_ALL_READ": "Mark all as read",
@@ -920,9 +921,24 @@
     },
     "FOOTER": {
       "COREUI": "CoreUI",
-      "COPYRIGHT": "2021 creativeLabs",
+      "COPYRIGHT": "2026 creativeLabs",
       "POWERED_BY": "Powered by",
-      "COREUI_ANGULAR": "CoreUI for Angular"
+      "COREUI_ANGULAR": "CoreUI for Angular",
+      "ABOUT": "About",
+      "CONTACT": "Contact",
+      "SITEMAP": "Sitemap"
+    },
+    "SHARE": {
+      "COPY_LINK": "Copy link",
+      "COPIED": "Link copied.",
+      "COPY_FAILED": "Could not copy the link.",
+      "NATIVE_FAILED": "Could not open the share menu."
+    },
+    "BOOKMARK": {
+      "INDICATOR": "Saved",
+      "LOGIN_REQUIRED": "Sign in to save entries.",
+      "SAVED": "Saved to your bookmarks.",
+      "REMOVED": "Removed from your bookmarks."
     },
     "LOGIN": {
       "SIGN_IN_MESSAGE": "Sign in with your account",
@@ -956,13 +972,6 @@
       "BODY_COMMENT_COUNTS": "Advanced comment counts are not available yet. They will be enabled when the endpoint exists.",
       "BODY_SHARE": "Sharing is not available yet. It will be enabled when the endpoint exists."
     },
-    "SHARE": {
-      "COPIED": "Link copied to clipboard.",
-      "COPY_FAILED": "Could not copy the link.",
-      "NATIVE_FAILED": "Could not open the share dialog."
-    },
-    "ABOUT": {
-    "ABOUT": {
     "ABOUT": {
       "TITLE": "About Us"
     },

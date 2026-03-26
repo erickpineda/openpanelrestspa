@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { PublicEntradasFacadeService } from '../../services/public-entradas-facade.service';
 import { parseAllowedDate } from '@shared/utils/date-utils';
 import { CategoriaService } from '@app/core/services/data/categoria.service';
+import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
+import { PublicBookmarksService } from '../../services/public-bookmarks.service';
 
 @Component({
   selector: 'app-listado-entradas-public',
@@ -22,15 +24,27 @@ export class ListadoEntradasPublicComponent implements OnInit {
   filterAllowComments = false;
   categoriasSeleccionadas: string[] = [];
   categoriasPopulares: string[] = [];
+  filtersVisible = false;
+  bookmarkedIds = new Set<number>();
 
   constructor(
     private facade: PublicEntradasFacadeService,
-    private categoriaService: CategoriaService
+    private categoriaService: CategoriaService,
+    private analytics: AnalyticsService,
+    private bookmarksService: PublicBookmarksService
   ) {}
 
   ngOnInit(): void {
     this.cargarCategoriasPopulares();
     this.cargarPagina();
+    
+    this.bookmarksService.observeIds().subscribe(ids => {
+      this.bookmarkedIds = ids;
+    });
+  }
+
+  isBookmarked(idEntrada: number): boolean {
+    return this.bookmarkedIds.has(Number(idEntrada));
   }
 
   cargarCategoriasPopulares() {
@@ -68,7 +82,20 @@ export class ListadoEntradasPublicComponent implements OnInit {
 
   aplicarFiltros() {
     this.currentPage = 1;
+    this.analytics.track('apply_filters', {
+      context: 'public_entradas_list',
+      searchText: this.searchText?.trim() || '',
+      sortField: this.sortField,
+      sortDirection: this.sortDirection,
+      filterAllowComments: this.filterAllowComments,
+      categorias: [...this.categoriasSeleccionadas],
+    });
     this.cargarPagina({ scrollToTop: false });
+  }
+
+  onSearch(term: string): void {
+    this.searchText = String(term ?? '');
+    this.aplicarFiltros();
   }
 
   resetFiltros() {
@@ -78,6 +105,7 @@ export class ListadoEntradasPublicComponent implements OnInit {
     this.filterAllowComments = false;
     this.categoriasSeleccionadas = [];
     this.currentPage = 1;
+    this.analytics.track('reset_filters', { context: 'public_entradas_list' });
     this.cargarPagina({ scrollToTop: false });
   }
 

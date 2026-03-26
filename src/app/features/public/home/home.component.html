@@ -1,24 +1,36 @@
 <div class="home-container">
-  <div class="row align-items-md-stretch py-5 mt-4">
-    <div class="col-md-6 mb-4 mb-md-0">
-      <div class="h-100 p-5 bg-light-subtle border-0 rounded-4 shadow-sm d-flex flex-column justify-content-center transition-hover">
-        <h2 class="display-5 fw-bold text-dark mb-3">Bienvenido a OpenPanel</h2>
-        <p class="lead text-muted mb-4">Explora nuestras últimas publicaciones, descubre contenido interesante y mantente actualizado con la comunidad.</p>
-        <div>
-          <button class="btn btn-primary btn-lg px-4 rounded-pill" type="button" routerLink="/entradas">Ver Entradas</button>
-        </div>
+  <header
+    class="public-hero mt-4 rounded-4 overflow-hidden shadow-sm"
+    role="banner"
+    aria-label="Portada"
+  >
+    <div class="public-hero-overlay"></div>
+    <div class="public-hero-content text-center text-white position-relative">
+      <div class="public-hero-kicker">OpenPanel</div>
+      <h1 class="public-hero-title mb-3">Blog y comunidad técnica</h1>
+      <p class="public-hero-subtitle mb-4">
+        Explora publicaciones, guarda tus favoritas y participa con comentarios cuando estés listo.
+      </p>
+      <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+        <button
+          class="btn btn-light btn-lg px-4 rounded-pill text-primary fw-bold"
+          type="button"
+          routerLink="/entradas"
+          (click)="trackCta('ver_entradas')"
+        >
+          Ver entradas
+        </button>
+        <button
+          class="btn btn-outline-light btn-lg px-4 rounded-pill"
+          type="button"
+          routerLink="/registro"
+          (click)="trackCta('registro')"
+        >
+          Crear cuenta
+        </button>
       </div>
     </div>
-    <div class="col-md-6">
-      <div class="h-100 p-5 bg-primary text-white border-0 rounded-4 shadow d-flex flex-column justify-content-center transition-hover" style="background: linear-gradient(135deg, var(--cui-primary) 0%, #0d47a1 100%);">
-        <h2 class="display-5 fw-bold mb-3">Contenido Destacado</h2>
-        <p class="lead mb-4 text-white-50">Regístrate para dejar comentarios, guardar tus favoritos e interactuar con la comunidad.</p>
-        <div>
-          <button class="btn btn-light btn-lg px-4 rounded-pill text-primary fw-bold" type="button" routerLink="/registro">Registrarse ahora</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  </header>
 
   <div class="d-flex justify-content-between align-items-end mt-5 mb-4">
     <h3 class="fw-bold text-dark mb-0">Últimas Publicaciones</h3>

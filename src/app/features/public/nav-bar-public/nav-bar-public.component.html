@@ -15,12 +15,6 @@
         <c-nav-item>
           <a cNavLink id="entradas" (click)="navigateToRoute('/entradas')" class="cursor-pointer hover-primary transition-colors px-3 rounded-pill">Blog</a>
         </c-nav-item>
-        <c-nav-item>
-          <a cNavLink id="about" (click)="navigateToRoute('/about')" class="cursor-pointer hover-primary transition-colors px-3 rounded-pill">{{ 'HEADER.ABOUT' | translate }}</a>
-        </c-nav-item>
-        <c-nav-item>
-          <a cNavLink id="contact" (click)="navigateToRoute('/contact')" class="cursor-pointer hover-primary transition-colors px-3 rounded-pill">{{ 'HEADER.CONTACT' | translate }}</a>
-        </c-nav-item>
       </c-navbar-nav>
       
       <c-navbar-nav class="ms-auto d-flex align-items-center gap-3">
@@ -46,13 +40,13 @@
         }
         @if (isLoggedIn) {
           <c-nav-item>
-            <a cNavLink (click)="navigateToRoute('/admin')" class="cursor-pointer">{{ 'HEADER.ADMIN' | translate }}</a>
+            <a cNavLink (click)="navigateToRoute('/guardados')" class="cursor-pointer d-flex align-items-center gap-2">
+              <svg cIcon name="cilUser"></svg>
+              {{ user?.username || 'Mi Espacio' }}
+            </a>
           </c-nav-item>
           <c-nav-item>
-            <a cNavLink (click)="navigateToRoute('/perfil')" class="cursor-pointer">Perfil</a>
-          </c-nav-item>
-          <c-nav-item>
-            <button cButton color="danger" variant="outline" size="sm" (click)="logout()" [disabled]="isLoadingLogout">
+            <button cButton color="danger" variant="outline" size="sm" (click)="logout()" [disabled]="isLoadingLogout" class="ms-2">
               @if (!isLoadingLogout) {
                 <span>{{ 'HEADER.LOGOUT' | translate }}</span>
               }

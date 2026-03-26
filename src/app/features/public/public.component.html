@@ -2,20 +2,6 @@
   <app-op-loader></app-op-loader>
   <app-nav-bar-public class="fixed-top shadow-sm w-100 bg-body" style="z-index: 1030;" role="navigation"></app-nav-bar-public>
   
-  <header class="masthead" style="background-image: url('/assets/img/home-bg.jpg'); margin-top: 64px;" role="banner">
-    <div class="overlay"></div>
-    <c-container class="position-relative">
-      <c-row class="justify-content-center text-center">
-        <c-col md="10" lg="8">
-          <div class="site-heading">
-            <h1>{{ 'PUBLIC.HOME.SITE_HEADING' | translate }}</h1>
-            <span class="subheading">{{ 'PUBLIC.HOME.SITE_SUBHEADING' | translate }}</span>
-          </div>
-        </c-col>
-      </c-row>
-    </c-container>
-  </header>
-
   <main class="body flex-grow-1 py-5" role="main">
     <c-container breakpoint="lg">
       <router-outlet></router-outlet>

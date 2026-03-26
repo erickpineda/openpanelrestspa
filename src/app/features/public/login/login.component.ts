@@ -32,6 +32,11 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.authSync.initializeAuthState();
     if (this.tokenStorage.getToken()) {
+      const user = this.tokenStorage.getUser();
+      if (!user || !this.authService.isTokenValid()) {
+        this.tokenStorage.signOut();
+        return;
+      }
       this.tryRedirectToLastRoute('ngOnInit');
     }
   }

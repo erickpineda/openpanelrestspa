@@ -6,6 +6,7 @@ import { ListadoEntradasPublicComponent } from './containers/listado-entradas-pu
 import { DetalleEntradaPublicComponent } from './containers/detalle-entrada-public/detalle-entrada-public.component';
 import { SharedOPModule } from '@app/shared/shared.module';
 import { SharedCoreUiModule } from '@app/shared/shared-coreui.module';
+import { SharedSearchModule } from '@shared/search/search.module';
 
 const routes: Routes = [
   { path: '', component: ListadoEntradasPublicComponent },
@@ -22,6 +23,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     SharedOPModule,
     SharedCoreUiModule,
+    SharedSearchModule,
     DetalleEntradaPublicComponent,
   ],
 })

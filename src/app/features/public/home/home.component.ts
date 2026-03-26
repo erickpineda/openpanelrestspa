@@ -3,6 +3,7 @@ import { EntradaService } from '@app/core/services/data/entrada.service';
 import { Entrada } from '@app/core/models/entrada.model';
 import { finalize } from 'rxjs/operators';
 import { parseAllowedDate } from '@shared/utils/date-utils';
+import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
 
 @Component({
   selector: 'app-home',
@@ -14,7 +15,10 @@ export class HomeComponent implements OnInit {
   ultimasEntradas: Entrada[] = [];
   loading = false;
 
-  constructor(private entradaService: EntradaService) {}
+  constructor(
+    private entradaService: EntradaService,
+    private analytics: AnalyticsService
+  ) {}
 
   ngOnInit(): void {
     this.cargarUltimasEntradas();
@@ -43,5 +47,9 @@ export class HomeComponent implements OnInit {
 
   getFechaDate(fecha: any): Date | null {
     return parseAllowedDate(fecha);
+  }
+
+  trackCta(name: string): void {
+    this.analytics.track('cta_click', { name, context: 'public_home' });
   }
 }

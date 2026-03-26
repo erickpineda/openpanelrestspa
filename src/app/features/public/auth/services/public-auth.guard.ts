@@ -20,21 +20,13 @@ export class PublicAuthGuard implements CanActivate {
     const user = this.tokenStorage.getUser();
 
     if (!token || !user) {
+      this.tokenStorage.signOut();
       return this.router.parseUrl('/login');
     }
 
     if (!this.authService.isTokenValid(this.EXPIRY_MARGIN_SECONDS)) {
-      this.router.navigate(['/login'], {
-        state: {
-          sessionData: {
-            type: 'SESSION_EXPIRED',
-            message: 'Su sesión ha caducado. Por favor, inicie sesión de nuevo.',
-            allowSave: true,
-            timestamp: Date.now(),
-          },
-        },
-      });
-      return false;
+      this.tokenStorage.signOut();
+      return this.router.parseUrl('/login');
     }
 
     return true;

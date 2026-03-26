@@ -1,3 +1,47 @@
+.public-hero {
+  position: relative;
+  background-image: url('/assets/img/home-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.25rem;
+}
+
+.public-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(13, 71, 161, 0.85), rgba(0, 0, 0, 0.65));
+}
+
+.public-hero-content {
+  max-width: 860px;
+}
+
+.public-hero-kicker {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  opacity: 0.9;
+  font-size: 0.85rem;
+}
+
+.public-hero-title {
+  font-weight: 900;
+  line-height: 1.05;
+  font-size: clamp(2rem, 3.4vw, 3.25rem);
+}
+
+.public-hero-subtitle {
+  opacity: 0.92;
+  font-size: clamp(1rem, 1.35vw, 1.25rem);
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .large-entry img {
   width: 100%;
   height: auto;

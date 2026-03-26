@@ -10,6 +10,8 @@ import { GlobalErrorHandlerService } from './core/errors/global-error/global-err
 import { UiAnomalyMonitorService } from './core/services/ui/ui-anomaly-monitor.service';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from '@shared/components/icons/coreui-icons';
+import { GtmService } from './core/services/analytics/gtm.service';
+import { AnalyticsRouterService } from './core/services/analytics/analytics-router.service';
 
 @Component({
   selector: 'app-root',
@@ -29,12 +31,17 @@ export class AppComponent implements OnInit {
     private tokenStorage: TokenStorageService,
     private globalErrorHandler: GlobalErrorHandlerService,
     private uiMonitor: UiAnomalyMonitorService,
-    private iconSetService: IconSetService
+    private iconSetService: IconSetService,
+    private gtm: GtmService,
+    private analyticsRouter: AnalyticsRouterService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
 
   ngOnInit(): void {
+    this.gtm.init();
+    this.analyticsRouter.start();
+
     // Inicializar sincronización entre pestañas
     this.authSync.initializeAuthState();
 

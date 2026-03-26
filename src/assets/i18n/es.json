@@ -7,6 +7,7 @@
     "LOGIN": "Iniciar Sesión",
     "LOGOUT": "Cerrar Sesión",
     "PROFILE": "Perfil",
+    "BOOKMARKS": "Guardados",
     "NOTIFICATIONS": "Notificaciones",
     "NO_NOTIFICATIONS": "No hay notificaciones",
     "MARK_ALL_READ": "Marcar todas como leídas",
@@ -26,9 +27,24 @@
     },
     "FOOTER": {
       "COREUI": "CoreUI",
-      "COPYRIGHT": "2021 creativeLabs",
+      "COPYRIGHT": "2026 creativeLabs",
       "POWERED_BY": "Powered by",
-      "COREUI_ANGULAR": "CoreUI for Angular"
+      "COREUI_ANGULAR": "CoreUI for Angular",
+      "ABOUT": "Acerca de",
+      "CONTACT": "Contacto",
+      "SITEMAP": "Sitemap"
+    },
+    "SHARE": {
+      "COPY_LINK": "Copiar enlace",
+      "COPIED": "Enlace copiado.",
+      "COPY_FAILED": "No se pudo copiar el enlace.",
+      "NATIVE_FAILED": "No se pudo abrir el menú de compartir."
+    },
+    "BOOKMARK": {
+      "INDICATOR": "Guardado",
+      "LOGIN_REQUIRED": "Inicia sesión para guardar entradas.",
+      "SAVED": "Guardado en tus bookmarks.",
+      "REMOVED": "Eliminado de tus bookmarks."
     },
     "ABOUT": {
       "TITLE": "Acerca de nosotros"
@@ -88,11 +104,6 @@
       "BODY_VOTE": "La votación todavía no está disponible. Se activará cuando exista el endpoint.",
       "BODY_COMMENT_COUNTS": "Los recuentos avanzados de comentarios todavía no están disponibles. Se activarán cuando exista el endpoint.",
       "BODY_SHARE": "Compartir todavía no está disponible. Se activará cuando exista el endpoint."
-    },
-    "SHARE": {
-      "COPIED": "Enlace copiado al portapapeles.",
-      "COPY_FAILED": "No se pudo copiar el enlace.",
-      "NATIVE_FAILED": "No se pudo abrir el diálogo de compartir."
     }
   },
   "COMMON": {
@@ -1018,7 +1029,7 @@
     },
     "FOOTER": {
       "COREUI": "CoreUI",
-      "COPYRIGHT": "2021 creativeLabs",
+      "COPYRIGHT": "2026 creativeLabs",
       "POWERED_BY": "Powered by",
       "COREUI_ANGULAR": "CoreUI for Angular"
     },
@@ -1373,7 +1384,7 @@
     "FORM_SUBMISSION_SUCCESSFUL": "Form submission successful!",
     "HTTPS_STARTBOOTSTRAP_COM_SOLUT": "https://startbootstrap.com/solution/contact-forms",
     "ERROR_SENDING_MESSAGE": "Error sending message!",
-    "COPY_2021_CREATIVELABS": "&copy; 2021 creativeLabs",
+    "COPY_2XYZ_CREATIVELABS": "&copy; 2026 creativeLabs",
     "POWERED_BY": "Powered by",
     "COREUI_FOR_ANGULAR": "CoreUI for Angular",
     "MI_PRIMER_BLOG": "Mi primer Blog",
