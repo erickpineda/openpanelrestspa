@@ -24,9 +24,16 @@
         <article class="blog-post bg-white p-md-5 p-4 rounded-4 shadow-sm">
           <header class="mb-5 border-bottom pb-4">
             <div class="d-flex gap-2 flex-wrap mb-4">
-              <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fs-6 fw-medium" *ngFor="let cat of entrada.categorias">
-                {{ cat.nombre }}
-              </span>
+              <div class="btn-group" *ngFor="let cat of entrada.categorias">
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-start-pill px-3 py-2 fs-6 fw-medium d-flex align-items-center">
+                  {{ cat.nombre }}
+                </span>
+                <button class="btn btn-sm btn-outline-primary rounded-end-pill px-2 d-flex align-items-center" 
+                        (click)="toggleCategoria(cat.nombre)"
+                        [title]="isCategoriaSeguida(cat.nombre) ? 'Dejar de seguir' : 'Seguir categoría'">
+                  <svg cIcon [name]="isCategoriaSeguida(cat.nombre) ? 'cilCheck' : 'cilPlus'" size="sm"></svg>
+                </button>
+              </div>
             </div>
             
             <h1 class="display-4 fw-bold mb-4 text-dark lh-sm">{{ entrada.titulo }}</h1>
@@ -42,7 +49,7 @@
               <div>
                 <div class="fw-bold fs-5 mb-0">{{ entrada.usernameCreador || 'Usuario' }}</div>
                 <div class="text-muted small d-flex align-items-center gap-2">
-                  <span>{{ getFechaDate(entrada.fechaPublicacion) | date:'dd MMM, yyyy' : '' : 'es-ES' }}</span>
+                  <span>{{ entrada.fechaPublicacion | allowedDate:'dd MMM, yyyy' }}</span>
                   <span>&bull;</span>
                   <span><svg cIcon name="cilSpeech" size="sm"></svg> {{ comentariosCounts?.visible ?? 0 }} comentarios</span>
                   @if(entrada.votos > 0) {
@@ -54,24 +61,57 @@
             </div>
           </header>
 
-          <div class="post-content lh-lg fs-5 text-dark" style="color: #333;" [innerHTML]="entrada.contenido | sanitizeHtml"></div>
+          <div class="post-content lh-lg fs-5 text-dark" [innerHTML]="entrada.contenido | sanitizeHtml"></div>
           
-          <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
-            <div class="d-flex gap-3">
-              <button class="btn btn-outline-primary rounded-pill d-flex align-items-center gap-2" (click)="darMeGusta()" [disabled]="isVoting">
+          <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top flex-wrap gap-3">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <button class="btn rounded-pill d-flex align-items-center gap-2" 
+                      [ngClass]="hasVoted ? 'btn-primary' : 'btn-outline-primary'" 
+                      (click)="darMeGusta()" 
+                      [disabled]="isVoting || hasVoted">
                 <svg cIcon name="cilThumbUp"></svg>
-                <span>Me gusta ({{ entrada.votos || 0 }})</span>
+                <span>{{ hasVoted ? 'Te gusta' : 'Me gusta' }} ({{ entrada.votos || 0 }})</span>
               </button>
-              <button class="btn btn-outline-secondary rounded-pill d-flex align-items-center gap-2" (click)="compartir()">
-                <svg cIcon name="cilShare"></svg>
-                <span>Compartir</span>
+              <button class="btn btn-outline-secondary rounded-pill d-flex align-items-center gap-2" (click)="toggleBookmark()">
+                <svg cIcon name="cilBookmark"></svg>
+                <span>{{ isBookmarked ? 'Guardado' : 'Guardar' }}</span>
               </button>
+              
+              <div class="btn-group" role="group" aria-label="Compartir en redes sociales">
+                <button
+                  class="btn btn-outline-secondary rounded-start-pill px-3"
+                  type="button"
+                  (click)="compartir()"
+                  [cTooltip]="'PUBLIC.SHARE.COPY_LINK' | translate"
+                  cTooltipPlacement="top"
+                  [attr.aria-label]="'PUBLIC.SHARE.COPY_LINK' | translate"
+                >
+                  <svg cIcon name="cilClone"></svg>
+                  <span class="visually-hidden">{{ 'PUBLIC.SHARE.COPY_LINK' | translate }}</span>
+                </button>
+                <button class="btn btn-outline-secondary px-3" type="button" (click)="shareTo('whatsapp')" aria-label="Compartir en WhatsApp" title="WhatsApp">
+                  <svg cIcon name="cibWhatsapp"></svg>
+                </button>
+                <button class="btn btn-outline-secondary px-3" type="button" (click)="shareTo('x')" aria-label="Compartir en X" title="X (Twitter)">
+                  <svg cIcon name="cibTwitter"></svg>
+                </button>
+                <button class="btn btn-outline-secondary rounded-end-pill px-3" type="button" (click)="shareTo('linkedin')" aria-label="Compartir en LinkedIn" title="LinkedIn">
+                  <svg cIcon name="cibLinkedin"></svg>
+                </button>
+              </div>
             </div>
             
-            <div class="d-flex gap-2">
-              <span class="badge bg-light text-dark border rounded-pill px-3 py-2" *ngFor="let tag of entrada.etiquetas">
-                #{{ tag.nombre }}
-              </span>
+            <div class="d-flex flex-wrap gap-2 justify-content-end mt-4 mt-md-0">
+              <div class="btn-group" *ngFor="let tag of entrada.etiquetas">
+                <span class="badge bg-light text-dark border rounded-start-pill px-3 py-2 d-flex align-items-center">
+                  #{{ tag.nombre }}
+                </span>
+                <button class="btn btn-sm btn-outline-secondary rounded-end-pill px-2 d-flex align-items-center" 
+                        (click)="toggleEtiqueta(tag.nombre)"
+                        [title]="isEtiquetaSeguida(tag.nombre) ? 'Dejar de seguir' : 'Seguir etiqueta'">
+                  <svg cIcon [name]="isEtiquetaSeguida(tag.nombre) ? 'cilCheck' : 'cilPlus'" size="sm"></svg>
+                </button>
+              </div>
             </div>
           </div>
           
@@ -80,6 +120,46 @@
           @if (voteError) {
             <div class="alert alert-warning border-0 rounded-4 shadow-sm">
               {{ voteError }}
+            </div>
+          }
+
+          @if (relatedLoading) {
+            <div class="mt-5 pt-4 border-top">
+              <div class="d-flex align-items-center gap-2 text-muted">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                <span>Cargando entradas relacionadas...</span>
+              </div>
+            </div>
+          }
+
+          @if (!relatedLoading && relatedEntradas.length > 0) {
+            <div class="mt-5 pt-4 border-top">
+              <h3 class="fw-bold mb-4">Entradas relacionadas</h3>
+              <div class="row row-cols-1 row-cols-md-2 g-4">
+                @for (e of relatedEntradas; track e.idEntrada) {
+                  <div class="col">
+                    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                      <div class="card-body p-4">
+                        <div class="d-flex gap-2 mb-3 flex-wrap">
+                          <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2" *ngFor="let cat of e.categorias">
+                            {{ cat.nombre }}
+                          </span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-2">
+                          <a [routerLink]="['/entradas', e.slug]" class="text-decoration-none text-dark stretched-link">
+                            {{ e.titulo }}
+                          </a>
+                        </h5>
+                        <p class="text-muted mb-0">{{ e.resumen | slice:0:140 }}...</p>
+                      </div>
+                      <div class="card-footer bg-white border-top-0 p-4 pt-0 d-flex justify-content-between">
+                        <small class="text-muted">{{ e.fechaPublicacion | allowedDate:'dd MMM, yyyy' }}</small>
+                        <small class="text-muted">{{ e.cantidadComentarios || 0 }} comentarios</small>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
             </div>
           }
           

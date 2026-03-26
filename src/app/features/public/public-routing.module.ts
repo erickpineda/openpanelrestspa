@@ -23,8 +23,9 @@ const routes: Routes = [
       { path: 'login', component: LoginComponent },
       { path: 'recuperar', component: ForgotPasswordPublicComponent },
       { path: 'registro', component: RegisterPublicComponent },
-      { path: 'perfil', redirectTo: 'guardados', pathMatch: 'full' },
-      { path: 'guardados', component: PerfilPublicComponent, canActivate: [PublicAuthGuard] },
+      { path: 'perfil', redirectTo: 'mi-espacio', pathMatch: 'full' },
+      { path: 'guardados', redirectTo: 'mi-espacio', pathMatch: 'full' },
+      { path: 'mi-espacio', component: PerfilPublicComponent, canActivate: [PublicAuthGuard] },
       { path: 'session-expired', component: SessionExpiredComponent },
       {
         path: 'entradas',

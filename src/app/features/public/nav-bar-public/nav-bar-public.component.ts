@@ -62,6 +62,10 @@ export class NavBarPublicComponent implements OnInit {
     this.languageService.toggleLanguage();
   }
 
+  setLanguage(lang: Language): void {
+    this.languageService.setLanguage(lang);
+  }
+
   private checkAuthStatus(): void {
     this.isLoggedIn = this.tokenStorageService.isLoggedIn();
     this.log.info('🔐 NavBar - Estado de autenticación:', this.isLoggedIn);

@@ -10,6 +10,9 @@ import { ToastService } from '@app/core/services/ui/toast.service';
 import { TranslationService } from '@app/core/services/translation.service';
 import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
 import { PublicBookmarksService } from '../../services/public-bookmarks.service';
+import { PublicVotesService } from '../../services/public-votes.service';
+import { PublicHistoryService } from '../../services/public-history.service';
+import { PublicSubscriptionsService, UserSubscriptions } from '../../../services/public-subscriptions.service';
 import { RouterModule } from '@angular/router';
 import { SharedOPModule } from '@shared/shared.module';
 import { ComentariosPublicComponent } from '../../../comentarios/components/comentarios-public.component';
@@ -33,8 +36,10 @@ export class DetalleEntradaPublicComponent implements OnInit {
   voteError = '';
   isLoggedIn = false;
   isBookmarked = false;
+  hasVoted = false;
   relatedEntradas: any[] = [];
   relatedLoading = false;
+  userSubs: UserSubscriptions = { categorias: [], etiquetas: [] };
   comentariosCounts: { visible: number; total: number | null; pending: number } | null = null;
   devModalVisible = false;
   devModalBodyKey = 'PUBLIC.DEV_MODAL.BODY_GENERIC';
@@ -50,11 +55,20 @@ export class DetalleEntradaPublicComponent implements OnInit {
     private toast: ToastService,
     private i18n: TranslationService,
     private analytics: AnalyticsService,
-    private bookmarks: PublicBookmarksService
+    private bookmarks: PublicBookmarksService,
+    private votesService: PublicVotesService,
+    private historyService: PublicHistoryService,
+    private subsService: PublicSubscriptionsService
   ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = this.tokenStorage.isLoggedIn();
+
+    if (this.isLoggedIn) {
+      this.subsService.observeSubscriptions().pipe(takeUntil(this.destroy$)).subscribe((subs: UserSubscriptions) => {
+        this.userSubs = subs;
+      });
+    }
 
     this.route.paramMap
       .pipe(
@@ -66,6 +80,7 @@ export class DetalleEntradaPublicComponent implements OnInit {
           this.error = false;
           this.entrada = null;
           this.isBookmarked = false;
+          this.hasVoted = false;
           this.relatedEntradas = [];
           this.relatedLoading = false;
           this.comentariosCounts = null;
@@ -83,7 +98,19 @@ export class DetalleEntradaPublicComponent implements OnInit {
           this.entrada = entradaData;
           this.seoService.setEntradaSeo(entradaData);
           this.isBookmarked = this.bookmarks.isBookmarked(entradaData?.idEntrada);
+          this.hasVoted = this.votesService.hasVoted(entradaData?.idEntrada);
           this.loadRelated(entradaData);
+          
+          if (this.isLoggedIn) {
+            this.historyService.addEntry({
+              idEntrada: Number(entradaData.idEntrada),
+              slug: entradaData?.slug ?? this.slug,
+              titulo: entradaData?.titulo ?? null,
+              resumen: entradaData?.resumen ?? null,
+              fechaPublicacion: entradaData?.fechaPublicacion ?? null,
+            });
+          }
+
           this.loading = false;
           return;
         }
@@ -104,6 +131,40 @@ export class DetalleEntradaPublicComponent implements OnInit {
   openDevModal(bodyKey: string): void {
     this.devModalBodyKey = bodyKey;
     this.devModalVisible = true;
+  }
+
+  isCategoriaSeguida(nombre: string): boolean {
+    return this.userSubs.categorias.includes(nombre);
+  }
+
+  isEtiquetaSeguida(nombre: string): boolean {
+    return this.userSubs.etiquetas.includes(nombre);
+  }
+
+  toggleCategoria(nombre: string): void {
+    if (!this.isLoggedIn) {
+      this.toast.showWarning('Inicia sesión para seguir categorías.');
+      return;
+    }
+    const isNowSubscribed = this.subsService.toggleCategoria(nombre);
+    if (isNowSubscribed) {
+      this.toast.showSuccess(`Ahora sigues la categoría: ${nombre}`);
+    } else {
+      this.toast.showInfo(`Dejaste de seguir la categoría: ${nombre}`);
+    }
+  }
+
+  toggleEtiqueta(nombre: string): void {
+    if (!this.isLoggedIn) {
+      this.toast.showWarning('Inicia sesión para seguir etiquetas.');
+      return;
+    }
+    const isNowSubscribed = this.subsService.toggleEtiqueta(nombre);
+    if (isNowSubscribed) {
+      this.toast.showSuccess(`Ahora sigues la etiqueta: ${nombre}`);
+    } else {
+      this.toast.showInfo(`Dejaste de seguir la etiqueta: ${nombre}`);
+    }
   }
 
   compartir(): void {
@@ -269,6 +330,8 @@ export class DetalleEntradaPublicComponent implements OnInit {
       next: (ok) => {
         if (ok) {
           this.isVoting = false;
+          this.hasVoted = true;
+          this.recordVoteInService();
           return;
         }
 
@@ -279,6 +342,9 @@ export class DetalleEntradaPublicComponent implements OnInit {
               if (!ok2) {
                 this.entrada = { ...this.entrada, votos: previousVotes };
                 this.voteError = 'No se pudo registrar tu voto.';
+              } else {
+                this.hasVoted = true;
+                this.recordVoteInService();
               }
               this.isVoting = false;
             },
@@ -294,6 +360,17 @@ export class DetalleEntradaPublicComponent implements OnInit {
         this.voteError = 'No se pudo registrar tu voto.';
         this.isVoting = false;
       },
+    });
+  }
+
+  private recordVoteInService(): void {
+    if (!this.entrada?.idEntrada || !this.isLoggedIn) return;
+    this.votesService.addVote({
+      idEntrada: Number(this.entrada.idEntrada),
+      slug: this.entrada?.slug ?? this.slug,
+      titulo: this.entrada?.titulo ?? null,
+      resumen: this.entrada?.resumen ?? null,
+      fechaPublicacion: this.entrada?.fechaPublicacion ?? null,
     });
   }
 }

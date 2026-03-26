@@ -3,3 +3,25 @@
     padding-top: 88px;
   }
 }
+
+// Reader Preferences classes (injected by ReaderPreferencesService)
+body.reader-font-small {
+  .post-content, .blog-post p, .lead {
+    font-size: 0.9rem !important;
+    line-height: 1.6;
+  }
+}
+
+body.reader-font-normal {
+  .post-content, .blog-post p, .lead {
+    font-size: 1.1rem !important;
+    line-height: 1.8;
+  }
+}
+
+body.reader-font-large {
+  .post-content, .blog-post p, .lead {
+    font-size: 1.35rem !important;
+    line-height: 2;
+  }
+}

@@ -3,3 +3,43 @@
   background-color: #f9f9f9;
   border-radius: 8px;
 }
+
+:host-context([data-coreui-theme="dark"]) {
+  .comentarios-section {
+    background-color: transparent;
+  }
+
+  .bg-light {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: var(--cui-body-color) !important;
+  }
+
+  .comentario-form.bg-white {
+    background-color: var(--cui-body-bg) !important;
+    border-color: var(--cui-border-color) !important;
+    color: var(--cui-body-color) !important;
+  }
+
+  .comentario-form .form-control.bg-light,
+  .comentario-form .form-control {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    border-color: var(--cui-border-color) !important;
+    color: var(--cui-body-color) !important;
+  }
+
+  .comentario-form .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.45) !important;
+  }
+
+  .text-muted {
+    color: var(--cui-secondary-color) !important;
+  }
+
+  .border,
+  .border-top,
+  .border-bottom,
+  .border-start,
+  .border-end {
+    border-color: var(--cui-border-color) !important;
+  }
+}

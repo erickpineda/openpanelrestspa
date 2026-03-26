@@ -12,6 +12,7 @@ import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from '@shared/components/icons/coreui-icons';
 import { GtmService } from './core/services/analytics/gtm.service';
 import { AnalyticsRouterService } from './core/services/analytics/analytics-router.service';
+import { ReaderPreferencesService } from './features/public/services/reader-preferences.service';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +34,8 @@ export class AppComponent implements OnInit {
     private uiMonitor: UiAnomalyMonitorService,
     private iconSetService: IconSetService,
     private gtm: GtmService,
-    private analyticsRouter: AnalyticsRouterService
+    private analyticsRouter: AnalyticsRouterService,
+    private readerPrefs: ReaderPreferencesService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }

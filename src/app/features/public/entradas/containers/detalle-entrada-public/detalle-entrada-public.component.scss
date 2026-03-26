@@ -1,3 +1,27 @@
 .detalle-entrada {
   padding: 20px;
 }
+
+.blog-post {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+// Soporte para tema oscuro (cuando CoreUI inyecta data-coreui-theme="dark")
+:host-context([data-coreui-theme="dark"]) {
+  .bg-white {
+    background-color: var(--cui-body-bg) !important;
+  }
+  .text-dark {
+    color: var(--cui-body-color) !important;
+  }
+  .post-content {
+    color: var(--cui-body-color) !important;
+  }
+  .bg-light {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+  .text-muted {
+    color: var(--cui-secondary-color) !important;
+  }
+}

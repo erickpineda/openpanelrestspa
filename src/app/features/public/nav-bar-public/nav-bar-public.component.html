@@ -18,13 +18,35 @@
       </c-navbar-nav>
       
       <c-navbar-nav class="ms-auto d-flex align-items-center gap-3">
-        <c-nav-item>
-          <a cNavLink (click)="toggleLanguage()" class="cursor-pointer d-flex align-items-center gap-1"
-             [attr.aria-label]="currentLang === 'es' ? 'Cambiar a Inglés' : 'Switch to Spanish'">
+        <c-dropdown alignment="end" variant="nav-item">
+          <a
+            cNavLink
+            cDropdownToggle
+            [caret]="false"
+            class="cursor-pointer d-flex align-items-center gap-2 px-3 rounded-pill"
+            [attr.aria-label]="'Idioma'"
+          >
             <span class="fi" [ngClass]="currentLang === 'es' ? 'fi-es' : 'fi-gb'"></span>
-            {{ currentLang === 'es' ? 'EN' : 'ES' }}
+            <span class="fw-semibold">{{ currentLang.toUpperCase() }}</span>
           </a>
-        </c-nav-item>
+          <ul cDropdownMenu class="pt-0">
+            <li>
+              <h6 cDropdownHeader class="bg-light fw-semibold py-2">Idioma</h6>
+            </li>
+            <li>
+              <button cDropdownItem type="button" class="d-flex align-items-center gap-2" (click)="setLanguage('es')">
+                <span class="fi fi-es"></span>
+                <span>Español</span>
+              </button>
+            </li>
+            <li>
+              <button cDropdownItem type="button" class="d-flex align-items-center gap-2" (click)="setLanguage('en')">
+                <span class="fi fi-gb"></span>
+                <span>English</span>
+              </button>
+            </li>
+          </ul>
+        </c-dropdown>
 
         @if (!isLoggedIn) {
           <c-nav-item>
@@ -39,24 +61,58 @@
           </c-nav-item>
         }
         @if (isLoggedIn) {
-          <c-nav-item>
-            <a cNavLink (click)="navigateToRoute('/guardados')" class="cursor-pointer d-flex align-items-center gap-2">
+          <c-dropdown alignment="end" variant="nav-item">
+            <a
+              cNavLink
+              cDropdownToggle
+              [caret]="false"
+              class="cursor-pointer d-flex align-items-center gap-2 px-3 rounded-pill"
+              [attr.aria-label]="'Menú de usuario'"
+            >
               <svg cIcon name="cilUser"></svg>
-              {{ user?.username || 'Mi Espacio' }}
+              <span class="fw-semibold">{{ user?.username || ('HEADER.MY_SPACE' | translate) }}</span>
             </a>
-          </c-nav-item>
-          <c-nav-item>
-            <button cButton color="danger" variant="outline" size="sm" (click)="logout()" [disabled]="isLoadingLogout" class="ms-2">
-              @if (!isLoadingLogout) {
-                <span>{{ 'HEADER.LOGOUT' | translate }}</span>
+            <ul cDropdownMenu class="pt-0">
+              <li>
+                <h6 cDropdownHeader class="bg-light fw-semibold py-2">
+                  {{ user?.username || ('HEADER.MY_SPACE' | translate) }}
+                </h6>
+              </li>
+              <li>
+                <button cDropdownItem type="button" class="d-flex align-items-center gap-2 py-2" (click)="navigateToRoute('/mi-espacio')">
+                  <svg cIcon name="cilHome" size="sm"></svg>
+                  <span>{{ 'HEADER.MY_SPACE' | translate }}</span>
+                </button>
+              </li>
+              <li>
+                <button cDropdownItem type="button" (click)="navigateToRoute('/admin/control/perfil')">
+                  Configuración de cuenta
+                </button>
+              </li>
+              @if (showAdminBoard || showModeratorBoard) {
+                <li><hr cDropdownDivider /></li>
+                <li>
+                  <button cDropdownItem type="button" (click)="navigateToRoute('/admin')">
+                    Panel de administración
+                  </button>
+                </li>
               }
-              @if (isLoadingLogout) {
-                <span>
-                  <span class="spinner-border spinner-border-sm" role="status"></span>
-                </span>
-              }
-            </button>
-          </c-nav-item>
+              <li><hr cDropdownDivider /></li>
+              <li>
+                <button cDropdownItem type="button" class="text-danger" (click)="logout()" [disabled]="isLoadingLogout">
+                  @if (!isLoadingLogout) {
+                    <span>{{ 'HEADER.LOGOUT' | translate }}</span>
+                  }
+                  @if (isLoadingLogout) {
+                    <span class="d-flex align-items-center gap-2">
+                      <span class="spinner-border spinner-border-sm" role="status"></span>
+                      Cerrando sesión...
+                    </span>
+                  }
+                </button>
+              </li>
+            </ul>
+          </c-dropdown>
         }
       </c-navbar-nav>
     </div>

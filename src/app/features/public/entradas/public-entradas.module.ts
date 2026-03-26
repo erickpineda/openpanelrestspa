@@ -7,6 +7,10 @@ import { DetalleEntradaPublicComponent } from './containers/detalle-entrada-publ
 import { SharedOPModule } from '@app/shared/shared.module';
 import { SharedCoreUiModule } from '@app/shared/shared-coreui.module';
 import { SharedSearchModule } from '@shared/search/search.module';
+import { PublicBookmarksService } from './services/public-bookmarks.service';
+import { PublicVotesService } from './services/public-votes.service';
+import { PublicHistoryService } from './services/public-history.service';
+import { ComentariosPublicComponent } from '../comentarios/components/comentarios-public.component';
 
 const routes: Routes = [
   { path: '', component: ListadoEntradasPublicComponent },
@@ -15,16 +19,21 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    ListadoEntradasPublicComponent,
+    ListadoEntradasPublicComponent
   ],
   imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule.forChild(routes),
-    SharedOPModule,
-    SharedCoreUiModule,
+    CommonModule, 
+    RouterModule.forChild(routes), 
+    SharedOPModule, 
+    SharedCoreUiModule, 
     SharedSearchModule,
-    DetalleEntradaPublicComponent,
+    ComentariosPublicComponent,
+    DetalleEntradaPublicComponent
   ],
+  providers: [
+    PublicBookmarksService,
+    PublicVotesService,
+    PublicHistoryService
+  ]
 })
 export class PublicEntradasModule {}

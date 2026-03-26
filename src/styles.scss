@@ -41,3 +41,104 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 // Navigation animations
 @use './assets/css/navigation-animations';
+
+body.reader-font-small .post-content,
+body.reader-font-small .post-content p,
+body.reader-font-small .post-content li,
+body.reader-font-small .post-content span,
+body.reader-font-small .post-content div,
+body.reader-font-small .post-content * {
+  font-size: 0.9rem !important;
+  line-height: 1.6;
+}
+
+body.reader-font-normal .post-content,
+body.reader-font-normal .post-content p,
+body.reader-font-normal .post-content li,
+body.reader-font-normal .post-content span,
+body.reader-font-normal .post-content div,
+body.reader-font-normal .post-content * {
+  font-size: 1.1rem !important;
+  line-height: 1.8;
+}
+
+body.reader-font-large .post-content,
+body.reader-font-large .post-content p,
+body.reader-font-large .post-content li,
+body.reader-font-large .post-content span,
+body.reader-font-large .post-content div,
+body.reader-font-large .post-content * {
+  font-size: 1.35rem !important;
+  line-height: 2;
+}
+
+[data-coreui-theme="dark"] hr {
+  border-color: var(--cui-border-color) !important;
+  opacity: 0.7;
+}
+
+[data-coreui-theme="dark"] .border,
+[data-coreui-theme="dark"] .border-top,
+[data-coreui-theme="dark"] .border-bottom,
+[data-coreui-theme="dark"] .border-start,
+[data-coreui-theme="dark"] .border-end {
+  border-color: var(--cui-border-color) !important;
+}
+
+[data-coreui-theme="dark"] .text-secondary {
+  color: var(--cui-secondary-color) !important;
+}
+
+[data-coreui-theme="dark"] .bg-white {
+  background-color: var(--cui-body-bg) !important;
+}
+
+[data-coreui-theme="dark"] .text-dark {
+  color: var(--cui-body-color) !important;
+}
+
+[data-coreui-theme="dark"] .card,
+[data-coreui-theme="dark"] .card-header,
+[data-coreui-theme="dark"] .card-footer {
+  background-color: var(--cui-body-bg) !important;
+  border-color: var(--cui-border-color) !important;
+}
+
+[data-coreui-theme="dark"] .input-group-text {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: var(--cui-border-color) !important;
+  color: var(--cui-body-color) !important;
+}
+
+[data-coreui-theme="dark"] .form-control,
+[data-coreui-theme="dark"] .form-select {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: var(--cui-border-color) !important;
+  color: var(--cui-body-color) !important;
+}
+
+[data-coreui-theme="dark"] .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+[data-coreui-theme="dark"] .btn-outline-secondary,
+[data-coreui-theme="dark"] .btn-outline-primary {
+  color: var(--cui-body-color) !important;
+  border-color: var(--cui-border-color) !important;
+}
+
+[data-coreui-theme="dark"] .btn-outline-secondary:hover,
+[data-coreui-theme="dark"] .btn-outline-primary:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-coreui-theme="dark"] .badge.bg-light {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  color: var(--cui-body-color) !important;
+  border-color: var(--cui-border-color) !important;
+}
+
+[data-coreui-theme="dark"] .offcanvas {
+  background-color: var(--cui-body-bg) !important;
+  color: var(--cui-body-color) !important;
+}
