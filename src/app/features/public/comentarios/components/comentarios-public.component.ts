@@ -176,7 +176,7 @@ export class ComentariosPublicComponent implements OnInit {
       email: user ? user.email : null
     };
 
-    if (!payload.idUsuario) {
+    if (!this.isLoggedIn) {
       this.errorMessage = 'Debes iniciar sesión para comentar.';
       this.isSubmitting = false;
       setTimeout(() => (this.errorMessage = ''), 5000);
