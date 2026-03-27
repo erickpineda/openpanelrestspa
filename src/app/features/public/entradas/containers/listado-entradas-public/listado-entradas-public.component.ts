@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PublicEntradasFacadeService } from '../../services/public-entradas-facade.service';
 import { parseAllowedDate } from '@shared/utils/date-utils';
 import { CategoriaService } from '@app/core/services/data/categoria.service';
+import { EtiquetaService } from '@app/core/services/data/etiqueta.service';
 import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
 import { PublicBookmarksService } from '../../services/public-bookmarks.service';
 import { ActivatedRoute } from '@angular/router';
@@ -26,12 +27,15 @@ export class ListadoEntradasPublicComponent implements OnInit {
   filterAllowComments = false;
   categoriasSeleccionadas: string[] = [];
   categoriasPopulares: string[] = [];
+  etiquetasSeleccionadas: string[] = [];
+  etiquetasPopulares: string[] = [];
   filtersVisible = false;
   bookmarkedSlugs = new Set<string>();
 
   constructor(
     private facade: PublicEntradasFacadeService,
     private categoriaService: CategoriaService,
+    private etiquetaService: EtiquetaService,
     private analytics: AnalyticsService,
     private bookmarksService: PublicBookmarksService,
     private route: ActivatedRoute
@@ -39,18 +43,21 @@ export class ListadoEntradasPublicComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarCategoriasPopulares();
+    this.cargarEtiquetasPopulares();
     this.route.queryParamMap
       .pipe(
         map((pm) => ({
           q: (pm.get('q') ?? '').trim(),
           categoria: (pm.get('categoria') ?? '').trim(),
+          etiqueta: (pm.get('etiqueta') ?? '').trim(),
         })),
-        distinctUntilChanged((a, b) => a.q === b.q && a.categoria === b.categoria)
+        distinctUntilChanged((a, b) => a.q === b.q && a.categoria === b.categoria && a.etiqueta === b.etiqueta)
       )
-      .subscribe(({ q, categoria }) => {
-        if (q) this.searchText = q;
-        if (categoria) this.categoriasSeleccionadas = [categoria];
-        if (q || categoria) this.currentPage = 1;
+      .subscribe(({ q, categoria, etiqueta }) => {
+        this.searchText = q;
+        this.categoriasSeleccionadas = categoria ? [categoria] : [];
+        this.etiquetasSeleccionadas = etiqueta ? [etiqueta] : [];
+        this.currentPage = 1;
         this.cargarPagina();
       });
     
@@ -81,6 +88,24 @@ export class ListadoEntradasPublicComponent implements OnInit {
       });
   }
 
+  cargarEtiquetasPopulares() {
+    this.etiquetaService
+      .listarPaginaSinGlobalLoader(0, 50, 'frecuencia', 'DESC')
+      .subscribe({
+        next: (res: any) => {
+          const data = res?.data || res;
+          const elements = Array.isArray(data?.elements) ? data.elements : [];
+          this.etiquetasPopulares = elements
+            .map((t: any) => t?.nombre)
+            .filter((n: any) => typeof n === 'string' && n.trim().length > 0)
+            .slice(0, 12);
+        },
+        error: () => {
+          this.etiquetasPopulares = [];
+        },
+      });
+  }
+
   cargarPagina(options?: { scrollToTop?: boolean }) {
     this.facade.buscarEntradasPublicas(
       this.currentPage - 1,
@@ -89,7 +114,8 @@ export class ListadoEntradasPublicComponent implements OnInit {
       this.sortDirection,
       this.searchText,
       this.filterAllowComments ? true : undefined,
-      this.categoriasSeleccionadas.length > 0 ? this.categoriasSeleccionadas : undefined
+      this.categoriasSeleccionadas.length > 0 ? this.categoriasSeleccionadas : undefined,
+      this.etiquetasSeleccionadas.length > 0 ? this.etiquetasSeleccionadas : undefined
     );
     if (options?.scrollToTop !== false) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -105,6 +131,7 @@ export class ListadoEntradasPublicComponent implements OnInit {
       sortDirection: this.sortDirection,
       filterAllowComments: this.filterAllowComments,
       categorias: [...this.categoriasSeleccionadas],
+      etiquetas: [...this.etiquetasSeleccionadas],
     });
     this.cargarPagina({ scrollToTop: false });
   }
@@ -120,6 +147,7 @@ export class ListadoEntradasPublicComponent implements OnInit {
     this.sortDirection = 'DESC';
     this.filterAllowComments = false;
     this.categoriasSeleccionadas = [];
+    this.etiquetasSeleccionadas = [];
     this.currentPage = 1;
     this.analytics.track('reset_filters', { context: 'public_entradas_list' });
     this.cargarPagina({ scrollToTop: false });
@@ -131,6 +159,16 @@ export class ListadoEntradasPublicComponent implements OnInit {
       this.categoriasSeleccionadas.splice(index, 1);
     } else {
       this.categoriasSeleccionadas.push(categoria);
+    }
+    this.aplicarFiltros();
+  }
+
+  toggleEtiqueta(etiqueta: string) {
+    const index = this.etiquetasSeleccionadas.indexOf(etiqueta);
+    if (index > -1) {
+      this.etiquetasSeleccionadas.splice(index, 1);
+    } else {
+      this.etiquetasSeleccionadas.push(etiqueta);
     }
     this.aplicarFiltros();
   }

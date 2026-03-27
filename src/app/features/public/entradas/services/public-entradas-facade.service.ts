@@ -30,12 +30,16 @@ export class PublicEntradasFacadeService {
     sortDirection: 'ASC' | 'DESC' = 'DESC',
     searchText?: string,
     permitirComentario?: boolean,
-    categoriasNombres?: string[]
+    categoriasNombres?: string[],
+    etiquetasNombres?: string[]
   ) {
     this.state.setLoading(true);
 
     const categoriasLimpias = Array.isArray(categoriasNombres)
       ? [...new Set(categoriasNombres.map((c) => String(c || '').trim()).filter((c) => c.length > 0))]
+      : [];
+    const etiquetasLimpias = Array.isArray(etiquetasNombres)
+      ? [...new Set(etiquetasNombres.map((t) => String(t || '').trim()).filter((t) => t.length > 0))]
       : [];
 
     const searchRequest = {
@@ -52,6 +56,12 @@ export class PublicEntradasFacadeService {
           filterKey: 'categoria.nombre',
           operation: 'EQUAL',
           value: categoria,
+          clazzName: 'Entrada',
+        })),
+        ...etiquetasLimpias.map((etiqueta) => ({
+          filterKey: 'etiqueta.nombre',
+          operation: 'EQUAL',
+          value: etiqueta,
           clazzName: 'Entrada',
         })),
       ],

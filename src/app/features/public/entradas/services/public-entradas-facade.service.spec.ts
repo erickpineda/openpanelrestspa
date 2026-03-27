@@ -3,7 +3,7 @@ import { of } from 'rxjs';
 import { PublicEntradasFacadeService } from './public-entradas-facade.service';
 
 describe('PublicEntradasFacadeService', () => {
-  it('construye filtros (publicada, permitirComentario, titulo y categorias) y setea totalPages', () => {
+  it('construye filtros (publicada, permitirComentario, titulo, categorias y etiquetas) y setea totalPages', () => {
     const buscarSafeSpy = jasmine
       .createSpy('buscarSafe')
       .and.returnValue(of({ elements: [{ idEntrada: 1 }], totalPages: 5 } as any));
@@ -24,12 +24,16 @@ describe('PublicEntradasFacadeService', () => {
 
     const sut = new PublicEntradasFacadeService(entradaServiceMock, stateMock);
 
-    sut.buscarEntradasPublicas(0, 10, 'fechaPublicacion', 'DESC', '  hello  ', true, [
-      ' Noticias ',
-      'Noticias',
-      '',
-      '  ',
-    ]);
+    sut.buscarEntradasPublicas(
+      0,
+      10,
+      'fechaPublicacion',
+      'DESC',
+      '  hello  ',
+      true,
+      [' Noticias ', 'Noticias', '', '  '],
+      [' JAV ', 'JAV', '']
+    );
 
     expect(stateMock.setLoading).toHaveBeenCalledWith(true);
     expect(buscarSafeSpy).toHaveBeenCalled();
@@ -49,6 +53,10 @@ describe('PublicEntradasFacadeService', () => {
     const categoriaCriteria = criteria.filter((c) => c.filterKey === 'categoria.nombre');
     expect(categoriaCriteria.length).toBe(1);
     expect(categoriaCriteria[0].value).toBe('Noticias');
+
+    const etiquetaCriteria = criteria.filter((c) => c.filterKey === 'etiqueta.nombre');
+    expect(etiquetaCriteria.length).toBe(1);
+    expect(etiquetaCriteria[0].value).toBe('JAV');
 
     expect(stateMock.setEntradas).toHaveBeenCalledWith([{ idEntrada: 1 }]);
     expect(stateMock.setTotalPages).toHaveBeenCalledWith(5);

@@ -12,6 +12,12 @@ describe('DetalleEntradaPublicComponent', () => {
     const i18n: any = { translate: (k: string) => k };
     const analytics: any = { track: () => undefined };
     const bookmarks: any = { isBookmarked: () => false, toggle: () => ({ bookmarked: false }) };
+    const votesService: any = { hasVoted: () => false, toggleVote: () => ({ voted: false }) };
+    const historyService: any = { addEntry: () => undefined };
+    const subsService: any = { observeSubscriptions: () => ({ pipe: () => ({ subscribe: () => undefined }) }) };
+    const categoriaService: any = { buscarSinGlobalLoader: () => ({ pipe: () => ({ subscribe: () => undefined }) }) };
+    const etiquetaService: any = { buscarSinGlobalLoader: () => ({ pipe: () => ({ subscribe: () => undefined }) }) };
+    const searchUtil: any = { buildSingle: () => ({}) };
 
     return new DetalleEntradaPublicComponent(
       route,
@@ -23,7 +29,13 @@ describe('DetalleEntradaPublicComponent', () => {
       toast,
       i18n,
       analytics,
-      bookmarks
+      bookmarks,
+      votesService,
+      historyService,
+      subsService,
+      categoriaService,
+      etiquetaService,
+      searchUtil
     );
   };
 

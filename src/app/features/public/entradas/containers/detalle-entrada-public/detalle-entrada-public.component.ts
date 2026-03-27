@@ -49,6 +49,7 @@ export class DetalleEntradaPublicComponent implements OnInit {
   private destroy$ = new Subject<void>();
   private categoriaNombreToCodigo = new Map<string, string>();
   private etiquetaNombreToCodigo = new Map<string, string>();
+  private readonly relatedMaxItems = 4;
 
   constructor(
     private route: ActivatedRoute,
@@ -369,7 +370,7 @@ export class DetalleEntradaPublicComponent implements OnInit {
         ],
       };
       this.relatedLoading = true;
-      this.entradaService.buscarSafe(searchRequest, 0, 6, 'fechaPublicacion', 'DESC').subscribe({
+      this.entradaService.buscarSafe(searchRequest, 0, this.relatedMaxItems, 'fechaPublicacion', 'DESC').subscribe({
         next: (res) => {
           const elements = Array.isArray((res as any)?.elements) ? (res as any).elements : [];
           this.relatedEntradas = elements.filter((e: any) => Number(e?.idEntrada) !== idEntrada);

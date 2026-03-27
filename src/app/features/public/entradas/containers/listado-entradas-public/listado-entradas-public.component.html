@@ -59,6 +59,20 @@
       }
     </div>
 
+    <h5 class="card-title fw-bold mt-4 mb-3 d-flex align-items-center gap-2">
+      <svg cIcon name="cilTag"></svg> Etiquetas Populares
+    </h5>
+    <div class="d-flex flex-wrap gap-2">
+      @for (tag of etiquetasPopulares; track tag) {
+        <span
+          class="badge border px-3 py-2 rounded-pill categoria-badge"
+          [ngClass]="etiquetasSeleccionadas.includes(tag) ? 'bg-secondary text-white border-secondary' : 'bg-light text-dark'"
+          (click)="toggleEtiqueta(tag)">
+          #{{ tag }}
+        </span>
+      }
+    </div>
+
     <h5 class="card-title fw-bold mt-5 mb-3 d-flex align-items-center gap-2">
       <svg cIcon name="cilStar"></svg> Top de hoy
     </h5>
