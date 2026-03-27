@@ -13,6 +13,9 @@ import { PublicBookmarksService } from '../../services/public-bookmarks.service'
 import { PublicVotesService } from '../../services/public-votes.service';
 import { PublicHistoryService } from '../../services/public-history.service';
 import { PublicSubscriptionsService, UserSubscriptions } from '../../../services/public-subscriptions.service';
+import { CategoriaService } from '@app/core/services/data/categoria.service';
+import { EtiquetaService } from '@app/core/services/data/etiqueta.service';
+import { SearchUtilService } from '@app/core/services/utils/search-util.service';
 import { RouterModule } from '@angular/router';
 import { SharedOPModule } from '@shared/shared.module';
 import { ComentariosPublicComponent } from '../../../comentarios/components/comentarios-public.component';
@@ -44,6 +47,8 @@ export class DetalleEntradaPublicComponent implements OnInit {
   devModalVisible = false;
   devModalBodyKey = 'PUBLIC.DEV_MODAL.BODY_GENERIC';
   private destroy$ = new Subject<void>();
+  private categoriaNombreToCodigo = new Map<string, string>();
+  private etiquetaNombreToCodigo = new Map<string, string>();
 
   constructor(
     private route: ActivatedRoute,
@@ -58,7 +63,10 @@ export class DetalleEntradaPublicComponent implements OnInit {
     private bookmarks: PublicBookmarksService,
     private votesService: PublicVotesService,
     private historyService: PublicHistoryService,
-    private subsService: PublicSubscriptionsService
+    private subsService: PublicSubscriptionsService,
+    private categoriaService: CategoriaService,
+    private etiquetaService: EtiquetaService,
+    private searchUtil: SearchUtilService
   ) {}
 
   ngOnInit(): void {
@@ -97,9 +105,10 @@ export class DetalleEntradaPublicComponent implements OnInit {
         if (entradaData && entradaData.publicada) {
           this.entrada = entradaData;
           this.seoService.setEntradaSeo(entradaData);
-          this.isBookmarked = this.bookmarks.isBookmarked(entradaData?.idEntrada);
-          this.hasVoted = this.votesService.hasVoted(entradaData?.idEntrada);
+          this.isBookmarked = this.bookmarks.isBookmarked(entradaData?.slug);
+          this.hasVoted = this.votesService.hasVoted(entradaData?.slug);
           this.loadRelated(entradaData);
+          this.resolveCodigosMetadata(entradaData);
           
           if (this.isLoggedIn) {
             this.historyService.addEntry({
@@ -133,38 +142,112 @@ export class DetalleEntradaPublicComponent implements OnInit {
     this.devModalVisible = true;
   }
 
-  isCategoriaSeguida(nombre: string): boolean {
-    return this.userSubs.categorias.includes(nombre);
+  isCategoriaSeguida(categoriaCodigoOrNombre: string): boolean {
+    const codigo =
+      this.categoriaNombreToCodigo.get(categoriaCodigoOrNombre) ?? categoriaCodigoOrNombre;
+    return this.userSubs.categorias.includes(codigo);
   }
 
-  isEtiquetaSeguida(nombre: string): boolean {
-    return this.userSubs.etiquetas.includes(nombre);
+  isEtiquetaSeguida(etiquetaCodigoOrNombre: string): boolean {
+    const codigo = this.etiquetaNombreToCodigo.get(etiquetaCodigoOrNombre) ?? etiquetaCodigoOrNombre;
+    return this.userSubs.etiquetas.includes(codigo);
   }
 
-  toggleCategoria(nombre: string): void {
+  toggleCategoria(categoriaCodigo: string, displayName?: string): void {
     if (!this.isLoggedIn) {
       this.toast.showWarning('Inicia sesión para seguir categorías.');
       return;
     }
-    const isNowSubscribed = this.subsService.toggleCategoria(nombre);
-    if (isNowSubscribed) {
-      this.toast.showSuccess(`Ahora sigues la categoría: ${nombre}`);
-    } else {
-      this.toast.showInfo(`Dejaste de seguir la categoría: ${nombre}`);
+    const nombre = displayName ?? categoriaCodigo;
+    const codigo = this.categoriaNombreToCodigo.get(nombre) ?? categoriaCodigo;
+    if (codigo === nombre) {
+      this.resolveCategoriaCodigoByNombre(nombre).subscribe((resolved) => {
+        if (!resolved) {
+          this.toast.showWarning(`No se pudo resolver el código de la categoría: ${nombre}`);
+          return;
+        }
+        this.toggleCategoria(resolved, nombre);
+      });
+      return;
     }
+    const isNowSubscribed = this.subsService.toggleCategoria(codigo);
+    if (isNowSubscribed) this.toast.showSuccess(`Ahora sigues la categoría: ${nombre}`);
+    else this.toast.showInfo(`Dejaste de seguir la categoría: ${nombre}`);
   }
 
-  toggleEtiqueta(nombre: string): void {
+  toggleEtiqueta(etiquetaCodigo: string, displayName?: string): void {
     if (!this.isLoggedIn) {
       this.toast.showWarning('Inicia sesión para seguir etiquetas.');
       return;
     }
-    const isNowSubscribed = this.subsService.toggleEtiqueta(nombre);
-    if (isNowSubscribed) {
-      this.toast.showSuccess(`Ahora sigues la etiqueta: ${nombre}`);
-    } else {
-      this.toast.showInfo(`Dejaste de seguir la etiqueta: ${nombre}`);
+    const nombre = displayName ?? etiquetaCodigo;
+    const codigo = this.etiquetaNombreToCodigo.get(nombre) ?? etiquetaCodigo;
+    if (codigo === nombre) {
+      this.resolveEtiquetaCodigoByNombre(nombre).subscribe((resolved) => {
+        if (!resolved) {
+          this.toast.showWarning(`No se pudo resolver el código de la etiqueta: ${nombre}`);
+          return;
+        }
+        this.toggleEtiqueta(resolved, nombre);
+      });
+      return;
     }
+    const isNowSubscribed = this.subsService.toggleEtiqueta(codigo);
+    if (isNowSubscribed) this.toast.showSuccess(`Ahora sigues la etiqueta: ${nombre}`);
+    else this.toast.showInfo(`Dejaste de seguir la etiqueta: ${nombre}`);
+  }
+
+  private resolveCodigosMetadata(entrada: any): void {
+    const categorias = Array.isArray(entrada?.categorias) ? entrada.categorias : [];
+    categorias.forEach((c: any) => {
+      const nombre = String(c?.nombre ?? '').trim();
+      const codigo = String(c?.codigo ?? '').trim();
+      if (codigo) this.categoriaNombreToCodigo.set(nombre || codigo, codigo);
+      if (!codigo && nombre) this.resolveCategoriaCodigoByNombre(nombre).subscribe();
+    });
+    const etiquetas = Array.isArray(entrada?.etiquetas) ? entrada.etiquetas : [];
+    etiquetas.forEach((t: any) => {
+      const nombre = String(t?.nombre ?? '').trim();
+      const codigo = String(t?.codigo ?? '').trim();
+      if (codigo) this.etiquetaNombreToCodigo.set(nombre || codigo, codigo);
+      if (!codigo && nombre) this.resolveEtiquetaCodigoByNombre(nombre).subscribe();
+    });
+  }
+
+  private resolveCategoriaCodigoByNombre(nombre: string) {
+    const n = String(nombre ?? '').trim();
+    if (!n) return of(null);
+    const cached = this.categoriaNombreToCodigo.get(n);
+    if (cached) return of(cached);
+    const payload = this.searchUtil.buildSingle('Categoria', 'nombre', n, 'EQUAL', 'AND');
+    return this.categoriaService.buscarSinGlobalLoader(payload, 0, 1).pipe(
+      map((res: any) => {
+        const data = res?.data ?? res;
+        const el = Array.isArray(data?.elements) ? data.elements[0] : null;
+        const codigo = String(el?.codigo ?? '').trim();
+        if (codigo) this.categoriaNombreToCodigo.set(n, codigo);
+        return codigo || null;
+      }),
+      catchError(() => of(null))
+    );
+  }
+
+  private resolveEtiquetaCodigoByNombre(nombre: string) {
+    const n = String(nombre ?? '').trim();
+    if (!n) return of(null);
+    const cached = this.etiquetaNombreToCodigo.get(n);
+    if (cached) return of(cached);
+    const payload = this.searchUtil.buildSingle('Etiqueta', 'nombre', n, 'EQUAL', 'AND');
+    return this.etiquetaService.buscarSinGlobalLoader(payload, 0, 1).pipe(
+      map((res: any) => {
+        const data = res?.data ?? res;
+        const el = Array.isArray(data?.elements) ? data.elements[0] : null;
+        const codigo = String(el?.codigo ?? '').trim();
+        if (codigo) this.etiquetaNombreToCodigo.set(n, codigo);
+        return codigo || null;
+      }),
+      catchError(() => of(null))
+    );
   }
 
   compartir(): void {

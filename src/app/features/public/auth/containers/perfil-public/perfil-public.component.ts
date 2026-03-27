@@ -5,6 +5,23 @@ import { PublicVotesService } from '../../../entradas/services/public-votes.serv
 import { PublicHistoryService } from '../../../entradas/services/public-history.service';
 import { PublicSubscriptionsService, UserSubscriptions } from '../../../services/public-subscriptions.service';
 import { ReaderPreferencesService, ReaderPreferences } from '../../../services/reader-preferences.service';
+import { CategoriaService } from '@app/core/services/data/categoria.service';
+import { EtiquetaService } from '@app/core/services/data/etiqueta.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+
+type PublicHistoryEntry = {
+  idEntrada: number;
+  slug: string;
+  titulo: string | null;
+  resumen: string | null;
+  fechaPublicacion: string | null;
+};
+
+type SubscriptionItem = {
+  codigo: string;
+  nombre: string;
+};
 
 @Component({
   selector: 'app-perfil-public',
@@ -16,7 +33,7 @@ export class PerfilPublicComponent implements OnInit {
   user: any;
   bookmarks: PublicBookmark[] = [];
   votes: PublicBookmark[] = [];
-  history: PublicBookmark[] = [];
+  history: PublicHistoryEntry[] = [];
   
   // Paginación Bookmarks
   currentPage = 1;
@@ -36,6 +53,10 @@ export class PerfilPublicComponent implements OnInit {
   
   // Suscripciones
   subscriptions: UserSubscriptions = { categorias: [], etiquetas: [] };
+  categoriasSeguidas: SubscriptionItem[] = [];
+  etiquetasSeguidas: SubscriptionItem[] = [];
+  private categoriaCodigoToNombre = new Map<string, string>();
+  private etiquetaCodigoToNombre = new Map<string, string>();
 
   constructor(
     private tokenStorage: TokenStorageService,
@@ -43,7 +64,9 @@ export class PerfilPublicComponent implements OnInit {
     private votesService: PublicVotesService,
     private historyService: PublicHistoryService,
     private prefsService: ReaderPreferencesService,
-    private subsService: PublicSubscriptionsService
+    private subsService: PublicSubscriptionsService,
+    private categoriaService: CategoriaService,
+    private etiquetaService: EtiquetaService
   ) {}
 
   ngOnInit(): void {
@@ -58,21 +81,35 @@ export class PerfilPublicComponent implements OnInit {
 
     this.subsService.observeSubscriptions().subscribe(subs => {
       this.subscriptions = subs;
+      this.resolveSubscriptionNames(subs);
     });
   }
 
   loadBookmarks(): void {
-    this.bookmarks = this.bookmarksService.getBookmarks();
-    this.checkPagination();
+    this.bookmarksService.getBookmarks().subscribe(bookmarks => {
+      this.bookmarks = bookmarks;
+      this.checkPagination();
+    });
   }
 
   loadVotes(): void {
-    this.votes = this.votesService.getVotes();
-    this.checkVotesPagination();
+    this.votesService.getVotes().subscribe(votes => {
+      this.votes = votes;
+      this.checkVotesPagination();
+    });
   }
 
   loadHistory(): void {
-    this.history = this.historyService.getHistory();
+    const raw = this.historyService.getHistory();
+    this.history = raw
+      .filter((h) => Number.isFinite(Number((h as any)?.idEntrada)) && !!(h as any)?.slug)
+      .map((h: any) => ({
+        idEntrada: Number(h.idEntrada),
+        slug: String(h.slug),
+        titulo: h.titulo ?? null,
+        resumen: h.resumen ?? null,
+        fechaPublicacion: typeof h.fechaPublicacion === 'string' ? h.fechaPublicacion : null,
+      }));
     this.checkHistoryPagination();
   }
 
@@ -94,7 +131,7 @@ export class PerfilPublicComponent implements OnInit {
     return Math.ceil(this.votes.length / this.votesItemsPerPage);
   }
 
-  get paginatedHistory(): PublicBookmark[] {
+  get paginatedHistory(): PublicHistoryEntry[] {
     const start = (this.historyCurrentPage - 1) * this.historyItemsPerPage;
     return this.history.slice(start, start + this.historyItemsPerPage);
   }
@@ -160,31 +197,36 @@ export class PerfilPublicComponent implements OnInit {
     }
   }
 
-  removeBookmark(idEntrada: number, event: Event): void {
+  removeBookmark(slug: string, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.bookmarksService.remove(idEntrada);
-    this.loadBookmarks();
+    this.bookmarksService.remove(slug);
+    // UI Optimista: quitar del array local inmediatamente
+    this.bookmarks = this.bookmarks.filter(b => b.slug !== slug);
+    this.checkPagination();
   }
 
   clearAllBookmarks(): void {
     if (confirm('¿Estás seguro de que deseas eliminar todas las entradas guardadas?')) {
       this.bookmarksService.clearAll();
-      this.loadBookmarks();
+      this.bookmarks = [];
+      this.checkPagination();
     }
   }
 
-  removeVote(idEntrada: number, event: Event): void {
+  removeVote(slug: string, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.votesService.removeVote(idEntrada);
-    this.loadVotes();
+    this.votesService.removeVote(slug);
+    this.votes = this.votes.filter(v => v.slug !== slug);
+    this.checkVotesPagination();
   }
 
   clearAllVotes(): void {
     if (confirm('¿Estás seguro de que deseas eliminar todos tus "Me gusta"?')) {
       this.votesService.clearAll();
-      this.loadVotes();
+      this.votes = [];
+      this.checkVotesPagination();
     }
   }
 
@@ -216,5 +258,52 @@ export class PerfilPublicComponent implements OnInit {
 
   unsubEtiqueta(tag: string): void {
     this.subsService.toggleEtiqueta(tag);
+  }
+
+  private resolveSubscriptionNames(subs: UserSubscriptions): void {
+    const categorias = Array.isArray(subs?.categorias) ? subs.categorias : [];
+    const etiquetas = Array.isArray(subs?.etiquetas) ? subs.etiquetas : [];
+
+    if (categorias.length === 0) this.categoriasSeguidas = [];
+    if (etiquetas.length === 0) this.etiquetasSeguidas = [];
+
+    const catRequests = categorias.map((codigo) => {
+      const cached = this.categoriaCodigoToNombre.get(codigo);
+      if (cached) return of({ codigo, nombre: cached });
+      return this.categoriaService.obtenerPorCodigo(codigo).pipe(
+        map((r: any) => r?.data ?? r),
+        map((c: any) => {
+          const nombre = String(c?.nombre ?? codigo).trim() || codigo;
+          this.categoriaCodigoToNombre.set(codigo, nombre);
+          return { codigo, nombre };
+        }),
+        catchError(() => of({ codigo, nombre: codigo }))
+      );
+    });
+
+    const tagRequests = etiquetas.map((codigo) => {
+      const cached = this.etiquetaCodigoToNombre.get(codigo);
+      if (cached) return of({ codigo, nombre: cached });
+      return this.etiquetaService.obtenerPorCodigo(codigo).pipe(
+        map((r: any) => r?.data ?? r),
+        map((t: any) => {
+          const nombre = String(t?.nombre ?? codigo).trim() || codigo;
+          this.etiquetaCodigoToNombre.set(codigo, nombre);
+          return { codigo, nombre };
+        }),
+        catchError(() => of({ codigo, nombre: codigo }))
+      );
+    });
+
+    if (catRequests.length > 0) {
+      forkJoin(catRequests).subscribe((items) => {
+        this.categoriasSeguidas = items;
+      });
+    }
+    if (tagRequests.length > 0) {
+      forkJoin(tagRequests).subscribe((items) => {
+        this.etiquetasSeguidas = items;
+      });
+    }
   }
 }

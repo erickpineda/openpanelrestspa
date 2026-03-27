@@ -112,12 +112,12 @@
                 <h6 class="fw-semibold mb-3 d-flex align-items-center gap-2">
                   <svg cIcon name="cilFolderOpen" size="sm"></svg> Categorías
                 </h6>
-                <div class="d-flex flex-wrap gap-2" *ngIf="subscriptions.categorias.length > 0; else noCats">
-                  <div class="btn-group" *ngFor="let cat of subscriptions.categorias">
-                    <a [routerLink]="['/entradas']" [queryParams]="{ q: cat }" class="btn btn-sm btn-outline-primary rounded-start-pill">
-                      {{ cat }}
+                <div class="d-flex flex-wrap gap-2" *ngIf="categoriasSeguidas.length > 0; else noCats">
+                  <div class="btn-group" *ngFor="let cat of categoriasSeguidas">
+                    <a [routerLink]="['/entradas']" [queryParams]="{ categoria: cat.nombre }" class="btn btn-sm btn-outline-primary rounded-start-pill">
+                      {{ cat.nombre }}
                     </a>
-                    <button class="btn btn-sm btn-outline-primary rounded-end-pill px-2" (click)="unsubCategoria(cat)" title="Dejar de seguir">
+                    <button class="btn btn-sm btn-outline-primary rounded-end-pill px-2" (click)="unsubCategoria(cat.codigo)" title="Dejar de seguir">
                       <svg cIcon name="cilMinus" size="sm"></svg>
                     </button>
                   </div>
@@ -131,12 +131,12 @@
                 <h6 class="fw-semibold mb-3 d-flex align-items-center gap-2">
                   <svg cIcon name="cilSpeech" size="sm"></svg> Etiquetas
                 </h6>
-                <div class="d-flex flex-wrap gap-2" *ngIf="subscriptions.etiquetas.length > 0; else noTags">
-                  <div class="btn-group" *ngFor="let tag of subscriptions.etiquetas">
-                    <a [routerLink]="['/entradas']" [queryParams]="{ q: tag }" class="btn btn-sm btn-outline-secondary rounded-start-pill">
-                      #{{ tag }}
+                <div class="d-flex flex-wrap gap-2" *ngIf="etiquetasSeguidas.length > 0; else noTags">
+                  <div class="btn-group" *ngFor="let tag of etiquetasSeguidas">
+                    <a [routerLink]="['/entradas']" [queryParams]="{ etiqueta: tag.nombre }" class="btn btn-sm btn-outline-secondary rounded-start-pill">
+                      #{{ tag.nombre }}
                     </a>
-                    <button class="btn btn-sm btn-outline-secondary rounded-end-pill px-2" (click)="unsubEtiqueta(tag)" title="Dejar de seguir">
+                    <button class="btn btn-sm btn-outline-secondary rounded-end-pill px-2" (click)="unsubEtiqueta(tag.codigo)" title="Dejar de seguir">
                       <svg cIcon name="cilMinus" size="sm"></svg>
                     </button>
                   </div>
@@ -183,7 +183,7 @@
                     <p class="text-muted small mb-0 text-truncate" style="max-width: 500px;">{{ b.resumen || 'Sin resumen disponible' }}</p>
                   </a>
                   <div class="flex-shrink-0 d-flex gap-2 position-relative z-1">
-                    <button class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px;" (click)="removeBookmark(b.idEntrada, $event)" title="Quitar de guardados">
+                    <button class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px;" (click)="removeBookmark(b.slug, $event)" title="Quitar de guardados">
                       <svg cIcon name="cilTrash" class="text-danger"></svg>
                     </button>
                     <a [routerLink]="['/entradas', b.slug]" class="btn bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
@@ -254,7 +254,7 @@
                     <p class="text-muted small mb-0 text-truncate" style="max-width: 500px;">{{ v.resumen || 'Sin resumen disponible' }}</p>
                   </a>
                   <div class="flex-shrink-0 d-flex gap-2 position-relative z-1">
-                    <button class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px;" (click)="removeVote(v.idEntrada, $event)" title="Quitar Me gusta">
+                    <button class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px;" (click)="removeVote(v.slug, $event)" title="Quitar Me gusta">
                       <svg cIcon name="cilTrash" class="text-danger"></svg>
                     </button>
                     <a [routerLink]="['/entradas', v.slug]" class="btn bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">

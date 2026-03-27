@@ -1,119 +1,125 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
-import { OPConstants } from '@shared/constants/op-global.constants';
-
-export type PublicBookmark = {
-  idEntrada: number;
-  slug?: string | null;
-  titulo?: string | null;
-  resumen?: string | null;
-  fechaPublicacion?: unknown;
-};
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '@env/environment';
+import { catchError, map } from 'rxjs/operators';
+import { PublicBookmark } from './public-bookmarks.service';
+import { OpenpanelApiResponse, PaginatedResponse } from '@app/core/models/openpanel-api-response.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PublicVotesService {
-  private readonly ids$ = new BehaviorSubject<Set<number>>(new Set<number>());
-  private loadedKey: string | null = null;
+  private readonly slugs$ = new BehaviorSubject<Set<string>>(new Set<string>());
+  private apiUrl = `${environment.backend.host}${environment.backend.uri}/usuarios`;
+  private jsonHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  constructor(private tokenStorage: TokenStorageService) {}
+  constructor(
+    private tokenStorage: TokenStorageService,
+    private http: HttpClient
+  ) {}
 
-  observeIds() {
-    return this.ids$.asObservable();
+  observeSlugs(): Observable<Set<string>> {
+    return this.slugs$.asObservable();
   }
 
-  hasVoted(idEntrada: number | null | undefined): boolean {
-    if (!idEntrada) return false;
-    this.ensureLoaded();
-    return this.ids$.value.has(idEntrada);
+  hasVoted(slug: string | null | undefined): boolean {
+    if (!slug) return false;
+    return this.slugs$.value.has(slug);
+  }
+
+  setInitialSlugs(slugs: string[]): void {
+    this.slugs$.next(new Set(slugs));
   }
 
   addVote(entrada: PublicBookmark): void {
-    this.ensureLoaded();
-    const id = Number(entrada?.idEntrada);
-    if (!Number.isFinite(id) || id <= 0) return;
+    const slug = entrada?.slug;
+    if (!slug) return;
     
-    const ids = new Set(this.ids$.value);
-    if (ids.has(id)) return; // Ya votado
+    const slugs = new Set(this.slugs$.value);
+    if (slugs.has(slug)) return; // Ya votado
 
-    const list = this.getVotes();
-    ids.add(id);
-    list.unshift(entrada);
+    const username = this.getUsername();
     
-    this.ids$.next(ids);
-    this.saveVotes(list);
+    // UI Optimista
+    slugs.add(slug);
+    this.slugs$.next(slugs);
+    
+    if (username) {
+      this.http.post(`${this.apiUrl}/${username}/votos/${slug}`, {}).pipe(
+        catchError(() => {
+          const revertSlugs = new Set(this.slugs$.value);
+          revertSlugs.delete(slug);
+          this.slugs$.next(revertSlugs);
+          return of(null);
+        })
+      ).subscribe();
+    }
   }
 
-  removeVote(idEntrada: number): void {
-    this.ensureLoaded();
-    const id = Number(idEntrada);
-    if (!Number.isFinite(id) || id <= 0) return;
+  removeVote(slug: string): void {
+    if (!slug) return;
     
-    const ids = new Set(this.ids$.value);
-    const list = this.getVotes();
-    const idx = list.findIndex((b) => Number(b.idEntrada) === id);
+    const slugs = new Set(this.slugs$.value);
+    const username = this.getUsername();
 
-    if (ids.has(id)) {
-      ids.delete(id);
-      if (idx >= 0) list.splice(idx, 1);
-      this.ids$.next(ids);
-      this.saveVotes(list);
+    if (slugs.has(slug)) {
+      slugs.delete(slug);
+      this.slugs$.next(slugs);
+      
+      if (username) {
+        this.http.delete(`${this.apiUrl}/${username}/votos/${slug}`).pipe(
+          catchError(() => {
+            const revertSlugs = new Set(this.slugs$.value);
+            revertSlugs.add(slug);
+            this.slugs$.next(revertSlugs);
+            return of(null);
+          })
+        ).subscribe();
+      }
     }
   }
 
   clearAll(): void {
-    this.ensureLoaded();
-    this.ids$.next(new Set<number>());
-    this.saveVotes([]);
-  }
-
-  getVotes(): PublicBookmark[] {
-    const key = this.getStorageKey();
-    if (!key) return [];
-    const raw = localStorage.getItem(key);
-    if (!raw) return [];
-    try {
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
+    const previousSlugs = new Set(this.slugs$.value);
+    this.slugs$.next(new Set<string>());
+    
+    const username = this.getUsername();
+    if (username) {
+      this.http.delete(`${this.apiUrl}/${username}/votos`).pipe(
+        catchError(() => {
+          this.slugs$.next(previousSlugs);
+          return of(null);
+        })
+      ).subscribe();
     }
   }
 
-  private ensureLoaded(): void {
-    const key = this.getStorageKey();
-    if (!key) {
-      this.loadedKey = null;
-      this.ids$.next(new Set<number>());
-      return;
-    }
-    if (this.loadedKey === key) return;
-    this.loadedKey = key;
-    const ids = new Set<number>();
-    this.getVotes().forEach((b) => {
-      const id = Number((b as any)?.idEntrada);
-      if (Number.isFinite(id) && id > 0) ids.add(id);
-    });
-    this.ids$.next(ids);
+  getVotes(): Observable<PublicBookmark[]> {
+    const username = this.getUsername();
+    if (!username) return of([]);
+    return this.http
+      .get<
+        | OpenpanelApiResponse<PaginatedResponse<PublicBookmark> | PublicBookmark[]>
+        | PaginatedResponse<PublicBookmark>
+        | PublicBookmark[]
+      >(`${this.apiUrl}/${username}/votos`, { headers: this.jsonHeaders })
+      .pipe(
+        map((r: any) => r?.data ?? r),
+        map((data: any) => {
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data?.elements)) return data.elements;
+          if (Array.isArray(data?.items)) return data.items;
+          if (Array.isArray(data?.content)) return data.content;
+          return [];
+        }),
+        catchError(() => of([]))
+      );
   }
 
-  private saveVotes(list: PublicBookmark[]): void {
-    const key = this.getStorageKey();
-    if (!key) return;
-    localStorage.setItem(key, JSON.stringify(list.slice(0, 200)));
-  }
-
-  private getStorageKey(): string | null {
+  private getUsername(): string | null {
     const user = this.tokenStorage.getUser();
-    if (!user) return null;
-    
-    // Buscar cualquier propiedad que pueda ser el ID del usuario
-    const userId = user.idUsuario ?? user.id ?? user.userId ?? user.username ?? null;
-    
-    if (!userId) return null;
-    return `${OPConstants.Storage.PUBLIC_VOTES_PREFIX}${String(userId)}`;
+    return user?.username ?? null;
   }
 }
-

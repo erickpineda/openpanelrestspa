@@ -116,7 +116,7 @@
                   {{ entrada.titulo }}
                 </a>
                 <button
-                  *ngIf="isBookmarked(entrada.idEntrada)"
+                  *ngIf="isBookmarked(entrada.slug)"
                   type="button"
                   class="btn btn-link p-0 text-primary position-relative"
                   style="z-index: 2;"

@@ -1,7 +1,11 @@
 import { Injectable, Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
+import { environment } from '@env/environment';
 import { OPConstants } from '@shared/constants/op-global.constants';
+import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
 
 export interface ReaderPreferences {
   fontSize: 'small' | 'normal' | 'large';
@@ -18,9 +22,14 @@ export class ReaderPreferencesService {
   };
 
   private prefs$ = new BehaviorSubject<ReaderPreferences>(this.defaultPrefs);
+  private apiUrl = `${environment.backend.host}${environment.backend.uri}/usuarios`;
 
-  constructor(@Inject(DOCUMENT) private document: Document) {
-    this.loadPreferences();
+  constructor(
+    @Inject(DOCUMENT) private document: Document,
+    private tokenStorage: TokenStorageService,
+    private http: HttpClient
+  ) {
+    this.loadLocalPreferences();
     this.applyPreferences(this.prefs$.value);
   }
 
@@ -32,14 +41,43 @@ export class ReaderPreferencesService {
     return this.prefs$.value;
   }
 
-  updatePreferences(newPrefs: Partial<ReaderPreferences>) {
-    const updated = { ...this.prefs$.value, ...newPrefs };
-    this.prefs$.next(updated);
-    this.savePreferences(updated);
-    this.applyPreferences(updated);
+  setInitialPreferences(prefs: any | null) {
+    if (prefs) {
+      const normalized = this.normalizeIncomingPreferences(prefs);
+      const updated = { ...this.defaultPrefs, ...normalized };
+      this.prefs$.next(updated);
+      this.saveLocalPreferences(updated);
+      this.applyPreferences(updated);
+    }
   }
 
-  private loadPreferences() {
+  resetToDefaultOrSystem() {
+    this.prefs$.next(this.defaultPrefs);
+    this.saveLocalPreferences(this.defaultPrefs);
+    this.applyPreferences(this.defaultPrefs);
+  }
+
+  updatePreferences(newPrefs: Partial<ReaderPreferences>) {
+    const previous = this.prefs$.value;
+    const updated = { ...previous, ...newPrefs };
+    
+    this.prefs$.next(updated);
+    this.saveLocalPreferences(updated);
+    this.applyPreferences(updated);
+
+    const username = this.getUsername();
+    if (username) {
+      this.http.put(`${this.apiUrl}/${username}/preferencias`, this.mapToBackendPreferences(updated)).pipe(
+        catchError(() => {
+          // Si falla, podríamos revertir, pero al ser preferencias visuales
+          // suele ser mejor dejar la UI optimista y que lo intente luego.
+          return of(null);
+        })
+      ).subscribe();
+    }
+  }
+
+  private loadLocalPreferences() {
     const saved = localStorage.getItem(OPConstants.Storage.PUBLIC_READER_PREFS);
     if (saved) {
       try {
@@ -51,7 +89,7 @@ export class ReaderPreferencesService {
     }
   }
 
-  private savePreferences(prefs: ReaderPreferences) {
+  private saveLocalPreferences(prefs: ReaderPreferences) {
     localStorage.setItem(OPConstants.Storage.PUBLIC_READER_PREFS, JSON.stringify(prefs));
   }
 
@@ -69,5 +107,43 @@ export class ReaderPreferencesService {
     } else {
       this.document.documentElement.setAttribute('data-coreui-theme', prefs.theme);
     }
+  }
+
+  private getUsername(): string | null {
+    const user = this.tokenStorage.getUser();
+    return user?.username ?? null;
+  }
+
+  private normalizeIncomingPreferences(prefs: any): ReaderPreferences {
+    const theme = String(prefs?.theme ?? '').trim().toLowerCase();
+    const fontSize = String(prefs?.fontSize ?? '').trim().toLowerCase();
+
+    const normalizedTheme: ReaderPreferences['theme'] =
+      theme === 'light' || theme === 'dark' || theme === 'auto' ? theme : this.defaultPrefs.theme;
+
+    const normalizedFontSize: ReaderPreferences['fontSize'] =
+      fontSize === 'small' || fontSize === 'large'
+        ? fontSize
+        : fontSize === 'medium'
+          ? 'normal'
+          : fontSize === 'normal'
+            ? 'normal'
+            : this.defaultPrefs.fontSize;
+
+    return { theme: normalizedTheme, fontSize: normalizedFontSize };
+  }
+
+  private mapToBackendPreferences(prefs: ReaderPreferences): { theme: 'light' | 'dark'; fontSize: 'small' | 'medium' | 'large' } {
+    const effectiveTheme: 'light' | 'dark' =
+      prefs.theme === 'auto'
+        ? window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        : prefs.theme;
+
+    const backendFontSize: 'small' | 'medium' | 'large' =
+      prefs.fontSize === 'normal' ? 'medium' : prefs.fontSize;
+
+    return { theme: effectiveTheme, fontSize: backendFontSize };
   }
 }

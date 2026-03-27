@@ -29,9 +29,9 @@
                   {{ cat.nombre }}
                 </span>
                 <button class="btn btn-sm btn-outline-primary rounded-end-pill px-2 d-flex align-items-center" 
-                        (click)="toggleCategoria(cat.nombre)"
-                        [title]="isCategoriaSeguida(cat.nombre) ? 'Dejar de seguir' : 'Seguir categoría'">
-                  <svg cIcon [name]="isCategoriaSeguida(cat.nombre) ? 'cilCheck' : 'cilPlus'" size="sm"></svg>
+                        (click)="toggleCategoria(cat.codigo ?? cat.nombre, cat.nombre)"
+                        [title]="isCategoriaSeguida(cat.codigo ?? cat.nombre) ? 'Dejar de seguir' : 'Seguir categoría'">
+                  <svg cIcon [name]="isCategoriaSeguida(cat.codigo ?? cat.nombre) ? 'cilCheck' : 'cilPlus'" size="sm"></svg>
                 </button>
               </div>
             </div>
@@ -107,9 +107,9 @@
                   #{{ tag.nombre }}
                 </span>
                 <button class="btn btn-sm btn-outline-secondary rounded-end-pill px-2 d-flex align-items-center" 
-                        (click)="toggleEtiqueta(tag.nombre)"
-                        [title]="isEtiquetaSeguida(tag.nombre) ? 'Dejar de seguir' : 'Seguir etiqueta'">
-                  <svg cIcon [name]="isEtiquetaSeguida(tag.nombre) ? 'cilCheck' : 'cilPlus'" size="sm"></svg>
+                        (click)="toggleEtiqueta(tag.codigo ?? tag.nombre, tag.nombre)"
+                        [title]="isEtiquetaSeguida(tag.codigo ?? tag.nombre) ? 'Dejar de seguir' : 'Seguir etiqueta'">
+                  <svg cIcon [name]="isEtiquetaSeguida(tag.codigo ?? tag.nombre) ? 'cilCheck' : 'cilPlus'" size="sm"></svg>
                 </button>
               </div>
             </div>

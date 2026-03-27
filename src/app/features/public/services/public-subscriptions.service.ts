@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { OPConstants } from '@shared/constants/op-global.constants';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
+import { environment } from '@env/environment';
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
 
 export interface UserSubscriptions {
@@ -14,96 +16,107 @@ export interface UserSubscriptions {
 export class PublicSubscriptionsService {
   private readonly defaultSubs: UserSubscriptions = { categorias: [], etiquetas: [] };
   private subs$ = new BehaviorSubject<UserSubscriptions>(this.defaultSubs);
-  private loadedKey: string | null = null;
+  private apiUrl = `${environment.backend.host}${environment.backend.uri}/usuarios`;
 
-  constructor(private tokenStorage: TokenStorageService) {}
+  constructor(
+    private tokenStorage: TokenStorageService,
+    private http: HttpClient
+  ) {}
 
-  observeSubscriptions() {
-    this.ensureLoaded();
+  observeSubscriptions(): Observable<UserSubscriptions> {
     return this.subs$.asObservable();
   }
 
   getCurrentSubscriptions(): UserSubscriptions {
-    this.ensureLoaded();
     return this.subs$.value;
   }
 
-  toggleCategoria(categoria: string): boolean {
-    this.ensureLoaded();
+  setInitialSubscriptions(subs: UserSubscriptions): void {
+    this.subs$.next(subs || this.defaultSubs);
+  }
+
+  toggleCategoria(categoriaCodigo: string): boolean {
     const subs = { ...this.subs$.value };
     subs.categorias = [...subs.categorias];
     
-    const idx = subs.categorias.indexOf(categoria);
+    const idx = subs.categorias.indexOf(categoriaCodigo);
     const isSubscribed = idx >= 0;
     
     if (isSubscribed) {
       subs.categorias.splice(idx, 1);
     } else {
-      subs.categorias.push(categoria);
+      subs.categorias.push(categoriaCodigo);
     }
     
     this.subs$.next(subs);
-    this.saveSubscriptions(subs);
+    
+    const username = this.getUsername();
+    if (username) {
+      const url = `${this.apiUrl}/${username}/suscripciones/categorias/${encodeURIComponent(categoriaCodigo)}`;
+      const request = isSubscribed ? this.http.delete(url) : this.http.post(url, {});
+      
+      request.pipe(
+        catchError(() => {
+          // Revert on error
+          const revertSubs = { ...this.subs$.value };
+          revertSubs.categorias = [...revertSubs.categorias];
+          const revIdx = revertSubs.categorias.indexOf(categoriaCodigo);
+          if (isSubscribed && revIdx < 0) {
+             revertSubs.categorias.push(categoriaCodigo);
+          } else if (!isSubscribed && revIdx >= 0) {
+             revertSubs.categorias.splice(revIdx, 1);
+          }
+          this.subs$.next(revertSubs);
+          return of(null);
+        })
+      ).subscribe();
+    }
+    
     return !isSubscribed;
   }
 
-  toggleEtiqueta(etiqueta: string): boolean {
-    this.ensureLoaded();
+  toggleEtiqueta(etiquetaCodigo: string): boolean {
     const subs = { ...this.subs$.value };
     subs.etiquetas = [...subs.etiquetas];
     
-    const idx = subs.etiquetas.indexOf(etiqueta);
+    const idx = subs.etiquetas.indexOf(etiquetaCodigo);
     const isSubscribed = idx >= 0;
     
     if (isSubscribed) {
       subs.etiquetas.splice(idx, 1);
     } else {
-      subs.etiquetas.push(etiqueta);
+      subs.etiquetas.push(etiquetaCodigo);
     }
     
     this.subs$.next(subs);
-    this.saveSubscriptions(subs);
+    
+    const username = this.getUsername();
+    if (username) {
+      const url = `${this.apiUrl}/${username}/suscripciones/etiquetas/${encodeURIComponent(etiquetaCodigo)}`;
+      const request = isSubscribed ? this.http.delete(url) : this.http.post(url, {});
+      
+      request.pipe(
+        catchError(() => {
+          // Revert on error
+          const revertSubs = { ...this.subs$.value };
+          revertSubs.etiquetas = [...revertSubs.etiquetas];
+          const revIdx = revertSubs.etiquetas.indexOf(etiquetaCodigo);
+          if (isSubscribed && revIdx < 0) {
+             revertSubs.etiquetas.push(etiquetaCodigo);
+          } else if (!isSubscribed && revIdx >= 0) {
+             revertSubs.etiquetas.splice(revIdx, 1);
+          }
+          this.subs$.next(revertSubs);
+          return of(null);
+        })
+      ).subscribe();
+    }
+    
     return !isSubscribed;
   }
 
-  private ensureLoaded(): void {
-    const key = this.getStorageKey();
-    if (!key) {
-      this.loadedKey = null;
-      this.subs$.next(this.defaultSubs);
-      return;
-    }
-    if (this.loadedKey === key) return;
-    
-    this.loadedKey = key;
-    const raw = localStorage.getItem(key);
-    if (!raw) {
-      this.subs$.next(this.defaultSubs);
-      return;
-    }
-    
-    try {
-      const parsed = JSON.parse(raw);
-      this.subs$.next({
-        categorias: Array.isArray(parsed.categorias) ? parsed.categorias : [],
-        etiquetas: Array.isArray(parsed.etiquetas) ? parsed.etiquetas : []
-      });
-    } catch {
-      this.subs$.next(this.defaultSubs);
-    }
-  }
-
-  private saveSubscriptions(subs: UserSubscriptions): void {
-    const key = this.getStorageKey();
-    if (!key) return;
-    localStorage.setItem(key, JSON.stringify(subs));
-  }
-
-  private getStorageKey(): string | null {
+  private getUsername(): string | null {
     const user = this.tokenStorage.getUser();
-    if (!user) return null;
-    const userId = user.idUsuario ?? user.id ?? user.userId ?? user.username ?? null;
-    if (!userId) return null;
-    return `${OPConstants.Storage.PUBLIC_SUBSCRIPTIONS_PREFIX}${String(userId)}`;
+    return user?.username ?? null;
   }
 }

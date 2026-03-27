@@ -4,6 +4,8 @@ import { parseAllowedDate } from '@shared/utils/date-utils';
 import { CategoriaService } from '@app/core/services/data/categoria.service';
 import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
 import { PublicBookmarksService } from '../../services/public-bookmarks.service';
+import { ActivatedRoute } from '@angular/router';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-listado-entradas-public',
@@ -25,26 +27,40 @@ export class ListadoEntradasPublicComponent implements OnInit {
   categoriasSeleccionadas: string[] = [];
   categoriasPopulares: string[] = [];
   filtersVisible = false;
-  bookmarkedIds = new Set<number>();
+  bookmarkedSlugs = new Set<string>();
 
   constructor(
     private facade: PublicEntradasFacadeService,
     private categoriaService: CategoriaService,
     private analytics: AnalyticsService,
-    private bookmarksService: PublicBookmarksService
+    private bookmarksService: PublicBookmarksService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.cargarCategoriasPopulares();
-    this.cargarPagina();
+    this.route.queryParamMap
+      .pipe(
+        map((pm) => ({
+          q: (pm.get('q') ?? '').trim(),
+          categoria: (pm.get('categoria') ?? '').trim(),
+        })),
+        distinctUntilChanged((a, b) => a.q === b.q && a.categoria === b.categoria)
+      )
+      .subscribe(({ q, categoria }) => {
+        if (q) this.searchText = q;
+        if (categoria) this.categoriasSeleccionadas = [categoria];
+        if (q || categoria) this.currentPage = 1;
+        this.cargarPagina();
+      });
     
-    this.bookmarksService.observeIds().subscribe(ids => {
-      this.bookmarkedIds = ids;
+    this.bookmarksService.observeSlugs().subscribe(slugs => {
+      this.bookmarkedSlugs = slugs;
     });
   }
 
-  isBookmarked(idEntrada: number): boolean {
-    return this.bookmarkedIds.has(Number(idEntrada));
+  isBookmarked(slug: string): boolean {
+    return this.bookmarkedSlugs.has(slug);
   }
 
   cargarCategoriasPopulares() {
