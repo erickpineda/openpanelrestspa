@@ -32,7 +32,7 @@
           <div class="bg-light p-3 rounded-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h6 class="mb-0 fw-bold">{{ c.username || 'Usuario' }}</h6>
-              <small class="text-muted">{{ c.fechaCreacion | allowedDate:'short' }}</small>
+              <small class="text-muted">{{ c.fechaCreacion | allowedDate:'dd/MM/yyyy, HH:mm' }}</small>
             </div>
             <p class="mb-0">{{ c.contenido }}</p>
           </div>

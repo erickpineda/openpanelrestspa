@@ -6,6 +6,9 @@ import { PublicCommentsUxService } from '../services/public-comments-ux.service'
 import { OPConstants } from '@shared/constants/op-global.constants';
 import { RouterModule } from '@angular/router';
 import { SharedOPModule } from '@shared/shared.module';
+import { UsuarioService } from '@app/core/services/data/usuario.service';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_GLOBAL_LOADER } from '@app/core/interceptor/network.interceptor';
 
 @Component({
   selector: 'app-comentarios-public',
@@ -38,6 +41,8 @@ export class ComentariosPublicComponent implements OnInit {
   showMyPendingNotice = false;
   private currentUserId: string | null = null;
   private currentUsername: string | null = null;
+  private usernameByUserId = new Map<string, string>();
+  private requestedUserIds = new Set<string>();
 
   devModalVisible = false;
   devModalBodyKey = 'PUBLIC.DEV_MODAL.BODY_GENERIC';
@@ -45,6 +50,7 @@ export class ComentariosPublicComponent implements OnInit {
   constructor(
     private comentarioService: ComentarioService,
     private tokenStorage: TokenStorageService,
+    private usuarioService: UsuarioService,
     public ux: PublicCommentsUxService
   ) {}
 
@@ -119,7 +125,11 @@ export class ComentariosPublicComponent implements OnInit {
       raw?.username,
       raw?.usernameCreador,
       raw?.usuario?.username,
+      raw?.usuario?.nombreUsuario,
+      raw?.usuario?.name,
       raw?.user?.username,
+      raw?.user?.nombreUsuario,
+      raw?.user?.name,
       raw?.autor?.username,
       raw?.nombreUsuario,
     ];
@@ -133,6 +143,58 @@ export class ComentariosPublicComponent implements OnInit {
       return v.length > 0 ? v : null;
     }
     return null;
+  }
+
+  private getComentarioUserId(raw: any): string | null {
+    const idUsuario = raw?.idUsuario ?? raw?.usuario?.idUsuario ?? raw?.user?.idUsuario ?? null;
+    return idUsuario != null ? String(idUsuario) : null;
+  }
+
+  private patchComentariosUsername(userId: string, username: string): void {
+    const normalizedUsername = String(username).trim();
+    if (!normalizedUsername) return;
+    this.comentarios = this.comentarios.map((c: any) => {
+      const cUserId = this.getComentarioUserId(c);
+      const current = c?.username != null ? String(c.username).trim() : '';
+      if (cUserId === userId && current.length === 0) return { ...c, username: normalizedUsername };
+      return c;
+    });
+  }
+
+  private hidratarUsernamesDesdeApi(comments: any[]): void {
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    for (const c of comments) {
+      const userId = this.getComentarioUserId(c);
+      if (!userId) continue;
+
+      const current = c?.username != null ? String(c.username).trim() : '';
+      if (current.length > 0) {
+        this.usernameByUserId.set(userId, current);
+        continue;
+      }
+
+      const cached = this.usernameByUserId.get(userId);
+      if (cached) {
+        this.patchComentariosUsername(userId, cached);
+        continue;
+      }
+
+      if (this.requestedUserIds.has(userId)) continue;
+      const idNum = Number(userId);
+      if (!Number.isFinite(idNum)) continue;
+
+      this.requestedUserIds.add(userId);
+      this.usuarioService.obtenerPorIdSafe(idNum, context).subscribe({
+        next: (u: any) => {
+          const username = u?.username ?? u?.nombreUsuario ?? u?.name ?? null;
+          const v = username != null ? String(username).trim() : '';
+          if (!v) return;
+          this.usernameByUserId.set(userId, v);
+          this.patchComentariosUsername(userId, v);
+        },
+        error: () => {},
+      });
+    }
   }
 
   private getPendingNoticeStorageKey(): string | null {
@@ -168,6 +230,7 @@ export class ComentariosPublicComponent implements OnInit {
           return username ? { ...c, username } : c;
         });
         this.comentarios = [...this.comentarios, ...normalized];
+        this.hidratarUsernamesDesdeApi(normalized);
 
         const totalElements = Number(res?.totalElements);
         if (Number.isFinite(totalElements) && totalElements >= 0) {
