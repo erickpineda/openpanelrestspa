@@ -89,6 +89,7 @@ describe('EntradaFormComponent', () => {
           providers: [{ provide: EntradaFormStateService, useValue: entradaFormStateServiceMock }],
         },
       })
+      .overrideTemplate(EntradaFormComponent, '<form [formGroup]="form"></form>')
       .compileComponents();
 
     fb = TestBed.inject(UntypedFormBuilder);

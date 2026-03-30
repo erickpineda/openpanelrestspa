@@ -8,6 +8,12 @@ import { RouteTrackerService } from './core/services/auth/route-tracker.service'
 import { OPConstants } from './shared/constants/op-global.constants';
 import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
 import { UiAnomalyMonitorService } from './core/services/ui/ui-anomaly-monitor.service';
+import { IconSetService } from '@coreui/icons-angular';
+import { iconSubset } from '@shared/components/icons/coreui-icons';
+import { GtmService } from './core/services/analytics/gtm.service';
+import { AnalyticsRouterService } from './core/services/analytics/analytics-router.service';
+import { ReaderPreferencesService } from './features/public/services/reader-preferences.service';
+import { UserInteractionsSyncService } from './core/services/sync/user-interactions-sync.service';
 
 @Component({
   selector: 'app-root',
@@ -26,10 +32,23 @@ export class AppComponent implements OnInit {
     private routeTracker: RouteTrackerService, // sólo para activar el tracking
     private tokenStorage: TokenStorageService,
     private globalErrorHandler: GlobalErrorHandlerService,
-    private uiMonitor: UiAnomalyMonitorService
-  ) {}
+    private uiMonitor: UiAnomalyMonitorService,
+    private iconSetService: IconSetService,
+    private gtm: GtmService,
+    private analyticsRouter: AnalyticsRouterService,
+    private readerPrefs: ReaderPreferencesService,
+    private userInteractionsSync: UserInteractionsSyncService
+  ) {
+    this.iconSetService.icons = { ...iconSubset };
+  }
 
   ngOnInit(): void {
+    this.gtm.init();
+    this.analyticsRouter.start();
+
+    // Inicializar sincronización de interacciones del usuario (bookmarks, likes, prefs)
+    this.userInteractionsSync.init();
+
     // Inicializar sincronización entre pestañas
     this.authSync.initializeAuthState();
 

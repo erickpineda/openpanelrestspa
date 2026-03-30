@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">20% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>2/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">11.11% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -154,27 +154,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// core/errors/error-boundary/error-boundary.service.ts
@@ -210,28 +210,28 @@ import { ErrorBoundaryComponent } from '../../../shared/components/errors/error-
 @Injectable({
   providedIn: 'root',
 })
-export <span class="fstat-no" title="function not covered" >class E</span>rrorBoundaryService {
-  private <span class="cstat-no" title="statement not covered" >boundaries = new Map&lt;string, ErrorBoundaryComponent&gt;();</span>
+export class ErrorBoundaryService {
+  private boundaries = new Map&lt;string, ErrorBoundaryComponent&gt;();
 &nbsp;
-<span class="fstat-no" title="function not covered" >  registerBoundary(</span>id: string, boundary: ErrorBoundaryComponent): void {
-<span class="cstat-no" title="statement not covered" >    this.boundaries.set(id, boundary);</span>
+  registerBoundary(id: string, boundary: ErrorBoundaryComponent): void {
+    this.boundaries.set(id, boundary);
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  unregisterBoundary(</span>id: string): void {
-<span class="cstat-no" title="statement not covered" >    this.boundaries.delete(id);</span>
+  unregisterBoundary(id: string): void {
+    this.boundaries.delete(id);
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  reportErrorToBoundary(</span>boundaryId: string, error: any, componentName: string = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span>: void {
-    const boundary = <span class="cstat-no" title="statement not covered" >this.boundaries.get(boundaryId);</span>
-<span class="cstat-no" title="statement not covered" >    if (boundary) {</span>
-<span class="cstat-no" title="statement not covered" >      boundary.captureError(error, componentName);</span>
+  reportErrorToBoundary(boundaryId: string, error: any, componentName: string = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span>: void {
+    const boundary = this.boundaries.get(boundaryId);
+    if (boundary) {
+      boundary.captureError(error, componentName);
     } else {
-<span class="cstat-no" title="statement not covered" >      console.warn(`Error Boundary no encontrado: ${boundaryId}`);</span>
+      console.warn(`Error Boundary no encontrado: ${boundaryId}`);
     }
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  getBoundary(</span>boundaryId: string): ErrorBoundaryComponent | undefined {
-<span class="cstat-no" title="statement not covered" >    return this.boundaries.get(boundaryId);</span>
+  getBoundary(boundaryId: string): ErrorBoundaryComponent | undefined {
+    return this.boundaries.get(boundaryId);
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -241,7 +241,7 @@ export <span class="fstat-no" title="function not covered" >class E</span>rrorBo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T17:02:13.631Z
+                at 2026-03-27T13:14:44.564Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

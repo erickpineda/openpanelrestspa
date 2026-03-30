@@ -21,6 +21,8 @@ describe('NavigationService', () => {
   let mockBadgeCounterService: jasmine.SpyObj<BadgeCounterService>;
 
   beforeEach(() => {
+    (globalThis as any).__ENABLE_BADGE_COUNTERS_IN_TEST__ = true;
+
     const routerSpy = jasmine.createSpyObj('Router', ['navigate'], {
       events: of({}),
       url: '/admin/dashboard',
@@ -89,6 +91,10 @@ describe('NavigationService', () => {
     mockBadgeCounterService = TestBed.inject(
       BadgeCounterService
     ) as jasmine.SpyObj<BadgeCounterService>;
+  });
+
+  afterEach(() => {
+    delete (globalThis as any).__ENABLE_BADGE_COUNTERS_IN_TEST__;
   });
 
   it('should be created', () => {

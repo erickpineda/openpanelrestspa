@@ -1,14 +1,17 @@
-<c-footer>
-  <div>
-    <a href="https://coreui.io/pro/angular/" target="_blank">{{
-      'PUBLIC.FOOTER.COREUI' | translate
-    }}</a>
-    <span>&copy; {{ 'PUBLIC.FOOTER.COPYRIGHT' | translate }}</span>
-  </div>
-  <div class="ms-auto">
-    <span>{{ 'PUBLIC.FOOTER.POWERED_BY' | translate }}</span>
-    <a href="https://coreui.io/pro/angular" target="_blank">
-      <span>{{ 'PUBLIC.FOOTER.COREUI_ANGULAR' | translate }}</span>
-    </a>
+<c-footer class="border-top py-4">
+  <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100">
+    <div class="d-flex align-items-center gap-2">
+      <span class="fw-bold">OpenPanel</span>
+      <span class="text-muted">&copy; {{ 'PUBLIC.FOOTER.COPYRIGHT' | translate }}</span>
+    </div>
+
+    <div class="d-flex flex-wrap gap-3 ms-md-auto align-items-center justify-content-center">
+      <a routerLink="/about" class="text-decoration-none text-muted fw-medium">{{ 'PUBLIC.FOOTER.ABOUT' | translate }}</a>
+      <a routerLink="/contact" class="text-decoration-none text-muted fw-medium">{{ 'PUBLIC.FOOTER.CONTACT' | translate }}</a>
+      <a href="/sitemap.xml" class="text-decoration-none text-muted fw-medium">{{ 'PUBLIC.FOOTER.SITEMAP' | translate }}</a>
+      <a href="https://coreui.io/pro/angular" target="_blank" class="text-decoration-none text-muted fw-medium">
+        {{ 'PUBLIC.FOOTER.COREUI_ANGULAR' | translate }}
+      </a>
+    </div>
   </div>
 </c-footer>

@@ -14,6 +14,7 @@ import { LanguageService, Language } from '@app/core/services/language.service';
   standalone: false,
 })
 export class NavBarPublicComponent implements OnInit {
+  user: any;
   private roles: string[] = [];
   isLoggedIn = false;
   showAdminBoard = false;
@@ -22,6 +23,7 @@ export class NavBarPublicComponent implements OnInit {
   isShrink: boolean = false;
   isLoadingLogout = false;
   currentLang: Language = 'es';
+  visible = false;
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -60,16 +62,21 @@ export class NavBarPublicComponent implements OnInit {
     this.languageService.toggleLanguage();
   }
 
+  setLanguage(lang: Language): void {
+    this.languageService.setLanguage(lang);
+  }
+
   private checkAuthStatus(): void {
     this.isLoggedIn = this.tokenStorageService.isLoggedIn();
     this.log.info('🔐 NavBar - Estado de autenticación:', this.isLoggedIn);
     if (this.isLoggedIn) {
-      const user = this.tokenStorageService.getUser();
-      this.roles = user.roles;
+      this.user = this.tokenStorageService.getUser();
+      this.roles = this.user.roles || [];
       this.showAdminBoard = this.roles.includes('ROLE_ADMIN');
       this.showModeratorBoard = this.roles.includes('ROLE_MODERATOR');
-      this.username = user.username;
+      this.username = this.user.username;
     } else {
+      this.user = null;
       this.roles = [];
       this.showAdminBoard = false;
       this.showModeratorBoard = false;

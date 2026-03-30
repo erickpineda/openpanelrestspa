@@ -2,8 +2,10 @@ import { SessionManagerService } from './session-manager.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
 import { RouteTrackerService } from './route-tracker.service';
 
-fdescribe('SessionManagerService', () => {
+describe('SessionManagerService', () => {
   it('handleLogoutFromSync fuerza logout inmediato si no hay cambios sin guardar', (done) => {
+    const prevHash = window.location.hash;
+    window.location.hash = '#/admin/x';
     const tokenStorage = jasmine.createSpyObj('TokenStorageService', ['signOut']);
     const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', ['hasUnsavedWork']);
     unsavedWorkService.hasUnsavedWork.and.returnValue(false);
@@ -36,10 +38,10 @@ fdescribe('SessionManagerService', () => {
     service.sessionExpired$.subscribe((payload) => {
       expect(payload.type).toBe('LOGOUT');
       expect(payload.origin).toBe('remote');
-      expect(tokenStorage.signOut).not.toHaveBeenCalled(); // Changed to match code behavior (remote logout shows modal)
+      expect(tokenStorage.signOut).not.toHaveBeenCalled();
       expect(router.navigate).not.toHaveBeenCalled();
-      // postLoginRedirect.saveLastValidRoute might still be called
       expect(postLoginRedirect.saveLastValidRoute).toHaveBeenCalledWith('/admin/x');
+      window.location.hash = prevHash;
       done();
     });
 
@@ -47,6 +49,8 @@ fdescribe('SessionManagerService', () => {
   });
 
   it('emite evento si hay trabajo sin guardar y allowSave=true', (done) => {
+    const prevHash = window.location.hash;
+    window.location.hash = '#/admin/y';
     const tokenStorage = jasmine.createSpyObj('TokenStorageService', ['signOut']);
     const unsavedWorkService = jasmine.createSpyObj('UnsavedWorkService', ['hasUnsavedWork']);
     unsavedWorkService.hasUnsavedWork.and.returnValue(true);
@@ -79,6 +83,7 @@ fdescribe('SessionManagerService', () => {
       expect(payload.type).toBe('LOGOUT');
       expect(tokenStorage.signOut).not.toHaveBeenCalled();
       expect(router.navigate).not.toHaveBeenCalled();
+      window.location.hash = prevHash;
       done();
     });
 

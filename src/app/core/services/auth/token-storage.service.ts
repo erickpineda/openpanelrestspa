@@ -189,6 +189,19 @@ export class TokenStorageService {
       localStorage.removeItem(OPConstants.Session.AUTH_SYNC_KEY);
       localStorage.removeItem(OPConstants.Session.SESSION_ACTIVE_KEY);
       localStorage.removeItem(OPConstants.Session.SESSION_TIMESTAMP_KEY);
+
+      // Limpiar historial público y preferencias de lectura
+      const historyPrefix = 'public-history:';
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(historyPrefix)) {
+          localStorage.removeItem(key);
+        }
+      }
+      localStorage.removeItem('public-reader-prefs');
+
+      // Limpiar estado de UI (sidebar)
+      localStorage.removeItem('sidebar_expanded_items');
     } catch (e) {
       this.log.error('TokenStorageService.signOut error', e);
     }

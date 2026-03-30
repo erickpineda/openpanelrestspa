@@ -54,6 +54,13 @@ export class TranslationService {
     );
   }
 
+  refresh(): void {
+    const lang = this.languageService.getCurrentLanguage();
+    this.loadLanguage(lang).subscribe((translations) => {
+      this.translationsSubject.next(translations);
+    });
+  }
+
   translate(key: string, params?: any): string {
     const translation =
       this.getValue(this.translationsSubject.value, key) ||

@@ -1,0 +1,51 @@
+ :host-context([data-coreui-theme="dark"]) {
+   ::ng-deep c-navbar {
+     background-color: var(--cui-body-bg) !important;
+     border-bottom-color: var(--cui-border-color) !important;
+   }
+ 
+   ::ng-deep .bg-white {
+     background-color: var(--cui-body-bg) !important;
+   }
+ 
+   ::ng-deep a[cNavLink] {
+     color: var(--cui-body-color) !important;
+   }
+
+  ::ng-deep a[cNavLink]:hover,
+  ::ng-deep a[cNavLink]:focus-visible {
+    color: var(--cui-body-color) !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    outline: 2px solid rgba(255, 255, 255, 0.12);
+    outline-offset: 2px;
+  }
+
+  ::ng-deep .nav-link.active,
+  ::ng-deep a[cNavLink].active {
+    color: var(--cui-body-color) !important;
+    background-color: rgba(255, 255, 255, 0.12) !important;
+  }
+ 
+   ::ng-deep .navbar-toggler-icon {
+     filter: invert(1);
+   }
+
+  ::ng-deep .dropdown-menu {
+    background-color: var(--cui-body-bg) !important;
+    border-color: var(--cui-border-color) !important;
+  }
+
+  ::ng-deep .dropdown-item {
+    color: var(--cui-body-color) !important;
+  }
+
+  ::ng-deep .dropdown-item:hover,
+  ::ng-deep .dropdown-item:focus-visible {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  ::ng-deep .dropdown-header.bg-light {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: var(--cui-body-color) !important;
+  }
+ }

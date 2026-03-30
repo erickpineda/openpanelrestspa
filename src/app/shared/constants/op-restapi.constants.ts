@@ -54,6 +54,7 @@ export const OPRestMethods: any = {
     ACTUALIZAR: (id: number) => `/comentarios/${id}`,
     ELIMINAR: (id: number) => `/comentarios/${id}`,
     LISTAR_POR_ID_ENTRADA: (idEntrada: number) => `/comentarios/listarPorIdEntrada/${idEntrada}`,
+    RECUENTOS_POR_ID_ENTRADA: (idEntrada: number) => `/comentarios/recuentosPorIdEntrada/${idEntrada}`,
     BUSCAR: '/comentarios/buscar',
   },
   CATEGORIAS: {

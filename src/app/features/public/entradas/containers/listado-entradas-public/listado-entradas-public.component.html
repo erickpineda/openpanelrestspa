@@ -1,0 +1,222 @@
+<div class="listado-entradas container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
+    <h2 class="display-6 fw-bold mb-0">Explorar Entradas</h2>
+    <div class="d-flex align-items-center gap-3">
+      <div class="text-muted">{{ (entradas$ | async)?.length || 0 }} publicaciones</div>
+      <button
+        class="btn btn-outline-primary rounded-pill px-3 d-flex align-items-center gap-2 d-lg-none"
+        type="button"
+        (click)="filtersVisible = true"
+        aria-label="Abrir filtros"
+      >
+        <svg cIcon name="cilFilter"></svg>
+        <span>Filtros</span>
+      </button>
+    </div>
+  </div>
+
+  <ng-template #filtersTpl>
+    <h5 class="card-title fw-bold mb-3 d-flex align-items-center gap-2">
+      <svg cIcon name="cilSearch"></svg> Buscar
+    </h5>
+    <div class="mb-4">
+      <op-search-basic
+        [placeholder]="'Palabras clave...'"
+        (onSearch)="onSearch($event)"
+        (onClear)="onSearch('')"
+      ></op-search-basic>
+    </div>
+
+    <h5 class="card-title fw-bold mt-4 mb-3 d-flex align-items-center gap-2">
+      <svg cIcon name="cilSortAlphaDown"></svg> Ordenar
+    </h5>
+    <select class="form-select bg-light border-0 mb-4" [ngModel]="getSortValue()" (ngModelChange)="setSort($event); aplicarFiltros()">
+      <option value="fechaPublicacion_DESC">Más recientes</option>
+      <option value="fechaPublicacion_ASC">Más antiguas</option>
+      <option value="votos_DESC">Más votadas</option>
+      <option value="cantidadComentarios_DESC">Más comentadas</option>
+    </select>
+
+    <h5 class="card-title fw-bold mt-4 mb-3 d-flex align-items-center gap-2">
+      <svg cIcon name="cilFilter"></svg> Filtros
+    </h5>
+    <div class="form-check form-switch mb-4">
+      <input class="form-check-input" type="checkbox" role="switch" id="filterAllowComments" [(ngModel)]="filterAllowComments" (change)="aplicarFiltros()">
+      <label class="form-check-label" for="filterAllowComments">Solo con comentarios habilitados</label>
+    </div>
+
+    <h5 class="card-title fw-bold mt-4 mb-3 d-flex align-items-center gap-2">
+      <svg cIcon name="cilTags"></svg> Categorías Populares
+    </h5>
+    <div class="d-flex flex-wrap gap-2">
+      @for (cat of categoriasPopulares; track cat) {
+        <span
+          class="badge border px-3 py-2 rounded-pill categoria-badge"
+          [ngClass]="categoriasSeleccionadas.includes(cat) ? 'bg-primary text-white border-primary' : 'bg-light text-dark'"
+          (click)="toggleCategoria(cat)">
+          {{ cat }}
+        </span>
+      }
+    </div>
+
+    <h5 class="card-title fw-bold mt-4 mb-3 d-flex align-items-center gap-2">
+      <svg cIcon name="cilTag"></svg> Etiquetas Populares
+    </h5>
+    <div class="d-flex flex-wrap gap-2">
+      @for (tag of etiquetasPopulares; track tag) {
+        <span
+          class="badge border px-3 py-2 rounded-pill categoria-badge"
+          [ngClass]="etiquetasSeleccionadas.includes(tag) ? 'bg-secondary text-white border-secondary' : 'bg-light text-dark'"
+          (click)="toggleEtiqueta(tag)">
+          #{{ tag }}
+        </span>
+      }
+    </div>
+
+    <h5 class="card-title fw-bold mt-5 mb-3 d-flex align-items-center gap-2">
+      <svg cIcon name="cilStar"></svg> Top de hoy
+    </h5>
+    <div class="list-group list-group-flush">
+      @for (e of getTopEntradas(entradas$ | async); track e.idEntrada) {
+        <a class="list-group-item list-group-item-action border-0 px-0" [routerLink]="['/entradas', e.slug]">
+          <div class="d-flex justify-content-between gap-2">
+            <div class="fw-semibold text-truncate">{{ e.titulo }}</div>
+            <div class="text-muted small">{{ e.votos || 0 }}</div>
+          </div>
+          <div class="text-muted small">{{ e.cantidadComentarios || 0 }} comentarios</div>
+        </a>
+      }
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+      <button class="btn btn-outline-secondary rounded-pill flex-grow-1" type="button" (click)="resetFiltros()">
+        <svg cIcon name="cilReload"></svg> Reset
+      </button>
+      <button class="btn btn-outline-secondary rounded-pill" type="button" (click)="scrollTop()">
+        <svg cIcon name="cilArrowTop"></svg>
+      </button>
+    </div>
+    
+    @if (!isLoggedIn()) {
+      <div class="mt-5 p-4 bg-primary bg-opacity-10 rounded-4 text-center">
+        <h5 class="fw-bold text-primary mb-2">¿Quieres participar?</h5>
+        <p class="small text-muted mb-3">Únete a nuestra comunidad para comentar y crear contenido.</p>
+        <button class="btn btn-sm btn-primary rounded-pill px-4" routerLink="/registro">Registrarse</button>
+      </div>
+    }
+  </ng-template>
+
+  @if (loading$ | async) {
+    <div class="text-center py-5 my-5">
+      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="text-muted mt-3">Cargando entradas...</p>
+    </div>
+  } @else {
+    <div class="row g-5">
+      <div class="col-lg-8">
+        @for (entrada of entradas$ | async; track entrada.idEntrada) {
+          <div class="card mb-4 shadow-sm border-0 transition-hover rounded-4 overflow-hidden op-entry-card">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="d-flex gap-2 flex-wrap">
+                  <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2" *ngFor="let cat of entrada.categorias">
+                    {{ cat.nombre }}
+                  </span>
+                </div>
+                <small class="text-muted">{{ getFechaDate(entrada.fechaPublicacion) | date:'dd MMM, yyyy' : '' : 'es-ES' }}</small>
+              </div>
+              <h3 class="card-title fw-bold mb-3 d-flex align-items-center gap-2">
+                <a [routerLink]="['/entradas', entrada.slug]" class="text-decoration-none text-dark stretched-link hover-primary">
+                  {{ entrada.titulo }}
+                </a>
+                <button
+                  *ngIf="isBookmarked(entrada.slug)"
+                  type="button"
+                  class="btn btn-link p-0 text-primary position-relative"
+                  style="z-index: 2;"
+                  [cTooltip]="'PUBLIC.BOOKMARK.INDICATOR' | translate"
+                  cTooltipPlacement="top"
+                  [attr.aria-label]="'PUBLIC.BOOKMARK.INDICATOR' | translate"
+                  (click)="$event.preventDefault(); $event.stopPropagation()"
+                >
+                  <svg cIcon name="cilBookmark" size="sm"></svg>
+                </button>
+              </h3>
+              <p class="card-text text-secondary mb-4 fs-5">{{ entrada.resumen }}</p>
+              
+              <div class="d-flex align-items-center gap-3 mt-4 pt-3 border-top">
+                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 40px; height: 40px;">
+                  {{ entrada.usernameCreador ? entrada.usernameCreador.charAt(0).toUpperCase() : 'U' }}
+                </div>
+                <div>
+                  <div class="fw-bold mb-0 lh-1">{{ entrada.usernameCreador || 'Usuario' }}</div>
+                  <small class="text-muted">Autor</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if ((entradas$ | async)?.length === 0) {
+          <div class="alert alert-light bg-light-subtle border-0 rounded-4 text-center py-5 shadow-sm">
+            <svg cIcon name="cilFolderOpen" size="3xl" class="text-muted mb-3"></svg>
+            <h4 class="alert-heading text-muted fw-bold">No se encontraron entradas</h4>
+            <p class="text-muted mb-0">Vuelve a revisar más tarde para ver nuevo contenido.</p>
+          </div>
+        }
+
+        @if (((entradas$ | async)?.length ?? 0) > 0 || currentPage > 1) {
+          <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+            <button 
+              class="btn btn-outline-primary rounded-pill px-4 d-flex align-items-center gap-2" 
+              (click)="prevPage()" 
+              [disabled]="currentPage === 1">
+              <svg cIcon name="cilArrowLeft"></svg> Anterior
+            </button>
+            <span class="text-muted fw-medium">
+              Página {{ currentPage }} de {{ (totalPages$ | async) ?? 1 }}
+            </span>
+            <button 
+              class="btn btn-outline-primary rounded-pill px-4 d-flex align-items-center gap-2" 
+              (click)="nextPage()"
+              [disabled]="currentPage >= ((totalPages$ | async) ?? 1)">
+              Siguiente <svg cIcon name="cilArrowRight"></svg>
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="col-lg-4 d-none d-lg-block">
+        <div class="card shadow-sm border-0 sticky-top rounded-4" style="top: 100px; z-index: 1;">
+          <div class="card-body p-4">
+            <ng-container *ngTemplateOutlet="filtersTpl"></ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<c-offcanvas
+  placement="end"
+  [visible]="filtersVisible"
+  (visibleChange)="filtersVisible = $event"
+  [scroll]="true"
+  [backdrop]="true"
+  tabindex="-1"
+  aria-labelledby="publicFiltersLabel"
+  class="d-lg-none"
+>
+  <c-offcanvas-header class="border-bottom bg-light bg-opacity-10">
+    <h5 cOffcanvasTitle id="publicFiltersLabel" class="fw-bold text-primary d-flex align-items-center gap-2">
+      <svg cIcon name="cilFilter"></svg>
+      Filtros
+    </h5>
+    <button cButtonClose class="text-reset" aria-label="Cerrar" (click)="filtersVisible = false"></button>
+  </c-offcanvas-header>
+  <c-offcanvas-body>
+    <ng-container *ngTemplateOutlet="filtersTpl"></ng-container>
+  </c-offcanvas-body>
+</c-offcanvas>

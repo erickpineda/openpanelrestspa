@@ -1,0 +1,185 @@
+<div class="detalle-entrada container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      
+      @if (loading) {
+        <div class="text-center py-5 my-5">
+          <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="text-muted mt-3">Cargando publicación...</p>
+        </div>
+      }
+
+      @if (error && !loading) {
+        <div class="alert alert-danger border-0 rounded-4 shadow-sm text-center py-5">
+          <svg cIcon name="cilWarning" size="3xl" class="text-danger mb-3"></svg>
+          <h3 class="alert-heading fw-bold">Entrada no encontrada</h3>
+          <p class="text-muted fs-5 mb-4">La publicación que buscas no existe o ya no está disponible.</p>
+          <a routerLink="/entradas" class="btn btn-danger rounded-pill px-4">Volver al listado</a>
+        </div>
+      }
+
+      @if (entrada && !loading) {
+        <article class="blog-post bg-white p-md-5 p-4 rounded-4 shadow-sm">
+          <header class="mb-5 border-bottom pb-4">
+            <div class="d-flex gap-2 flex-wrap mb-4">
+              <div class="btn-group" *ngFor="let cat of entrada.categorias">
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-start-pill px-3 py-2 fs-6 fw-medium d-flex align-items-center">
+                  {{ cat.nombre }}
+                </span>
+                <button class="btn btn-sm btn-outline-primary rounded-end-pill px-2 d-flex align-items-center" 
+                        (click)="toggleCategoria(cat.codigo ?? cat.nombre, cat.nombre)"
+                        [title]="isCategoriaSeguida(cat.codigo ?? cat.nombre) ? 'Dejar de seguir' : 'Seguir categoría'">
+                  <svg cIcon [name]="isCategoriaSeguida(cat.codigo ?? cat.nombre) ? 'cilCheck' : 'cilPlus'" size="sm"></svg>
+                </button>
+              </div>
+            </div>
+            
+            <h1 class="display-4 fw-bold mb-4 text-dark lh-sm">{{ entrada.titulo }}</h1>
+            
+            @if (entrada.subtitulo) {
+              <h2 class="h4 text-secondary fw-normal lh-base mb-4">{{ entrada.subtitulo }}</h2>
+            }
+            
+            <div class="d-flex align-items-center gap-3 mt-4 pt-4 border-top">
+              <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-4" style="width: 50px; height: 50px;">
+                {{ entrada.usernameCreador ? entrada.usernameCreador.charAt(0).toUpperCase() : 'U' }}
+              </div>
+              <div>
+                <div class="fw-bold fs-5 mb-0">{{ entrada.usernameCreador || 'Usuario' }}</div>
+                <div class="text-muted small d-flex align-items-center gap-2">
+                  <span>{{ entrada.fechaPublicacion | allowedDate:'dd MMM, yyyy' }}</span>
+                  <span>&bull;</span>
+                  <span><svg cIcon name="cilSpeech" size="sm"></svg> {{ comentariosCounts?.visible ?? 0 }} comentarios</span>
+                  @if(entrada.votos > 0) {
+                    <span>&bull;</span>
+                    <span class="text-success"><svg cIcon name="cilThumbUp" size="sm"></svg> {{ entrada.votos }} votos</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div class="post-content lh-lg fs-5 text-dark" [innerHTML]="entrada.contenido | sanitizeHtml"></div>
+          
+          <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top flex-wrap gap-3">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <button class="btn rounded-pill d-flex align-items-center gap-2" 
+                      [ngClass]="hasVoted ? 'btn-primary' : 'btn-outline-primary'" 
+                      (click)="darMeGusta()" 
+                      [disabled]="isVoting || hasVoted">
+                <svg cIcon name="cilThumbUp"></svg>
+                <span>{{ hasVoted ? 'Te gusta' : 'Me gusta' }} ({{ entrada.votos || 0 }})</span>
+              </button>
+              <button class="btn btn-outline-secondary rounded-pill d-flex align-items-center gap-2" (click)="toggleBookmark()">
+                <svg cIcon name="cilBookmark"></svg>
+                <span>{{ isBookmarked ? 'Guardado' : 'Guardar' }}</span>
+              </button>
+              
+              <div class="btn-group" role="group" aria-label="Compartir en redes sociales">
+                <button
+                  class="btn btn-outline-secondary rounded-start-pill px-3"
+                  type="button"
+                  (click)="compartir()"
+                  [cTooltip]="'PUBLIC.SHARE.COPY_LINK' | translate"
+                  cTooltipPlacement="top"
+                  [attr.aria-label]="'PUBLIC.SHARE.COPY_LINK' | translate"
+                >
+                  <svg cIcon name="cilClone"></svg>
+                  <span class="visually-hidden">{{ 'PUBLIC.SHARE.COPY_LINK' | translate }}</span>
+                </button>
+                <button class="btn btn-outline-secondary px-3" type="button" (click)="shareTo('whatsapp')" aria-label="Compartir en WhatsApp" title="WhatsApp">
+                  <svg cIcon name="cibWhatsapp"></svg>
+                </button>
+                <button class="btn btn-outline-secondary px-3" type="button" (click)="shareTo('x')" aria-label="Compartir en X" title="X (Twitter)">
+                  <svg cIcon name="cibTwitter"></svg>
+                </button>
+                <button class="btn btn-outline-secondary rounded-end-pill px-3" type="button" (click)="shareTo('linkedin')" aria-label="Compartir en LinkedIn" title="LinkedIn">
+                  <svg cIcon name="cibLinkedin"></svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="d-flex flex-wrap gap-2 justify-content-end mt-4 mt-md-0">
+              <div class="btn-group" *ngFor="let tag of entrada.etiquetas">
+                <span class="badge bg-light text-dark border rounded-start-pill px-3 py-2 d-flex align-items-center">
+                  #{{ tag.nombre }}
+                </span>
+                <button class="btn btn-sm btn-outline-secondary rounded-end-pill px-2 d-flex align-items-center" 
+                        (click)="toggleEtiqueta(tag.codigo ?? tag.nombre, tag.nombre)"
+                        [title]="isEtiquetaSeguida(tag.codigo ?? tag.nombre) ? 'Dejar de seguir' : 'Seguir etiqueta'">
+                  <svg cIcon [name]="isEtiquetaSeguida(tag.codigo ?? tag.nombre) ? 'cilCheck' : 'cilPlus'" size="sm"></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <hr class="my-5 border-light border-2 opacity-75">
+
+          @if (voteError) {
+            <div class="alert alert-warning border-0 rounded-4 shadow-sm">
+              {{ voteError }}
+            </div>
+          }
+
+          @if (relatedLoading) {
+            <div class="mt-5 pt-4 border-top">
+              <div class="d-flex align-items-center gap-2 text-muted">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                <span>Cargando entradas relacionadas...</span>
+              </div>
+            </div>
+          }
+
+          @if (!relatedLoading && relatedEntradas.length > 0) {
+            <div class="mt-5 pt-4 border-top">
+              <h3 class="fw-bold mb-4">Entradas relacionadas</h3>
+              <div class="row row-cols-1 row-cols-md-2 g-4">
+                @for (e of relatedEntradas; track e.idEntrada) {
+                  <div class="col">
+                    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden op-entry-card">
+                      <div class="card-body p-4">
+                        <div class="d-flex gap-2 mb-3 flex-wrap">
+                          <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2" *ngFor="let cat of e.categorias">
+                            {{ cat.nombre }}
+                          </span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-2">
+                          <a [routerLink]="['/entradas', e.slug]" class="text-decoration-none text-dark stretched-link">
+                            {{ e.titulo }}
+                          </a>
+                        </h5>
+                        <p class="text-muted mb-0">{{ e.resumen | slice:0:140 }}...</p>
+                      </div>
+                      <div class="card-footer bg-white border-top-0 p-4 pt-0 d-flex justify-content-between">
+                        <small class="text-muted">{{ e.fechaPublicacion | allowedDate:'dd MMM, yyyy' }}</small>
+                        <small class="text-muted">{{ e.cantidadComentarios || 0 }} comentarios</small>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          
+          <!-- Sección de comentarios rediseñada -->
+          <div class="comentarios-section mt-5">
+            <app-comentarios-public
+              [idEntrada]="entrada.idEntrada"
+              [slugEntrada]="entrada.slug"
+              [totalComentarios]="entrada.cantidadComentarios || 0"
+              (countsChange)="comentariosCounts = $event">
+            </app-comentarios-public>
+          </div>
+        </article>
+
+        <app-dev-feature-modal
+          [(visible)]="devModalVisible"
+          [bodyKey]="devModalBodyKey">
+        </app-dev-feature-modal>
+      }
+
+    </div>
+  </div>
+</div>

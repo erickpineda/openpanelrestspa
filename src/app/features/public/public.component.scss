@@ -1,24 +1,27 @@
-.header-fullscreen {
-  background-image: url('/assets/img/home-bg.jpg');
-  background-size: cover;
-  background-position: center;
-  width: 100%;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
+.wrapper {
+  .body {
+    padding-top: 88px;
+  }
 }
-.site-heading {
-  text-align: center;
-  color: white;
+
+// Reader Preferences classes (injected by ReaderPreferencesService)
+body.reader-font-small {
+  .post-content, .blog-post p, .lead {
+    font-size: 0.9rem !important;
+    line-height: 1.6;
+  }
 }
-.site-heading h1 {
-  font-size: 50px;
-  margin-bottom: 10px;
-  color: #6c757d;
+
+body.reader-font-normal {
+  .post-content, .blog-post p, .lead {
+    font-size: 1.1rem !important;
+    line-height: 1.8;
+  }
 }
-.site-heading .subheading {
-  font-size: 24px;
-  font-weight: 300;
-  margin-bottom: 50px;
-  color: #6c757d;
+
+body.reader-font-large {
+  .post-content, .blog-post p, .lead {
+    font-size: 1.35rem !important;
+    line-height: 2;
+  }
 }

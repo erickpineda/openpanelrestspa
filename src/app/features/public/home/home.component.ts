@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { TranslationService } from '@app/core/services/translation.service';
-import { Entrada } from '@app/core/models/entrada.model';
-import { Categoria } from '@app/core/models/categoria.model';
+import { Component, OnInit, signal } from '@angular/core';
 import { EntradaService } from '@app/core/services/data/entrada.service';
-import { LoggerService } from '@app/core/services/logger.service';
+import { Entrada } from '@app/core/models/entrada.model';
+import { finalize } from 'rxjs/operators';
+import { parseAllowedDate } from '@shared/utils/date-utils';
+import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
 
 @Component({
   selector: 'app-home',
@@ -12,85 +12,44 @@ import { LoggerService } from '@app/core/services/logger.service';
   standalone: false,
 })
 export class HomeComponent implements OnInit {
-  cargaFinalizada: boolean = false;
-  hasEntries: boolean = false;
-  errorMsg: string = '';
-  entradas: Entrada[] = [];
-  categorias: Categoria[] = [];
-  page = 1;
-  pageSize = 5;
-  pagedEntradas: any[] = [];
+  ultimasEntradas: Entrada[] = [];
+  loading = false;
+
   constructor(
     private entradaService: EntradaService,
-    private log: LoggerService,
-    private translate: TranslationService
+    private analytics: AnalyticsService
   ) {}
+
   ngOnInit(): void {
-    this.obtenerListaEntradas()
-      .then((listaRes: Entrada[]) => {
-        listaRes.forEach((entradaRes: any) => {
-          entradaRes.categoriasConComas = entradaRes.categorias
-            .map((e: any) => e.nombre)
-            .join(', ');
-        });
-        this.refreshEntradas();
-      })
-      .catch((error) => {
-        this.log.error('Error al obtener lista de entradas:', error.message);
-        this.errorMsg = 'PUBLIC.HOME.LOAD_ERROR';
-        this.log.error(this.errorMsg);
-        this.cargaFinalizada = true;
+    this.cargarUltimasEntradas();
+  }
+
+  cargarUltimasEntradas() {
+    this.loading = true;
+    const searchRequest = {
+      dataOption: 'ALL',
+      searchCriteriaList: [
+        { filterKey: 'publicada', operation: 'EQUAL', value: true, clazzName: 'Entrada' }
+      ]
+    };
+
+    this.entradaService.buscarSafe(searchRequest, 0, 6, 'fechaPublicacion', 'DESC')
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
+        next: (res) => {
+          this.ultimasEntradas = res.elements || [];
+        },
+        error: (err) => {
+          console.error('Error cargando entradas en home', err);
+        }
       });
   }
-  obtenerListaEntradas(): Promise<Entrada[]> {
-    return new Promise((resolve, reject) => {
-      this.entradaService.listarPagina().subscribe({
-        next: (response: any) => {
-          const entradas: Entrada[] = Array.isArray(response.data?.elements)
-            ? response.data.elements
-            : [];
-          if (entradas.length > 0) {
-            this.hasEntries = true;
-            this.entradas = entradas;
-            this.categorias = this.entradas.flatMap((e) => e.categorias);
-          } else {
-            this.hasEntries = false;
-          }
-          this.cargaFinalizada = true;
-          resolve(entradas);
-        },
-        error: (error: any) => {
-          this.hasEntries = false;
-          this.cargaFinalizada = true;
-          reject(error);
-        },
-      });
-    });
+
+  getFechaDate(fecha: any): Date | null {
+    return parseAllowedDate(fecha);
   }
-  refreshEntradas() {
-    this.pagedEntradas = this.entradas.slice(
-      (this.page - 1) * this.pageSize,
-      (this.page - 1) * this.pageSize + this.pageSize
-    );
-  }
-  onPageChange(page: number) {
-    if (page < 1 || page > this.numberOfPages) return;
-    this.page = page;
-    this.refreshEntradas();
-  }
-  get numberOfPages(): number {
-    return Math.ceil(this.entradas.length / this.pageSize);
-  }
-  getPages(): number[] {
-    return Array.from({ length: this.numberOfPages }, (v, k) => k + 1);
-  }
-  public refrescarPagina(): void {
-    window.location.reload();
-  }
-  trackByCategoria(index: number, c: Categoria): number | string {
-    return c?.codigo ?? c?.nombre ?? index;
-  }
-  trackByEntrada(index: number, e: Entrada): number {
-    return e?.idEntrada ?? index;
+
+  trackCta(name: string): void {
+    this.analytics.track('cta_click', { name, context: 'public_home' });
   }
 }

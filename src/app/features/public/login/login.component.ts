@@ -32,6 +32,11 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.authSync.initializeAuthState();
     if (this.tokenStorage.getToken()) {
+      const user = this.tokenStorage.getUser();
+      if (!user || !this.authService.isTokenValid()) {
+        this.tokenStorage.signOut();
+        return;
+      }
       this.tryRedirectToLastRoute('ngOnInit');
     }
   }
@@ -83,7 +88,13 @@ export class LoginComponent implements OnInit {
         return;
       }
     } catch {}
-    this.router.navigate(['/admin']);
+    // si el usuario es ROLE_ADMIN, mandarlo a admin. Si no, a perfil o home
+    const user = this.tokenStorage.getUser();
+    if (user && user.roles && user.roles.includes('ROLE_ADMIN')) {
+      this.router.navigate(['/admin']);
+    } else {
+      this.router.navigate(['/perfil']);
+    }
   }
   reloadPage(): void {
     window.location.reload();

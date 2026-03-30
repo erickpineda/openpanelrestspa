@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">5.88% </span>
+                <span class="strong">76.47% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/17</span>
+                <span class='fraction'>13/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">62.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>5/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">60% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>6/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">6.25% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/16</span>
+                <span class='fraction'>12/16</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -126,30 +126,30 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -178,31 +178,31 @@ import { parseAllowedDate, formatForBackend, isAllowedDateString } from '../util
   providedIn: 'root',
 })
 export class CommonFunctionalityService {
-<span class="fstat-no" title="function not covered" >  constructor(</span>
-    private <span class="cstat-no" title="statement not covered" >router: Router,</span>
-    private <span class="cstat-no" title="statement not covered" >datePipe: DatePipe</span>
+  constructor(
+    private router: Router,
+    private datePipe: DatePipe
   ) {}
 &nbsp;
-<span class="fstat-no" title="function not covered" >  transformaFecha(</span>fecha: Date | any, formato: string, flag: boolean): string {
-    const d = <span class="cstat-no" title="statement not covered" >parseAllowedDate(fecha);</span>
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!d) <span class="cstat-no" title="statement not covered" >return '';</span></span>
-<span class="cstat-no" title="statement not covered" >    return this.datePipe.transform(d, formato) || '';</span>
+  transformaFecha(fecha: Date | any, formato: string, flag: boolean): string {
+    const d = parseAllowedDate(fecha);
+    if (!d) return '';
+    return this.datePipe.transform(d, formato) || <span class="branch-1 cbranch-no" title="branch not covered" >'';</span>
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  reloadComponent(</span>self: boolean, urlToNavigateTo?: string) {
-    const url = <span class="cstat-no" title="statement not covered" >self ? this.router.url : urlToNavigateTo;</span>
-<span class="cstat-no" title="statement not covered" >    this.router.navigateByUrl('/', { skipLocationChange: true }).then(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      this.router.navigate([`/${url}`]).then(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+  reloadComponent(self: boolean, urlToNavigateTo?: string) {
+    const url = self ? this.router.url : urlToNavigateTo;
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() =&gt; {
+      this.router.navigate([`/${url}`]).then(() =&gt; {
         // Navigation completed
       });
     });
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  acortarTexto(</span>texto: string, maxLength: number = <span class="branch-0 cbranch-no" title="branch not covered" >40)</span>: string {
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (texto.length &gt; maxLength) {</span>
-<span class="cstat-no" title="statement not covered" >      return texto.substring(0, maxLength) + '...';</span>
+  acortarTexto(texto: string, maxLength: number = <span class="branch-0 cbranch-no" title="branch not covered" >40)</span>: string {
+    if (texto.length &gt; maxLength) {
+      return texto.substring(0, maxLength) + '...';
     }
-<span class="cstat-no" title="statement not covered" >    return texto;</span>
+    return texto;
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  reloadPage(</span>) {
@@ -229,7 +229,7 @@ export class CommonFunctionalityService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T17:02:13.631Z
+                at 2026-03-27T13:14:44.564Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

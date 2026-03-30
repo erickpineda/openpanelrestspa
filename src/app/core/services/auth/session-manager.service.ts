@@ -125,6 +125,14 @@ export class SessionManagerService {
   // Manejo cuando otra pestaña pidió logout
   public handleLogoutFromSync(data: any): void {
     this.log.info('SessionManager: handleLogoutFromSync', data);
+
+    try {
+      const lastValid = RouteTrackerService.getLastValidUrl();
+      if (lastValid) {
+        this.postLoginRedirect.saveLastValidRoute(lastValid);
+      }
+    } catch {}
+
     const payload: SessionExpirationData = {
       type: 'LOGOUT',
       origin: 'remote',

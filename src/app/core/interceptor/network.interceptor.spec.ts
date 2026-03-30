@@ -14,7 +14,7 @@ import { LoggerService } from '../services/logger.service';
 import { Router } from '@angular/router';
 import { SessionManagerService } from '../services/auth/session-manager.service';
 
-fdescribe('NetworkInterceptor', () => {
+describe('NetworkInterceptor', () => {
   let http: HttpClient;
   let httpMock: HttpTestingController;
   let interceptor: NetworkInterceptor;

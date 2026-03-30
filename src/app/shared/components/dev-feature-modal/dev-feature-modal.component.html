@@ -1,0 +1,13 @@
+<c-modal [visible]="visible" (visibleChange)="visibleChange.emit($event)" alignment="center" backdrop="static">
+  <c-modal-header>
+    <h5 cModalTitle>{{ titleKey | translate }}</h5>
+    <button cButtonClose (click)="close()"></button>
+  </c-modal-header>
+  <c-modal-body>
+    <p class="mb-0 text-muted">{{ bodyKey | translate }}</p>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="primary" class="rounded-pill" (click)="close()">{{ okKey | translate }}</button>
+  </c-modal-footer>
+</c-modal>
+

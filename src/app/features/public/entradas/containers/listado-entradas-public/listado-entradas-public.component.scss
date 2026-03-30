@@ -1,0 +1,82 @@
+.listado-entradas {
+  padding: 20px;
+}
+
+.categoria-badge {
+  cursor: pointer;
+  user-select: none;
+}
+
+.hover-primary {
+  transition: color 0.2s ease-in-out;
+  &:hover {
+    color: var(--cui-primary) !important;
+  }
+}
+
+.hover-elevate {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+.op-entry-card {
+  position: relative;
+}
+
+.op-entry-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--cui-primary) 60%, transparent),
+    transparent
+  );
+}
+
+.text-justify {
+  text-align: justify;
+}
+
+// Soporte para tema oscuro (cuando CoreUI inyecta data-coreui-theme="dark")
+:host-context([data-coreui-theme="dark"]) {
+  .bg-white {
+    background-color: var(--cui-body-bg) !important;
+  }
+  .text-dark {
+    color: var(--cui-body-color) !important;
+  }
+  .card {
+    background-color: var(--cui-body-bg) !important;
+    border-color: var(--cui-border-color) !important;
+  }
+  .card-footer {
+    background-color: var(--cui-body-bg) !important;
+    border-color: var(--cui-border-color) !important;
+  }
+  .text-muted {
+    color: var(--cui-secondary-color) !important;
+  }
+  .bg-light {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+  .list-group-item {
+    background-color: var(--cui-body-bg) !important;
+    border-color: var(--cui-border-color) !important;
+  }
+  .form-control, .form-select {
+    background-color: var(--cui-body-bg);
+    color: var(--cui-body-color);
+    border-color: var(--cui-border-color);
+  }
+  .offcanvas {
+    background-color: var(--cui-body-bg);
+    color: var(--cui-body-color);
+  }
+}

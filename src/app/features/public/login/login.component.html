@@ -1,8 +1,8 @@
-<div class="bg-light d-flex flex-row align-items-center">
+<div class="login-container d-flex flex-row align-items-center min-vh-100 mt-5">
   <c-container>
     <c-row class="justify-content-center">
-      <c-col md="4">
-        <c-card class="p-4">
+      <c-col md="6" lg="5">
+        <c-card class="p-5 shadow-lg border-0 rounded-4">
           <c-card-body>
             @if (!isLoggedIn) {
               <form
@@ -12,36 +12,34 @@
                 #f="ngForm"
                 novalidate
               >
-                <h1>{{ 'HEADER.LOGIN' | translate }}</h1>
-                <p class="text-medium-emphasis">{{ 'PUBLIC.LOGIN.SIGN_IN_MESSAGE' | translate }}</p>
-                <c-input-group class="mb-3">
-                  <span cInputGroupText>
-                    <svg [cIcon]="icons.cilUser" name="cilUser"></svg>
-                  </span>
+                <div class="text-center mb-4">
+                  <svg cIcon name="cilLayers" size="3xl" class="text-primary mb-3"></svg>
+                  <h2 class="fw-bold text-dark">{{ 'HEADER.LOGIN' | translate }}</h2>
+                  <p class="text-muted">{{ 'PUBLIC.LOGIN.SIGN_IN_MESSAGE' | translate }}</p>
+                </div>
+                
+                <div class="form-floating mb-3">
                   <input
+                    class="form-control"
                     id="username"
                     autoComplete="username"
-                    cFormControl
                     [placeholder]="'PUBLIC.LOGIN.USERNAME_PLACEHOLDER' | translate"
                     name="username"
                     [(ngModel)]="form.username"
                     required
                     #username="ngModel"
                   />
-                </c-input-group>
+                  <label for="username">{{ 'PUBLIC.LOGIN.USERNAME_PLACEHOLDER' | translate }}</label>
+                </div>
                 @if (username.errors && f.submitted) {
-                  <c-alert color="danger" fade>{{
-                    'PUBLIC.LOGIN.USERNAME_REQUIRED' | translate
-                  }}</c-alert>
+                  <c-alert color="danger" fade class="py-2">{{ 'PUBLIC.LOGIN.USERNAME_REQUIRED' | translate }}</c-alert>
                 }
-                <c-input-group class="mb-4">
-                  <span cInputGroupText>
-                    <svg [cIcon]="icons.cilLockLocked"></svg>
-                  </span>
+                
+                <div class="form-floating mb-4">
                   <input
+                    class="form-control"
                     id="password"
                     autoComplete="current-password"
-                    cFormControl
                     [placeholder]="'PUBLIC.LOGIN.PASSWORD_PLACEHOLDER' | translate"
                     type="password"
                     name="password"
@@ -50,9 +48,10 @@
                     minlength="6"
                     #password="ngModel"
                   />
-                </c-input-group>
+                  <label for="password">{{ 'PUBLIC.LOGIN.PASSWORD_PLACEHOLDER' | translate }}</label>
+                </div>
                 @if (password.errors && f.submitted) {
-                  <c-alert color="danger" fade>
+                  <c-alert color="danger" fade class="py-2">
                     @if (password.errors['required']) {
                       <span>{{ 'PUBLIC.LOGIN.PASSWORD_REQUIRED' | translate }}</span>
                     }
@@ -61,48 +60,56 @@
                     }
                   </c-alert>
                 }
-                <c-row>
-                  <c-col xs="6">
-                    @if (!isLoading) {
-                      <button class="btn btn-primary" type="submit">
-                        {{ 'HEADER.LOGIN' | translate }}
-                      </button>
-                    }
-                    @if (isLoading) {
-                      <button class="btn btn-primary" type="button" disabled>
-                        {{ 'PUBLIC.LOGIN.SIGNING_IN' | translate }}
-                        <span
-                          class="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                      </button>
-                    }
-                  </c-col>
-                  <c-col class="text-right" xs="6">
-                    <button cButton class="px-0" color="link" type="button">
-                      {{ 'PUBLIC.LOGIN.FORGOT_PASSWORD' | translate }}
+                
+                <div class="d-grid mb-3 mt-4">
+                  @if (!isLoading) {
+                    <button class="btn btn-primary btn-lg rounded-pill fw-bold" type="submit">
+                      {{ 'HEADER.LOGIN' | translate }}
                     </button>
-                  </c-col>
-                </c-row>
-                <c-row>
-                  @if (isLoginFailed) {
-                    <c-alert color="danger" fade
-                      >{{ 'COMMON.ERROR' | translate }}: {{ errorMessage }}</c-alert
-                    >
                   }
-                </c-row>
+                  @if (isLoading) {
+                    <button class="btn btn-primary btn-lg rounded-pill fw-bold" type="button" disabled>
+                      <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      {{ 'PUBLIC.LOGIN.SIGNING_IN' | translate }}
+                    </button>
+                  }
+                </div>
+                
+                <div class="text-center">
+                  <button
+                    cButton
+                    class="text-decoration-none fw-medium text-muted"
+                    color="link"
+                    type="button"
+                    routerLink="/recuperar"
+                  >
+                    {{ 'PUBLIC.LOGIN.FORGOT_PASSWORD' | translate }}
+                  </button>
+                </div>
+                
+                @if (isLoginFailed) {
+                  <div class="mt-3">
+                    <c-alert color="danger" fade class="mb-0">{{ 'COMMON.ERROR' | translate }}: {{ errorMessage }}</c-alert>
+                  </div>
+                }
               </form>
             }
             <c-row>
               @if (isLoggedIn) {
-                <c-alert color="success"
-                  >{{ 'PUBLIC.LOGIN.USER_ROLE_INFO' | translate }} {{ roles }}.</c-alert
-                >
+                <div class="text-center">
+                  <c-alert color="success" class="mb-3">{{ 'PUBLIC.LOGIN.USER_ROLE_INFO' | translate }} {{ roles }}.</c-alert>
+                  <button cButton color="primary" class="rounded-pill" (click)="reloadPage()">
+                    {{ 'COMMON.REFRESH' | translate }}
+                  </button>
+                </div>
               }
             </c-row>
           </c-card-body>
         </c-card>
+        
+        <div class="text-center mt-4">
+          <p class="text-muted">¿No tienes cuenta? <a routerLink="/registro" class="text-decoration-none fw-bold text-primary">Regístrate aquí</a></p>
+        </div>
       </c-col>
     </c-row>
   </c-container>

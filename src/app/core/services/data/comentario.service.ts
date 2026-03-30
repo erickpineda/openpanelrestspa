@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Comentario } from '../../models/comentario.model';
 import { CrudService } from '../../_utils/crud.service';
@@ -10,6 +10,8 @@ import { HttpContext } from '@angular/common/http';
 import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
+import { catchError, shareReplay } from 'rxjs/operators';
+import { ComentarioRecuentos } from '@app/core/models/comentario-recuentos.model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +19,11 @@ import { OPConstants } from '../../../shared/constants/op-global.constants';
 export class ComentarioService extends CrudService<Comentario, number> {
   protected endpoint = OPConstants.Methods.COMENTARIOS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
+
+  private recuentosCache = new Map<
+    number,
+    { expiresAt: number; obs$: Observable<ComentarioRecuentos | null> }
+  >();
 
   buscarSafe(
     searchRequest: any,
@@ -95,5 +102,30 @@ export class ComentarioService extends CrudService<Comentario, number> {
       undefined,
       'comentarios.listarPorIdEntrada'
     );
+  }
+
+  obtenerRecuentosPorIdEntrada(idEntrada: number): Observable<ComentarioRecuentos | null> {
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    return this.safeGetData<ComentarioRecuentos>(
+      OPConstants.Methods.COMENTARIOS.RECUENTOS_POR_ID_ENTRADA(idEntrada),
+      null as any,
+      undefined,
+      undefined,
+      'comentarios.recuentosPorIdEntrada',
+      context
+    ).pipe(catchError(() => of(null)));
+  }
+
+  obtenerRecuentosPorIdEntradaCached(
+    idEntrada: number,
+    ttlMs: number = 30000
+  ): Observable<ComentarioRecuentos | null> {
+    const now = Date.now();
+    const cached = this.recuentosCache.get(idEntrada);
+    if (cached && cached.expiresAt > now) return cached.obs$;
+
+    const obs$ = this.obtenerRecuentosPorIdEntrada(idEntrada).pipe(shareReplay(1));
+    this.recuentosCache.set(idEntrada, { expiresAt: now + ttlMs, obs$ });
+    return obs$;
   }
 }

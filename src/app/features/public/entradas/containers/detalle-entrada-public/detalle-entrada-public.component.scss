@@ -1,0 +1,45 @@
+.detalle-entrada {
+  padding: 20px;
+}
+
+.blog-post {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.op-entry-card {
+  position: relative;
+}
+
+.op-entry-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--cui-primary) 60%, transparent),
+    transparent
+  );
+}
+
+// Soporte para tema oscuro (cuando CoreUI inyecta data-coreui-theme="dark")
+:host-context([data-coreui-theme="dark"]) {
+  .bg-white {
+    background-color: var(--cui-body-bg) !important;
+  }
+  .text-dark {
+    color: var(--cui-body-color) !important;
+  }
+  .post-content {
+    color: var(--cui-body-color) !important;
+  }
+  .bg-light {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+  .text-muted {
+    color: var(--cui-secondary-color) !important;
+  }
+}

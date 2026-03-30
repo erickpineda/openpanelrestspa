@@ -1,0 +1,42 @@
+.perfil-public {
+  min-height: 70vh;
+}
+
+.hover-elevate {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    border-color: var(--cui-primary) !important;
+  }
+}
+
+// Soporte para tema oscuro (cuando CoreUI inyecta data-coreui-theme="dark")
+:host-context([data-coreui-theme="dark"]) {
+  .bg-white {
+    background-color: var(--cui-body-bg) !important;
+  }
+  .text-dark {
+    color: var(--cui-body-color) !important;
+  }
+  .card {
+    background-color: var(--cui-body-bg) !important;
+    border-color: var(--cui-border-color) !important;
+  }
+  .card-header {
+    background-color: var(--cui-body-bg) !important;
+    border-bottom-color: var(--cui-border-color) !important;
+  }
+  .list-group-item {
+    background-color: var(--cui-body-bg) !important;
+    border-color: var(--cui-border-color) !important;
+  }
+  .text-muted {
+    color: var(--cui-secondary-color) !important;
+  }
+  .bg-light {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+

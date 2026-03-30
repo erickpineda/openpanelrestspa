@@ -1,64 +1,120 @@
-<c-header [ngClass]="{ 'navbar-fixed': true, 'navbar-shrink': isShrink }">
-  <c-container fluid>
-    <c-header-brand (click)="navigateToRoute('/home')" style="cursor: pointer" class="brand-large">
-      Openpanel
-    </c-header-brand>
-    <c-header-nav class="ms-auto">
-      @if (isLoggedIn) {
+<c-navbar colorScheme="light" expand="lg" class="bg-white shadow-sm sticky-top border-bottom py-3">
+  <c-container>
+    <a cNavbarBrand (click)="navigateToRoute('/home')" class="cursor-pointer fw-bold text-primary d-flex align-items-center gap-2 fs-4">
+      <svg cIcon name="cilLayers" size="lg" class="text-primary"></svg>
+      OpenPanel
+    </a>
+    <button class="navbar-toggler border-0" type="button" aria-label="Toggle navigation" (click)="visible = !visible">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div [class.collapse]="!visible" [class.navbar-collapse]="true" class="w-100">
+      <c-navbar-nav class="mx-auto mb-2 mb-lg-0 gap-3 fw-medium">
         <c-nav-item>
-          <a cNavLink (click)="navigateToRoute('/admin')" style="cursor: pointer">{{
-            'HEADER.ADMIN' | translate
-          }}</a>
+          <a cNavLink id="home" (click)="navigateToRoute('/home')" class="cursor-pointer hover-primary transition-colors px-3 rounded-pill">{{ 'HEADER.HOME' | translate }}</a>
         </c-nav-item>
-      }
-      <c-nav-item>
-        <a cNavLink id="home" (click)="navigateToRoute('/home')" style="cursor: pointer">{{
-          'HEADER.HOME' | translate
-        }}</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink id="about" (click)="navigateToRoute('/about')" style="cursor: pointer">{{
-          'HEADER.ABOUT' | translate
-        }}</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink id="contact" (click)="navigateToRoute('/contact')" style="cursor: pointer">{{
-          'HEADER.CONTACT' | translate
-        }}</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a
-          cNavLink
-          (click)="toggleLanguage()"
-          style="cursor: pointer"
-          [attr.aria-label]="currentLang === 'es' ? 'Cambiar a Inglés' : 'Switch to Spanish'"
-        >
-          <span class="fi" [ngClass]="currentLang === 'es' ? 'fi-es' : 'fi-gb'"></span>
-          {{ currentLang === 'es' ? 'EN' : 'ES' }}
-        </a>
-      </c-nav-item>
-      @if (!isLoggedIn) {
         <c-nav-item>
-          <a cNavLink (click)="navigateToRoute('/login')" style="cursor: pointer">{{
-            'HEADER.LOGIN' | translate
-          }}</a>
+          <a cNavLink id="entradas" (click)="navigateToRoute('/entradas')" class="cursor-pointer hover-primary transition-colors px-3 rounded-pill">Blog</a>
         </c-nav-item>
-      }
-      @if (isLoggedIn) {
-        <c-nav-item>
-          <a cNavLink (click)="logout()" style="cursor: pointer" [class.disabled]="isLoadingLogout">
-            @if (!isLoadingLogout) {
-              <span>{{ 'HEADER.LOGOUT' | translate }}</span>
-            }
-            @if (isLoadingLogout) {
-              <span>
-                {{ 'COMMON.CLOSING_SESSION' | translate }}
-                <span class="spinner-border spinner-border-sm" role="status"></span>
-              </span>
-            }
+      </c-navbar-nav>
+      
+      <c-navbar-nav class="ms-auto d-flex align-items-center gap-3">
+        <c-dropdown alignment="end" variant="nav-item">
+          <a
+            cNavLink
+            cDropdownToggle
+            [caret]="false"
+            class="cursor-pointer d-flex align-items-center gap-2 px-3 rounded-pill"
+            [attr.aria-label]="'Idioma'"
+          >
+            <span class="fi" [ngClass]="currentLang === 'es' ? 'fi-es' : 'fi-gb'"></span>
+            <span class="fw-semibold">{{ currentLang.toUpperCase() }}</span>
           </a>
-        </c-nav-item>
-      }
-    </c-header-nav>
+          <ul cDropdownMenu class="pt-0">
+            <li>
+              <h6 cDropdownHeader class="bg-light fw-semibold py-2">Idioma</h6>
+            </li>
+            <li>
+              <button cDropdownItem type="button" class="d-flex align-items-center gap-2" (click)="setLanguage('es')">
+                <span class="fi fi-es"></span>
+                <span>Español</span>
+              </button>
+            </li>
+            <li>
+              <button cDropdownItem type="button" class="d-flex align-items-center gap-2" (click)="setLanguage('en')">
+                <span class="fi fi-gb"></span>
+                <span>English</span>
+              </button>
+            </li>
+          </ul>
+        </c-dropdown>
+
+        @if (!isLoggedIn) {
+          <c-nav-item>
+            <button cButton color="outline-primary" variant="outline" size="sm" (click)="navigateToRoute('/login')">
+              {{ 'HEADER.LOGIN' | translate }}
+            </button>
+          </c-nav-item>
+          <c-nav-item>
+            <button cButton color="primary" size="sm" (click)="navigateToRoute('/registro')">
+              Registro
+            </button>
+          </c-nav-item>
+        }
+        @if (isLoggedIn) {
+          <c-dropdown alignment="end" variant="nav-item">
+            <a
+              cNavLink
+              cDropdownToggle
+              [caret]="false"
+              class="cursor-pointer d-flex align-items-center gap-2 px-3 rounded-pill"
+              [attr.aria-label]="'Menú de usuario'"
+            >
+              <svg cIcon name="cilUser"></svg>
+              <span class="fw-semibold">{{ user?.username || ('HEADER.MY_SPACE' | translate) }}</span>
+            </a>
+            <ul cDropdownMenu class="pt-0">
+              <li>
+                <h6 cDropdownHeader class="bg-light fw-semibold py-2">
+                  {{ user?.username || ('HEADER.MY_SPACE' | translate) }}
+                </h6>
+              </li>
+              <li>
+                <button cDropdownItem type="button" class="d-flex align-items-center gap-2 py-2" (click)="navigateToRoute('/mi-espacio')">
+                  <svg cIcon name="cilHome" size="sm"></svg>
+                  <span>{{ 'HEADER.MY_SPACE' | translate }}</span>
+                </button>
+              </li>
+              <li>
+                <button cDropdownItem type="button" (click)="navigateToRoute('/admin/control/perfil')">
+                  Configuración de cuenta
+                </button>
+              </li>
+              @if (showAdminBoard || showModeratorBoard) {
+                <li><hr cDropdownDivider /></li>
+                <li>
+                  <button cDropdownItem type="button" (click)="navigateToRoute('/admin')">
+                    Panel de administración
+                  </button>
+                </li>
+              }
+              <li><hr cDropdownDivider /></li>
+              <li>
+                <button cDropdownItem type="button" class="text-danger" (click)="logout()" [disabled]="isLoadingLogout">
+                  @if (!isLoadingLogout) {
+                    <span>{{ 'HEADER.LOGOUT' | translate }}</span>
+                  }
+                  @if (isLoadingLogout) {
+                    <span class="d-flex align-items-center gap-2">
+                      <span class="spinner-border spinner-border-sm" role="status"></span>
+                      Cerrando sesión...
+                    </span>
+                  }
+                </button>
+              </li>
+            </ul>
+          </c-dropdown>
+        }
+      </c-navbar-nav>
+    </div>
   </c-container>
-</c-header>
+</c-navbar>
