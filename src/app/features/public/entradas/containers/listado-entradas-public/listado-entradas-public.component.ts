@@ -4,6 +4,7 @@ import { parseAllowedDate } from '@shared/utils/date-utils';
 import { CategoriaService } from '@app/core/services/data/categoria.service';
 import { EtiquetaService } from '@app/core/services/data/etiqueta.service';
 import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
+import { AuthService } from '@app/core/services/auth/auth.service';
 import { PublicBookmarksService } from '../../services/public-bookmarks.service';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
@@ -38,7 +39,8 @@ export class ListadoEntradasPublicComponent implements OnInit {
     private etiquetaService: EtiquetaService,
     private analytics: AnalyticsService,
     private bookmarksService: PublicBookmarksService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +70,12 @@ export class ListadoEntradasPublicComponent implements OnInit {
 
   isBookmarked(slug: string): boolean {
     return this.bookmarkedSlugs.has(slug);
+  }
+
+  isLoggedIn(): boolean {
+    let loggedIn = false;
+    this.authService.user$.subscribe(user => loggedIn = !!user).unsubscribe();
+    return loggedIn;
   }
 
   cargarCategoriasPopulares() {

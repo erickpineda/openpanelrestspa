@@ -17,6 +17,7 @@ import { SharedOPModule } from '@shared/shared.module';
 export class ComentariosPublicComponent implements OnInit {
   @Input() idEntrada!: number;
   @Input() totalComentarios: number | null = null;
+  @Input() slugEntrada: string | null = null;
 
   @Output() countsChange = new EventEmitter<{ visible: number; total: number | null; pending: number }>();
 
@@ -35,6 +36,8 @@ export class ComentariosPublicComponent implements OnInit {
   totalCount: number | null = null;
   pendingCount = 0;
   showMyPendingNotice = false;
+  private currentUserId: string | null = null;
+  private currentUsername: string | null = null;
 
   devModalVisible = false;
   devModalBodyKey = 'PUBLIC.DEV_MODAL.BODY_GENERIC';
@@ -47,6 +50,8 @@ export class ComentariosPublicComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoggedIn = !!this.tokenStorage.getToken();
+    this.currentUserId = this.getUserId();
+    this.currentUsername = this.getUsername();
     this.totalCount = typeof this.totalComentarios === 'number' ? this.totalComentarios : null;
     this.hidratarAvisoPendienteUsuario();
     if (this.ux.useRecuentosEndpoint) {
@@ -103,6 +108,33 @@ export class ComentariosPublicComponent implements OnInit {
     return userId != null ? String(userId) : null;
   }
 
+  private getUsername(): string | null {
+    const user = this.tokenStorage.getUser();
+    const username = user?.username ?? user?.nombreUsuario ?? user?.name ?? null;
+    return username != null ? String(username) : null;
+  }
+
+  private normalizeUsername(raw: any): string | null {
+    const candidates = [
+      raw?.username,
+      raw?.usernameCreador,
+      raw?.usuario?.username,
+      raw?.user?.username,
+      raw?.autor?.username,
+      raw?.nombreUsuario,
+    ];
+    for (const c of candidates) {
+      const v = c != null ? String(c).trim() : '';
+      if (v.length > 0) return v;
+    }
+    const idUsuario = raw?.idUsuario ?? raw?.usuario?.idUsuario ?? raw?.user?.idUsuario ?? null;
+    if (idUsuario != null && this.currentUserId && String(idUsuario) === this.currentUserId && this.currentUsername) {
+      const v = String(this.currentUsername).trim();
+      return v.length > 0 ? v : null;
+    }
+    return null;
+  }
+
   private getPendingNoticeStorageKey(): string | null {
     const userId = this.getUserId();
     if (!userId || !this.idEntrada) return null;
@@ -131,7 +163,11 @@ export class ComentariosPublicComponent implements OnInit {
     this.comentarioService.listarPorIdEntrada(this.idEntrada, this.pageNo, this.pageSize).subscribe({
       next: (res: any) => {
         const elements = res?.elements || [];
-        this.comentarios = [...this.comentarios, ...(Array.isArray(elements) ? elements : [])];
+        const normalized = (Array.isArray(elements) ? elements : []).map((c: any) => {
+          const username = this.normalizeUsername(c);
+          return username ? { ...c, username } : c;
+        });
+        this.comentarios = [...this.comentarios, ...normalized];
 
         const totalElements = Number(res?.totalElements);
         if (Number.isFinite(totalElements) && totalElements >= 0) {
@@ -171,6 +207,7 @@ export class ComentariosPublicComponent implements OnInit {
     const payload: any = {
       contenido: this.nuevoComentarioTexto,
       idEntrada: this.idEntrada,
+      entradaSlug: this.slugEntrada,
       idUsuario: userId,
       username: user ? user.username : null,
       email: user ? user.email : null

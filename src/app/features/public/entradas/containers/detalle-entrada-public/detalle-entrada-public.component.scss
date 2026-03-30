@@ -7,6 +7,24 @@
   margin: 0 auto;
 }
 
+.op-entry-card {
+  position: relative;
+}
+
+.op-entry-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--cui-primary) 60%, transparent),
+    transparent
+  );
+}
+
 // Soporte para tema oscuro (cuando CoreUI inyecta data-coreui-theme="dark")
 :host-context([data-coreui-theme="dark"]) {
   .bg-white {

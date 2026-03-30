@@ -8,6 +8,7 @@ import { RegisterPublicComponent } from './auth/containers/register-public/regis
 import { PerfilPublicComponent } from './auth/containers/perfil-public/perfil-public.component';
 import { ForgotPasswordPublicComponent } from './auth/containers/forgot-password-public/forgot-password-public.component';
 import { PublicAuthGuard } from './auth/services/public-auth.guard';
+import { NoAuthGuard } from './auth/services/no-auth.guard';
 import { PublicComponent } from './public.component';
 import { SessionExpiredComponent } from '../../core/features/session-expired.component';
 
@@ -20,9 +21,9 @@ const routes: Routes = [
       { path: 'home', component: HomeComponent },
       { path: 'about', component: AboutComponent },
       { path: 'contact', component: ContactComponent },
-      { path: 'login', component: LoginComponent },
-      { path: 'recuperar', component: ForgotPasswordPublicComponent },
-      { path: 'registro', component: RegisterPublicComponent },
+      { path: 'login', component: LoginComponent, canActivate: [NoAuthGuard] },
+      { path: 'recuperar', component: ForgotPasswordPublicComponent, canActivate: [NoAuthGuard] },
+      { path: 'registro', component: RegisterPublicComponent, canActivate: [NoAuthGuard] },
       { path: 'perfil', redirectTo: 'mi-espacio', pathMatch: 'full' },
       { path: 'guardados', redirectTo: 'mi-espacio', pathMatch: 'full' },
       { path: 'mi-espacio', component: PerfilPublicComponent, canActivate: [PublicAuthGuard] },

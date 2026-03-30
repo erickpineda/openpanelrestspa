@@ -96,12 +96,14 @@
         <svg cIcon name="cilArrowTop"></svg>
       </button>
     </div>
-
-    <div class="mt-5 p-4 bg-primary bg-opacity-10 rounded-4 text-center">
-      <h5 class="fw-bold text-primary mb-2">¿Quieres participar?</h5>
-      <p class="small text-muted mb-3">Únete a nuestra comunidad para comentar y crear contenido.</p>
-      <button class="btn btn-sm btn-primary rounded-pill px-4" routerLink="/registro">Registrarse</button>
-    </div>
+    
+    @if (!isLoggedIn()) {
+      <div class="mt-5 p-4 bg-primary bg-opacity-10 rounded-4 text-center">
+        <h5 class="fw-bold text-primary mb-2">¿Quieres participar?</h5>
+        <p class="small text-muted mb-3">Únete a nuestra comunidad para comentar y crear contenido.</p>
+        <button class="btn btn-sm btn-primary rounded-pill px-4" routerLink="/registro">Registrarse</button>
+      </div>
+    }
   </ng-template>
 
   @if (loading$ | async) {
@@ -115,7 +117,7 @@
     <div class="row g-5">
       <div class="col-lg-8">
         @for (entrada of entradas$ | async; track entrada.idEntrada) {
-          <div class="card mb-4 shadow-sm border-0 transition-hover rounded-4 overflow-hidden">
+          <div class="card mb-4 shadow-sm border-0 transition-hover rounded-4 overflow-hidden op-entry-card">
             <div class="card-body p-4">
               <div class="d-flex justify-content-between align-items-start mb-3">
                 <div class="d-flex gap-2 flex-wrap">

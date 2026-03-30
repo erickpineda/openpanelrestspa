@@ -138,7 +138,7 @@
               <div class="row row-cols-1 row-cols-md-2 g-4">
                 @for (e of relatedEntradas; track e.idEntrada) {
                   <div class="col">
-                    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden op-entry-card">
                       <div class="card-body p-4">
                         <div class="d-flex gap-2 mb-3 flex-wrap">
                           <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2" *ngFor="let cat of e.categorias">
@@ -167,6 +167,7 @@
           <div class="comentarios-section mt-5">
             <app-comentarios-public
               [idEntrada]="entrada.idEntrada"
+              [slugEntrada]="entrada.slug"
               [totalComentarios]="entrada.cantidadComentarios || 0"
               (countsChange)="comentariosCounts = $event">
             </app-comentarios-public>
