@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders, HttpContext } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpContext } from '@angular/common/http';
+import { Observable, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { MediaItem } from '../models/media-item.model';
 import { TokenStorageService } from './auth/token-storage.service';
@@ -20,13 +20,6 @@ export class FileStorageService {
     form.append('file', file);
     if (folder) form.append('folder', folder);
     return this.http.post(`${this.base}/fileStorage/subirFichero`, form, { context });
-  }
-
-  listMedia(type: 'image' | 'file' = 'image', page?: number, size?: number): Observable<any> {
-    let params = new HttpParams().set('type', type);
-    if (page != null) params = params.set('pageNo', String(page));
-    if (size != null) params = params.set('pageSize', String(size));
-    return this.http.get(`${this.base}/media`, { params });
   }
 
   listarFicheros(skipLoader: boolean = false): Observable<MediaItem[]> {
@@ -77,6 +70,8 @@ export class FileStorageService {
   }
 
   deleteMedia(id: string, context?: HttpContext): Observable<any> {
-    return this.http.delete(`${this.base}/media/${encodeURIComponent(id)}`, { context });
+    void id;
+    void context;
+    return throwError(() => new Error('El backend no expone endpoint de borrado de ficheros'));
   }
 }

@@ -37,12 +37,13 @@ export class AuthService {
 
   login(username: string, password: string): Observable<any> {
     return this.http
-      .post(this.urlBase + this.urlLogin, {
+      .post(this.urlBase + this.urlUri + this.urlAuth + this.urlLogin, {
         username,
         password,
       })
       .pipe(
-        tap((data: any) => {
+        tap((response: any) => {
+          const data = response?.data ?? response;
           this.tokenStorage.cleanExpiredPostLoginRedirects();
           this.tokenStorage.startPostLoginRedirectMaintenance(60 * 60 * 1000);
           this.tokenStorage.saveToken(data.jwttoken);
@@ -53,7 +54,7 @@ export class AuthService {
   }
 
   register(userData: any): Observable<any> {
-    return this.http.post(this.urlBase + this.urlRegis, userData, httpOptions);
+    return this.http.post(this.urlBase + this.urlUri + this.urlRegis, userData, httpOptions);
   }
 
   logout(): Observable<any> {

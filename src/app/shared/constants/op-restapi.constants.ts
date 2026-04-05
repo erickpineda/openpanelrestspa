@@ -108,7 +108,7 @@ export const OPRestMethods: any = {
     BASE: '/redis',
   },
   CONFIRM_REGISTER: {
-    BASE: '/validaRegistro/confirmarRegistroUsuario',
+    BASE: '/usuarios/validaRegistro/confirmarRegistroUsuario',
   },
   HERRAMIENTAS_AUXILIAR: {
     BASE: '/herramientas/sistema',

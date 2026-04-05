@@ -30,7 +30,7 @@ describe('OPRestMethods', () => {
     expect(OPRestMethods.AUTH.REFRESH_TOKEN).toBe('/auth/refreshToken');
     expect(OPRestMethods.BUSCAR.DEFINICIONES).toBe('/buscar/definicionesBuscador');
     expect(OPRestMethods.REDIS.BASE).toBe('/redis');
-    expect(OPRestMethods.CONFIRM_REGISTER.BASE).toBe('/validaRegistro/confirmarRegistroUsuario');
+    expect(OPRestMethods.CONFIRM_REGISTER.BASE).toBe('/usuarios/validaRegistro/confirmarRegistroUsuario');
     expect(OPRestMethods.HERRAMIENTAS_AUXILIAR.BASE).toBe('/herramientas/sistema');
     expect(OPRestMethods.FICHEROS.RUTA_INTERNA).toBe('/fileStorage/ficheros/obtenerDatos/');
   });

@@ -63,6 +63,10 @@ describe('AuthService', () => {
 
   it('login guarda token y actualiza usuario', (done) => {
     const userData = { jwttoken: 'jwt', username: 'u' };
+    const response = {
+      result: { success: true },
+      data: userData,
+    };
 
     service.user$.subscribe((user) => {
       if (user) {
@@ -79,7 +83,7 @@ describe('AuthService', () => {
     const req = httpMock.expectOne((r) => r.url.includes('/login'));
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ username: 'u', password: 'p' });
-    req.flush(userData);
+    req.flush(response);
   });
 
   it('logout llama a performLogout tras respuesta', () => {

@@ -251,22 +251,13 @@ describe('FileStorageService request shapes', () => {
     req.flush({ data: { uuid: 'u1' } });
   });
 
-  it('listMedia sends expected query params', () => {
-    service.listMedia('file', 2, 15).subscribe(() => {});
-
-    const req = httpMock.expectOne((r) => r.url.includes('/media'));
-    expect(req.request.method).toBe('GET');
-    expect(req.request.params.get('type')).toBe('file');
-    expect(req.request.params.get('pageNo')).toBe('2');
-    expect(req.request.params.get('pageSize')).toBe('15');
-    req.flush({ data: [] });
-  });
-
-  it('deleteMedia encodes id in URL', () => {
-    service.deleteMedia('a b').subscribe(() => {});
-
-    const req = httpMock.expectOne((r) => r.url.includes('/media/a%20b'));
-    expect(req.request.method).toBe('DELETE');
-    req.flush({ data: true });
+  it('deleteMedia falla si el backend no soporta borrado', (done) => {
+    service.deleteMedia('a b').subscribe({
+      next: () => done.fail('Se esperaba error'),
+      error: (err) => {
+        expect(String(err?.message || err)).toContain('no expone endpoint');
+        done();
+      },
+    });
   });
 });
