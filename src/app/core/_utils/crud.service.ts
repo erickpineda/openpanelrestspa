@@ -14,6 +14,16 @@ import { OPConstants } from '../../shared/constants/op-global.constants';
 export abstract class CrudService<T, ID> extends BaseService {
   protected abstract endpoint: string;
   protected pageSizeParam: string = OPConstants.Pagination.PAGE_SIZE_PARAM;
+  protected useLegacyCreateEndpoint = false;
+  protected useLegacyGetByIdEndpoint = false;
+
+  protected buildCreateUrl(): string {
+    return this.useLegacyCreateEndpoint ? `${this.endpoint}/crear` : this.endpoint;
+  }
+
+  protected buildGetByIdUrl(id: ID): string {
+    return this.useLegacyGetByIdEndpoint ? `${this.endpoint}/obtenerPorId/${id}` : `${this.endpoint}/${id}`;
+  }
 
   constructor(
     protected override http: HttpClient,
@@ -56,7 +66,7 @@ export abstract class CrudService<T, ID> extends BaseService {
    */
   obtenerPorIdSafe(id: ID, context?: HttpContext): Observable<T> {
     return this.safeGetData<T>(
-      `${this.endpoint}/obtenerPorId/${id}`,
+      this.buildGetByIdUrl(id),
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
@@ -70,7 +80,7 @@ export abstract class CrudService<T, ID> extends BaseService {
    */
   crearSafe(entity: T, context?: HttpContext): Observable<T> {
     return this.safePostData<T>(
-      `${this.endpoint}/crear`,
+      this.buildCreateUrl(),
       entity,
       {} as T, // ✅ Cast simple a T
       undefined,
@@ -88,7 +98,7 @@ export abstract class CrudService<T, ID> extends BaseService {
     context?: HttpContext
   ): Observable<{ success: boolean; data?: T; error?: any }> {
     return this.safeOperationWithState<T>(
-      this.post<T>(`${this.endpoint}/crear`, entity, undefined, undefined, context),
+      this.post<T>(this.buildCreateUrl(), entity, undefined, undefined, context),
       `${this.endpoint}.crear`
     );
   }
@@ -155,11 +165,11 @@ export abstract class CrudService<T, ID> extends BaseService {
   }
 
   obtenerPorId(id: ID, context?: HttpContext): Observable<OpenpanelApiResponse<any>> {
-    return this.get<any>(`${this.endpoint}/obtenerPorId/${id}`, undefined, undefined, context);
+    return this.get<any>(this.buildGetByIdUrl(id), undefined, undefined, context);
   }
 
   crear(entity: T, context?: HttpContext): Observable<any> {
-    return this.post<any>(`${this.endpoint}/crear`, entity, undefined, undefined, context);
+    return this.post<any>(this.buildCreateUrl(), entity, undefined, undefined, context);
   }
 
   actualizar(id: ID, entity: T, context?: HttpContext): Observable<OpenpanelApiResponse<any>> {

@@ -29,19 +29,19 @@ export class TipoEntradaService extends CrudService<TipoEntrada, number> {
   }
 
   override obtenerPorId(id: number): Observable<any> {
-    return this.get<any>(OPConstants.Methods.TIPOS_ENTRADAS.OBTENER_POR_ID(id));
+    return super.obtenerPorId(id);
   }
 
   override crear(entity: TipoEntrada): Observable<any> {
-    return this.post<any>(OPConstants.Methods.TIPOS_ENTRADAS.CREAR, entity);
+    return super.crear(entity);
   }
 
   override actualizar(id: number, entity: TipoEntrada): Observable<any> {
-    return this.put<any>(OPConstants.Methods.TIPOS_ENTRADAS.ACTUALIZAR(id), entity);
+    return super.actualizar(id, entity);
   }
 
   override borrar(id: number): Observable<any> {
-    return this.delete<any>(OPConstants.Methods.TIPOS_ENTRADAS.ELIMINAR(id));
+    return super.borrar(id);
   }
 
   obtenerPorCodigo(codigo: string): Observable<any> {

@@ -19,6 +19,7 @@ import { ComentarioRecuentos } from '@app/core/models/comentario-recuentos.model
 export class ComentarioService extends CrudService<Comentario, number> {
   protected endpoint = OPConstants.Methods.COMENTARIOS.BASE;
   protected override pageSizeParam = OPConstants.Pagination.PAGE_SIZE_PARAM;
+  protected override useLegacyCreateEndpoint = true;
 
   private recuentosCache = new Map<
     number,

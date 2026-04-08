@@ -226,7 +226,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
           const hasValue = !!fechaCtrl.value;
           if (!hasValue) {
             const nowPlusMargin = new Date();
-            nowPlusMargin.setMinutes(nowPlusMargin.getMinutes() + 30);
+            nowPlusMargin.setMinutes(nowPlusMargin.getMinutes() + 1);
             fechaCtrl.setValue(this.formatDateTimeLocal(nowPlusMargin), { emitEvent: false });
           }
         } else {
@@ -344,7 +344,7 @@ export class EntradaFormComponent implements OnInit, OnDestroy {
 
   get minDate(): string {
     const now = new Date();
-    now.setMinutes(now.getMinutes() + 30);
+    now.setMinutes(now.getMinutes() + 1);
     return this.formatDateTimeLocal(now);
   }
 

@@ -36,8 +36,8 @@ export class ValidationEntradaFormsService {
       return { minDate: true };
     }
 
-    const thirtyMinutesLater = new Date(now.getTime() + 30 * 60000);
-    if (inputDate < thirtyMinutesLater) {
+    const minMinutesLater = new Date(now.getTime() + 1 * 60000);
+    if (inputDate < minMinutesLater) {
       return { minMargin: true };
     }
 

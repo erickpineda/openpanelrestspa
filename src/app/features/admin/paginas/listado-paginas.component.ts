@@ -191,7 +191,7 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
       {
         filterKey: 'tipoEntrada.nombre',
         value: 'Página',
-        operation: 'EQUAL',
+        operation: 'CONTAINS',
         clazzName: 'Entrada',
       },
     ];

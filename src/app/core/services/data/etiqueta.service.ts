@@ -27,13 +27,7 @@ export class EtiquetaService extends CrudService<Etiqueta, string> {
   }
 
   override crear(etiqueta: Etiqueta, context?: HttpContext): Observable<any> {
-    return this.post<any>(
-      OPConstants.Methods.ETIQUETAS.CREAR,
-      etiqueta,
-      undefined,
-      undefined,
-      context
-    );
+    return super.crear(etiqueta, context);
   }
 
   override listarPaginaSinGlobalLoader(

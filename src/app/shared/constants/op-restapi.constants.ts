@@ -8,8 +8,8 @@ export const OPRestApiConstants: any = {
 export const OPRestMethods: any = {
   ENTRADAS: {
     BASE: '/entradas',
-    CREAR: '/entradas/crear', // POST para crear una entrada
-    OBTENER_POR_ID: (id: number) => `/entradas/obtenerPorId/${id}`, // GET para obtener una entrada por ID
+    CREAR: '/entradas',
+    OBTENER_POR_ID: (id: number) => `/entradas/${id}`,
     ACTUALIZAR: (id: number) => `/entradas/${id}`, // PUT para actualizar una entrada
     ELIMINAR: (id: number) => `/entradas/${id}`, // DELETE para eliminar una entrada
     OBTENER_POR_SLUG: (slug: string) => `/entradas/obtenerPorSlug/${slug}`,
@@ -17,8 +17,8 @@ export const OPRestMethods: any = {
   },
   ROLES: {
     BASE: '/roles',
-    CREAR: `/roles/crear`,
-    OBTENER_POR_ID: (id: number) => `/roles/obtenerPorId/${id}`,
+    CREAR: `/roles`,
+    OBTENER_POR_ID: (id: number) => `/roles/${id}`,
     ACTUALIZAR: (id: number) => `/roles/${id}`,
     ELIMINAR: (id: number) => `/roles/${id}`,
     OBTENER_POR_CODIGO: (codigo: string) => `/roles/obtenerPorCodigo/${codigo}`,
@@ -27,8 +27,8 @@ export const OPRestMethods: any = {
   },
   PRIVILEGIOS: {
     BASE: '/privilegios',
-    CREAR: `/privilegios/crear`,
-    OBTENER_POR_ID: (id: number) => `/privilegios/obtenerPorId/${id}`,
+    CREAR: `/privilegios`,
+    OBTENER_POR_ID: (id: number) => `/privilegios/${id}`,
     ACTUALIZAR: (id: number) => `/privilegios/${id}`,
     ELIMINAR: (id: number) => `/privilegios/${id}`,
     OBTENER_POR_CODIGO: (codigo: string) => `/privilegios/obtenerPorCodigo/${codigo}`,
@@ -37,8 +37,8 @@ export const OPRestMethods: any = {
   },
   USUARIOS: {
     BASE: '/usuarios',
-    CREAR: `/usuarios/crear`,
-    OBTENER_POR_ID: (id: number) => `/usuarios/obtenerPorId/${id}`,
+    CREAR: `/usuarios`,
+    OBTENER_POR_ID: (id: number) => `/usuarios/${id}`,
     ACTUALIZAR: (id: number) => `/usuarios/${id}`,
     ELIMINAR: (id: number) => `/usuarios/${id}`,
     OBTENER_POR_USERNAME: (username: string) => `/usuarios/obtenerPorUsername/${username}`,
@@ -50,7 +50,7 @@ export const OPRestMethods: any = {
   COMENTARIOS: {
     BASE: '/comentarios',
     CREAR: `/comentarios/crear`,
-    OBTENER_POR_ID: (id: number) => `/comentarios/obtenerPorId/${id}`,
+    OBTENER_POR_ID: (id: number) => `/comentarios/${id}`,
     ACTUALIZAR: (id: number) => `/comentarios/${id}`,
     ELIMINAR: (id: number) => `/comentarios/${id}`,
     LISTAR_POR_ID_ENTRADA: (idEntrada: number) => `/comentarios/listarPorIdEntrada/${idEntrada}`,
@@ -59,8 +59,8 @@ export const OPRestMethods: any = {
   },
   CATEGORIAS: {
     BASE: '/categorias',
-    CREAR: `/categorias/crear`,
-    OBTENER_POR_ID: (id: number) => `/categorias/obtenerPorId/${id}`,
+    CREAR: `/categorias`,
+    OBTENER_POR_ID: (id: number) => `/categorias/${id}`,
     ACTUALIZAR: (id: number) => `/categorias/${id}`,
     ELIMINAR: (id: number) => `/categorias/${id}`,
     OBTENER_POR_CODIGO: (codigo: string) => `/categorias/obtenerPorCodigo/${codigo}`,
@@ -70,8 +70,8 @@ export const OPRestMethods: any = {
   },
   ETIQUETAS: {
     BASE: '/etiquetas',
-    CREAR: `/etiquetas/crear`,
-    OBTENER_POR_ID: (id: number) => `/etiquetas/obtenerPorId/${id}`,
+    CREAR: `/etiquetas`,
+    OBTENER_POR_ID: (id: number) => `/etiquetas/${id}`,
     ACTUALIZAR: (id: number) => `/etiquetas/${id}`,
     ELIMINAR: (id: number) => `/etiquetas/${id}`,
     OBTENER_POR_CODIGO: (codigo: string) => `/etiquetas/obtenerPorCodigo/${codigo}`,
@@ -118,8 +118,8 @@ export const OPRestMethods: any = {
   },
   TIPOS_ENTRADAS: {
     BASE: '/tiposEntradas',
-    OBTENER_POR_ID: (id: number) => `/tiposEntradas/obtenerPorId/${id}`,
-    CREAR: '/tiposEntradas/crear',
+    OBTENER_POR_ID: (id: number) => `/tiposEntradas/${id}`,
+    CREAR: '/tiposEntradas',
     ACTUALIZAR: (id: number) => `/tiposEntradas/${id}`,
     ELIMINAR: (id: number) => `/tiposEntradas/${id}`,
     OBTENER_POR_CODIGO: (codigo: string) => `/tiposEntradas/obtenerPorCodigo/${codigo}`,

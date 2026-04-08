@@ -916,7 +916,7 @@
       "SCHEDULED_DATE_LABEL": "Programar Publicación",
       "SCHEDULED_DATE_HELP": "Si el estado es PROGRAMADA, la fecha es obligatoria",
       "SCHEDULED_DATE_ERROR_PAST": "La fecha no puede ser anterior a la actual",
-      "SCHEDULED_DATE_ERROR_MARGIN": "Debe haber al menos 30 minutos de margen",
+      "SCHEDULED_DATE_ERROR_MARGIN": "Debe haber al menos 1 minuto de margen",
       "SCHEDULED_DATE_ERROR_REQUIRED_WHEN_SCHEDULED": "La fecha es obligatoria cuando el estado es PROGRAMADA",
       "RESET_CONFIRM_TITLE": "Restablecer formulario",
       "RESET_CONFIRM_MESSAGE": "Vas a descartar los cambios no guardados de esta entrada. ¿Seguro que quieres restablecer el formulario?",

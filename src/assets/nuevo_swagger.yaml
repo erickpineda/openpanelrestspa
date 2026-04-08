@@ -86,7 +86,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -169,7 +170,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -254,7 +256,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -337,7 +340,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -374,7 +378,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "requestBody" : {
@@ -422,7 +427,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -505,7 +511,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -637,7 +644,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -720,7 +728,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -804,7 +813,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "requestBody" : {
@@ -851,7 +861,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "requestBody" : {
@@ -899,7 +910,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -982,7 +994,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1020,7 +1033,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1103,7 +1117,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1140,7 +1155,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "requestBody" : {
@@ -1187,7 +1203,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "requestBody" : {
@@ -1235,7 +1252,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1318,7 +1336,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1356,7 +1375,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1439,7 +1459,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1524,7 +1545,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1562,7 +1584,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1645,7 +1668,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -1682,7 +1706,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "requestBody" : {
@@ -1731,7 +1756,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -1740,7 +1766,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -2232,8 +2276,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/usuarios/checkUsernameAvailability" : {
@@ -2364,7 +2407,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -2373,7 +2417,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "requestBody" : {
@@ -2422,7 +2484,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -2431,7 +2494,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -2496,6 +2577,45 @@
         }
       }
     },
+    "/api/v1/tiposEntradas/crear" : {
+      "post" : {
+        "tags" : [ "tipo-entrada-controller" ],
+        "operationId" : "crearLegacy_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TipoEntradaDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTipoEntradaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/roles" : {
       "get" : {
         "tags" : [ "rol-controller" ],
@@ -2507,7 +2627,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -2516,7 +2637,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -2592,7 +2731,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -2601,7 +2741,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "requestBody" : {
@@ -2642,7 +2784,7 @@
     "/api/v1/roles/crear" : {
       "post" : {
         "tags" : [ "rol-controller" ],
-        "operationId" : "crearLegacy_1",
+        "operationId" : "crearLegacy_2",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2675,8 +2817,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/roles/buscar" : {
@@ -2690,7 +2831,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -2699,7 +2841,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "requestBody" : {
@@ -2800,7 +2960,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -2809,7 +2970,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -2877,7 +3056,7 @@
     "/api/v1/privilegios/crear" : {
       "post" : {
         "tags" : [ "privilegio-controller" ],
-        "operationId" : "crearLegacy_2",
+        "operationId" : "crearLegacy_3",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2910,8 +3089,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/privilegios/buscar" : {
@@ -2925,7 +3103,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -2934,7 +3113,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "requestBody" : {
@@ -2983,7 +3180,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -2992,7 +3190,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -3060,7 +3276,7 @@
     "/api/v1/herramientas/sistema/crear" : {
       "post" : {
         "tags" : [ "herramientas-auxiliar-controller" ],
-        "operationId" : "crearLegacy_3",
+        "operationId" : "crearLegacy_4",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3093,8 +3309,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/fileStorage/subirFichero" : {
@@ -3153,7 +3368,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -3162,7 +3378,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -3227,6 +3461,45 @@
         }
       }
     },
+    "/api/v1/etiquetas/crear" : {
+      "post" : {
+        "tags" : [ "etiqueta-controller" ],
+        "operationId" : "crearLegacy_5",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/EtiquetaDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseEtiquetaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/etiquetas/buscar" : {
       "post" : {
         "tags" : [ "etiqueta-controller" ],
@@ -3238,7 +3511,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -3247,7 +3521,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "requestBody" : {
@@ -3296,7 +3588,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -3305,7 +3598,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -3381,7 +3692,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -3390,7 +3702,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -3458,7 +3788,7 @@
     "/api/v1/entradas/estados/flujos/crear" : {
       "post" : {
         "tags" : [ "estado-entrada-flujo-controller" ],
-        "operationId" : "crearLegacy_4",
+        "operationId" : "crearLegacy_6",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3491,14 +3821,13 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/entradas/crear" : {
       "post" : {
         "tags" : [ "entrada-controller" ],
-        "operationId" : "crearLegacy_5",
+        "operationId" : "crearLegacy_7",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3531,8 +3860,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/entradas/cambiarEstadoEntrada" : {
@@ -3585,7 +3913,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -3594,7 +3923,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "requestBody" : {
@@ -3668,8 +4015,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/comentarios/buscar" : {
@@ -3683,7 +4029,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -3692,7 +4039,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "requestBody" : {
@@ -3741,7 +4106,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -3750,7 +4116,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -3815,6 +4199,45 @@
         }
       }
     },
+    "/api/v1/categorias/crear" : {
+      "post" : {
+        "tags" : [ "categoria-controller" ],
+        "operationId" : "crearLegacy_8",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CategoriaDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseCategoriaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/categorias/buscar" : {
       "post" : {
         "tags" : [ "categoria-controller" ],
@@ -3826,7 +4249,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -3835,7 +4259,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "requestBody" : {
@@ -4074,7 +4516,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -4083,7 +4526,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -4201,7 +4646,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -4210,7 +4656,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -4393,7 +4841,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -4418,8 +4867,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/usuarios/obtenerMetadatosPerfil/{id}" : {
@@ -4500,7 +4948,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -4525,8 +4974,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/tiposEntradas/obtenerPorCodigo/{codigo}" : {
@@ -4538,7 +4986,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -4621,7 +5070,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -4630,7 +5080,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -4668,7 +5120,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -4693,8 +5146,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/roles/obtenerPorCodigo/{codigoRol}" : {
@@ -4847,7 +5299,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -4872,8 +5325,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/privilegios/obtenerPorCodigo/{codigo}" : {
@@ -4885,7 +5337,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -5034,7 +5487,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -5146,7 +5600,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5171,8 +5626,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/herramientas/sistema/obtenerPorCodigo/{codigo}" : {
@@ -5223,7 +5677,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -5232,7 +5687,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5257,8 +5714,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/fileStorage/ficheros" : {
@@ -5299,7 +5755,9 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1,
+            "pattern" : "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
           }
         } ],
         "responses" : {
@@ -5336,7 +5794,9 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1,
+            "pattern" : "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
           }
         } ],
         "responses" : {
@@ -5412,7 +5872,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5437,8 +5898,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/etiquetas/obtenerPorCodigo/{codigo}" : {
@@ -5450,7 +5910,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -5487,7 +5948,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -5541,8 +6003,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/entradas/obtenerPorSlug/{slug}" : {
@@ -5592,7 +6053,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5617,8 +6079,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/entradas/listarPorIdUsuario/{idUsuario}" : {
@@ -5631,7 +6092,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         }, {
           "name" : "pageNo",
@@ -5640,7 +6102,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -5649,7 +6112,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5703,8 +6168,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/entradas/estados/flujos/porRol" : {
@@ -5725,7 +6189,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -5734,7 +6199,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5787,7 +6254,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -5796,7 +6264,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5842,7 +6312,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -5851,7 +6322,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5897,7 +6370,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -5906,7 +6380,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5944,7 +6420,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -5969,8 +6446,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/entradas/buscar/definicionesBuscador" : {
@@ -6021,7 +6497,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 10
+            "default" : 10,
+            "minimum" : 1
           }
         }, {
           "name" : "startDate",
@@ -6149,7 +6626,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 30
+            "default" : 30,
+            "minimum" : 1
           }
         }, {
           "name" : "split",
@@ -6212,7 +6690,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 30
+            "default" : 30,
+            "minimum" : 1
           }
         }, {
           "name" : "granularity",
@@ -6267,7 +6746,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "size",
@@ -6276,7 +6756,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 5
+            "default" : 5,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -6344,7 +6825,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -6353,7 +6835,25 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
           }
         } ],
         "responses" : {
@@ -6416,8 +6916,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/comentarios/listarPorIdEntrada/{idEntrada}" : {
@@ -6440,7 +6939,8 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0
+            "default" : 0,
+            "minimum" : 0
           }
         }, {
           "name" : "pageSize",
@@ -6449,7 +6949,9 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 20
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -6516,7 +7018,8 @@
           "required" : true,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "minimum" : 1
           }
         } ],
         "responses" : {
@@ -6541,8 +7044,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/categorias/obtenerPorCodigo/{codigo}" : {
@@ -6554,7 +7056,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -6653,8 +7156,7 @@
               }
             }
           }
-        },
-        "deprecated" : true
+        }
       }
     },
     "/api/v1/tiposEntradas/borrarPorCodigo/{codigo}" : {
@@ -6666,7 +7168,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -6777,7 +7280,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -6814,7 +7318,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -6888,7 +7393,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -6925,7 +7431,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -6962,7 +7469,8 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
         } ],
         "responses" : {
@@ -7154,11 +7662,14 @@
           },
           "idCategoria" : {
             "type" : "integer",
-            "format" : "int64",
-            "writeOnly" : true
+            "format" : "int64"
           },
           "nombre" : {
             "type" : "string"
+          },
+          "codigo" : {
+            "type" : "string",
+            "pattern" : "^[A-Z0-9_]+$"
           }
         }
       },
@@ -8679,15 +9190,22 @@
         "type" : "object",
         "properties" : {
           "entradaSlug" : {
-            "type" : "string",
-            "minLength" : 1
+            "type" : "string"
+          },
+          "idEntrada" : {
+            "type" : "integer",
+            "format" : "int64",
+            "minimum" : 1
           },
           "contenido" : {
             "type" : "string",
             "minLength" : 1
+          },
+          "entradaRefValida" : {
+            "type" : "boolean"
           }
         },
-        "required" : [ "contenido", "entradaSlug" ]
+        "required" : [ "contenido" ]
       },
       "OpenpanelApiResponsePaginaResponseDTOComentarioDTO" : {
         "type" : "object",

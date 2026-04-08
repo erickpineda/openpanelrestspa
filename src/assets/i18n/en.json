@@ -808,7 +808,7 @@
       "SCHEDULED_DATE_LABEL": "Schedule Publication",
       "SCHEDULED_DATE_HELP": "If status is SCHEDULED, date is required",
       "SCHEDULED_DATE_ERROR_PAST": "Date cannot be in the past",
-      "SCHEDULED_DATE_ERROR_MARGIN": "Must be at least 30 minutes in the future",
+      "SCHEDULED_DATE_ERROR_MARGIN": "Must be at least 1 minute in the future",
       "SCHEDULED_DATE_ERROR_REQUIRED_WHEN_SCHEDULED": "Date is required when status is SCHEDULED",
       "RESET_CONFIRM_TITLE": "Reset form",
       "RESET_CONFIRM_MESSAGE": "You are about to discard unsaved changes for this entry. Are you sure you want to reset the form?",
