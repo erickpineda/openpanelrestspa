@@ -63,6 +63,9 @@ export class ThemeRuntimeService {
 
     const root = document.documentElement;
     Object.keys(obj).forEach((k) => {
+      // Hardening: solo permitir CSS variables y prevenir prototype pollution
+      if (k === '__proto__' || k === 'constructor' || k === 'prototype') return;
+      if (!k.startsWith('--')) return;
       const v = obj[k];
       if (typeof k === 'string' && (typeof v === 'string' || typeof v === 'number')) {
         root.style.setProperty(k, String(v));
@@ -94,4 +97,3 @@ export class ThemeRuntimeService {
     return `${environment.backend.host}${environment.backend.uri}${url}`;
   }
 }
-

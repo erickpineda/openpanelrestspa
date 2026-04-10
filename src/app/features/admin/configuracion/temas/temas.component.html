@@ -54,10 +54,10 @@
                 color="secondary"
                 variant="ghost"
                 size="sm"
-                [cTooltip]="'Ordenar listado'"
+                [cTooltip]="'ADMIN.THEMES.TOOLTIP.SORT' | translate"
               >
                 <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
-                Ordenar
+                {{ 'COMMON.SORT' | translate }}
               </button>
               <ul cDropdownMenu>
                 <li>
@@ -163,16 +163,16 @@
                 {{ 'COMMON.NAME' | translate }}
               </th>
               <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
-                Slug
+                {{ 'COMMON.SLUG' | translate }}
               </th>
               <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
-                Draft
+                {{ 'ADMIN.THEMES.TABLE.DRAFT' | translate }}
               </th>
               <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
-                Published
+                {{ 'ADMIN.THEMES.TABLE.PUBLISHED' | translate }}
               </th>
               <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
-                Origen
+                {{ 'ADMIN.THEMES.TABLE.ORIGIN' | translate }}
               </th>
               <th
                 scope="col"
@@ -228,7 +228,7 @@
                       variant="ghost"
                       size="sm"
                       (click)="zipInput.click()"
-                      [cTooltip]="'Subir ZIP a draft'"
+                      [cTooltip]="'ADMIN.THEMES.TOOLTIP.UPLOAD_DRAFT_ZIP' | translate"
                     >
                       <svg cIcon name="cilCloudUpload"></svg>
                     </button>
@@ -238,7 +238,7 @@
                       variant="ghost"
                       size="sm"
                       (click)="preview(t)"
-                      [cTooltip]="'Preview'"
+                      [cTooltip]="'ADMIN.THEMES.TOOLTIP.PREVIEW' | translate"
                     >
                       <svg cIcon name="cilMediaPlay"></svg>
                     </button>
@@ -249,7 +249,7 @@
                       size="sm"
                       (click)="publish(t)"
                       [disabled]="!t.draft"
-                      [cTooltip]="'Publicar'"
+                      [cTooltip]="'ADMIN.THEMES.TOOLTIP.PUBLISH' | translate"
                     >
                       <svg cIcon name="cilCloudUpload"></svg>
                     </button>
@@ -260,7 +260,7 @@
                       size="sm"
                       (click)="activate(t)"
                       [disabled]="!t.published"
-                      [cTooltip]="'Activar'"
+                      [cTooltip]="'ADMIN.THEMES.TOOLTIP.ACTIVATE' | translate"
                     >
                       <svg cIcon name="cilCheckCircle"></svg>
                     </button>
@@ -354,14 +354,14 @@
       </div>
 
       <div class="mb-3">
-        <label class="form-label small fw-bold text-muted">Slug</label>
+        <label class="form-label small fw-bold text-muted">{{ 'COMMON.SLUG' | translate }}</label>
         <input
           cFormControl
           type="text"
           formControlName="slug"
-          placeholder="slug-opcional"
+          [placeholder]="'ADMIN.THEMES.SLUG_PLACEHOLDER' | translate"
         />
-        <div class="form-text">Opcional. Si se deja vacío, el backend lo genera automáticamente.</div>
+        <div class="form-text">{{ 'ADMIN.THEMES.SLUG_HELP' | translate }}</div>
       </div>
 
       <div class="mb-3">

@@ -171,6 +171,7 @@
     "RESET": "Limpiar",
     "UNPUBLISHED": "No Publicada",
     "FILTERS": "Filtros",
+    "SORT": "Ordenar",
     "ACTIVE": "Activos",
     "VALIDATION": {
       "REQUIRED": "Este campo es obligatorio",
@@ -252,8 +253,20 @@
         "STATUS_ACTIVE": "Activo",
         "STATUS_INACTIVE": "Inactivo",
         "COLOR_SCHEME": "Esquema de Color",
-        "ACTIONS": "Acciones"
+        "ACTIONS": "Acciones",
+        "DRAFT": "Borrador",
+        "PUBLISHED": "Publicado",
+        "ORIGIN": "Origen"
       },
+      "TOOLTIP": {
+        "SORT": "Ordenar listado",
+        "UPLOAD_DRAFT_ZIP": "Subir ZIP a draft",
+        "PREVIEW": "Vista previa",
+        "PUBLISH": "Publicar",
+        "ACTIVATE": "Activar"
+      },
+      "SLUG_PLACEHOLDER": "slug-opcional",
+      "SLUG_HELP": "Opcional. Si se deja vacío, el backend lo genera automáticamente.",
       "SEARCH_PLACEHOLDER": "Buscar tema...",
       "NO_THEMES_FOUND": "No se encontraron temas",
       "ADJUST_FILTERS_HELP": "Intenta ajustar los filtros",

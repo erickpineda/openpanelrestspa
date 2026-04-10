@@ -76,6 +76,7 @@
     "ACTIVE": "Active",
     "ENABLE_EDIT": "Enable Editing",
     "FILTERS": "Filters",
+    "SORT": "Sort",
     "NO_RESULTS": "No results found",
     "VALIDATION": {
       "REQUIRED": "This field is required",
@@ -157,8 +158,20 @@
         "STATUS_ACTIVE": "Active",
         "STATUS_INACTIVE": "Inactive",
         "COLOR_SCHEME": "Color Scheme",
-        "ACTIONS": "Actions"
+        "ACTIONS": "Actions",
+        "DRAFT": "Draft",
+        "PUBLISHED": "Published",
+        "ORIGIN": "Origin"
       },
+      "TOOLTIP": {
+        "SORT": "Sort list",
+        "UPLOAD_DRAFT_ZIP": "Upload draft ZIP",
+        "PREVIEW": "Preview",
+        "PUBLISH": "Publish",
+        "ACTIVATE": "Activate"
+      },
+      "SLUG_PLACEHOLDER": "optional-slug",
+      "SLUG_HELP": "Optional. If left empty, the backend generates it automatically.",
       "SEARCH_PLACEHOLDER": "Search theme...",
       "NO_THEMES_FOUND": "No themes found",
       "ADJUST_FILTERS_HELP": "Try adjusting filters",
