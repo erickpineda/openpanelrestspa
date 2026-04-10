@@ -90,8 +90,15 @@ export class TemasComponent implements OnInit, OnDestroy {
   }
 
   closeModal(): void {
-    this.modalVisible = false;
-    this.editItem = null;
+    this.onModalVisibleChange(false);
+  }
+
+  onModalVisibleChange(visible: boolean): void {
+    this.modalVisible = visible;
+    if (!visible) {
+      this.editItem = null;
+    }
+    this.cdr.detectChanges();
   }
 
   save(): void {

@@ -325,7 +325,12 @@
 </div>
 
 <!-- Modal -->
-<c-modal [visible]="modalVisible" (visibleChange)="closeModal()" backdrop="static" size="lg">
+<c-modal
+  [visible]="modalVisible"
+  (visibleChange)="onModalVisibleChange($event)"
+  backdrop="static"
+  size="lg"
+>
   <c-modal-header>
     <h5 cModalTitle class="fw-bold">
       {{
