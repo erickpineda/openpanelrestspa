@@ -284,11 +284,26 @@
       "NEW_THEME": "Nuevo Tema",
       "SUCCESS": {
         "UPDATE": "Tema actualizado correctamente",
-        "CREATE": "Tema creado correctamente"
+        "CREATE": "Tema creado correctamente",
+        "DELETE": "Tema eliminado correctamente"
       },
       "ERROR": {
         "UPDATE": "Error actualizando tema",
-        "CREATE": "Error creando tema"
+        "CREATE": "Error creando tema",
+        "DELETE": "Error eliminando tema"
+      },
+      "DRAFT": {
+        "ACTION": "Borrador...",
+        "TITLE": "Borrador",
+        "TOKENS": "Tokens (JSON)",
+        "METADATA": "Metadata (JSON)",
+        "SOURCE_TYPE": "Origen del borrador",
+        "FROM_ZIP": "Este borrador proviene de un ZIP.",
+        "NO_DRAFT": "El tema no tiene borrador todavía. Puedes crear uno pegando tokens en JSON.",
+        "CONVERT_TO_TOKENS": "Convertir a tokens",
+        "REUPLOAD_ZIP": "Re-subir ZIP",
+        "CONVERT_CONFIRM_TITLE": "Convertir borrador",
+        "CONVERT_CONFIRM_MSG": "Este borrador viene de ZIP. Si conviertes a tokens, se perderá la referencia al ZIP. ¿Continuar?"
       }
     },
     "PROFILE": {

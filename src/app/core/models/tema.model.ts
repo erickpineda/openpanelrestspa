@@ -32,3 +32,17 @@ export interface TemaPreviewTokenResponse {
   expiresAt: string | Date;
   previewUrl: string;
 }
+
+export interface TemaDraft {
+  slug: string;
+  idTemaVersion?: number;
+  version?: number;
+  state?: string;
+  sourceType?: 'TOKENS_ONLY' | 'CSS_PACKAGE' | string;
+  tokensJson?: string | null;
+  metadataJson?: string | null;
+  cssUuid?: string | null;
+  assetsUuid?: string | null;
+  checksum?: string | null;
+  packageSizeKb?: number | null;
+}

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { HttpContext } from '@angular/common/http';
 import { TemasService } from '../../../../core/services/data/temas.service';
-import { Tema } from '../../../../core/models/tema.model';
+import { Tema, TemaDraft } from '../../../../core/models/tema.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
@@ -44,6 +44,16 @@ export class TemasComponent implements OnInit, OnDestroy {
   // Sorting
   currentSortField?: string;
   currentSortDirection?: 'ASC' | 'DESC';
+
+  // Draft modal
+  draftModalVisible = false;
+  draftLoading = false;
+  draftTema: Tema | null = null;
+  draftData: TemaDraft | null = null;
+  draftTokensJson = '';
+  draftMetadataJson = '';
+  draftAllowTokensEdit = false;
+  showConvertDraftModal = false;
 
   constructor(
     private temasService: TemasService,
@@ -260,6 +270,112 @@ export class TemasComponent implements OnInit, OnDestroy {
   }
 
   // ===== Acciones =====
+  openDraft(t: Tema): void {
+    if (!t?.slug) return;
+
+    this.draftTema = t;
+    this.draftData = null;
+    this.draftTokensJson = '';
+    this.draftMetadataJson = '';
+    this.draftAllowTokensEdit = false;
+    this.draftModalVisible = true;
+    this.draftLoading = true;
+
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService
+      .getDraft(t.slug, context)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.draftLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (d) => {
+          this.draftData = d;
+          this.draftAllowTokensEdit = (d?.sourceType || '').toString() !== 'CSS_PACKAGE';
+          this.draftTokensJson = d?.tokensJson || '{\n\n}';
+          this.draftMetadataJson = d?.metadataJson || '';
+        },
+        error: (err) => {
+          // Si no existe borrador todavía, permitimos crearlo pegando tokens.
+          this.draftAllowTokensEdit = true;
+          this.draftTokensJson = '{\n\n}';
+          this.draftMetadataJson = '';
+          this.toast.showInfo(
+            this.translate.instant('ADMIN.THEMES.DRAFT.NO_DRAFT'),
+            this.translate.instant('MENU.THEMES')
+          );
+          this.log.error('temas draft get', err);
+        },
+      });
+  }
+
+  closeDraftModal(): void {
+    this.draftModalVisible = false;
+    this.draftTema = null;
+    this.draftData = null;
+    this.draftTokensJson = '';
+    this.draftMetadataJson = '';
+    this.draftAllowTokensEdit = false;
+    this.showConvertDraftModal = false;
+    this.cdr.detectChanges();
+  }
+
+  askConvertDraftToTokens(): void {
+    this.showConvertDraftModal = true;
+  }
+
+  confirmConvertDraftToTokens(): void {
+    this.showConvertDraftModal = false;
+    this.draftAllowTokensEdit = true;
+    if (!this.draftTokensJson || !this.draftTokensJson.trim()) {
+      this.draftTokensJson = '{\n  \"--op-primary\": \"#0d6efd\"\n}';
+    }
+    this.cdr.detectChanges();
+  }
+
+  saveDraft(): void {
+    if (!this.draftTema?.slug) return;
+    if (!this.draftAllowTokensEdit) return;
+
+    // Validación mínima de JSON
+    try {
+      JSON.parse(this.draftTokensJson || '{}');
+      if (this.draftMetadataJson) JSON.parse(this.draftMetadataJson);
+    } catch (e) {
+      this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
+      return;
+    }
+
+    this.draftLoading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService
+      .upsertDraft(
+        this.draftTema.slug,
+        { tokensJson: this.draftTokensJson, metadataJson: this.draftMetadataJson || undefined },
+        context
+      )
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.draftLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.closeDraftModal();
+          this.obtenerListaTemas();
+        },
+        error: (err) => {
+          this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
+          this.log.error('temas draft save', err);
+        },
+      });
+  }
+
   preview(t: Tema): void {
     if (!t?.slug) return;
     if (!t.draft && !t.published) {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpContext } from '@angular/common/http';
 import { CrudService } from '../../_utils/crud.service';
-import { Tema, TemaDraftRequest, TemaPreviewTokenResponse } from '../../models/tema.model';
+import { Tema, TemaDraft, TemaDraftRequest, TemaPreviewTokenResponse } from '../../models/tema.model';
 import { HttpClient } from '@angular/common/http';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
@@ -58,6 +58,18 @@ export class TemasService extends CrudService<Tema, number> {
       undefined,
       'temas.obtenerPorSlug',
       context
+    );
+  }
+
+  getDraft(slug: string, context?: HttpContext): Observable<TemaDraft> {
+    const ctx = context ?? new HttpContext().set(SKIP_GLOBAL_LOADER, true);
+    return this.safeGetData<TemaDraft>(
+      `${this.endpoint}/${encodeURIComponent(slug)}/draft`,
+      {} as TemaDraft,
+      undefined,
+      undefined,
+      'temas.draft.get',
+      ctx
     );
   }
 

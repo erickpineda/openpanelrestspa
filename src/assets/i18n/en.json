@@ -189,11 +189,26 @@
       "NEW_THEME": "New Theme",
       "SUCCESS": {
         "UPDATE": "Theme updated successfully",
-        "CREATE": "Theme created successfully"
+        "CREATE": "Theme created successfully",
+        "DELETE": "Theme deleted successfully"
       },
       "ERROR": {
         "UPDATE": "Error updating theme",
-        "CREATE": "Error creating theme"
+        "CREATE": "Error creating theme",
+        "DELETE": "Error deleting theme"
+      },
+      "DRAFT": {
+        "ACTION": "Draft...",
+        "TITLE": "Draft",
+        "TOKENS": "Tokens (JSON)",
+        "METADATA": "Metadata (JSON)",
+        "SOURCE_TYPE": "Draft source",
+        "FROM_ZIP": "This draft comes from a ZIP package.",
+        "NO_DRAFT": "This theme doesn't have a draft yet. You can create one by pasting JSON tokens.",
+        "CONVERT_TO_TOKENS": "Convert to tokens",
+        "REUPLOAD_ZIP": "Re-upload ZIP",
+        "CONVERT_CONFIRM_TITLE": "Convert draft",
+        "CONVERT_CONFIRM_MSG": "This draft comes from a ZIP. If you convert to tokens, the ZIP reference will be lost. Continue?"
       }
     },
     "PROFILE": {

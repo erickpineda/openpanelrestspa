@@ -243,16 +243,6 @@
                       color="secondary"
                       variant="ghost"
                       size="sm"
-                      (click)="zipInput.click()"
-                      [cTooltip]="'ADMIN.THEMES.TOOLTIP.UPLOAD_DRAFT_ZIP' | translate"
-                    >
-                      <svg cIcon name="cilCloudUpload"></svg>
-                    </button>
-                    <button
-                      cButton
-                      color="secondary"
-                      variant="ghost"
-                      size="sm"
                       (click)="preview(t)"
                       [disabled]="!t.draft && !t.published"
                       [cTooltip]="'ADMIN.THEMES.TOOLTIP.PREVIEW' | translate"
@@ -281,26 +271,45 @@
                     >
                       <svg cIcon name="cilCheckCircle"></svg>
                     </button>
-                    <button
-                      cButton
-                      color="primary"
-                      variant="ghost"
-                      size="sm"
-                      (click)="openEdit(t)"
-                      [cTooltip]="'COMMON.EDIT' | translate"
-                    >
-                      <svg cIcon name="cilPen"></svg>
-                    </button>
-                    <button
-                      cButton
-                      color="danger"
-                      variant="ghost"
-                      size="sm"
-                      (click)="delete(t)"
-                      [cTooltip]="'COMMON.DELETE' | translate"
-                    >
-                      <svg cIcon name="cilTrash"></svg>
-                    </button>
+                    <c-dropdown variant="btn-group">
+                      <button
+                        cButton
+                        cDropdownToggle
+                        color="secondary"
+                        variant="ghost"
+                        size="sm"
+                        [cTooltip]="'COMMON.ACTIONS' | translate"
+                      >
+                        <svg cIcon name="cilOptions"></svg>
+                      </button>
+                      <ul cDropdownMenu>
+                        <li>
+                          <button cDropdownItem (click)="openDraft(t)">
+                            <svg cIcon name="cilDescription" class="me-2"></svg>
+                            {{ 'ADMIN.THEMES.DRAFT.ACTION' | translate }}
+                          </button>
+                        </li>
+                        <li>
+                          <button cDropdownItem (click)="zipInput.click()">
+                            <svg cIcon name="cilCloudUpload" class="me-2"></svg>
+                            {{ 'ADMIN.THEMES.TOOLTIP.UPLOAD_DRAFT_ZIP' | translate }}
+                          </button>
+                        </li>
+                        <li><hr cDropdownDivider /></li>
+                        <li>
+                          <button cDropdownItem (click)="openEdit(t)">
+                            <svg cIcon name="cilPen" class="me-2"></svg>
+                            {{ 'COMMON.EDIT' | translate }}
+                          </button>
+                        </li>
+                        <li>
+                          <button cDropdownItem class="text-danger" (click)="delete(t)">
+                            <svg cIcon name="cilTrash" class="me-2"></svg>
+                            {{ 'COMMON.DELETE' | translate }}
+                          </button>
+                        </li>
+                      </ul>
+                    </c-dropdown>
                   </c-button-group>
                 </td>
               </tr>
@@ -433,4 +442,137 @@
   [loading]="loading"
   (visibleChange)="showDeleteModal = $event"
   (confirm)="confirmDelete()"
+></app-confirmation-modal>
+
+<!-- Modal Borrador -->
+<c-modal
+  [visible]="draftModalVisible"
+  (visibleChange)="draftModalVisible = $event; if (!$event) closeDraftModal()"
+  size="xl"
+  backdrop="static"
+  scrollable
+>
+  <c-modal-header>
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilDescription" class="text-primary"></svg>
+      {{ 'ADMIN.THEMES.DRAFT.TITLE' | translate }}
+      @if (draftTema?.nombre) {
+        <span class="text-muted fw-normal">- {{ draftTema?.nombre }}</span>
+      }
+    </h5>
+    <button cButtonClose (click)="closeDraftModal()"></button>
+  </c-modal-header>
+  <c-modal-body class="py-4">
+    @if (draftLoading) {
+      <div class="d-flex justify-content-center align-items-center py-5">
+        <c-spinner color="primary"></c-spinner>
+      </div>
+    } @else {
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="text-muted small fw-semibold">{{ 'ADMIN.THEMES.DRAFT.SOURCE_TYPE' | translate }}:</span>
+            <c-badge
+              [color]="(draftData?.sourceType || '') === 'CSS_PACKAGE' ? 'info' : 'warning'"
+              shape="rounded-pill"
+            >
+              {{ draftData?.sourceType || 'TOKENS_ONLY' }}
+            </c-badge>
+            @if (draftData?.version) {
+              <c-badge color="secondary" shape="rounded-pill">v{{ draftData?.version }}</c-badge>
+            }
+          </div>
+        </div>
+
+        @if ((draftData?.sourceType || '') === 'CSS_PACKAGE' && !draftAllowTokensEdit) {
+          <div class="col-12">
+            <c-alert color="info" class="d-flex align-items-start justify-content-between">
+              <div class="d-flex gap-2">
+                <svg cIcon name="cilInfo" class="mt-1"></svg>
+                <div>
+                  <div class="fw-semibold">{{ 'ADMIN.THEMES.DRAFT.FROM_ZIP' | translate }}</div>
+                  <div class="small text-muted">
+                    {{ 'ADMIN.THEMES.DRAFT.CONVERT_CONFIRM_MSG' | translate }}
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button cButton color="warning" variant="outline" size="sm" (click)="askConvertDraftToTokens()">
+                  {{ 'ADMIN.THEMES.DRAFT.CONVERT_TO_TOKENS' | translate }}
+                </button>
+                <button cButton color="primary" variant="outline" size="sm" (click)="draftZipInput.click()">
+                  {{ 'ADMIN.THEMES.DRAFT.REUPLOAD_ZIP' | translate }}
+                </button>
+              </div>
+            </c-alert>
+            <input
+              #draftZipInput
+              type="file"
+              accept=".zip"
+              class="d-none"
+              (change)="draftTema && onUploadDraftZip(draftTema, $event)"
+            />
+          </div>
+        }
+
+        @if (draftAllowTokensEdit) {
+          <div class="col-12">
+            <label class="form-label small fw-bold text-muted">{{ 'ADMIN.THEMES.DRAFT.TOKENS' | translate }}</label>
+            <textarea
+              cFormControl
+              rows="12"
+              [(ngModel)]="draftTokensJson"
+              [ngModelOptions]="{ standalone: true }"
+              class="font-monospace"
+            ></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-bold text-muted">{{ 'ADMIN.THEMES.DRAFT.METADATA' | translate }}</label>
+            <textarea
+              cFormControl
+              rows="4"
+              [(ngModel)]="draftMetadataJson"
+              [ngModelOptions]="{ standalone: true }"
+              class="font-monospace"
+            ></textarea>
+          </div>
+        } @else {
+          <div class="col-12">
+            <c-alert color="secondary" class="mb-0">
+              {{ 'ADMIN.THEMES.DRAFT.NO_DRAFT' | translate }}
+            </c-alert>
+          </div>
+        }
+      </div>
+    }
+  </c-modal-body>
+  <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
+    <div></div>
+    <div class="d-flex gap-2">
+      <button cButton color="secondary" variant="ghost" (click)="closeDraftModal()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        cButton
+        color="primary"
+        class="px-4"
+        [disabled]="draftLoading || !draftAllowTokensEdit"
+        (click)="saveDraft()"
+      >
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </div>
+  </c-modal-footer>
+</c-modal>
+
+<app-confirmation-modal
+  [visible]="showConvertDraftModal"
+  [title]="'ADMIN.THEMES.DRAFT.CONVERT_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.DRAFT.CONVERT_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.DRAFT.CONVERT_TO_TOKENS' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'warning'"
+  [loading]="draftLoading"
+  (visibleChange)="showConvertDraftModal = $event"
+  (confirm)="confirmConvertDraftToTokens()"
 ></app-confirmation-modal>
