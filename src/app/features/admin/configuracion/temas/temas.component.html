@@ -195,7 +195,7 @@
                 <td class="px-3">
                   @if (t.draft) {
                     <c-badge color="warning" shape="rounded-pill">
-                      v{{ t.draft?.version }} {{ t.draft?.state }}
+                      v{{ t.draft.version }} {{ t.draft.state }}
                     </c-badge>
                   } @else {
                     <span class="text-muted">—</span>
@@ -204,7 +204,7 @@
                 <td class="px-3">
                   @if (t.published) {
                     <c-badge color="success" shape="rounded-pill">
-                      v{{ t.published?.version }} {{ t.published?.state }}
+                      v{{ t.published.version }} {{ t.published.state }}
                     </c-badge>
                   } @else {
                     <span class="text-muted">—</span>

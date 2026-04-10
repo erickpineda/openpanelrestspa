@@ -27,7 +27,7 @@ export class TemasService extends CrudService<Tema, number> {
    * Listado paginado (server paging) usando los params del backend:
    * pageNo, pageSize, sortBy, sortDir
    */
-  listarPaginaSinGlobalLoader(
+  listarPaginaTemasSinGlobalLoader(
     pageNo: number,
     pageSize: number,
     sortBy?: string,

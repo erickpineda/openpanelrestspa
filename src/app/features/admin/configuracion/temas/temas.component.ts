@@ -313,7 +313,7 @@ export class TemasComponent implements OnInit, OnDestroy {
     const sortDir = this.currentSortDirection || 'DESC';
 
     this.temasService
-      .listarPaginaSinGlobalLoader(this.pageNo, this.pageSize, sortBy, sortDir)
+      .listarPaginaTemasSinGlobalLoader(this.pageNo, this.pageSize, sortBy, sortDir)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
