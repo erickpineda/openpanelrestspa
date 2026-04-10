@@ -8,6 +8,7 @@ import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.i
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { TranslationService } from '../../../../core/services/translation.service';
+import { SKIP_GLOBAL_LOADER } from '../../../../core/interceptor/network.interceptor';
 
 @Component({
   selector: 'app-temas',
@@ -18,7 +19,8 @@ import { TranslationService } from '../../../../core/services/translation.servic
 export class TemasComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
-  temas: Tema[] = [];
+  temas: Tema[] = []; // página actual (server paging)
+  viewTemas: Tema[] = []; // filtro client-side sobre la página actual
   modalVisible = false;
   showDeleteModal = false;
   editItem: Tema | null = null;
@@ -33,13 +35,15 @@ export class TemasComponent implements OnInit, OnDestroy {
   // Patrón de toolbar/búsqueda/paginación
   basicSearchText: string = '';
   showAdvanced: boolean = false;
-  filtroNombre: string = '';
-  filtroActivo: boolean | null = null;
   pageSize: number = 10;
   pageNo: number = 0;
   totalElements: number = 0;
-  filteredTemas: Tema[] = [];
-  pagedTemas: Tema[] = [];
+  totalPages: number = 1;
+  numberOfElements: number = 0;
+
+  // Sorting
+  currentSortField?: string;
+  currentSortDirection?: 'ASC' | 'DESC';
 
   constructor(
     private temasService: TemasService,
@@ -51,8 +55,8 @@ export class TemasComponent implements OnInit, OnDestroy {
   ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
-      activo: ['false', Validators.required],
-      esquemaColor: ['', Validators.maxLength(50)],
+      slug: ['', Validators.maxLength(100)],
+      descripcion: ['', Validators.maxLength(255)],
     });
   }
 
@@ -65,34 +69,13 @@ export class TemasComponent implements OnInit, OnDestroy {
   }
 
   load(): void {
-    this.loading = true;
-    this.error = null;
-
-    this.temasService
-      .listarSafeSinGlobalLoader()
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
-        })
-      )
-      .subscribe({
-        next: (list: Tema[]) => {
-          this.temas = Array.isArray(list) ? list : [];
-          this.totalElements = this.temas.length;
-          this.search();
-        },
-        error: (err) => {
-          this.error = 'Error cargando temas';
-          this.log.error('temas listar', err);
-        },
-      });
+    this.pageNo = 0;
+    this.obtenerListaTemas();
   }
 
   openNew(): void {
     this.editItem = null;
-    this.form.reset({ nombre: '', activo: 'false', esquemaColor: '' });
+    this.form.reset({ nombre: '', slug: '', descripcion: '' });
     this.modalVisible = true;
   }
 
@@ -100,8 +83,8 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.editItem = { ...item };
     this.form.reset({
       nombre: item.nombre || '',
-      activo: String(item.activo ? 'true' : 'false'),
-      esquemaColor: item.esquemaColor || '',
+      slug: item.slug || '',
+      descripcion: item.descripcion || '',
     });
     this.modalVisible = true;
   }
@@ -114,15 +97,15 @@ export class TemasComponent implements OnInit, OnDestroy {
   save(): void {
     if (this.form.invalid) return;
     this.loading = true;
-    const payload: Tema = {
+    const payload: Partial<Tema> = {
       nombre: this.form.value.nombre,
-      activo: this.form.value.activo === 'true',
-      esquemaColor: this.form.value.esquemaColor,
+      slug: (this.form.value.slug || '').trim() || undefined,
+      descripcion: (this.form.value.descripcion || '').trim() || undefined,
     };
     const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
-    const op = this.editItem?.id
-      ? this.temasService.actualizarSafe(this.editItem.id, payload, context)
-      : this.temasService.crearSafe(payload, context);
+    const op = this.editItem?.slug
+      ? this.temasService.actualizarPorSlug(this.editItem.slug, payload, context)
+      : this.temasService.crearTema(payload, context);
     op.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.toast.showSuccess(
@@ -133,7 +116,7 @@ export class TemasComponent implements OnInit, OnDestroy {
         );
         this.loading = false;
         this.modalVisible = false;
-        this.load();
+        this.obtenerListaTemas();
       },
       error: (err) => {
         this.toast.showError(
@@ -150,18 +133,18 @@ export class TemasComponent implements OnInit, OnDestroy {
   }
 
   delete(item: Tema): void {
-    if (!item.id) return;
+    if (!item.slug) return;
     this.itemToDelete = item;
     this.showDeleteModal = true;
     this.cdr.detectChanges();
   }
 
   confirmDelete(): void {
-    if (!this.itemToDelete || !this.itemToDelete.id) return;
+    if (!this.itemToDelete || !this.itemToDelete.slug) return;
     this.loading = true;
     const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.temasService
-      .eliminarSafe(this.itemToDelete.id, context)
+      .borrarPorSlug(this.itemToDelete.slug, context)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -172,7 +155,7 @@ export class TemasComponent implements OnInit, OnDestroy {
           this.loading = false;
           this.showDeleteModal = false;
           this.itemToDelete = null;
-          this.load();
+          this.obtenerListaTemas();
         },
         error: (err) => {
           this.toast.showError(
@@ -190,57 +173,179 @@ export class TemasComponent implements OnInit, OnDestroy {
   toggleAdvanced(): void {
     this.showAdvanced = !this.showAdvanced;
   }
+
   onBasicSearchTextChange(text: string): void {
     this.basicSearchText = text || '';
-    this.pageNo = 0;
     this.search();
   }
+
   onPageSizeChange(size: number): void {
     this.pageSize = Number(size) || 10;
     this.pageNo = 0;
-    this.updatePage();
+    this.obtenerListaTemas();
   }
 
   search(): void {
-    const term = (this.basicSearchText || '').toLowerCase();
-    const nombre = (this.filtroNombre || '').toLowerCase();
-    const activo = this.filtroActivo;
-    const base = this.temas || [];
-    this.filteredTemas = base.filter((t) => {
+    const term = (this.basicSearchText || '').trim().toLowerCase();
+    if (!term) {
+      this.viewTemas = [...this.temas];
+      return;
+    }
+    // Filtro client-side sobre la página actual (MVP). No altera la paginación del servidor.
+    this.viewTemas = (this.temas || []).filter((t) => {
       const n = (t.nombre || '').toLowerCase();
-      const mBasic = !term || n.includes(term);
-      const mNombre = !nombre || n.includes(nombre);
-      const mActivo = activo === null || t.activo === activo;
-      return mBasic && mNombre && mActivo;
+      const s = (t.slug || '').toLowerCase();
+      return n.includes(term) || s.includes(term);
     });
-    this.totalElements = this.filteredTemas.length;
-    this.pageNo = 0;
-    this.updatePage();
   }
 
   reset(): void {
     this.basicSearchText = '';
-    this.filtroNombre = '';
-    this.filtroActivo = null;
-    this.pageNo = 0;
     this.search();
   }
 
   onPageChange(page: number): void {
-    const totalPages = this.getTotalPages();
-    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, totalPages - 1)));
+    const safePage = Math.max(0, Math.min(Number(page) || 0, Math.max(0, this.totalPages - 1)));
     if (safePage === this.pageNo) return;
     this.pageNo = safePage;
-    this.updatePage();
+    this.obtenerListaTemas();
   }
 
-  getTotalPages(): number {
-    return Math.max(1, Math.ceil(this.totalElements / this.pageSize));
+  ordenar(field: string, direction: 'ASC' | 'DESC'): void {
+    if (this.currentSortField !== field || this.currentSortDirection !== direction) {
+      this.currentSortField = field;
+      this.currentSortDirection = direction;
+      this.pageNo = 0;
+      this.obtenerListaTemas();
+    }
   }
 
-  private updatePage(): void {
-    const start = this.pageNo * this.pageSize;
-    const end = start + this.pageSize;
-    this.pagedTemas = this.filteredTemas.slice(start, end);
+  getSortIcon(): string {
+    if (!this.currentSortField) return 'cilSortAlphaDown';
+    return this.currentSortDirection === 'ASC' ? 'cilSortAlphaUp' : 'cilSortAlphaDown';
+  }
+
+  isSortActive(field: string, direction: 'ASC' | 'DESC'): boolean {
+    return this.currentSortField === field && this.currentSortDirection === direction;
+  }
+
+  // ===== Acciones =====
+  preview(t: Tema): void {
+    if (!t?.slug) return;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService.createPreviewToken(t.slug, context).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (resp) => {
+        const url = resp?.previewUrl || '';
+        const finalUrl = url.startsWith('/') ? `${window.location.origin}${url}` : url;
+        if (finalUrl) window.open(finalUrl, '_blank');
+      },
+      error: (err) => {
+        this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
+        this.log.error('temas preview', err);
+      },
+    });
+  }
+
+  publish(t: Tema): void {
+    if (!t?.slug) return;
+    this.loading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService.publish(t.slug, context).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.loading = false;
+        this.obtenerListaTemas();
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
+        this.log.error('temas publish', err);
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  activate(t: Tema): void {
+    if (!t?.slug) return;
+    this.loading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService.activate(t.slug, undefined, context).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.loading = false;
+        this.obtenerListaTemas();
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
+        this.log.error('temas activate', err);
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  onUploadDraftZip(t: Tema, ev: Event): void {
+    const input = ev.target as HTMLInputElement;
+    const file = input?.files && input.files.length ? input.files[0] : null;
+    if (!t?.slug || !file) return;
+
+    this.loading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService.uploadDraftPackage(t.slug, file, context).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.loading = false;
+        input.value = '';
+        this.obtenerListaTemas();
+      },
+      error: (err) => {
+        this.loading = false;
+        input.value = '';
+        this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
+        this.log.error('temas upload', err);
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private obtenerListaTemas(): void {
+    this.loading = true;
+    this.error = null;
+
+    const sortBy = this.currentSortField || 'idTema';
+    const sortDir = this.currentSortDirection || 'DESC';
+
+    this.temasService
+      .listarPaginaSinGlobalLoader(this.pageNo, this.pageSize, sortBy, sortDir)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (data: any) => this.setPageData(data),
+        error: (err) => {
+          this.error = 'Error cargando temas';
+          this.log.error('temas listar', err);
+        },
+      });
+  }
+
+  private setPageData(data: any): void {
+    const raw = data?.elements ?? (Array.isArray(data) ? data : []);
+    const elementos: Tema[] = Array.isArray(raw) ? raw : [];
+    this.temas = elementos;
+    this.viewTemas = [...elementos];
+
+    this.totalElements = Number(data?.totalElements ?? elementos.length ?? 0);
+    this.totalPages = Number(data?.totalPages ?? 1);
+    this.numberOfElements = Number(data?.numberOfElements ?? elementos.length ?? 0);
+
+    if (this.temas.length === 0 && this.pageNo > 0 && this.pageNo >= this.totalPages) {
+      this.pageNo = Math.max(0, this.totalPages - 1);
+      this.obtenerListaTemas();
+      return;
+    }
+
+    this.search();
   }
 }
