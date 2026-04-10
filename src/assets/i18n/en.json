@@ -77,6 +77,8 @@
     "ENABLE_EDIT": "Enable Editing",
     "FILTERS": "Filters",
     "SORT": "Sort",
+    "CREATED_AT": "Created",
+    "UPDATED_AT": "Updated",
     "NO_RESULTS": "No results found",
     "VALIDATION": {
       "REQUIRED": "This field is required",

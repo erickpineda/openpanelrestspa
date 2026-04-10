@@ -172,6 +172,8 @@
     "UNPUBLISHED": "No Publicada",
     "FILTERS": "Filtros",
     "SORT": "Ordenar",
+    "CREATED_AT": "Creado",
+    "UPDATED_AT": "Últ. modif.",
     "ACTIVE": "Activos",
     "VALIDATION": {
       "REQUIRED": "Este campo es obligatorio",

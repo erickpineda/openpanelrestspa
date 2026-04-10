@@ -166,6 +166,12 @@
                 {{ 'COMMON.SLUG' | translate }}
               </th>
               <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
+                {{ 'COMMON.CREATED_AT' | translate }}
+              </th>
+              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
+                {{ 'COMMON.UPDATED_AT' | translate }}
+              </th>
+              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
                 {{ 'ADMIN.THEMES.TABLE.DRAFT' | translate }}
               </th>
               <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
@@ -190,7 +196,17 @@
                   <div class="fw-bold text-primary">{{ t.nombre }}</div>
                 </td>
                 <td class="px-3">
-                  <code class="text-muted">{{ t.slug }}</code>
+                  <code class="text-muted text-uppercase">{{ t.slug }}</code>
+                </td>
+                <td class="px-3 text-nowrap">
+                  <span class="text-muted">
+                    {{ t.fechaCreacion | date: 'dd-MM-yyyy HH:mm:ss' }}
+                  </span>
+                </td>
+                <td class="px-3 text-nowrap">
+                  <span class="text-muted">
+                    {{ t.fechaUltimaModif | date: 'dd-MM-yyyy HH:mm:ss' }}
+                  </span>
                 </td>
                 <td class="px-3">
                   @if (t.draft) {
@@ -332,70 +348,70 @@
   size="lg"
 >
   <c-modal-header>
-    <h5 cModalTitle class="fw-bold">
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilPaint" class="text-primary"></svg>
       {{
         editItem ? ('ADMIN.THEMES.EDIT_THEME' | translate) : ('ADMIN.THEMES.NEW_THEME' | translate)
       }}
     </h5>
     <button cButtonClose (click)="closeModal()"></button>
   </c-modal-header>
-  <c-modal-body>
-    <form [formGroup]="form" class="d-flex flex-column gap-3">
-      <div class="mb-3">
-        <label class="form-label small fw-bold text-muted">{{
-          'COMMON.NAME' | translate
-        }}</label>
-        <input
-          cFormControl
-          type="text"
-          formControlName="nombre"
-          [placeholder]="'COMMON.NAME' | translate"
-          [valid]="form.get('nombre')?.touched && form.get('nombre')?.valid"
-          [class.is-invalid]="form.get('nombre')?.touched && form.get('nombre')?.invalid"
-        />
-        @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
-          <div class="invalid-feedback d-block">{{ 'ADMIN.THEMES.NAME_REQUIRED' | translate }}</div>
-        }
-      </div>
+  <c-modal-body class="py-4">
+    <form [formGroup]="form">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">{{ 'COMMON.NAME' | translate }}</label>
+          <input
+            cFormControl
+            type="text"
+            formControlName="nombre"
+            [placeholder]="'COMMON.NAME' | translate"
+            [valid]="form.get('nombre')?.touched && form.get('nombre')?.valid"
+            [class.is-invalid]="form.get('nombre')?.touched && form.get('nombre')?.invalid"
+          />
+          @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+            <div class="invalid-feedback d-block">{{ 'ADMIN.THEMES.NAME_REQUIRED' | translate }}</div>
+          }
+        </div>
 
-      <div class="mb-3">
-        <label class="form-label small fw-bold text-muted">{{ 'COMMON.SLUG' | translate }}</label>
-        <input
-          cFormControl
-          type="text"
-          formControlName="slug"
-          [placeholder]="'ADMIN.THEMES.SLUG_PLACEHOLDER' | translate"
-        />
-        <div class="form-text">{{ 'ADMIN.THEMES.SLUG_HELP' | translate }}</div>
-      </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">{{ 'COMMON.SLUG' | translate }}</label>
+          <input
+            cFormControl
+            type="text"
+            formControlName="slug"
+            class="text-uppercase"
+            [placeholder]="'ADMIN.THEMES.SLUG_PLACEHOLDER' | translate"
+            [disabled]="isEditing"
+          />
+          <div class="form-text">{{ 'ADMIN.THEMES.SLUG_HELP' | translate }}</div>
+        </div>
 
-      <div class="mb-3">
-        <label class="form-label small fw-bold text-muted">{{ 'COMMON.DESCRIPTION' | translate }}</label>
-        <textarea
-          cFormControl
-          id="descripcion"
-          formControlName="descripcion"
-          rows="3"
-          [placeholder]="'COMMON.DESCRIPTION' | translate"
-        ></textarea>
+        <div class="col-12">
+          <label class="form-label small fw-bold text-muted">{{ 'COMMON.DESCRIPTION' | translate }}</label>
+          <textarea
+            cFormControl
+            id="descripcion"
+            formControlName="descripcion"
+            rows="2"
+            [placeholder]="'COMMON.DESCRIPTION' | translate"
+          ></textarea>
+        </div>
       </div>
     </form>
   </c-modal-body>
-  <c-modal-footer>
+  <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
+    <div></div>
+    <div class="d-flex gap-2">
     <button cButton color="secondary" variant="ghost" (click)="closeModal()">
       {{ 'COMMON.CANCEL' | translate }}
     </button>
     <button
       cButton
       color="primary"
+    </div>
       class="px-4"
       [disabled]="form.invalid || loading"
-      (click)="save()"
-    >
-      {{ 'COMMON.SAVE' | translate }}
-    </button>
-  </c-modal-footer>
-</c-modal>
 
 <app-confirmation-modal
   [visible]="showDeleteModal"

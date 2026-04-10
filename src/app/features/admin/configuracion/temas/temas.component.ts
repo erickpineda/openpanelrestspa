@@ -58,6 +58,23 @@ export class TemasComponent implements OnInit, OnDestroy {
       slug: ['', Validators.maxLength(100)],
       descripcion: ['', Validators.maxLength(255)],
     });
+
+    // El "código" (slug) debe almacenarse en minúsculas (backend lo exige),
+    // pero mostrarse en mayúsculas en la UI (text-uppercase en template).
+    this.form
+      .get('slug')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((v: any) => {
+        if (v == null) return;
+        const normalized = String(v)
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '');
+        if (normalized !== v) {
+          this.form.get('slug')?.setValue(normalized, { emitEvent: false });
+        }
+      });
   }
 
   ngOnInit(): void {
@@ -76,6 +93,7 @@ export class TemasComponent implements OnInit, OnDestroy {
   openNew(): void {
     this.editItem = null;
     this.form.reset({ nombre: '', slug: '', descripcion: '' });
+    this.form.get('slug')?.enable({ emitEvent: false });
     this.modalVisible = true;
   }
 
@@ -86,6 +104,8 @@ export class TemasComponent implements OnInit, OnDestroy {
       slug: item.slug || '',
       descripcion: item.descripcion || '',
     });
+    // El slug no se puede modificar una vez creado.
+    this.form.get('slug')?.disable({ emitEvent: false });
     this.modalVisible = true;
   }
 
@@ -106,9 +126,12 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.loading = true;
     const payload: Partial<Tema> = {
       nombre: this.form.value.nombre,
-      slug: (this.form.value.slug || '').trim() || undefined,
       descripcion: (this.form.value.descripcion || '').trim() || undefined,
     };
+    // Solo permitir slug en creación; en edición debe ser inmutable.
+    if (!this.isEditing) {
+      payload.slug = (this.form.get('slug')?.value || '').trim() || undefined;
+    }
     const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     const op = this.editItem?.slug
       ? this.temasService.actualizarPorSlug(this.editItem.slug, payload, context)
