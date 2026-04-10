@@ -447,7 +447,7 @@
 <!-- Modal Borrador -->
 <c-modal
   [visible]="draftModalVisible"
-  (visibleChange)="draftModalVisible = $event; if (!$event) closeDraftModal()"
+  (visibleChange)="onDraftModalVisibleChange($event)"
   size="xl"
   backdrop="static"
   scrollable

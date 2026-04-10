@@ -313,14 +313,25 @@ export class TemasComponent implements OnInit, OnDestroy {
   }
 
   closeDraftModal(): void {
-    this.draftModalVisible = false;
+    this.closeDraftModalInternal(true);
+  }
+
+  onDraftModalVisibleChange(visible: boolean): void {
+    this.draftModalVisible = visible;
+    if (!visible) {
+      this.closeDraftModalInternal(false);
+    }
+    this.cdr.detectChanges();
+  }
+
+  private closeDraftModalInternal(setVisible: boolean): void {
+    if (setVisible) this.draftModalVisible = false;
     this.draftTema = null;
     this.draftData = null;
     this.draftTokensJson = '';
     this.draftMetadataJson = '';
     this.draftAllowTokensEdit = false;
     this.showConvertDraftModal = false;
-    this.cdr.detectChanges();
   }
 
   askConvertDraftToTokens(): void {
