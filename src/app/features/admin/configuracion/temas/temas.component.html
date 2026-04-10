@@ -254,6 +254,7 @@
                       variant="ghost"
                       size="sm"
                       (click)="preview(t)"
+                      [disabled]="!t.draft && !t.published"
                       [cTooltip]="'ADMIN.THEMES.TOOLTIP.PREVIEW' | translate"
                     >
                       <svg cIcon name="cilMediaPlay"></svg>
@@ -382,7 +383,6 @@
             formControlName="slug"
             class="text-uppercase"
             [placeholder]="'ADMIN.THEMES.SLUG_PLACEHOLDER' | translate"
-            [disabled]="isEditing"
           />
           <div class="form-text">{{ 'ADMIN.THEMES.SLUG_HELP' | translate }}</div>
         </div>

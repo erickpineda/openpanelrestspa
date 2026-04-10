@@ -272,6 +272,7 @@
       "SEARCH_PLACEHOLDER": "Buscar tema...",
       "NO_THEMES_FOUND": "No se encontraron temas",
       "ADJUST_FILTERS_HELP": "Intenta ajustar los filtros",
+      "PREVIEW_NO_VERSION": "Para previsualizar, el tema debe tener un borrador o una versión publicada.",
       "EDIT_THEME": "Editar Tema",
       "NAME_REQUIRED": "El nombre es obligatorio",
       "COLOR_SCHEME_PLACEHOLDER": "JSON del esquema de color...",

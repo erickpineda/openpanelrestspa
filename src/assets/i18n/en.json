@@ -177,6 +177,7 @@
       "SEARCH_PLACEHOLDER": "Search theme...",
       "NO_THEMES_FOUND": "No themes found",
       "ADJUST_FILTERS_HELP": "Try adjusting filters",
+      "PREVIEW_NO_VERSION": "To preview, the theme must have a draft or a published version.",
       "EDIT_THEME": "Edit Theme",
       "NAME_REQUIRED": "Name is required",
       "COLOR_SCHEME_PLACEHOLDER": "Color scheme JSON...",

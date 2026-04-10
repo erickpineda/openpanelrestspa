@@ -262,6 +262,13 @@ export class TemasComponent implements OnInit, OnDestroy {
   // ===== Acciones =====
   preview(t: Tema): void {
     if (!t?.slug) return;
+    if (!t.draft && !t.published) {
+      this.toast.showWarning(
+        this.translate.instant('ADMIN.THEMES.PREVIEW_NO_VERSION'),
+        this.translate.instant('MENU.THEMES')
+      );
+      return;
+    }
     const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
     this.temasService.createPreviewToken(t.slug, context).pipe(takeUntil(this.destroy$)).subscribe({
       next: (resp) => {
