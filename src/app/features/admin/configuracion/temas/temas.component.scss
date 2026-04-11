@@ -1,3 +1,17 @@
 .card {
   min-height: 240px;
 }
+
+// Mantener la columna de acciones visible al hacer scroll horizontal en la tabla
+.sticky-actions {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: var(--cui-card-bg, #fff);
+  box-shadow: -8px 0 12px -12px rgba(0, 0, 0, 0.35);
+}
+
+.sticky-actions--header {
+  z-index: 3;
+  background: var(--cui-card-cap-bg, #f8f9fa);
+}
