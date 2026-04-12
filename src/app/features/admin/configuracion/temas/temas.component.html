@@ -135,7 +135,7 @@
       </div>
 
       <!-- Tabla -->
-      <div class="table-responsive">
+      <div class="table-responsive op-table-responsive">
         @if (loading) {
           <div
             class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex justify-content-center align-items-center"
@@ -294,7 +294,7 @@
                       >
                         <svg cIcon name="cilOptions"></svg>
                       </button>
-                      <ul cDropdownMenu>
+                      <ul cDropdownMenu class="dropdown-menu-end">
                         <li>
                           <button cDropdownItem (click)="openDraft(t)">
                             <svg cIcon name="cilDescription" class="me-2"></svg>
