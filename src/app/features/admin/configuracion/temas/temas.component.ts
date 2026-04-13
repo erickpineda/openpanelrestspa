@@ -5,6 +5,7 @@ import { Tema, TemaDraft } from '../../../../core/models/tema.model';
 import { TemaPreset } from '../../../../core/models/tema-preset.model';
 import { TemaPresetsService } from '../../../../core/services/data/tema-presets.service';
 import { PublicThemesService } from '../../../../core/services/data/public-themes.service';
+import { ThemeRuntimeService } from '../../../public/services/theme-runtime.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
@@ -65,6 +66,7 @@ export class TemasComponent implements OnInit, OnDestroy {
   manageTema: Tema | null = null;
   private manageAllowClose = false;
   activePublicThemeSlug: string | null = null;
+  showResetActiveThemeConfirm = false;
 
   // Presets (global)
   presets: TemaPreset[] = [];
@@ -79,6 +81,7 @@ export class TemasComponent implements OnInit, OnDestroy {
     private temasService: TemasService,
     private presetsService: TemaPresetsService,
     private publicThemes: PublicThemesService,
+    private themeRuntime: ThemeRuntimeService,
     private fb: FormBuilder,
     private toast: ToastService,
     private log: LoggerService,
@@ -161,6 +164,35 @@ export class TemasComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (t) => (this.activePublicThemeSlug = t?.slug ?? null),
         error: () => (this.activePublicThemeSlug = null),
+      });
+  }
+
+  askResetActiveTheme(): void {
+    this.showResetActiveThemeConfirm = true;
+  }
+
+  confirmResetActiveTheme(): void {
+    this.showResetActiveThemeConfirm = false;
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService
+      .resetActiveTheme(ctx)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toast.showSuccess(
+            this.translate.instant('ADMIN.THEMES.ACTIVE.RESET_SUCCESS'),
+            this.translate.instant('MENU.THEMES')
+          );
+          this.loadActivePublicTheme();
+          this.themeRuntime.refreshActive().subscribe();
+        },
+        error: (err) => {
+          this.log.error('temas reset active', err);
+          this.toast.showError(
+            this.translate.instant('ADMIN.THEMES.ACTIVE.RESET_ERROR'),
+            this.translate.instant('MENU.THEMES')
+          );
+        },
       });
   }
 
@@ -744,6 +776,8 @@ export class TemasComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.obtenerListaTemas();
         this.loadActivePublicTheme();
+        // Aplicar inmediatamente el tema activo en la SPA (sin recargar)
+        this.themeRuntime.refreshActive().subscribe();
       },
       error: (err) => {
         this.loading = false;

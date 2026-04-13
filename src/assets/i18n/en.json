@@ -234,7 +234,12 @@
       "ACTIVE": {
         "LABEL": "Active theme",
         "NONE": "None (default)",
-        "INFO": "Publishing does not change the active theme. To apply it on the public site you must activate it."
+        "INFO": "Publishing does not change the active theme. To apply it on the public site you must activate it.",
+        "RESET_BUTTON": "Restore default",
+        "RESET_CONFIRM_TITLE": "Restore theme",
+        "RESET_CONFIRM_MSG": "The active theme will be cleared and the app will return to the default theme. Continue?",
+        "RESET_SUCCESS": "Theme restored to default",
+        "RESET_ERROR": "Error restoring theme"
       }
     },
     "PROFILE": {

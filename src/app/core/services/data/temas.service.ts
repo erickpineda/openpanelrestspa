@@ -159,6 +159,16 @@ export class TemasService extends CrudService<Tema, number> {
     );
   }
 
+  resetActiveTheme(context?: HttpContext): Observable<boolean> {
+    return this.safeDeleteOperation(
+      `${this.endpoint}/active`,
+      undefined,
+      undefined,
+      'temas.active.reset',
+      context
+    );
+  }
+
   activate(slug: string, version?: number, context?: HttpContext): Observable<Tema> {
     const params: any = {};
     if (version != null) params['version'] = String(version);

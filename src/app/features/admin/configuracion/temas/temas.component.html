@@ -7,6 +7,16 @@
           <h4 class="mb-0 text-primary">{{ 'ADMIN.THEMES.TITLE' | translate }}</h4>
         </div>
         <div class="d-flex gap-2">
+          <button
+            cButton
+            color="secondary"
+            variant="outline"
+            [cTooltip]="'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate"
+            (click)="askResetActiveTheme()"
+          >
+            <svg cIcon name="cilReload" size="sm" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate }}
+          </button>
           <button cButton color="secondary" variant="outline" (click)="openPresetsModal()">
             <svg cIcon name="cilPaintBucket" size="sm" class="me-2"></svg>
             {{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}
@@ -430,6 +440,12 @@
               {{ activePublicThemeSlug || ('ADMIN.THEMES.ACTIVE.NONE' | translate) }}
             </c-badge>
             <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.ACTIVE.INFO' | translate }}</div>
+            <div class="mt-2">
+              <button cButton color="secondary" variant="outline" size="sm" (click)="askResetActiveTheme()">
+                <svg cIcon name="cilReload" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -666,6 +682,18 @@
   [loading]="loading"
   (visibleChange)="showApplyPresetConfirm = $event"
   (confirm)="applyPresetConfirm()"
+></app-confirmation-modal>
+
+<app-confirmation-modal
+  [visible]="showResetActiveThemeConfirm"
+  [title]="'ADMIN.THEMES.ACTIVE.RESET_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.ACTIVE.RESET_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'warning'"
+  [loading]="loading"
+  (visibleChange)="showResetActiveThemeConfirm = $event"
+  (confirm)="confirmResetActiveTheme()"
 ></app-confirmation-modal>
 
 <!-- Modal Borrador -->

@@ -7,7 +7,7 @@ import { environment } from '@env/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeRuntimeService {
-  private appliedKey?: string;
+  private appliedSignature?: string;
 
   constructor(private publicThemes: PublicThemesService) {}
 
@@ -23,7 +23,8 @@ export class ThemeRuntimeService {
 
     if (previewThemeSlug && previewToken) {
       return this.publicThemes.getPreview(previewThemeSlug, previewToken).pipe(
-        tap((t) => this.applyTheme(t, `preview:${previewThemeSlug}`)),
+        // Incluir token para que re-aplique si cambia la preview (p.ej. nuevo token tras modificar borrador)
+        tap((t) => this.applyTheme(t, `preview:${previewThemeSlug}:${previewToken}`)),
         catchError(() =>
           this.publicThemes.getActive().pipe(
             tap((t) => this.applyTheme(t, 'active')),
@@ -41,13 +42,43 @@ export class ThemeRuntimeService {
     );
   }
 
+  /**
+   * Fuerza recarga del tema activo (útil tras "Activar" en admin).
+   */
+  refreshActive() {
+    return this.publicThemes.getActive().pipe(
+      tap((t) => this.applyTheme(t, 'active')),
+      map(() => void 0),
+      catchError(() => of(void 0))
+    );
+  }
+
   private applyTheme(theme: PublicTheme, key: string) {
     if (!theme) return;
-    if (this.appliedKey === key) return;
+    const signature = this.buildSignature(theme, key);
+    if (this.appliedSignature === signature) return;
 
     this.applyTokens(theme.tokensJson);
     this.applyCssUrl(theme.cssUrl);
-    this.appliedKey = key;
+    this.appliedSignature = signature;
+  }
+
+  private buildSignature(theme: PublicTheme, key: string): string {
+    const slug = theme.slug ?? '';
+    const cssUrl = theme.cssUrl ?? '';
+    const assetsUrl = (theme as any).assetsUrl ?? '';
+    const tokenHash = this.hashString(theme.tokensJson ?? '');
+    return `${key}|${slug}|${cssUrl}|${assetsUrl}|${tokenHash}`;
+  }
+
+  // Hash simple para evitar guardar tokensJson completos como firma
+  private hashString(s: string): number {
+    let hash = 5381;
+    for (let i = 0; i < s.length; i++) {
+      hash = (hash * 33) ^ s.charCodeAt(i);
+    }
+    // Forzar uint32
+    return hash >>> 0;
   }
 
   private applyTokens(tokensJson: string) {

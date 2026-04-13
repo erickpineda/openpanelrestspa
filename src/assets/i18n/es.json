@@ -329,7 +329,12 @@
       "ACTIVE": {
         "LABEL": "Tema activo",
         "NONE": "Ninguno (default)",
-        "INFO": "Publicar no cambia el tema activo. Para que se aplique en la web pública debes activarlo."
+        "INFO": "Publicar no cambia el tema activo. Para que se aplique en la web pública debes activarlo.",
+        "RESET_BUTTON": "Restaurar por defecto",
+        "RESET_CONFIRM_TITLE": "Restaurar tema",
+        "RESET_CONFIRM_MSG": "Se quitará el tema activo y se volverá al tema por defecto. ¿Continuar?",
+        "RESET_SUCCESS": "Tema restablecido al por defecto",
+        "RESET_ERROR": "Error restableciendo el tema"
       }
     },
     "PROFILE": {

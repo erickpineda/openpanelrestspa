@@ -2,12 +2,15 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { HttpContext } from '@angular/common/http';
 import { AjustesService } from '../../../../core/services/data/ajustes.service';
 import { Ajustes } from '../../../../core/models/ajustes.model';
+import { TemasService } from '../../../../core/services/data/temas.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { TranslationService } from '../../../../core/services/translation.service';
+import { SKIP_GLOBAL_LOADER } from '../../../../core/interceptor/network.interceptor';
+import { ThemeRuntimeService } from '../../../public/services/theme-runtime.service';
 
 @Component({
   selector: 'app-ajustes',
@@ -45,8 +48,12 @@ export class AjustesComponent implements OnInit, OnDestroy {
   currentSortField?: string;
   currentSortDirection?: 'ASC' | 'DESC';
 
+  showResetActiveThemeConfirm = false;
+
   constructor(
     private ajustesService: AjustesService,
+    private temasService: TemasService,
+    private themeRuntime: ThemeRuntimeService,
     private fb: FormBuilder,
     private toast: ToastService,
     private log: LoggerService,
@@ -89,6 +96,37 @@ export class AjustesComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.error = 'Error cargando ajustes';
           this.log.error('ajustes listar', err);
+        },
+      });
+  }
+
+  askResetActiveTheme(): void {
+    this.showResetActiveThemeConfirm = true;
+    this.cdr.detectChanges();
+  }
+
+  confirmResetActiveTheme(): void {
+    this.showResetActiveThemeConfirm = false;
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService
+      .resetActiveTheme(ctx)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toast.showSuccess(
+            this.translate.instant('ADMIN.THEMES.ACTIVE.RESET_SUCCESS'),
+            this.translate.instant('MENU.SETTINGS')
+          );
+          this.themeRuntime.refreshActive().subscribe();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.log.error('reset theme', err);
+          this.toast.showError(
+            this.translate.instant('ADMIN.THEMES.ACTIVE.RESET_ERROR'),
+            this.translate.instant('MENU.SETTINGS')
+          );
+          this.cdr.detectChanges();
         },
       });
   }

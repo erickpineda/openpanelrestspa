@@ -1,5 +1,6 @@
 // src/app/app.component.ts
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TokenStorageService } from './core/services/auth/token-storage.service';
 import { AuthSyncService } from './core/services/auth/auth-sync.service';
 import { LoggerService } from './core/services/logger.service';
@@ -14,6 +15,8 @@ import { GtmService } from './core/services/analytics/gtm.service';
 import { AnalyticsRouterService } from './core/services/analytics/analytics-router.service';
 import { ReaderPreferencesService } from './features/public/services/reader-preferences.service';
 import { UserInteractionsSyncService } from './core/services/sync/user-interactions-sync.service';
+import { ThemeRuntimeService } from './features/public/services/theme-runtime.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +29,8 @@ export class AppComponent implements OnInit {
   loading: boolean = false;
 
   constructor(
+    private router: Router,
+    private route: ActivatedRoute,
     private authSync: AuthSyncService,
     private log: LoggerService,
     private authService: AuthService,
@@ -37,7 +42,8 @@ export class AppComponent implements OnInit {
     private gtm: GtmService,
     private analyticsRouter: AnalyticsRouterService,
     private readerPrefs: ReaderPreferencesService,
-    private userInteractionsSync: UserInteractionsSyncService
+    private userInteractionsSync: UserInteractionsSyncService,
+    private themeRuntime: ThemeRuntimeService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
@@ -71,5 +77,11 @@ export class AppComponent implements OnInit {
     setTimeout(() => {
       this.uiMonitor.scanAndRecover('startup_safety');
     }, 2000);
+
+    // Aplicar tema activo / preview al iniciar y en cada navegación (incluye /admin directo).
+    this.themeRuntime.initFromRoute(this.route).subscribe();
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
+      this.themeRuntime.initFromRoute(this.route).subscribe();
+    });
   }
 }
