@@ -178,9 +178,16 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.showResetActiveThemeConfirm = false;
     const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
     this.themeActionLoading = true;
+    this.cdr.detectChanges();
     this.temasService
       .resetActiveTheme(ctx)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.themeActionLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: () => {
           this.toast.showSuccess(
@@ -189,7 +196,6 @@ export class TemasComponent implements OnInit, OnDestroy {
           );
           this.loadActivePublicTheme();
           this.themeRuntime.refreshActive().subscribe();
-          this.themeActionLoading = false;
         },
         error: (err) => {
           this.log.error('temas reset active', err);
@@ -197,7 +203,6 @@ export class TemasComponent implements OnInit, OnDestroy {
             this.translate.instant('ADMIN.THEMES.ACTIVE.RESET_ERROR'),
             this.translate.instant('MENU.THEMES')
           );
-          this.themeActionLoading = false;
         },
       });
   }
@@ -841,22 +846,29 @@ export class TemasComponent implements OnInit, OnDestroy {
     if (!t?.slug) return;
     this.loading = true;
     this.themeActionLoading = true;
+    this.cdr.detectChanges();
     const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
-    this.temasService.activate(t.slug, undefined, context).pipe(takeUntil(this.destroy$)).subscribe({
+    this.temasService
+      .activate(t.slug, undefined, context)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.themeActionLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
       next: () => {
-        this.loading = false;
         this.obtenerListaTemas();
         this.loadActivePublicTheme();
         // Aplicar inmediatamente el tema activo en la SPA (sin recargar)
         this.themeRuntime.refreshActive().subscribe();
-        this.themeActionLoading = false;
       },
       error: (err) => {
-        this.loading = false;
         this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
         this.log.error('temas activate', err);
         this.cdr.detectChanges();
-        this.themeActionLoading = false;
       },
     });
   }

@@ -441,9 +441,21 @@
             </c-badge>
             <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.ACTIVE.INFO' | translate }}</div>
             <div class="mt-2">
-              <button cButton color="secondary" variant="outline" size="sm" (click)="askResetActiveTheme()">
-                <svg cIcon name="cilReload" class="me-2"></svg>
-                {{ 'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate }}
+              <button
+                cButton
+                color="secondary"
+                variant="outline"
+                size="sm"
+                (click)="askResetActiveTheme()"
+                [disabled]="themeActionLoading"
+              >
+                @if (themeActionLoading) {
+                  <c-spinner size="sm" class="me-2"></c-spinner>
+                  {{ 'ADMIN.THEMES.ACTIVE.DEACTIVATE_WORKING' | translate }}
+                } @else {
+                  <svg cIcon name="cilReload" class="me-2"></svg>
+                  {{ 'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate }}
+                }
               </button>
             </div>
           </div>
@@ -459,13 +471,27 @@
 
         <div class="row g-2">
           <div class="col-12 col-md-6">
-            <button cButton color="secondary" variant="outline" class="w-100" (click)="onManageDraft()">
+            <button
+              cButton
+              color="secondary"
+              variant="outline"
+              class="w-100"
+              (click)="onManageDraft()"
+              [disabled]="themeActionLoading"
+            >
               <svg cIcon name="cilNotes" class="me-2"></svg>
               {{ 'ADMIN.THEMES.DRAFT.ACTION' | translate }}
             </button>
           </div>
           <div class="col-12 col-md-6">
-            <button cButton color="secondary" variant="outline" class="w-100" (click)="manageZipInput.click()">
+            <button
+              cButton
+              color="secondary"
+              variant="outline"
+              class="w-100"
+              (click)="manageZipInput.click()"
+              [disabled]="themeActionLoading"
+            >
               <svg cIcon name="cilCloudUpload" class="me-2"></svg>
               {{ 'ADMIN.THEMES.TOOLTIP.UPLOAD_DRAFT_ZIP' | translate }}
             </button>
@@ -558,13 +584,27 @@
             }
           </div>
           <div class="col-12 col-md-6">
-            <button cButton color="primary" variant="outline" class="w-100" (click)="onManageEdit()">
+            <button
+              cButton
+              color="primary"
+              variant="outline"
+              class="w-100"
+              (click)="onManageEdit()"
+              [disabled]="themeActionLoading"
+            >
               <svg cIcon name="cilPen" class="me-2"></svg>
               {{ 'COMMON.EDIT' | translate }}
             </button>
           </div>
           <div class="col-12">
-            <button cButton color="danger" variant="outline" class="w-100" (click)="onManageDelete()">
+            <button
+              cButton
+              color="danger"
+              variant="outline"
+              class="w-100"
+              (click)="onManageDelete()"
+              [disabled]="themeActionLoading"
+            >
               <svg cIcon name="cilTrash" class="me-2"></svg>
               {{ 'COMMON.DELETE' | translate }}
             </button>
@@ -591,7 +631,7 @@
                 cButton
                 color="primary"
                 class="w-100"
-                [disabled]="!applyPresetId"
+                [disabled]="themeActionLoading || !applyPresetId"
                 (click)="applyPresetAskConfirm()"
               >
                 {{ 'ADMIN.THEMES.PRESETS.APPLY' | translate }}
