@@ -757,6 +757,26 @@ export class TemasComponent implements OnInit, OnDestroy {
       next: () => {
         this.loading = false;
         this.obtenerListaTemas();
+        // Si estamos gestionando este tema en el modal, refrescarlo para que desaparezca el draft
+        // y se deshabilite el botón "Publicar" (evita segundo click con error 400).
+        if (this.manageTema?.slug === t.slug) {
+          this.temasService
+            .obtenerPorSlug(t.slug, context)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (fresh) => {
+                this.manageTema = fresh || null;
+                this.cdr.detectChanges();
+              },
+              error: () => {
+                // fallback: al menos quitar draft local para evitar botón habilitado
+                if (this.manageTema) {
+                  (this.manageTema as any).draft = null;
+                  this.cdr.detectChanges();
+                }
+              },
+            });
+        }
       },
       error: (err) => {
         this.loading = false;
