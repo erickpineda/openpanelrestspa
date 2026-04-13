@@ -264,6 +264,7 @@
         "TITLE": "How to use",
         "SUBTITLE": "Quick guide to the recommended workflow for themes.",
         "HIDE_FOREVER": "Hide guide",
+        "SHOW_TOOLTIP": "Show guide",
         "SELECT_THEME": "Theme to guide",
         "STEP_DRAFT": "Draft",
         "STEP_PRESETS": "Presets",

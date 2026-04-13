@@ -11,6 +11,15 @@
             cButton
             color="secondary"
             variant="outline"
+            [cTooltip]="'ADMIN.THEMES.GUIDE.SHOW_TOOLTIP' | translate"
+            (click)="showGuideFromHeader()"
+          >
+            <svg cIcon name="cilInfo" size="sm"></svg>
+          </button>
+          <button
+            cButton
+            color="secondary"
+            variant="outline"
             [cTooltip]="'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate"
             (click)="askResetActiveTheme()"
           >

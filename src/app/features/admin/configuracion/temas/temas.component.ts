@@ -177,6 +177,18 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  showGuideFromHeader(): void {
+    this.showGuide = true;
+    this.guideCollapsed = false;
+    try {
+      localStorage.removeItem(this.GUIDE_DISMISSED_KEY);
+    } catch {
+      // ignore
+    }
+    this.syncGuideTema();
+    this.cdr.detectChanges();
+  }
+
   onGuideTemaChange(slug: string | null): void {
     this.guideTemaSlug = slug;
     this.guideTema = this.temas.find((t) => (t?.slug || '').toLowerCase() === (slug || '').toLowerCase()) ?? null;

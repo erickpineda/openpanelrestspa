@@ -359,6 +359,7 @@
         "TITLE": "Cómo se usa",
         "SUBTITLE": "Guía rápida del flujo recomendado para trabajar con temas.",
         "HIDE_FOREVER": "Ocultar guía",
+        "SHOW_TOOLTIP": "Mostrar guía",
         "SELECT_THEME": "Tema para guiar",
         "STEP_DRAFT": "Borrador",
         "STEP_PRESETS": "Presets",
