@@ -69,17 +69,10 @@
                   it.title.length > 30 ? (it.title | slice: 0 : 30) + '...' : it.title
                 }}</strong>
                 <div class="notif-meta d-flex align-items-center gap-2">
-                  @if (it.type === 'temporary') {
-                    <span class="notif-tag badge rounded-pill text-bg-warning">Temporal</span>
-                  }
-                  @if (it.unread) {
-                    <span class="badge rounded-pill text-bg-primary">Nuevo</span>
-                  }
                   <small class="small time">{{ timeAgo(it.timestamp) }}</small>
                 </div>
               </div>
-              <div class="small text-body mt-1">{{ it.message }}</div>
-              <div class="mt-3 d-flex gap-2">
+              <div class="mt-2 d-flex gap-2">
                 <button
                   cButton
                   color="secondary"

@@ -145,7 +145,7 @@
   flex: 0 0 auto;
   justify-content: flex-end;
   flex-wrap: wrap;
-  max-width: 60%;
+  max-width: 40%;
 }
 
 .notif-meta .time {
@@ -178,10 +178,7 @@
   filter: brightness(0.97);
 }
 
-.notif-tag {
-  /* Mantener alineación vertical con el resto de metadatos */
-  align-self: center;
-}
+/* .notif-tag: eliminado visualmente (ya no mostramos badges en el dropdown) */
 
 /* Pie */
 .notif-menu .dropdown-divider {
