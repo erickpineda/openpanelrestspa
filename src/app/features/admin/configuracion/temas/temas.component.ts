@@ -10,7 +10,7 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subject, takeUntil, finalize } from 'rxjs';
+import { Subject, takeUntil, finalize, forkJoin, of, switchMap, tap, map } from 'rxjs';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { SKIP_GLOBAL_LOADER } from '../../../../core/interceptor/network.interceptor';
 
@@ -165,9 +165,34 @@ export class TemasComponent implements OnInit, OnDestroy {
       .getActive(true)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (t) => (this.activePublicThemeSlug = t?.slug ?? null),
+        next: (t) => {
+          this.activePublicThemeSlug = t?.slug ?? null;
+          this.cdr.detectChanges();
+        },
         error: () => (this.activePublicThemeSlug = null),
       });
+  }
+
+  private refreshThemeStateAfterAction(context: HttpContext) {
+    const slug = this.manageTema?.slug;
+    const refreshActive$ = this.publicThemes.getActive(true).pipe(
+      tap((t) => (this.activePublicThemeSlug = t?.slug ?? null)),
+      map(() => true)
+    );
+    const refreshManage$ = slug
+      ? this.temasService.obtenerPorSlug(slug, context).pipe(
+          tap((t) => (this.manageTema = t || null)),
+          map(() => true)
+        )
+      : of(true);
+
+    // Reaplica tema en la SPA sin recargar
+    const refreshRuntime$ = this.themeRuntime.refreshActive().pipe(map(() => true));
+
+    return forkJoin([refreshActive$, refreshManage$, refreshRuntime$]).pipe(
+      tap(() => this.cdr.detectChanges()),
+      map(() => void 0)
+    );
   }
 
   askResetActiveTheme(): void {
@@ -183,6 +208,7 @@ export class TemasComponent implements OnInit, OnDestroy {
       .resetActiveTheme(ctx)
       .pipe(
         takeUntil(this.destroy$),
+        switchMap(() => this.refreshThemeStateAfterAction(ctx)),
         finalize(() => {
           this.themeActionLoading = false;
           this.cdr.detectChanges();
@@ -194,8 +220,6 @@ export class TemasComponent implements OnInit, OnDestroy {
             this.translate.instant('ADMIN.THEMES.ACTIVE.RESET_SUCCESS'),
             this.translate.instant('MENU.THEMES')
           );
-          this.loadActivePublicTheme();
-          this.themeRuntime.refreshActive().subscribe();
         },
         error: (err) => {
           this.log.error('temas reset active', err);
@@ -852,6 +876,7 @@ export class TemasComponent implements OnInit, OnDestroy {
       .activate(t.slug, undefined, context)
       .pipe(
         takeUntil(this.destroy$),
+        switchMap(() => this.refreshThemeStateAfterAction(context)),
         finalize(() => {
           this.loading = false;
           this.themeActionLoading = false;
@@ -861,9 +886,6 @@ export class TemasComponent implements OnInit, OnDestroy {
       .subscribe({
       next: () => {
         this.obtenerListaTemas();
-        this.loadActivePublicTheme();
-        // Aplicar inmediatamente el tema activo en la SPA (sin recargar)
-        this.themeRuntime.refreshActive().subscribe();
       },
       error: (err) => {
         this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
