@@ -6,10 +6,16 @@
           <svg cIcon name="cilPaint" size="lg" class="text-primary"></svg>
           <h4 class="mb-0 text-primary">{{ 'ADMIN.THEMES.TITLE' | translate }}</h4>
         </div>
-        <button cButton color="primary" class="text-white shadow-sm" (click)="openNew()">
-          <svg cIcon name="cilPlus" size="sm" class="me-2"></svg>
-          {{ 'ADMIN.THEMES.NEW_THEME' | translate }}
-        </button>
+        <div class="d-flex gap-2">
+          <button cButton color="secondary" variant="outline" (click)="openPresetsModal()">
+            <svg cIcon name="cilPaintBucket" size="sm" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}
+          </button>
+          <button cButton color="primary" class="text-white shadow-sm" (click)="openNew()">
+            <svg cIcon name="cilPlus" size="sm" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.NEW_THEME' | translate }}
+          </button>
+        </div>
       </div>
     </c-card-header>
 
@@ -414,6 +420,17 @@
               {{ mt.fechaUltimaModif | date: 'dd-MM-yyyy HH:mm:ss' }}
             </div>
           </div>
+
+          <div class="mt-3">
+            <div class="small text-muted fw-semibold mb-1">{{ 'ADMIN.THEMES.ACTIVE.LABEL' | translate }}:</div>
+            <c-badge
+              [color]="activePublicThemeSlug === mt.slug ? 'success' : 'secondary'"
+              shape="rounded-pill"
+            >
+              {{ activePublicThemeSlug || ('ADMIN.THEMES.ACTIVE.NONE' | translate) }}
+            </c-badge>
+            <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.ACTIVE.INFO' | translate }}</div>
+          </div>
         </div>
 
         <input
@@ -489,6 +506,36 @@
             </button>
           </div>
         </div>
+
+        <hr class="my-3" />
+        <div class="border rounded-3 p-3 bg-light bg-opacity-10">
+          <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}</div>
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-8">
+              <label class="form-label small text-muted fw-bold mb-1">{{
+                'ADMIN.THEMES.PRESETS.SELECT' | translate
+              }}</label>
+              <select cSelect [(ngModel)]="applyPresetId" [ngModelOptions]="{ standalone: true }">
+                <option [ngValue]="null">{{ 'ADMIN.THEMES.PRESETS.SELECT_PLACEHOLDER' | translate }}</option>
+                @for (p of presets; track p.idTemaPreset) {
+                  <option [ngValue]="p.idTemaPreset">{{ p.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-12 col-md-4">
+              <button
+                cButton
+                color="primary"
+                class="w-100"
+                [disabled]="!applyPresetId"
+                (click)="applyPresetAskConfirm()"
+              >
+                {{ 'ADMIN.THEMES.PRESETS.APPLY' | translate }}
+              </button>
+            </div>
+          </div>
+          <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.PRESETS.APPLY_HELP' | translate }}</div>
+        </div>
       </div>
     }
   </c-modal-body>
@@ -498,6 +545,128 @@
     </button>
   </c-modal-footer>
 </c-modal>
+
+<!-- Modal: Presets -->
+<c-modal
+  [visible]="presetsModalVisible"
+  (visibleChange)="presetsModalVisible = $event"
+  size="xl"
+  backdrop="static"
+  scrollable
+>
+  <c-modal-header>
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilPaintBucket" class="text-primary"></svg>
+      {{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}
+    </h5>
+    <button cButtonClose (click)="closePresetsModal()"></button>
+  </c-modal-header>
+  <c-modal-body class="py-4">
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+      <div class="text-muted small">{{ 'ADMIN.THEMES.PRESETS.DESC' | translate }}</div>
+      <div class="d-flex gap-2">
+        <button cButton color="secondary" variant="outline" size="sm" (click)="openPresetNewHighContrast()">
+          {{ 'ADMIN.THEMES.PRESETS.NEW_FROM_RECOMMENDED' | translate }}
+        </button>
+        <button cButton color="primary" size="sm" (click)="presetEdit = null; presetForm.reset();">
+          {{ 'COMMON.NEW' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <div class="table-responsive border rounded-3">
+          <table class="table mb-0 align-middle">
+            <thead class="bg-light">
+              <tr>
+                <th>{{ 'COMMON.NAME' | translate }}</th>
+                <th class="text-end" style="width: 130px">{{ 'COMMON.ACTIONS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of presets; track p.idTemaPreset) {
+                <tr>
+                  <td>
+                    <div class="fw-semibold">{{ p.nombre }}</div>
+                    <div class="small text-muted">{{ p.descripcion || '—' }}</div>
+                  </td>
+                  <td class="text-end">
+                    <button cButton color="primary" variant="ghost" size="sm" (click)="editPreset(p)">
+                      <svg cIcon name="cilPen"></svg>
+                    </button>
+                    <button cButton color="danger" variant="ghost" size="sm" (click)="deletePreset(p)">
+                      <svg cIcon name="cilTrash"></svg>
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="2" class="text-center text-muted py-4">
+                    {{ 'ADMIN.THEMES.PRESETS.EMPTY' | translate }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="border rounded-3 p-3">
+          <div class="fw-bold mb-3">
+            {{ presetEdit?.idTemaPreset ? ('COMMON.EDIT' | translate) : ('COMMON.NEW' | translate) }}
+          </div>
+          <form [formGroup]="presetForm" class="d-block">
+            <div class="mb-3">
+              <label class="form-label small text-muted fw-bold">{{ 'COMMON.NAME' | translate }}</label>
+              <input cFormControl type="text" formControlName="nombre" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted fw-bold">{{ 'COMMON.DESCRIPTION' | translate }}</label>
+              <input cFormControl type="text" formControlName="descripcion" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted fw-bold">{{ 'ADMIN.THEMES.PRESETS.TOKENS' | translate }}</label>
+              <textarea cFormControl rows="10" class="font-monospace" formControlName="tokensJson"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted fw-bold">{{ 'ADMIN.THEMES.PRESETS.METADATA' | translate }}</label>
+              <textarea cFormControl rows="6" class="font-monospace" formControlName="metadataJson"></textarea>
+            </div>
+            <button
+              type="button"
+              cButton
+              color="primary"
+              class="w-100"
+              [disabled]="presetForm.invalid || presetsLoading"
+              (click)="savePreset()"
+            >
+              {{ 'COMMON.SAVE' | translate }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" variant="ghost" (click)="closePresetsModal()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<app-confirmation-modal
+  [visible]="showApplyPresetConfirm"
+  [title]="'ADMIN.THEMES.PRESETS.APPLY_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.PRESETS.APPLY_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.PRESETS.APPLY' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'warning'"
+  [loading]="loading"
+  (visibleChange)="showApplyPresetConfirm = $event"
+  (confirm)="applyPresetConfirm()"
+></app-confirmation-modal>
 
 <!-- Modal Borrador -->
 <c-modal
@@ -524,6 +693,38 @@
       </div>
     } @else {
       <div class="row g-3">
+        <!-- Presets -->
+        <div class="col-12">
+          <div class="border rounded-3 p-3 bg-light bg-opacity-10">
+            <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}</div>
+            <div class="row g-2 align-items-end">
+              <div class="col-12 col-md-8">
+                <label class="form-label small text-muted fw-bold mb-1">{{
+                  'ADMIN.THEMES.PRESETS.SELECT' | translate
+                }}</label>
+                <select cSelect [(ngModel)]="draftPresetId" [ngModelOptions]="{ standalone: true }">
+                  <option [ngValue]="null">{{ 'ADMIN.THEMES.PRESETS.SELECT_PLACEHOLDER' | translate }}</option>
+                  @for (p of presets; track p.idTemaPreset) {
+                    <option [ngValue]="p.idTemaPreset">{{ p.nombre }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-12 col-md-4">
+                <button
+                  cButton
+                  color="primary"
+                  class="w-100"
+                  [disabled]="!draftPresetId"
+                  (click)="applyDraftPresetAskConfirm()"
+                >
+                  {{ 'ADMIN.THEMES.PRESETS.APPLY' | translate }}
+                </button>
+              </div>
+            </div>
+            <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.PRESETS.APPLY_HELP' | translate }}</div>
+          </div>
+        </div>
+
         <div class="col-12">
           <div class="d-flex flex-wrap gap-2 align-items-center">
             <span class="text-muted small fw-semibold">{{ 'ADMIN.THEMES.DRAFT.SOURCE_TYPE' | translate }}:</span>
@@ -619,6 +820,18 @@
     </div>
   </c-modal-footer>
 </c-modal>
+
+<app-confirmation-modal
+  [visible]="showApplyDraftPresetConfirm"
+  [title]="'ADMIN.THEMES.PRESETS.APPLY_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.PRESETS.APPLY_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.PRESETS.APPLY' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'warning'"
+  [loading]="draftLoading"
+  (visibleChange)="showApplyDraftPresetConfirm = $event"
+  (confirm)="applyDraftPresetConfirm()"
+></app-confirmation-modal>
 
 <app-confirmation-modal
   [visible]="showConvertDraftModal"

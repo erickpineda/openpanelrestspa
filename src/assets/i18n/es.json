@@ -136,6 +136,7 @@
     "EXISTING": "Existentes",
     "COLOR": "Color",
     "CREATE": "Crear",
+    "NEW": "Nuevo",
     "UPDATE": "Actualizar",
     "CHARACTERS": "caracteres",
     "CONFIRM_DELETE": "Confirmar eliminación",
@@ -309,6 +310,26 @@
       ,
       "MANAGE_MODAL": {
         "TITLE": "Gestionar tema"
+      },
+      "PRESETS": {
+        "TITLE": "Presets",
+        "DESC": "Presets globales para aplicar rápidamente al borrador.",
+        "EMPTY": "No hay presets todavía",
+        "TOKENS": "Tokens (JSON)",
+        "METADATA": "Metadata (JSON)",
+        "SELECT": "Selecciona un preset",
+        "SELECT_PLACEHOLDER": "— Selecciona —",
+        "APPLY": "Aplicar preset",
+        "APPLIED": "Preset aplicado al borrador",
+        "APPLY_HELP": "Esto reemplaza el tokensJson del borrador por el preset seleccionado.",
+        "APPLY_CONFIRM_TITLE": "Aplicar preset",
+        "APPLY_CONFIRM_MSG": "Se reemplazará el borrador actual por el preset seleccionado. ¿Continuar?",
+        "NEW_FROM_RECOMMENDED": "Cargar preset #3"
+      },
+      "ACTIVE": {
+        "LABEL": "Tema activo",
+        "NONE": "Ninguno (default)",
+        "INFO": "Publicar no cambia el tema activo. Para que se aplique en la web pública debes activarlo."
       }
     },
     "PROFILE": {

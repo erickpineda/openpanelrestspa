@@ -44,6 +44,7 @@
     "EXISTING": "Existing",
     "COLOR": "Color",
     "CREATE": "Create",
+    "NEW": "New",
     "UPDATE": "Update",
     "CHARACTERS": "characters",
     "CONFIRM_DELETE": "Confirm deletion",
@@ -214,6 +215,26 @@
       ,
       "MANAGE_MODAL": {
         "TITLE": "Manage theme"
+      },
+      "PRESETS": {
+        "TITLE": "Presets",
+        "DESC": "Global presets to quickly apply to the draft.",
+        "EMPTY": "No presets yet",
+        "TOKENS": "Tokens (JSON)",
+        "METADATA": "Metadata (JSON)",
+        "SELECT": "Select a preset",
+        "SELECT_PLACEHOLDER": "— Select —",
+        "APPLY": "Apply preset",
+        "APPLIED": "Preset applied to draft",
+        "APPLY_HELP": "This replaces the current draft tokensJson with the selected preset.",
+        "APPLY_CONFIRM_TITLE": "Apply preset",
+        "APPLY_CONFIRM_MSG": "The current draft will be replaced by the selected preset. Continue?",
+        "NEW_FROM_RECOMMENDED": "Load preset #3"
+      },
+      "ACTIVE": {
+        "LABEL": "Active theme",
+        "NONE": "None (default)",
+        "INFO": "Publishing does not change the active theme. To apply it on the public site you must activate it."
       }
     },
     "PROFILE": {

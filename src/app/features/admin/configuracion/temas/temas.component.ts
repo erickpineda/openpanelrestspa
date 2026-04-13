@@ -2,6 +2,9 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { HttpContext } from '@angular/common/http';
 import { TemasService } from '../../../../core/services/data/temas.service';
 import { Tema, TemaDraft } from '../../../../core/models/tema.model';
+import { TemaPreset } from '../../../../core/models/tema-preset.model';
+import { TemaPresetsService } from '../../../../core/services/data/tema-presets.service';
+import { PublicThemesService } from '../../../../core/services/data/public-themes.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
@@ -54,14 +57,28 @@ export class TemasComponent implements OnInit, OnDestroy {
   draftMetadataJson = '';
   draftAllowTokensEdit = false;
   showConvertDraftModal = false;
+  draftPresetId: number | null = null;
+  showApplyDraftPresetConfirm = false;
 
   // Manage modal (detalle + acciones)
   manageModalVisible = false;
   manageTema: Tema | null = null;
   private manageAllowClose = false;
+  activePublicThemeSlug: string | null = null;
+
+  // Presets (global)
+  presets: TemaPreset[] = [];
+  presetsLoading = false;
+  presetsModalVisible = false;
+  presetEdit: TemaPreset | null = null;
+  presetForm: FormGroup;
+  applyPresetId: number | null = null;
+  showApplyPresetConfirm = false;
 
   constructor(
     private temasService: TemasService,
+    private presetsService: TemaPresetsService,
+    private publicThemes: PublicThemesService,
     private fb: FormBuilder,
     private toast: ToastService,
     private log: LoggerService,
@@ -72,6 +89,13 @@ export class TemasComponent implements OnInit, OnDestroy {
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
       slug: ['', Validators.maxLength(100)],
       descripcion: ['', Validators.maxLength(255)],
+    });
+
+    this.presetForm = this.fb.group({
+      nombre: ['', [Validators.required, Validators.maxLength(100)]],
+      descripcion: ['', Validators.maxLength(255)],
+      tokensJson: ['', [Validators.required]],
+      metadataJson: [''],
     });
 
     // El "código" (slug) debe almacenarse en minúsculas (backend lo exige),
@@ -94,6 +118,8 @@ export class TemasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.load();
+    this.loadPresets();
+    this.loadActivePublicTheme();
   }
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -103,6 +129,39 @@ export class TemasComponent implements OnInit, OnDestroy {
   load(): void {
     this.pageNo = 0;
     this.obtenerListaTemas();
+  }
+
+  loadPresets(): void {
+    this.presetsLoading = true;
+    const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.presetsService
+      .listar(context)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.presetsLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (list) => {
+          this.presets = list || [];
+        },
+        error: (err) => {
+          this.log.error('presets listar', err);
+        },
+      });
+  }
+
+  loadActivePublicTheme(): void {
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.publicThemes
+      .getActive(true)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (t) => (this.activePublicThemeSlug = t?.slug ?? null),
+        error: () => (this.activePublicThemeSlug = null),
+      });
   }
 
   openNew(): void {
@@ -278,6 +337,7 @@ export class TemasComponent implements OnInit, OnDestroy {
   openManage(t: Tema): void {
     this.manageTema = t;
     this.manageModalVisible = true;
+    this.applyPresetId = null;
     this.cdr.detectChanges();
   }
 
@@ -300,6 +360,149 @@ export class TemasComponent implements OnInit, OnDestroy {
       this.manageAllowClose = false;
       this.manageTema = null;
     }
+  }
+
+  openPresetsModal(): void {
+    this.presetsModalVisible = true;
+    this.presetEdit = null;
+    this.presetForm.reset({ nombre: '', descripcion: '', tokensJson: '', metadataJson: '' });
+    this.cdr.detectChanges();
+  }
+
+  closePresetsModal(): void {
+    this.presetsModalVisible = false;
+    this.presetEdit = null;
+    this.cdr.detectChanges();
+  }
+
+  openPresetNewHighContrast(): void {
+    this.presetEdit = null;
+    this.presetForm.reset({
+      nombre: 'High Contrast Blue',
+      descripcion: 'Preset recomendado',
+      tokensJson: JSON.stringify(
+        {
+          '--cui-primary': '#0ea5e9',
+          '--cui-primary-rgb': '14,165,233',
+          '--cui-body-bg': '#ffffff',
+          '--cui-body-color': '#0b1220',
+          '--cui-border-color': 'rgba(11,18,32,0.22)',
+          '--cui-secondary-color': 'rgba(11,18,32,0.78)',
+          '--cui-table-hover-bg': 'rgba(14,165,233,0.12)',
+        },
+        null,
+        2
+      ),
+      metadataJson: JSON.stringify({ displayName: 'High Contrast Blue', mode: 'light', recommended: true }, null, 2),
+    });
+    this.cdr.detectChanges();
+  }
+
+  editPreset(p: TemaPreset): void {
+    this.presetEdit = p;
+    this.presetForm.reset({
+      nombre: p.nombre,
+      descripcion: p.descripcion || '',
+      tokensJson: p.tokensJson || '',
+      metadataJson: p.metadataJson || '',
+    });
+    this.cdr.detectChanges();
+  }
+
+  savePreset(): void {
+    if (this.presetForm.invalid) return;
+    // Validación mínima JSON
+    try {
+      JSON.parse(this.presetForm.value.tokensJson || '{}');
+      if (this.presetForm.value.metadataJson) JSON.parse(this.presetForm.value.metadataJson);
+    } catch {
+      this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('ADMIN.THEMES.PRESETS.TITLE'));
+      return;
+    }
+
+    this.presetsLoading = true;
+    const payload: Partial<TemaPreset> = {
+      nombre: this.presetForm.value.nombre,
+      descripcion: (this.presetForm.value.descripcion || '').trim() || undefined,
+      tokensJson: this.presetForm.value.tokensJson,
+      metadataJson: (this.presetForm.value.metadataJson || '').trim() || undefined,
+    };
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    const op = this.presetEdit?.idTemaPreset
+      ? this.presetsService.actualizar(this.presetEdit.idTemaPreset, payload, ctx)
+      : this.presetsService.crear(payload, ctx);
+
+    op.pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.presetsLoading = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: () => {
+        this.loadPresets();
+      },
+      error: (err) => {
+        this.log.error('presets guardar', err);
+        this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('ADMIN.THEMES.PRESETS.TITLE'));
+      },
+    });
+  }
+
+  deletePreset(p: TemaPreset): void {
+    if (!p?.idTemaPreset) return;
+    this.presetsLoading = true;
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.presetsService
+      .borrar(p.idTemaPreset, ctx)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.presetsLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => this.loadPresets(),
+        error: (err) => {
+          this.log.error('presets borrar', err);
+          this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('ADMIN.THEMES.PRESETS.TITLE'));
+        },
+      });
+  }
+
+  applyPresetAskConfirm(): void {
+    if (!this.manageTema?.slug || !this.applyPresetId) return;
+    this.showApplyPresetConfirm = true;
+  }
+
+  applyPresetConfirm(): void {
+    if (!this.manageTema?.slug || !this.applyPresetId) return;
+    const preset = this.presets.find((p) => p.idTemaPreset === this.applyPresetId);
+    if (!preset) return;
+    this.showApplyPresetConfirm = false;
+
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService
+      .upsertDraft(
+        this.manageTema.slug,
+        { tokensJson: preset.tokensJson, metadataJson: preset.metadataJson || undefined },
+        ctx
+      )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toast.showSuccess(
+            this.translate.instant('ADMIN.THEMES.PRESETS.APPLIED'),
+            this.translate.instant('MENU.THEMES')
+          );
+          this.obtenerListaTemas();
+        },
+        error: (err) => {
+          this.log.error('preset apply', err);
+          this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
+        },
+      });
   }
 
   // Acciones desde el modal de gestionar (evitar referencias null en template)
@@ -351,6 +554,8 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.draftTokensJson = '';
     this.draftMetadataJson = '';
     this.draftAllowTokensEdit = false;
+    this.draftPresetId = null;
+    this.showApplyDraftPresetConfirm = false;
     this.draftModalVisible = true;
     this.draftLoading = true;
 
@@ -429,6 +634,23 @@ export class TemasComponent implements OnInit, OnDestroy {
     if (!this.draftTokensJson || !this.draftTokensJson.trim()) {
       this.draftTokensJson = '{\n  \"--op-primary\": \"#0d6efd\"\n}';
     }
+    this.cdr.detectChanges();
+  }
+
+  applyDraftPresetAskConfirm(): void {
+    if (!this.draftTema?.slug || !this.draftPresetId) return;
+    this.showApplyDraftPresetConfirm = true;
+  }
+
+  applyDraftPresetConfirm(): void {
+    if (!this.draftTema?.slug || !this.draftPresetId) return;
+    const preset = this.presets.find((p) => p.idTemaPreset === this.draftPresetId);
+    if (!preset) return;
+    this.showApplyDraftPresetConfirm = false;
+    // Aplicación al editor (no guarda hasta que pulses Guardar)
+    this.draftAllowTokensEdit = true;
+    this.draftTokensJson = preset.tokensJson || '{\n\n}';
+    this.draftMetadataJson = preset.metadataJson || '';
     this.cdr.detectChanges();
   }
 
@@ -521,6 +743,7 @@ export class TemasComponent implements OnInit, OnDestroy {
       next: () => {
         this.loading = false;
         this.obtenerListaTemas();
+        this.loadActivePublicTheme();
       },
       error: (err) => {
         this.loading = false;
