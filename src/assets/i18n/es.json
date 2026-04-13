@@ -172,6 +172,7 @@
     "UNPUBLISHED": "No Publicada",
     "FILTERS": "Filtros",
     "SORT": "Ordenar",
+    "MANAGE": "Gestionar",
     "CREATED_AT": "Creado",
     "UPDATED_AT": "Últ. modif.",
     "ACTIVE": "Activos",
@@ -304,6 +305,10 @@
         "REUPLOAD_ZIP": "Re-subir ZIP",
         "CONVERT_CONFIRM_TITLE": "Convertir borrador",
         "CONVERT_CONFIRM_MSG": "Este borrador viene de ZIP. Si conviertes a tokens, se perderá la referencia al ZIP. ¿Continuar?"
+      }
+      ,
+      "MANAGE_MODAL": {
+        "TITLE": "Gestionar tema"
       }
     },
     "PROFILE": {

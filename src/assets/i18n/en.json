@@ -77,6 +77,7 @@
     "ENABLE_EDIT": "Enable Editing",
     "FILTERS": "Filters",
     "SORT": "Sort",
+    "MANAGE": "Manage",
     "CREATED_AT": "Created",
     "UPDATED_AT": "Updated",
     "NO_RESULTS": "No results found",
@@ -209,6 +210,10 @@
         "REUPLOAD_ZIP": "Re-upload ZIP",
         "CONVERT_CONFIRM_TITLE": "Convert draft",
         "CONVERT_CONFIRM_MSG": "This draft comes from a ZIP. If you convert to tokens, the ZIP reference will be lost. Continue?"
+      }
+      ,
+      "MANAGE_MODAL": {
+        "TITLE": "Manage theme"
       }
     },
     "PROFILE": {

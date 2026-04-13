@@ -2,33 +2,4 @@
   min-height: 240px;
 }
 
-// Mantener la columna de acciones visible al hacer scroll horizontal en la tabla
-.sticky-actions {
-  position: sticky;
-  right: 0;
-  z-index: 2;
-  background: var(--cui-card-bg, #fff);
-  box-shadow: -8px 0 12px -12px rgba(0, 0, 0, 0.35);
-  overflow: visible;
-}
-
-.sticky-actions--header {
-  z-index: 3;
-  background: var(--cui-card-cap-bg, #f8f9fa);
-}
-
-// Evitar que el dropdown de acciones quede “cortado” dentro del contenedor responsive
-.op-table-responsive {
-  position: relative;
-  overflow-x: auto;
-  overflow-y: visible;
-}
-
-.sticky-actions .btn-group,
-.sticky-actions .dropdown {
-  position: static;
-}
-
-.sticky-actions .dropdown-menu {
-  z-index: 2000;
-}
+/* La tabla no debe comportarse como lista clicable; acciones se gestionan en modal. */

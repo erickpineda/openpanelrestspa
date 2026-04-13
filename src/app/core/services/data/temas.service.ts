@@ -7,8 +7,8 @@ import { HttpClient } from '@angular/common/http';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 import { PaginaResponse } from '../../models/pagina-response.model';
-import { OPConstants } from '../../../shared/constants/op-global.constants';
 import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
+import { OPConstants } from '../../../shared/constants/op-global.constants';
 import { map } from 'rxjs/operators';
 import { HttpHeaders } from '@angular/common/http';
 
@@ -61,15 +61,11 @@ export class TemasService extends CrudService<Tema, number> {
     );
   }
 
-  getDraft(slug: string, context?: HttpContext): Observable<TemaDraft> {
+  getDraft(slug: string, context?: HttpContext): Observable<TemaDraft | null> {
     const ctx = context ?? new HttpContext().set(SKIP_GLOBAL_LOADER, true);
-    return this.safeGetData<TemaDraft>(
-      `${this.endpoint}/${encodeURIComponent(slug)}/draft`,
-      {} as TemaDraft,
-      undefined,
-      undefined,
-      'temas.draft.get',
-      ctx
+    // OJO: si el backend devuelve data=null (sin borrador), aquí devolvemos null (no {}).
+    return this.get<TemaDraft | null>(`${this.endpoint}/${encodeURIComponent(slug)}/draft`, undefined, undefined, ctx).pipe(
+      map((resp) => resp?.data ?? null)
     );
   }
 

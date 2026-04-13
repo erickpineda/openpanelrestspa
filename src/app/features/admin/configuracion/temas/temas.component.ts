@@ -55,6 +55,11 @@ export class TemasComponent implements OnInit, OnDestroy {
   draftAllowTokensEdit = false;
   showConvertDraftModal = false;
 
+  // Manage modal (detalle + acciones)
+  manageModalVisible = false;
+  manageTema: Tema | null = null;
+  private manageAllowClose = false;
+
   constructor(
     private temasService: TemasService,
     private fb: FormBuilder,
@@ -270,6 +275,74 @@ export class TemasComponent implements OnInit, OnDestroy {
   }
 
   // ===== Acciones =====
+  openManage(t: Tema): void {
+    this.manageTema = t;
+    this.manageModalVisible = true;
+    this.cdr.detectChanges();
+  }
+
+  closeManageModal(): void {
+    this.manageAllowClose = true;
+    this.manageModalVisible = false;
+    this.cdr.detectChanges();
+  }
+
+  onManageModalVisibleChange(visible: boolean): void {
+    // UX: no cerrar por click fuera / ESC. Solo cerrar con botón X/Cancelar.
+    // CoreUI emite visibleChange al inicializar (false). No debemos forzar apertura ahí.
+    const wasOpen = this.manageModalVisible === true;
+    if (wasOpen && !visible && !this.manageAllowClose) {
+      this.manageModalVisible = true;
+      this.cdr.detectChanges();
+      return;
+    }
+    if (!visible) {
+      this.manageAllowClose = false;
+      this.manageTema = null;
+    }
+  }
+
+  // Acciones desde el modal de gestionar (evitar referencias null en template)
+  onManageDraft(): void {
+    const t = this.manageTema;
+    if (!t) return;
+    // Evitar stacking de modales (Gestionar + Borrador)
+    this.closeManageModal();
+    this.openDraft(t);
+  }
+
+  onManagePreview(): void {
+    const t = this.manageTema;
+    if (!t) return;
+    this.preview(t);
+  }
+
+  onManagePublish(): void {
+    const t = this.manageTema;
+    if (!t) return;
+    this.publish(t);
+  }
+
+  onManageActivate(): void {
+    const t = this.manageTema;
+    if (!t) return;
+    this.activate(t);
+  }
+
+  onManageEdit(): void {
+    const t = this.manageTema;
+    if (!t) return;
+    this.openEdit(t);
+    this.closeManageModal();
+  }
+
+  onManageDelete(): void {
+    const t = this.manageTema;
+    if (!t) return;
+    this.delete(t);
+    this.closeManageModal();
+  }
+
   openDraft(t: Tema): void {
     if (!t?.slug) return;
 
@@ -293,6 +366,18 @@ export class TemasComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (d) => {
+          // d === null => no existe borrador aún (backend devuelve data=null)
+          if (!d) {
+            this.draftData = null;
+            this.draftAllowTokensEdit = true;
+            this.draftTokensJson = '{\n\n}';
+            this.draftMetadataJson = '';
+            this.toast.showInfo(
+              this.translate.instant('ADMIN.THEMES.DRAFT.NO_DRAFT'),
+              this.translate.instant('MENU.THEMES')
+            );
+            return;
+          }
           this.draftData = d;
           this.draftAllowTokensEdit = (d?.sourceType || '').toString() !== 'CSS_PACKAGE';
           this.draftTokensJson = d?.tokensJson || '{\n\n}';
