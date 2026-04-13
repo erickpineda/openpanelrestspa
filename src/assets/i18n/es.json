@@ -311,6 +311,8 @@
       "MANAGE_MODAL": {
         "TITLE": "Gestionar tema"
       },
+      "PUBLISHED_LABEL": "Publicado",
+      "PUBLISH_NEEDS_DRAFT": "Sin borrador",
       "PRESETS": {
         "TITLE": "Presets",
         "DESC": "Presets globales para aplicar rápidamente al borrador.",
@@ -330,6 +332,7 @@
         "LABEL": "Tema activo",
         "NONE": "Ninguno (default)",
         "INFO": "Publicar no cambia el tema activo. Para que se aplique en la web pública debes activarlo.",
+        "DEACTIVATE_BUTTON": "Desactivar",
         "RESET_BUTTON": "Restaurar por defecto",
         "RESET_CONFIRM_TITLE": "Restaurar tema",
         "RESET_CONFIRM_MSG": "Se quitará el tema activo y se volverá al tema por defecto. ¿Continuar?",

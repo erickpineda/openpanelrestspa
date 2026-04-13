@@ -484,30 +484,48 @@
             </button>
           </div>
           <div class="col-12 col-md-6">
-            <button
-              cButton
-              color="success"
-              variant="outline"
-              class="w-100"
-              (click)="onManagePublish()"
-              [disabled]="!mt.draft"
-            >
-              <svg cIcon name="cilCloudUpload" class="me-2"></svg>
-              {{ 'ADMIN.THEMES.TOOLTIP.PUBLISH' | translate }}
-            </button>
+            @if (mt.draft) {
+              <button cButton color="success" variant="outline" class="w-100" (click)="onManagePublish()">
+                <svg cIcon name="cilCloudUpload" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.TOOLTIP.PUBLISH' | translate }}
+              </button>
+            } @else if (mt.published) {
+              <button cButton color="success" variant="outline" class="w-100" disabled>
+                <svg cIcon name="cilCheckCircle" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.PUBLISHED_LABEL' | translate }}
+              </button>
+            } @else {
+              <button cButton color="secondary" variant="outline" class="w-100" disabled>
+                <svg cIcon name="cilWarning" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.PUBLISH_NEEDS_DRAFT' | translate }}
+              </button>
+            }
           </div>
           <div class="col-12 col-md-6">
-            <button
-              cButton
-              color="primary"
-              variant="outline"
-              class="w-100"
-              (click)="onManageActivate()"
-              [disabled]="!mt.published"
-            >
-              <svg cIcon name="cilCheckCircle" class="me-2"></svg>
-              {{ 'ADMIN.THEMES.TOOLTIP.ACTIVATE' | translate }}
-            </button>
+            @if (activePublicThemeSlug === mt.slug) {
+              <button
+                cButton
+                color="secondary"
+                variant="outline"
+                class="w-100"
+                (click)="askResetActiveTheme()"
+              >
+                <svg cIcon name="cilXCircle" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.ACTIVE.DEACTIVATE_BUTTON' | translate }}
+              </button>
+            } @else {
+              <button
+                cButton
+                color="primary"
+                variant="outline"
+                class="w-100"
+                (click)="onManageActivate()"
+                [disabled]="!mt.published"
+              >
+                <svg cIcon name="cilCheckCircle" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.TOOLTIP.ACTIVATE' | translate }}
+              </button>
+            }
           </div>
           <div class="col-12 col-md-6">
             <button cButton color="primary" variant="outline" class="w-100" (click)="onManageEdit()">
