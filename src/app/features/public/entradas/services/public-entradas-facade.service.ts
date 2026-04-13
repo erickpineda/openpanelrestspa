@@ -56,13 +56,13 @@ export class PublicEntradasFacadeService {
           filterKey: 'categoria.nombre',
           operation: 'EQUAL',
           value: categoria,
-          clazzName: 'Entrada',
+          clazzName: 'Categoria',
         })),
         ...etiquetasLimpias.map((etiqueta) => ({
           filterKey: 'etiqueta.nombre',
           operation: 'EQUAL',
           value: etiqueta,
-          clazzName: 'Entrada',
+          clazzName: 'Etiqueta',
         })),
       ],
     };

@@ -6,10 +6,35 @@
           <svg cIcon name="cilPaint" size="lg" class="text-primary"></svg>
           <h4 class="mb-0 text-primary">{{ 'ADMIN.THEMES.TITLE' | translate }}</h4>
         </div>
-        <button cButton color="primary" class="text-white shadow-sm" (click)="openNew()">
-          <svg cIcon name="cilPlus" size="sm" class="me-2"></svg>
-          {{ 'ADMIN.THEMES.NEW_THEME' | translate }}
-        </button>
+        <div class="d-flex gap-2">
+          <button
+            cButton
+            color="secondary"
+            variant="outline"
+            [cTooltip]="'ADMIN.THEMES.GUIDE.SHOW_TOOLTIP' | translate"
+            (click)="showGuideFromHeader()"
+          >
+            <svg cIcon name="cilInfo" size="sm"></svg>
+          </button>
+          <button
+            cButton
+            color="secondary"
+            variant="outline"
+            [cTooltip]="'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate"
+            (click)="askResetActiveTheme()"
+          >
+            <svg cIcon name="cilReload" size="sm" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate }}
+          </button>
+          <button cButton color="secondary" variant="outline" (click)="openPresetsModal()">
+            <svg cIcon name="cilPaintBucket" size="sm" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}
+          </button>
+          <button cButton color="primary" class="text-white shadow-sm" (click)="openNew()">
+            <svg cIcon name="cilPlus" size="sm" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.NEW_THEME' | translate }}
+          </button>
+        </div>
       </div>
     </c-card-header>
 
@@ -23,12 +48,75 @@
         </c-alert>
       }
 
+      <!-- Asistente guiado -->
+      @if (showGuide) {
+        <div class="border rounded-3 p-3 mb-4 bg-light bg-opacity-50">
+          <div class="d-flex justify-content-between align-items-start gap-2">
+            <div>
+              <div class="fw-bold text-primary d-flex align-items-center gap-2">
+                <svg cIcon name="cilInfo" class="text-primary"></svg>
+                {{ 'ADMIN.THEMES.GUIDE.TITLE' | translate }}
+              </div>
+              <div class="small text-muted">{{ 'ADMIN.THEMES.GUIDE.SUBTITLE' | translate }}</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleGuideCollapsed()">
+                {{ (guideCollapsed ? 'COMMON.SHOW' : 'COMMON.HIDE') | translate }}
+              </button>
+              <button cButton color="secondary" variant="ghost" size="sm" (click)="dismissGuide()">
+                {{ 'ADMIN.THEMES.GUIDE.HIDE_FOREVER' | translate }}
+              </button>
+            </div>
+          </div>
+
+          @if (!guideCollapsed) {
+            <div class="row g-2 align-items-end mt-2">
+              <div class="col-12 col-lg-5">
+                <label class="form-label small text-muted fw-bold mb-1">{{
+                  'ADMIN.THEMES.GUIDE.SELECT_THEME' | translate
+                }}</label>
+                <select
+                  cSelect
+                  [ngModel]="guideTemaSlug"
+                  (ngModelChange)="onGuideTemaChange($event)"
+                  [ngModelOptions]="{ standalone: true }"
+                  [disabled]="loading || temas.length === 0"
+                >
+                  @for (t of temas; track t.idTema) {
+                    <option [ngValue]="t.slug">{{ t.nombre }} ({{ t.slug }})</option>
+                  }
+                </select>
+              </div>
+              <div class="col-12 col-lg-7">
+                <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                  <button cButton color="secondary" variant="outline" (click)="guideOpenDraft()" [disabled]="!guideTema">
+                    1) {{ 'ADMIN.THEMES.GUIDE.STEP_DRAFT' | translate }}
+                  </button>
+                  <button cButton color="secondary" variant="outline" (click)="guideOpenPresets()">
+                    2) {{ 'ADMIN.THEMES.GUIDE.STEP_PRESETS' | translate }}
+                  </button>
+                  <button cButton color="secondary" variant="outline" (click)="guideOpenManage()" [disabled]="!guideTema">
+                    3) {{ 'ADMIN.THEMES.GUIDE.STEP_PREVIEW' | translate }}
+                  </button>
+                  <button cButton color="primary" (click)="guidePrimaryAction()" [disabled]="!guideTema">
+                    4) {{ 'ADMIN.THEMES.GUIDE.STEP_PUBLISH_ACTIVATE' | translate }}
+                  </button>
+                </div>
+                <div class="small text-muted mt-2">
+                  {{ 'ADMIN.THEMES.GUIDE.FLOW_HINT' | translate }}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
       <!-- Filtros -->
       <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
-        <c-row class="g-3 align-items-end">
-          <c-col xs="12" md="6">
-            <label class="form-label small text-muted mb-1">{{
-              'ADMIN.THEMES.TABLE.NAME' | translate
+        <div class="d-flex flex-wrap gap-3 align-items-end">
+          <div class="flex-grow-1" style="min-width: 250px">
+            <label class="form-label small text-muted fw-bold mb-1">{{
+              'COMMON.SEARCH' | translate
             }}</label>
             <c-input-group>
               <span cInputGroupText class="bg-white border-end-0 text-muted">
@@ -44,30 +132,83 @@
                 [disabled]="loading"
               />
             </c-input-group>
-          </c-col>
+          </div>
 
-          <c-col xs="12" md="3">
-            <label class="form-label small fw-bold text-muted">{{
-              'ADMIN.THEMES.TABLE.ACTIVE' | translate
+          <div>
+            <c-dropdown variant="btn-group">
+              <button
+                cButton
+                cDropdownToggle
+                color="secondary"
+                variant="ghost"
+                size="sm"
+                [cTooltip]="'ADMIN.THEMES.TOOLTIP.SORT' | translate"
+              >
+                <svg cIcon [name]="getSortIcon()" class="me-1"></svg>
+                {{ 'COMMON.SORT' | translate }}
+              </button>
+              <ul cDropdownMenu>
+                <li>
+                  <button cDropdownItem (click)="ordenar('idTema', 'DESC')">
+                    <span *ngIf="isSortActive('idTema', 'DESC')" class="me-1 fw-bold">✓</span>
+                    Más recientes (ID)
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('idTema', 'ASC')">
+                    <span *ngIf="isSortActive('idTema', 'ASC')" class="me-1 fw-bold">✓</span>
+                    Más antiguos (ID)
+                  </button>
+                </li>
+                <li><hr cDropdownDivider /></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('nombre', 'ASC')">
+                    <span *ngIf="isSortActive('nombre', 'ASC')" class="me-1 fw-bold">✓</span>
+                    Nombre (A-Z)
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('nombre', 'DESC')">
+                    <span *ngIf="isSortActive('nombre', 'DESC')" class="me-1 fw-bold">✓</span>
+                    Nombre (Z-A)
+                  </button>
+                </li>
+                <li><hr cDropdownDivider /></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('slug', 'ASC')">
+                    <span *ngIf="isSortActive('slug', 'ASC')" class="me-1 fw-bold">✓</span>
+                    Slug (A-Z)
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('slug', 'DESC')">
+                    <span *ngIf="isSortActive('slug', 'DESC')" class="me-1 fw-bold">✓</span>
+                    Slug (Z-A)
+                  </button>
+                </li>
+              </ul>
+            </c-dropdown>
+          </div>
+
+          <div>
+            <label class="form-label small text-muted fw-bold mb-1">{{
+              'COMMON.SHOW' | translate
             }}</label>
             <select
               cSelect
-              [value]="filtroActivo === null ? '' : filtroActivo ? 'true' : 'false'"
-              (change)="
-                filtroActivo =
-                  $any($event.target).value === '' ? null : $any($event.target).value === 'true';
-                search()
-              "
+              [ngModel]="pageSize"
+              (ngModelChange)="onPageSizeChange($event)"
+              style="width: 80px"
               [disabled]="loading"
-              class="shadow-none"
             >
-              <option value="">{{ 'COMMON.ALL' | translate }}</option>
-              <option value="true">{{ 'ADMIN.THEMES.TABLE.STATUS_ACTIVE' | translate }}</option>
-              <option value="false">{{ 'ADMIN.THEMES.TABLE.STATUS_INACTIVE' | translate }}</option>
+              <option [ngValue]="5">5</option>
+              <option [ngValue]="10">{{ 'AUTO.10' | translate }}</option>
+              <option [ngValue]="20">{{ 'AUTO.20' | translate }}</option>
+              <option [ngValue]="50">{{ 'AUTO.50' | translate }}</option>
             </select>
-          </c-col>
+          </div>
 
-          <c-col xs="12" md="3" class="d-flex justify-content-md-end">
+          <div class="d-flex justify-content-md-end">
             <button
               cButton
               color="secondary"
@@ -77,8 +218,8 @@
             >
               <svg cIcon name="cilReload" class="me-1"></svg> {{ 'COMMON.CLEAN' | translate }}
             </button>
-          </c-col>
-        </c-row>
+          </div>
+        </div>
       </div>
 
       <!-- Tabla -->
@@ -107,70 +248,75 @@
                 class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase"
                 style="width: 250px"
               >
-                {{ 'ADMIN.THEMES.TABLE.NAME' | translate }}
+                {{ 'COMMON.NAME' | translate }}
               </th>
               <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
-                {{ 'ADMIN.THEMES.TABLE.ACTIVE' | translate }}
+                {{ 'COMMON.SLUG' | translate }}
               </th>
               <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
-                {{ 'ADMIN.THEMES.TABLE.COLOR_SCHEME' | translate }}
+                {{ 'ADMIN.THEMES.TABLE.DRAFT' | translate }}
+              </th>
+              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
+                {{ 'ADMIN.THEMES.TABLE.PUBLISHED' | translate }}
+              </th>
+              <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
+                {{ 'ADMIN.THEMES.TABLE.ORIGIN' | translate }}
               </th>
               <th
                 scope="col"
                 class="py-3 pe-4 border-0 text-secondary small fw-bold text-uppercase text-end"
-                style="width: 120px"
+                style="width: 80px"
               >
-                {{ 'ADMIN.THEMES.TABLE.ACTIONS' | translate }}
+                {{ 'COMMON.ACTIONS' | translate }}
               </th>
             </tr>
           </thead>
           <tbody>
-            @for (t of pagedTemas; track t.nombre) {
+            @for (t of viewTemas; track t.slug) {
               <tr>
                 <td class="px-3">
                   <div class="fw-bold text-primary">{{ t.nombre }}</div>
                 </td>
-                <td class="px-3 text-center">
-                  <c-badge [color]="t.activo ? 'success' : 'secondary'" shape="rounded-pill">
-                    {{
-                      (t.activo
-                        ? 'ADMIN.THEMES.TABLE.STATUS_ACTIVE'
-                        : 'ADMIN.THEMES.TABLE.STATUS_INACTIVE'
-                      ) | translate
-                    }}
-                  </c-badge>
+                <td class="px-3">
+                  <code class="text-muted text-uppercase">{{ t.slug }}</code>
                 </td>
                 <td class="px-3">
-                  <code class="text-muted">{{ t.esquemaColor }}</code>
+                  @if (t.draft) {
+                    <c-badge color="warning" shape="rounded-pill">
+                      v{{ t.draft.version }} {{ t.draft.state }}
+                    </c-badge>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
                 </td>
-                <td class="px-3 text-end">
-                  <c-button-group role="group">
-                    <button
-                      cButton
-                      color="primary"
-                      variant="ghost"
-                      size="sm"
-                      (click)="openEdit(t)"
-                      [cTooltip]="'COMMON.EDIT' | translate"
-                    >
-                      <svg cIcon name="cilPen"></svg>
-                    </button>
-                    <button
-                      cButton
-                      color="danger"
-                      variant="ghost"
-                      size="sm"
-                      (click)="delete(t)"
-                      [cTooltip]="'COMMON.DELETE' | translate"
-                    >
-                      <svg cIcon name="cilTrash"></svg>
-                    </button>
-                  </c-button-group>
+                <td class="px-3">
+                  @if (t.published) {
+                    <c-badge color="success" shape="rounded-pill">
+                      v{{ t.published.version }} {{ t.published.state }}
+                    </c-badge>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+                <td class="px-3">
+                  <c-badge color="info" shape="rounded-pill">{{ t.origen || '—' }}</c-badge>
+                </td>
+                <td class="px-3 pe-4 text-end">
+                  <button
+                    cButton
+                    color="secondary"
+                    variant="ghost"
+                    size="sm"
+                    (click)="openManage(t); $event.stopPropagation()"
+                    [cTooltip]="'COMMON.MANAGE' | translate"
+                  >
+                    <svg cIcon name="cilSettings"></svg>
+                  </button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="4" class="text-center py-5 text-muted">
+                <td colspan="6" class="text-center py-5 text-muted">
                   <div class="d-flex flex-column align-items-center">
                     <svg cIcon name="cilPaint" size="4xl" class="text-muted mb-3"></svg>
                     <h5 class="text-muted">{{ 'ADMIN.THEMES.NO_THEMES_FOUND' | translate }}</h5>
@@ -191,11 +337,11 @@
     >
       <div class="text-muted small">
         {{
-          'COMMON.PAGINATION_INFO' | translate: { current: pagedTemas.length, total: totalElements }
+          'COMMON.PAGINATION_INFO' | translate: { current: numberOfElements, total: totalElements }
         }}
       </div>
       <app-op-pagination
-        [totalPages]="getTotalPages()"
+        [totalPages]="totalPages"
         [currentPage]="pageNo"
         (pageChange)="onPageChange($event)"
         align="end"
@@ -206,81 +352,129 @@
 </div>
 
 <!-- Modal -->
-<c-modal [visible]="modalVisible" (visibleChange)="closeModal()" backdrop="static" size="lg">
+<c-modal
+  [visible]="modalVisible"
+  (visibleChange)="onModalVisibleChange($event)"
+  backdrop="static"
+  size="lg"
+>
   <c-modal-header>
-    <h5 cModalTitle class="fw-bold">
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilPaint" class="text-primary"></svg>
       {{
         editItem ? ('ADMIN.THEMES.EDIT_THEME' | translate) : ('ADMIN.THEMES.NEW_THEME' | translate)
       }}
     </h5>
     <button cButtonClose (click)="closeModal()"></button>
   </c-modal-header>
-  <c-modal-body>
-    <form [formGroup]="form" class="d-flex flex-column gap-3">
-      <div class="mb-3">
-        <label class="form-label small fw-bold text-muted">{{
-          'ADMIN.THEMES.TABLE.NAME' | translate
-        }}</label>
-        <input
-          cFormControl
-          type="text"
-          formControlName="nombre"
-          [placeholder]="'ADMIN.THEMES.TABLE.NAME' | translate"
-          [valid]="form.get('nombre')?.touched && form.get('nombre')?.valid"
-          [class.is-invalid]="form.get('nombre')?.touched && form.get('nombre')?.invalid"
-        />
-        @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
-          <div class="invalid-feedback d-block">{{ 'ADMIN.THEMES.NAME_REQUIRED' | translate }}</div>
-        }
-      </div>
+  <c-modal-body class="py-4">
+    <form [formGroup]="form">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">{{ 'COMMON.NAME' | translate }}</label>
+          <input
+            cFormControl
+            type="text"
+            formControlName="nombre"
+            [placeholder]="'COMMON.NAME' | translate"
+            [valid]="form.get('nombre')?.touched && form.get('nombre')?.valid"
+            [class.is-invalid]="form.get('nombre')?.touched && form.get('nombre')?.invalid"
+          />
+          @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+            <div class="invalid-feedback d-block">{{ 'ADMIN.THEMES.NAME_REQUIRED' | translate }}</div>
+          }
+        </div>
 
-      <div class="mb-3">
-        <label class="form-label small fw-bold text-muted">{{
-          'ADMIN.THEMES.TABLE.COLOR_SCHEME' | translate
-        }}</label>
-        <textarea
-          cFormControl
-          id="esquemaColor"
-          formControlName="esquemaColor"
-          rows="4"
-          [placeholder]="'ADMIN.THEMES.COLOR_SCHEME_PLACEHOLDER' | translate"
-        ></textarea>
-        <div class="form-text">{{ 'ADMIN.THEMES.DEFINE_MAIN_COLORS' | translate }}</div>
-      </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">{{ 'COMMON.SLUG' | translate }}</label>
+          <input
+            cFormControl
+            type="text"
+            formControlName="slug"
+            class="text-uppercase"
+            [placeholder]="'ADMIN.THEMES.SLUG_PLACEHOLDER' | translate"
+          />
+          <div class="form-text">{{ 'ADMIN.THEMES.SLUG_HELP' | translate }}</div>
+        </div>
 
-      <div class="form-check form-switch">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="activo"
-          formControlName="activo"
-          [checked]="form.get('activo')?.value === 'true' || form.get('activo')?.value === true"
-          (change)="form.get('activo')?.setValue($any($event.target).checked)"
-        />
-        <label class="form-check-label" for="activo">{{
-          'ADMIN.THEMES.ACTIVE_THEME' | translate
-        }}</label>
+        <div class="col-12">
+          <label class="form-label small fw-bold text-muted">{{ 'COMMON.DESCRIPTION' | translate }}</label>
+          <textarea
+            cFormControl
+            id="descripcion"
+            formControlName="descripcion"
+            rows="2"
+            [placeholder]="'COMMON.DESCRIPTION' | translate"
+          ></textarea>
+        </div>
       </div>
     </form>
   </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" variant="ghost" (click)="closeModal()">
-      {{ 'COMMON.CANCEL' | translate }}
-    </button>
-    <button
-      cButton
-      color="primary"
-      class="px-4"
-      [disabled]="form.invalid || loading"
-      (click)="save()"
-    >
-      @if (loading) {
-        <c-spinner size="sm" class="me-2"></c-spinner>
-      }
-      {{ editItem ? ('COMMON.SAVE_CHANGES' | translate) : ('COMMON.CREATE_THEME' | translate) }}
-    </button>
+  <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
+    <div></div>
+    <div class="d-flex gap-2">
+      <button cButton color="secondary" variant="ghost" (click)="closeModal()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        cButton
+        color="primary"
+        class="px-4"
+        [disabled]="form.invalid || loading"
+        (click)="save()"
+      >
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </div>
   </c-modal-footer>
 </c-modal>
+
+<!-- Tour (primera vez) -->
+<c-modal [visible]="tourVisible" size="lg" backdrop="static">
+  <c-modal-header>
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilInfo" class="text-primary"></svg>
+      {{ 'ADMIN.THEMES.TOUR.TITLE' | translate }}
+    </h5>
+    <button cButtonClose (click)="tourSkip()"></button>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="small text-muted mb-3">
+      {{ 'ADMIN.THEMES.TOUR.SUBTITLE' | translate: { step: tourStep, total: 4 } }}
+    </div>
+
+    @if (tourStep === 1) {
+      <h6 class="fw-bold">{{ 'ADMIN.THEMES.TOUR.STEP1_TITLE' | translate }}</h6>
+      <p class="mb-0">{{ 'ADMIN.THEMES.TOUR.STEP1_BODY' | translate }}</p>
+    } @else if (tourStep === 2) {
+      <h6 class="fw-bold">{{ 'ADMIN.THEMES.TOUR.STEP2_TITLE' | translate }}</h6>
+      <p class="mb-0">{{ 'ADMIN.THEMES.TOUR.STEP2_BODY' | translate }}</p>
+    } @else if (tourStep === 3) {
+      <h6 class="fw-bold">{{ 'ADMIN.THEMES.TOUR.STEP3_TITLE' | translate }}</h6>
+      <p class="mb-0">{{ 'ADMIN.THEMES.TOUR.STEP3_BODY' | translate }}</p>
+    } @else {
+      <h6 class="fw-bold">{{ 'ADMIN.THEMES.TOUR.STEP4_TITLE' | translate }}</h6>
+      <p class="mb-0">{{ 'ADMIN.THEMES.TOUR.STEP4_BODY' | translate }}</p>
+    }
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" variant="ghost" (click)="tourDontShowAgain()">
+      {{ 'ADMIN.THEMES.TOUR.DONT_SHOW_AGAIN' | translate }}
+    </button>
+    <button cButton color="secondary" variant="outline" (click)="tourSkip()">
+      {{ 'ADMIN.THEMES.TOUR.SKIP' | translate }}
+    </button>
+    <div class="ms-auto d-flex gap-2">
+      <button cButton color="secondary" variant="outline" (click)="tourPrev()" [disabled]="tourStep <= 1">
+        {{ 'COMMON.PREV' | translate }}
+      </button>
+      <button cButton color="primary" (click)="tourNext()" [disabled]="tourStep >= 4">
+        {{ 'COMMON.NEXT' | translate }}
+      </button>
+    </div>
+  </c-modal-footer>
+</c-modal>
+
 <app-confirmation-modal
   [visible]="showDeleteModal"
   [title]="'ADMIN.THEMES.DELETE_THEME' | translate"
@@ -295,4 +489,685 @@
   [loading]="loading"
   (visibleChange)="showDeleteModal = $event"
   (confirm)="confirmDelete()"
+></app-confirmation-modal>
+
+<!-- Modal: Gestionar tema -->
+<c-modal
+  [visible]="manageModalVisible"
+  (visibleChange)="onManageModalVisibleChange($event)"
+  backdrop="static"
+  size="lg"
+  scrollable
+>
+  <c-modal-header>
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilSettings" class="text-primary"></svg>
+      {{ 'ADMIN.THEMES.MANAGE_MODAL.TITLE' | translate }}
+      @if (manageTema?.nombre) {
+        <span class="text-muted fw-normal">- {{ manageTema?.nombre }}</span>
+      }
+    </h5>
+    <button cButtonClose (click)="closeManageModal()"></button>
+  </c-modal-header>
+  <c-modal-body class="py-4">
+    @if (manageTema; as mt) {
+      <div class="d-flex flex-column gap-3">
+        <div class="border rounded-3 p-3 bg-light bg-opacity-10">
+          <div class="text-muted">
+            <span class="fw-semibold">{{ 'COMMON.SLUG' | translate }}:</span>
+            <code class="text-uppercase ms-1">{{ mt.slug }}</code>
+          </div>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            @if (mt.draft) {
+              <c-badge color="warning" shape="rounded-pill">
+                {{ 'ADMIN.THEMES.TABLE.DRAFT' | translate }} v{{ mt.draft.version }}
+              </c-badge>
+            } @else {
+              <c-badge color="secondary" shape="rounded-pill">
+                {{ 'ADMIN.THEMES.TABLE.DRAFT' | translate }} —
+              </c-badge>
+            }
+            @if (mt.published) {
+              <c-badge color="success" shape="rounded-pill">
+                {{ 'ADMIN.THEMES.TABLE.PUBLISHED' | translate }} v{{ mt.published.version }}
+              </c-badge>
+            } @else {
+              <c-badge color="secondary" shape="rounded-pill">
+                {{ 'ADMIN.THEMES.TABLE.PUBLISHED' | translate }} —
+              </c-badge>
+            }
+            <c-badge color="info" shape="rounded-pill">{{ mt.origen || '—' }}</c-badge>
+          </div>
+          <div class="mt-2 small text-muted">
+            <div>
+              <span class="fw-semibold">{{ 'COMMON.CREATED_AT' | translate }}:</span>
+              {{ mt.fechaCreacion | date: 'dd-MM-yyyy HH:mm:ss' }}
+            </div>
+            <div>
+              <span class="fw-semibold">{{ 'COMMON.UPDATED_AT' | translate }}:</span>
+              {{ mt.fechaUltimaModif | date: 'dd-MM-yyyy HH:mm:ss' }}
+            </div>
+          </div>
+
+          <div class="mt-3 p-3 bg-white rounded-3 border">
+            <div class="fw-semibold mb-1">{{ 'ADMIN.THEMES.NEXT.TITLE' | translate }}</div>
+            <div class="text-muted small">{{ getNextStepKey(mt) | translate }}</div>
+          </div>
+
+          <div class="mt-3">
+            <div class="small text-muted fw-semibold mb-1">{{ 'ADMIN.THEMES.ACTIVE.LABEL' | translate }}:</div>
+            <c-badge
+              [color]="activePublicThemeSlug === mt.slug ? 'success' : 'secondary'"
+              shape="rounded-pill"
+            >
+              {{ activePublicThemeSlug || ('ADMIN.THEMES.ACTIVE.NONE' | translate) }}
+            </c-badge>
+            <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.ACTIVE.INFO' | translate }}</div>
+            <div class="mt-2">
+              <button
+                cButton
+                color="secondary"
+                variant="outline"
+                size="sm"
+                (click)="askResetActiveTheme()"
+                [disabled]="themeActionLoading"
+              >
+                @if (themeActionLoading) {
+                  <c-spinner size="sm" class="me-2"></c-spinner>
+                  {{ 'ADMIN.THEMES.ACTIVE.DEACTIVATE_WORKING' | translate }}
+                } @else {
+                  <svg cIcon name="cilReload" class="me-2"></svg>
+                  {{ 'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate }}
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <input
+          #manageZipInput
+          type="file"
+          accept=".zip"
+          class="d-none"
+          (change)="onUploadDraftZip(mt, $event)"
+        />
+
+        <div class="row g-2">
+          <div class="col-12 col-md-6">
+            <button
+              cButton
+              color="secondary"
+              variant="outline"
+              class="w-100"
+              (click)="onManageDraft()"
+              [disabled]="themeActionLoading"
+            >
+              <svg cIcon name="cilNotes" class="me-2"></svg>
+              {{ 'ADMIN.THEMES.DRAFT.ACTION' | translate }}
+            </button>
+          </div>
+          <div class="col-12 col-md-6">
+            <button
+              cButton
+              color="secondary"
+              variant="outline"
+              class="w-100"
+              (click)="manageZipInput.click()"
+              [disabled]="themeActionLoading"
+            >
+              <svg cIcon name="cilCloudUpload" class="me-2"></svg>
+              {{ 'ADMIN.THEMES.TOOLTIP.UPLOAD_DRAFT_ZIP' | translate }}
+            </button>
+          </div>
+          <div class="col-12 col-md-6">
+            <button
+              cButton
+              color="secondary"
+              variant="outline"
+              class="w-100"
+              (click)="onManagePreview()"
+              [disabled]="themeActionLoading || (!mt.draft && !mt.published)"
+            >
+              <svg cIcon name="cilMediaPlay" class="me-2"></svg>
+              {{ 'ADMIN.THEMES.TOOLTIP.PREVIEW' | translate }}
+            </button>
+          </div>
+          <div class="col-12 col-md-6">
+            @if (mt.draft) {
+              <button
+                cButton
+                color="success"
+                variant="outline"
+                class="w-100"
+                (click)="onManagePublish()"
+                [disabled]="themeActionLoading"
+              >
+                <svg cIcon name="cilCloudUpload" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.TOOLTIP.PUBLISH' | translate }}
+              </button>
+            } @else if (mt.published) {
+              <button
+                cButton
+                color="danger"
+                variant="outline"
+                class="w-100"
+                (click)="askUnpublish()"
+                [disabled]="themeActionLoading"
+              >
+                @if (themeActionLoading) {
+                  <c-spinner size="sm" class="me-2"></c-spinner>
+                  {{ 'ADMIN.THEMES.UNPUBLISH_WORKING' | translate }}
+                } @else {
+                  <svg cIcon name="cilXCircle" class="me-2"></svg>
+                  {{ 'ADMIN.THEMES.UNPUBLISH_BUTTON' | translate }}
+                }
+              </button>
+            } @else {
+              <button cButton color="secondary" variant="outline" class="w-100" disabled>
+                <svg cIcon name="cilWarning" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.PUBLISH_NEEDS_DRAFT' | translate }}
+              </button>
+            }
+          </div>
+          <div class="col-12 col-md-6">
+            @if (activePublicThemeSlug === mt.slug) {
+              <button
+                cButton
+                color="secondary"
+                variant="outline"
+                class="w-100"
+                (click)="askResetActiveTheme()"
+                [disabled]="themeActionLoading"
+              >
+                @if (themeActionLoading) {
+                  <c-spinner size="sm" class="me-2"></c-spinner>
+                  {{ 'ADMIN.THEMES.ACTIVE.DEACTIVATE_WORKING' | translate }}
+                } @else {
+                  <svg cIcon name="cilXCircle" class="me-2"></svg>
+                  {{ 'ADMIN.THEMES.ACTIVE.DEACTIVATE_BUTTON' | translate }}
+                }
+              </button>
+            } @else {
+              <button
+                cButton
+                color="primary"
+                variant="outline"
+                class="w-100"
+                (click)="onManageActivate()"
+                [disabled]="themeActionLoading || !mt.published"
+              >
+                @if (themeActionLoading) {
+                  <c-spinner size="sm" class="me-2"></c-spinner>
+                  {{ 'ADMIN.THEMES.ACTIVE.ACTIVATE_WORKING' | translate }}
+                } @else {
+                  <svg cIcon name="cilCheckCircle" class="me-2"></svg>
+                  {{ 'ADMIN.THEMES.TOOLTIP.ACTIVATE' | translate }}
+                }
+              </button>
+            }
+          </div>
+          <div class="col-12 col-md-6">
+            <button
+              cButton
+              color="primary"
+              variant="outline"
+              class="w-100"
+              (click)="onManageEdit()"
+              [disabled]="themeActionLoading"
+            >
+              <svg cIcon name="cilPen" class="me-2"></svg>
+              {{ 'COMMON.EDIT' | translate }}
+            </button>
+          </div>
+          <div class="col-12">
+            <button
+              cButton
+              color="danger"
+              variant="outline"
+              class="w-100"
+              (click)="onManageDelete()"
+              [disabled]="themeActionLoading"
+            >
+              <svg cIcon name="cilTrash" class="me-2"></svg>
+              {{ 'COMMON.DELETE' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <hr class="my-3" />
+        <div class="border rounded-3 p-3 bg-light bg-opacity-10">
+          <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}</div>
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-8">
+              <label class="form-label small text-muted fw-bold mb-1">{{
+                'ADMIN.THEMES.PRESETS.SELECT' | translate
+              }}</label>
+              <select cSelect [(ngModel)]="applyPresetId" [ngModelOptions]="{ standalone: true }">
+                <option [ngValue]="null">{{ 'ADMIN.THEMES.PRESETS.SELECT_PLACEHOLDER' | translate }}</option>
+                @for (p of presets; track p.idTemaPreset) {
+                  <option [ngValue]="p.idTemaPreset">{{ p.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-12 col-md-4">
+              <button
+                cButton
+                color="primary"
+                class="w-100"
+                [disabled]="themeActionLoading || !applyPresetId"
+                (click)="applyPresetAskConfirm()"
+              >
+                {{ 'ADMIN.THEMES.PRESETS.APPLY' | translate }}
+              </button>
+            </div>
+          </div>
+          <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.PRESETS.APPLY_HELP' | translate }}</div>
+        </div>
+      </div>
+    }
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" variant="ghost" (click)="closeManageModal()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<!-- Modal: Presets -->
+<c-modal
+  [visible]="presetsModalVisible"
+  (visibleChange)="presetsModalVisible = $event"
+  size="xl"
+  backdrop="static"
+  scrollable
+>
+  <c-modal-header>
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilPaintBucket" class="text-primary"></svg>
+      {{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}
+    </h5>
+    <button cButtonClose (click)="closePresetsModal()"></button>
+  </c-modal-header>
+  <c-modal-body class="py-4">
+    <details class="mb-3">
+      <summary class="fw-semibold">{{ 'ADMIN.THEMES.HELP.TITLE' | translate }}</summary>
+      <div class="mt-2 small text-muted">
+        <div class="mb-2">
+          <b>{{ 'ADMIN.THEMES.HELP.PRESET_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.PRESET_BODY' | translate }}
+        </div>
+        <div class="mb-2">
+          <b>{{ 'ADMIN.THEMES.HELP.TOKENS_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.TOKENS_BODY' | translate }}
+        </div>
+        <div>
+          <b>{{ 'ADMIN.THEMES.HELP.METADATA_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.METADATA_BODY' | translate }}
+        </div>
+      </div>
+    </details>
+
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+      <div class="text-muted small">{{ 'ADMIN.THEMES.PRESETS.DESC' | translate }}</div>
+      <div class="d-flex gap-2">
+        <button cButton color="secondary" variant="outline" size="sm" (click)="openPresetNewHighContrast()">
+          {{ 'ADMIN.THEMES.PRESETS.NEW_FROM_RECOMMENDED' | translate }}
+        </button>
+        <button cButton color="primary" size="sm" (click)="presetEdit = null; presetForm.reset();">
+          {{ 'COMMON.NEW' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <div class="table-responsive border rounded-3">
+          <table class="table mb-0 align-middle">
+            <thead class="bg-light">
+              <tr>
+                <th>{{ 'COMMON.NAME' | translate }}</th>
+                <th class="text-end" style="width: 130px">{{ 'COMMON.ACTIONS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of presets; track p.idTemaPreset) {
+                <tr>
+                  <td>
+                    <div class="fw-semibold">{{ p.nombre }}</div>
+                    <div class="small text-muted">{{ p.descripcion || '—' }}</div>
+                  </td>
+                  <td class="text-end">
+                    <button cButton color="primary" variant="ghost" size="sm" (click)="editPreset(p)">
+                      <svg cIcon name="cilPen"></svg>
+                    </button>
+                    <button cButton color="danger" variant="ghost" size="sm" (click)="deletePreset(p)">
+                      <svg cIcon name="cilTrash"></svg>
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="2" class="text-center text-muted py-4">
+                    {{ 'ADMIN.THEMES.PRESETS.EMPTY' | translate }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="border rounded-3 p-3">
+          <div class="fw-bold mb-3">
+            {{ presetEdit?.idTemaPreset ? ('COMMON.EDIT' | translate) : ('COMMON.NEW' | translate) }}
+          </div>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button cButton color="secondary" variant="outline" size="sm" type="button" (click)="presetInsertExampleTokens()">
+              {{ 'COMMON.INSERT_EXAMPLE_TOKENS' | translate }}
+            </button>
+            <button
+              cButton
+              color="secondary"
+              variant="outline"
+              size="sm"
+              type="button"
+              (click)="presetInsertExampleMetadata()"
+            >
+              {{ 'COMMON.INSERT_EXAMPLE_METADATA' | translate }}
+            </button>
+            <button
+              cButton
+              color="secondary"
+              variant="ghost"
+              size="sm"
+              type="button"
+              (click)="validateJson(presetForm.value.tokensJson, 'ADMIN.THEMES.PRESETS.TITLE')"
+            >
+              {{ 'COMMON.VALIDATE_JSON' | translate }}
+            </button>
+          </div>
+          <form [formGroup]="presetForm" class="d-block">
+            <div class="mb-3">
+              <label class="form-label small text-muted fw-bold">{{ 'COMMON.NAME' | translate }}</label>
+              <input cFormControl type="text" formControlName="nombre" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted fw-bold">{{ 'COMMON.DESCRIPTION' | translate }}</label>
+              <input cFormControl type="text" formControlName="descripcion" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted fw-bold">{{ 'ADMIN.THEMES.PRESETS.TOKENS' | translate }}</label>
+              <textarea cFormControl rows="10" class="font-monospace" formControlName="tokensJson"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted fw-bold">{{ 'ADMIN.THEMES.PRESETS.METADATA' | translate }}</label>
+              <textarea cFormControl rows="6" class="font-monospace" formControlName="metadataJson"></textarea>
+            </div>
+            <button
+              type="button"
+              cButton
+              color="primary"
+              class="w-100"
+              [disabled]="presetForm.invalid || presetsLoading"
+              (click)="savePreset()"
+            >
+              {{ 'COMMON.SAVE' | translate }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" variant="ghost" (click)="closePresetsModal()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<app-confirmation-modal
+  [visible]="showApplyPresetConfirm"
+  [title]="'ADMIN.THEMES.PRESETS.APPLY_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.PRESETS.APPLY_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.PRESETS.APPLY' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'warning'"
+  [loading]="loading"
+  (visibleChange)="showApplyPresetConfirm = $event"
+  (confirm)="applyPresetConfirm()"
+></app-confirmation-modal>
+
+<app-confirmation-modal
+  [visible]="showResetActiveThemeConfirm"
+  [title]="'ADMIN.THEMES.ACTIVE.RESET_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.ACTIVE.RESET_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.ACTIVE.RESET_BUTTON' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'warning'"
+  [loading]="loading"
+  (visibleChange)="showResetActiveThemeConfirm = $event"
+  (confirm)="confirmResetActiveTheme()"
+></app-confirmation-modal>
+
+<app-confirmation-modal
+  [visible]="showUnpublishConfirm"
+  [title]="'ADMIN.THEMES.UNPUBLISH_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.UNPUBLISH_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.UNPUBLISH_BUTTON' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'danger'"
+  [loading]="loading"
+  (visibleChange)="showUnpublishConfirm = $event"
+  (confirm)="confirmUnpublish()"
+></app-confirmation-modal>
+
+<!-- Modal Borrador -->
+<c-modal
+  [visible]="draftModalVisible"
+  (visibleChange)="onDraftModalVisibleChange($event)"
+  size="xl"
+  backdrop="static"
+  scrollable
+>
+  <c-modal-header>
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilNotes" class="text-primary"></svg>
+      {{ 'ADMIN.THEMES.DRAFT.TITLE' | translate }}
+      @if (draftTema?.nombre) {
+        <span class="text-muted fw-normal">- {{ draftTema?.nombre }}</span>
+      }
+    </h5>
+    <button cButtonClose (click)="closeDraftModal()"></button>
+  </c-modal-header>
+  <c-modal-body class="py-4">
+    @if (draftLoading) {
+      <div class="d-flex justify-content-center align-items-center py-5">
+        <c-spinner color="primary"></c-spinner>
+      </div>
+    } @else {
+      <details class="mb-3">
+        <summary class="fw-semibold">{{ 'ADMIN.THEMES.HELP.TITLE' | translate }}</summary>
+        <div class="mt-2 small text-muted">
+          <div class="mb-2">
+            <b>{{ 'ADMIN.THEMES.HELP.TOKENS_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.TOKENS_BODY' | translate }}
+          </div>
+          <div class="mb-2">
+            <b>{{ 'ADMIN.THEMES.HELP.METADATA_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.METADATA_BODY' | translate }}
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button cButton color="secondary" variant="outline" size="sm" type="button" (click)="draftInsertExampleTokens()">
+              {{ 'COMMON.INSERT_EXAMPLE_TOKENS' | translate }}
+            </button>
+            <button
+              cButton
+              color="secondary"
+              variant="outline"
+              size="sm"
+              type="button"
+              (click)="draftInsertExampleMetadata()"
+            >
+              {{ 'COMMON.INSERT_EXAMPLE_METADATA' | translate }}
+            </button>
+            <button
+              cButton
+              color="secondary"
+              variant="ghost"
+              size="sm"
+              type="button"
+              (click)="validateJson(draftTokensJson, 'ADMIN.THEMES.DRAFT.TITLE')"
+            >
+              {{ 'COMMON.VALIDATE_JSON' | translate }}
+            </button>
+          </div>
+        </div>
+      </details>
+      <div class="row g-3">
+        <!-- Presets -->
+        <div class="col-12">
+          <div class="border rounded-3 p-3 bg-light bg-opacity-10">
+            <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}</div>
+            <div class="row g-2 align-items-end">
+              <div class="col-12 col-md-8">
+                <label class="form-label small text-muted fw-bold mb-1">{{
+                  'ADMIN.THEMES.PRESETS.SELECT' | translate
+                }}</label>
+                <select cSelect [(ngModel)]="draftPresetId" [ngModelOptions]="{ standalone: true }">
+                  <option [ngValue]="null">{{ 'ADMIN.THEMES.PRESETS.SELECT_PLACEHOLDER' | translate }}</option>
+                  @for (p of presets; track p.idTemaPreset) {
+                    <option [ngValue]="p.idTemaPreset">{{ p.nombre }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-12 col-md-4">
+                <button
+                  cButton
+                  color="primary"
+                  class="w-100"
+                  [disabled]="themeActionLoading || !draftPresetId"
+                  (click)="applyDraftPresetAskConfirm()"
+                >
+                  {{ 'ADMIN.THEMES.PRESETS.APPLY' | translate }}
+                </button>
+              </div>
+            </div>
+            <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.PRESETS.APPLY_HELP' | translate }}</div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="text-muted small fw-semibold">{{ 'ADMIN.THEMES.DRAFT.SOURCE_TYPE' | translate }}:</span>
+            <c-badge
+              [color]="(draftData?.sourceType || '') === 'CSS_PACKAGE' ? 'info' : 'warning'"
+              shape="rounded-pill"
+            >
+              {{ draftData?.sourceType || 'TOKENS_ONLY' }}
+            </c-badge>
+            @if (draftData?.version) {
+              <c-badge color="secondary" shape="rounded-pill">v{{ draftData?.version }}</c-badge>
+            }
+          </div>
+        </div>
+
+        @if ((draftData?.sourceType || '') === 'CSS_PACKAGE' && !draftAllowTokensEdit) {
+          <div class="col-12">
+            <c-alert color="info" class="d-flex align-items-start justify-content-between">
+              <div class="d-flex gap-2">
+                <svg cIcon name="cilInfo" class="mt-1"></svg>
+                <div>
+                  <div class="fw-semibold">{{ 'ADMIN.THEMES.DRAFT.FROM_ZIP' | translate }}</div>
+                  <div class="small text-muted">
+                    {{ 'ADMIN.THEMES.DRAFT.CONVERT_CONFIRM_MSG' | translate }}
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button cButton color="warning" variant="outline" size="sm" (click)="askConvertDraftToTokens()">
+                  {{ 'ADMIN.THEMES.DRAFT.CONVERT_TO_TOKENS' | translate }}
+                </button>
+                <button cButton color="primary" variant="outline" size="sm" (click)="draftZipInput.click()">
+                  {{ 'ADMIN.THEMES.DRAFT.REUPLOAD_ZIP' | translate }}
+                </button>
+              </div>
+            </c-alert>
+            <input
+              #draftZipInput
+              type="file"
+              accept=".zip"
+              class="d-none"
+              (change)="draftTema && onUploadDraftZip(draftTema, $event)"
+            />
+          </div>
+        }
+
+        @if (draftAllowTokensEdit) {
+          <div class="col-12">
+            <label class="form-label small fw-bold text-muted">{{ 'ADMIN.THEMES.DRAFT.TOKENS' | translate }}</label>
+            <textarea
+              cFormControl
+              rows="12"
+              [(ngModel)]="draftTokensJson"
+              [ngModelOptions]="{ standalone: true }"
+              class="font-monospace"
+            ></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-bold text-muted">{{ 'ADMIN.THEMES.DRAFT.METADATA' | translate }}</label>
+            <textarea
+              cFormControl
+              rows="4"
+              [(ngModel)]="draftMetadataJson"
+              [ngModelOptions]="{ standalone: true }"
+              class="font-monospace"
+            ></textarea>
+          </div>
+        } @else {
+          <div class="col-12">
+            <c-alert color="secondary" class="mb-0">
+              {{ 'ADMIN.THEMES.DRAFT.NO_DRAFT' | translate }}
+            </c-alert>
+          </div>
+        }
+      </div>
+    }
+  </c-modal-body>
+  <c-modal-footer class="bg-light bg-opacity-10 d-flex justify-content-between">
+    <div></div>
+    <div class="d-flex gap-2">
+      <button cButton color="secondary" variant="ghost" (click)="closeDraftModal()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        cButton
+        color="primary"
+        class="px-4"
+        [disabled]="draftLoading || !draftAllowTokensEdit"
+        (click)="saveDraft()"
+      >
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </div>
+  </c-modal-footer>
+</c-modal>
+
+<app-confirmation-modal
+  [visible]="showApplyDraftPresetConfirm"
+  [title]="'ADMIN.THEMES.PRESETS.APPLY_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.PRESETS.APPLY_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.PRESETS.APPLY' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'warning'"
+  [loading]="draftLoading"
+  (visibleChange)="showApplyDraftPresetConfirm = $event"
+  (confirm)="applyDraftPresetConfirm()"
+></app-confirmation-modal>
+
+<app-confirmation-modal
+  [visible]="showConvertDraftModal"
+  [title]="'ADMIN.THEMES.DRAFT.CONVERT_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.DRAFT.CONVERT_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.DRAFT.CONVERT_TO_TOKENS' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'warning'"
+  [loading]="draftLoading"
+  (visibleChange)="showConvertDraftModal = $event"
+  (confirm)="confirmConvertDraftToTokens()"
 ></app-confirmation-modal>

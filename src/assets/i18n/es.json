@@ -117,6 +117,13 @@
     "SEARCH": "Buscar",
     "SHOW": "Mostrar",
     "HIDE": "Ocultar",
+    "NEXT": "Siguiente",
+    "PREV": "Anterior",
+    "VALIDATE_JSON": "Validar JSON",
+    "VALID_JSON": "JSON válido",
+    "INVALID_JSON": "JSON inválido",
+    "INSERT_EXAMPLE_TOKENS": "Insertar ejemplo de tokens",
+    "INSERT_EXAMPLE_METADATA": "Insertar ejemplo de metadata",
     "ACTIONS": "Acciones",
     "NAME": "Nombre",
     "PASSWORD": "Contraseña",
@@ -136,6 +143,7 @@
     "EXISTING": "Existentes",
     "COLOR": "Color",
     "CREATE": "Crear",
+    "NEW": "Nuevo",
     "UPDATE": "Actualizar",
     "CHARACTERS": "caracteres",
     "CONFIRM_DELETE": "Confirmar eliminación",
@@ -171,6 +179,10 @@
     "RESET": "Limpiar",
     "UNPUBLISHED": "No Publicada",
     "FILTERS": "Filtros",
+    "SORT": "Ordenar",
+    "MANAGE": "Gestionar",
+    "CREATED_AT": "Creado",
+    "UPDATED_AT": "Últ. modif.",
     "ACTIVE": "Activos",
     "VALIDATION": {
       "REQUIRED": "Este campo es obligatorio",
@@ -211,6 +223,7 @@
     "CHANGE_PASSWORD": "Cambiar Contraseña",
     "SYSTEM_CONFIGURATION": "Config. del Sistema",
     "APPEARANCE": "Apariencia",
+    "THEMES": "Temas",
     "GENERAL_SETTINGS": "Configuración General",
     "ADVANCED_SETTINGS": "Ajustes Avanzados",
     "MAINTENANCE": "Mantenimiento",
@@ -252,11 +265,24 @@
         "STATUS_ACTIVE": "Activo",
         "STATUS_INACTIVE": "Inactivo",
         "COLOR_SCHEME": "Esquema de Color",
-        "ACTIONS": "Acciones"
+        "ACTIONS": "Acciones",
+        "DRAFT": "Borrador",
+        "PUBLISHED": "Publicado",
+        "ORIGIN": "Origen"
       },
+      "TOOLTIP": {
+        "SORT": "Ordenar listado",
+        "UPLOAD_DRAFT_ZIP": "Subir ZIP a draft",
+        "PREVIEW": "Vista previa",
+        "PUBLISH": "Publicar",
+        "ACTIVATE": "Activar"
+      },
+      "SLUG_PLACEHOLDER": "slug-opcional",
+      "SLUG_HELP": "Opcional. Si se deja vacío, el backend lo genera automáticamente.",
       "SEARCH_PLACEHOLDER": "Buscar tema...",
       "NO_THEMES_FOUND": "No se encontraron temas",
       "ADJUST_FILTERS_HELP": "Intenta ajustar los filtros",
+      "PREVIEW_NO_VERSION": "Para previsualizar, el tema debe tener un borrador o una versión publicada.",
       "EDIT_THEME": "Editar Tema",
       "NAME_REQUIRED": "El nombre es obligatorio",
       "COLOR_SCHEME_PLACEHOLDER": "JSON del esquema de color...",
@@ -268,11 +294,109 @@
       "NEW_THEME": "Nuevo Tema",
       "SUCCESS": {
         "UPDATE": "Tema actualizado correctamente",
-        "CREATE": "Tema creado correctamente"
+        "CREATE": "Tema creado correctamente",
+        "DELETE": "Tema eliminado correctamente"
       },
       "ERROR": {
         "UPDATE": "Error actualizando tema",
-        "CREATE": "Error creando tema"
+        "CREATE": "Error creando tema",
+        "DELETE": "Error eliminando tema"
+      },
+      "DRAFT": {
+        "ACTION": "Borrador...",
+        "TITLE": "Borrador",
+        "TOKENS": "Tokens (JSON)",
+        "METADATA": "Metadata (JSON)",
+        "SOURCE_TYPE": "Origen del borrador",
+        "FROM_ZIP": "Este borrador proviene de un ZIP.",
+        "NO_DRAFT": "El tema no tiene borrador todavía. Puedes crear uno pegando tokens en JSON.",
+        "CONVERT_TO_TOKENS": "Convertir a tokens",
+        "REUPLOAD_ZIP": "Re-subir ZIP",
+        "CONVERT_CONFIRM_TITLE": "Convertir borrador",
+        "CONVERT_CONFIRM_MSG": "Este borrador viene de ZIP. Si conviertes a tokens, se perderá la referencia al ZIP. ¿Continuar?"
+      }
+      ,
+      "MANAGE_MODAL": {
+        "TITLE": "Gestionar tema"
+      },
+      "PUBLISH_NEEDS_DRAFT": "Sin borrador",
+      "UNPUBLISH_BUTTON": "Despublicar",
+      "UNPUBLISH_WORKING": "Despublicando...",
+      "UNPUBLISH_CONFIRM_TITLE": "Despublicar tema",
+      "UNPUBLISH_CONFIRM_MSG": "Se eliminará la versión publicada del tema (y si está activo, se desactivará). ¿Continuar?",
+      "UNPUBLISH_SUCCESS": "Tema despublicado",
+      "UNPUBLISH_ERROR": "Error despublicando el tema",
+      "PRESETS": {
+        "TITLE": "Presets",
+        "DESC": "Presets globales para aplicar rápidamente al borrador.",
+        "EMPTY": "No hay presets todavía",
+        "TOKENS": "Tokens (JSON)",
+        "METADATA": "Metadata (JSON)",
+        "SELECT": "Selecciona un preset",
+        "SELECT_PLACEHOLDER": "— Selecciona —",
+        "APPLY": "Aplicar preset",
+        "APPLIED": "Preset aplicado al borrador",
+        "APPLY_HELP": "Esto reemplaza el tokensJson del borrador por el preset seleccionado.",
+        "APPLY_CONFIRM_TITLE": "Aplicar preset",
+        "APPLY_CONFIRM_MSG": "Se reemplazará el borrador actual por el preset seleccionado. ¿Continuar?",
+        "NEW_FROM_RECOMMENDED": "Cargar preset #3"
+      },
+      "ACTIVE": {
+        "LABEL": "Tema activo",
+        "NONE": "Ninguno (default)",
+        "INFO": "Publicar no cambia el tema activo. Para que se aplique en la web pública debes activarlo.",
+        "DEACTIVATE_BUTTON": "Desactivar",
+        "DEACTIVATE_WORKING": "Desactivando...",
+        "ACTIVATE_WORKING": "Activando...",
+        "RESET_BUTTON": "Restaurar por defecto",
+        "RESET_CONFIRM_TITLE": "Restaurar tema",
+        "RESET_CONFIRM_MSG": "Se quitará el tema activo y se volverá al tema por defecto. ¿Continuar?",
+        "RESET_SUCCESS": "Tema restablecido al por defecto",
+        "RESET_ERROR": "Error restableciendo el tema"
+      }
+      ,
+      "GUIDE": {
+        "TITLE": "Cómo se usa",
+        "SUBTITLE": "Guía rápida del flujo recomendado para trabajar con temas.",
+        "HIDE_FOREVER": "Ocultar guía",
+        "SHOW_TOOLTIP": "Mostrar guía",
+        "SELECT_THEME": "Tema para guiar",
+        "STEP_DRAFT": "Borrador",
+        "STEP_PRESETS": "Presets",
+        "STEP_PREVIEW": "Preview",
+        "STEP_PUBLISH_ACTIVATE": "Publicar/Activar",
+        "FLOW_HINT": "Flujo recomendado: Borrador → (Preset) → (Preview) → Publicar → Activar."
+      },
+      "TOUR": {
+        "TITLE": "Tour de Temas",
+        "SUBTITLE": "Paso {{step}} de {{total}}",
+        "SKIP": "Saltar",
+        "DONT_SHOW_AGAIN": "No volver a mostrar",
+        "STEP1_TITLE": "1) Borrador",
+        "STEP1_BODY": "El borrador es donde editas los tokens (variables CSS). Si ya publicaste, el sistema mantiene un borrador para seguir iterando.",
+        "STEP2_TITLE": "2) Presets",
+        "STEP2_BODY": "Un preset es una plantilla reutilizable de tokens + metadata. Puedes aplicarlo al borrador para empezar más rápido.",
+        "STEP3_TITLE": "3) Preview",
+        "STEP3_BODY": "La preview genera un enlace temporal para ver el tema sin activarlo. Ideal para validar antes de publicar.",
+        "STEP4_TITLE": "4) Publicar y Activar",
+        "STEP4_BODY": "Publicar crea una versión estable. Activar aplica el tema a la web pública. Desactivar vuelve al tema por defecto."
+      }
+      ,
+      "HELP": {
+        "TITLE": "¿Qué es esto?",
+        "PRESET_TITLE": "Preset",
+        "PRESET_BODY": "Plantilla reutilizable de tokens + metadata para aplicar rápido al borrador.",
+        "TOKENS_TITLE": "Tokens (tokensJson)",
+        "TOKENS_BODY": "JSON de variables CSS. Solo se aplican claves que empiecen por “--” (p. ej. --cui-primary).",
+        "METADATA_TITLE": "Metadata (metadataJson)",
+        "METADATA_BODY": "JSON libre para guardar información (displayName, mode, notes...). No afecta al estilo salvo que la app lo use."
+      },
+      "NEXT": {
+        "TITLE": "Siguiente paso recomendado",
+        "CREATE_DRAFT": "Crea o abre el borrador para empezar a definir el tema.",
+        "PUBLISH": "Tienes un borrador pendiente. Publica para generar una versión estable.",
+        "ACTIVATE": "Ya está publicado. Actívalo para aplicarlo a la web pública.",
+        "DEACTIVATE": "Este tema está activo. Puedes desactivarlo para volver al tema por defecto."
       }
     },
     "PROFILE": {

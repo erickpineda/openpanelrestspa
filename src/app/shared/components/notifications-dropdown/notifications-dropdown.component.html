@@ -41,6 +41,11 @@
             class="notif-item d-flex align-items-start gap-3 p-3 rounded-2"
             [class.unread]="it.unread"
             [class.marking-read]="markingAsReadIds.has(it.id)"
+            role="button"
+            tabindex="0"
+            (click)="handleOpen(it.id)"
+            (keydown.enter)="handleOpen(it.id)"
+            (keydown.space)="handleOpen(it.id); $event.preventDefault()"
           >
             <div class="icon d-flex align-items-center justify-content-center">
               @switch (it.type) {
@@ -59,22 +64,15 @@
               }
             </div>
             <div class="flex-fill">
-              <div class="d-flex align-items-center justify-content-between">
-                <strong class="me-2" [title]="it.title">{{
+              <div class="notif-title-row">
+                <strong class="notif-title me-2" [title]="it.title">{{
                   it.title.length > 30 ? (it.title | slice: 0 : 30) + '...' : it.title
                 }}</strong>
-                <div class="d-flex align-items-center gap-2">
-                  @if (it.type === 'temporary') {
-                    <span class="notif-tag badge rounded-pill text-bg-warning">Temporal</span>
-                  }
-                  @if (it.unread) {
-                    <span class="badge rounded-pill text-bg-primary">Nuevo</span>
-                  }
+                <div class="notif-meta d-flex align-items-center gap-2">
                   <small class="small time">{{ timeAgo(it.timestamp) }}</small>
                 </div>
               </div>
-              <div class="small text-body mt-1">{{ it.message }}</div>
-              <div class="mt-3 d-flex gap-2">
+              <div class="mt-2 d-flex gap-2">
                 <button
                   cButton
                   color="secondary"
@@ -91,7 +89,7 @@
                   color="danger"
                   size="sm"
                   variant="outline"
-                  (click)="handleDismiss(it.id)"
+                  (click)="$event.stopPropagation(); handleDismiss(it.id)"
                   aria-label="Descartar notificación"
                 >
                   <svg cIcon name="cilX"></svg>

@@ -28,6 +28,14 @@
     "ALL": "All",
     "SEARCH": "Search",
     "SHOW": "Show",
+    "HIDE": "Hide",
+    "NEXT": "Next",
+    "PREV": "Previous",
+    "VALIDATE_JSON": "Validate JSON",
+    "VALID_JSON": "Valid JSON",
+    "INVALID_JSON": "Invalid JSON",
+    "INSERT_EXAMPLE_TOKENS": "Insert token example",
+    "INSERT_EXAMPLE_METADATA": "Insert metadata example",
     "ACTIONS": "Actions",
     "NAME": "Name",
     "DESCRIPTION": "Description",
@@ -44,6 +52,7 @@
     "EXISTING": "Existing",
     "COLOR": "Color",
     "CREATE": "Create",
+    "NEW": "New",
     "UPDATE": "Update",
     "CHARACTERS": "characters",
     "CONFIRM_DELETE": "Confirm deletion",
@@ -76,6 +85,10 @@
     "ACTIVE": "Active",
     "ENABLE_EDIT": "Enable Editing",
     "FILTERS": "Filters",
+    "SORT": "Sort",
+    "MANAGE": "Manage",
+    "CREATED_AT": "Created",
+    "UPDATED_AT": "Updated",
     "NO_RESULTS": "No results found",
     "VALIDATION": {
       "REQUIRED": "This field is required",
@@ -116,6 +129,7 @@
     "CHANGE_PASSWORD": "Change Password",
     "SYSTEM_CONFIGURATION": "System Configuration",
     "APPEARANCE": "Appearance",
+    "THEMES": "Themes",
     "GENERAL_SETTINGS": "General Settings",
     "ADVANCED_SETTINGS": "Advanced Settings",
     "MAINTENANCE": "Maintenance",
@@ -157,11 +171,24 @@
         "STATUS_ACTIVE": "Active",
         "STATUS_INACTIVE": "Inactive",
         "COLOR_SCHEME": "Color Scheme",
-        "ACTIONS": "Actions"
+        "ACTIONS": "Actions",
+        "DRAFT": "Draft",
+        "PUBLISHED": "Published",
+        "ORIGIN": "Origin"
       },
+      "TOOLTIP": {
+        "SORT": "Sort list",
+        "UPLOAD_DRAFT_ZIP": "Upload draft ZIP",
+        "PREVIEW": "Preview",
+        "PUBLISH": "Publish",
+        "ACTIVATE": "Activate"
+      },
+      "SLUG_PLACEHOLDER": "optional-slug",
+      "SLUG_HELP": "Optional. If left empty, the backend generates it automatically.",
       "SEARCH_PLACEHOLDER": "Search theme...",
       "NO_THEMES_FOUND": "No themes found",
       "ADJUST_FILTERS_HELP": "Try adjusting filters",
+      "PREVIEW_NO_VERSION": "To preview, the theme must have a draft or a published version.",
       "EDIT_THEME": "Edit Theme",
       "NAME_REQUIRED": "Name is required",
       "COLOR_SCHEME_PLACEHOLDER": "Color scheme JSON...",
@@ -173,11 +200,108 @@
       "NEW_THEME": "New Theme",
       "SUCCESS": {
         "UPDATE": "Theme updated successfully",
-        "CREATE": "Theme created successfully"
+        "CREATE": "Theme created successfully",
+        "DELETE": "Theme deleted successfully"
       },
       "ERROR": {
         "UPDATE": "Error updating theme",
-        "CREATE": "Error creating theme"
+        "CREATE": "Error creating theme",
+        "DELETE": "Error deleting theme"
+      },
+      "DRAFT": {
+        "ACTION": "Draft...",
+        "TITLE": "Draft",
+        "TOKENS": "Tokens (JSON)",
+        "METADATA": "Metadata (JSON)",
+        "SOURCE_TYPE": "Draft source",
+        "FROM_ZIP": "This draft comes from a ZIP package.",
+        "NO_DRAFT": "This theme doesn't have a draft yet. You can create one by pasting JSON tokens.",
+        "CONVERT_TO_TOKENS": "Convert to tokens",
+        "REUPLOAD_ZIP": "Re-upload ZIP",
+        "CONVERT_CONFIRM_TITLE": "Convert draft",
+        "CONVERT_CONFIRM_MSG": "This draft comes from a ZIP. If you convert to tokens, the ZIP reference will be lost. Continue?"
+      }
+      ,
+      "MANAGE_MODAL": {
+        "TITLE": "Manage theme"
+      },
+      "PUBLISH_NEEDS_DRAFT": "No draft",
+      "UNPUBLISH_BUTTON": "Unpublish",
+      "UNPUBLISH_WORKING": "Unpublishing...",
+      "UNPUBLISH_CONFIRM_TITLE": "Unpublish theme",
+      "UNPUBLISH_CONFIRM_MSG": "The published version will be removed (and if it is active, it will be deactivated). Continue?",
+      "UNPUBLISH_SUCCESS": "Theme unpublished",
+      "UNPUBLISH_ERROR": "Error unpublishing theme",
+      "PRESETS": {
+        "TITLE": "Presets",
+        "DESC": "Global presets to quickly apply to the draft.",
+        "EMPTY": "No presets yet",
+        "TOKENS": "Tokens (JSON)",
+        "METADATA": "Metadata (JSON)",
+        "SELECT": "Select a preset",
+        "SELECT_PLACEHOLDER": "— Select —",
+        "APPLY": "Apply preset",
+        "APPLIED": "Preset applied to draft",
+        "APPLY_HELP": "This replaces the current draft tokensJson with the selected preset.",
+        "APPLY_CONFIRM_TITLE": "Apply preset",
+        "APPLY_CONFIRM_MSG": "The current draft will be replaced by the selected preset. Continue?",
+        "NEW_FROM_RECOMMENDED": "Load preset #3"
+      },
+      "ACTIVE": {
+        "LABEL": "Active theme",
+        "NONE": "None (default)",
+        "INFO": "Publishing does not change the active theme. To apply it on the public site you must activate it.",
+        "DEACTIVATE_BUTTON": "Deactivate",
+        "DEACTIVATE_WORKING": "Deactivating...",
+        "ACTIVATE_WORKING": "Activating...",
+        "RESET_BUTTON": "Restore default",
+        "RESET_CONFIRM_TITLE": "Restore theme",
+        "RESET_CONFIRM_MSG": "The active theme will be cleared and the app will return to the default theme. Continue?",
+        "RESET_SUCCESS": "Theme restored to default",
+        "RESET_ERROR": "Error restoring theme"
+      },
+      "GUIDE": {
+        "TITLE": "How to use",
+        "SUBTITLE": "Quick guide to the recommended workflow for themes.",
+        "HIDE_FOREVER": "Hide guide",
+        "SHOW_TOOLTIP": "Show guide",
+        "SELECT_THEME": "Theme to guide",
+        "STEP_DRAFT": "Draft",
+        "STEP_PRESETS": "Presets",
+        "STEP_PREVIEW": "Preview",
+        "STEP_PUBLISH_ACTIVATE": "Publish/Activate",
+        "FLOW_HINT": "Recommended flow: Draft → (Preset) → (Preview) → Publish → Activate."
+      },
+      "TOUR": {
+        "TITLE": "Themes tour",
+        "SUBTITLE": "Step {{step}} of {{total}}",
+        "SKIP": "Skip",
+        "DONT_SHOW_AGAIN": "Don't show again",
+        "STEP1_TITLE": "1) Draft",
+        "STEP1_BODY": "The draft is where you edit tokens (CSS variables). After publishing, the system keeps a draft so you can continue iterating.",
+        "STEP2_TITLE": "2) Presets",
+        "STEP2_BODY": "A preset is a reusable template of tokens + metadata. You can apply it to the draft to get started faster.",
+        "STEP3_TITLE": "3) Preview",
+        "STEP3_BODY": "Preview generates a temporary link to view the theme without activating it. Great for validating before publishing.",
+        "STEP4_TITLE": "4) Publish & Activate",
+        "STEP4_BODY": "Publish creates a stable version. Activate applies it to the public site. Deactivate returns to the default theme."
+      }
+      ,
+      "HELP": {
+        "TITLE": "What is this?",
+        "PRESET_TITLE": "Preset",
+        "PRESET_BODY": "Reusable template of tokens + metadata to apply quickly to the draft.",
+        "TOKENS_TITLE": "Tokens (tokensJson)",
+        "TOKENS_BODY": "JSON of CSS variables. Only keys starting with “--” are applied (e.g. --cui-primary).",
+        "METADATA_TITLE": "Metadata (metadataJson)",
+        "METADATA_BODY": "Free-form JSON to store info (displayName, mode, notes...). It does not affect styling unless the app uses it."
+      },
+      "NEXT": {
+        "TITLE": "Recommended next step",
+        "CREATE_DRAFT": "Create or open the draft to start defining the theme.",
+        "PUBLISH": "You have a pending draft. Publish to generate a stable version.",
+        "ACTIVATE": "It is published. Activate it to apply it to the public site.",
+        "DEACTIVATE": "This theme is active. You can deactivate it to return to the default theme."
       }
     },
     "PROFILE": {

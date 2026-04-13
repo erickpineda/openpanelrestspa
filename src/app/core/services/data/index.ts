@@ -16,5 +16,6 @@ export * from './privilegio.service';
 export * from './rol.service';
 export * from './sesiones.service';
 export * from './temas.service';
+export * from './public-themes.service';
 export * from './tipo-entrada.service';
 export * from './usuario.service';

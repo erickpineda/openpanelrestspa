@@ -69,6 +69,7 @@
   position: relative;
   background-color: var(--cui-body-bg);
   border: 1px solid rgba(0, 0, 0, 0.065);
+  cursor: pointer;
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
@@ -120,6 +121,37 @@
   border-color: rgba(0, 0, 0, 0.085);
 }
 
+.notif-item:focus-visible {
+  outline: 2px solid rgba(50, 31, 219, 0.4);
+  outline-offset: 2px;
+}
+
+.notif-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.notif-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notif-meta {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  max-width: 40%;
+}
+
+.notif-meta .time {
+  white-space: nowrap;
+}
+
 .notif-item .icon svg {
   width: 1rem;
   height: 1rem;
@@ -146,9 +178,7 @@
   filter: brightness(0.97);
 }
 
-.notif-tag {
-  align-self: flex-start;
-}
+/* .notif-tag: eliminado visualmente (ya no mostramos badges en el dropdown) */
 
 /* Pie */
 .notif-menu .dropdown-divider {
