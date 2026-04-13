@@ -39,6 +39,69 @@
         </c-alert>
       }
 
+      <!-- Asistente guiado -->
+      @if (showGuide) {
+        <div class="border rounded-3 p-3 mb-4 bg-light bg-opacity-50">
+          <div class="d-flex justify-content-between align-items-start gap-2">
+            <div>
+              <div class="fw-bold text-primary d-flex align-items-center gap-2">
+                <svg cIcon name="cilInfo" class="text-primary"></svg>
+                {{ 'ADMIN.THEMES.GUIDE.TITLE' | translate }}
+              </div>
+              <div class="small text-muted">{{ 'ADMIN.THEMES.GUIDE.SUBTITLE' | translate }}</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button cButton color="secondary" variant="ghost" size="sm" (click)="toggleGuideCollapsed()">
+                {{ (guideCollapsed ? 'COMMON.SHOW' : 'COMMON.HIDE') | translate }}
+              </button>
+              <button cButton color="secondary" variant="ghost" size="sm" (click)="dismissGuide()">
+                {{ 'ADMIN.THEMES.GUIDE.HIDE_FOREVER' | translate }}
+              </button>
+            </div>
+          </div>
+
+          @if (!guideCollapsed) {
+            <div class="row g-2 align-items-end mt-2">
+              <div class="col-12 col-lg-5">
+                <label class="form-label small text-muted fw-bold mb-1">{{
+                  'ADMIN.THEMES.GUIDE.SELECT_THEME' | translate
+                }}</label>
+                <select
+                  cSelect
+                  [ngModel]="guideTemaSlug"
+                  (ngModelChange)="onGuideTemaChange($event)"
+                  [ngModelOptions]="{ standalone: true }"
+                  [disabled]="loading || temas.length === 0"
+                >
+                  @for (t of temas; track t.idTema) {
+                    <option [ngValue]="t.slug">{{ t.nombre }} ({{ t.slug }})</option>
+                  }
+                </select>
+              </div>
+              <div class="col-12 col-lg-7">
+                <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                  <button cButton color="secondary" variant="outline" (click)="guideOpenDraft()" [disabled]="!guideTema">
+                    1) {{ 'ADMIN.THEMES.GUIDE.STEP_DRAFT' | translate }}
+                  </button>
+                  <button cButton color="secondary" variant="outline" (click)="guideOpenPresets()">
+                    2) {{ 'ADMIN.THEMES.GUIDE.STEP_PRESETS' | translate }}
+                  </button>
+                  <button cButton color="secondary" variant="outline" (click)="guideOpenManage()" [disabled]="!guideTema">
+                    3) {{ 'ADMIN.THEMES.GUIDE.STEP_PREVIEW' | translate }}
+                  </button>
+                  <button cButton color="primary" (click)="guidePrimaryAction()" [disabled]="!guideTema">
+                    4) {{ 'ADMIN.THEMES.GUIDE.STEP_PUBLISH_ACTIVATE' | translate }}
+                  </button>
+                </div>
+                <div class="small text-muted mt-2">
+                  {{ 'ADMIN.THEMES.GUIDE.FLOW_HINT' | translate }}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
       <!-- Filtros -->
       <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
         <div class="d-flex flex-wrap gap-3 align-items-end">
@@ -357,6 +420,52 @@
   </c-modal-footer>
 </c-modal>
 
+<!-- Tour (primera vez) -->
+<c-modal [visible]="tourVisible" size="lg" backdrop="static">
+  <c-modal-header>
+    <h5 cModalTitle class="fw-bold d-flex align-items-center gap-2">
+      <svg cIcon name="cilInfo" class="text-primary"></svg>
+      {{ 'ADMIN.THEMES.TOUR.TITLE' | translate }}
+    </h5>
+    <button cButtonClose (click)="tourSkip()"></button>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="small text-muted mb-3">
+      {{ 'ADMIN.THEMES.TOUR.SUBTITLE' | translate: { step: tourStep, total: 4 } }}
+    </div>
+
+    @if (tourStep === 1) {
+      <h6 class="fw-bold">{{ 'ADMIN.THEMES.TOUR.STEP1_TITLE' | translate }}</h6>
+      <p class="mb-0">{{ 'ADMIN.THEMES.TOUR.STEP1_BODY' | translate }}</p>
+    } @else if (tourStep === 2) {
+      <h6 class="fw-bold">{{ 'ADMIN.THEMES.TOUR.STEP2_TITLE' | translate }}</h6>
+      <p class="mb-0">{{ 'ADMIN.THEMES.TOUR.STEP2_BODY' | translate }}</p>
+    } @else if (tourStep === 3) {
+      <h6 class="fw-bold">{{ 'ADMIN.THEMES.TOUR.STEP3_TITLE' | translate }}</h6>
+      <p class="mb-0">{{ 'ADMIN.THEMES.TOUR.STEP3_BODY' | translate }}</p>
+    } @else {
+      <h6 class="fw-bold">{{ 'ADMIN.THEMES.TOUR.STEP4_TITLE' | translate }}</h6>
+      <p class="mb-0">{{ 'ADMIN.THEMES.TOUR.STEP4_BODY' | translate }}</p>
+    }
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" variant="ghost" (click)="tourDontShowAgain()">
+      {{ 'ADMIN.THEMES.TOUR.DONT_SHOW_AGAIN' | translate }}
+    </button>
+    <button cButton color="secondary" variant="outline" (click)="tourSkip()">
+      {{ 'ADMIN.THEMES.TOUR.SKIP' | translate }}
+    </button>
+    <div class="ms-auto d-flex gap-2">
+      <button cButton color="secondary" variant="outline" (click)="tourPrev()" [disabled]="tourStep <= 1">
+        {{ 'COMMON.PREV' | translate }}
+      </button>
+      <button cButton color="primary" (click)="tourNext()" [disabled]="tourStep >= 4">
+        {{ 'COMMON.NEXT' | translate }}
+      </button>
+    </div>
+  </c-modal-footer>
+</c-modal>
+
 <app-confirmation-modal
   [visible]="showDeleteModal"
   [title]="'ADMIN.THEMES.DELETE_THEME' | translate"
@@ -429,6 +538,11 @@
               <span class="fw-semibold">{{ 'COMMON.UPDATED_AT' | translate }}:</span>
               {{ mt.fechaUltimaModif | date: 'dd-MM-yyyy HH:mm:ss' }}
             </div>
+          </div>
+
+          <div class="mt-3 p-3 bg-white rounded-3 border">
+            <div class="fw-semibold mb-1">{{ 'ADMIN.THEMES.NEXT.TITLE' | translate }}</div>
+            <div class="text-muted small">{{ getNextStepKey(mt) | translate }}</div>
           </div>
 
           <div class="mt-3">
@@ -666,6 +780,21 @@
     <button cButtonClose (click)="closePresetsModal()"></button>
   </c-modal-header>
   <c-modal-body class="py-4">
+    <details class="mb-3">
+      <summary class="fw-semibold">{{ 'ADMIN.THEMES.HELP.TITLE' | translate }}</summary>
+      <div class="mt-2 small text-muted">
+        <div class="mb-2">
+          <b>{{ 'ADMIN.THEMES.HELP.PRESET_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.PRESET_BODY' | translate }}
+        </div>
+        <div class="mb-2">
+          <b>{{ 'ADMIN.THEMES.HELP.TOKENS_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.TOKENS_BODY' | translate }}
+        </div>
+        <div>
+          <b>{{ 'ADMIN.THEMES.HELP.METADATA_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.METADATA_BODY' | translate }}
+        </div>
+      </div>
+    </details>
+
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
       <div class="text-muted small">{{ 'ADMIN.THEMES.PRESETS.DESC' | translate }}</div>
       <div class="d-flex gap-2">
@@ -720,6 +849,31 @@
         <div class="border rounded-3 p-3">
           <div class="fw-bold mb-3">
             {{ presetEdit?.idTemaPreset ? ('COMMON.EDIT' | translate) : ('COMMON.NEW' | translate) }}
+          </div>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button cButton color="secondary" variant="outline" size="sm" type="button" (click)="presetInsertExampleTokens()">
+              {{ 'COMMON.INSERT_EXAMPLE_TOKENS' | translate }}
+            </button>
+            <button
+              cButton
+              color="secondary"
+              variant="outline"
+              size="sm"
+              type="button"
+              (click)="presetInsertExampleMetadata()"
+            >
+              {{ 'COMMON.INSERT_EXAMPLE_METADATA' | translate }}
+            </button>
+            <button
+              cButton
+              color="secondary"
+              variant="ghost"
+              size="sm"
+              type="button"
+              (click)="validateJson(presetForm.value.tokensJson, 'ADMIN.THEMES.PRESETS.TITLE')"
+            >
+              {{ 'COMMON.VALIDATE_JSON' | translate }}
+            </button>
           </div>
           <form [formGroup]="presetForm" class="d-block">
             <div class="mb-3">
@@ -820,6 +974,42 @@
         <c-spinner color="primary"></c-spinner>
       </div>
     } @else {
+      <details class="mb-3">
+        <summary class="fw-semibold">{{ 'ADMIN.THEMES.HELP.TITLE' | translate }}</summary>
+        <div class="mt-2 small text-muted">
+          <div class="mb-2">
+            <b>{{ 'ADMIN.THEMES.HELP.TOKENS_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.TOKENS_BODY' | translate }}
+          </div>
+          <div class="mb-2">
+            <b>{{ 'ADMIN.THEMES.HELP.METADATA_TITLE' | translate }}</b> — {{ 'ADMIN.THEMES.HELP.METADATA_BODY' | translate }}
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button cButton color="secondary" variant="outline" size="sm" type="button" (click)="draftInsertExampleTokens()">
+              {{ 'COMMON.INSERT_EXAMPLE_TOKENS' | translate }}
+            </button>
+            <button
+              cButton
+              color="secondary"
+              variant="outline"
+              size="sm"
+              type="button"
+              (click)="draftInsertExampleMetadata()"
+            >
+              {{ 'COMMON.INSERT_EXAMPLE_METADATA' | translate }}
+            </button>
+            <button
+              cButton
+              color="secondary"
+              variant="ghost"
+              size="sm"
+              type="button"
+              (click)="validateJson(draftTokensJson, 'ADMIN.THEMES.DRAFT.TITLE')"
+            >
+              {{ 'COMMON.VALIDATE_JSON' | translate }}
+            </button>
+          </div>
+        </div>
+      </details>
       <div class="row g-3">
         <!-- Presets -->
         <div class="col-12">
@@ -842,7 +1032,7 @@
                   cButton
                   color="primary"
                   class="w-100"
-                  [disabled]="!draftPresetId"
+                  [disabled]="themeActionLoading || !draftPresetId"
                   (click)="applyDraftPresetAskConfirm()"
                 >
                   {{ 'ADMIN.THEMES.PRESETS.APPLY' | translate }}

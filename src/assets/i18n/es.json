@@ -117,6 +117,13 @@
     "SEARCH": "Buscar",
     "SHOW": "Mostrar",
     "HIDE": "Ocultar",
+    "NEXT": "Siguiente",
+    "PREV": "Anterior",
+    "VALIDATE_JSON": "Validar JSON",
+    "VALID_JSON": "JSON válido",
+    "INVALID_JSON": "JSON inválido",
+    "INSERT_EXAMPLE_TOKENS": "Insertar ejemplo de tokens",
+    "INSERT_EXAMPLE_METADATA": "Insertar ejemplo de metadata",
     "ACTIONS": "Acciones",
     "NAME": "Nombre",
     "PASSWORD": "Contraseña",
@@ -346,6 +353,49 @@
         "RESET_CONFIRM_MSG": "Se quitará el tema activo y se volverá al tema por defecto. ¿Continuar?",
         "RESET_SUCCESS": "Tema restablecido al por defecto",
         "RESET_ERROR": "Error restableciendo el tema"
+      }
+      ,
+      "GUIDE": {
+        "TITLE": "Cómo se usa",
+        "SUBTITLE": "Guía rápida del flujo recomendado para trabajar con temas.",
+        "HIDE_FOREVER": "Ocultar guía",
+        "SELECT_THEME": "Tema para guiar",
+        "STEP_DRAFT": "Borrador",
+        "STEP_PRESETS": "Presets",
+        "STEP_PREVIEW": "Preview",
+        "STEP_PUBLISH_ACTIVATE": "Publicar/Activar",
+        "FLOW_HINT": "Flujo recomendado: Borrador → (Preset) → (Preview) → Publicar → Activar."
+      },
+      "TOUR": {
+        "TITLE": "Tour de Temas",
+        "SUBTITLE": "Paso {{step}} de {{total}}",
+        "SKIP": "Saltar",
+        "DONT_SHOW_AGAIN": "No volver a mostrar",
+        "STEP1_TITLE": "1) Borrador",
+        "STEP1_BODY": "El borrador es donde editas los tokens (variables CSS). Si ya publicaste, el sistema mantiene un borrador para seguir iterando.",
+        "STEP2_TITLE": "2) Presets",
+        "STEP2_BODY": "Un preset es una plantilla reutilizable de tokens + metadata. Puedes aplicarlo al borrador para empezar más rápido.",
+        "STEP3_TITLE": "3) Preview",
+        "STEP3_BODY": "La preview genera un enlace temporal para ver el tema sin activarlo. Ideal para validar antes de publicar.",
+        "STEP4_TITLE": "4) Publicar y Activar",
+        "STEP4_BODY": "Publicar crea una versión estable. Activar aplica el tema a la web pública. Desactivar vuelve al tema por defecto."
+      }
+      ,
+      "HELP": {
+        "TITLE": "¿Qué es esto?",
+        "PRESET_TITLE": "Preset",
+        "PRESET_BODY": "Plantilla reutilizable de tokens + metadata para aplicar rápido al borrador.",
+        "TOKENS_TITLE": "Tokens (tokensJson)",
+        "TOKENS_BODY": "JSON de variables CSS. Solo se aplican claves que empiecen por “--” (p. ej. --cui-primary).",
+        "METADATA_TITLE": "Metadata (metadataJson)",
+        "METADATA_BODY": "JSON libre para guardar información (displayName, mode, notes...). No afecta al estilo salvo que la app lo use."
+      },
+      "NEXT": {
+        "TITLE": "Siguiente paso recomendado",
+        "CREATE_DRAFT": "Crea o abre el borrador para empezar a definir el tema.",
+        "PUBLISH": "Tienes un borrador pendiente. Publica para generar una versión estable.",
+        "ACTIVATE": "Ya está publicado. Actívalo para aplicarlo a la web pública.",
+        "DEACTIVATE": "Este tema está activo. Puedes desactivarlo para volver al tema por defecto."
       }
     },
     "PROFILE": {

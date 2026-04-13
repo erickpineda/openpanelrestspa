@@ -28,6 +28,14 @@
     "ALL": "All",
     "SEARCH": "Search",
     "SHOW": "Show",
+    "HIDE": "Hide",
+    "NEXT": "Next",
+    "PREV": "Previous",
+    "VALIDATE_JSON": "Validate JSON",
+    "VALID_JSON": "Valid JSON",
+    "INVALID_JSON": "Invalid JSON",
+    "INSERT_EXAMPLE_TOKENS": "Insert token example",
+    "INSERT_EXAMPLE_METADATA": "Insert metadata example",
     "ACTIONS": "Actions",
     "NAME": "Name",
     "DESCRIPTION": "Description",
@@ -251,6 +259,48 @@
         "RESET_CONFIRM_MSG": "The active theme will be cleared and the app will return to the default theme. Continue?",
         "RESET_SUCCESS": "Theme restored to default",
         "RESET_ERROR": "Error restoring theme"
+      },
+      "GUIDE": {
+        "TITLE": "How to use",
+        "SUBTITLE": "Quick guide to the recommended workflow for themes.",
+        "HIDE_FOREVER": "Hide guide",
+        "SELECT_THEME": "Theme to guide",
+        "STEP_DRAFT": "Draft",
+        "STEP_PRESETS": "Presets",
+        "STEP_PREVIEW": "Preview",
+        "STEP_PUBLISH_ACTIVATE": "Publish/Activate",
+        "FLOW_HINT": "Recommended flow: Draft → (Preset) → (Preview) → Publish → Activate."
+      },
+      "TOUR": {
+        "TITLE": "Themes tour",
+        "SUBTITLE": "Step {{step}} of {{total}}",
+        "SKIP": "Skip",
+        "DONT_SHOW_AGAIN": "Don't show again",
+        "STEP1_TITLE": "1) Draft",
+        "STEP1_BODY": "The draft is where you edit tokens (CSS variables). After publishing, the system keeps a draft so you can continue iterating.",
+        "STEP2_TITLE": "2) Presets",
+        "STEP2_BODY": "A preset is a reusable template of tokens + metadata. You can apply it to the draft to get started faster.",
+        "STEP3_TITLE": "3) Preview",
+        "STEP3_BODY": "Preview generates a temporary link to view the theme without activating it. Great for validating before publishing.",
+        "STEP4_TITLE": "4) Publish & Activate",
+        "STEP4_BODY": "Publish creates a stable version. Activate applies it to the public site. Deactivate returns to the default theme."
+      }
+      ,
+      "HELP": {
+        "TITLE": "What is this?",
+        "PRESET_TITLE": "Preset",
+        "PRESET_BODY": "Reusable template of tokens + metadata to apply quickly to the draft.",
+        "TOKENS_TITLE": "Tokens (tokensJson)",
+        "TOKENS_BODY": "JSON of CSS variables. Only keys starting with “--” are applied (e.g. --cui-primary).",
+        "METADATA_TITLE": "Metadata (metadataJson)",
+        "METADATA_BODY": "Free-form JSON to store info (displayName, mode, notes...). It does not affect styling unless the app uses it."
+      },
+      "NEXT": {
+        "TITLE": "Recommended next step",
+        "CREATE_DRAFT": "Create or open the draft to start defining the theme.",
+        "PUBLISH": "You have a pending draft. Publish to generate a stable version.",
+        "ACTIVATE": "It is published. Activate it to apply it to the public site.",
+        "DEACTIVATE": "This theme is active. You can deactivate it to return to the default theme."
       }
     },
     "PROFILE": {

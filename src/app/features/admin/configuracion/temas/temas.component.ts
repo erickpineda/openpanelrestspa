@@ -80,6 +80,17 @@ export class TemasComponent implements OnInit, OnDestroy {
   applyPresetId: number | null = null;
   showApplyPresetConfirm = false;
 
+  // ===== UX: asistente guiado + tour =====
+  private readonly GUIDE_DISMISSED_KEY = 'op_admin_themes_guide_dismissed';
+  private readonly TOUR_DISMISSED_KEY = 'op_admin_themes_tour_dismissed';
+  showGuide = true;
+  guideCollapsed = false;
+  guideTemaSlug: string | null = null;
+  guideTema: Tema | null = null;
+
+  tourVisible = false;
+  tourStep = 1; // 1..4
+
   constructor(
     private temasService: TemasService,
     private presetsService: TemaPresetsService,
@@ -126,6 +137,7 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.load();
     this.loadPresets();
     this.loadActivePublicTheme();
+    this.initUxState();
   }
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -135,6 +147,171 @@ export class TemasComponent implements OnInit, OnDestroy {
   load(): void {
     this.pageNo = 0;
     this.obtenerListaTemas();
+  }
+
+  private initUxState(): void {
+    try {
+      this.showGuide = localStorage.getItem(this.GUIDE_DISMISSED_KEY) !== 'true';
+      this.tourVisible = localStorage.getItem(this.TOUR_DISMISSED_KEY) !== 'true';
+      this.tourStep = 1;
+    } catch {
+      this.showGuide = true;
+      this.tourVisible = false;
+      this.tourStep = 1;
+    }
+    this.cdr.detectChanges();
+  }
+
+  toggleGuideCollapsed(): void {
+    this.guideCollapsed = !this.guideCollapsed;
+    this.cdr.detectChanges();
+  }
+
+  dismissGuide(): void {
+    this.showGuide = false;
+    try {
+      localStorage.setItem(this.GUIDE_DISMISSED_KEY, 'true');
+    } catch {
+      // ignore
+    }
+    this.cdr.detectChanges();
+  }
+
+  onGuideTemaChange(slug: string | null): void {
+    this.guideTemaSlug = slug;
+    this.guideTema = this.temas.find((t) => (t?.slug || '').toLowerCase() === (slug || '').toLowerCase()) ?? null;
+    this.cdr.detectChanges();
+  }
+
+  private syncGuideTema(): void {
+    if (!this.showGuide) return;
+    const preferSlug =
+      this.guideTemaSlug ||
+      (this.activePublicThemeSlug && this.temas.some((t) => t.slug === this.activePublicThemeSlug)
+        ? this.activePublicThemeSlug
+        : null) ||
+      (this.temas.length ? this.temas[0].slug : null);
+
+    this.guideTemaSlug = preferSlug;
+    this.guideTema =
+      this.temas.find((t) => (t?.slug || '').toLowerCase() === (preferSlug || '').toLowerCase()) ?? null;
+  }
+
+  // Acciones del wizard
+  guideOpenManage(): void {
+    if (!this.guideTema) return;
+    this.openManage(this.guideTema);
+  }
+
+  guideOpenDraft(): void {
+    if (!this.guideTema) return;
+    this.openDraft(this.guideTema);
+  }
+
+  guideOpenPresets(): void {
+    this.openPresetsModal();
+  }
+
+  // CTA principal sugerido (abre el modal gestionar y ejecuta acción)
+  guidePrimaryAction(): void {
+    const t = this.guideTema;
+    if (!t) return;
+    this.openManage(t);
+    // Nota: dejamos que el usuario confirme dentro del modal si procede (publicar/despublicar/reset)
+  }
+
+  // ===== Tour =====
+  tourNext(): void {
+    this.tourStep = Math.min(4, (this.tourStep || 1) + 1);
+    this.cdr.detectChanges();
+  }
+
+  tourPrev(): void {
+    this.tourStep = Math.max(1, (this.tourStep || 1) - 1);
+    this.cdr.detectChanges();
+  }
+
+  tourSkip(): void {
+    this.tourVisible = false;
+    this.cdr.detectChanges();
+  }
+
+  tourDontShowAgain(): void {
+    this.tourVisible = false;
+    try {
+      localStorage.setItem(this.TOUR_DISMISSED_KEY, 'true');
+    } catch {
+      // ignore
+    }
+    this.cdr.detectChanges();
+  }
+
+  // ===== UX helpers (help/ejemplos/validación) =====
+  presetInsertExampleTokens(): void {
+    this.presetForm.patchValue({
+      tokensJson: JSON.stringify(
+        {
+          '--cui-primary': '#0ea5e9',
+          '--cui-primary-rgb': '14,165,233',
+          '--cui-body-bg': '#ffffff',
+          '--cui-body-color': '#0b1220',
+          '--cui-border-color': 'rgba(11,18,32,0.22)',
+        },
+        null,
+        2
+      ),
+    });
+    this.cdr.detectChanges();
+  }
+
+  presetInsertExampleMetadata(): void {
+    this.presetForm.patchValue({
+      metadataJson: JSON.stringify(
+        { displayName: 'High Contrast Blue', mode: 'light', notes: 'Ejemplo de metadata', recommended: true },
+        null,
+        2
+      ),
+    });
+    this.cdr.detectChanges();
+  }
+
+  draftInsertExampleTokens(): void {
+    this.draftAllowTokensEdit = true;
+    this.draftTokensJson = JSON.stringify(
+      {
+        '--cui-primary': '#0ea5e9',
+        '--cui-primary-rgb': '14,165,233',
+        '--cui-body-bg': '#ffffff',
+        '--cui-body-color': '#0b1220',
+      },
+      null,
+      2
+    );
+    this.cdr.detectChanges();
+  }
+
+  draftInsertExampleMetadata(): void {
+    this.draftMetadataJson = JSON.stringify({ displayName: 'Mi tema', mode: 'light', notes: 'Ejemplo' }, null, 2);
+    this.cdr.detectChanges();
+  }
+
+  validateJson(text: string, toastTitleKey: string): void {
+    try {
+      JSON.parse(text || '{}');
+      this.toast.showSuccess(this.translate.instant('COMMON.VALID_JSON'), this.translate.instant(toastTitleKey));
+    } catch {
+      this.toast.showError(this.translate.instant('COMMON.INVALID_JSON'), this.translate.instant(toastTitleKey));
+    }
+  }
+
+  // ===== UX: estado + siguiente paso =====
+  getNextStepKey(t: Tema | null): string {
+    if (!t) return '';
+    const isActive = !!this.activePublicThemeSlug && this.activePublicThemeSlug === t.slug;
+    if (t.draft) return 'ADMIN.THEMES.NEXT.PUBLISH';
+    if (t.published && !isActive) return 'ADMIN.THEMES.NEXT.ACTIVATE';
+    if (isActive) return 'ADMIN.THEMES.NEXT.DEACTIVATE';
+    return 'ADMIN.THEMES.NEXT.CREATE_DRAFT';
   }
 
   loadPresets(): void {
@@ -948,6 +1125,7 @@ export class TemasComponent implements OnInit, OnDestroy {
     const elementos: Tema[] = Array.isArray(raw) ? raw : [];
     this.temas = elementos;
     this.viewTemas = [...elementos];
+    this.syncGuideTema();
 
     this.totalElements = Number(data?.totalElements ?? elementos.length ?? 0);
     this.totalPages = Number(data?.totalPages ?? 1);
