@@ -8,6 +8,7 @@ import { environment } from '@env/environment';
 @Injectable({ providedIn: 'root' })
 export class ThemeRuntimeService {
   private appliedSignature?: string;
+  private appliedTokenKeys = new Set<string>();
 
   constructor(private publicThemes: PublicThemesService) {}
 
@@ -82,34 +83,49 @@ export class ThemeRuntimeService {
   }
 
   private applyTokens(tokensJson: string) {
-    if (!tokensJson) return;
-
     let obj: any;
     try {
-      obj = JSON.parse(tokensJson);
+      obj = JSON.parse(tokensJson || '{}');
     } catch {
+      // Si no se puede parsear, no tocamos los tokens ya aplicados.
       return;
     }
     if (!obj || typeof obj !== 'object') return;
 
     const root = document.documentElement;
+    const nextKeys = new Set<string>();
+
     Object.keys(obj).forEach((k) => {
       // Hardening: solo permitir CSS variables y prevenir prototype pollution
       if (k === '__proto__' || k === 'constructor' || k === 'prototype') return;
       if (!k.startsWith('--')) return;
       const v = obj[k];
       if (typeof k === 'string' && (typeof v === 'string' || typeof v === 'number')) {
+        nextKeys.add(k);
         root.style.setProperty(k, String(v));
       }
     });
+
+    // Quitar variables que estaban aplicadas pero ya no vienen en el tema actual.
+    // Esto es clave para que "Restaurar por defecto" tenga efecto sin recargar.
+    this.appliedTokenKeys.forEach((k) => {
+      if (!nextKeys.has(k)) {
+        root.style.removeProperty(k);
+      }
+    });
+    this.appliedTokenKeys = nextKeys;
   }
 
   private applyCssUrl(cssUrl?: string | null) {
-    if (!cssUrl) return;
-    const href = this.toAbsoluteUrl(cssUrl);
-
     const id = 'op-theme-css';
     let link = document.getElementById(id) as HTMLLinkElement | null;
+    if (!cssUrl) {
+      // Si el tema activo no trae CSS, eliminamos el link del tema anterior.
+      if (link) link.remove();
+      return;
+    }
+
+    const href = this.toAbsoluteUrl(cssUrl);
     if (!link) {
       link = document.createElement('link');
       link.id = id;
