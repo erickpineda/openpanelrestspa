@@ -159,6 +159,12 @@ export class TemasService extends CrudService<Tema, number> {
     );
   }
 
+  unpublish(slug: string, context?: HttpContext): Observable<Tema> {
+    return this.delete<Tema>(`${this.endpoint}/${encodeURIComponent(slug)}/published`, undefined, undefined, context).pipe(
+      map((resp) => resp?.data ?? ({} as Tema))
+    );
+  }
+
   resetActiveTheme(context?: HttpContext): Observable<boolean> {
     return this.safeDeleteOperation(
       `${this.endpoint}/active`,

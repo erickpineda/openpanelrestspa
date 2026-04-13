@@ -67,6 +67,7 @@ export class TemasComponent implements OnInit, OnDestroy {
   private manageAllowClose = false;
   activePublicThemeSlug: string | null = null;
   showResetActiveThemeConfirm = false;
+  showUnpublishConfirm = false;
 
   // Presets (global)
   presets: TemaPreset[] = [];
@@ -190,6 +191,48 @@ export class TemasComponent implements OnInit, OnDestroy {
           this.log.error('temas reset active', err);
           this.toast.showError(
             this.translate.instant('ADMIN.THEMES.ACTIVE.RESET_ERROR'),
+            this.translate.instant('MENU.THEMES')
+          );
+        },
+      });
+  }
+
+  askUnpublish(): void {
+    if (!this.manageTema?.slug || !this.manageTema?.published) return;
+    this.showUnpublishConfirm = true;
+  }
+
+  confirmUnpublish(): void {
+    if (!this.manageTema?.slug) return;
+    const slug = this.manageTema.slug;
+    this.showUnpublishConfirm = false;
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.loading = true;
+    this.temasService
+      .unpublish(slug, ctx)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (fresh) => {
+          // refrescar lista + modal
+          this.toast.showSuccess(
+            this.translate.instant('ADMIN.THEMES.UNPUBLISH_SUCCESS'),
+            this.translate.instant('MENU.THEMES')
+          );
+          this.obtenerListaTemas();
+          this.manageTema = fresh || null;
+          this.loadActivePublicTheme();
+          this.themeRuntime.refreshActive().subscribe();
+        },
+        error: (err) => {
+          this.log.error('temas unpublish', err);
+          this.toast.showError(
+            this.translate.instant('ADMIN.THEMES.UNPUBLISH_ERROR'),
             this.translate.instant('MENU.THEMES')
           );
         },

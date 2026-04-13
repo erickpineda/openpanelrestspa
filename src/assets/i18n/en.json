@@ -216,8 +216,12 @@
       "MANAGE_MODAL": {
         "TITLE": "Manage theme"
       },
-      "PUBLISHED_LABEL": "Published",
       "PUBLISH_NEEDS_DRAFT": "No draft",
+      "UNPUBLISH_BUTTON": "Unpublish",
+      "UNPUBLISH_CONFIRM_TITLE": "Unpublish theme",
+      "UNPUBLISH_CONFIRM_MSG": "The published version will be removed (and if it is active, it will be deactivated). Continue?",
+      "UNPUBLISH_SUCCESS": "Theme unpublished",
+      "UNPUBLISH_ERROR": "Error unpublishing theme",
       "PRESETS": {
         "TITLE": "Presets",
         "DESC": "Global presets to quickly apply to the draft.",

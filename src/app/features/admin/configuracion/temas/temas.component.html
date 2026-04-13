@@ -490,9 +490,9 @@
                 {{ 'ADMIN.THEMES.TOOLTIP.PUBLISH' | translate }}
               </button>
             } @else if (mt.published) {
-              <button cButton color="success" variant="outline" class="w-100" disabled>
-                <svg cIcon name="cilCheckCircle" class="me-2"></svg>
-                {{ 'ADMIN.THEMES.PUBLISHED_LABEL' | translate }}
+              <button cButton color="danger" variant="outline" class="w-100" (click)="askUnpublish()">
+                <svg cIcon name="cilXCircle" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.UNPUBLISH_BUTTON' | translate }}
               </button>
             } @else {
               <button cButton color="secondary" variant="outline" class="w-100" disabled>
@@ -712,6 +712,18 @@
   [loading]="loading"
   (visibleChange)="showResetActiveThemeConfirm = $event"
   (confirm)="confirmResetActiveTheme()"
+></app-confirmation-modal>
+
+<app-confirmation-modal
+  [visible]="showUnpublishConfirm"
+  [title]="'ADMIN.THEMES.UNPUBLISH_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.UNPUBLISH_CONFIRM_MSG' | translate"
+  [confirmText]="'ADMIN.THEMES.UNPUBLISH_BUTTON' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'danger'"
+  [loading]="loading"
+  (visibleChange)="showUnpublishConfirm = $event"
+  (confirm)="confirmUnpublish()"
 ></app-confirmation-modal>
 
 <!-- Modal Borrador -->

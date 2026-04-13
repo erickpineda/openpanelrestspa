@@ -311,8 +311,12 @@
       "MANAGE_MODAL": {
         "TITLE": "Gestionar tema"
       },
-      "PUBLISHED_LABEL": "Publicado",
       "PUBLISH_NEEDS_DRAFT": "Sin borrador",
+      "UNPUBLISH_BUTTON": "Despublicar",
+      "UNPUBLISH_CONFIRM_TITLE": "Despublicar tema",
+      "UNPUBLISH_CONFIRM_MSG": "Se eliminará la versión publicada del tema (y si está activo, se desactivará). ¿Continuar?",
+      "UNPUBLISH_SUCCESS": "Tema despublicado",
+      "UNPUBLISH_ERROR": "Error despublicando el tema",
       "PRESETS": {
         "TITLE": "Presets",
         "DESC": "Presets globales para aplicar rápidamente al borrador.",
