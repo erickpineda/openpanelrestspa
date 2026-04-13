@@ -177,6 +177,14 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     this.router.navigate(['/admin/control/entradas/entradas-temporales']);
   }
 
+  onNotificationOpened(id: string): void {
+    // Por ahora navegamos al listado/detalle principal. El queryParam permite
+    // enfocar/resaltar la notificación/entrada en el futuro sin romper compatibilidad.
+    this.router.navigate(['/admin/control/entradas/entradas-temporales'], {
+      queryParams: { focus: id },
+    });
+  }
+
   private createBreadcrumbs(
     route: ActivatedRoute,
     url: string = '',

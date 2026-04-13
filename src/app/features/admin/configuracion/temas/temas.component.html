@@ -477,7 +477,7 @@
               variant="outline"
               class="w-100"
               (click)="onManagePreview()"
-              [disabled]="!mt.draft && !mt.published"
+              [disabled]="themeActionLoading || (!mt.draft && !mt.published)"
             >
               <svg cIcon name="cilMediaPlay" class="me-2"></svg>
               {{ 'ADMIN.THEMES.TOOLTIP.PREVIEW' | translate }}
@@ -485,14 +485,33 @@
           </div>
           <div class="col-12 col-md-6">
             @if (mt.draft) {
-              <button cButton color="success" variant="outline" class="w-100" (click)="onManagePublish()">
+              <button
+                cButton
+                color="success"
+                variant="outline"
+                class="w-100"
+                (click)="onManagePublish()"
+                [disabled]="themeActionLoading"
+              >
                 <svg cIcon name="cilCloudUpload" class="me-2"></svg>
                 {{ 'ADMIN.THEMES.TOOLTIP.PUBLISH' | translate }}
               </button>
             } @else if (mt.published) {
-              <button cButton color="danger" variant="outline" class="w-100" (click)="askUnpublish()">
-                <svg cIcon name="cilXCircle" class="me-2"></svg>
-                {{ 'ADMIN.THEMES.UNPUBLISH_BUTTON' | translate }}
+              <button
+                cButton
+                color="danger"
+                variant="outline"
+                class="w-100"
+                (click)="askUnpublish()"
+                [disabled]="themeActionLoading"
+              >
+                @if (themeActionLoading) {
+                  <c-spinner size="sm" class="me-2"></c-spinner>
+                  {{ 'ADMIN.THEMES.UNPUBLISH_WORKING' | translate }}
+                } @else {
+                  <svg cIcon name="cilXCircle" class="me-2"></svg>
+                  {{ 'ADMIN.THEMES.UNPUBLISH_BUTTON' | translate }}
+                }
               </button>
             } @else {
               <button cButton color="secondary" variant="outline" class="w-100" disabled>
@@ -509,9 +528,15 @@
                 variant="outline"
                 class="w-100"
                 (click)="askResetActiveTheme()"
+                [disabled]="themeActionLoading"
               >
-                <svg cIcon name="cilXCircle" class="me-2"></svg>
-                {{ 'ADMIN.THEMES.ACTIVE.DEACTIVATE_BUTTON' | translate }}
+                @if (themeActionLoading) {
+                  <c-spinner size="sm" class="me-2"></c-spinner>
+                  {{ 'ADMIN.THEMES.ACTIVE.DEACTIVATE_WORKING' | translate }}
+                } @else {
+                  <svg cIcon name="cilXCircle" class="me-2"></svg>
+                  {{ 'ADMIN.THEMES.ACTIVE.DEACTIVATE_BUTTON' | translate }}
+                }
               </button>
             } @else {
               <button
@@ -520,10 +545,15 @@
                 variant="outline"
                 class="w-100"
                 (click)="onManageActivate()"
-                [disabled]="!mt.published"
+                [disabled]="themeActionLoading || !mt.published"
               >
-                <svg cIcon name="cilCheckCircle" class="me-2"></svg>
-                {{ 'ADMIN.THEMES.TOOLTIP.ACTIVATE' | translate }}
+                @if (themeActionLoading) {
+                  <c-spinner size="sm" class="me-2"></c-spinner>
+                  {{ 'ADMIN.THEMES.ACTIVE.ACTIVATE_WORKING' | translate }}
+                } @else {
+                  <svg cIcon name="cilCheckCircle" class="me-2"></svg>
+                  {{ 'ADMIN.THEMES.TOOLTIP.ACTIVATE' | translate }}
+                }
               </button>
             }
           </div>

@@ -27,6 +27,7 @@ export class NotificationsDropdownComponent {
   @Output() markAllRead = new EventEmitter<void>();
   @Output() itemMarkedRead = new EventEmitter<string>();
   @Output() itemDismissed = new EventEmitter<string>();
+  @Output() itemOpened = new EventEmitter<string>();
   @Output() viewAll = new EventEmitter<void>();
 
   open = false;
@@ -60,6 +61,13 @@ export class NotificationsDropdownComponent {
 
   handleDismiss(id: string): void {
     this.itemDismissed.emit(id);
+  }
+
+  handleOpen(id: string): void {
+    // Evitar navegar si se está animando/saliendo
+    if (this.markingAsReadIds.has(id)) return;
+    this.close();
+    this.itemOpened.emit(id);
   }
 
   timeAgo(ts: number): string {
