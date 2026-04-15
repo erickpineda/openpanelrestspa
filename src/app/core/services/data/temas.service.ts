@@ -3,6 +3,8 @@ import { Observable } from 'rxjs';
 import { HttpContext } from '@angular/common/http';
 import { CrudService } from '../../_utils/crud.service';
 import { Tema, TemaDraft, TemaDraftRequest, TemaPreviewTokenResponse } from '../../models/tema.model';
+import { TemaVersion } from '../../models/tema-version.model';
+import { TemaVersionCompare } from '../../models/tema-version-compare.model';
 import { HttpClient } from '@angular/common/http';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
@@ -185,6 +187,71 @@ export class TemasService extends CrudService<Tema, number> {
       params,
       undefined,
       'temas.activate',
+      context
+    );
+  }
+
+  listVersions(
+    slug: string,
+    state: 'PUBLISHED' | 'DRAFT' = 'PUBLISHED',
+    context?: HttpContext
+  ): Observable<TemaVersion[]> {
+    return this.safeGetData<TemaVersion[]>(
+      `${this.endpoint}/${encodeURIComponent(slug)}/versions`,
+      [],
+      { state },
+      undefined,
+      'temas.versions.list',
+      context
+    );
+  }
+
+  rollback(slug: string, context?: HttpContext): Observable<Tema> {
+    return this.safePostData<Tema>(
+      `${this.endpoint}/${encodeURIComponent(slug)}/rollback`,
+      {},
+      {} as Tema,
+      undefined,
+      undefined,
+      'temas.rollback',
+      context
+    );
+  }
+
+  compareVersions(slug: string, from: number, to: number, context?: HttpContext): Observable<TemaVersionCompare> {
+    return this.safeGetData<TemaVersionCompare>(
+      `${this.endpoint}/${encodeURIComponent(slug)}/compare`,
+      {} as TemaVersionCompare,
+      { from, to },
+      undefined,
+      'temas.versions.compare',
+      context
+    );
+  }
+
+  deleteVersion(slug: string, version: number, context?: HttpContext): Observable<boolean> {
+    return this.safeDeleteOperation(
+      `${this.endpoint}/${encodeURIComponent(slug)}/versions/${version}`,
+      undefined,
+      undefined,
+      'temas.versions.delete',
+      context
+    );
+  }
+
+  updateReleaseNotes(
+    slug: string,
+    version: number,
+    releaseNotes: string | null | undefined,
+    context?: HttpContext
+  ): Observable<TemaVersion> {
+    return this.safePutData<TemaVersion>(
+      `${this.endpoint}/${encodeURIComponent(slug)}/versions/${version}/release-notes`,
+      { releaseNotes: (releaseNotes || '').trim() || null },
+      {} as TemaVersion,
+      undefined,
+      undefined,
+      'temas.versions.releaseNotes',
       context
     );
   }

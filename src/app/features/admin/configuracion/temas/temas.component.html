@@ -735,6 +735,160 @@
         </div>
 
         <hr class="my-3" />
+
+        <!-- Historial de versiones publicadas -->
+        <div class="border rounded-3 p-3 bg-light bg-opacity-10 mb-3">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <div class="fw-semibold">{{ 'ADMIN.THEMES.VERSIONS.TITLE' | translate }}</div>
+            <div class="d-flex gap-2">
+              <button
+                cButton
+                color="secondary"
+                variant="outline"
+                size="sm"
+                (click)="rollbackTheme()"
+                [disabled]="themeActionLoading || publishedVersions.length < 2"
+              >
+                <svg cIcon name="cilHistory" class="me-2"></svg>
+                {{ 'ADMIN.THEMES.VERSIONS.ROLLBACK' | translate }}
+              </button>
+            </div>
+          </div>
+
+          @if (versionsLoading) {
+            <div class="d-flex justify-content-center py-3"><c-spinner size="sm"></c-spinner></div>
+          } @else {
+            <div class="table-responsive border rounded-3 bg-white">
+              <table class="table mb-0 align-middle">
+                <thead class="bg-light">
+                  <tr>
+                    <th style="width: 90px">v</th>
+                    <th>{{ 'ADMIN.THEMES.VERSIONS.NOTES' | translate }}</th>
+                    <th style="width: 220px">{{ 'ADMIN.THEMES.VERSIONS.PUBLISHED_AT' | translate }}</th>
+                    <th style="width: 130px" class="text-end">{{ 'COMMON.ACTIONS' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (v of publishedVersions; track v.version) {
+                    <tr>
+                      <td>
+                        <span class="fw-semibold">v{{ v.version }}</span>
+                        @if (isActiveVersion(v)) {
+                          <c-badge color="success" class="ms-2">{{ 'ADMIN.THEMES.VERSIONS.ACTIVE' | translate }}</c-badge>
+                        }
+                      </td>
+                      <td>
+                        @if (editingReleaseNotesVersion === v.version) {
+                          <div class="d-flex gap-2">
+                            <input cFormControl [(ngModel)]="editingReleaseNotesText" [ngModelOptions]="{standalone:true}" />
+                            <button cButton color="primary" variant="outline" size="sm" (click)="saveReleaseNotes(v)">
+                              <svg cIcon name="cilSave"></svg>
+                            </button>
+                            <button cButton color="secondary" variant="ghost" size="sm" (click)="cancelEditReleaseNotes()">
+                              <svg cIcon name="cilX"></svg>
+                            </button>
+                          </div>
+                        } @else {
+                          <div class="d-flex justify-content-between align-items-center gap-2">
+                            <span class="text-muted small">{{ v.releaseNotes || '—' }}</span>
+                            <button
+                              cButton
+                              color="secondary"
+                              variant="ghost"
+                              size="sm"
+                              (click)="startEditReleaseNotes(v)"
+                              [disabled]="themeActionLoading"
+                            >
+                              <svg cIcon name="cilPen"></svg>
+                            </button>
+                          </div>
+                        }
+                      </td>
+                      <td class="small text-muted">
+                        {{ v.publishedAt ? (v.publishedAt | date: 'dd-MM-yyyy HH:mm') : '—' }}
+                        <div class="small text-muted">{{ v.publishedBy || '—' }}</div>
+                      </td>
+                      <td class="text-end">
+                        <button
+                          cButton
+                          color="primary"
+                          variant="ghost"
+                          size="sm"
+                          (click)="activatePublishedVersion(v)"
+                          [disabled]="themeActionLoading || isActiveVersion(v)"
+                          [cTooltip]="
+                            (isActiveVersion(v) ? 'ADMIN.THEMES.VERSIONS.ALREADY_ACTIVE' : 'ADMIN.THEMES.VERSIONS.ACTIVATE') | translate
+                          "
+                        >
+                          <svg cIcon name="cilCheckCircle"></svg>
+                        </button>
+                        <button
+                          cButton
+                          color="secondary"
+                          variant="ghost"
+                          size="sm"
+                          (click)="askDeleteVersion(v)"
+                          [disabled]="themeActionLoading"
+                          [cTooltip]="'COMMON.DELETE' | translate"
+                        >
+                          <svg cIcon name="cilTrash"></svg>
+                        </button>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="4" class="text-center text-muted py-3">{{ 'ADMIN.THEMES.VERSIONS.EMPTY' | translate }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-3">
+              <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.VERSIONS.COMPARE' | translate }}</div>
+              <div class="row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                  <label class="form-label small text-muted fw-bold mb-1">From</label>
+                  <select cSelect [(ngModel)]="versionCompareFrom" [ngModelOptions]="{ standalone: true }">
+                    <option [ngValue]="null">—</option>
+                    @for (v of publishedVersions; track v.version) {
+                      <option [ngValue]="v.version">v{{ v.version }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label small text-muted fw-bold mb-1">To</label>
+                  <select cSelect [(ngModel)]="versionCompareTo" [ngModelOptions]="{ standalone: true }">
+                    <option [ngValue]="null">—</option>
+                    @for (v of publishedVersions; track v.version) {
+                      <option [ngValue]="v.version">v{{ v.version }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col-12 col-md-4">
+                  <button
+                    cButton
+                    color="primary"
+                    class="w-100"
+                    (click)="compareThemeVersions()"
+                    [disabled]="themeActionLoading || !versionCompareFrom || !versionCompareTo"
+                  >
+                    {{ 'ADMIN.THEMES.VERSIONS.COMPARE_BTN' | translate }}
+                  </button>
+                </div>
+              </div>
+
+              @if (versionCompareResult) {
+                <div class="mt-3 small">
+                  <div class="fw-semibold mb-1">Diff</div>
+                  <pre class="bg-white border rounded-3 p-2 mb-0" style="max-height: 220px; overflow:auto">{{
+                    versionCompareResult | json
+                  }}</pre>
+                </div>
+              }
+            </div>
+          }
+        </div>
         <div class="border rounded-3 p-3 bg-light bg-opacity-10">
           <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}</div>
           <div class="row g-2 align-items-end">
@@ -748,6 +902,16 @@
                   <option [ngValue]="p.idTemaPreset">{{ p.nombre }}</option>
                 }
               </select>
+              <div class="mt-2 d-flex gap-3 small">
+                <label class="d-flex align-items-center gap-1">
+                  <input type="radio" [ngModel]="applyPresetMode" (ngModelChange)="applyPresetMode=$event" [ngModelOptions]="{standalone:true}" value="replace" />
+                  {{ 'ADMIN.THEMES.PRESETS.MODE_REPLACE' | translate }}
+                </label>
+                <label class="d-flex align-items-center gap-1">
+                  <input type="radio" [ngModel]="applyPresetMode" (ngModelChange)="applyPresetMode=$event" [ngModelOptions]="{standalone:true}" value="merge" />
+                  {{ 'ADMIN.THEMES.PRESETS.MODE_MERGE' | translate }}
+                </label>
+              </div>
             </div>
             <div class="col-12 col-md-4">
               <button
@@ -810,10 +974,15 @@
         <button cButton color="secondary" variant="outline" size="sm" (click)="openPresetNewHighContrast()">
           {{ 'ADMIN.THEMES.PRESETS.NEW_FROM_RECOMMENDED' | translate }}
         </button>
-        <button cButton color="primary" size="sm" (click)="presetEdit = null; presetForm.reset();">
+        <button cButton color="primary" size="sm" (click)="presetEdit = null; presetForm.reset({nombre:'',descripcion:'',tokensJson:'',metadataJson:'',tags:''});">
           {{ 'COMMON.NEW' | translate }}
         </button>
       </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label small text-muted fw-bold mb-1">{{ 'ADMIN.THEMES.PRESETS.FILTER_BY_TAG' | translate }}</label>
+      <input cFormControl [(ngModel)]="presetTagFilter" [ngModelOptions]="{standalone:true}" />
     </div>
 
     <div class="row g-3">
@@ -827,17 +996,25 @@
               </tr>
             </thead>
             <tbody>
-              @for (p of presets; track p.idTemaPreset) {
+              @for (p of filteredPresets; track p.idTemaPreset) {
                 <tr>
                   <td>
-                    <div class="fw-semibold">{{ p.nombre }}</div>
+                    <div class="fw-semibold d-flex align-items-center gap-2">
+                      <span>{{ p.nombre }}</span>
+                      @if (p.isSystem) {
+                        <c-badge color="info">{{ 'ADMIN.THEMES.PRESETS.SYSTEM' | translate }}</c-badge>
+                      }
+                    </div>
                     <div class="small text-muted">{{ p.descripcion || '—' }}</div>
+                    @if (p.tags) {
+                      <div class="small text-muted">{{ 'ADMIN.THEMES.PRESETS.TAGS' | translate }}: {{ p.tags }}</div>
+                    }
                   </td>
                   <td class="text-end">
-                    <button cButton color="primary" variant="ghost" size="sm" (click)="editPreset(p)">
+                    <button cButton color="primary" variant="ghost" size="sm" (click)="editPreset(p)" [disabled]="p.isSystem" [cTooltip]="p.isSystem ? ('ADMIN.THEMES.PRESETS.SYSTEM_READONLY'|translate) : ('COMMON.EDIT'|translate)">
                       <svg cIcon name="cilPen"></svg>
                     </button>
-                    <button cButton color="danger" variant="ghost" size="sm" (click)="deletePreset(p)">
+                    <button cButton color="danger" variant="ghost" size="sm" (click)="deletePreset(p)" [disabled]="p.isSystem" [cTooltip]="p.isSystem ? ('ADMIN.THEMES.PRESETS.SYSTEM_READONLY'|translate) : ('COMMON.DELETE'|translate)">
                       <svg cIcon name="cilTrash"></svg>
                     </button>
                   </td>
@@ -894,6 +1071,11 @@
               <input cFormControl type="text" formControlName="descripcion" />
             </div>
             <div class="mb-3">
+              <label class="form-label small text-muted fw-bold">{{ 'ADMIN.THEMES.PRESETS.TAGS' | translate }}</label>
+              <input cFormControl type="text" formControlName="tags" />
+              <div class="small text-muted">{{ 'ADMIN.THEMES.PRESETS.TAGS_HELP' | translate }}</div>
+            </div>
+            <div class="mb-3">
               <label class="form-label small text-muted fw-bold">{{ 'ADMIN.THEMES.PRESETS.TOKENS' | translate }}</label>
               <textarea cFormControl rows="10" class="font-monospace" formControlName="tokensJson"></textarea>
             </div>
@@ -906,7 +1088,7 @@
               cButton
               color="primary"
               class="w-100"
-              [disabled]="presetForm.invalid || presetsLoading"
+              [disabled]="presetForm.invalid || presetsLoading || presetEdit?.isSystem"
               (click)="savePreset()"
             >
               {{ 'COMMON.SAVE' | translate }}
@@ -957,6 +1139,18 @@
   [loading]="loading"
   (visibleChange)="showUnpublishConfirm = $event"
   (confirm)="confirmUnpublish()"
+></app-confirmation-modal>
+
+<app-confirmation-modal
+  [visible]="showDeleteVersionConfirm"
+  [title]="'ADMIN.THEMES.VERSIONS.DELETE_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.THEMES.VERSIONS.DELETE_CONFIRM_MSG' | translate"
+  [confirmText]="'COMMON.DELETE' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [type]="'danger'"
+  [loading]="themeActionLoading"
+  (visibleChange)="showDeleteVersionConfirm = $event"
+  (confirm)="confirmDeleteVersion()"
 ></app-confirmation-modal>
 
 <!-- Modal Borrador -->
@@ -1035,6 +1229,28 @@
                     <option [ngValue]="p.idTemaPreset">{{ p.nombre }}</option>
                   }
                 </select>
+                <div class="mt-2 d-flex gap-3 small">
+                  <label class="d-flex align-items-center gap-1">
+                    <input
+                      type="radio"
+                      [ngModel]="draftPresetMode"
+                      (ngModelChange)="draftPresetMode=$event"
+                      [ngModelOptions]="{standalone:true}"
+                      value="replace"
+                    />
+                    {{ 'ADMIN.THEMES.PRESETS.MODE_REPLACE' | translate }}
+                  </label>
+                  <label class="d-flex align-items-center gap-1">
+                    <input
+                      type="radio"
+                      [ngModel]="draftPresetMode"
+                      (ngModelChange)="draftPresetMode=$event"
+                      [ngModelOptions]="{standalone:true}"
+                      value="merge"
+                    />
+                    {{ 'ADMIN.THEMES.PRESETS.MODE_MERGE' | translate }}
+                  </label>
+                </div>
               </div>
               <div class="col-12 col-md-4">
                 <button
@@ -1100,14 +1316,71 @@
 
         @if (draftAllowTokensEdit) {
           <div class="col-12">
-            <label class="form-label small fw-bold text-muted">{{ 'ADMIN.THEMES.DRAFT.TOKENS' | translate }}</label>
-            <textarea
-              cFormControl
-              rows="12"
-              [(ngModel)]="draftTokensJson"
-              [ngModelOptions]="{ standalone: true }"
-              class="font-monospace"
-            ></textarea>
+            <div class="d-flex justify-content-between align-items-end flex-wrap gap-2">
+              <label class="form-label small fw-bold text-muted mb-1">{{ 'ADMIN.THEMES.DRAFT.TOKENS' | translate }}</label>
+              <div class="btn-group btn-group-sm">
+                <button
+                  cButton
+                  color="secondary"
+                  variant="outline"
+                  type="button"
+                  (click)="setDraftEditorMode('json')"
+                  [disabled]="draftEditorMode === 'json'"
+                >
+                  JSON
+                </button>
+                <button
+                  cButton
+                  color="secondary"
+                  variant="outline"
+                  type="button"
+                  (click)="setDraftEditorMode('table')"
+                  [disabled]="draftEditorMode === 'table'"
+                >
+                  {{ 'ADMIN.THEMES.DRAFT.TABLE' | translate }}
+                </button>
+              </div>
+            </div>
+
+            @if (draftEditorMode === 'json') {
+              <textarea
+                cFormControl
+                rows="12"
+                [(ngModel)]="draftTokensJson"
+                [ngModelOptions]="{ standalone: true }"
+                class="font-monospace"
+              ></textarea>
+            } @else {
+              <div class="table-responsive border rounded-3 bg-white">
+                <table class="table mb-0 align-middle">
+                  <thead class="bg-light">
+                    <tr>
+                      <th style="width: 45%">{{ 'ADMIN.THEMES.DRAFT.TABLE_TOKEN' | translate }}</th>
+                      <th style="width: 45%">{{ 'ADMIN.THEMES.DRAFT.TABLE_VALUE' | translate }}</th>
+                      <th style="width: 10%" class="text-end">
+                        <button cButton color="primary" variant="ghost" size="sm" type="button" (click)="addDraftTokenRow()">
+                          <svg cIcon name="cilPlus"></svg>
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (r of draftTokenRows; track $index) {
+                      <tr>
+                        <td><input cFormControl [(ngModel)]="r.key" [ngModelOptions]="{standalone:true}" /></td>
+                        <td><input cFormControl [(ngModel)]="r.value" [ngModelOptions]="{standalone:true}" /></td>
+                        <td class="text-end">
+                          <button cButton color="danger" variant="ghost" size="sm" type="button" (click)="removeDraftTokenRow($index)">
+                            <svg cIcon name="cilTrash"></svg>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.DRAFT.TABLE_HELP' | translate }}</div>
+            }
           </div>
           <div class="col-12">
             <label class="form-label small fw-bold text-muted">{{ 'ADMIN.THEMES.DRAFT.METADATA' | translate }}</label>

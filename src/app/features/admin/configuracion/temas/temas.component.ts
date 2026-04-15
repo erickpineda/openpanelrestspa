@@ -3,6 +3,8 @@ import { HttpContext } from '@angular/common/http';
 import { TemasService } from '../../../../core/services/data/temas.service';
 import { Tema, TemaDraft } from '../../../../core/models/tema.model';
 import { TemaPreset } from '../../../../core/models/tema-preset.model';
+import { TemaVersion } from '../../../../core/models/tema-version.model';
+import { TemaVersionCompare } from '../../../../core/models/tema-version-compare.model';
 import { TemaPresetsService } from '../../../../core/services/data/tema-presets.service';
 import { PublicThemesService } from '../../../../core/services/data/public-themes.service';
 import { ThemeRuntimeService } from '../../../public/services/theme-runtime.service';
@@ -10,7 +12,8 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LoggerService } from '../../../../core/services/logger.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subject, takeUntil, finalize, forkJoin, of, switchMap, tap, map } from 'rxjs';
+import { Subject, forkJoin, of } from 'rxjs';
+import { takeUntil, finalize, switchMap, tap, map } from 'rxjs/operators';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { SKIP_GLOBAL_LOADER } from '../../../../core/interceptor/network.interceptor';
 
@@ -66,10 +69,31 @@ export class TemasComponent implements OnInit, OnDestroy {
   manageTema: Tema | null = null;
   private manageAllowClose = false;
   activePublicThemeSlug: string | null = null;
+  activePublicThemeVersion: number | null = null;
+  activePublicThemeVersionId: number | null = null;
   showResetActiveThemeConfirm = false;
   showUnpublishConfirm = false;
   // Bloqueo global de acciones del modal (activar/desactivar/despublicar) mientras dura la llamada al backend
   themeActionLoading = false;
+
+  // Versiones / historial
+  versionsLoading = false;
+  publishedVersions: TemaVersion[] = [];
+  versionCompareFrom: number | null = null;
+  versionCompareTo: number | null = null;
+  versionCompareResult: TemaVersionCompare | null = null;
+  showDeleteVersionConfirm = false;
+  versionToDelete: TemaVersion | null = null;
+  editingReleaseNotesVersion: number | null = null;
+  editingReleaseNotesText: string = '';
+
+  // Presets pro
+  applyPresetMode: 'replace' | 'merge' = 'replace';
+  draftPresetMode: 'replace' | 'merge' = 'replace';
+
+  // Editor tokens pro
+  draftEditorMode: 'json' | 'table' = 'json';
+  draftTokenRows: Array<{ key: string; value: string }> = [];
 
   // Presets (global)
   presets: TemaPreset[] = [];
@@ -77,6 +101,7 @@ export class TemasComponent implements OnInit, OnDestroy {
   presetsModalVisible = false;
   presetEdit: TemaPreset | null = null;
   presetForm: FormGroup;
+  presetTagFilter = '';
   applyPresetId: number | null = null;
   showApplyPresetConfirm = false;
 
@@ -113,6 +138,7 @@ export class TemasComponent implements OnInit, OnDestroy {
       descripcion: ['', Validators.maxLength(255)],
       tokensJson: ['', [Validators.required]],
       metadataJson: [''],
+      tags: ['', Validators.maxLength(255)],
     });
 
     // El "código" (slug) debe almacenarse en minúsculas (backend lo exige),
@@ -348,14 +374,22 @@ export class TemasComponent implements OnInit, OnDestroy {
       });
   }
 
+  get filteredPresets(): TemaPreset[] {
+    const term = (this.presetTagFilter || '').trim().toLowerCase();
+    if (!term) return this.presets;
+    return (this.presets || []).filter((p) => ((p.tags || '').toLowerCase().includes(term) ? true : false));
+  }
+
   loadActivePublicTheme(): void {
     const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
     this.publicThemes
       .getActive(true)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (t) => {
+        next: (t: any) => {
           this.activePublicThemeSlug = t?.slug ?? null;
+          this.activePublicThemeVersion = t?.version ?? null;
+          this.activePublicThemeVersionId = t?.idTemaVersion ?? null;
           this.cdr.detectChanges();
         },
         error: () => (this.activePublicThemeSlug = null),
@@ -638,7 +672,232 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.manageTema = t;
     this.manageModalVisible = true;
     this.applyPresetId = null;
+    this.applyPresetMode = 'replace';
+    this.versionCompareFrom = null;
+    this.versionCompareTo = null;
+    this.versionCompareResult = null;
+    this.publishedVersions = [];
+    this.loadManageTemaAndVersions(t.slug);
     this.cdr.detectChanges();
+  }
+
+  private loadManageTemaAndVersions(slug: string): void {
+    if (!slug) return;
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.versionsLoading = true;
+    forkJoin({
+      tema: this.temasService.obtenerPorSlug(slug, ctx),
+      versions: this.temasService.listVersions(slug, 'PUBLISHED', ctx),
+    })
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.versionsLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: ({ tema, versions }) => {
+          this.manageTema = tema || this.manageTema;
+          this.publishedVersions = versions || [];
+        },
+        error: (err) => {
+          this.log.error('temas load manage+versions', err);
+        },
+      });
+  }
+
+  isActiveVersion(v: TemaVersion): boolean {
+    return (
+      !!this.manageTema?.slug &&
+      this.activePublicThemeSlug === this.manageTema.slug &&
+      (this.activePublicThemeVersion ?? null) === (v?.version ?? null)
+    );
+  }
+
+  // ===== Versiones: acciones =====
+  activatePublishedVersion(v: TemaVersion): void {
+    if (!this.manageTema?.slug || !v?.version) return;
+    if (this.isActiveVersion(v)) {
+      this.toast.showInfo(
+        this.translate.instant('ADMIN.THEMES.VERSIONS.ALREADY_ACTIVE'),
+        this.translate.instant('MENU.THEMES')
+      );
+      return;
+    }
+    this.themeActionLoading = true;
+    this.cdr.detectChanges();
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService
+      .activate(this.manageTema.slug, v.version, ctx)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(() => this.refreshThemeStateAfterAction(ctx)),
+        switchMap(() => this.temasService.listVersions(this.manageTema!.slug, 'PUBLISHED', ctx)),
+        finalize(() => {
+          this.themeActionLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (versions) => {
+          this.publishedVersions = versions || [];
+          this.toast.showSuccess(this.translate.instant('ADMIN.THEMES.VERSIONS.ACTIVATED'), this.translate.instant('MENU.THEMES'));
+        },
+        error: (err) => {
+          this.log.error('temas activate version', err);
+          this.toast.showError(this.extractApiErrorMessage(err), this.translate.instant('MENU.THEMES'));
+        },
+      });
+  }
+
+  rollbackTheme(): void {
+    if (!this.manageTema?.slug) return;
+    if (!this.publishedVersions || this.publishedVersions.length < 2) {
+      this.toast.showInfo(
+        this.translate.instant('ADMIN.THEMES.VERSIONS.ROLLBACK_NOT_AVAILABLE'),
+        this.translate.instant('MENU.THEMES')
+      );
+      return;
+    }
+    this.themeActionLoading = true;
+    this.cdr.detectChanges();
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService
+      .rollback(this.manageTema.slug, ctx)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(() => this.refreshThemeStateAfterAction(ctx)),
+        switchMap(() => this.temasService.listVersions(this.manageTema!.slug, 'PUBLISHED', ctx)),
+        finalize(() => {
+          this.themeActionLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (versions) => {
+          this.publishedVersions = versions || [];
+          this.toast.showSuccess(this.translate.instant('ADMIN.THEMES.VERSIONS.ROLLBACK_OK'), this.translate.instant('MENU.THEMES'));
+        },
+        error: (err) => {
+          this.log.error('temas rollback', err);
+          this.toast.showError(this.extractApiErrorMessage(err), this.translate.instant('MENU.THEMES'));
+        },
+      });
+  }
+
+  compareThemeVersions(): void {
+    if (!this.manageTema?.slug || !this.versionCompareFrom || !this.versionCompareTo) return;
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.versionsLoading = true;
+    this.temasService
+      .compareVersions(this.manageTema.slug, this.versionCompareFrom, this.versionCompareTo, ctx)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.versionsLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (r) => (this.versionCompareResult = r),
+        error: (err) => {
+          this.log.error('temas compare', err);
+          this.toast.showError(this.translate.instant('COMMON.ERROR'), this.translate.instant('MENU.THEMES'));
+        },
+      });
+  }
+
+  askDeleteVersion(v: TemaVersion): void {
+    if (!this.manageTema?.slug || !v?.version) return;
+    this.versionToDelete = v;
+    this.showDeleteVersionConfirm = true;
+    this.cdr.detectChanges();
+  }
+
+  confirmDeleteVersion(): void {
+    if (!this.manageTema?.slug || !this.versionToDelete?.version) return;
+    const slug = this.manageTema.slug;
+    const ver = this.versionToDelete.version;
+    this.showDeleteVersionConfirm = false;
+    this.versionToDelete = null;
+    this.themeActionLoading = true;
+    this.cdr.detectChanges();
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.temasService
+      .deleteVersion(slug, ver, ctx)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(() => this.refreshThemeStateAfterAction(ctx)),
+        switchMap(() => this.temasService.listVersions(slug, 'PUBLISHED', ctx)),
+        finalize(() => {
+          this.themeActionLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (versions) => {
+          this.publishedVersions = versions || [];
+          this.toast.showSuccess(this.translate.instant('ADMIN.THEMES.VERSIONS.DELETED'), this.translate.instant('MENU.THEMES'));
+        },
+        error: (err) => {
+          this.log.error('temas delete version', err);
+          this.toast.showError(this.extractApiErrorMessage(err), this.translate.instant('MENU.THEMES'));
+        },
+      });
+  }
+
+  startEditReleaseNotes(v: TemaVersion): void {
+    this.editingReleaseNotesVersion = v?.version ?? null;
+    this.editingReleaseNotesText = (v?.releaseNotes || '').toString();
+    this.cdr.detectChanges();
+  }
+
+  cancelEditReleaseNotes(): void {
+    this.editingReleaseNotesVersion = null;
+    this.editingReleaseNotesText = '';
+    this.cdr.detectChanges();
+  }
+
+  saveReleaseNotes(v: TemaVersion): void {
+    if (!this.manageTema?.slug || !v?.version) return;
+    const slug = this.manageTema.slug;
+    const ver = v.version;
+    const notes = this.editingReleaseNotesText;
+    const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    this.versionsLoading = true;
+    this.temasService
+      .updateReleaseNotes(slug, ver, notes, ctx)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.versionsLoading = false;
+          this.editingReleaseNotesVersion = null;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (updated) => {
+          this.publishedVersions = this.publishedVersions.map((x) => (x.version === ver ? { ...x, ...updated } : x));
+          this.toast.showSuccess(this.translate.instant('ADMIN.THEMES.VERSIONS.NOTES_SAVED'), this.translate.instant('MENU.THEMES'));
+        },
+        error: (err) => {
+          this.log.error('temas release notes', err);
+          this.toast.showError(this.extractApiErrorMessage(err), this.translate.instant('MENU.THEMES'));
+        },
+      });
+  }
+
+  private extractApiErrorMessage(err: any): string {
+    // Formato típico: err.error.error.details[]
+    const details: string[] = err?.error?.error?.details || err?.error?.details || [];
+    if (Array.isArray(details) && details.length) return details.join(' · ');
+    const msg =
+      err?.error?.error?.message ||
+      err?.error?.message ||
+      err?.message ||
+      this.translate.instant('COMMON.ERROR');
+    return String(msg);
   }
 
   closeManageModal(): void {
@@ -665,7 +924,7 @@ export class TemasComponent implements OnInit, OnDestroy {
   openPresetsModal(): void {
     this.presetsModalVisible = true;
     this.presetEdit = null;
-    this.presetForm.reset({ nombre: '', descripcion: '', tokensJson: '', metadataJson: '' });
+    this.presetForm.reset({ nombre: '', descripcion: '', tokensJson: '', metadataJson: '', tags: '' });
     this.cdr.detectChanges();
   }
 
@@ -694,6 +953,7 @@ export class TemasComponent implements OnInit, OnDestroy {
         2
       ),
       metadataJson: JSON.stringify({ displayName: 'High Contrast Blue', mode: 'light', recommended: true }, null, 2),
+      tags: 'light,contrast',
     });
     this.cdr.detectChanges();
   }
@@ -705,6 +965,7 @@ export class TemasComponent implements OnInit, OnDestroy {
       descripcion: p.descripcion || '',
       tokensJson: p.tokensJson || '',
       metadataJson: p.metadataJson || '',
+      tags: p.tags || '',
     });
     this.cdr.detectChanges();
   }
@@ -726,6 +987,7 @@ export class TemasComponent implements OnInit, OnDestroy {
       descripcion: (this.presetForm.value.descripcion || '').trim() || undefined,
       tokensJson: this.presetForm.value.tokensJson,
       metadataJson: (this.presetForm.value.metadataJson || '').trim() || undefined,
+      tags: (this.presetForm.value.tags || '').trim() || undefined,
     };
     const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
     const op = this.presetEdit?.idTemaPreset
@@ -751,6 +1013,10 @@ export class TemasComponent implements OnInit, OnDestroy {
 
   deletePreset(p: TemaPreset): void {
     if (!p?.idTemaPreset) return;
+    if (p.isSystem) {
+      this.toast.showInfo(this.translate.instant('ADMIN.THEMES.PRESETS.SYSTEM_READONLY'), this.translate.instant('MENU.THEMES'));
+      return;
+    }
     this.presetsLoading = true;
     const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
     this.presetsService
@@ -783,13 +1049,40 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.showApplyPresetConfirm = false;
 
     const ctx = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true).set(SKIP_GLOBAL_LOADER, true);
+    const slug = this.manageTema.slug;
+    this.draftLoading = true;
     this.temasService
-      .upsertDraft(
-        this.manageTema.slug,
-        { tokensJson: preset.tokensJson, metadataJson: preset.metadataJson || undefined },
-        ctx
+      .getDraft(slug, ctx)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap((draft) => {
+          const baseTokens = this.safeParseJsonObject((draft as any)?.tokensJson);
+          const presetTokens = this.safeParseJsonObject(preset.tokensJson);
+          const mergedTokens = this.applyPresetMode === 'merge' ? { ...baseTokens, ...presetTokens } : presetTokens;
+
+          const baseMeta = this.safeParseJsonObject((draft as any)?.metadataJson);
+          const presetMeta = this.safeParseJsonObject(preset.metadataJson || '');
+          const mergedMeta =
+            this.applyPresetMode === 'merge'
+              ? { ...baseMeta, ...presetMeta }
+              : preset.metadataJson
+                ? presetMeta
+                : {};
+
+          return this.temasService.upsertDraft(
+            slug,
+            {
+              tokensJson: JSON.stringify(mergedTokens, null, 2),
+              metadataJson: Object.keys(mergedMeta).length ? JSON.stringify(mergedMeta, null, 2) : undefined,
+            },
+            ctx
+          );
+        }),
+        finalize(() => {
+          this.draftLoading = false;
+          this.cdr.detectChanges();
+        })
       )
-      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.toast.showSuccess(
@@ -797,6 +1090,7 @@ export class TemasComponent implements OnInit, OnDestroy {
             this.translate.instant('MENU.THEMES')
           );
           this.obtenerListaTemas();
+          this.loadManageTemaAndVersions(slug);
         },
         error: (err) => {
           this.log.error('preset apply', err);
@@ -854,7 +1148,10 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.draftTokensJson = '';
     this.draftMetadataJson = '';
     this.draftAllowTokensEdit = false;
+    this.draftEditorMode = 'json';
+    this.draftTokenRows = [];
     this.draftPresetId = null;
+    this.draftPresetMode = 'replace';
     this.showApplyDraftPresetConfirm = false;
     this.draftModalVisible = true;
     this.draftLoading = true;
@@ -877,6 +1174,7 @@ export class TemasComponent implements OnInit, OnDestroy {
             this.draftAllowTokensEdit = true;
             this.draftTokensJson = '{\n\n}';
             this.draftMetadataJson = '';
+            this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
             this.toast.showInfo(
               this.translate.instant('ADMIN.THEMES.DRAFT.NO_DRAFT'),
               this.translate.instant('MENU.THEMES')
@@ -887,12 +1185,14 @@ export class TemasComponent implements OnInit, OnDestroy {
           this.draftAllowTokensEdit = (d?.sourceType || '').toString() !== 'CSS_PACKAGE';
           this.draftTokensJson = d?.tokensJson || '{\n\n}';
           this.draftMetadataJson = d?.metadataJson || '';
+          this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
         },
         error: (err) => {
           // Si no existe borrador todavía, permitimos crearlo pegando tokens.
           this.draftAllowTokensEdit = true;
           this.draftTokensJson = '{\n\n}';
           this.draftMetadataJson = '';
+          this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
           this.toast.showInfo(
             this.translate.instant('ADMIN.THEMES.DRAFT.NO_DRAFT'),
             this.translate.instant('MENU.THEMES')
@@ -921,6 +1221,8 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.draftTokensJson = '';
     this.draftMetadataJson = '';
     this.draftAllowTokensEdit = false;
+    this.draftEditorMode = 'json';
+    this.draftTokenRows = [];
     this.showConvertDraftModal = false;
   }
 
@@ -949,14 +1251,101 @@ export class TemasComponent implements OnInit, OnDestroy {
     this.showApplyDraftPresetConfirm = false;
     // Aplicación al editor (no guarda hasta que pulses Guardar)
     this.draftAllowTokensEdit = true;
-    this.draftTokensJson = preset.tokensJson || '{\n\n}';
-    this.draftMetadataJson = preset.metadataJson || '';
+    const baseTokens = this.safeParseJsonObject(this.draftTokensJson);
+    const presetTokens = this.safeParseJsonObject(preset.tokensJson);
+    const mergedTokens = this.draftPresetMode === 'merge' ? { ...baseTokens, ...presetTokens } : presetTokens;
+    this.draftTokensJson = JSON.stringify(mergedTokens, null, 2);
+
+    const baseMeta = this.safeParseJsonObject(this.draftMetadataJson);
+    const presetMeta = this.safeParseJsonObject(preset.metadataJson || '');
+    const mergedMeta =
+      this.draftPresetMode === 'merge'
+        ? { ...baseMeta, ...presetMeta }
+        : preset.metadataJson
+          ? presetMeta
+          : {};
+    this.draftMetadataJson = Object.keys(mergedMeta).length ? JSON.stringify(mergedMeta, null, 2) : '';
+    this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
     this.cdr.detectChanges();
+  }
+
+  // ===== Editor tokens: JSON <-> tabla =====
+  setDraftEditorMode(mode: 'json' | 'table'): void {
+    if (this.draftEditorMode === mode) return;
+    if (mode === 'table') {
+      this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
+      this.draftEditorMode = 'table';
+    } else {
+      const { json, errors } = this.buildJsonFromTokenRows(this.draftTokenRows);
+      if (errors.length) {
+        this.toast.showError(errors.join(' · '), this.translate.instant('MENU.THEMES'));
+        return;
+      }
+      this.draftTokensJson = json;
+      this.draftEditorMode = 'json';
+    }
+    this.cdr.detectChanges();
+  }
+
+  addDraftTokenRow(): void {
+    this.draftTokenRows = [...this.draftTokenRows, { key: '', value: '' }];
+    this.cdr.detectChanges();
+  }
+
+  removeDraftTokenRow(i: number): void {
+    this.draftTokenRows = this.draftTokenRows.filter((_, idx) => idx !== i);
+    this.cdr.detectChanges();
+  }
+
+  private buildTokenRowsFromJson(tokensJson: string): Array<{ key: string; value: string }> {
+    const obj = this.safeParseJsonObject(tokensJson);
+    const rows = Object.keys(obj)
+      .sort()
+      .map((k) => ({ key: k, value: obj[k] == null ? '' : String(obj[k]) }));
+    return rows.length ? rows : [{ key: '', value: '' }];
+  }
+
+  private buildJsonFromTokenRows(rows: Array<{ key: string; value: string }>): { json: string; errors: string[] } {
+    const errors: string[] = [];
+    const out: Record<string, string> = {};
+    const seen = new Set<string>();
+    (rows || []).forEach((r, idx) => {
+      const k = (r?.key || '').trim();
+      const v = (r?.value || '').toString();
+      if (!k && !v) return;
+      if (!k.startsWith('--')) errors.push(this.translate.instant('ADMIN.THEMES.DRAFT.TABLE_ERR_TOKEN', { i: idx + 1 }));
+      if (seen.has(k)) errors.push(this.translate.instant('ADMIN.THEMES.DRAFT.TABLE_ERR_DUP', { token: k }));
+      seen.add(k);
+      out[k] = v;
+    });
+    return { json: JSON.stringify(out, null, 2), errors };
+  }
+
+  private safeParseJsonObject(text: string | null | undefined): Record<string, any> {
+    if (!text || !text.trim()) return {};
+    try {
+      const v = JSON.parse(text);
+      if (!v || typeof v !== 'object' || Array.isArray(v)) return {};
+      return v;
+    } catch {
+      return {};
+    }
   }
 
   saveDraft(): void {
     if (!this.draftTema?.slug) return;
     if (!this.draftAllowTokensEdit) return;
+
+    // Si estamos en modo tabla, convertir a JSON y validar
+    if (this.draftEditorMode === 'table') {
+      const { json, errors } = this.buildJsonFromTokenRows(this.draftTokenRows);
+      if (errors.length) {
+        this.toast.showError(errors.join(' · '), this.translate.instant('MENU.THEMES'));
+        return;
+      }
+      this.draftTokensJson = json;
+      this.draftEditorMode = 'json';
+    }
 
     // Validación mínima de JSON
     try {
