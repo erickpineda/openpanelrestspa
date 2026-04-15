@@ -399,7 +399,11 @@ export class TemasComponent implements OnInit, OnDestroy {
   private refreshThemeStateAfterAction(context: HttpContext) {
     const slug = this.manageTema?.slug;
     const refreshActive$ = this.publicThemes.getActive(true).pipe(
-      tap((t) => (this.activePublicThemeSlug = t?.slug ?? null)),
+      tap((t: any) => {
+        this.activePublicThemeSlug = t?.slug ?? null;
+        this.activePublicThemeVersion = t?.version ?? null;
+        this.activePublicThemeVersionId = t?.idTemaVersion ?? null;
+      }),
       map(() => true)
     );
     const refreshManage$ = slug
@@ -753,7 +757,7 @@ export class TemasComponent implements OnInit, OnDestroy {
 
   rollbackTheme(): void {
     if (!this.manageTema?.slug) return;
-    if (!this.publishedVersions || this.publishedVersions.length < 2) {
+    if (!this.canRollback()) {
       this.toast.showInfo(
         this.translate.instant('ADMIN.THEMES.VERSIONS.ROLLBACK_NOT_AVAILABLE'),
         this.translate.instant('MENU.THEMES')
@@ -784,6 +788,18 @@ export class TemasComponent implements OnInit, OnDestroy {
           this.toast.showError(this.extractApiErrorMessage(err), this.translate.instant('MENU.THEMES'));
         },
       });
+  }
+
+  canRollback(): boolean {
+    if (!this.manageTema?.slug) return false;
+    const versions = this.publishedVersions || [];
+    if (versions.length < 2) return false;
+
+    // Si el tema no está activo, backend toma como "current" la última publicada -> rollback posible si hay >=2
+    if (this.activePublicThemeSlug !== this.manageTema.slug || this.activePublicThemeVersion == null) return true;
+
+    // Si está activo: rollback solo si existe una versión menor a la activa
+    return versions.some((v) => (v?.version ?? 0) < (this.activePublicThemeVersion as number));
   }
 
   compareThemeVersions(): void {

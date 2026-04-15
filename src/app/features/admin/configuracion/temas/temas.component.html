@@ -747,7 +747,7 @@
                 variant="outline"
                 size="sm"
                 (click)="rollbackTheme()"
-                [disabled]="themeActionLoading || publishedVersions.length < 2"
+                [disabled]="themeActionLoading || !canRollback()"
               >
                 <svg cIcon name="cilHistory" class="me-2"></svg>
                 {{ 'ADMIN.THEMES.VERSIONS.ROLLBACK' | translate }}
