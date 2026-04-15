@@ -1,0 +1,36 @@
+.theme-studio-page {
+  .studio-shell {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 70vh;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .studio-sidebar {
+    background: rgba(255, 255, 255, 0.015);
+
+    button.active {
+      background: rgba(13, 110, 253, 0.12);
+      border-color: rgba(13, 110, 253, 0.35);
+    }
+  }
+
+  .studio-main {
+    min-width: 0;
+  }
+
+  .studio-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: rgba(10, 15, 25, 0.86);
+    backdrop-filter: blur(8px);
+  }
+
+  textarea.font-monospace,
+  input.font-monospace {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
+  }
+}
+

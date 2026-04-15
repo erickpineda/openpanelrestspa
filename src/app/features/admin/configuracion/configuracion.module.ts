@@ -8,6 +8,7 @@ import { SharedCoreUiModule } from '@shared/shared-coreui.module';
 import { ConfiguracionFeatureRoutingModule } from './configuracion-routing.module';
 import { TemasComponent } from './temas/temas.component';
 import { AjustesComponent } from './ajustes/ajustes.component';
+import { TemaStudioComponent } from './temas/studio/tema-studio.component';
 
 @NgModule({
   imports: [
@@ -20,6 +21,6 @@ import { AjustesComponent } from './ajustes/ajustes.component';
     SharedCoreUiModule,
     ConfiguracionFeatureRoutingModule,
   ],
-  declarations: [TemasComponent, AjustesComponent],
+  declarations: [TemasComponent, AjustesComponent, TemaStudioComponent],
 })
 export class ConfiguracionFeatureModule {}

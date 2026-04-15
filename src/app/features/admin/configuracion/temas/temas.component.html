@@ -302,6 +302,16 @@
                   <c-badge color="info" shape="rounded-pill">{{ t.origen || '—' }}</c-badge>
                 </td>
                 <td class="px-3 pe-4 text-end">
+                  <a
+                    cButton
+                    color="primary"
+                    variant="ghost"
+                    size="sm"
+                    [routerLink]="['/admin/configuracion/temas', t.slug]"
+                    [cTooltip]="'ADMIN.THEMES.STUDIO.OPEN' | translate"
+                  >
+                    <svg cIcon name="cilScreenDesktop"></svg>
+                  </a>
                   <button
                     cButton
                     color="secondary"

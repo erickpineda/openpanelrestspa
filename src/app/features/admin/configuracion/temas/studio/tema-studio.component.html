@@ -1,0 +1,518 @@
+<div class="theme-studio-page">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+      <div class="text-muted small">
+        {{ 'ADMIN.THEMES.STUDIO.BREADCRUMB' | translate }}
+      </div>
+      <h4 class="mb-0 d-flex align-items-center gap-2">
+        <svg cIcon name="cilPaint" class="text-primary"></svg>
+        <span class="fw-bold">{{ tema?.nombre || slug }}</span>
+        <code class="text-muted text-uppercase">{{ slug }}</code>
+      </h4>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <label class="d-flex align-items-center gap-2 small text-muted mb-0">
+        <input
+          type="checkbox"
+          [ngModel]="mode === 'advanced'"
+          (ngModelChange)="setMode($event ? 'advanced' : 'simple')"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        {{ 'ADMIN.THEMES.STUDIO.ADVANCED_TOGGLE' | translate }}
+      </label>
+
+      <button cButton color="secondary" variant="outline" (click)="router.navigate(['/admin/configuracion/temas'])">
+        <svg cIcon name="cilArrowLeft" class="me-2"></svg>
+        {{ 'COMMON.BACK' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="studio-shell border rounded-3">
+    <!-- Sidebar -->
+    <aside class="studio-sidebar p-3 border-end">
+      <div class="small text-muted fw-semibold mb-2">{{ 'ADMIN.THEMES.STUDIO.SECTIONS' | translate }}</div>
+      <div class="nav flex-column nav-pills gap-1">
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          class="text-start"
+          [class.active]="section === 'overview'"
+          (click)="setSection('overview')"
+        >
+          {{ 'ADMIN.THEMES.STUDIO.TABS.OVERVIEW' | translate }}
+        </button>
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          class="text-start"
+          [class.active]="section === 'simple'"
+          (click)="setSection('simple')"
+        >
+          {{ 'ADMIN.THEMES.STUDIO.TABS.SIMPLE' | translate }}
+        </button>
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          class="text-start"
+          [class.active]="section === 'draft'"
+          (click)="setSection('draft')"
+          [disabled]="mode !== 'advanced'"
+          [cTooltip]="mode !== 'advanced' ? ('ADMIN.THEMES.STUDIO.ADVANCED_REQUIRED' | translate) : ''"
+        >
+          {{ 'ADMIN.THEMES.STUDIO.TABS.DRAFT' | translate }}
+        </button>
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          class="text-start"
+          [class.active]="section === 'versions'"
+          (click)="setSection('versions')"
+          [disabled]="mode !== 'advanced'"
+          [cTooltip]="mode !== 'advanced' ? ('ADMIN.THEMES.STUDIO.ADVANCED_REQUIRED' | translate) : ''"
+        >
+          {{ 'ADMIN.THEMES.STUDIO.TABS.VERSIONS' | translate }}
+        </button>
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          class="text-start"
+          [class.active]="section === 'preview'"
+          (click)="setSection('preview')"
+        >
+          {{ 'ADMIN.THEMES.STUDIO.TABS.PREVIEW' | translate }}
+        </button>
+        <button
+          cButton
+          color="secondary"
+          variant="ghost"
+          class="text-start"
+          [class.active]="section === 'settings'"
+          (click)="setSection('settings')"
+        >
+          {{ 'ADMIN.THEMES.STUDIO.TABS.SETTINGS' | translate }}
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="studio-main">
+      <!-- Topbar -->
+      <div class="studio-topbar p-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <c-badge [color]="isThemeActive() ? 'success' : 'secondary'" shape="rounded-pill">
+            {{ 'ADMIN.THEMES.STUDIO.STATUS.ACTIVE' | translate }}:
+            {{ isThemeActive() ? ('v' + (activePublicThemeVersion || '—')) : ('ADMIN.THEMES.STUDIO.STATUS.DEFAULT' | translate) }}
+          </c-badge>
+          <c-badge [color]="tema?.published ? 'info' : 'secondary'" shape="rounded-pill">
+            {{ 'ADMIN.THEMES.STUDIO.STATUS.PUBLISHED' | translate }}:
+            {{ tema?.published ? ('v' + (tema?.published?.version || '—')) : '—' }}
+          </c-badge>
+          <c-badge [color]="tema?.draft ? 'warning' : 'secondary'" shape="rounded-pill">
+            {{ 'ADMIN.THEMES.STUDIO.STATUS.DRAFT' | translate }}:
+            {{ tema?.draft ? ('v' + (tema?.draft?.version || '—')) : '—' }}
+          </c-badge>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button cButton color="secondary" variant="outline" (click)="openPreview()" [disabled]="loading">
+            <svg cIcon name="cilExternalLink" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.STUDIO.ACTIONS.PREVIEW' | translate }}
+          </button>
+          <button
+            cButton
+            color="primary"
+            variant="outline"
+            (click)="doPublish()"
+            [disabled]="loading || !tema?.draft"
+            [cTooltip]="!tema?.draft ? ('ADMIN.THEMES.PUBLISH_NEEDS_DRAFT' | translate) : ''"
+          >
+            <svg cIcon name="cilCloudUpload" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.STUDIO.ACTIONS.PUBLISH' | translate }}
+          </button>
+          <button
+            cButton
+            color="success"
+            variant="outline"
+            (click)="doActivateLatest()"
+            [disabled]="loading || !tema?.published"
+          >
+            <svg cIcon name="cilCheckCircle" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.STUDIO.ACTIONS.ACTIVATE' | translate }}
+          </button>
+          <button cButton color="secondary" variant="outline" (click)="doRollback()" [disabled]="loading || !canRollback()">
+            <svg cIcon name="cilHistory" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.VERSIONS.ROLLBACK' | translate }}
+          </button>
+          <button cButton color="danger" variant="outline" (click)="doDeactivateToDefault()" [disabled]="loading || !isThemeActive()">
+            <svg cIcon name="cilXCircle" class="me-2"></svg>
+            {{ 'ADMIN.THEMES.STUDIO.ACTIONS.DEACTIVATE' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="studio-content p-3">
+        @if (loading) {
+          <div class="d-flex justify-content-center align-items-center py-5">
+            <c-spinner color="primary"></c-spinner>
+          </div>
+        } @else {
+          @switch (section) {
+            @case ('overview') {
+              <c-alert color="info" class="mb-3">
+                <div class="fw-semibold">{{ 'ADMIN.THEMES.STUDIO.OVERVIEW.TITLE' | translate }}</div>
+                <div class="small text-muted">{{ 'ADMIN.THEMES.STUDIO.OVERVIEW.DESC' | translate }}</div>
+              </c-alert>
+
+              <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <div class="border rounded-3 p-3">
+                    <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.NEXT.TITLE' | translate }}</div>
+                    <ul class="small text-muted mb-0">
+                      @if (!tema?.draft) {
+                        <li>{{ 'ADMIN.THEMES.NEXT.CREATE_DRAFT' | translate }}</li>
+                      } @else if (tema?.draft && !tema?.published) {
+                        <li>{{ 'ADMIN.THEMES.NEXT.PUBLISH' | translate }}</li>
+                      } @else if (tema?.published && !isThemeActive()) {
+                        <li>{{ 'ADMIN.THEMES.NEXT.ACTIVATE' | translate }}</li>
+                      } @else if (isThemeActive()) {
+                        <li>{{ 'ADMIN.THEMES.NEXT.DEACTIVATE' | translate }}</li>
+                      }
+                      <li>{{ 'ADMIN.THEMES.STUDIO.OVERVIEW.HINT' | translate }}</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <div class="border rounded-3 p-3">
+                    <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.STUDIO.OVERVIEW.MODE_TITLE' | translate }}</div>
+                    <div class="small text-muted mb-2">{{ 'ADMIN.THEMES.STUDIO.OVERVIEW.MODE_DESC' | translate }}</div>
+                    <div class="d-flex gap-2 flex-wrap">
+                      <button cButton color="primary" variant="outline" (click)="setSection('simple')">
+                        {{ 'ADMIN.THEMES.STUDIO.TABS.SIMPLE' | translate }}
+                      </button>
+                      <button
+                        cButton
+                        color="secondary"
+                        variant="outline"
+                        (click)="setMode('advanced'); setSection('draft')"
+                      >
+                        {{ 'ADMIN.THEMES.STUDIO.GO_ADVANCED' | translate }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @case ('simple') {
+              <div class="row g-3">
+                <div class="col-12 col-xl-7">
+                  <div class="border rounded-3 p-3">
+                    <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.STUDIO.SIMPLE.TITLE' | translate }}</div>
+                    <div class="small text-muted mb-3">{{ 'ADMIN.THEMES.STUDIO.SIMPLE.DESC' | translate }}</div>
+
+                    <form [formGroup]="simpleForm" class="row g-3">
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small text-muted fw-bold mb-1">{{ 'ADMIN.THEMES.STUDIO.SIMPLE.PRIMARY' | translate }}</label>
+                        <div class="d-flex gap-2">
+                          <input class="form-control form-control-sm" type="color" [ngModel]="simpleForm.value['--cui-primary']" (ngModelChange)="simpleForm.get('--cui-primary')?.setValue($event)" [ngModelOptions]="{standalone:true}" />
+                          <input cFormControl type="text" formControlName="--cui-primary" class="font-monospace" />
+                        </div>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small text-muted fw-bold mb-1">{{ 'ADMIN.THEMES.STUDIO.SIMPLE.PRIMARY_RGB' | translate }}</label>
+                        <input cFormControl type="text" formControlName="--cui-primary-rgb" class="font-monospace" />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small text-muted fw-bold mb-1">{{ 'ADMIN.THEMES.STUDIO.SIMPLE.BG' | translate }}</label>
+                        <div class="d-flex gap-2">
+                          <input class="form-control form-control-sm" type="color" [ngModel]="simpleForm.value['--cui-body-bg']" (ngModelChange)="simpleForm.get('--cui-body-bg')?.setValue($event)" [ngModelOptions]="{standalone:true}" />
+                          <input cFormControl type="text" formControlName="--cui-body-bg" class="font-monospace" />
+                        </div>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small text-muted fw-bold mb-1">{{ 'ADMIN.THEMES.STUDIO.SIMPLE.TEXT' | translate }}</label>
+                        <div class="d-flex gap-2">
+                          <input class="form-control form-control-sm" type="color" [ngModel]="simpleForm.value['--cui-body-color']" (ngModelChange)="simpleForm.get('--cui-body-color')?.setValue($event)" [ngModelOptions]="{standalone:true}" />
+                          <input cFormControl type="text" formControlName="--cui-body-color" class="font-monospace" />
+                        </div>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small text-muted fw-bold mb-1">{{ 'ADMIN.THEMES.STUDIO.SIMPLE.BORDER' | translate }}</label>
+                        <input cFormControl type="text" formControlName="--cui-border-color" class="font-monospace" />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small text-muted fw-bold mb-1">{{ 'ADMIN.THEMES.STUDIO.SIMPLE.SECONDARY' | translate }}</label>
+                        <input cFormControl type="text" formControlName="--cui-secondary-color" class="font-monospace" />
+                      </div>
+                    </form>
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                      <button cButton color="primary" (click)="saveDraftFromSimple()" [disabled]="savingDraft">
+                        <svg cIcon name="cilSave" class="me-2"></svg>
+                        {{ 'COMMON.SAVE' | translate }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-xl-5">
+                  <div class="border rounded-3 p-3">
+                    <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.PRESETS.TITLE' | translate }}</div>
+                    <div class="small text-muted mb-2">{{ 'ADMIN.THEMES.PRESETS.APPLY_HELP' | translate }}</div>
+
+                    <label class="form-label small text-muted fw-bold mb-1">{{ 'ADMIN.THEMES.PRESETS.SELECT' | translate }}</label>
+                    <select cSelect [(ngModel)]="applyPresetId" [ngModelOptions]="{ standalone: true }">
+                      <option [ngValue]="null">{{ 'ADMIN.THEMES.PRESETS.SELECT_PLACEHOLDER' | translate }}</option>
+                      @for (p of presets; track p.idTemaPreset) {
+                        <option [ngValue]="p.idTemaPreset">{{ p.nombre }}</option>
+                      }
+                    </select>
+                    <div class="mt-2 d-flex gap-3 small">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="radio" [ngModel]="applyPresetMode" (ngModelChange)="applyPresetMode=$event" [ngModelOptions]="{standalone:true}" value="replace" />
+                        {{ 'ADMIN.THEMES.PRESETS.MODE_REPLACE' | translate }}
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="radio" [ngModel]="applyPresetMode" (ngModelChange)="applyPresetMode=$event" [ngModelOptions]="{standalone:true}" value="merge" />
+                        {{ 'ADMIN.THEMES.PRESETS.MODE_MERGE' | translate }}
+                      </label>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-3">
+                      <button cButton color="primary" variant="outline" (click)="applySelectedPreset()" [disabled]="!applyPresetId">
+                        {{ 'ADMIN.THEMES.PRESETS.APPLY' | translate }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @case ('draft') {
+              <div class="border rounded-3 p-3">
+                <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.DRAFT.TITLE' | translate }}</div>
+
+                <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-2">
+                  <div class="small text-muted">{{ 'ADMIN.THEMES.HELP.TOKENS_BODY' | translate }}</div>
+                  <div class="btn-group btn-group-sm">
+                    <button cButton color="secondary" variant="outline" type="button" (click)="setDraftEditorMode('json')" [disabled]="draftEditorMode==='json'">
+                      JSON
+                    </button>
+                    <button cButton color="secondary" variant="outline" type="button" (click)="setDraftEditorMode('table')" [disabled]="draftEditorMode==='table'">
+                      {{ 'ADMIN.THEMES.DRAFT.TABLE' | translate }}
+                    </button>
+                  </div>
+                </div>
+
+                @if (draftEditorMode === 'json') {
+                  <textarea cFormControl rows="14" [(ngModel)]="draftTokensJson" [ngModelOptions]="{standalone:true}" class="font-monospace"></textarea>
+                } @else {
+                  <div class="table-responsive border rounded-3 bg-white">
+                    <table class="table mb-0 align-middle">
+                      <thead class="bg-light">
+                        <tr>
+                          <th style="width:45%">{{ 'ADMIN.THEMES.DRAFT.TABLE_TOKEN' | translate }}</th>
+                          <th style="width:45%">{{ 'ADMIN.THEMES.DRAFT.TABLE_VALUE' | translate }}</th>
+                          <th style="width:10%" class="text-end">
+                            <button cButton color="primary" variant="ghost" size="sm" type="button" (click)="addDraftTokenRow()">
+                              <svg cIcon name="cilPlus"></svg>
+                            </button>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (r of draftTokenRows; track $index) {
+                          <tr>
+                            <td><input cFormControl [(ngModel)]="r.key" [ngModelOptions]="{standalone:true}" /></td>
+                            <td><input cFormControl [(ngModel)]="r.value" [ngModelOptions]="{standalone:true}" /></td>
+                            <td class="text-end">
+                              <button cButton color="danger" variant="ghost" size="sm" type="button" (click)="removeDraftTokenRow($index)">
+                                <svg cIcon name="cilTrash"></svg>
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="small text-muted mt-2">{{ 'ADMIN.THEMES.DRAFT.TABLE_HELP' | translate }}</div>
+                }
+
+                <div class="mt-3">
+                  <label class="form-label small fw-bold text-muted">{{ 'ADMIN.THEMES.DRAFT.METADATA' | translate }}</label>
+                  <textarea cFormControl rows="5" [(ngModel)]="draftMetadataJson" [ngModelOptions]="{standalone:true}" class="font-monospace"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                  <button cButton color="primary" (click)="saveDraftAdvanced()" [disabled]="savingDraft">
+                    <svg cIcon name="cilSave" class="me-2"></svg>
+                    {{ 'COMMON.SAVE' | translate }}
+                  </button>
+                </div>
+              </div>
+            }
+
+            @case ('versions') {
+              <div class="border rounded-3 p-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                  <div class="fw-semibold">{{ 'ADMIN.THEMES.VERSIONS.TITLE' | translate }}</div>
+                  <button cButton color="secondary" variant="outline" size="sm" (click)="doRollback()" [disabled]="loading || !canRollback()">
+                    <svg cIcon name="cilHistory" class="me-2"></svg>
+                    {{ 'ADMIN.THEMES.VERSIONS.ROLLBACK' | translate }}
+                  </button>
+                </div>
+
+                @if (versionsLoading) {
+                  <div class="d-flex justify-content-center py-3"><c-spinner size="sm"></c-spinner></div>
+                } @else {
+                  <div class="table-responsive border rounded-3">
+                    <table class="table mb-0 align-middle">
+                      <thead class="bg-light">
+                        <tr>
+                          <th style="width:90px">v</th>
+                          <th>{{ 'ADMIN.THEMES.VERSIONS.NOTES' | translate }}</th>
+                          <th style="width:220px">{{ 'ADMIN.THEMES.VERSIONS.PUBLISHED_AT' | translate }}</th>
+                          <th style="width:160px" class="text-end">{{ 'COMMON.ACTIONS' | translate }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (v of publishedVersions; track v.version) {
+                          <tr>
+                            <td>
+                              <span class="fw-semibold">v{{ v.version }}</span>
+                              @if (isActiveVersion(v)) {
+                                <c-badge color="success" class="ms-2">{{ 'ADMIN.THEMES.VERSIONS.ACTIVE' | translate }}</c-badge>
+                              }
+                            </td>
+                            <td>
+                              @if (editingReleaseNotesVersion === v.version) {
+                                <div class="d-flex gap-2">
+                                  <input cFormControl [(ngModel)]="editingReleaseNotesText" [ngModelOptions]="{standalone:true}" />
+                                  <button cButton color="primary" variant="outline" size="sm" (click)="saveReleaseNotes(v)">
+                                    <svg cIcon name="cilSave"></svg>
+                                  </button>
+                                  <button cButton color="secondary" variant="ghost" size="sm" (click)="cancelEditReleaseNotes()">
+                                    <svg cIcon name="cilX"></svg>
+                                  </button>
+                                </div>
+                              } @else {
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                  <span class="text-muted small">{{ v.releaseNotes || '—' }}</span>
+                                  <button cButton color="secondary" variant="ghost" size="sm" (click)="startEditReleaseNotes(v)">
+                                    <svg cIcon name="cilPen"></svg>
+                                  </button>
+                                </div>
+                              }
+                            </td>
+                            <td class="small text-muted">
+                              {{ v.publishedAt ? (v.publishedAt | date: 'dd-MM-yyyy HH:mm') : '—' }}
+                              <div class="small text-muted">{{ v.publishedBy || '—' }}</div>
+                            </td>
+                            <td class="text-end">
+                              <button
+                                cButton
+                                color="primary"
+                                variant="ghost"
+                                size="sm"
+                                (click)="activateVersion(v)"
+                                [disabled]="isActiveVersion(v)"
+                                [cTooltip]="(isActiveVersion(v) ? 'ADMIN.THEMES.VERSIONS.ALREADY_ACTIVE' : 'ADMIN.THEMES.VERSIONS.ACTIVATE') | translate"
+                              >
+                                <svg cIcon name="cilCheckCircle"></svg>
+                              </button>
+                              <button cButton color="danger" variant="ghost" size="sm" (click)="deleteVersion(v)">
+                                <svg cIcon name="cilTrash"></svg>
+                              </button>
+                            </td>
+                          </tr>
+                        } @empty {
+                          <tr>
+                            <td colspan="4" class="text-center text-muted py-3">{{ 'ADMIN.THEMES.VERSIONS.EMPTY' | translate }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="mt-3">
+                    <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.VERSIONS.COMPARE' | translate }}</div>
+                    <div class="row g-2 align-items-end">
+                      <div class="col-12 col-md-4">
+                        <label class="form-label small text-muted fw-bold mb-1">From</label>
+                        <select cSelect [(ngModel)]="versionCompareFrom" [ngModelOptions]="{ standalone: true }">
+                          <option [ngValue]="null">—</option>
+                          @for (v of publishedVersions; track v.version) {
+                            <option [ngValue]="v.version">v{{ v.version }}</option>
+                          }
+                        </select>
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <label class="form-label small text-muted fw-bold mb-1">To</label>
+                        <select cSelect [(ngModel)]="versionCompareTo" [ngModelOptions]="{ standalone: true }">
+                          <option [ngValue]="null">—</option>
+                          @for (v of publishedVersions; track v.version) {
+                            <option [ngValue]="v.version">v{{ v.version }}</option>
+                          }
+                        </select>
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <button cButton color="primary" class="w-100" (click)="compareVersions()" [disabled]="!versionCompareFrom || !versionCompareTo">
+                          {{ 'ADMIN.THEMES.VERSIONS.COMPARE_BTN' | translate }}
+                        </button>
+                      </div>
+                    </div>
+
+                    @if (versionCompareResult) {
+                      <div class="mt-3 small">
+                        <pre class="bg-white border rounded-3 p-2 mb-0" style="max-height: 260px; overflow:auto">{{
+                          versionCompareResult | json
+                        }}</pre>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            @case ('preview') {
+              <div class="border rounded-3 p-3">
+                <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.STUDIO.PREVIEW.TITLE' | translate }}</div>
+                <div class="small text-muted mb-3">{{ 'ADMIN.THEMES.STUDIO.PREVIEW.DESC' | translate }}</div>
+                <button cButton color="primary" (click)="openPreview()">
+                  <svg cIcon name="cilExternalLink" class="me-2"></svg>
+                  {{ 'ADMIN.THEMES.STUDIO.ACTIONS.PREVIEW' | translate }}
+                </button>
+              </div>
+            }
+
+            @case ('settings') {
+              <div class="border rounded-3 p-3">
+                <div class="fw-semibold mb-2">{{ 'ADMIN.THEMES.STUDIO.SETTINGS.TITLE' | translate }}</div>
+                <div class="small text-muted mb-3">{{ 'ADMIN.THEMES.STUDIO.SETTINGS.DESC' | translate }}</div>
+                <div class="row g-2 small">
+                  <div class="col-12 col-md-6">
+                    <div class="text-muted">{{ 'COMMON.SLUG' | translate }}</div>
+                    <code class="text-uppercase">{{ tema?.slug || slug }}</code>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="text-muted">{{ 'ADMIN.THEMES.TABLE.ORIGIN' | translate }}</div>
+                    <span>{{ tema?.origen || '—' }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          }
+        }
+      </div>
+    </main>
+  </div>
+</div>
+

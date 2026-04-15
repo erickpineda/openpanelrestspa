@@ -119,6 +119,7 @@
     "HIDE": "Ocultar",
     "NEXT": "Siguiente",
     "PREV": "Anterior",
+    "BACK": "Volver",
     "VALIDATE_JSON": "Validar JSON",
     "VALID_JSON": "JSON válido",
     "INVALID_JSON": "JSON inválido",
@@ -372,6 +373,60 @@
         "DELETED": "Versión eliminada",
         "DELETE_CONFIRM_TITLE": "Eliminar versión",
         "DELETE_CONFIRM_MSG": "Se eliminará la versión publicada seleccionada. Si era la activa, se restaurará el tema por defecto. ¿Continuar?"
+      },
+      "STUDIO": {
+        "OPEN": "Abrir Studio",
+        "BREADCRUMB": "Configuración / Temas / Studio",
+        "ADVANCED_TOGGLE": "Modo avanzado (soy técnico)",
+        "ADVANCED_REQUIRED": "Activa el modo avanzado para ver esta sección",
+        "SECTIONS": "Secciones",
+        "TABS": {
+          "OVERVIEW": "Overview",
+          "SIMPLE": "Simple (recomendado)",
+          "DRAFT": "Borrador",
+          "VERSIONS": "Versiones",
+          "PREVIEW": "Preview",
+          "SETTINGS": "Ajustes"
+        },
+        "STATUS": {
+          "ACTIVE": "Activo",
+          "DEFAULT": "Default",
+          "PUBLISHED": "Publicado",
+          "DRAFT": "Borrador"
+        },
+        "ACTIONS": {
+          "PREVIEW": "Preview",
+          "PUBLISH": "Publicar",
+          "PUBLISH_OK": "Tema publicado",
+          "ACTIVATE": "Activar",
+          "DEACTIVATE": "Desactivar"
+        },
+        "OVERVIEW": {
+          "TITLE": "Theme Studio",
+          "DESC": "Espacio de trabajo para gestionar el tema sin un modal saturado.",
+          "HINT": "Consejo: usa Simple para ajustes rápidos y Avanzado para tokens/versiones.",
+          "MODE_TITLE": "Modo de trabajo",
+          "MODE_DESC": "Puedes cambiar entre Simple y Avanzado en cualquier momento."
+        },
+        "GO_ADVANCED": "Ir a Avanzado",
+        "SIMPLE": {
+          "TITLE": "Edición simple (recomendada)",
+          "DESC": "Ajusta los tokens principales sin editar JSON.",
+          "PRIMARY": "Primary",
+          "PRIMARY_RGB": "Primary RGB",
+          "BG": "Background",
+          "TEXT": "Text",
+          "BORDER": "Border",
+          "SECONDARY": "Secondary text"
+        },
+        "PREVIEW": {
+          "TITLE": "Preview",
+          "DESC": "Genera un enlace temporal para ver el tema sin activarlo."
+        },
+        "SETTINGS": {
+          "TITLE": "Ajustes",
+          "DESC": "Información del tema (slug, origen, etc.)."
+        }
       },
       "ACTIVE": {
         "LABEL": "Tema activo",
