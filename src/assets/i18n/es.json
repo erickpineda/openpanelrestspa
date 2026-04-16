@@ -376,7 +376,7 @@
       },
       "STUDIO": {
         "OPEN": "Abrir Studio",
-        "BREADCRUMB": "Configuración / Temas / Studio",
+        "TITLE": "Theme Studio",
         "ADVANCED_TOGGLE": "Modo avanzado (soy técnico)",
         "ADVANCED_REQUIRED": "Activa el modo avanzado para ver esta sección",
         "SECTIONS": "Secciones",

@@ -282,7 +282,7 @@
       },
       "STUDIO": {
         "OPEN": "Open Studio",
-        "BREADCRUMB": "Configuration / Themes / Studio",
+        "TITLE": "Theme Studio",
         "ADVANCED_TOGGLE": "Advanced mode (I'm technical)",
         "ADVANCED_REQUIRED": "Enable advanced mode to see this section",
         "SECTIONS": "Sections",

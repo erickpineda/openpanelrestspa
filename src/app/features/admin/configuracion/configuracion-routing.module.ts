@@ -5,9 +5,9 @@ import { AjustesComponent } from './ajustes/ajustes.component';
 import { TemaStudioComponent } from './temas/studio/tema-studio.component';
 
 const routes: Routes = [
-  { path: 'temas/:slug', component: TemaStudioComponent },
-  { path: 'temas', component: TemasComponent, pathMatch: 'full' },
-  { path: 'ajustes', component: AjustesComponent },
+  { path: 'temas/:slug', component: TemaStudioComponent, data: { title: 'ADMIN.THEMES.STUDIO.TITLE' } },
+  { path: 'temas', component: TemasComponent, pathMatch: 'full', data: { title: 'MENU.THEMES' } },
+  { path: 'ajustes', component: AjustesComponent, data: { title: 'MENU.SETTINGS' } },
   { path: '', redirectTo: 'temas', pathMatch: 'full' },
 ];
 
