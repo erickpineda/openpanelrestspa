@@ -417,6 +417,23 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
     this.simpleForm.patchValue(patch, { emitEvent: false });
   }
 
+  private syncDraftTokensFromSimple(): void {
+    const obj = this.safeParseJsonObject(this.draftTokensJson);
+    const v = this.simpleForm.value || {};
+
+    this.simpleTokenKeys.forEach((k) => {
+      const val = (v as any)[k];
+      if (val == null || String(val).trim() === '') {
+        delete obj[k];
+      } else {
+        obj[k] = String(val).trim();
+      }
+    });
+
+    this.draftTokensJson = JSON.stringify(obj, null, 2);
+    this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
+  }
+
   private applySimpleTokensToRuntime(): void {
     // Preview local: aplicar solo los 6 tokens en :root (sin necesidad de tocar ThemeRuntimeService)
     const root = document.documentElement;
@@ -448,6 +465,9 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
 
   saveDraftFromSimple(): void {
     if (!this.tema?.slug) return;
+    // Importante: en modo Simple los cambios viven en el formulario.
+    // Antes de guardar, debemos volcar esos 6 tokens al draftTokensJson.
+    this.syncDraftTokensFromSimple();
     this.saveDraftInternal();
   }
 
