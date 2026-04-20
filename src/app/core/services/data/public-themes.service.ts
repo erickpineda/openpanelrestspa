@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpContext, HttpHeaders } from '@angular/common/http';
+import { HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseService } from '../../_utils/base.service';
@@ -32,15 +32,10 @@ export class PublicThemesService extends BaseService {
     skipLoader: boolean = true
   ): Observable<PublicTheme> {
     const context = skipLoader ? new HttpContext().set(SKIP_GLOBAL_LOADER, true) : undefined;
-    const params = { previewThemeSlug, previewToken };
+    // Hardening sin romper CORS: usar cache-buster como query param (evita headers custom en preflight)
+    const params = { previewThemeSlug, previewToken, _ts: Date.now() };
 
-    // Hardening: evitar cachés intermedias
-    const headers = this.setHeaders({
-      'Cache-Control': 'no-store',
-      Pragma: 'no-cache',
-    });
-
-    return this.get<PublicTheme>(`${this.endpoint}/preview`, params, headers, context).pipe(
+    return this.get<PublicTheme>(`${this.endpoint}/preview`, params, undefined, context).pipe(
       map((resp) => resp?.data as PublicTheme)
     );
   }
