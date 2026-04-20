@@ -262,6 +262,7 @@
       "TITLE": "Temas",
       "SUBTITLE": "Gestión de temas y apariencia",
       "PREVIEW_FALLBACK": "La preview por token no está disponible ahora mismo. Se muestra el tema activo.",
+      "PREVIEW_CUSTOMCSS_BLOCKED": "El custom CSS de la metadata ha sido bloqueado (no pasa la whitelist).",
       "TABLE": {
         "NAME": "Nombre",
         "ACTIVE": "Activo",

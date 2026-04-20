@@ -9,6 +9,8 @@ import { RouteTrackerService } from './core/services/auth/route-tracker.service'
 import { OPConstants } from './shared/constants/op-global.constants';
 import { GlobalErrorHandlerService } from './core/errors/global-error/global-error-handler.service';
 import { UiAnomalyMonitorService } from './core/services/ui/ui-anomaly-monitor.service';
+import { ToastService } from './core/services/ui/toast.service';
+import { TranslationService } from './core/services/translation.service';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from '@shared/components/icons/coreui-icons';
 import { GtmService } from './core/services/analytics/gtm.service';
@@ -27,6 +29,7 @@ import { filter } from 'rxjs/operators';
 export class AppComponent implements OnInit {
   title = 'openpanelspa';
   loading: boolean = false;
+  private lastPreviewFallbackAt = 0;
 
   constructor(
     private router: Router,
@@ -38,6 +41,8 @@ export class AppComponent implements OnInit {
     private tokenStorage: TokenStorageService,
     private globalErrorHandler: GlobalErrorHandlerService,
     private uiMonitor: UiAnomalyMonitorService,
+    private toast: ToastService,
+    private i18n: TranslationService,
     private iconSetService: IconSetService,
     private gtm: GtmService,
     private analyticsRouter: AnalyticsRouterService,
@@ -83,5 +88,23 @@ export class AppComponent implements OnInit {
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
       this.themeRuntime.initFromRoute(this.route).subscribe();
     });
+
+    // Aviso UX: si el preview por token falla y se hace fallback a tema activo,
+    // mostramos un toast para evitar sensación de "aleatorio".
+    try {
+      window.addEventListener('op-theme-preview-fallback', (ev: any) => {
+        const now = Date.now();
+        // throttle suave para evitar spam (por retries)
+        if (now - this.lastPreviewFallbackAt < 1500) return;
+        this.lastPreviewFallbackAt = now;
+        const kind = String(ev?.detail?.kind || '');
+        const body =
+          kind === 'custom_css_blocked'
+            ? this.i18n.instant('ADMIN.THEMES.PREVIEW_CUSTOMCSS_BLOCKED')
+            : this.i18n.instant('ADMIN.THEMES.PREVIEW_FALLBACK');
+        const title = this.i18n.instant('MENU.THEMES');
+        this.toast.showInfo(body, title, { delay: 6000 });
+      });
+    } catch {}
   }
 }

@@ -426,11 +426,13 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
     // No mutar draftTokensJson al abrir la preview: construir un payload "virtual"
     // a partir del borrador actual + el formulario (modo Simple).
     const tokensJsonForPreview = this.buildTokensJsonForSimplePreview(this.draftTokensJson);
+    const metadataJsonForPreview = this.draftMetadataJson || '';
 
     const key = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
     const payload = {
       slug,
       tokensJson: tokensJsonForPreview || '{}',
+      metadataJson: metadataJsonForPreview || '',
       // cssUrl/assetsUrl se pueden incorporar en una fase posterior si el borrador es CSS_PACKAGE
       cssUrl: null,
       assetsUrl: null,
@@ -632,9 +634,14 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
             window.open(finalUrl, '_blank');
             return;
           }
+          // Guardar metadata local para que el preview por token (en este navegador) también pueda aplicarla.
+          // Nota: si copias el enlace a otro dispositivo, no tendrá acceso a esta metadata.
+          const metaKey = this.savePreviewMetadataForCurrentBrowser();
+
           const here = this.buildUrlWithPreviewParams(this.router.url, {
             previewThemeSlug,
             previewToken,
+            ...(metaKey ? { metaKey } : {}),
           });
           window.open(here, '_blank');
         } catch {
@@ -645,13 +652,26 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
     });
   }
 
+  private savePreviewMetadataForCurrentBrowser(): string | null {
+    const metadataJson = (this.draftMetadataJson || '').trim();
+    if (!metadataJson) return null;
+    const key = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+    const payload = { metadataJson, createdAt: new Date().toISOString() };
+    try {
+      localStorage.setItem(`op-theme-preview-meta:${key}`, JSON.stringify(payload));
+      return key;
+    } catch {
+      return null;
+    }
+  }
+
   private buildUrlWithPreviewParams(basePathOrUrl: string, params: Record<string, string>): string {
     const origin = window.location.origin;
     const base = basePathOrUrl.startsWith('http') ? basePathOrUrl : `${origin}${basePathOrUrl}`;
     const u = new URL(base);
 
     // Limpieza: evitar mezclar previews antiguas
-    ['previewThemeSlug', 'previewToken', 'localThemeKey', '_ts'].forEach((k) => u.searchParams.delete(k));
+    ['previewThemeSlug', 'previewToken', 'localThemeKey', 'metaKey', '_ts'].forEach((k) => u.searchParams.delete(k));
     Object.entries(params).forEach(([k, v]) => {
       if (v != null && String(v).trim() !== '') u.searchParams.set(k, String(v));
     });

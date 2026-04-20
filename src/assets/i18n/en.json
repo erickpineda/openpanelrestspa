@@ -168,6 +168,7 @@
       "TITLE": "Themes",
       "SUBTITLE": "Themes and appearance management",
       "PREVIEW_FALLBACK": "Token preview is not available right now. Showing the active theme.",
+      "PREVIEW_CUSTOMCSS_BLOCKED": "Custom CSS from metadata was blocked (does not pass the whitelist).",
       "TABLE": {
         "NAME": "Name",
         "ACTIVE": "Active",
