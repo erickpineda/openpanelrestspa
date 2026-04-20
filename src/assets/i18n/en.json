@@ -44,6 +44,7 @@
     "SAVE_CHANGES": "Save Changes",
     "CREATE_ROLE": "Create Role",
     "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
     "CLEAN": "Clean",
     "ID": "ID",
     "NO_DESCRIPTION": "No description",
@@ -166,6 +167,7 @@
     "THEMES": {
       "TITLE": "Themes",
       "SUBTITLE": "Themes and appearance management",
+      "PREVIEW_FALLBACK": "Token preview is not available right now. Showing the active theme.",
       "TABLE": {
         "NAME": "Name",
         "ACTIVE": "Active",
@@ -307,6 +309,15 @@
           "ACTIVATE": "Activate",
           "DEACTIVATE": "Deactivate"
         },
+        "TOOLTIPS": {
+          "PREVIEW_LOCAL": "Preview (local)",
+          "PREVIEW_OPTIONS": "Preview options",
+          "PUBLISH": "Publish",
+          "ACTIVATE": "Activate",
+          "ROLLBACK": "Rollback",
+          "DEACTIVATE": "Deactivate"
+        },
+        "SAVING_WAIT": "Saving draft… please wait before opening the preview",
         "OVERVIEW": {
           "TITLE": "Theme Studio",
           "DESC": "Workspace to manage the theme without a crowded modal.",
@@ -318,6 +329,13 @@
         "SIMPLE": {
           "TITLE": "Simple editing (recommended)",
           "DESC": "Adjust the main tokens without editing JSON.",
+          "LIVE_PREVIEW": "Apply live changes",
+          "RESET": "Reset view",
+          "RESET_OK": "View reset and unsaved changes discarded",
+          "RESET_DRAFT": "Reset draft",
+          "RESET_DRAFT_CONFIRM": "The 6 recommended tokens (primary/bg/text/border…) will be removed from the draft. Continue?",
+          "QUICK_PREVIEW": "Quick preview",
+          "QUICK_PREVIEW_HELP": "If you don't notice changes, check this preview: it shows Primary, Border and Text clearly even if the rest of the Admin isn't using them.",
           "PRIMARY": "Primary",
           "PRIMARY_RGB": "Primary RGB",
           "BG": "Background",
@@ -327,7 +345,13 @@
         },
         "PREVIEW": {
           "TITLE": "Preview",
-          "DESC": "Generate a temporary link to view the theme without activating it."
+          "DESC": "Preview the theme. If token preview is intermittent, use local preview.",
+          "LOCAL": "Local preview (recommended)",
+          "LOCAL_HERE": "Local preview (this page)",
+          "LOCAL_HOME": "Local preview (Home)",
+          "SHARE": "Token preview (shareable)",
+          "SHARE_HERE": "Token preview (this page)",
+          "SHARE_HOME": "Token preview (Home)"
         },
         "SETTINGS": {
           "TITLE": "Settings",

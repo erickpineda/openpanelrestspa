@@ -134,6 +134,7 @@
     "SAVE_CHANGES": "Guardar Cambios",
     "CREATE_ROLE": "Crear Rol",
     "CANCEL": "Cancelar",
+    "CONFIRM": "Confirmar",
     "CLEAN": "Limpiar",
     "ID": "ID",
     "NO_DESCRIPTION": "Sin descripción",
@@ -260,6 +261,7 @@
     "THEMES": {
       "TITLE": "Temas",
       "SUBTITLE": "Gestión de temas y apariencia",
+      "PREVIEW_FALLBACK": "La preview por token no está disponible ahora mismo. Se muestra el tema activo.",
       "TABLE": {
         "NAME": "Nombre",
         "ACTIVE": "Activo",
@@ -401,6 +403,15 @@
           "ACTIVATE": "Activar",
           "DEACTIVATE": "Desactivar"
         },
+        "TOOLTIPS": {
+          "PREVIEW_LOCAL": "Preview (local)",
+          "PREVIEW_OPTIONS": "Opciones de preview",
+          "PUBLISH": "Publicar",
+          "ACTIVATE": "Activar",
+          "ROLLBACK": "Rollback",
+          "DEACTIVATE": "Desactivar"
+        },
+        "SAVING_WAIT": "Guardando borrador… espera un momento antes de abrir la preview",
         "OVERVIEW": {
           "TITLE": "Theme Studio",
           "DESC": "Espacio de trabajo para gestionar el tema sin un modal saturado.",
@@ -412,6 +423,13 @@
         "SIMPLE": {
           "TITLE": "Edición simple (recomendada)",
           "DESC": "Ajusta los tokens principales sin editar JSON.",
+          "LIVE_PREVIEW": "Aplicar cambios en vivo",
+          "RESET": "Reset vista",
+          "RESET_OK": "Vista restablecida y cambios no guardados descartados",
+          "RESET_DRAFT": "Reset borrador",
+          "RESET_DRAFT_CONFIRM": "Se eliminarán del borrador los 6 tokens recomendados (primary/bg/text/border…). ¿Continuar?",
+          "QUICK_PREVIEW": "Vista rápida",
+          "QUICK_PREVIEW_HELP": "Si no notas cambios, mira esta vista: aquí se ve claramente Primary, Border y Text aunque el resto del Admin no los esté usando.",
           "PRIMARY": "Primary",
           "PRIMARY_RGB": "Primary RGB",
           "BG": "Background",
@@ -421,7 +439,13 @@
         },
         "PREVIEW": {
           "TITLE": "Preview",
-          "DESC": "Genera un enlace temporal para ver el tema sin activarlo."
+          "DESC": "Previsualiza el tema. Si el preview por token falla de forma intermitente, usa el preview local.",
+          "LOCAL": "Preview local (recomendado)",
+          "LOCAL_HERE": "Preview local (esta página)",
+          "LOCAL_HOME": "Preview local (Home)",
+          "SHARE": "Preview por token (compartible)",
+          "SHARE_HERE": "Preview por token (esta página)",
+          "SHARE_HOME": "Preview por token (Home)"
         },
         "SETTINGS": {
           "TITLE": "Ajustes",

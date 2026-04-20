@@ -43,6 +43,8 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
   // UI state
   mode: StudioMode = 'simple';
   section: StudioSection = 'overview';
+  livePreviewEnabled = true; // aplica tokens al :root mientras editas en Simple
+  resetDraftModalVisible = false;
 
   // Cargas
   loading = false;
@@ -57,6 +59,7 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
 
   // Simple mode form (6 tokens recomendados)
   simpleForm: FormGroup;
+  private simpleDefaults: Record<string, string> = {};
   private simpleTokenKeys = [
     '--cui-primary',
     '--cui-primary-rgb',
@@ -69,6 +72,9 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
   // Draft (Avanzado)
   draftTokensJson = '{\n\n}';
   draftMetadataJson = '';
+  // Snapshot del último borrador cargado/guardado (para poder descartar cambios del modo Simple)
+  private baselineDraftTokensJson = '{\n\n}';
+  private baselineDraftMetadataJson = '';
   draftEditorMode: 'json' | 'table' = 'json';
   draftTokenRows: Array<{ key: string; value: string }> = [{ key: '', value: '' }];
 
@@ -102,6 +108,8 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
       '--cui-border-color': ['rgba(11,18,32,0.22)', [Validators.required]],
       '--cui-secondary-color': ['rgba(11,18,32,0.78)', [Validators.required]],
     });
+    // Defaults del modo Simple (para poder "resetear" el formulario de forma determinista)
+    this.simpleDefaults = { ...(this.simpleForm.getRawValue() as any) };
   }
 
   ngOnInit(): void {
@@ -116,13 +124,16 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
 
     // Re-aplicar preview local cuando cambien controles del modo simple
     this.simpleForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.applySimpleTokensToRuntime();
+      if (this.livePreviewEnabled) this.applySimpleTokensToRuntime();
     });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    // Al salir del Studio, restaurar el tema activo para evitar que queden colores “pegados” en el Admin.
+    this.removeSimpleLiveOverrides();
+    this.themeRuntime.refreshActive().subscribe();
   }
 
   // =========================
@@ -198,6 +209,8 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
           // Draft local (si no hay borrador, empezar vacío)
           this.draftTokensJson = draft?.tokensJson || '{\n\n}';
           this.draftMetadataJson = draft?.metadataJson || '';
+          this.baselineDraftTokensJson = this.draftTokensJson;
+          this.baselineDraftMetadataJson = this.draftMetadataJson;
           this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
 
           // Sincronizar valores del modo simple
@@ -373,8 +386,14 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
       tap(({ tema, versions, draft }: any) => {
         this.tema = tema || null;
         this.publishedVersions = versions || [];
-        this.draftTokensJson = draft?.tokensJson || this.draftTokensJson;
-        this.draftMetadataJson = draft?.metadataJson || this.draftMetadataJson;
+        // Si el backend devuelve draft (lo normal), lo tratamos como baseline.
+        // Si no (caso raro), mantenemos el baseline actual.
+        if (draft) {
+          this.draftTokensJson = draft?.tokensJson || '{\n\n}';
+          this.draftMetadataJson = draft?.metadataJson || '';
+          this.baselineDraftTokensJson = this.draftTokensJson;
+          this.baselineDraftMetadataJson = this.draftMetadataJson;
+        }
         this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
         this.fillSimpleFormFromDraftTokens();
       }),
@@ -387,6 +406,205 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
   // =========================
 
   openPreview(): void {
+    if (this.savingDraft) {
+      this.toast.showInfo(this.translate.instant('ADMIN.THEMES.STUDIO.SAVING_WAIT'), this.translate.instant('MENU.THEMES'));
+      return;
+    }
+    // Compat: si en algún sitio llama a openPreview, mantenemos preview local.
+    this.openLocalPreview('current');
+  }
+
+  /**
+   * Preview local (no depende del endpoint /public/themes/preview).
+   * Evita la "aleatoriedad" cuando el backend de preview falla/intermitente.
+   * Nota: se basa en tokensJson (modo TOKENS_ONLY). Para CSS_PACKAGE, se previsualiza solo lo tokenizable.
+   */
+  openLocalPreview(target: 'current' | 'home' = 'current'): void {
+    const slug = this.tema?.slug || this.slug;
+    if (!slug) return;
+
+    // No mutar draftTokensJson al abrir la preview: construir un payload "virtual"
+    // a partir del borrador actual + el formulario (modo Simple).
+    const tokensJsonForPreview = this.buildTokensJsonForSimplePreview(this.draftTokensJson);
+
+    const key = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+    const payload = {
+      slug,
+      tokensJson: tokensJsonForPreview || '{}',
+      // cssUrl/assetsUrl se pueden incorporar en una fase posterior si el borrador es CSS_PACKAGE
+      cssUrl: null,
+      assetsUrl: null,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Limpieza para evitar crecimiento infinito en localStorage
+    this.cleanupLocalPreviewStorage();
+
+    // IMPORTANTE: sessionStorage NO se comparte entre pestañas. Guardamos siempre en localStorage.
+    try {
+      localStorage.setItem(`op-theme-local-preview:${key}`, JSON.stringify(payload));
+    } catch {}
+    // opcional: también en sessionStorage (misma pestaña)
+    try {
+      sessionStorage.setItem(`op-theme-local-preview:${key}`, JSON.stringify(payload));
+    } catch {}
+
+    const url = `/home?localThemeKey=${encodeURIComponent(key)}`;
+    const basePath = target === 'home' ? '/home' : this.router.url;
+    const finalUrl = this.buildUrlWithPreviewParams(basePath, { localThemeKey: key });
+    window.open(finalUrl, '_blank');
+  }
+
+  private buildTokensJsonForSimplePreview(baseTokensJson: string): string {
+    const obj = this.safeParseJsonObject(baseTokensJson);
+    const v = this.simpleForm.value || {};
+    this.simpleTokenKeys.forEach((k) => {
+      const val = (v as any)[k];
+      if (val == null || String(val).trim() === '') {
+        delete obj[k];
+      } else {
+        obj[k] = String(val).trim();
+      }
+    });
+    return JSON.stringify(obj, null, 2);
+  }
+
+  private cleanupLocalPreviewStorage(maxEntries = 20, maxAgeMs = 24 * 60 * 60 * 1000): void {
+    // El payload puede ser grande; limpiamos previos antiguos para evitar cuota de storage.
+    try {
+      const prefix = 'op-theme-local-preview:';
+      const keys: Array<{ key: string; ts: number }> = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k || !k.startsWith(prefix)) continue;
+        const raw = localStorage.getItem(k) || '';
+        let ts = 0;
+        try {
+          const obj: any = JSON.parse(raw);
+          ts = Date.parse(obj?.createdAt || '');
+        } catch {}
+        keys.push({ key: k, ts: isNaN(ts) ? 0 : ts });
+      }
+
+      const now = Date.now();
+      // 1) por antigüedad
+      keys.forEach(({ key, ts }) => {
+        if (ts > 0 && now - ts > maxAgeMs) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      // 2) por máximo de entradas
+      const remaining: Array<{ key: string; ts: number }> = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k || !k.startsWith(prefix)) continue;
+        const raw = localStorage.getItem(k) || '';
+        let ts = 0;
+        try {
+          const obj: any = JSON.parse(raw);
+          ts = Date.parse(obj?.createdAt || '');
+        } catch {}
+        remaining.push({ key: k, ts: isNaN(ts) ? 0 : ts });
+      }
+      if (remaining.length > maxEntries) {
+        const sorted = remaining.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        sorted.slice(maxEntries).forEach(({ key }) => localStorage.removeItem(key));
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  toggleLivePreview(enabled: boolean): void {
+    this.livePreviewEnabled = !!enabled;
+    if (!this.livePreviewEnabled) {
+      // Restaurar el tema activo para limpiar overrides temporales
+      this.removeSimpleLiveOverrides();
+      this.themeRuntime.refreshActive().subscribe();
+    } else {
+      this.applySimpleTokensToRuntime();
+    }
+    this.cdr.detectChanges();
+  }
+
+  resetLivePreview(): void {
+    // Reset "de verdad" para el modo Simple:
+    // 1) desactivar live preview
+    // 2) quitar overrides del :root
+    // 3) volver a cargar el formulario desde el borrador baseline (descarta cambios no guardados)
+    // 4) reaplicar tema activo (limpia cualquier tinte en la UI)
+    this.livePreviewEnabled = false;
+    this.removeSimpleLiveOverrides();
+    this.draftTokensJson = this.baselineDraftTokensJson || '{\n\n}';
+    this.draftMetadataJson = this.baselineDraftMetadataJson || '';
+    this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
+    this.fillSimpleFormFromDraftTokens();
+    this.themeRuntime.refreshActive().subscribe();
+    this.toast.showInfo(
+      this.translate.instant('ADMIN.THEMES.STUDIO.SIMPLE.RESET_OK'),
+      this.translate.instant('MENU.THEMES')
+    );
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Resetea el borrador (solo los 6 tokens recomendados) y lo guarda.
+   * Esto SÍ “persiste” el reset.
+   */
+  resetSimpleDraftAndSave(): void {
+    // Mantener compatibilidad (si algún sitio lo llama): abrir modal
+    this.openResetDraftModal();
+  }
+
+  openResetDraftModal(): void {
+    this.resetDraftModalVisible = true;
+    this.cdr.detectChanges();
+  }
+
+  closeResetDraftModal(): void {
+    this.resetDraftModalVisible = false;
+    this.cdr.detectChanges();
+  }
+
+  confirmResetDraftAndSave(): void {
+    this.resetDraftModalVisible = false;
+    this.performResetSimpleDraftAndSave();
+  }
+
+  private performResetSimpleDraftAndSave(): void {
+    // Quitar overrides visuales
+    this.livePreviewEnabled = false;
+    this.removeSimpleLiveOverrides();
+
+    // Partir del baseline (último borrador guardado/cargado) para no tocar otros tokens del preset
+    const obj = this.safeParseJsonObject(this.baselineDraftTokensJson || this.draftTokensJson);
+    this.simpleTokenKeys.forEach((k) => delete obj[k]);
+    this.draftTokensJson = JSON.stringify(obj, null, 2);
+    this.draftTokenRows = this.buildTokenRowsFromJson(this.draftTokensJson);
+    this.fillSimpleFormFromDraftTokens(); // quedará con defaults
+
+    // Guardar directamente (NO usar saveDraftFromSimple, porque re-sincroniza y reintroduce tokens)
+    this.saveDraftInternal();
+  }
+
+  private removeSimpleLiveOverrides(): void {
+    // Importante: los overrides del modo Simple se aplican directamente al :root,
+    // por lo que ThemeRuntimeService no los “conoce” y no los elimina.
+    // Aquí los limpiamos explícitamente.
+    const root = document.documentElement;
+    this.simpleTokenKeys.forEach((k) => {
+      try {
+        root.style.removeProperty(k);
+      } catch {}
+    });
+  }
+
+  /**
+   * Preview "shareable" usando token del backend.
+   * Útil para compartir con otros usuarios/dispositivos.
+   */
+  openShareablePreview(target: 'current' | 'home' = 'current'): void {
     const t = this.tema;
     if (!t?.slug) return;
     if (!(t as any).draft && !(t as any).published) {
@@ -398,10 +616,46 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
       next: (resp) => {
         const url = (resp as any)?.previewUrl || '';
         const finalUrl = url.startsWith('/') ? `${window.location.origin}${url}` : url;
-        if (finalUrl) window.open(finalUrl, '_blank');
+        if (!finalUrl) return;
+
+        if (target === 'home') {
+          window.open(finalUrl, '_blank');
+          return;
+        }
+
+        // Transformar el previewUrl (normalmente /home?... ) a "ruta actual + query params"
+        try {
+          const u = new URL(finalUrl);
+          const previewThemeSlug = u.searchParams.get('previewThemeSlug') || '';
+          const previewToken = u.searchParams.get('previewToken') || '';
+          if (!previewThemeSlug || !previewToken) {
+            window.open(finalUrl, '_blank');
+            return;
+          }
+          const here = this.buildUrlWithPreviewParams(this.router.url, {
+            previewThemeSlug,
+            previewToken,
+          });
+          window.open(here, '_blank');
+        } catch {
+          window.open(finalUrl, '_blank');
+        }
       },
       error: (err) => this.toast.showError(this.extractApiErrorMessage(err), this.translate.instant('MENU.THEMES')),
     });
+  }
+
+  private buildUrlWithPreviewParams(basePathOrUrl: string, params: Record<string, string>): string {
+    const origin = window.location.origin;
+    const base = basePathOrUrl.startsWith('http') ? basePathOrUrl : `${origin}${basePathOrUrl}`;
+    const u = new URL(base);
+
+    // Limpieza: evitar mezclar previews antiguas
+    ['previewThemeSlug', 'previewToken', 'localThemeKey', '_ts'].forEach((k) => u.searchParams.delete(k));
+    Object.entries(params).forEach(([k, v]) => {
+      if (v != null && String(v).trim() !== '') u.searchParams.set(k, String(v));
+    });
+    return u.toString();
   }
 
   // =========================
@@ -410,11 +664,12 @@ export class TemaStudioComponent implements OnInit, OnDestroy {
 
   private fillSimpleFormFromDraftTokens(): void {
     const obj = this.safeParseJsonObject(this.draftTokensJson);
-    const patch: any = {};
+    const next: any = { ...this.simpleDefaults };
     this.simpleTokenKeys.forEach((k) => {
-      if (obj[k] != null) patch[k] = String(obj[k]);
+      if (obj[k] != null) next[k] = String(obj[k]);
     });
-    this.simpleForm.patchValue(patch, { emitEvent: false });
+    // setValue fuerza a sobreescribir TODOS los campos (evita que queden valores “pegados”)
+    this.simpleForm.setValue(next, { emitEvent: false });
   }
 
   private syncDraftTokensFromSimple(): void {
