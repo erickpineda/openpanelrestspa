@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, map, of, switchMap, tap } from 'rxjs';
+import { retry } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 import { PublicThemesService } from '@app/core/services/data/public-themes.service';
 import { PublicTheme } from '@app/core/models/public-theme.model';
 import { environment } from '@env/environment';
@@ -23,15 +25,23 @@ export class ThemeRuntimeService {
     const previewToken = qp.get('previewToken');
 
     if (previewThemeSlug && previewToken) {
-      return this.publicThemes.getPreview(previewThemeSlug, previewToken).pipe(
+      // Usar modo estricto para evitar fallback silencioso a "default" en caso de error.
+      return this.publicThemes.getPreviewStrict(previewThemeSlug, previewToken).pipe(
+        retry(1),
         // Incluir token para que re-aplique si cambia la preview (p.ej. nuevo token tras modificar borrador)
         tap((t) => this.applyTheme(t, `preview:${previewThemeSlug}:${previewToken}`)),
-        catchError(() =>
-          this.publicThemes.getActive().pipe(
-            tap((t) => this.applyTheme(t, 'active')),
-            map(() => void 0)
-          )
-        ),
+        catchError((err: HttpErrorResponse) => {
+          // Si el token es inválido/expiró, hacemos fallback a activo.
+          // Si es un fallo transitorio, preferimos NO sobreescribir el tema actual para evitar "parpadeos".
+          const status = err?.status ?? 0;
+          if (status === 401 || status === 403 || status === 404) {
+            return this.publicThemes.getActive().pipe(
+              tap((t) => this.applyTheme(t, 'active')),
+              map(() => void 0)
+            );
+          }
+          return of(void 0);
+        }),
         map(() => void 0)
       );
     }
