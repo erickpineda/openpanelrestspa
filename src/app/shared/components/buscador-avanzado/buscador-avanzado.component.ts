@@ -18,7 +18,7 @@ import {
 } from '../../utils/date-utils';
 
 /**
- * BuscadorAvanzadoComponent
+ * BuscadorAvanzadoComponent (v2)
  * - Editor recursivo de un árbol SearchQuery.node (group/condition).
  * - Renderiza campos/operaciones en base a SearchDefinitionsDTO.fields.
  * - Serializa date/datetime-local a los formatos públicos del backend.
