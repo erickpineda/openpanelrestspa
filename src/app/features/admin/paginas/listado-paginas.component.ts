@@ -26,6 +26,7 @@ import { parseAllowedDate } from '../../../shared/utils/date-utils';
 import { DatePipe } from '@angular/common';
 import { HttpContext } from '@angular/common/http';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../core/interceptor/skip-global-error.token';
+import { SearchDefinitions, SearchQuery } from '@app/shared/models/search.models';
 
 @Component({
   selector: 'app-listado-paginas',
@@ -58,6 +59,8 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
   dataOptionSeleccionada: string = 'AND';
   showAdvanced = false;
   basicSearchText = '';
+  private advancedActive: boolean = false;
+  private lastAdvancedQuery: SearchQuery | null = null;
 
   // UI State
   cargando: boolean = false;
@@ -161,7 +164,12 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   private inicializarCamposBusqueda(): void {
-    const campos = (this.definiciones.filterKeySegunClazzNamePermitido as string[]) || [];
+    const d = (this.definiciones?.data ?? this.definiciones) as SearchDefinitions | any;
+    const campos: string[] = Array.isArray(d?.fields)
+      ? (d.fields as any[])
+          .map((f: any) => String(f?.key ?? ''))
+          .filter((k: string) => k.length > 0)
+      : [];
 
     // Ordenar campos: 'titulo' primero, luego el resto alfabéticamente
     const camposOrdenados = [
@@ -170,8 +178,10 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     ];
 
     this.campoSeleccionado = camposOrdenados[0] || '';
-    const operaciones = this.definiciones.operationPermitido?.[this.campoSeleccionado];
-    this.operacionSeleccionada = Array.isArray(operaciones) ? operaciones[0] : '';
+    const fieldDef = Array.isArray(d?.fields)
+      ? d.fields.find((f: any) => f?.key === this.campoSeleccionado)
+      : null;
+    this.operacionSeleccionada = Array.isArray(fieldDef?.operations) ? fieldDef.operations[0] : '';
     this.valorBusqueda = '';
     this.currentPage = 0;
 
@@ -186,29 +196,10 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
     this.cargandoTabla = true;
     this.cdr.markForCheck();
 
-    // Filtro base: TipoEntrada = 'Página'
-    const searchCriteriaList = [
-      {
-        filterKey: 'tipoEntrada.nombre',
-        value: 'Página',
-        operation: 'CONTAINS',
-        clazzName: 'Entrada',
-      },
-    ];
-
-    if (term && this.campoSeleccionado) {
-      searchCriteriaList.push({
-        filterKey: this.campoSeleccionado,
-        value: term,
-        operation: this.operacionSeleccionada,
-        clazzName: 'Entrada',
-      });
-    }
-
-    const searchRequest = {
-      dataOption: 'AND', // Aseguramos AND para que cumpla ambas condiciones si hay búsqueda
-      searchCriteriaList: searchCriteriaList,
-    };
+    const searchRequest: SearchQuery =
+      this.advancedActive && this.lastAdvancedQuery
+        ? this.lastAdvancedQuery
+        : this.buildBasicQuery(term);
 
     const pageToUse = page !== undefined ? page : this.currentPage;
     return this.entradaService
@@ -418,36 +409,64 @@ export class ListadoPaginasComponent implements OnInit, OnDestroy, AfterViewInit
 
   public onBasicSearchTextChange(text: string): void {
     this.basicSearchText = text;
+    this.advancedActive = false;
+    this.lastAdvancedQuery = null;
     this.campoSeleccionado = 'titulo';
 
-    // Intentar obtener operación válida para título, por defecto CONTAINS
-    const operaciones = this.definiciones?.operationPermitido?.['titulo'];
+    // Intentar obtener operación válida para título, por defecto contains
+    const d = (this.definiciones?.data ?? this.definiciones) as SearchDefinitions | any;
+    const fieldDef = Array.isArray(d?.fields) ? d.fields.find((f: any) => f?.key === 'titulo') : null;
     this.operacionSeleccionada =
-      Array.isArray(operaciones) && operaciones.length > 0 ? operaciones[0] : 'CONTAINS';
+      Array.isArray(fieldDef?.operations) && fieldDef.operations.length > 0
+        ? fieldDef.operations[0]
+        : 'contains';
 
     this.valorBusqueda = text;
     this.currentPage = 0;
     this.busquedaService.triggerBusqueda(text);
   }
 
-  public aplicarFiltro(filtro: any): void {
-    this.campoSeleccionado = filtro.campo;
-    this.operacionSeleccionada = filtro.operacion;
-    this.valorBusqueda = filtro.valor;
+  public aplicarFiltro(query: SearchQuery): void {
+    this.advancedActive = true;
+    this.lastAdvancedQuery = this.withBasePaginaFilter(query);
     this.currentPage = 0;
     this.cdr.markForCheck();
 
-    if (this.campoSeleccionado && this.operacionSeleccionada) {
-      this.busquedaService.triggerBusqueda(this.valorBusqueda);
-    }
+    this.busquedaService.triggerBusqueda(this.valorBusqueda);
   }
 
-  public onFiltroChanged(filtro: any): void {
-    // Actualizar el estado interno pero no volver a disparar la búsqueda
-    this.campoSeleccionado = filtro.campo;
-    this.operacionSeleccionada = filtro.operacion;
-    this.valorBusqueda = filtro.valor;
+  public onFiltroChanged(query: SearchQuery): void {
+    this.advancedActive = true;
+    this.lastAdvancedQuery = this.withBasePaginaFilter(query);
     this.currentPage = 0;
+    this.busquedaService.triggerBusqueda(this.valorBusqueda);
+  }
+
+  private buildBasicQuery(term: string): SearchQuery {
+    const children: any[] = [
+      { type: 'condition', field: 'tipoEntrada.nombre', op: 'contains', value: 'Página' },
+    ];
+    if (term && this.campoSeleccionado) {
+      children.push({
+        type: 'condition',
+        field: this.campoSeleccionado,
+        op: this.operacionSeleccionada || 'contains',
+        value: term,
+      });
+    }
+    return {
+      node: children.length === 1 ? children[0] : { type: 'group', op: 'AND', children },
+    };
+  }
+
+  private withBasePaginaFilter(query: SearchQuery): SearchQuery {
+    const base = { type: 'condition', field: 'tipoEntrada.nombre', op: 'contains', value: 'Página' };
+    const incoming = query?.node as any;
+    if (!incoming) return { node: base as any };
+    if (incoming.type === 'group' && incoming.op === 'AND') {
+      return { node: { ...incoming, children: [base as any, ...(incoming.children || [])] } as any };
+    }
+    return { node: { type: 'group', op: 'AND', children: [base as any, incoming] } as any };
   }
 
   // #endregion

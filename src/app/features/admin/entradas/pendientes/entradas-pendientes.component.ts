@@ -10,6 +10,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize, takeUntil } from 'rxjs/operators';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 import { Entrada } from '@app/core/models/entrada.model';
+import { SearchQuery } from '@app/shared/models/search.models';
 
 @Component({
   selector: 'app-entradas-pendientes',
@@ -85,27 +86,26 @@ export class EntradasPendientesComponent implements OnInit, OnDestroy {
     this.cargando = true;
     this.cdr.markForCheck();
 
-    const criteriaList: any[] = [
+    const children: any[] = [
       {
-        filterKey: 'estadoEntrada.nombre',
+        type: 'condition',
+        field: 'estadoEntrada.nombre',
+        op: 'equal',
         value: 'PENDIENTE REVISION',
-        operation: 'EQUAL',
-        clazzName: 'Entrada',
       },
     ];
 
     if (this.searchTerm) {
-      criteriaList.push({
-        filterKey: 'titulo',
+      children.push({
+        type: 'condition',
+        field: 'titulo',
+        op: 'contains',
         value: this.searchTerm,
-        operation: 'CN',
-        clazzName: 'Entrada',
       });
     }
 
-    const searchRequest = {
-      dataOption: 'AND',
-      searchCriteriaList: criteriaList,
+    const searchRequest: SearchQuery = {
+      node: children.length === 1 ? children[0] : { type: 'group', op: 'AND', children },
     };
 
     this.entradaService

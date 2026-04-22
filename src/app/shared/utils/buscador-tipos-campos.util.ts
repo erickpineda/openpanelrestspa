@@ -1,7 +1,7 @@
 // Mapeo de tipos de campo para el BuscadorAvanzadoComponent
 // Extensible por entidad y campo. Usar 'string', 'number', 'date', 'boolean', 'select', etc.
 
-export type TipoCampoBuscador = 'string' | 'number' | 'date' | 'boolean' | 'select';
+export type TipoCampoBuscador = 'string' | 'number' | 'date' | 'datetime' | 'boolean' | 'select';
 
 export interface MapeoTiposCampos {
   [entidad: string]: {

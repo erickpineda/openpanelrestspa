@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AdvancedSearchParams } from '../models/search.models';
+import { SearchQuery } from '../models/search.models';
 
 interface SearchState {
   term: string;
-  advanced?: AdvancedSearchParams | null;
+  advanced?: SearchQuery | null;
   results: any[];
 }
 
@@ -20,7 +20,7 @@ export class SearchStoreService {
     this.state.next({ ...s, term });
   }
 
-  setAdvanced(params: AdvancedSearchParams | null): void {
+  setAdvanced(params: SearchQuery | null): void {
     const s = this.state.value;
     this.state.next({ ...s, advanced: params });
   }

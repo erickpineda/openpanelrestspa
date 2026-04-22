@@ -361,13 +361,16 @@ export class DetalleEntradaPublicComponent implements OnInit {
     const searchBy = (filterKey: string, value: string) => {
       const v = String(value ?? '').trim();
       if (!v) return;
-      const searchRequest: any = {
-        dataOption: 'ALL',
-        searchCriteriaList: [
-          { filterKey: 'publicada', operation: 'EQUAL', value: true, clazzName: 'Entrada' },
-          { filterKey: 'idEntrada', operation: 'NOT_EQUAL', value: idEntrada, clazzName: 'Entrada' },
-          { filterKey, operation: 'EQUAL', value: v, clazzName: 'Entrada' },
-        ],
+      const searchRequest = {
+        node: {
+          type: 'group',
+          op: 'AND',
+          children: [
+            { type: 'condition', field: 'publicada', op: 'equal', value: true },
+            { type: 'condition', field: 'idEntrada', op: 'not_equal', value: idEntrada },
+            { type: 'condition', field: filterKey, op: 'equal', value: v },
+          ],
+        },
       };
       this.relatedLoading = true;
       this.entradaService.buscarSafe(searchRequest, 0, this.relatedMaxItems, 'fechaPublicacion', 'DESC').subscribe({

@@ -3,7 +3,8 @@ import { of, throwError } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { ListadoEntradasStateService } from './listado-entradas-state.service';
 import { EntradaService } from '@app/core/services/data/entrada.service';
-import { AdvancedSearchParams } from '@app/shared/models/search.models';
+import { SearchQuery } from '@app/shared/models/search.models';
+import { SearchUtilService } from '@app/core/services/utils/search-util.service';
 
 describe('ListadoEntradasStateService', () => {
   let service: ListadoEntradasStateService;
@@ -15,22 +16,20 @@ describe('ListadoEntradasStateService', () => {
       providers: [
         ListadoEntradasStateService,
         { provide: EntradaService, useValue: entradaServiceSpy },
+        SearchUtilService,
       ],
     });
     service = TestBed.inject(ListadoEntradasStateService);
   });
 
-  it('searchAdvanced actualiza estado y llama buscarSafe', (done) => {
+  it('searchQuery actualiza estado y llama buscarSafe', (done) => {
     const mockResponse = { elements: [], totalPages: 1 };
     entradaServiceSpy.buscarSafe.and.returnValue(of(mockResponse as any));
 
-    const params: AdvancedSearchParams = {
-      dataOption: 'AND',
-      searchCriteriaList: [
-        { filterKey: 'titulo', operation: 'CONTAINS', value: 'abc', clazzName: 'Entrada' },
-      ],
+    const query: SearchQuery = {
+      node: { type: 'condition', field: 'titulo', op: 'contains', value: 'abc' },
     };
-    service.searchAdvanced(params, 0).subscribe({
+    service.searchQuery(query, 0).subscribe({
       next: () => {
         expect(entradaServiceSpy.buscarSafe).toHaveBeenCalled();
         service.pagingInfo$.pipe(take(1)).subscribe((pi: any) => {
@@ -42,21 +41,13 @@ describe('ListadoEntradasStateService', () => {
     });
   });
 
-  it('reloadCurrentPage usa búsqueda avanzada previa', (done) => {
+  it('reloadCurrentPage usa búsqueda previa (query)', (done) => {
     const mockResponse = { elements: [], totalPages: 2 };
     entradaServiceSpy.buscarSafe.and.returnValue(of(mockResponse as any));
-    const params: AdvancedSearchParams = {
-      dataOption: 'OR',
-      searchCriteriaList: [
-        {
-          filterKey: 'estadoEntrada.nombre',
-          operation: 'EQUAL',
-          value: 'Publicada',
-          clazzName: 'Entrada',
-        },
-      ],
+    const query: SearchQuery = {
+      node: { type: 'condition', field: 'estadoEntrada.nombre', op: 'equal', value: 'Publicada' },
     };
-    service.searchAdvanced(params, 0).subscribe(() => {
+    service.searchQuery(query, 0).subscribe(() => {
       service.reloadCurrentPage().subscribe({
         next: () => {
           expect(entradaServiceSpy.buscarSafe).toHaveBeenCalledTimes(2);
@@ -67,16 +58,13 @@ describe('ListadoEntradasStateService', () => {
     });
   });
 
-  it('goToPage sin parámetros usa criterios avanzados previos', (done) => {
+  it('goToPage sin parámetros usa query previa', (done) => {
     const mockResponse = { elements: [], totalPages: 5, totalElements: 100 };
     entradaServiceSpy.buscarSafe.and.returnValue(of(mockResponse as any));
-    const params: AdvancedSearchParams = {
-      dataOption: 'AND',
-      searchCriteriaList: [
-        { filterKey: 'titulo', operation: 'CONTAINS', value: 'algo', clazzName: 'Entrada' },
-      ],
+    const query: SearchQuery = {
+      node: { type: 'condition', field: 'titulo', op: 'contains', value: 'algo' },
     };
-    service.searchAdvanced(params, 0).subscribe({
+    service.searchQuery(query, 0).subscribe({
       next: () => {
         service.goToPage(3).subscribe({
           next: () => {
@@ -96,15 +84,12 @@ describe('ListadoEntradasStateService', () => {
     const mockResponse = { elements: [], totalPages: 1 };
     entradaServiceSpy.buscarSafe.and.returnValue(of(mockResponse as any));
 
-    // 1. Advanced Search
-    const advancedParams: AdvancedSearchParams = {
-      dataOption: 'AND',
-      searchCriteriaList: [
-        { filterKey: 'titulo', operation: 'CONTAINS', value: 'advanced', clazzName: 'Entrada' },
-      ],
+    // 1. Advanced Search (query)
+    const advancedQuery: SearchQuery = {
+      node: { type: 'condition', field: 'titulo', op: 'contains', value: 'advanced' },
     };
 
-    service.searchAdvanced(advancedParams, 0).subscribe(() => {
+    service.searchQuery(advancedQuery, 0).subscribe(() => {
       // 2. Basic Search
       const basicParams: any = {
         term: 'basic',
@@ -122,7 +107,8 @@ describe('ListadoEntradasStateService', () => {
           const args = entradaServiceSpy.buscarSafe.calls.mostRecent().args;
           const searchRequest = args[0];
           // Should be 'basic' value, not 'advanced'
-          expect(searchRequest.searchCriteriaList[0].value).toBe('basic');
+          expect(searchRequest?.node?.type).toBe('condition');
+          expect(searchRequest?.node?.value).toBe('basic');
           done();
         });
       });
