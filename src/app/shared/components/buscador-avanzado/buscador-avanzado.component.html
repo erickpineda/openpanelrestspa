@@ -162,9 +162,9 @@
     <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: root, parent: null, index: -1 }">
     </ng-container>
 
-    @if (adaptedDefs.indicaciones?.length) {
+    @if (adaptedDefs?.indicaciones.length) {
       <div class="mt-2 small text-muted">
-        @for (h of adaptedDefs.indicaciones; track h) {
+        @for (h of (adaptedDefs?.indicaciones ?? []); track h) {
           <div>• {{ h }}</div>
         }
       </div>
