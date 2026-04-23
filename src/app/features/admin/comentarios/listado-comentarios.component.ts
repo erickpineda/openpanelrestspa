@@ -285,7 +285,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     if (this.filtroUsuario) {
       children.push({
         type: 'condition',
-        field: 'username',
+        field: 'usuario.username',
         op: 'contains',
         value: this.filtroUsuario,
       });
