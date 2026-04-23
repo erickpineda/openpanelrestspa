@@ -103,6 +103,7 @@
               } @else {
                 @if (getFieldDef(node.field)?.tipo === 'boolean') {
                   <select cSelect cFormControl [(ngModel)]="node.value" (ngModelChange)="onNodeChange()">
+                    <option [ngValue]="''">{{ 'AUTO.SELECCIONE' | translate }}</option>
                     <option [ngValue]="true">{{ 'AUTO.S' | translate }}</option>
                     <option [ngValue]="false">{{ 'AUTO.NO' | translate }}</option>
                   </select>

@@ -197,13 +197,19 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
 
   // =================== DTO build ===================
   private buildQuery(): SearchQuery {
-    return { node: this.stripAndSerialize(this.root) };
+    const node = this.stripAndSerialize(this.root);
+    return { node: node ?? this.buildFallbackNode() };
   }
 
-  private stripAndSerialize(node: SearchNodeUI): SearchNode {
+  private stripAndSerialize(node: SearchNodeUI): SearchNode | null {
     if (node.type === 'group') {
       const g = node as SearchGroupNodeUI;
-      const children = (g.children || []).map((c) => this.stripAndSerialize(c));
+      const children = (g.children || [])
+          .map((c) => this.stripAndSerialize(c))
+          .filter((n): n is SearchNode => n != null);
+      if (children.length === 0) {
+        return null;
+      }
       return { type: 'group', op: g.op, children };
     }
 
@@ -216,6 +222,16 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     }
 
     let value: any = c.value;
+    if (this.isEmptyValue(value)) {
+      // Para string permitimos value '' (sirve como "no filtrar" con contains)
+      if (def?.tipo !== 'string') {
+        return null;
+      }
+      value = '';
+    }
+    if (def?.tipo === 'select' && value === '') {
+      return null;
+    }
     if (def?.tipo === 'date' && typeof value === 'string') {
       value = serializeDateInputToBackend(value) ?? value;
     }
@@ -224,6 +240,20 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     }
 
     return { type: 'condition', field: c.field, op, value };
+  }
+
+  private isEmptyValue(value: any): boolean {
+    return value === '' || value === null || value === undefined;
+  }
+
+  private buildFallbackNode(): SearchNode {
+    const fields = this.getOrderedFields();
+    const stringField = fields.find((f) => f.tipo === 'string')?.key;
+    if (stringField) {
+      return { type: 'condition', field: stringField, op: 'contains', value: '' };
+    }
+    const anyField = fields[0]?.key || '';
+    return { type: 'condition', field: anyField, op: 'not_null' };
   }
 
   // =================== UI node factories ===================
@@ -242,10 +272,14 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
 
   private createDefaultCondition(): SearchConditionNodeUI {
     const ordered = this.getOrderedFields();
+    const defaultFieldDef = this.defaultField
+      ? ordered.find((c) => c.key === this.defaultField)
+      : undefined;
+    // Evitar arrancar en boolean/number/select con value '', porque el backend darÃ­a 400.
     const field =
-      (this.defaultField && ordered.some((c) => c.key === this.defaultField)
-        ? this.defaultField
-        : ordered[0]?.key) || '';
+      (defaultFieldDef?.tipo === 'string'
+        ? defaultFieldDef.key
+        : ordered.find((c) => c.tipo === 'string')?.key || ordered[0]?.key) || '';
     const ops = this.getOperationsForField(field);
     const op = (ops[0]?.value as any) || 'contains';
     return { type: 'condition', field, op, value: '', _id: this.nextId() };
