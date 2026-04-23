@@ -138,7 +138,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
   private fetchPrivilegiosRecursively(codigos: string[], pageNo: number, roles: Rol[]): void {
     const PAGE_SIZE = 50;
     this.rolService
-      .obtenerPorCodigos(codigos, pageNo, PAGE_SIZE)
+      .obtenerPrivilegiosPorCodigos(codigos, pageNo, PAGE_SIZE)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: any) => {
@@ -149,7 +149,9 @@ export class RolesListComponent implements OnInit, OnDestroy {
               ? data
               : [];
           elements.forEach((item: any) => {
-            const rol = roles.find((r) => r.nombre === item.rolNombre);
+            const rol = roles.find(
+              (r) => (r.nombre || '').toUpperCase() === (item.rolNombre || '').toUpperCase()
+            );
             if (rol) {
               const priv = new Privilegio();
               priv.idPrivilegio = item.idPrivilegio;

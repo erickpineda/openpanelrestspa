@@ -41,6 +41,14 @@ export class RolService extends CrudService<Rol, string> {
     return this.post<any>(`${this.endpoint}/obtenerPorCodigos`, payload, params);
   }
 
+  obtenerPrivilegiosPorCodigos(codigos: string[], pageNo: number = 0, pageSize: number = 50): Observable<any> {
+    const params: any = {};
+    params[OPConstants.Pagination.PAGE_NO_PARAM] = pageNo.toString();
+    params[this.pageSizeParam] = pageSize.toString();
+    const payload = { codigosRol: codigos };
+    return this.post<any>(`${this.endpoint}/obtenerPrivilegiosPorCodigos`, payload, params);
+  }
+
   // Overrides for code-based endpoints
   override obtenerPorId(codigo: string, context?: HttpContext): Observable<any> {
     return this.get<any>(
