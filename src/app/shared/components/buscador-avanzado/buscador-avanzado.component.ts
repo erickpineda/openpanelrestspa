@@ -157,6 +157,19 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     return [];
   }
 
+  /**
+   * Para campos de catálogo (p.ej. categoria/estado/tipo), cuando la operación es
+   * equal / not_equal se debe mostrar un selector (desplegable) con los valores del catálogo.
+   */
+  public shouldUseCatalogSelect(node: SearchConditionNodeUI): boolean {
+    if (!node) return false;
+    const fieldKey = String(node.field || '');
+    if (!fieldKey) return false;
+    if (!this.camposCatalogo.includes(fieldKey)) return false;
+    if (!this.isEqualityOp(node.op)) return false;
+    return this.getSelectOptions(fieldKey).length > 0;
+  }
+
   public shouldShowValueInput(node: SearchConditionNodeUI): boolean {
     return !(node.op === 'null' || node.op === 'not_null');
   }
@@ -205,32 +218,30 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     if (node.type === 'group') {
       const g = node as SearchGroupNodeUI;
       const children = (g.children || [])
-          .map((c) => this.stripAndSerialize(c))
-          .filter((n): n is SearchNode => n != null);
-      if (children.length === 0) {
-        return null;
-      }
+        .map((c) => this.stripAndSerialize(c))
+        .filter((n): n is SearchNode => n != null);
+      if (children.length === 0) return null;
       return { type: 'group', op: g.op, children };
     }
 
     const c = node as SearchConditionNodeUI;
     const def = this.getFieldDef(c.field);
     const op = String(c.op ?? '').trim();
+    const opLower = op.toLowerCase();
 
-    if (op === 'null' || op === 'not_null') {
+    if (opLower === 'null' || opLower === 'not_null') {
       return { type: 'condition', field: c.field, op };
     }
 
     let value: any = c.value;
-    if (this.isEmptyValue(value)) {
-      // Para string permitimos value '' (sirve como "no filtrar" con contains)
-      if (def?.tipo !== 'string') {
+    // Evitar enviar criterios incompletos (p.ej. equal con value vacío), porque el backend devuelve 400.
+    if (value === '' || value === null || value === undefined) {
+      // Permitir contains '' en string como "match-all" (no filtra, pero es válido)
+      const isContains = opLower === 'contains';
+      const isString = (def?.tipo || 'string') === 'string';
+      if (!(isContains && isString)) {
         return null;
       }
-      value = '';
-    }
-    if (def?.tipo === 'select' && value === '') {
-      return null;
     }
     if (def?.tipo === 'date' && typeof value === 'string') {
       value = serializeDateInputToBackend(value) ?? value;
@@ -242,10 +253,6 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     return { type: 'condition', field: c.field, op, value };
   }
 
-  private isEmptyValue(value: any): boolean {
-    return value === '' || value === null || value === undefined;
-  }
-
   private buildFallbackNode(): SearchNode {
     const fields = this.getOrderedFields();
     const stringField = fields.find((f) => f.tipo === 'string')?.key;
@@ -254,6 +261,11 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     }
     const anyField = fields[0]?.key || '';
     return { type: 'condition', field: anyField, op: 'not_null' };
+  }
+
+  private isEqualityOp(op: any): boolean {
+    const o = String(op || '').toLowerCase();
+    return o === 'equal' || o === 'not_equal';
   }
 
   // =================== UI node factories ===================
@@ -272,14 +284,10 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
 
   private createDefaultCondition(): SearchConditionNodeUI {
     const ordered = this.getOrderedFields();
-    const defaultFieldDef = this.defaultField
-      ? ordered.find((c) => c.key === this.defaultField)
-      : undefined;
-    // Evitar arrancar en boolean/number/select con value '', porque el backend darÃ­a 400.
     const field =
-      (defaultFieldDef?.tipo === 'string'
-        ? defaultFieldDef.key
-        : ordered.find((c) => c.tipo === 'string')?.key || ordered[0]?.key) || '';
+      (this.defaultField && ordered.some((c) => c.key === this.defaultField)
+        ? this.defaultField
+        : ordered[0]?.key) || '';
     const ops = this.getOperationsForField(field);
     const op = (ops[0]?.value as any) || 'contains';
     return { type: 'condition', field, op, value: '', _id: this.nextId() };
