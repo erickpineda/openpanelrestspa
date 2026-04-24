@@ -167,7 +167,9 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     if (!fieldKey) return false;
     if (!this.camposCatalogo.includes(fieldKey)) return false;
     if (!this.isEqualityOp(node.op)) return false;
-    return this.getSelectOptions(fieldKey).length > 0;
+    // Importante (UX): aunque el catálogo aún esté cargando, mostramos el <select>
+    // y renderizamos un placeholder de "cargando" hasta que lleguen opciones.
+    return true;
   }
 
   public shouldShowValueInput(node: SearchConditionNodeUI): boolean {

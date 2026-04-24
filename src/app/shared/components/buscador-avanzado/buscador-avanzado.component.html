@@ -102,10 +102,22 @@
                 <div class="text-muted small">Sin valor</div>
               } @else {
                 @if (shouldUseCatalogSelect(node)) {
-                  <select cSelect cFormControl [(ngModel)]="node.value" (ngModelChange)="onNodeChange()">
-                    <option [ngValue]="''">{{ 'AUTO.SELECCIONE' | translate }}</option>
-                    @for (opt of getSelectOptions(node.field); track opt) {
-                      <option [ngValue]="opt">{{ opt }}</option>
+                  <select
+                    cSelect
+                    cFormControl
+                    [(ngModel)]="node.value"
+                    (ngModelChange)="onNodeChange()"
+                    [disabled]="getSelectOptions(node.field).length === 0"
+                  >
+                    @if (getSelectOptions(node.field).length === 0) {
+                      <option [ngValue]="''" [disabled]="true">
+                        {{ 'COMMON.LOADING' | translate }}...
+                      </option>
+                    } @else {
+                      <option [ngValue]="''">{{ 'AUTO.SELECCIONE' | translate }}</option>
+                      @for (opt of getSelectOptions(node.field); track opt) {
+                        <option [ngValue]="opt">{{ opt }}</option>
+                      }
                     }
                   </select>
                 } @else if (getFieldDef(node.field)?.tipo === 'boolean') {
