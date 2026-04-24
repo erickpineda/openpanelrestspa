@@ -43,8 +43,8 @@ export interface SearchConditionNode {
    * Debe omitirse para `null` / `not_null`.
    *
    * Nota (fechas):
-   * - date: 'dd-MM-yyyy'
-   * - datetime: 'dd-MM-yyyy HH:mm:ss' (Europe/Madrid)
+   * - date: 'yyyy-MM-dd'
+   * - datetime: 'yyyy-MM-ddTHH:mm:ss' (ISO-8601)
    */
   value?: any;
 }

@@ -59,4 +59,14 @@ describe('SearchUtilService', () => {
     expect(req.node.type).toBe('condition');
     expect((req.node as any).field).toBe('titulo');
   });
+
+  it('buildCondition should serialize date and datetime-local to final contract', () => {
+    const service = new SearchUtilService();
+
+    const dateNode = service.buildCondition('fechaPublicacion', 'equal', '2026-04-24');
+    const dateTimeNode = service.buildCondition('fechaPublicacion', 'equal', '2026-04-24T10:15');
+
+    expect(dateNode?.value).toBe('2026-04-24');
+    expect(dateTimeNode?.value).toBe('2026-04-24T10:15:00');
+  });
 });
