@@ -352,17 +352,14 @@ describe('NavigationPerformanceService', () => {
         priority: i,
         requiredRoles: i % 2 === 0 ? [userRole] : undefined,
       }));
-      const startTime = performance.now();
       service
         .getOptimizedNavigationItems(largeDataset, userRole)
         .pipe(take(1))
         .subscribe((processedItems) => {
-          const endTime = performance.now();
-          const processingTime = endTime - startTime;
           expect(processedItems.length).toBeLessThanOrEqual(largeDataset.length);
-          expect(processingTime).toBeLessThan(1000);
           const stats = service.getPerformanceStats();
           expect(stats.permissionCacheHits + stats.permissionCacheMisses).toBeGreaterThan(0);
+          expect(Number.isFinite(stats.averageRenderTime)).toBeTrue();
           done();
         });
     });

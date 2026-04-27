@@ -137,7 +137,8 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const isDashboardRoute =
       this.router.url.includes('/admin/dashboard') || this.router.url.includes('/admin/control');
-    if (isDashboardRoute) {
+    const canReadDashboardStats = this.tokenStorage.hasMinimumRole(UserRole.ADMINISTRADOR);
+    if (isDashboardRoute && canReadDashboardStats) {
       this.dashboardApi
         .getContentStats()
         .pipe(takeUntil(this.destroy$))

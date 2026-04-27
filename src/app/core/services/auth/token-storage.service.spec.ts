@@ -9,6 +9,7 @@ import {
   POST_LOGIN_PREFIX,
 } from './token-storage.service';
 import { OPConstants } from '../../../shared/constants/op-global.constants';
+import { UserRole } from '../../../shared/types/navigation.types';
 
 describe('TokenStorageService', () => {
   let service: TokenStorageService;
@@ -129,5 +130,25 @@ describe('TokenStorageService', () => {
     service.cleanExpiredPostLoginRedirects();
     expect(localStorage.getItem(`${POST_LOGIN_PREFIX}${oldTs}-x`)).toBeNull();
     expect(localStorage.getItem(`${POST_LOGIN_PREFIX}${recentTs}-y`)).toBe('/recent');
+  });
+
+  it('getUserRole mapea ROLE_ADMIN a ADMINISTRADOR', () => {
+    service.saveUser({ roles: ['ROLE_ADMIN'] });
+    expect(service.getUserRole()).toBe(UserRole.ADMINISTRADOR);
+  });
+
+  it('getUserRole mapea ROLE_ADMINISTRADOR a ADMINISTRADOR', () => {
+    service.saveUser({ roles: ['ROLE_ADMINISTRADOR'] });
+    expect(service.getUserRole()).toBe(UserRole.ADMINISTRADOR);
+  });
+
+  it('getUserRole usa rolCodigo aunque exista roles cuando no hay match', () => {
+    service.saveUser({ roles: ['ROLE_SOMETHING_UNKNOWN'], rolCodigo: 'ADMIN' });
+    expect(service.getUserRole()).toBe(UserRole.ADMINISTRADOR);
+  });
+
+  it('getUserRole elige el rol más alto si hay múltiples', () => {
+    service.saveUser({ roles: ['ROLE_EDITOR', 'ROLE_DESAR'] });
+    expect(service.getUserRole()).toBe(UserRole.DESARROLLADOR);
   });
 });

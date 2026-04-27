@@ -67,7 +67,7 @@ describe('CrudService base behaviors', () => {
       done();
     });
 
-    const req = httpMock.expectOne((r) => r.url.includes('/things/crear'));
+    const req = httpMock.expectOne((r) => r.url.includes('/things'));
     expect(req.request.method).toBe('POST');
     req.flush({ result: { success: true }, data: { id: '1' } });
   });

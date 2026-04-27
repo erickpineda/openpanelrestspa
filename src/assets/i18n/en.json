@@ -1186,6 +1186,9 @@
       "PASSWORD_MIN_LENGTH": "Password must be at least 6 characters",
       "SIGNING_IN": "Signing in...",
       "FORGOT_PASSWORD": "Forgot password?",
+      "INVALID_CREDENTIALS": "Incorrect username or password.",
+      "NETWORK_ERROR": "Could not connect to the server. Please try again.",
+      "UNKNOWN_ERROR": "Something went wrong. Please try again.",
       "USER_ROLE_INFO": "User role is"
     },
     "FORGOT_PASSWORD": {

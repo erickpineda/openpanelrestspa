@@ -14,6 +14,8 @@ import {
 } from '../../../core/services/ui/temporary-storage.service';
 import { NotificationItem } from '../../../shared/components/notifications-dropdown/notifications-dropdown.component';
 import { RightSidebarService } from '../../../core/services/ui/right-sidebar.service';
+import { TokenStorageService } from '../../../core/services/auth/token-storage.service';
+import { UserRole } from '../../../shared/types/navigation.types';
 
 interface IBreadcrumb {
   label: string;
@@ -63,6 +65,15 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
   unreadNotifications = 0;
   private translationsSubscription: Subscription | undefined;
   private tempEntriesSubscription: Subscription | undefined;
+  public canAccessControlPanel = false;
+  private readonly controlPanelRoles: UserRole[] = [
+    UserRole.AUTOR,
+    UserRole.EDITOR,
+    UserRole.ADMINISTRADOR,
+    UserRole.DESARROLLADOR,
+    UserRole.MANTENIMIENTO,
+    UserRole.PROPIETARIO,
+  ];
 
   get messagesCount(): number {
     return this.userCounts?.messages ?? this.newMessages.length;
@@ -85,7 +96,8 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     private sessionManager: SessionManagerService,
     private temporaryStorage: TemporaryStorageService,
     private translationService: TranslationService,
-    public rightSidebarService: RightSidebarService
+    public rightSidebarService: RightSidebarService,
+    private tokenStorage: TokenStorageService
   ) {
     super();
   }
@@ -99,6 +111,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
   }
 
   ngOnInit(): void {
+    this.canAccessControlPanel = this.tokenStorage.hasAnyRole(this.controlPanelRoles);
     this.breadcrumbs = this.createBreadcrumbs(this.router.routerState.root);
 
     this.languageService.currentLang$.subscribe((lang: Language) => {
@@ -204,6 +217,10 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
 
       const label = child.snapshot.data['title'];
       if (label) {
+        const isControlPanelCrumb = url === '/admin/control' && label === 'MENU.CONTROL_PANEL';
+        if (isControlPanelCrumb && !this.canAccessControlPanel) {
+          return this.createBreadcrumbs(child, url, breadcrumbs);
+        }
         // Evitar duplicados consecutivos (mismo label)
         const lastBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
         if (!lastBreadcrumb || lastBreadcrumb.label !== label) {
@@ -214,5 +231,12 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
       return this.createBreadcrumbs(child, url, breadcrumbs);
     }
     return breadcrumbs;
+  }
+
+  canNavigateToBreadcrumb(url: string): boolean {
+    if (url === '/admin/control') {
+      return this.canAccessControlPanel;
+    }
+    return true;
   }
 }

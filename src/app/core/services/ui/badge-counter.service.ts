@@ -30,6 +30,8 @@ import { NavigationConstants } from '../../../shared/constants/navigation.consta
 import { ComentarioService } from '../data/comentario.service';
 import { EntradaService } from '../data/entrada.service';
 import { UsuarioService } from '../data/usuario.service';
+import { TokenStorageService } from '../auth/token-storage.service';
+import { UserRole } from '../../../shared/types/navigation.types';
 
 import { TemporaryStorageService } from './temporary-storage.service';
 import { HttpContext } from '@angular/common/http';
@@ -78,7 +80,8 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
     private comentarioService: ComentarioService,
     private entradaService: EntradaService,
     private usuarioService: UsuarioService,
-    private temporaryStorage: TemporaryStorageService
+    private temporaryStorage: TemporaryStorageService,
+    private tokenStorage: TokenStorageService
   ) {
     const isTestEnv =
       typeof (globalThis as any).__karma__ !== 'undefined' ||
@@ -383,12 +386,18 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
    * Inicializa los contadores con configuración automática
    */
   initializeCounters(): void {
-    // Configurar contadores con actualización automática
-    this.setupAutoRefreshCounter(
-      'unmoderated-comments',
-      this.getUnmoderatedCommentsCount(),
-      NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
-    );
+    const canAccessAdminCounters = this.tokenStorage.hasMinimumRole(UserRole.ADMINISTRADOR);
+
+    // Solo los perfiles admin deben consultar endpoints de moderación/usuarios.
+    if (canAccessAdminCounters) {
+      this.setupAutoRefreshCounter(
+        'unmoderated-comments',
+        this.getUnmoderatedCommentsCount(),
+        NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
+      );
+    } else {
+      this.setCounterValue('unmoderated-comments', 0);
+    }
 
     this.setupAutoRefreshCounter(
       'draft-entries',
@@ -404,17 +413,22 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
       }
     } catch {}
 
-    this.setupAutoRefreshCounter(
-      'pending-users',
-      this.getPendingUsersCount(),
-      NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
-    );
+    if (canAccessAdminCounters) {
+      this.setupAutoRefreshCounter(
+        'pending-users',
+        this.getPendingUsersCount(),
+        NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
+      );
 
-    this.setupAutoRefreshCounter(
-      'system-alerts',
-      this.getSystemAlertsCount(),
-      NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
-    );
+      this.setupAutoRefreshCounter(
+        'system-alerts',
+        this.getSystemAlertsCount(),
+        NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
+      );
+    } else {
+      this.setCounterValue('pending-users', 0);
+      this.setCounterValue('system-alerts', 0);
+    }
 
     this.setupAutoRefreshCounter(
       'my-drafts',
