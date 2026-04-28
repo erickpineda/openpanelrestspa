@@ -16,6 +16,7 @@ import { AuthSyncService } from '../services/auth/auth-sync.service';
 import { LoggerService } from '../services/logger.service';
 import { AuthService } from '../services/auth/auth.service';
 import { OPSessionConstants } from '../../shared/constants/op-session.constants';
+import { UserRole } from '../../shared/types/navigation.types';
 
 @Injectable({
   providedIn: 'root',
@@ -78,6 +79,17 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     return true;
   }
 
+  private redirectForForbidden(): UrlTree {
+    try {
+      const token = this.tokenStorage.getToken();
+      const user = this.tokenStorage.getUser();
+      if (token && user) {
+        return this.router.parseUrl('/admin/control/perfil');
+      }
+    } catch {}
+    return this.router.parseUrl('/login');
+  }
+
   canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree {
     try {
       const qp =
@@ -100,16 +112,20 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
       return false;
     }
 
-    // comprobación de roles (si la ruta la requiere)
-    const requiredRoles = route.data['roles'] as Array<string> | undefined;
-    if (requiredRoles && requiredRoles.length > 0) {
-      const user = this.tokenStorage.getUser();
-      const hasRole =
-        Array.isArray(user?.roles) &&
-        user.roles.some((role: string) => requiredRoles.includes(role));
-      if (!hasRole) {
-        this.log.info('🔐 AuthGuard - Usuario no tiene los roles requeridos:', requiredRoles);
-        return this.router.parseUrl('/login');
+    const data: any = route.data || {};
+    const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
+    if (requiredRoles && requiredRoles.length > 0 && !this.tokenStorage.hasAnyRole(requiredRoles)) {
+      this.log.info('🔐 AuthGuard - Usuario no tiene los roles requeridos:', requiredRoles);
+      return this.redirectForForbidden();
+    }
+
+    const minRoleRaw = data['minRole'] as UserRole | string | undefined;
+    if (minRoleRaw) {
+      const minRole =
+        typeof minRoleRaw === 'string' ? this.tokenStorage.parseUserRole(minRoleRaw) : minRoleRaw;
+      if (!minRole || !this.tokenStorage.hasMinimumRole(minRole)) {
+        this.log.info('🔐 AuthGuard - Usuario no cumple el rol mínimo requerido:', minRoleRaw);
+        return this.redirectForForbidden();
       }
     }
 
@@ -125,9 +141,26 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     if (check instanceof UrlTree) {
       return check;
     }
-    // Si check es false, retornamos false para cancelar la carga.
-    // Si check es true, retornamos true.
-    return check;
+    if (!check) return false;
+
+    const data: any = route.data || {};
+    const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
+    if (requiredRoles && requiredRoles.length > 0 && !this.tokenStorage.hasAnyRole(requiredRoles)) {
+      this.log.info('🔐 AuthGuard - Usuario no tiene los roles requeridos (canLoad):', requiredRoles);
+      return this.redirectForForbidden();
+    }
+
+    const minRoleRaw = data['minRole'] as UserRole | string | undefined;
+    if (minRoleRaw) {
+      const minRole =
+        typeof minRoleRaw === 'string' ? this.tokenStorage.parseUserRole(minRoleRaw) : minRoleRaw;
+      if (!minRole || !this.tokenStorage.hasMinimumRole(minRole)) {
+        this.log.info('🔐 AuthGuard - Usuario no cumple rol mínimo (canLoad):', minRoleRaw);
+        return this.redirectForForbidden();
+      }
+    }
+
+    return true;
   }
 
   canMatch(route: Route, segments: UrlSegment[]): boolean | UrlTree {
@@ -135,7 +168,29 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     if (check instanceof UrlTree) {
       return check;
     }
-    return check;
+    if (!check) return false;
+
+    const data: any = route.data || {};
+    const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
+    if (requiredRoles && requiredRoles.length > 0 && !this.tokenStorage.hasAnyRole(requiredRoles)) {
+      this.log.info(
+        '🔐 AuthGuard - Usuario no tiene los roles requeridos (canMatch):',
+        requiredRoles
+      );
+      return this.redirectForForbidden();
+    }
+
+    const minRoleRaw = data['minRole'] as UserRole | string | undefined;
+    if (minRoleRaw) {
+      const minRole =
+        typeof minRoleRaw === 'string' ? this.tokenStorage.parseUserRole(minRoleRaw) : minRoleRaw;
+      if (!minRole || !this.tokenStorage.hasMinimumRole(minRole)) {
+        this.log.info('🔐 AuthGuard - Usuario no cumple rol mínimo (canMatch):', minRoleRaw);
+        return this.redirectForForbidden();
+      }
+    }
+
+    return true;
   }
 
   private redirectToLogin(): void {

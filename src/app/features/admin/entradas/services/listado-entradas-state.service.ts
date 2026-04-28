@@ -17,10 +17,11 @@ import { EntradaService } from '@app/core/services/data/entrada.service';
 import { mapEntradasComputed } from '../mappers/entrada.mapper';
 import { LoggerService } from '@app/core/services/logger.service';
 import { EntradaVM } from '../models/entrada.vm';
-import { AdvancedSearchParams, DataOption } from '@app/shared/models/search.models';
+import { SearchQuery } from '@app/shared/models/search.models';
 import { OPConstants } from '@app/shared/constants/op-global.constants';
 import { ListState } from '../models/list-state.model';
 import { SearchParams } from '../models/search-params.model';
+import { SearchUtilService } from '@app/core/services/utils/search-util.service';
 
 const INITIAL_STATE: ListState = {
   entradas: [],
@@ -35,8 +36,7 @@ const INITIAL_STATE: ListState = {
   lastSearchParams: null,
   sortField: undefined,
   sortDirection: undefined,
-  lastAdvancedCriteriaList: null,
-  lastAdvancedDataOption: null,
+  lastSearchQuery: null,
 };
 
 @Injectable({
@@ -58,7 +58,8 @@ export class ListadoEntradasStateService {
 
   constructor(
     private entradaService: EntradaService,
-    private log: LoggerService
+    private log: LoggerService,
+    private searchUtil: SearchUtilService
   ) {}
 
   setSort(field: string, direction: 'ASC' | 'DESC'): Observable<void> {
@@ -96,17 +97,11 @@ export class ListadoEntradasStateService {
       if (searchParams) {
         return this.search(searchParams, page).pipe(map(() => void 0));
       }
-      if (current.lastAdvancedCriteriaList && current.lastAdvancedDataOption) {
-        return this.searchAdvanced(
-          {
-            dataOption: current.lastAdvancedDataOption,
-            searchCriteriaList: current.lastAdvancedCriteriaList,
-          },
-          page
-        ).pipe(map(() => void 0));
-      }
       if (current.lastSearchParams) {
         return this.search(current.lastSearchParams, page).pipe(map(() => void 0));
+      }
+      if (current.lastSearchQuery) {
+        return this.searchQuery(current.lastSearchQuery, page).pipe(map(() => void 0));
       }
       this.log.warn('Intentando paginar en servidor sin parámetros de búsqueda');
       return of(void 0);
@@ -118,17 +113,11 @@ export class ListadoEntradasStateService {
 
   reloadCurrentPage(): Observable<void> {
     const current = this.state.value;
-    if (current.lastAdvancedCriteriaList && current.lastAdvancedDataOption) {
-      return this.searchAdvanced(
-        {
-          dataOption: current.lastAdvancedDataOption,
-          searchCriteriaList: current.lastAdvancedCriteriaList,
-        },
-        current.currentPage
-      ).pipe(map(() => void 0));
-    }
     if (current.lastSearchParams) {
       return this.search(current.lastSearchParams, current.currentPage).pipe(map(() => void 0));
+    }
+    if (current.lastSearchQuery) {
+      return this.searchQuery(current.lastSearchQuery, current.currentPage).pipe(map(() => void 0));
     }
     return of(void 0);
   }
@@ -169,21 +158,18 @@ export class ListadoEntradasStateService {
       loading: true,
       error: null,
       lastSearchParams: params,
-      lastAdvancedCriteriaList: null,
-      lastAdvancedDataOption: null,
+      lastSearchQuery: null,
     });
-    const searchRequest = {
-      dataOption: params.dataOption,
-      searchCriteriaList: [
-        {
-          filterKey: params.field,
-          value: params.term,
-          operation: params.operation,
-          clazzName: 'Entrada',
-        },
-      ],
-    };
-    return this.entradaService.buscarSafe(searchRequest, page, this.state.value.pageSize).pipe(
+    const query = this.searchUtil.buildSingle(
+      'Entrada',
+      params.field,
+      params.term,
+      params.operation,
+      params.dataOption
+    );
+    this.updateState({ lastSearchQuery: query });
+
+    return this.entradaService.buscarSafe(query, page, this.state.value.pageSize).pipe(
       tap((response) => this.processResponse(response, page)),
       catchError((error) => {
         this.log.error('Error searching entradas', error);
@@ -194,22 +180,17 @@ export class ListadoEntradasStateService {
     );
   }
 
-  searchAdvanced(params: AdvancedSearchParams, page: number = 0) {
+  searchQuery(query: SearchQuery, page: number = 0) {
     this.updateState({
       loading: true,
       error: null,
-      lastAdvancedCriteriaList: params.searchCriteriaList,
-      lastAdvancedDataOption: params.dataOption,
       lastSearchParams: null,
+      lastSearchQuery: query,
     });
-    const searchRequest = {
-      dataOption: params.dataOption,
-      searchCriteriaList: params.searchCriteriaList,
-    };
-    return this.entradaService.buscarSafe(searchRequest, page, this.state.value.pageSize).pipe(
+    return this.entradaService.buscarSafe(query, page, this.state.value.pageSize).pipe(
       tap((response) => this.processResponse(response, page)),
       catchError((error) => {
-        this.log.error('Error searching entradas (advanced)', error);
+        this.log.error('Error searching entradas (query)', error);
         this.updateState({ loading: false, error });
         return throwError(() => error);
       }),

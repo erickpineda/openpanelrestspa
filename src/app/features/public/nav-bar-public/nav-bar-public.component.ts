@@ -6,6 +6,7 @@ import { TokenStorageService } from '@app/core/services/auth/token-storage.servi
 import { LoggerService } from '@app/core/services/logger.service';
 import { OPConstants } from '@shared/constants/op-global.constants';
 import { LanguageService, Language } from '@app/core/services/language.service';
+import { UserRole } from '@app/shared/types/navigation.types';
 
 @Component({
   selector: 'app-nav-bar-public',
@@ -72,8 +73,8 @@ export class NavBarPublicComponent implements OnInit {
     if (this.isLoggedIn) {
       this.user = this.tokenStorageService.getUser();
       this.roles = this.user.roles || [];
-      this.showAdminBoard = this.roles.includes('ROLE_ADMIN');
-      this.showModeratorBoard = this.roles.includes('ROLE_MODERATOR');
+      this.showAdminBoard = this.tokenStorageService.hasMinimumRole(UserRole.ADMINISTRADOR);
+      this.showModeratorBoard = this.tokenStorageService.hasMinimumRole(UserRole.EDITOR);
       this.username = this.user.username;
     } else {
       this.user = null;

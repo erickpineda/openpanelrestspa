@@ -23,7 +23,7 @@ describe('SearchUtilService', () => {
     expect(ops.some((o) => o.valor === SearchOperation.CONTAINS)).toBeTrue();
   });
 
-  it('buildRequest should stringify values and include clazzName when provided', () => {
+  it('buildRequest should build SearchQuery (condition) and normalize ops', () => {
     const service = new SearchUtilService();
 
     const req = service.buildRequest(
@@ -32,15 +32,10 @@ describe('SearchUtilService', () => {
       'ALL'
     );
 
-    expect(req.dataOption).toBe('ALL');
-    expect(req.searchCriteriaList).toEqual([
-      {
-        filterKey: 'nombre',
-        value: '12',
-        operation: 'CONTAINS',
-        clazzName: 'Privilegio',
-      },
-    ]);
+    expect(req.node.type).toBe('condition');
+    expect((req.node as any).field).toBe('nombre');
+    expect((req.node as any).op).toBe('contains');
+    expect((req.node as any).value).toBe(12);
   });
 
   it('buildRequest should handle null entityName and null value', () => {
@@ -52,14 +47,26 @@ describe('SearchUtilService', () => {
       'ANY'
     );
 
-    expect(req.searchCriteriaList[0].clazzName).toBeUndefined();
-    expect(req.searchCriteriaList[0].value).toBe('');
+    expect(req.node.type).toBe('condition');
+    expect((req.node as any).field).toBe('nombre');
+    expect((req.node as any).op).toBe('equal');
+    expect((req.node as any).value).toBeNull();
   });
 
   it('buildSingle should delegate to buildRequest', () => {
     const service = new SearchUtilService();
     const req = service.buildSingle('Entrada', 'titulo', 'a', 'CONTAINS', 'AND');
-    expect(req.dataOption).toBe('AND');
-    expect(req.searchCriteriaList.length).toBe(1);
+    expect(req.node.type).toBe('condition');
+    expect((req.node as any).field).toBe('titulo');
+  });
+
+  it('buildCondition should serialize date and datetime-local to final contract', () => {
+    const service = new SearchUtilService();
+
+    const dateNode = service.buildCondition('fechaPublicacion', 'equal', '2026-04-24');
+    const dateTimeNode = service.buildCondition('fechaPublicacion', 'equal', '2026-04-24T10:15');
+
+    expect(dateNode?.value).toBe('2026-04-24');
+    expect(dateTimeNode?.value).toBe('2026-04-24T10:15:00');
   });
 });

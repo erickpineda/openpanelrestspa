@@ -127,7 +127,7 @@ describe('Data services request shapes', () => {
 
     service.crear(payload).subscribe(() => {});
 
-    const req = httpMock.expectOne((r) => r.url.includes('/privilegios/crear'));
+    const req = httpMock.expectOne((r) => r.url.includes('/privilegios'));
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({ data: payload });

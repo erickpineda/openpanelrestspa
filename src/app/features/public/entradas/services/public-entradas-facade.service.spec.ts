@@ -44,17 +44,29 @@ describe('PublicEntradasFacadeService', () => {
     expect(sortField).toBe('fechaPublicacion');
     expect(sortDirection).toBe('DESC');
 
-    const criteria = (searchRequest?.searchCriteriaList ?? []) as any[];
-    expect(criteria.some((c) => c.filterKey === 'publicada' && c.value === true)).toBeTrue();
-    expect(criteria.some((c) => c.filterKey === 'permitirComentario' && c.value === true)).toBeTrue();
-    expect(criteria.some((c) => c.filterKey === 'titulo' && c.operation === 'CONTAINS' && c.value === 'hello'))
-      .toBeTrue();
+    const flatten = (node: any): any[] => {
+      if (!node) return [];
+      if (node.type === 'condition') return [node];
+      if (node.type === 'group' && Array.isArray(node.children)) {
+        return node.children.flatMap((c: any) => flatten(c));
+      }
+      return [];
+    };
 
-    const categoriaCriteria = criteria.filter((c) => c.filterKey === 'categoria.nombre');
+    const criteria = flatten(searchRequest?.node);
+    expect(criteria.some((c) => c.field === 'publicada' && c.op === 'equal' && c.value === true)).toBeTrue();
+    expect(
+      criteria.some((c) => c.field === 'permitirComentario' && c.op === 'equal' && c.value === true)
+    ).toBeTrue();
+    expect(
+      criteria.some((c) => c.field === 'titulo' && c.op === 'contains' && c.value === 'hello')
+    ).toBeTrue();
+
+    const categoriaCriteria = criteria.filter((c) => c.field === 'categoria.nombre');
     expect(categoriaCriteria.length).toBe(1);
     expect(categoriaCriteria[0].value).toBe('Noticias');
 
-    const etiquetaCriteria = criteria.filter((c) => c.filterKey === 'etiqueta.nombre');
+    const etiquetaCriteria = criteria.filter((c) => c.field === 'etiqueta.nombre');
     expect(etiquetaCriteria.length).toBe(1);
     expect(etiquetaCriteria[0].value).toBe('JAV');
 
@@ -62,4 +74,3 @@ describe('PublicEntradasFacadeService', () => {
     expect(stateMock.setTotalPages).toHaveBeenCalledWith(5);
   });
 });
-

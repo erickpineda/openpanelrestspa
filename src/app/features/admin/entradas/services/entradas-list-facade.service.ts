@@ -5,7 +5,7 @@ import { Entrada } from '@app/core/models/entrada.model';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 import { ListadoEntradasStateService } from './listado-entradas-state.service';
 import { SearchParams } from '../models/search-params.model';
-import { AdvancedSearchParams } from '@app/shared/models/search.models';
+import { SearchConditionNode, SearchDefinitions, SearchQuery } from '@app/shared/models/search.models';
 import { BusquedaService } from '@app/core/services/srv-busqueda/busqueda.service';
 import { TranslationService } from '@app/core/services/translation.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
@@ -127,22 +127,28 @@ export class EntradasListFacadeService {
   }
 
   computeDefaultSearch(defs: any): { field: string; operation: string } {
-    const campos: string[] = (defs?.filterKeySegunClazzNamePermitido as string[]) || [];
+    const d = (defs?.data ?? defs) as SearchDefinitions | any;
+    const fields = Array.isArray(d?.fields) ? (d.fields as any[]) : [];
+    const keys = fields.map((f) => String(f?.key ?? '')).filter((k) => k.length > 0);
+
     const camposOrdenados = [
-      ...campos.filter((k) => k === 'titulo'),
-      ...campos.filter((k) => k !== 'titulo').sort((a, b) => a.localeCompare(b)),
+      ...keys.filter((k) => k === 'titulo'),
+      ...keys.filter((k) => k !== 'titulo').sort((a, b) => a.localeCompare(b)),
     ];
-    const campo = camposOrdenados[0] || '';
-    const operaciones = defs?.operationPermitido?.[campo];
-    const operacion = Array.isArray(operaciones) ? operaciones[0] : '';
-    return { field: campo, operation: operacion };
+    const field = camposOrdenados[0] || '';
+    const fieldDef = fields.find((f: any) => f?.key === field);
+    const operation = Array.isArray(fieldDef?.operations) ? fieldDef.operations[0] : 'contains';
+    return { field, operation };
   }
 
   setBasicSearchText(text: string): void {
-    const operaciones = this.defs?.operationPermitido?.['titulo'];
     this.currentField = 'titulo';
+    const d = (this.defs?.data ?? this.defs) as SearchDefinitions | any;
+    const fieldDef = Array.isArray(d?.fields) ? d.fields.find((f: any) => f?.key === 'titulo') : null;
     this.currentOperation =
-      Array.isArray(operaciones) && operaciones.length > 0 ? operaciones[0] : 'CONTAINS';
+      Array.isArray(fieldDef?.operations) && fieldDef.operations.length > 0
+        ? fieldDef.operations[0]
+        : 'contains';
     this.triggerBusqueda(text);
   }
 
@@ -196,23 +202,25 @@ export class EntradasListFacadeService {
     this.currentDataOption = option;
   }
 
-  applyAdvancedFilters(payload: AdvancedSearchParams, page?: number): Observable<any> {
-    this.currentDataOption = payload.dataOption;
-    const first = payload.searchCriteriaList?.[0];
+  applySearchQuery(query: SearchQuery, page?: number): Observable<any> {
+    const first = this.findFirstCondition(query?.node);
     if (first) {
-      this.currentField = first.filterKey;
-      this.currentOperation = first.operation;
+      this.currentField = first.field;
+      this.currentOperation = first.op;
       this.currentTerm = String(first.value ?? '');
     }
-    const mapped = payload.searchCriteriaList.map((c) => ({
-      filterKey: c.filterKey,
-      operation: c.operation,
-      value: c.value,
-      clazzName: c.clazzName || 'Entrada',
-    }));
-    return this.stateService.searchAdvanced(
-      { dataOption: payload.dataOption, searchCriteriaList: mapped },
-      page ?? 0
-    );
+    return this.stateService.searchQuery(query, page ?? 0);
+  }
+
+  private findFirstCondition(node: any): SearchConditionNode | undefined {
+    if (!node) return undefined;
+    if (node.type === 'condition') return node as SearchConditionNode;
+    if (node.type === 'group' && Array.isArray(node.children)) {
+      for (const child of node.children) {
+        const found = this.findFirstCondition(child);
+        if (found) return found;
+      }
+    }
+    return undefined;
   }
 }

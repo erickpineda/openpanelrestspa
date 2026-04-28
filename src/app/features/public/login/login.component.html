@@ -89,7 +89,10 @@
                 
                 @if (isLoginFailed) {
                   <div class="mt-3">
-                    <c-alert color="danger" fade class="mb-0">{{ 'COMMON.ERROR' | translate }}: {{ errorMessage }}</c-alert>
+                    <c-alert color="danger" fade class="mb-0">
+                      {{ 'COMMON.ERROR' | translate }}:
+                      {{ errorMessageKey ? (errorMessageKey | translate) : errorMessage }}
+                    </c-alert>
                   </div>
                 }
               </form>

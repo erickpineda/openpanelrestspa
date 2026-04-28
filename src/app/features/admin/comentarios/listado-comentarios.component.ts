@@ -15,7 +15,7 @@ import { LoggerService } from '@app/core/services/logger.service';
 import { TranslationService } from '@app/core/services/translation.service';
 import { ToastService } from '@app/core/services/ui/toast.service';
 import { HttpContext } from '@angular/common/http';
-import { AdvancedSearchParams } from '@shared/models/search.models';
+import { SearchQuery } from '@shared/models/search.models';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '@core/interceptor/skip-global-error.token';
 
 @Component({
@@ -133,7 +133,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
           error: (err: any) => this.handlePageError(err),
         });
     } else {
-      const payload: AdvancedSearchParams = this.buildAdvancedSearchPayload();
+      const payload: SearchQuery = this.buildAdvancedSearchPayload();
       this.comentarioService
         .buscarSinGlobalLoader(
           payload,
@@ -272,43 +272,42 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     );
   }
 
-  private buildAdvancedSearchPayload(): AdvancedSearchParams {
-    const list: AdvancedSearchParams['searchCriteriaList'] = [];
+  private buildAdvancedSearchPayload(): SearchQuery {
+    const children: any[] = [];
     if (this.basicSearchText) {
-      list.push({
-        filterKey: 'contenido',
+      children.push({
+        type: 'condition',
+        field: 'contenido',
+        op: 'contains',
         value: this.basicSearchText,
-        operation: 'CONTAINS',
-        clazzName: 'Comentario',
       });
     }
     if (this.filtroUsuario) {
-      list.push({
-        filterKey: 'username',
+      children.push({
+        type: 'condition',
+        field: 'usuario.username',
+        op: 'contains',
         value: this.filtroUsuario,
-        operation: 'CONTAINS',
-        clazzName: 'Comentario',
       });
     }
     if (this.filtroAprobado !== null) {
-      list.push({
-        filterKey: 'aprobado',
+      children.push({
+        type: 'condition',
+        field: 'aprobado',
+        op: 'equal',
         value: this.filtroAprobado,
-        operation: 'EQUAL',
-        clazzName: 'Comentario',
       });
     }
     if (this.filtroCuarentena !== null) {
-      list.push({
-        filterKey: 'cuarentena',
+      children.push({
+        type: 'condition',
+        field: 'cuarentena',
+        op: 'equal',
         value: this.filtroCuarentena,
-        operation: 'EQUAL',
-        clazzName: 'Comentario',
       });
     }
     return {
-      dataOption: 'AND',
-      searchCriteriaList: list,
+      node: children.length === 1 ? children[0] : { type: 'group', op: 'AND', children },
     };
   }
 

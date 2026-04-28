@@ -4,6 +4,7 @@ import { Entrada } from '@app/core/models/entrada.model';
 import { finalize } from 'rxjs/operators';
 import { parseAllowedDate } from '@shared/utils/date-utils';
 import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
+import { SearchQuery } from '@app/shared/models/search.models';
 
 @Component({
   selector: 'app-home',
@@ -26,11 +27,8 @@ export class HomeComponent implements OnInit {
 
   cargarUltimasEntradas() {
     this.loading = true;
-    const searchRequest = {
-      dataOption: 'ALL',
-      searchCriteriaList: [
-        { filterKey: 'publicada', operation: 'EQUAL', value: true, clazzName: 'Entrada' }
-      ]
+    const searchRequest: SearchQuery = {
+      node: { type: 'condition', field: 'publicada', op: 'equal', value: true },
     };
 
     this.entradaService.buscarSafe(searchRequest, 0, 6, 'fechaPublicacion', 'DESC')

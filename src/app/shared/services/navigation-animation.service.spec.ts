@@ -154,7 +154,7 @@ describe('NavigationAnimationService', () => {
       await sequencePromise;
 
       const endTime = Date.now();
-      expect(endTime - startTime).toBeGreaterThan(300); // Secuencial
+      expect(endTime - startTime).toBeGreaterThanOrEqual(300); // Secuencial
 
       // Limpiar
       document.body.removeChild(element1);

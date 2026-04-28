@@ -5,6 +5,7 @@ import { AuthService } from '@app/core/services/auth/auth.service';
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
 import { PostLoginRedirectService } from '@app/core/services/auth/post-login-redirect.service';
 import { AuthSyncService } from '@app/core/services/auth/auth-sync.service';
+import { UserRole } from '@app/shared/types/navigation.types';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ export class LoginComponent implements OnInit {
   isLoginFailed = false;
   isLoading = false;
   errorMessage = '';
+  errorMessageKey: string | null = null;
   roles: string[] = [];
   constructor(
     private authService: AuthService,
@@ -50,17 +52,45 @@ export class LoginComponent implements OnInit {
         this.isLoggedIn = true;
         this.roles = this.tokenStorage.getUser().roles;
         this.isLoading = false;
+        this.errorMessage = '';
+        this.errorMessageKey = null;
         this.tryRedirectToLastRoute('manual');
         this.authSync.notifyLogin();
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        this.errorMessage = err.error?.message ?? err.message ?? 'Error en el login';
         this.isLoginFailed = true;
         this.isLoading = false;
+        this.setLoginErrorMessage(err);
         this.cdr.detectChanges();
       },
     });
+  }
+
+  private setLoginErrorMessage(err: any): void {
+    const status = typeof err?.status === 'number' ? err.status : null;
+
+    if (status === 401 || status === 403) {
+      this.errorMessageKey = 'PUBLIC.LOGIN.INVALID_CREDENTIALS';
+      this.errorMessage = '';
+      return;
+    }
+
+    if (status === 0) {
+      this.errorMessageKey = 'PUBLIC.LOGIN.NETWORK_ERROR';
+      this.errorMessage = '';
+      return;
+    }
+
+    const msg = err?.error?.message;
+    if (typeof msg === 'string' && msg.trim().length > 0) {
+      this.errorMessageKey = null;
+      this.errorMessage = msg.trim();
+      return;
+    }
+
+    this.errorMessageKey = 'PUBLIC.LOGIN.UNKNOWN_ERROR';
+    this.errorMessage = '';
   }
   private tryRedirectToLastRoute(context: string): void {
     try {
@@ -88,12 +118,10 @@ export class LoginComponent implements OnInit {
         return;
       }
     } catch {}
-    // si el usuario es ROLE_ADMIN, mandarlo a admin. Si no, a perfil o home
-    const user = this.tokenStorage.getUser();
-    if (user && user.roles && user.roles.includes('ROLE_ADMIN')) {
+    if (this.tokenStorage.hasMinimumRole(UserRole.ADMINISTRADOR)) {
       this.router.navigate(['/admin']);
     } else {
-      this.router.navigate(['/perfil']);
+      this.router.navigate(['/admin/control/perfil']);
     }
   }
   reloadPage(): void {

@@ -72,11 +72,8 @@ export class NetworkInterceptor implements HttpInterceptor {
   }
 
   private handleNetworkError(error: HttpErrorResponse): void {
-    // No notificar si es 401 (AuthInterceptor lo maneja)
+    // No forzar expiración en 401 aquí; AuthInterceptor decide si el token está realmente caducado.
     if (error.status === 401) {
-      try {
-        this.sessionManager.notifySessionExpired();
-      } catch {}
       return;
     }
 

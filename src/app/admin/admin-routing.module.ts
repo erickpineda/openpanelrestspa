@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './admin.component';
 import { AuthGuard } from '../core/_helpers/auth.guard';
+import { UserRole } from '../shared/types/navigation.types';
 
 const routes: Routes = [
   {
@@ -18,12 +19,37 @@ const routes: Routes = [
           import('@features/admin/dashboard/dashboard.module').then(
             (m) => m.DashboardFeatureModule
           ),
-        data: { preload: true, delay: 1000, title: 'MENU.DASHBOARD' },
+        data: {
+          preload: true,
+          delay: 1000,
+          title: 'MENU.DASHBOARD',
+          roles: [
+            UserRole.AUTOR,
+            UserRole.EDITOR,
+            UserRole.ADMINISTRADOR,
+            UserRole.DESARROLLADOR,
+            UserRole.MANTENIMIENTO,
+            UserRole.PROPIETARIO,
+          ],
+        },
       },
       {
         path: 'control',
         loadChildren: () => import('./base/base.module').then((m) => m.BaseModule),
-        data: { preload: true, delay: 1000, title: 'MENU.CONTROL_PANEL' },
+        data: {
+          preload: true,
+          delay: 1000,
+          title: 'MENU.CONTROL_PANEL',
+          roles: [
+            UserRole.LECTOR,
+            UserRole.AUTOR,
+            UserRole.EDITOR,
+            UserRole.ADMINISTRADOR,
+            UserRole.DESARROLLADOR,
+            UserRole.MANTENIMIENTO,
+            UserRole.PROPIETARIO,
+          ],
+        },
         canLoad: [AuthGuard], // evita la carga del módulo si no estamos autenticados
       },
       {

@@ -301,6 +301,7 @@ export const navItems: INavItemEnhanced[] = [
     title: true,
     name: 'MENU.SYSTEM_CONFIGURATION',
     priority: 40,
+    requiredRoles: [UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
   },
   {
     name: 'MENU.APPEARANCE',
@@ -367,6 +368,15 @@ export const navItems: INavItemEnhanced[] = [
     title: true,
     name: 'MENU.QUICK_LINKS',
     priority: 1,
+    requiredRoles: [
+      UserRole.LECTOR,
+      UserRole.AUTOR,
+      UserRole.EDITOR,
+      UserRole.ADMINISTRADOR,
+      UserRole.DESARROLLADOR,
+      UserRole.MANTENIMIENTO,
+      UserRole.PROPIETARIO,
+    ],
   },
   {
     name: 'MENU.VIEW_WEBSITE',

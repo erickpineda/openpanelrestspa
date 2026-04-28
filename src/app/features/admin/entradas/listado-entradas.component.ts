@@ -26,6 +26,7 @@ import { SearchParams } from './models/search-params.model';
 import { EntradasListFacadeService } from './services/entradas-list-facade.service';
 import { getPreviewStateColor as getPreviewStateColorHelper } from './utils/estado-utils';
 import { OPConstants } from '@app/shared/constants/op-global.constants';
+import { SearchConditionNode, SearchQuery } from '@app/shared/models/search.models';
 
 @Component({
   selector: 'app-listado-entradas',
@@ -153,60 +154,41 @@ export class ListadoEntradasComponent implements OnInit, OnDestroy, AfterViewIni
     this.advancedActive = false;
   }
 
-  aplicarFiltro(filtro: any): void {
-    if (Array.isArray(filtro?.searchCriteriaList)) {
-      this.advancedActive = true;
-      if (filtro.dataOption) {
-        this.dataOptionSeleccionada = filtro.dataOption;
-        this.facade.setDataOption(filtro.dataOption);
-      }
-      this.facade
-        .applyAdvancedFilters({
-          dataOption:
-            (filtro.dataOption as 'AND' | 'OR') || (this.dataOptionSeleccionada as 'AND' | 'OR'),
-          searchCriteriaList: filtro.searchCriteriaList,
-        })
-        .subscribe();
-      const first = filtro.searchCriteriaList[0];
-      this.campoSeleccionado = first?.filterKey || this.campoSeleccionado;
-      this.operacionSeleccionada = first?.operation || this.operacionSeleccionada;
-      this.valorBusqueda = String(first?.value ?? this.valorBusqueda);
-    } else {
-      this.advancedActive = false;
-      this.facade.applyFilter({
-        campo: filtro.campo,
-        operacion: filtro.operacion,
-        valor: filtro.valor,
-        dataOption: this.dataOptionSeleccionada,
-      });
-      this.campoSeleccionado = this.facade.getCurrentField() || filtro.campo;
-      this.operacionSeleccionada = this.facade.getCurrentOperation() || filtro.operacion;
-      this.valorBusqueda = filtro.valor;
+  aplicarFiltro(query: SearchQuery): void {
+    this.advancedActive = true;
+    this.facade.applySearchQuery(query).subscribe();
+    const first = this.findFirstCondition(query?.node);
+    if (first) {
+      this.campoSeleccionado = first.field;
+      this.operacionSeleccionada = first.op;
+      this.valorBusqueda = String(first.value ?? '');
     }
     this.cdr.markForCheck();
   }
 
-  onFiltroChanged(filtro: any): void {
-    if (Array.isArray(filtro?.searchCriteriaList)) {
-      if (filtro.dataOption) {
-        this.dataOptionSeleccionada = filtro.dataOption;
-        this.facade.setDataOption(filtro.dataOption);
-      }
-      const first = filtro.searchCriteriaList[0];
-      this.campoSeleccionado = first?.filterKey || this.campoSeleccionado;
-      this.operacionSeleccionada = first?.operation || this.operacionSeleccionada;
-      this.valorBusqueda = String(first?.value ?? this.valorBusqueda);
-    } else {
-      this.facade.updateFilterState({
-        campo: filtro.campo,
-        operacion: filtro.operacion,
-        valor: filtro.valor,
-        dataOption: this.dataOptionSeleccionada,
-      });
-      this.campoSeleccionado = this.facade.getCurrentField() || filtro.campo;
-      this.operacionSeleccionada = this.facade.getCurrentOperation() || filtro.operacion;
-      this.valorBusqueda = filtro.valor;
+  onFiltroChanged(query: SearchQuery): void {
+    // En modo avanzado con autoTrigger queremos lanzar búsqueda conforme se edita.
+    this.advancedActive = true;
+    this.facade.applySearchQuery(query).subscribe();
+    const first = this.findFirstCondition(query?.node);
+    if (first) {
+      this.campoSeleccionado = first.field;
+      this.operacionSeleccionada = first.op;
+      this.valorBusqueda = String(first.value ?? '');
     }
+    this.cdr.markForCheck();
+  }
+
+  private findFirstCondition(node: any): SearchConditionNode | undefined {
+    if (!node) return undefined;
+    if (node.type === 'condition') return node as SearchConditionNode;
+    if (node.type === 'group' && Array.isArray(node.children)) {
+      for (const child of node.children) {
+        const found = this.findFirstCondition(child);
+        if (found) return found;
+      }
+    }
+    return undefined;
   }
 
   abrirModalEliminar(entrada: EntradaVM): void {

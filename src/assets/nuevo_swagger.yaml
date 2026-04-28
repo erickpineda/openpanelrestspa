@@ -1,9 +1,9 @@
-{
+﻿{
   "openapi" : "3.1.0",
   "info" : {
     "title" : "Openpanel REST",
     "description" : "API de un blog personal",
-    "termsOfService" : "TÃ©rminos de servicio",
+    "termsOfService" : "TÃÂ©rminos de servicio",
     "contact" : {
       "name" : "Openpanel",
       "url" : "https://openpanel.net",
@@ -23,7 +23,7 @@
     "description" : "Desarrollo"
   }, {
     "url" : "/",
-    "description" : "Producción"
+    "description" : "ProducciÃ³n"
   } ],
   "security" : [ {
     "Bearer Authentication" : [ ]
@@ -1488,10 +1488,384 @@
         }
       }
     },
+    "/api/v1/config/temas/{slug}" : {
+      "get" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "obtenerPorSlug",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "actualizarPorSlug",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TemaDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "borrarPorSlug",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/versions/{version}/release-notes" : {
+      "put" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "updateReleaseNotes",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "version",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TemaVersionReleaseNotesRequestDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaVersionDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/draft" : {
+      "get" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "getDraft",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDraftDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "upsertDraft",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TemaDraftRequestDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/presets/{id}" : {
+      "get" : {
+        "tags" : [ "tema-preset-controller" ],
+        "operationId" : "obtenerPorId_8",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaPresetDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "tema-preset-controller" ],
+        "operationId" : "actualizar_8",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TemaPresetDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaPresetDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "tema-preset-controller" ],
+        "operationId" : "borrar_8",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/comentarios/{id}" : {
       "put" : {
         "tags" : [ "comentario-controller" ],
-        "operationId" : "actualizar_8",
+        "operationId" : "actualizar_9",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1538,7 +1912,7 @@
       },
       "delete" : {
         "tags" : [ "comentario-controller" ],
-        "operationId" : "borrar_8",
+        "operationId" : "borrar_9",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1577,7 +1951,7 @@
     "/api/v1/categorias/{id}" : {
       "get" : {
         "tags" : [ "categoria-controller" ],
-        "operationId" : "obtenerPorId_8",
+        "operationId" : "obtenerPorId_9",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1614,7 +1988,7 @@
       },
       "put" : {
         "tags" : [ "categoria-controller" ],
-        "operationId" : "actualizar_9",
+        "operationId" : "actualizar_10",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1661,7 +2035,7 @@
       },
       "delete" : {
         "tags" : [ "categoria-controller" ],
-        "operationId" : "borrar_9",
+        "operationId" : "borrar_10",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2442,7 +2816,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/SearchRequestDTO"
+                "$ref" : "#/components/schemas/SearchQueryDTO"
               }
             }
           },
@@ -2542,45 +2916,6 @@
       "post" : {
         "tags" : [ "tipo-entrada-controller" ],
         "operationId" : "crear_1",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/TipoEntradaDTO"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "500" : {
-            "description" : "Error ocurred",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ApiError",
-                  "example" : "INTERNAL_SERVER_ERROR"
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/OpenpanelApiResponseTipoEntradaDTO"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/tiposEntradas/crear" : {
-      "post" : {
-        "tags" : [ "tipo-entrada-controller" ],
-        "operationId" : "crearLegacy_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2720,6 +3055,67 @@
         }
       }
     },
+    "/api/v1/roles/obtenerPrivilegiosPorCodigos" : {
+      "post" : {
+        "tags" : [ "rol-controller" ],
+        "operationId" : "obtenerPrivilegiosPorCodigos",
+        "parameters" : [ {
+          "name" : "pageNo",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "pageSize",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CodigosRolRequestDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponsePaginaResponseDTORolPrivilegioDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/roles/obtenerPorCodigos" : {
       "post" : {
         "tags" : [ "rol-controller" ],
@@ -2784,7 +3180,7 @@
     "/api/v1/roles/crear" : {
       "post" : {
         "tags" : [ "rol-controller" ],
-        "operationId" : "crearLegacy_2",
+        "operationId" : "crearLegacy_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2866,7 +3262,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/SearchRequestDTO"
+                "$ref" : "#/components/schemas/SearchQueryDTO"
               }
             }
           },
@@ -3056,7 +3452,7 @@
     "/api/v1/privilegios/crear" : {
       "post" : {
         "tags" : [ "privilegio-controller" ],
-        "operationId" : "crearLegacy_3",
+        "operationId" : "crearLegacy_2",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3138,7 +3534,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/SearchRequestDTO"
+                "$ref" : "#/components/schemas/SearchQueryDTO"
               }
             }
           },
@@ -3276,7 +3672,7 @@
     "/api/v1/herramientas/sistema/crear" : {
       "post" : {
         "tags" : [ "herramientas-auxiliar-controller" ],
-        "operationId" : "crearLegacy_4",
+        "operationId" : "crearLegacy_3",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3464,7 +3860,7 @@
     "/api/v1/etiquetas/crear" : {
       "post" : {
         "tags" : [ "etiqueta-controller" ],
-        "operationId" : "crearLegacy_5",
+        "operationId" : "crearLegacy_4",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3546,7 +3942,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/SearchRequestDTO"
+                "$ref" : "#/components/schemas/SearchQueryDTO"
               }
             }
           },
@@ -3788,7 +4184,7 @@
     "/api/v1/entradas/estados/flujos/crear" : {
       "post" : {
         "tags" : [ "estado-entrada-flujo-controller" ],
-        "operationId" : "crearLegacy_6",
+        "operationId" : "crearLegacy_5",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3827,7 +4223,7 @@
     "/api/v1/entradas/crear" : {
       "post" : {
         "tags" : [ "entrada-controller" ],
-        "operationId" : "crearLegacy_7",
+        "operationId" : "crearLegacy_6",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3948,7 +4344,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/SearchRequestDTO"
+                "$ref" : "#/components/schemas/SearchQueryDTO"
               }
             }
           },
@@ -3979,10 +4375,389 @@
         }
       }
     },
+    "/api/v1/config/temas" : {
+      "get" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "listar_8",
+        "parameters" : [ {
+          "name" : "pageNo",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "pageSize",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "sortDir",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponsePaginaResponseDTOTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "crear_8",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TemaDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/rollback" : {
+      "post" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "rollback",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/publish" : {
+      "post" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "publish",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/preview-token" : {
+      "post" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "createPreviewToken",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaPreviewTokenResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/draft/upload" : {
+      "post" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "uploadDraftPackage",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "file" : {
+                    "type" : "string",
+                    "format" : "binary"
+                  }
+                },
+                "required" : [ "file" ]
+              }
+            }
+          }
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/activate" : {
+      "post" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "activate",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "version",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/presets" : {
+      "get" : {
+        "tags" : [ "tema-preset-controller" ],
+        "operationId" : "listar_9",
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseListTemaPresetDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "tema-preset-controller" ],
+        "operationId" : "crear_9",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TemaPresetDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaPresetDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/comentarios/crear" : {
       "post" : {
         "tags" : [ "comentario-controller" ],
-        "operationId" : "crear_8",
+        "operationId" : "crear_10",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -4064,7 +4839,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/SearchRequestDTO"
+                "$ref" : "#/components/schemas/SearchQueryDTO"
               }
             }
           },
@@ -4098,7 +4873,7 @@
     "/api/v1/categorias" : {
       "get" : {
         "tags" : [ "categoria-controller" ],
-        "operationId" : "listar_8",
+        "operationId" : "listar_10",
         "parameters" : [ {
           "name" : "pageNo",
           "in" : "query",
@@ -4163,7 +4938,7 @@
       },
       "post" : {
         "tags" : [ "categoria-controller" ],
-        "operationId" : "crear_9",
+        "operationId" : "crear_11",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -4202,7 +4977,7 @@
     "/api/v1/categorias/crear" : {
       "post" : {
         "tags" : [ "categoria-controller" ],
-        "operationId" : "crearLegacy_8",
+        "operationId" : "crearLegacy_7",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -4284,7 +5059,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/SearchRequestDTO"
+                "$ref" : "#/components/schemas/SearchQueryDTO"
               }
             }
           },
@@ -4930,46 +5705,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/OpenpanelApiResponseCriterioBusquedaDTO"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/tiposEntradas/obtenerPorId/{id}" : {
-      "get" : {
-        "tags" : [ "tipo-entrada-controller" ],
-        "operationId" : "obtenerPorIdLegacy_1",
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int64",
-            "minimum" : 1
-          }
-        } ],
-        "responses" : {
-          "500" : {
-            "description" : "Error ocurred",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ApiError",
-                  "example" : "INTERNAL_SERVER_ERROR"
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/OpenpanelApiResponseTipoEntradaDTO"
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseSearchDefinitionsDTO"
                 }
               }
             }
@@ -5113,7 +5849,7 @@
     "/api/v1/roles/obtenerPorId/{id}" : {
       "get" : {
         "tags" : [ "rol-controller" ],
-        "operationId" : "obtenerPorIdLegacy_2",
+        "operationId" : "obtenerPorIdLegacy_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -5289,10 +6025,83 @@
         }
       }
     },
+    "/api/v1/public/themes/preview" : {
+      "get" : {
+        "tags" : [ "public-theme-controller" ],
+        "operationId" : "getPreviewTheme",
+        "parameters" : [ {
+          "name" : "previewThemeSlug",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "previewToken",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponsePublicThemeDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/themes/active" : {
+      "get" : {
+        "tags" : [ "public-theme-controller" ],
+        "operationId" : "getActiveTheme",
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponsePublicThemeDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/privilegios/obtenerPorId/{id}" : {
       "get" : {
         "tags" : [ "privilegio-controller" ],
-        "operationId" : "obtenerPorIdLegacy_3",
+        "operationId" : "obtenerPorIdLegacy_2",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -5593,7 +6402,7 @@
     "/api/v1/herramientas/sistema/obtenerPorId/{id}" : {
       "get" : {
         "tags" : [ "herramientas-auxiliar-controller" ],
-        "operationId" : "obtenerPorIdLegacy_4",
+        "operationId" : "obtenerPorIdLegacy_3",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -5720,7 +6529,7 @@
     "/api/v1/fileStorage/ficheros" : {
       "get" : {
         "tags" : [ "file-storage-controller" ],
-        "operationId" : "listar_9",
+        "operationId" : "listar_11",
         "responses" : {
           "500" : {
             "description" : "Error ocurred",
@@ -5865,7 +6674,7 @@
     "/api/v1/etiquetas/obtenerPorId/{id}" : {
       "get" : {
         "tags" : [ "etiqueta-controller" ],
-        "operationId" : "obtenerPorIdLegacy_5",
+        "operationId" : "obtenerPorIdLegacy_4",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -6009,7 +6818,7 @@
     "/api/v1/entradas/obtenerPorSlug/{slug}" : {
       "get" : {
         "tags" : [ "entrada-controller" ],
-        "operationId" : "obtenerPorSlug",
+        "operationId" : "obtenerPorSlug_1",
         "parameters" : [ {
           "name" : "slug",
           "in" : "path",
@@ -6046,7 +6855,7 @@
     "/api/v1/entradas/obtenerPorId/{id}" : {
       "get" : {
         "tags" : [ "entrada-controller" ],
-        "operationId" : "obtenerPorIdLegacy_6",
+        "operationId" : "obtenerPorIdLegacy_5",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -6413,7 +7222,7 @@
     "/api/v1/entradas/estados/flujos/obtenerPorId/{id}" : {
       "get" : {
         "tags" : [ "estado-entrada-flujo-controller" ],
-        "operationId" : "obtenerPorIdLegacy_7",
+        "operationId" : "obtenerPorIdLegacy_6",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -6470,7 +7279,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/OpenpanelApiResponseCriterioBusquedaDTO"
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseSearchDefinitionsDTO"
                 }
               }
             }
@@ -6814,10 +7623,108 @@
         }
       }
     },
+    "/api/v1/config/temas/{slug}/versions" : {
+      "get" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "listarVersiones",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "state",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "PUBLISHED"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseListTemaVersionDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/compare" : {
+      "get" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "compare",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "to",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaVersionCompareDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/comentarios" : {
       "get" : {
         "tags" : [ "comentario-controller" ],
-        "operationId" : "listar_10",
+        "operationId" : "listar_12",
         "parameters" : [ {
           "name" : "pageNo",
           "in" : "query",
@@ -6884,7 +7791,7 @@
     "/api/v1/comentarios/obtenerPorId/{id}" : {
       "get" : {
         "tags" : [ "comentario-controller" ],
-        "operationId" : "obtenerPorIdLegacy_8",
+        "operationId" : "obtenerPorIdLegacy_7",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -7000,7 +7907,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/OpenpanelApiResponseCriterioBusquedaDTO"
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseSearchDefinitionsDTO"
                 }
               }
             }
@@ -7011,7 +7918,7 @@
     "/api/v1/categorias/obtenerPorId/{id}" : {
       "get" : {
         "tags" : [ "categoria-controller" ],
-        "operationId" : "obtenerPorIdLegacy_9",
+        "operationId" : "obtenerPorIdLegacy_8",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -7237,7 +8144,7 @@
     "/api/v1/redis/borrar" : {
       "delete" : {
         "tags" : [ "redis-controller" ],
-        "operationId" : "borrar_10",
+        "operationId" : "borrar_11",
         "parameters" : [ {
           "name" : "key",
           "in" : "query",
@@ -7435,6 +8342,117 @@
             "minLength" : 1
           }
         } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/versions/{version}" : {
+      "delete" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "borrarVersion",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "version",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/{slug}/published" : {
+      "delete" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "unpublish",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Error ocurred",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError",
+                  "example" : "INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OpenpanelApiResponseTemaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/temas/active" : {
+      "delete" : {
+        "tags" : [ "tema-controller" ],
+        "operationId" : "resetActiveTheme",
         "responses" : {
           "500" : {
             "description" : "Error ocurred",
@@ -7908,7 +8926,7 @@
           "hashRefreshToken" : {
             "type" : "string"
           },
-          "fprimeraSesion" : {
+          "fultimaSesion" : {
             "type" : "string",
             "format" : "date-time"
           },
@@ -7920,7 +8938,7 @@
             "type" : "string",
             "format" : "date-time"
           },
-          "fultimaSesion" : {
+          "fprimeraSesion" : {
             "type" : "string",
             "format" : "date-time"
           }
@@ -8645,6 +9663,205 @@
           }
         }
       },
+      "TemaDTO" : {
+        "type" : "object",
+        "properties" : {
+          "idTema" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "nombre" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "descripcion" : {
+            "type" : "string"
+          },
+          "origen" : {
+            "type" : "string"
+          },
+          "published" : {
+            "$ref" : "#/components/schemas/TemaVersionSummaryDTO"
+          },
+          "draft" : {
+            "$ref" : "#/components/schemas/TemaVersionSummaryDTO"
+          },
+          "fechaCreacion" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "usuarioCreacion" : {
+            "type" : "string"
+          },
+          "fechaUltimaModif" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "usuarioUltimaModif" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "nombre" ]
+      },
+      "TemaVersionSummaryDTO" : {
+        "type" : "object",
+        "properties" : {
+          "idTemaVersion" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "version" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "state" : {
+            "type" : "string"
+          },
+          "publishedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "publishedBy" : {
+            "type" : "string"
+          }
+        }
+      },
+      "OpenpanelApiResponseTemaDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/TemaDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "TemaVersionReleaseNotesRequestDTO" : {
+        "type" : "object",
+        "properties" : {
+          "releaseNotes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "OpenpanelApiResponseTemaVersionDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/TemaVersionDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "TemaVersionDTO" : {
+        "type" : "object",
+        "properties" : {
+          "idTemaVersion" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "version" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "state" : {
+            "type" : "string"
+          },
+          "sourceType" : {
+            "type" : "string"
+          },
+          "checksum" : {
+            "type" : "string"
+          },
+          "publishedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "publishedBy" : {
+            "type" : "string"
+          },
+          "releaseNotes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "TemaDraftRequestDTO" : {
+        "type" : "object",
+        "properties" : {
+          "tokensJson" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "metadataJson" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "tokensJson" ]
+      },
+      "TemaPresetDTO" : {
+        "type" : "object",
+        "properties" : {
+          "idTemaPreset" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "nombre" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "descripcion" : {
+            "type" : "string"
+          },
+          "tokensJson" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "metadataJson" : {
+            "type" : "string"
+          },
+          "isSystem" : {
+            "type" : "boolean"
+          },
+          "tags" : {
+            "type" : "string"
+          },
+          "fechaCreacion" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "fechaUltimaModif" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "nombre", "tokensJson" ]
+      },
+      "OpenpanelApiResponseTemaPresetDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/TemaPresetDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
       "ComentarioActualizarRequestDTO" : {
         "type" : "object",
         "properties" : {
@@ -8872,39 +10089,73 @@
         },
         "required" : [ "idUsuario", "password", "username" ]
       },
-      "SearchCriteriaDTO" : {
-        "type" : "object",
-        "properties" : {
-          "filterKey" : {
-            "type" : "string"
-          },
-          "value" : { },
-          "operation" : {
-            "type" : "string"
-          },
-          "dataOption" : {
-            "type" : "string"
-          },
-          "clazzName" : {
-            "type" : "string"
-          }
-        }
-      },
-      "SearchRequestDTO" : {
-        "type" : "object",
-        "properties" : {
-          "dataOption" : {
-            "type" : "string"
-          },
-          "searchCriteriaList" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/SearchCriteriaDTO"
+      "SearchConditionNodeDTO" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/SearchNodeDTO"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "field" : {
+              "type" : "string",
+              "minLength" : 1
             },
-            "minItems" : 1
+            "op" : {
+              "type" : "string",
+              "minLength" : 1
+            },
+            "value" : { }
+          }
+        } ],
+        "required" : [ "field", "op" ]
+      },
+      "SearchGroupNodeDTO" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/SearchNodeDTO"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "op" : {
+              "type" : "string",
+              "enum" : [ "AND", "OR" ]
+            },
+            "children" : {
+              "type" : "array",
+              "items" : {
+                "oneOf" : [ {
+                  "$ref" : "#/components/schemas/SearchConditionNodeDTO"
+                }, {
+                  "$ref" : "#/components/schemas/SearchGroupNodeDTO"
+                } ]
+              },
+              "minItems" : 1
+            }
+          }
+        } ],
+        "required" : [ "children", "op" ]
+      },
+      "SearchNodeDTO" : {
+        "discriminator" : {
+          "propertyName" : "type"
+        },
+        "properties" : {
+          "type" : {
+            "type" : "string"
           }
         },
-        "required" : [ "dataOption", "searchCriteriaList" ]
+        "required" : [ "type" ]
+      },
+      "SearchQueryDTO" : {
+        "type" : "object",
+        "properties" : {
+          "node" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/SearchConditionNodeDTO"
+            }, {
+              "$ref" : "#/components/schemas/SearchGroupNodeDTO"
+            } ]
+          }
+        },
+        "required" : [ "node" ]
       },
       "OpenpanelApiResponsePaginaResponseDTOUsuarioDTO" : {
         "type" : "object",
@@ -8965,6 +10216,53 @@
           }
         },
         "required" : [ "codigosRol" ]
+      },
+      "OpenpanelApiResponsePaginaResponseDTORolPrivilegioDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/PaginaResponseDTORolPrivilegioDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "PaginaResponseDTORolPrivilegioDTO" : {
+        "type" : "object",
+        "properties" : {
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "size" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "numberOfElements" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "empty" : {
+            "type" : "boolean"
+          },
+          "hasMore" : {
+            "type" : "boolean"
+          },
+          "elements" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RolPrivilegioDTO"
+            }
+          }
+        }
       },
       "OpenpanelApiResponsePaginaResponseDTORolDTO" : {
         "type" : "object",
@@ -9183,6 +10481,35 @@
             "items" : {
               "$ref" : "#/components/schemas/EntradaDTO"
             }
+          }
+        }
+      },
+      "OpenpanelApiResponseTemaPreviewTokenResponseDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/TemaPreviewTokenResponseDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "TemaPreviewTokenResponseDTO" : {
+        "type" : "object",
+        "properties" : {
+          "previewToken" : {
+            "type" : "string"
+          },
+          "expiresAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "previewUrl" : {
+            "type" : "string"
           }
         }
       },
@@ -9589,47 +10916,39 @@
           }
         }
       },
-      "CriterioBusquedaDTO" : {
+      "OpenpanelApiResponseSearchDefinitionsDTO" : {
         "type" : "object",
         "properties" : {
-          "ejemplo" : {
-            "$ref" : "#/components/schemas/SearchRequestDTO"
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
           },
-          "dataOptionPermitido" : {
+          "data" : {
+            "$ref" : "#/components/schemas/SearchDefinitionsDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "SearchDefinitionsDTO" : {
+        "type" : "object",
+        "properties" : {
+          "entity" : {
+            "type" : "string"
+          },
+          "version" : {
+            "type" : "string"
+          },
+          "fields" : {
             "type" : "array",
             "items" : {
-              "type" : "string"
+              "$ref" : "#/components/schemas/SearchFieldDefinitionDTO"
             }
           },
-          "indicaciones" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+          "example" : {
+            "$ref" : "#/components/schemas/SearchQueryDTO"
           },
-          "operationPermitido" : {
-            "type" : "object",
-            "additionalProperties" : {
-              "type" : "array",
-              "items" : {
-                "type" : "string",
-                "enum" : [ "CONTAINS", "DOES_NOT_CONTAIN", "EQUAL", "NOT_EQUAL", "BEGINS_WITH", "DOES_NOT_BEGIN_WITH", "ENDS_WITH", "DOES_NOT_END_WITH", "NULL", "NOT_NULL", "GREATER_THAN", "GREATER_THAN_EQUAL", "LESS_THAN", "LESS_THAN_EQUAL", "BOOLEAN", "ANY", "ALL", "AND", "OR" ]
-              }
-            }
-          },
-          "valuePermitido" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          },
-          "clazzNamePermitido" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          },
-          "filterKeySegunClazzNamePermitido" : {
+          "hints" : {
             "type" : "array",
             "items" : {
               "type" : "string"
@@ -9637,17 +10956,32 @@
           }
         }
       },
-      "OpenpanelApiResponseCriterioBusquedaDTO" : {
+      "SearchFieldDefinitionDTO" : {
         "type" : "object",
         "properties" : {
-          "result" : {
-            "$ref" : "#/components/schemas/ResultApiResponse"
+          "key" : {
+            "type" : "string"
           },
-          "data" : {
-            "$ref" : "#/components/schemas/CriterioBusquedaDTO"
+          "type" : {
+            "type" : "string"
           },
-          "error" : {
-            "$ref" : "#/components/schemas/ApiError"
+          "operations" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "nullable" : {
+            "type" : "boolean"
+          },
+          "sortable" : {
+            "type" : "boolean"
+          },
+          "enumValues" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           }
         }
       },
@@ -9781,6 +11115,45 @@
           },
           "error" : {
             "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "OpenpanelApiResponsePublicThemeDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/PublicThemeDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "PublicThemeDTO" : {
+        "type" : "object",
+        "properties" : {
+          "slug" : {
+            "type" : "string"
+          },
+          "idTemaVersion" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "version" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "tokensJson" : {
+            "type" : "string"
+          },
+          "cssUrl" : {
+            "type" : "string"
+          },
+          "assetsUrl" : {
+            "type" : "string"
           }
         }
       },
@@ -10357,6 +11730,190 @@
           }
         }
       },
+      "OpenpanelApiResponsePaginaResponseDTOTemaDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/PaginaResponseDTOTemaDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "PaginaResponseDTOTemaDTO" : {
+        "type" : "object",
+        "properties" : {
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "size" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "numberOfElements" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "empty" : {
+            "type" : "boolean"
+          },
+          "hasMore" : {
+            "type" : "boolean"
+          },
+          "elements" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TemaDTO"
+            }
+          }
+        }
+      },
+      "OpenpanelApiResponseListTemaVersionDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TemaVersionDTO"
+            }
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "OpenpanelApiResponseTemaDraftDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/TemaDraftDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "TemaDraftDTO" : {
+        "type" : "object",
+        "properties" : {
+          "slug" : {
+            "type" : "string"
+          },
+          "idTemaVersion" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "version" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "state" : {
+            "type" : "string"
+          },
+          "sourceType" : {
+            "type" : "string"
+          },
+          "tokensJson" : {
+            "type" : "string"
+          },
+          "metadataJson" : {
+            "type" : "string"
+          },
+          "cssUuid" : {
+            "type" : "string"
+          },
+          "assetsUuid" : {
+            "type" : "string"
+          },
+          "checksum" : {
+            "type" : "string"
+          },
+          "packageSizeKb" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "ChangedValue" : {
+        "type" : "object",
+        "properties" : {
+          "from" : { },
+          "to" : { }
+        }
+      },
+      "OpenpanelApiResponseTemaVersionCompareDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/TemaVersionCompareDTO"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
+      "TemaVersionCompareDTO" : {
+        "type" : "object",
+        "properties" : {
+          "from" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "to" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "added" : {
+            "type" : "object",
+            "additionalProperties" : { }
+          },
+          "removed" : {
+            "type" : "object",
+            "additionalProperties" : { }
+          },
+          "changed" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "$ref" : "#/components/schemas/ChangedValue"
+            }
+          }
+        }
+      },
+      "OpenpanelApiResponseListTemaPresetDTO" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ResultApiResponse"
+          },
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TemaPresetDTO"
+            }
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/ApiError"
+          }
+        }
+      },
       "AgravioDTO" : {
         "type" : "object",
         "properties" : {
@@ -10403,3 +11960,4 @@
     }
   }
 }
+

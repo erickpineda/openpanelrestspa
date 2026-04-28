@@ -1,303 +1,192 @@
 <div class="buscador-avanzado">
-  <div class="d-flex justify-content-between align-items-center mb-2 text-secondary small">
-    <span class="fw-semibold">Criterio</span>
-    <div class="d-flex align-items-center gap-3">
-      <span class="micro-divider"></span>
-      <span class="fw-semibold">Herramientas</span>
-    </div>
-  </div>
-  <c-row class="g-3 align-items-end flex-column flex-md-row">
-    <c-col xs="12" md="3">
-      <select
-        cSelect
-        cFormControl
-        [(ngModel)]="campoSeleccionado"
-        (change)="actualizarOperacionesDisponibles()"
-      >
-        @for (c of camposDisponibles; track c.valor) {
-          <option [value]="c.valor">{{ c.nombre }}</option>
-        }
-      </select>
-    </c-col>
-    <c-col xs="12" md="3">
-      <select cSelect cFormControl [(ngModel)]="operacionSeleccionada">
-        @for (o of operacionesDisponibles; track o.valor) {
-          <option [value]="o.valor">{{ o.nombre }}</option>
-        }
-      </select>
-    </c-col>
-    <c-col xs="12" md="4">
-      <!-- Input contextual según el tipo de campo (usar el getter campoActual en TS) -->
-      @if (campoActual) {
-        <!-- String -->
-        @if (campoActual.tipo === 'string') {
-          <input
-            type="text"
-            cFormControl
-            [placeholder]="placeholder"
-            [(ngModel)]="valorBusqueda"
-            (ngModelChange)="onValorChange($event)"
-            (keyup.enter)="buscar()"
-          />
-        }
-        <!-- Number -->
-        @if (campoActual.tipo === 'number') {
-          <input
-            type="number"
-            cFormControl
-            [placeholder]="placeholder"
-            [(ngModel)]="valorBusqueda"
-            (ngModelChange)="onValorChange($event)"
-            (keyup.enter)="buscar()"
-          />
-        }
-        <!-- Date -->
-        @if (campoActual.tipo === 'date') {
-          <input
-            type="date"
-            cFormControl
-            [placeholder]="placeholder"
-            [(ngModel)]="valorBusqueda"
-            (ngModelChange)="onValorChange($event)"
-            (keyup.enter)="buscar()"
-          />
-        }
-        <!-- Boolean -->
-        @if (campoActual.tipo === 'boolean') {
-          <select
-            cSelect
-            cFormControl
-            [(ngModel)]="valorBusqueda"
-            (ngModelChange)="onValorChange($event)"
-          >
-            <option [ngValue]="''">{{ 'AUTO.' | translate }}</option>
-            <option [ngValue]="true">{{ 'AUTO.S' | translate }}</option>
-            <option [ngValue]="false">{{ 'AUTO.NO' | translate }}</option>
-          </select>
-        }
-        <!-- Select (catálogos) -->
-        @if (campoActual.tipo === 'select') {
-          <select
-            cSelect
-            cFormControl
-            [(ngModel)]="valorBusqueda"
-            (ngModelChange)="onValorChange($event)"
-            [disabled]="!!catalogosError"
-          >
-            <option [ngValue]="''">{{ 'AUTO.SELECCIONE' | translate }}</option>
-            @for (opt of opcionesSelectActual; track opt) {
-              <option [ngValue]="opt">{{ opt }}</option>
-            }
-          </select>
-          @if (catalogosError) {
-            <div class="text-danger small mt-1">
-              {{ catalogosError }}
-            </div>
-          }
-        }
-      }
-    </c-col>
-  </c-row>
-  <c-row class="g-2 align-items-center mt-2">
-    <c-col xs="12" md="6" class="d-flex align-items-center gap-2">
-      <button cButton color="secondary" variant="ghost" size="sm" (click)="addCriterion()">
-        <svg cIcon name="cilPlus" class="me-1"></svg>
-        Añadir criterio
-      </button>
-    </c-col>
-    <c-col xs="12" md="6" class="d-none d-md-flex flex-wrap gap-2 justify-content-md-end">
-      <div class="btn-group" role="group" aria-label="Conmutador lógica">
-        <button
-          cButton
-          color="secondary"
-          variant="ghost"
-          size="sm"
-          [active]="dataOption === 'AND'"
-          (click)="setDataOption('AND')"
-          [cTooltip]="'Lógica: AND'"
-        >
-          AND
-        </button>
-        <button
-          cButton
-          color="secondary"
-          variant="ghost"
-          size="sm"
-          [active]="dataOption === 'OR'"
-          (click)="setDataOption('OR')"
-          [cTooltip]="'Lógica: OR'"
-        >
-          OR
-        </button>
-      </div>
-      <span class="micro-divider"></span>
-      <c-dropdown variant="btn-group">
-        <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm">
-          <svg cIcon name="cilApplicationsSettings" class="me-1"></svg>
-          Plantillas
-        </button>
-        <ul cDropdownMenu>
-          <li>
-            <button cDropdownItem (click)="applyPreset('PUBLICADAS_AND_TITULO')">
-              <span class="d-flex align-items-center gap-2">
-                <svg cIcon name="cilCheckAlt"></svg>
-                Publicadas AND Título contiene
-              </span>
-            </button>
-          </li>
-          <li>
-            <button cDropdownItem (click)="applyPreset('BORRADORES_OR_SIN_PUBLICAR')">
-              <span class="d-flex align-items-center gap-2">
-                <svg cIcon name="cilCheckAlt"></svg>
-                Borradores OR No publicada
-              </span>
-            </button>
-          </li>
-        </ul>
-      </c-dropdown>
-      <span class="micro-divider"></span>
-      @if (debeMostrarBotonBusqueda()) {
-        <button
-          cButton
-          [color]="autoTrigger ? 'secondary' : 'primary'"
-          [variant]="autoTrigger ? 'ghost' : undefined"
-          size="sm"
-          (click)="buscar()"
-        >
-          <svg cIcon name="cilSearch" class="me-1"></svg>
-          {{ 'AUTO.BUSCAR' | translate }}
-        </button>
-      }
-      @if (showClearButton) {
-        <button cButton color="secondary" size="sm" variant="ghost" (click)="limpiar()">
-          <svg cIcon name="cilX" class="me-1"></svg>
-          {{ 'AUTO.LIMPIAR' | translate }}
-        </button>
-      }
-    </c-col>
-  </c-row>
-  <c-row class="mt-2 d-md-none">
-    <c-col xs="12" class="d-flex justify-content-end">
-      <c-dropdown>
-        <button cButton cDropdownToggle color="secondary" variant="ghost" size="sm">
-          <svg cIcon name="cilOptions" class="me-1"></svg>
-          Más
-        </button>
-        <ul cDropdownMenu>
-          <li>
-            <button cDropdownItem (click)="addCriterion()">
-              <span class="d-flex align-items-center gap-2">
-                <svg cIcon name="cilPlus"></svg>
-                Añadir criterio
-              </span>
-            </button>
-          </li>
-          <li><hr cDropdownDivider /></li>
-          <li>
-            <button cDropdownItem (click)="setDataOption('AND')" [active]="dataOption === 'AND'">
-              <span class="d-flex align-items-center gap-2">
-                <svg cIcon name="cilFilter"></svg>
-                Lógica: AND
-              </span>
-            </button>
-          </li>
-          <li>
-            <button cDropdownItem (click)="setDataOption('OR')" [active]="dataOption === 'OR'">
-              <span class="d-flex align-items-center gap-2">
-                <svg cIcon name="cilFilter"></svg>
-                Lógica: OR
-              </span>
-            </button>
-          </li>
-          <li><hr cDropdownDivider /></li>
-          <li>
-            <button cDropdownItem (click)="buscar()">
-              <span class="d-flex align-items-center gap-2">
-                <svg cIcon name="cilSearch"></svg>
-                Buscar
-              </span>
-            </button>
-          </li>
-          <li>
-            <button cDropdownItem (click)="limpiar()">
-              <span class="d-flex align-items-center gap-2">
-                <svg cIcon name="cilX"></svg>
-                Limpiar
-              </span>
-            </button>
-          </li>
-        </ul>
-      </c-dropdown>
-    </c-col>
-  </c-row>
-  <c-row class="mt-2 d-md-none">
-    <c-col xs="12" class="d-flex align-items-center gap-3 justify-content-center">
-      <button
-        cButton
-        variant="ghost"
-        size="sm"
-        (click)="addCriterion()"
-        [cTooltip]="'Añadir criterio'"
-      >
-        <svg cIcon name="cilPlus"></svg>
-      </button>
-      <button
-        cButton
-        variant="ghost"
-        size="sm"
-        (click)="setDataOption('AND')"
-        [active]="dataOption === 'AND'"
-        [cTooltip]="'Lógica: AND'"
-      >
-        AND
-      </button>
-      <button
-        cButton
-        variant="ghost"
-        size="sm"
-        (click)="setDataOption('OR')"
-        [active]="dataOption === 'OR'"
-        [cTooltip]="'Lógica: OR'"
-      >
-        OR
-      </button>
-      <button cButton variant="ghost" size="sm" (click)="buscar()" [cTooltip]="'Buscar'">
-        <svg cIcon name="cilSearch"></svg>
-      </button>
-      <button cButton variant="ghost" size="sm" (click)="limpiar()" [cTooltip]="'Limpiar'">
-        <svg cIcon name="cilX"></svg>
-      </button>
-    </c-col>
-    @if (ultimaAccionLabel) {
-      <c-col xs="12" class="text-center text-secondary small mt-1">
-        {{ ultimaAccionLabel }}
-      </c-col>
-    }
-  </c-row>
-  @if (criterios.length > 0) {
-    <div class="mt-2 d-flex flex-wrap gap-2">
-      @for (c of criterios; track c) {
-        <span
-          class="badge rounded-pill bg-light border text-secondary d-inline-flex align-items-center gap-2 px-3 py-2"
-        >
-          <svg cIcon name="cilFilter" class="text-secondary"></svg>
-          <span class="fw-semibold">{{ c.campo }}</span>
-          <span class="opacity-75">{{ c.operacion }}</span>
-          <span class="font-monospace">{{ c.valor }}</span>
-          <button
-            cButton
-            color="secondary"
-            variant="ghost"
-            size="sm"
-            class="ms-2 p-0 px-1"
-            (click)="removeCriterion($index)"
-            [cTooltip]="'Quitar criterio'"
-            aria-label="Quitar criterio"
-          >
-            <svg cIcon name="cilXCircle"></svg>
+  @if (!adaptedDefs || getOrderedFields().length === 0) {
+    <div class="text-muted small">Sin definiciones de buscador.</div>
+  } @else {
+    <div class="d-flex justify-content-between align-items-center mb-2 text-secondary small">
+      <span class="fw-semibold">Búsqueda avanzada</span>
+      <div class="d-flex gap-2">
+        @if (debeMostrarBotonBusqueda()) {
+          <button cButton color="primary" size="sm" (click)="buscar()">
+            <svg cIcon name="cilSearch" class="me-1"></svg>
+            {{ 'AUTO.BUSCAR' | translate }}
           </button>
-        </span>
-      }
+        }
+        @if (showClearButton) {
+          <button cButton color="secondary" variant="ghost" size="sm" (click)="limpiar()">
+            <svg cIcon name="cilX" class="me-1"></svg>
+            {{ 'AUTO.LIMPIAR' | translate }}
+          </button>
+        }
+      </div>
     </div>
+
+    @if (catalogosError) {
+      <div class="text-danger small mb-2">{{ catalogosError }}</div>
+    }
+
+    <ng-template #nodeTpl let-node let-parent="parent" let-index="index">
+      @if (node.type === 'group') {
+        <div class="border rounded p-2 mb-2 bg-white">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-secondary small fw-semibold">Grupo</span>
+              <select
+                cSelect
+                size="sm"
+                [(ngModel)]="node.op"
+                (ngModelChange)="onNodeChange()"
+                aria-label="Operador de grupo"
+                class="w-auto"
+              >
+                <option [ngValue]="'AND'">AND</option>
+                <option [ngValue]="'OR'">OR</option>
+              </select>
+              <span class="text-muted small">({{ node.children.length }} nodos)</span>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button cButton color="secondary" variant="ghost" size="sm" (click)="addCondition(node)">
+                <svg cIcon name="cilPlus" class="me-1"></svg>
+                Condición
+              </button>
+              <button cButton color="secondary" variant="ghost" size="sm" (click)="addGroup(node)">
+                <svg cIcon name="cilFolderOpen" class="me-1"></svg>
+                Grupo
+              </button>
+              @if (parent) {
+                <button cButton color="danger" variant="ghost" size="sm" (click)="removeNode(parent, index)">
+                  <svg cIcon name="cilTrash" class="me-1"></svg>
+                  Quitar
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="ps-2 border-start">
+            @for (child of node.children; track child._id; let i = $index) {
+              <ng-container
+                *ngTemplateOutlet="nodeTpl; context: { $implicit: child, parent: node, index: i }"
+              ></ng-container>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="border rounded p-2 mb-2 bg-light">
+          <c-row class="g-2 align-items-end">
+            <c-col xs="12" md="4">
+              <label class="form-label small text-secondary mb-1">Campo</label>
+              <select
+                cSelect
+                cFormControl
+                [(ngModel)]="node.field"
+                (ngModelChange)="onFieldChange(node)"
+              >
+                @for (f of getOrderedFields(); track f.key) {
+                  <option [value]="f.key">{{ f.label }}</option>
+                }
+              </select>
+            </c-col>
+
+            <c-col xs="12" md="3">
+              <label class="form-label small text-secondary mb-1">Operación</label>
+              <select cSelect cFormControl [(ngModel)]="node.op" (ngModelChange)="onOpChange(node)">
+                @for (o of getOperationsForField(node.field); track o.value) {
+                  <option [value]="o.value">{{ o.label }}</option>
+                }
+              </select>
+            </c-col>
+
+            <c-col xs="12" md="4">
+              <label class="form-label small text-secondary mb-1">Valor</label>
+              @if (!shouldShowValueInput(node)) {
+                <div class="text-muted small">Sin valor</div>
+              } @else {
+                @if (shouldUseCatalogSelect(node)) {
+                  <select
+                    cSelect
+                    cFormControl
+                    [(ngModel)]="node.value"
+                    (ngModelChange)="onNodeChange()"
+                    [disabled]="getSelectOptions(node.field).length === 0"
+                  >
+                    @if (getSelectOptions(node.field).length === 0) {
+                      <option [ngValue]="''" [disabled]="true">
+                        {{ 'COMMON.LOADING' | translate }}...
+                      </option>
+                    } @else {
+                      <option [ngValue]="''">{{ 'AUTO.SELECCIONE' | translate }}</option>
+                      @for (opt of getSelectOptions(node.field); track opt) {
+                        <option [ngValue]="opt">{{ opt }}</option>
+                      }
+                    }
+                  </select>
+                } @else if (getFieldDef(node.field)?.tipo === 'boolean') {
+                  <select cSelect cFormControl [(ngModel)]="node.value" (ngModelChange)="onNodeChange()">
+                    <option [ngValue]="true">{{ 'AUTO.S' | translate }}</option>
+                    <option [ngValue]="false">{{ 'AUTO.NO' | translate }}</option>
+                  </select>
+                } @else if (getFieldDef(node.field)?.tipo === 'number') {
+                  <input
+                    type="number"
+                    cFormControl
+                    [placeholder]="placeholder"
+                    [(ngModel)]="node.value"
+                    (ngModelChange)="onNodeChange()"
+                  />
+                } @else if (getFieldDef(node.field)?.tipo === 'date') {
+                  <input
+                    type="date"
+                    cFormControl
+                    [(ngModel)]="node.value"
+                    (ngModelChange)="onNodeChange()"
+                  />
+                } @else if (getFieldDef(node.field)?.tipo === 'datetime') {
+                  <input
+                    type="datetime-local"
+                    cFormControl
+                    [(ngModel)]="node.value"
+                    (ngModelChange)="onNodeChange()"
+                  />
+                } @else if (getFieldDef(node.field)?.tipo === 'select') {
+                  <select cSelect cFormControl [(ngModel)]="node.value" (ngModelChange)="onNodeChange()">
+                    <option [ngValue]="''">{{ 'AUTO.SELECCIONE' | translate }}</option>
+                    @for (opt of getSelectOptions(node.field); track opt) {
+                      <option [ngValue]="opt">{{ opt }}</option>
+                    }
+                  </select>
+                } @else {
+                  <input
+                    type="text"
+                    cFormControl
+                    [placeholder]="placeholder"
+                    [(ngModel)]="node.value"
+                    (ngModelChange)="onNodeChange()"
+                  />
+                }
+              }
+            </c-col>
+
+            <c-col xs="12" md="1" class="d-flex justify-content-end">
+              @if (parent) {
+                <button cButton color="danger" variant="ghost" size="sm" (click)="removeNode(parent, index)">
+                  <svg cIcon name="cilTrash"></svg>
+                </button>
+              }
+            </c-col>
+          </c-row>
+        </div>
+      }
+    </ng-template>
+
+    <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: root, parent: null, index: -1 }">
+    </ng-container>
+
+    @if (adaptedDefs.indicaciones?.length) {
+      <div class="mt-2 small text-muted">
+        @for (h of adaptedDefs.indicaciones; track h) {
+          <div>• {{ h }}</div>
+        }
+      </div>
+    }
   }
 </div>

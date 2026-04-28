@@ -407,8 +407,8 @@ export const OPRestApiConstants: any = {
 export const OPRestMethods: any = {
   ENTRADAS: {
     BASE: '/entradas',
-    CREAR: '/entradas/crear', // POST para crear una entrada
-    OBTENER_POR_ID: (id: number) =&gt; `/entradas/obtenerPorId/${id}`, // GET para obtener una entrada por ID
+    CREAR: '/entradas',
+    OBTENER_POR_ID: (id: number) =&gt; `/entradas/${id}`,
     ACTUALIZAR: (id: number) =&gt; `/entradas/${id}`, // PUT para actualizar una entrada
     ELIMINAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/entradas/${id}`,</span> // DELETE para eliminar una entrada
     OBTENER_POR_SLUG: (slug: string) =&gt; `/entradas/obtenerPorSlug/${slug}`,
@@ -416,8 +416,8 @@ export const OPRestMethods: any = {
   },
   ROLES: {
     BASE: '/roles',
-    CREAR: `/roles/crear`,
-    OBTENER_POR_ID: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/roles/obtenerPorId/${id}`,</span>
+    CREAR: `/roles`,
+    OBTENER_POR_ID: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/roles/${id}`,</span>
     ACTUALIZAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/roles/${id}`,</span>
     ELIMINAR: (id: number) =&gt; `/roles/${id}`,
     OBTENER_POR_CODIGO: <span class="fstat-no" title="function not covered" >(c</span>odigo: string) =&gt; <span class="cstat-no" title="statement not covered" >`/roles/obtenerPorCodigo/${codigo}`,</span>
@@ -426,8 +426,8 @@ export const OPRestMethods: any = {
   },
   PRIVILEGIOS: {
     BASE: '/privilegios',
-    CREAR: `/privilegios/crear`,
-    OBTENER_POR_ID: (id: number) =&gt; `/privilegios/obtenerPorId/${id}`,
+    CREAR: `/privilegios`,
+    OBTENER_POR_ID: (id: number) =&gt; `/privilegios/${id}`,
     ACTUALIZAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/privilegios/${id}`,</span>
     ELIMINAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/privilegios/${id}`,</span>
     OBTENER_POR_CODIGO: <span class="fstat-no" title="function not covered" >(c</span>odigo: string) =&gt; <span class="cstat-no" title="statement not covered" >`/privilegios/obtenerPorCodigo/${codigo}`,</span>
@@ -436,8 +436,8 @@ export const OPRestMethods: any = {
   },
   USUARIOS: {
     BASE: '/usuarios',
-    CREAR: `/usuarios/crear`,
-    OBTENER_POR_ID: (id: number) =&gt; `/usuarios/obtenerPorId/${id}`,
+    CREAR: `/usuarios`,
+    OBTENER_POR_ID: (id: number) =&gt; `/usuarios/${id}`,
     ACTUALIZAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/usuarios/${id}`,</span>
     ELIMINAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/usuarios/${id}`,</span>
     OBTENER_POR_USERNAME: <span class="fstat-no" title="function not covered" >(u</span>sername: string) =&gt; <span class="cstat-no" title="statement not covered" >`/usuarios/obtenerPorUsername/${username}`,</span>
@@ -449,7 +449,7 @@ export const OPRestMethods: any = {
   COMENTARIOS: {
     BASE: '/comentarios',
     CREAR: `/comentarios/crear`,
-    OBTENER_POR_ID: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/comentarios/obtenerPorId/${id}`,</span>
+    OBTENER_POR_ID: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/comentarios/${id}`,</span>
     ACTUALIZAR: (id: number) =&gt; `/comentarios/${id}`,
     ELIMINAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/comentarios/${id}`,</span>
     LISTAR_POR_ID_ENTRADA: (idEntrada: number) =&gt; `/comentarios/listarPorIdEntrada/${idEntrada}`,
@@ -458,8 +458,8 @@ export const OPRestMethods: any = {
   },
   CATEGORIAS: {
     BASE: '/categorias',
-    CREAR: `/categorias/crear`,
-    OBTENER_POR_ID: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/categorias/obtenerPorId/${id}`,</span>
+    CREAR: `/categorias`,
+    OBTENER_POR_ID: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/categorias/${id}`,</span>
     ACTUALIZAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/categorias/${id}`,</span>
     ELIMINAR: (id: number) =&gt; `/categorias/${id}`,
     OBTENER_POR_CODIGO: <span class="fstat-no" title="function not covered" >(c</span>odigo: string) =&gt; <span class="cstat-no" title="statement not covered" >`/categorias/obtenerPorCodigo/${codigo}`,</span>
@@ -469,8 +469,8 @@ export const OPRestMethods: any = {
   },
   ETIQUETAS: {
     BASE: '/etiquetas',
-    CREAR: `/etiquetas/crear`,
-    OBTENER_POR_ID: (id: number) =&gt; `/etiquetas/obtenerPorId/${id}`,
+    CREAR: `/etiquetas`,
+    OBTENER_POR_ID: (id: number) =&gt; `/etiquetas/${id}`,
     ACTUALIZAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/etiquetas/${id}`,</span>
     ELIMINAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/etiquetas/${id}`,</span>
     OBTENER_POR_CODIGO: <span class="fstat-no" title="function not covered" >(c</span>odigo: string) =&gt; <span class="cstat-no" title="statement not covered" >`/etiquetas/obtenerPorCodigo/${codigo}`,</span>
@@ -517,8 +517,8 @@ export const OPRestMethods: any = {
   },
   TIPOS_ENTRADAS: {
     BASE: '/tiposEntradas',
-    OBTENER_POR_ID: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/tiposEntradas/obtenerPorId/${id}`,</span>
-    CREAR: '/tiposEntradas/crear',
+    OBTENER_POR_ID: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/tiposEntradas/${id}`,</span>
+    CREAR: '/tiposEntradas',
     ACTUALIZAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/tiposEntradas/${id}`,</span>
     ELIMINAR: <span class="fstat-no" title="function not covered" >(i</span>d: number) =&gt; <span class="cstat-no" title="statement not covered" >`/tiposEntradas/${id}`,</span>
     OBTENER_POR_CODIGO: (codigo: string) =&gt; `/tiposEntradas/obtenerPorCodigo/${codigo}`,
@@ -571,7 +571,7 @@ export const OPRestMethods: any = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-07T14:11:32.767Z
+                at 2026-04-27T13:34:12.622Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

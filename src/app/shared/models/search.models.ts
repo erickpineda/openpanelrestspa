@@ -1,33 +1,87 @@
-export type DataOption = 'AND' | 'OR';
+/**
+ * Nuevo contrato de búsqueda avanzada (árbol AND/OR) + definitions.
+ *
+ * - Request: SearchQuery { node: SearchNode }
+ * - Node: group(op, children[]) | condition(field, op, value?)
+ * - Definitions: SearchDefinitions { fields[], example?, hints? }
+ *
+ * Nota: el backend espera `op` en minúsculas (contains, equal, null, ...).
+ * Los GroupOp son `AND`/`OR` en mayúsculas.
+ */
 
-export type Operation =
-  | 'CONTAINS'
-  | 'EQUAL'
-  | 'NOT_EQUAL'
-  | 'BEGINS_WITH'
-  | 'ENDS_WITH'
-  | 'GREATER_THAN'
-  | 'LESS_THAN'
-  | 'IN'
-  | 'NOT_IN';
+export type SearchGroupOp = 'AND' | 'OR';
 
-export interface SearchCriterion {
-  filterKey: string;
-  operation: Operation | string;
-  value: any;
-  clazzName: string;
+export type SearchConditionOp =
+  | 'contains'
+  | 'does_not_contain'
+  | 'equal'
+  | 'not_equal'
+  | 'begins_with'
+  | 'does_not_begin_with'
+  | 'ends_with'
+  | 'does_not_end_with'
+  | 'greater_than'
+  | 'greater_than_equal'
+  | 'less_than'
+  | 'less_than_equal'
+  | 'null'
+  | 'not_null'
+  | 'boolean'
+  | string;
+
+export interface SearchGroupNode {
+  type: 'group';
+  op: SearchGroupOp;
+  children: SearchNode[];
 }
 
-export interface AdvancedSearchParams {
-  dataOption: DataOption;
-  searchCriteriaList: SearchCriterion[];
+export interface SearchConditionNode {
+  type: 'condition';
+  field: string;
+  op: SearchConditionOp;
+  /**
+   * Debe omitirse para `null` / `not_null`.
+   *
+   * Nota (fechas):
+   * - date: 'yyyy-MM-dd'
+   * - datetime: 'yyyy-MM-ddTHH:mm:ss' (ISO-8601)
+   */
+  value?: any;
 }
 
-export interface SingleFilter {
-  campo: string;
-  operacion: Operation | string;
-  valor: any;
-  dataOption?: DataOption;
+export type SearchNode = SearchGroupNode | SearchConditionNode;
+
+export interface SearchQuery {
+  node: SearchNode;
 }
 
-export interface SearchRequest extends AdvancedSearchParams {}
+export type SearchFieldType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'datetime'
+  | 'enum'
+  | string;
+
+export interface SearchFieldDefinition {
+  key: string;
+  type: SearchFieldType;
+  operations: SearchConditionOp[];
+  nullable?: boolean;
+  sortable?: boolean;
+  enumValues?: string[];
+  // Extensible
+  label?: string;
+  widget?: string;
+  placeholder?: string;
+  uiGroup?: string;
+}
+
+export interface SearchDefinitions {
+  entity: string;
+  version?: string;
+  fields: SearchFieldDefinition[];
+  example?: SearchQuery;
+  hints?: string[];
+}

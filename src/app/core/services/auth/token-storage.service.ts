@@ -21,6 +21,113 @@ export class TokenStorageService {
     (OPConstants.Session.POST_LOGIN_MAX_AGE_DAYS || 1) * 24 * 60 * 60 * 1000;
   private postLoginMaintenanceTimer: any = null;
 
+  private readonly roleWeights: Record<UserRole, number> = {
+    [UserRole.PROPIETARIO]: 7,
+    [UserRole.ADMINISTRADOR]: 6,
+    [UserRole.MANTENIMIENTO]: 5,
+    [UserRole.DESARROLLADOR]: 4,
+    [UserRole.EDITOR]: 3,
+    [UserRole.AUTOR]: 2,
+    [UserRole.LECTOR]: 1,
+    [UserRole.ANONYMOUS]: 0,
+  };
+
+  private normalizeRoleCandidate(candidate: string): string {
+    const v = (candidate || '').trim().toUpperCase();
+    return v.startsWith('ROLE_') ? v.substring('ROLE_'.length) : v;
+  }
+
+  private mapCandidateToUserRole(candidate: string): UserRole | null {
+    const normalized = this.normalizeRoleCandidate(candidate);
+    if (!normalized) return null;
+
+    const aliasMap: Record<string, UserRole> = {
+      USER: UserRole.LECTOR,
+      USUARIO: UserRole.LECTOR,
+      MODERATOR: UserRole.EDITOR,
+      MODERADOR: UserRole.EDITOR,
+      OWNER: UserRole.PROPIETARIO,
+      SUPERADMIN: UserRole.PROPIETARIO,
+      SUPER_ADMIN: UserRole.PROPIETARIO,
+      DEV: UserRole.DESARROLLADOR,
+      DEVELOPER: UserRole.DESARROLLADOR,
+      MAINTENANCE: UserRole.MANTENIMIENTO,
+    };
+
+    const alias = aliasMap[normalized];
+    if (alias) return alias;
+
+    const roleValues = Object.values(UserRole) as UserRole[];
+    if (roleValues.includes(normalized as UserRole)) {
+      return normalized as UserRole;
+    }
+
+    const key = normalized as keyof typeof UserRole;
+    if (UserRole[key]) {
+      return UserRole[key];
+    }
+
+    return null;
+  }
+
+  private pickHighestRole(roles: UserRole[]): UserRole {
+    if (!roles || roles.length === 0) return UserRole.LECTOR;
+    return roles.reduce((best, current) => {
+      const bestWeight = this.roleWeights[best] ?? 0;
+      const currentWeight = this.roleWeights[current] ?? 0;
+      return currentWeight > bestWeight ? current : best;
+    }, roles[0]);
+  }
+
+  public parseUserRole(candidate: string): UserRole | null {
+    return this.mapCandidateToUserRole(candidate);
+  }
+
+  public getUserRoles(): UserRole[] {
+    const user = this.getUser();
+    if (!user) return [];
+
+    const mapped: UserRole[] = [];
+
+    if (user.rolCodigo) {
+      const fromCodigo = this.mapCandidateToUserRole(user.rolCodigo);
+      if (fromCodigo) mapped.push(fromCodigo);
+    }
+
+    if (user.roles && Array.isArray(user.roles)) {
+      for (const r of user.roles) {
+        const mappedRole = this.mapCandidateToUserRole(r);
+        if (mappedRole) mapped.push(mappedRole);
+      }
+    }
+
+    if (mapped.length === 0) return [UserRole.LECTOR];
+
+    return Array.from(new Set(mapped));
+  }
+
+  public hasAnyRole(required: Array<UserRole | string> | null | undefined): boolean {
+    if (!required || required.length === 0) return true;
+
+    const requiredMapped = required
+      .map((r) => (typeof r === 'string' ? this.mapCandidateToUserRole(r) : r))
+      .filter((r): r is UserRole => !!r);
+
+    if (requiredMapped.length === 0) return false;
+
+    const userRoles = this.getUserRoles();
+    if (userRoles.length === 0) return false;
+
+    return requiredMapped.some((r) => userRoles.includes(r));
+  }
+
+  public hasMinimumRole(minRole: UserRole): boolean {
+    const current = this.getUserRole();
+    const currentWeight = this.roleWeights[current] ?? 0;
+    const minWeight = this.roleWeights[minRole] ?? 0;
+    return currentWeight >= minWeight;
+  }
+
   public getOrCreateTabId(): string {
     try {
       let id = window.sessionStorage.getItem(TAB_ID_KEY);
@@ -253,21 +360,25 @@ export class TokenStorageService {
       return UserRole.LECTOR;
     }
 
-    if (user.roles && Array.isArray(user.roles)) {
-      // Mapeo dinámico de roles de Spring Security (ROLE_KEY) a UserRole (KEY)
-      const userRoleKeys = Object.keys(UserRole) as Array<keyof typeof UserRole>;
+    const mapped: UserRole[] = [];
 
-      for (const key of userRoleKeys) {
-        if (user.roles.includes(`ROLE_${key}`)) {
-          return UserRole[key];
-        }
-      }
-    } else if (user.rolCodigo) {
-      // Fallback si viene como rolCodigo (compatibilidad antigua)
-      return user.rolCodigo as UserRole;
+    if (user.rolCodigo) {
+      const fromCodigo = this.mapCandidateToUserRole(user.rolCodigo);
+      if (fromCodigo) mapped.push(fromCodigo);
     }
 
-    return UserRole.LECTOR; // Default fallback
+    if (user.roles && Array.isArray(user.roles)) {
+      for (const r of user.roles) {
+        const mappedRole = this.mapCandidateToUserRole(r);
+        if (mappedRole) mapped.push(mappedRole);
+      }
+    }
+
+    if (mapped.length > 0) {
+      return this.pickHighestRole(mapped);
+    }
+
+    return UserRole.LECTOR;
   }
 
   public isLoggedIn(): boolean {

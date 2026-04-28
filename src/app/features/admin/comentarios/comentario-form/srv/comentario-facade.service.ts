@@ -8,6 +8,7 @@ import { ComentarioService } from '@app/core/services/data/comentario.service';
 import { UsuarioService } from '@app/core/services/data/usuario.service';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 import { OpenpanelApiResponse } from '@app/core/models/openpanel-api-response.model';
+import { SearchQuery } from '@app/shared/models/search.models';
 
 @Injectable({ providedIn: 'root' })
 export class ComentarioFacadeService {
@@ -75,16 +76,8 @@ export class ComentarioFacadeService {
   }
 
   buscarEntradas(term: string): Observable<Entrada[]> {
-    const searchRequest = {
-      dataOption: 'AND',
-      searchCriteriaList: [
-        {
-          filterKey: 'titulo',
-          value: term,
-          operation: 'CONTAINS',
-          clazzName: 'Entrada',
-        },
-      ],
+    const searchRequest: SearchQuery = {
+      node: { type: 'condition', field: 'titulo', op: 'contains', value: term },
     };
     return this.entradaService
       .buscarSafe(searchRequest, 0, 10)

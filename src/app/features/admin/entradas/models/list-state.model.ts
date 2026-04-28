@@ -1,4 +1,4 @@
-import { AdvancedSearchParams, DataOption } from '@app/shared/models/search.models';
+import { SearchQuery } from '@app/shared/models/search.models';
 import { EntradaVM } from './entrada.vm';
 import { SearchParams } from './search-params.model';
 
@@ -15,6 +15,5 @@ export interface ListState {
   lastSearchParams: SearchParams | null;
   sortField?: string;
   sortDirection?: 'ASC' | 'DESC';
-  lastAdvancedCriteriaList?: AdvancedSearchParams['searchCriteriaList'] | null;
-  lastAdvancedDataOption?: DataOption | null;
+  lastSearchQuery?: SearchQuery | null;
 }

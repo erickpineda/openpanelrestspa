@@ -78,6 +78,9 @@ export class AppComponent implements OnInit {
 
     this.uiMonitor.start();
 
+    // Limpieza preventiva: evitar que localStorage se llene con previews (puede afectar al sync de auth entre pestañas).
+    this.cleanupThemePreviewStorage();
+
     // Safety check: ensure no stale backdrops or overlays are blocking the UI on startup
     setTimeout(() => {
       this.uiMonitor.scanAndRecover('startup_safety');
@@ -105,6 +108,41 @@ export class AppComponent implements OnInit {
         const title = this.i18n.instant('MENU.THEMES');
         this.toast.showInfo(body, title, { delay: 6000 });
       });
+    } catch {}
+  }
+
+  private cleanupThemePreviewStorage() {
+    try {
+      const now = Date.now();
+      const cleanup = (prefix: string, maxEntries: number, maxAgeMs: number) => {
+        const items: Array<{ key: string; ts: number }> = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k || !k.startsWith(prefix)) continue;
+          const raw = localStorage.getItem(k) || '';
+          let ts = 0;
+          try {
+            const obj: any = JSON.parse(raw);
+            ts = Date.parse(obj?.createdAt || '');
+          } catch {}
+          const safeTs = isNaN(ts) ? 0 : ts;
+          items.push({ key: k, ts: safeTs });
+        }
+        // Age
+        items.forEach(({ key, ts }) => {
+          if (ts > 0 && now - ts > maxAgeMs) {
+            localStorage.removeItem(key);
+          }
+        });
+        // Max
+        if (items.length > maxEntries) {
+          const sorted = items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+          sorted.slice(maxEntries).forEach(({ key }) => localStorage.removeItem(key));
+        }
+      };
+
+      cleanup('op-theme-local-preview:', 20, 24 * 60 * 60 * 1000);
+      cleanup('op-theme-preview-meta:', 20, 24 * 60 * 60 * 1000);
     } catch {}
   }
 }

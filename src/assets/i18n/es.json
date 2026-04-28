@@ -82,6 +82,9 @@
       "SIGNING_IN": "Iniciando sesión...",
       "FORGOT_PASSWORD": "¿Has olvidado la contraseña?",
       "LOGIN_FAILED": "Error de inicio de sesión",
+      "INVALID_CREDENTIALS": "Usuario o contraseña incorrectos.",
+      "NETWORK_ERROR": "No se pudo conectar con el servidor. Inténtalo de nuevo.",
+      "UNKNOWN_ERROR": "Ha ocurrido un error. Inténtalo de nuevo.",
       "LOGGED_IN": "Sesión iniciada con éxito",
       "USER_ROLE_INFO": "Tus roles son"
     },

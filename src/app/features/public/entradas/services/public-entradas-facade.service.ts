@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 import { PublicEntradasStateService } from './public-entradas-state.service';
 import { finalize } from 'rxjs/operators';
+import { SearchQuery } from '@app/shared/models/search.models';
 
 @Injectable({
   providedIn: 'root',
@@ -42,29 +43,37 @@ export class PublicEntradasFacadeService {
       ? [...new Set(etiquetasNombres.map((t) => String(t || '').trim()).filter((t) => t.length > 0))]
       : [];
 
-    const searchRequest = {
-      dataOption: 'ALL',
-      searchCriteriaList: [
-        { filterKey: 'publicada', operation: 'EQUAL', value: true, clazzName: 'Entrada' },
-        ...(permitirComentario === true
-          ? [{ filterKey: 'permitirComentario', operation: 'EQUAL', value: true, clazzName: 'Entrada' }]
-          : []),
-        ...(searchText && searchText.trim().length > 0
-          ? [{ filterKey: 'titulo', operation: 'CONTAINS', value: searchText.trim(), clazzName: 'Entrada' }]
-          : []),
-        ...categoriasLimpias.map((categoria) => ({
-          filterKey: 'categoria.nombre',
-          operation: 'EQUAL',
-          value: categoria,
-          clazzName: 'Categoria',
-        })),
-        ...etiquetasLimpias.map((etiqueta) => ({
-          filterKey: 'etiqueta.nombre',
-          operation: 'EQUAL',
-          value: etiqueta,
-          clazzName: 'Etiqueta',
-        })),
-      ],
+    const children: any[] = [
+      { type: 'condition', field: 'publicada', op: 'equal', value: true },
+      ...(permitirComentario === true
+        ? [{ type: 'condition', field: 'permitirComentario', op: 'equal', value: true }]
+        : []),
+      ...(searchText && searchText.trim().length > 0
+        ? [
+            {
+              type: 'condition',
+              field: 'titulo',
+              op: 'contains',
+              value: searchText.trim(),
+            },
+          ]
+        : []),
+      ...categoriasLimpias.map((categoria) => ({
+        type: 'condition',
+        field: 'categoria.nombre',
+        op: 'equal',
+        value: categoria,
+      })),
+      ...etiquetasLimpias.map((etiqueta) => ({
+        type: 'condition',
+        field: 'etiqueta.nombre',
+        op: 'equal',
+        value: etiqueta,
+      })),
+    ];
+
+    const searchRequest: SearchQuery = {
+      node: children.length === 1 ? children[0] : { type: 'group', op: 'AND', children },
     };
 
     this.entradaService

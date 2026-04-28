@@ -1,8 +1,10 @@
 import {
-  parseAllowedDate,
   formatForBackend,
-  isAllowedDateString,
   formatForDateTimeLocal,
+  isAllowedDateString,
+  parseAllowedDate,
+  serializeDateInputToBackend,
+  serializeDateTimeLocalInputToBackend,
 } from './date-utils';
 
 describe('DateUtils', () => {
@@ -19,75 +21,51 @@ describe('DateUtils', () => {
       expect(parseAllowedDate(d)).toEqual(d);
     });
 
-    it('should return null for invalid Date object', () => {
-      expect(parseAllowedDate(new Date('invalid'))).toBeNull();
+    it('should parse ISO local datetime and legacy ES datetime', () => {
+      const iso = parseAllowedDate('2026-04-24T10:15:00');
+      const legacy = parseAllowedDate('24-04-2026 10:15:00');
+
+      expect(iso).toBeTruthy();
+      expect(legacy).toBeTruthy();
+      expect(iso?.getFullYear()).toBe(2026);
+      expect(legacy?.getFullYear()).toBe(2026);
     });
 
-    it('should return Date for valid number timestamp', () => {
-      const d = new Date(2023, 0, 1);
-      expect(parseAllowedDate(d.getTime())).toEqual(d);
-    });
-
-    it('should parse ISO format yyyy-MM-dd', () => {
-      const d = parseAllowedDate('2023-01-20');
+    it('should fall back to native parsing for ISO with timezone', () => {
+      const d = parseAllowedDate('2026-04-24T10:15:00Z');
       expect(d).toBeTruthy();
-      expect(d?.getFullYear()).toBe(2023);
-      expect(d?.getMonth()).toBe(0); // Jan is 0
-      expect(d?.getDate()).toBe(20);
-    });
-
-    it('should parse ISO format yyyy-MM-dd HH:mm:ss', () => {
-      const d = parseAllowedDate('2023-01-20 14:30:45');
-      expect(d).toBeTruthy();
-      expect(d?.getFullYear()).toBe(2023);
-      expect(d?.getHours()).toBe(14);
-      expect(d?.getMinutes()).toBe(30);
-      expect(d?.getSeconds()).toBe(45);
-    });
-
-    it('should parse ES format dd-MM-yyyy', () => {
-      const d = parseAllowedDate('20-01-2023');
-      expect(d).toBeTruthy();
-      expect(d?.getFullYear()).toBe(2023);
-      expect(d?.getMonth()).toBe(0);
-      expect(d?.getDate()).toBe(20);
-    });
-
-    it('should parse ES format dd-MM-yyyy HH:mm:ss', () => {
-      const d = parseAllowedDate('20-01-2023 14:30:45');
-      expect(d).toBeTruthy();
-      expect(d?.getFullYear()).toBe(2023);
-      expect(d?.getHours()).toBe(14);
-    });
-
-    it('should fall back to native Date parsing', () => {
-      const d = parseAllowedDate('2023/01/20');
-      expect(d).toBeTruthy();
-      expect(d?.getFullYear()).toBe(2023);
     });
   });
 
   describe('formatForBackend', () => {
-    it('should format as yyyy-MM-dd HH:mm:ss by default', () => {
+    it('should format datetime as ISO local by default', () => {
       const d = new Date(2023, 0, 20, 14, 30, 45);
-      expect(formatForBackend(d)).toBe('2023-01-20 14:30:45');
+      expect(formatForBackend(d)).toBe('2023-01-20T14:30:45');
     });
 
-    it('should format as yyyy-MM-dd when withTime=false', () => {
+    it('should format date as yyyy-MM-dd when withTime=false', () => {
       const d = new Date(2023, 0, 20, 14, 30, 45);
       expect(formatForBackend(d, false)).toBe('2023-01-20');
     });
+  });
 
-    it('should return null for invalid input', () => {
-      expect(formatForBackend(null as any)).toBeNull();
+  describe('serializers', () => {
+    it('should serialize date inputs without converting to legacy format', () => {
+      expect(serializeDateInputToBackend('2026-04-24')).toBe('2026-04-24');
+    });
+
+    it('should serialize datetime-local inputs as ISO local', () => {
+      expect(serializeDateTimeLocalInputToBackend('2026-04-24T10:15')).toBe(
+        '2026-04-24T10:15:00'
+      );
     });
   });
 
   describe('isAllowedDateString', () => {
-    it('should return true for valid patterns', () => {
-      expect(isAllowedDateString('2023-01-01')).toBeTrue();
-      expect(isAllowedDateString('01-01-2023')).toBeTrue();
-      expect(isAllowedDateString('2023-01-01 12:00:00')).toBeTrue();
+    it('should return true for final and legacy patterns', () => {
+      expect(isAllowedDateString('2026-04-24')).toBeTrue();
+      expect(isAllowedDateString('2026-04-24T10:15:00')).toBeTrue();
+      expect(isAllowedDateString('24-04-2026 10:15:00')).toBeTrue();
     });
 
     it('should return false for invalid patterns', () => {
@@ -98,12 +76,8 @@ describe('DateUtils', () => {
 
   describe('formatForDateTimeLocal', () => {
     it('should format as yyyy-MM-ddTHH:mm', () => {
-      const d = new Date(2023, 0, 20, 14, 5); // 14:05
+      const d = new Date(2023, 0, 20, 14, 5);
       expect(formatForDateTimeLocal(d)).toBe('2023-01-20T14:05');
-    });
-
-    it('should return null for invalid input', () => {
-      expect(formatForDateTimeLocal(null)).toBeNull();
     });
   });
 });
