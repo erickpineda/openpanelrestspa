@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './admin.component';
 import { AuthGuard } from '../core/_helpers/auth.guard';
+import { OpPrivilegioConstants } from '../shared/constants/op-privilegio.constants';
 import { UserRole } from '../shared/types/navigation.types';
 
 const routes: Routes = [
@@ -23,6 +24,8 @@ const routes: Routes = [
           preload: true,
           delay: 1000,
           title: 'MENU.DASHBOARD',
+          permissions: [OpPrivilegioConstants.VER_DASHBOARD],
+          permissionMode: 'ANY',
           roles: [
             UserRole.AUTOR,
             UserRole.EDITOR,
@@ -40,15 +43,6 @@ const routes: Routes = [
           preload: true,
           delay: 1000,
           title: 'MENU.CONTROL_PANEL',
-          roles: [
-            UserRole.LECTOR,
-            UserRole.AUTOR,
-            UserRole.EDITOR,
-            UserRole.ADMINISTRADOR,
-            UserRole.DESARROLLADOR,
-            UserRole.MANTENIMIENTO,
-            UserRole.PROPIETARIO,
-          ],
         },
         canLoad: [AuthGuard], // evita la carga del módulo si no estamos autenticados
       },

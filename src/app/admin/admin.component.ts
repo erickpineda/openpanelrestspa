@@ -335,6 +335,21 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     const filtered: any[] = [];
 
     items.forEach((originalItem) => {
+      // 0. Check requiredPermissions (si están presentes, prevalecen sobre roles)
+      if (originalItem.requiredPermissions && originalItem.requiredPermissions.length > 0) {
+        const user = this.tokenStorage.getUser();
+        const privs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+        const set = new Set(privs);
+        const mode: 'ANY' | 'ALL' = (originalItem.permissionMode as any) || 'ANY';
+        const ok =
+          mode === 'ALL'
+            ? originalItem.requiredPermissions.every((p: string) => set.has(p))
+            : originalItem.requiredPermissions.some((p: string) => set.has(p));
+        if (!ok) {
+          return;
+        }
+      }
+
       // 1. Check requiredRoles
       if (originalItem.requiredRoles && !originalItem.requiredRoles.includes(role)) {
         return;

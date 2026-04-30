@@ -112,9 +112,32 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
       return false;
     }
 
+    // comprobación de permisos (preferida; desacopla de roles hardcodeados)
+    const requiredPermissions = route.data['permissions'] as Array<string> | undefined;
+    const hasPermissionRequirements = !!requiredPermissions && requiredPermissions.length > 0;
+    const permissionMode = (route.data['permissionMode'] as 'ANY' | 'ALL' | undefined) ?? 'ANY';
+    if (hasPermissionRequirements) {
+      const user = this.tokenStorage.getUser();
+      const userPrivs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+      const set = new Set(userPrivs);
+      const ok =
+        permissionMode === 'ALL'
+          ? requiredPermissions.every((p) => set.has(p))
+          : requiredPermissions.some((p) => set.has(p));
+      if (!ok) {
+        this.log.info('🔐 AuthGuard - Usuario no tiene los permisos requeridos:', requiredPermissions);
+        return this.redirectForForbidden();
+      }
+    }
+
     const data: any = route.data || {};
     const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
-    if (requiredRoles && requiredRoles.length > 0 && !this.tokenStorage.hasAnyRole(requiredRoles)) {
+    if (
+      !hasPermissionRequirements &&
+      requiredRoles &&
+      requiredRoles.length > 0 &&
+      !this.tokenStorage.hasAnyRole(requiredRoles)
+    ) {
       this.log.info('🔐 AuthGuard - Usuario no tiene los roles requeridos:', requiredRoles);
       return this.redirectForForbidden();
     }
@@ -144,8 +167,31 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     if (!check) return false;
 
     const data: any = route.data || {};
+
+    const requiredPermissions = data['permissions'] as Array<string> | undefined;
+    const hasPermissionRequirements = !!requiredPermissions && requiredPermissions.length > 0;
+    const permissionMode = (data['permissionMode'] as 'ANY' | 'ALL' | undefined) ?? 'ANY';
+    if (hasPermissionRequirements) {
+      const user = this.tokenStorage.getUser();
+      const userPrivs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+      const set = new Set(userPrivs);
+      const ok =
+        permissionMode === 'ALL'
+          ? requiredPermissions.every((p) => set.has(p))
+          : requiredPermissions.some((p) => set.has(p));
+      if (!ok) {
+        this.log.info('🔐 AuthGuard - Usuario no tiene los permisos requeridos (canLoad):', requiredPermissions);
+        return this.redirectForForbidden();
+      }
+    }
+
     const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
-    if (requiredRoles && requiredRoles.length > 0 && !this.tokenStorage.hasAnyRole(requiredRoles)) {
+    if (
+      !hasPermissionRequirements &&
+      requiredRoles &&
+      requiredRoles.length > 0 &&
+      !this.tokenStorage.hasAnyRole(requiredRoles)
+    ) {
       this.log.info('🔐 AuthGuard - Usuario no tiene los roles requeridos (canLoad):', requiredRoles);
       return this.redirectForForbidden();
     }
@@ -171,8 +217,31 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     if (!check) return false;
 
     const data: any = route.data || {};
+
+    const requiredPermissions = data['permissions'] as Array<string> | undefined;
+    const hasPermissionRequirements = !!requiredPermissions && requiredPermissions.length > 0;
+    const permissionMode = (data['permissionMode'] as 'ANY' | 'ALL' | undefined) ?? 'ANY';
+    if (hasPermissionRequirements) {
+      const user = this.tokenStorage.getUser();
+      const userPrivs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+      const set = new Set(userPrivs);
+      const ok =
+        permissionMode === 'ALL'
+          ? requiredPermissions.every((p) => set.has(p))
+          : requiredPermissions.some((p) => set.has(p));
+      if (!ok) {
+        this.log.info('🔐 AuthGuard - Usuario no tiene permisos requeridos (canMatch):', requiredPermissions);
+        return this.redirectForForbidden();
+      }
+    }
+
     const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
-    if (requiredRoles && requiredRoles.length > 0 && !this.tokenStorage.hasAnyRole(requiredRoles)) {
+    if (
+      !hasPermissionRequirements &&
+      requiredRoles &&
+      requiredRoles.length > 0 &&
+      !this.tokenStorage.hasAnyRole(requiredRoles)
+    ) {
       this.log.info(
         '🔐 AuthGuard - Usuario no tiene los roles requeridos (canMatch):',
         requiredRoles

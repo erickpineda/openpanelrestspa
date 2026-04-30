@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { BaseComponent } from './base.component';
 import { BaseIndexComponent } from './base-index.component';
 // Entradas feature is lazy-loaded (EntradasModule)
+import { OpPrivilegioConstants } from '../../shared/constants/op-privilegio.constants';
 import { UserRole } from '../../shared/types/navigation.types';
 
 const routes: Routes = [
@@ -33,6 +34,12 @@ const routes: Routes = [
           preload: true,
           delay: 3000,
           title: 'MENU.ENTRIES',
+          permissions: [
+            OpPrivilegioConstants.CREAR_ENTRADAS,
+            OpPrivilegioConstants.EDITAR_ENTRADAS_PROPIAS,
+            OpPrivilegioConstants.EDITAR_ENTRADAS_TODO,
+          ],
+          permissionMode: 'ANY',
           roles: [
             UserRole.AUTOR,
             UserRole.EDITOR,
@@ -69,6 +76,8 @@ const routes: Routes = [
           preload: true,
           delay: 8000,
           title: 'MENU.SETTINGS',
+          permissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+          permissionMode: 'ANY',
           roles: [UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
         },
       },
@@ -82,6 +91,8 @@ const routes: Routes = [
           preload: true,
           delay: 5000,
           title: 'MENU.CONTENT',
+          permissions: [OpPrivilegioConstants.GESTIONAR_ARCHIVOS],
+          permissionMode: 'ANY',
           roles: [
             UserRole.AUTOR,
             UserRole.EDITOR,
@@ -99,6 +110,12 @@ const routes: Routes = [
           preload: true,
           delay: 6000,
           title: 'MENU.MANAGEMENT',
+          permissions: [
+            OpPrivilegioConstants.GESTIONAR_USUARIOS,
+            OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS,
+            OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS,
+          ],
+          permissionMode: 'ANY',
           roles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO],
         },
       },
@@ -112,6 +129,8 @@ const routes: Routes = [
           preload: true,
           delay: 7000,
           title: 'MENU.TAGS',
+          permissions: [OpPrivilegioConstants.GESTIONAR_ETIQUETAS],
+          permissionMode: 'ANY',
           roles: [
             UserRole.AUTOR,
             UserRole.EDITOR,
@@ -127,6 +146,8 @@ const routes: Routes = [
           import('@features/admin/perfil/perfil.module').then((m) => m.PerfilFeatureModule),
         data: {
           title: 'MENU.PROFILE',
+          permissions: [OpPrivilegioConstants.GESTIONAR_PERFIL],
+          permissionMode: 'ANY',
           roles: [
             UserRole.LECTOR,
             UserRole.AUTOR,
@@ -146,6 +167,11 @@ const routes: Routes = [
           ),
         data: {
           title: 'MENU.MAINTENANCE',
+          permissions: [
+            OpPrivilegioConstants.REALIZAR_MANTENIMIENTO,
+            OpPrivilegioConstants.DEPURAR_ERRORES,
+          ],
+          permissionMode: 'ANY',
           roles: [UserRole.MANTENIMIENTO, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
         }, // No preload
       },
@@ -159,6 +185,8 @@ const routes: Routes = [
           preload: true,
           delay: 7500,
           title: 'MENU.CATEGORIES',
+          permissions: [OpPrivilegioConstants.GESTIONAR_CATEGORIAS],
+          permissionMode: 'ANY',
           roles: [
             UserRole.EDITOR,
             UserRole.ADMINISTRADOR,
@@ -177,6 +205,8 @@ const routes: Routes = [
           preload: true,
           delay: 6500,
           title: 'MENU.COMMENTS',
+          permissions: [OpPrivilegioConstants.MODERAR_COMENTARIOS],
+          permissionMode: 'ANY',
           roles: [
             UserRole.EDITOR,
             UserRole.ADMINISTRADOR,

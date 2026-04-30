@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.91% </span>
+                <span class="strong">45.45% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>23/48</span>
+                <span class='fraction'>20/44</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">22.22% </span>
+                <span class="strong">21.42% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/18</span>
+                <span class='fraction'>3/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">43.75% </span>
+                <span class="strong">42.85% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>7/16</span>
+                <span class='fraction'>6/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">47.22% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>20/40</span>
+                <span class='fraction'>17/36</span>
             </div>
         
             
@@ -235,17 +235,7 @@
 <a name='L170'></a><a href='#L170'>170</a>
 <a name='L171'></a><a href='#L171'>171</a>
 <a name='L172'></a><a href='#L172'>172</a>
-<a name='L173'></a><a href='#L173'>173</a>
-<a name='L174'></a><a href='#L174'>174</a>
-<a name='L175'></a><a href='#L175'>175</a>
-<a name='L176'></a><a href='#L176'>176</a>
-<a name='L177'></a><a href='#L177'>177</a>
-<a name='L178'></a><a href='#L178'>178</a>
-<a name='L179'></a><a href='#L179'>179</a>
-<a name='L180'></a><a href='#L180'>180</a>
-<a name='L181'></a><a href='#L181'>181</a>
-<a name='L182'></a><a href='#L182'>182</a>
-<a name='L183'></a><a href='#L183'>183</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L173'></a><a href='#L173'>173</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -261,16 +251,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">60x</span>
-<span class="cline-any cline-yes">60x</span>
-<span class="cline-any cline-yes">60x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">60x</span>
@@ -443,16 +423,6 @@ import { OPConstants } from '../../shared/constants/op-global.constants';
 export abstract class CrudService&lt;T, ID&gt; extends BaseService {
   protected abstract endpoint: string;
   protected pageSizeParam: string = OPConstants.Pagination.PAGE_SIZE_PARAM;
-  protected useLegacyCreateEndpoint = false;
-  protected useLegacyGetByIdEndpoint = false;
-&nbsp;
-  protected buildCreateUrl(): string {
-    return this.useLegacyCreateEndpoint ? <span class="branch-0 cbranch-no" title="branch not covered" >`${this.endpoint}/crear` </span>: this.endpoint;
-  }
-&nbsp;
-  protected <span class="fstat-no" title="function not covered" >buildGetByIdUrl(</span>id: ID): string {
-<span class="cstat-no" title="statement not covered" >    return this.useLegacyGetByIdEndpoint ? `${this.endpoint}/obtenerPorId/${id}` : `${this.endpoint}/${id}`;</span>
-  }
 &nbsp;
   constructor(
     protected override http: HttpClient,
@@ -495,7 +465,7 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
    */
 <span class="fstat-no" title="function not covered" >  obtenerPorIdSafe(</span>id: ID, context?: HttpContext): Observable&lt;T&gt; {
 <span class="cstat-no" title="statement not covered" >    return this.safeGetData&lt;T&gt;(</span>
-      this.buildGetByIdUrl(id),
+      `${this.endpoint}/obtenerPorId/${id}`,
       {} as T, // ✅ Cast simple a T
       undefined,
       undefined,
@@ -509,7 +479,7 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
    */
 <span class="fstat-no" title="function not covered" >  crearSafe(</span>entity: T, context?: HttpContext): Observable&lt;T&gt; {
 <span class="cstat-no" title="statement not covered" >    return this.safePostData&lt;T&gt;(</span>
-      this.buildCreateUrl(),
+      `${this.endpoint}/crear`,
       entity,
       {} as T, // ✅ Cast simple a T
       undefined,
@@ -527,7 +497,7 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
     context?: HttpContext
   ): Observable&lt;{ success: boolean; data?: T; error?: any }&gt; {
     return this.safeOperationWithState&lt;T&gt;(
-      this.post&lt;T&gt;(this.buildCreateUrl(), entity, undefined, undefined, context),
+      this.post&lt;T&gt;(`${this.endpoint}/crear`, entity, undefined, undefined, context),
       `${this.endpoint}.crear`
     );
   }
@@ -594,11 +564,11 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  obtenerPorId(</span>id: ID, context?: HttpContext): Observable&lt;OpenpanelApiResponse&lt;any&gt;&gt; {
-<span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(this.buildGetByIdUrl(id), undefined, undefined, context);</span>
+<span class="cstat-no" title="statement not covered" >    return this.get&lt;any&gt;(`${this.endpoint}/obtenerPorId/${id}`, undefined, undefined, context);</span>
   }
 &nbsp;
   crear(entity: T, context?: HttpContext): Observable&lt;any&gt; {
-    return this.post&lt;any&gt;(this.buildCreateUrl(), entity, undefined, undefined, context);
+    return this.post&lt;any&gt;(`${this.endpoint}/crear`, entity, undefined, undefined, context);
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  actualizar(</span>id: ID, entity: T, context?: HttpContext): Observable&lt;OpenpanelApiResponse&lt;any&gt;&gt; {
@@ -616,7 +586,7 @@ export abstract class CrudService&lt;T, ID&gt; extends BaseService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-27T13:34:12.622Z
+                at 2026-04-07T14:11:32.767Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

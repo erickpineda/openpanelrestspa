@@ -3,6 +3,7 @@ import { Observable, BehaviorSubject, combineLatest, timer } from 'rxjs';
 import { map, distinctUntilChanged, debounceTime, shareReplay, startWith } from 'rxjs/operators';
 import { INavItemEnhanced, UserRole } from '../../../shared/types/navigation.types';
 import { NavigationUtils } from '../../../shared/utils/navigation.utils';
+import { TokenStorageService } from '../auth/token-storage.service';
 
 /**
  * Configuración de optimización de rendimiento
@@ -109,7 +110,7 @@ export class NavigationPerformanceService {
   private memoizedPermissionChecks = new Map<string, Observable<boolean>>();
   private debouncedBadgeUpdates = new BehaviorSubject<Map<string, number>>(new Map());
 
-  constructor() {
+  constructor(private tokenStorage: TokenStorageService) {
     this.initializePerformanceOptimizations();
   }
 
@@ -126,7 +127,8 @@ export class NavigationPerformanceService {
    */
   checkPermissionMemoized(item: INavItemEnhanced, userRole: UserRole): boolean {
     const itemId = this.generateItemId(item);
-    const cacheKey = `${userRole}-${itemId}`;
+    const privSig = this.getPrivilegesSignature();
+    const cacheKey = `${userRole}-${privSig}-${itemId}`;
 
     // Verificar cache
     const cached = this.permissionCache.get(cacheKey);
@@ -151,6 +153,14 @@ export class NavigationPerformanceService {
     });
 
     return hasPermission;
+  }
+
+  private getPrivilegesSignature(): string {
+    const user = this.tokenStorage.getUser();
+    const privs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+    if (privs.length === 0) return '';
+    const sig = privs.slice().sort().join('|');
+    return sig.length > 120 ? sig.substring(0, 120) + `:${sig.length}` : sig;
   }
 
   /**
@@ -633,6 +643,17 @@ export class NavigationPerformanceService {
    * Calcula si un elemento tiene permisos para un rol específico
    */
   private calculateItemPermission(item: INavItemEnhanced, userRole: UserRole): boolean {
+    // Preferencia: permisos dinámicos por usuario (evita acoplar navegación a enums de rol)
+    if (item.requiredPermissions && item.requiredPermissions.length > 0) {
+      const user = this.tokenStorage.getUser();
+      const privs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+      const set = new Set(privs);
+      const mode = item.permissionMode || 'ANY';
+      return mode === 'ALL'
+        ? item.requiredPermissions.every((p) => set.has(p))
+        : item.requiredPermissions.some((p) => set.has(p));
+    }
+
     // Si el item tiene roles requeridos específicos, verificar contra esos
     if (item.requiredRoles && item.requiredRoles.length > 0) {
       return item.requiredRoles.includes(userRole);

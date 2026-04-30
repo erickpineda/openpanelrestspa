@@ -52,6 +52,17 @@ export interface INavItemEnhanced extends INavData {
   priority?: number;
   requiredRoles?: UserRole[];
   minRole?: UserRole;
+  /**
+   * Permisos/privilegios requeridos para ver el item.
+   * Preferido frente a requiredRoles (evita acoplar la UI a enums hardcodeados).
+   */
+  requiredPermissions?: string[];
+  /**
+   * Modo de evaluación de requiredPermissions.
+   * - ANY: basta con tener 1
+   * - ALL: requiere todos
+   */
+  permissionMode?: 'ANY' | 'ALL';
   dynamicBadge?: {
     service: string;
     method: string;

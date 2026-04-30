@@ -18,6 +18,7 @@ import { ActiveSectionService } from './active-section.service';
 import { ProgrammaticNavigationConfigService } from './programmatic-navigation-config.service';
 import { NavigationPerformanceService } from './navigation-performance.service';
 import { BadgeCounterService } from './badge-counter.service';
+import { TokenStorageService } from '../auth/token-storage.service';
 
 /**
  * Códigos de error específicos para el servicio de navegación
@@ -57,7 +58,8 @@ export class NavigationService implements INavigationService {
     private activeSectionService: ActiveSectionService,
     private programmaticConfigService: ProgrammaticNavigationConfigService,
     private performanceService: NavigationPerformanceService,
-    private badgeCounterService: BadgeCounterService
+    private badgeCounterService: BadgeCounterService,
+    private tokenStorage: TokenStorageService
   ) {
     this.initializeNavigation();
     this.initializePerformanceOptimizations();
@@ -224,7 +226,12 @@ export class NavigationService implements INavigationService {
    * Filtra elementos por permisos (implementación de la interfaz)
    */
   filterByPermissions(items: INavItemEnhanced[], userRole: UserRole): INavItemEnhanced[] {
-    return NavigationUtils.filterByPermissions(items, userRole);
+    return NavigationUtils.filterByPermissions(items, userRole, this.getCurrentUserPrivileges());
+  }
+
+  private getCurrentUserPrivileges(): string[] {
+    const user = this.tokenStorage.getUser();
+    return Array.isArray(user?.privileges) ? user.privileges : [];
   }
 
   /**
@@ -607,11 +614,15 @@ export class NavigationService implements INavigationService {
     userRole: UserRole
   ): INavItemEnhanced[] {
     try {
-      return NavigationUtils.filterByPermissions(items, userRole);
+      return NavigationUtils.filterByPermissions(items, userRole, this.getCurrentUserPrivileges());
     } catch (error) {
       this.logPermissionError(userRole, NavigationErrorCodes.PERMISSION_DENIED, error);
       // Retornar solo elementos básicos sin restricciones
-      return items.filter((item) => !item.requiredRoles || item.requiredRoles.length === 0);
+      return items.filter(
+        (item) =>
+          (!item.requiredRoles || item.requiredRoles.length === 0) &&
+          (!item.requiredPermissions || item.requiredPermissions.length === 0)
+      );
     }
   }
 

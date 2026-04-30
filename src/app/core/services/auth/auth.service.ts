@@ -1,7 +1,7 @@
 // src/app/core/services/auth/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, map, switchMap, tap } from 'rxjs';
 import { Usuario } from '../../models/usuario.model';
 import { TokenStorageService } from './token-storage.service';
 import { environment } from '../../../../environments/environment.dev.es';
@@ -9,6 +9,8 @@ import { OPConstants } from '../../../shared/constants/op-global.constants';
 import { AuthSyncService } from './auth-sync.service';
 import { isJwtExpired } from '../../_utils/jwt.utils';
 import { SessionManagerService } from './session-manager.service';
+import { MeResponse } from './me.types';
+import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -35,6 +37,23 @@ export class AuthService {
     this.user$ = this.userSubject.asObservable();
   }
 
+  /**
+   * Carga información del usuario autenticado (roles + privilegios).
+   * Nota: el backend expone este endpoint en /api/v1/me.
+   */
+  public loadMe(): Observable<MeResponse> {
+    return this.http
+      .get<OpenpanelApiResponse<MeResponse>>(this.urlBase + this.urlUri + '/me', {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + this.tokenStorage.getToken(),
+      }),
+      })
+      .pipe(
+        map((res) => res?.data as MeResponse)
+      );
+  }
+
   login(username: string, password: string): Observable<any> {
     return this.http
       .post(this.urlBase + this.urlUri + this.urlAuth + this.urlLogin, {
@@ -42,13 +61,29 @@ export class AuthService {
         password,
       })
       .pipe(
-        tap((response: any) => {
+        switchMap((response: any) => {
           const data = response?.data ?? response;
           this.tokenStorage.cleanExpiredPostLoginRedirects();
           this.tokenStorage.startPostLoginRedirectMaintenance(60 * 60 * 1000);
           this.tokenStorage.saveToken(data.jwttoken);
+
+          // Guardamos el payload base (compat)
           this.tokenStorage.saveUser(data);
           this.userSubject.next(data);
+
+          return this.loadMe().pipe(
+            map((me) => {
+              const merged = {
+                ...data,
+                roles: Array.isArray(me?.roles) ? me.roles : data.roles,
+                privileges: Array.isArray(me?.privileges) ? me.privileges : [],
+              };
+              // Guardamos el usuario con privilegios para guards/menús
+              this.tokenStorage.saveUser(merged);
+              this.userSubject.next(merged);
+              return merged;
+            })
+          );
         })
       );
   }
