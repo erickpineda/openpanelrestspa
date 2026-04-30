@@ -16,7 +16,7 @@
     <c-card-body class="p-4 bg-light bg-opacity-25">
       <c-row>
         <!-- Gestión de Contenido -->
-        <c-col md="6" xl="4" class="mb-4">
+        <c-col *ngIf="hasContentSection()" md="6" xl="4" class="mb-4">
           <c-card class="h-100 border-0 shadow-sm">
             <c-card-header class="bg-primary bg-opacity-10 text-primary border-bottom-0 fw-bold">
               <svg cIcon name="cilPencil" class="me-2"></svg>
@@ -25,6 +25,7 @@
             <c-card-body>
               <div class="d-grid gap-2">
                 <a
+                  *ngIf="canEntries"
                   routerLink="./entradas"
                   cButton
                   color="primary"
@@ -34,6 +35,7 @@
                   <svg cIcon name="cilList" class="me-2"></svg> {{ 'MENU.ENTRIES' | translate }}
                 </a>
                 <a
+                  *ngIf="canPages"
                   routerLink="./paginas"
                   cButton
                   color="primary"
@@ -43,6 +45,7 @@
                   <svg cIcon name="cilLibrary" class="me-2"></svg> {{ 'MENU.PAGES' | translate }}
                 </a>
                 <a
+                  *ngIf="canMedia"
                   routerLink="./contenido"
                   cButton
                   color="primary"
@@ -57,7 +60,7 @@
         </c-col>
 
         <!-- Gestión de Usuarios y Roles -->
-        <c-col md="6" xl="4" class="mb-4">
+        <c-col *ngIf="hasUsersSection()" md="6" xl="4" class="mb-4">
           <c-card class="h-100 border-0 shadow-sm">
             <c-card-header class="bg-success bg-opacity-10 text-success border-bottom-0 fw-bold">
               <svg cIcon name="cilPeople" class="me-2"></svg>
@@ -66,6 +69,7 @@
             <c-card-body>
               <div class="d-grid gap-2">
                 <a
+                  *ngIf="canUsersAndRoles"
                   routerLink="./gestion/usuarios"
                   cButton
                   color="success"
@@ -75,6 +79,7 @@
                   <svg cIcon name="cilUser" class="me-2"></svg> {{ 'MENU.USERS' | translate }}
                 </a>
                 <a
+                  *ngIf="canUsersAndRoles"
                   routerLink="./gestion/roles"
                   cButton
                   color="success"
@@ -84,6 +89,7 @@
                   <svg cIcon name="cilShieldAlt" class="me-2"></svg> {{ 'MENU.ROLES' | translate }}
                 </a>
                 <a
+                  *ngIf="canProfile"
                   routerLink="./perfil"
                   cButton
                   color="success"
@@ -98,7 +104,7 @@
         </c-col>
 
         <!-- Configuración y Sistema -->
-        <c-col md="6" xl="4" class="mb-4">
+        <c-col *ngIf="hasSystemSection()" md="6" xl="4" class="mb-4">
           <c-card class="h-100 border-0 shadow-sm">
             <c-card-header
               class="bg-warning bg-opacity-10 text-warning-emphasis border-bottom-0 fw-bold"
@@ -109,6 +115,7 @@
             <c-card-body>
               <div class="d-grid gap-2">
                 <a
+                  *ngIf="canSystemSettings"
                   routerLink="./configuracion/ajustes"
                   cButton
                   color="warning"
@@ -119,6 +126,7 @@
                   {{ 'MENU.GENERAL_SETTINGS' | translate }}
                 </a>
                 <a
+                  *ngIf="canSystemSettings"
                   routerLink="./configuracion/temas"
                   cButton
                   color="warning"
@@ -129,6 +137,7 @@
                   {{ 'MENU.APPEARANCE' | translate }}
                 </a>
                 <a
+                  *ngIf="canMaintenance"
                   routerLink="./mantenimiento"
                   cButton
                   color="warning"
@@ -144,7 +153,7 @@
         </c-col>
 
         <!-- Interacción -->
-        <c-col md="6" xl="4" class="mb-4">
+        <c-col *ngIf="hasInteractionSection()" md="6" xl="4" class="mb-4">
           <c-card class="h-100 border-0 shadow-sm">
             <c-card-header class="bg-info bg-opacity-10 text-info-emphasis border-bottom-0 fw-bold">
               <svg cIcon name="cilCommentSquare" class="me-2"></svg>
@@ -153,6 +162,7 @@
             <c-card-body>
               <div class="d-grid gap-2">
                 <a
+                  *ngIf="canComments"
                   routerLink="./comentarios"
                   cButton
                   color="info"
@@ -163,6 +173,7 @@
                   {{ 'MENU.COMMENTS' | translate }}
                 </a>
                 <a
+                  *ngIf="canTags"
                   routerLink="./etiquetas"
                   cButton
                   color="info"
@@ -172,6 +183,7 @@
                   <svg cIcon name="cilTags" class="me-2"></svg> {{ 'MENU.TAGS' | translate }}
                 </a>
                 <a
+                  *ngIf="canCategories"
                   routerLink="./categorias"
                   cButton
                   color="info"

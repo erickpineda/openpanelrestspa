@@ -38,6 +38,7 @@ describe('PostLoginRedirectService', () => {
 
   it('normalizeRoute soporta HashLocationStrategy y rutas relativas', () => {
     expect(service.normalizeRoute('/a')).toBe('/a');
+    expect(service.normalizeRoute('/admin/control/entradas')).toBe('/admin/control/entradas');
     expect(service.normalizeRoute('/#b')).toBe('/b');
     expect(service.normalizeRoute('c')).toBe('/c');
     expect(service.normalizeRoute('')).toBe('/');

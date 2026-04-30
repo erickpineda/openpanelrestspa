@@ -6,7 +6,7 @@ import { TokenStorageService } from '@app/core/services/auth/token-storage.servi
 import { LoggerService } from '@app/core/services/logger.service';
 import { OPConstants } from '@shared/constants/op-global.constants';
 import { LanguageService, Language } from '@app/core/services/language.service';
-import { UserRole } from '@app/shared/types/navigation.types';
+import { OpPrivilegioConstants } from '@app/shared/constants/op-privilegio.constants';
 
 @Component({
   selector: 'app-nav-bar-public',
@@ -73,8 +73,8 @@ export class NavBarPublicComponent implements OnInit {
     if (this.isLoggedIn) {
       this.user = this.tokenStorageService.getUser();
       this.roles = this.user.roles || [];
-      this.showAdminBoard = this.tokenStorageService.hasMinimumRole(UserRole.ADMINISTRADOR);
-      this.showModeratorBoard = this.tokenStorageService.hasMinimumRole(UserRole.EDITOR);
+      this.showAdminBoard = this.hasPrivilege(OpPrivilegioConstants.VER_DASHBOARD);
+      this.showModeratorBoard = this.hasPrivilege(OpPrivilegioConstants.MODERAR_COMENTARIOS);
       this.username = this.user.username;
     } else {
       this.user = null;
@@ -83,6 +83,11 @@ export class NavBarPublicComponent implements OnInit {
       this.showModeratorBoard = false;
       this.username = undefined;
     }
+  }
+
+  private hasPrivilege(privilege: string): boolean {
+    const privileges: string[] = Array.isArray(this.user?.privileges) ? this.user.privileges : [];
+    return privileges.includes(privilege);
   }
 
   navigateToRoute(route: string): void {

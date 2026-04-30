@@ -6,12 +6,14 @@ import { NavigationService } from './navigation.service';
 import { SidebarStateService } from './sidebar-state.service';
 import { ActiveSectionService } from './active-section.service';
 import { BadgeCounterService } from './badge-counter.service';
+import { TokenStorageService } from '../auth/token-storage.service';
 import {
   UserRole,
   NavigationConfig,
   INavItemEnhanced,
 } from '../../../shared/types/navigation.types';
 import { NavigationConstants } from '../../../shared/constants/navigation.constants';
+import { OpPrivilegioConstants } from '../../../shared/constants/op-privilegio.constants';
 
 describe('NavigationService', () => {
   let service: NavigationService;
@@ -19,6 +21,7 @@ describe('NavigationService', () => {
   let mockSidebarStateService: jasmine.SpyObj<SidebarStateService>;
   let mockActiveSectionService: jasmine.SpyObj<ActiveSectionService>;
   let mockBadgeCounterService: jasmine.SpyObj<BadgeCounterService>;
+  let mockTokenStorageService: jasmine.SpyObj<TokenStorageService>;
 
   beforeEach(() => {
     (globalThis as any).__ENABLE_BADGE_COUNTERS_IN_TEST__ = true;
@@ -37,6 +40,9 @@ describe('NavigationService', () => {
       'getAllCounters',
     ]);
     badgeCounterSpy.getAllCounters.and.returnValue(of(new Map<string, number>()));
+
+    const tokenStorageSpy = jasmine.createSpyObj('TokenStorageService', ['getUser']);
+    tokenStorageSpy.getUser.and.returnValue(null);
 
     const activeSectionSpy = jasmine.createSpyObj(
       'ActiveSectionService',
@@ -77,6 +83,7 @@ describe('NavigationService', () => {
         { provide: SidebarStateService, useValue: sidebarStateSpy },
         { provide: ActiveSectionService, useValue: activeSectionSpy },
         { provide: BadgeCounterService, useValue: badgeCounterSpy },
+        { provide: TokenStorageService, useValue: tokenStorageSpy },
       ],
     });
 
@@ -91,6 +98,9 @@ describe('NavigationService', () => {
     mockBadgeCounterService = TestBed.inject(
       BadgeCounterService
     ) as jasmine.SpyObj<BadgeCounterService>;
+    mockTokenStorageService = TestBed.inject(
+      TokenStorageService
+    ) as jasmine.SpyObj<TokenStorageService>;
   });
 
   afterEach(() => {
@@ -181,6 +191,37 @@ describe('NavigationService', () => {
         .subscribe((items) => {
           expect(items).toBeDefined();
           expect(items.some((item) => item.name === 'Admin Only Section')).toBeFalse();
+          done();
+        });
+    });
+
+    it('oculta secciones sin hijos visibles', (done) => {
+      mockTokenStorageService.getUser.and.returnValue({ privileges: [] });
+
+      service.setNavigationItems([
+        { title: true, name: 'SECTION' },
+        {
+          name: 'A',
+          url: '/admin/a',
+          iconComponent: { name: 'cil-list' },
+          requiredPermissions: ['X'],
+        },
+        { title: true, name: 'VISIBLE_SECTION' },
+        {
+          name: 'B',
+          url: '/admin/b',
+          iconComponent: { name: 'cil-list' },
+        },
+      ]);
+
+      service
+        .getNavigationItems(UserRole.ADMINISTRADOR)
+        .pipe(take(1))
+        .subscribe((items) => {
+          expect(items.some((item) => item.name === 'SECTION')).toBeFalse();
+          expect(items.some((item) => item.name === 'A')).toBeFalse();
+          expect(items.some((item) => item.name === 'VISIBLE_SECTION')).toBeTrue();
+          expect(items.some((item) => item.name === 'B')).toBeTrue();
           done();
         });
     });
@@ -277,6 +318,107 @@ describe('NavigationService', () => {
       service.loadNavigationConfig(invalidConfig);
 
       expect(console.error).toHaveBeenCalled();
+    });
+
+    it('debe preservar requiredPermissions y permissionMode al convertir secciones y títulos', (done) => {
+      mockTokenStorageService.getUser.and.returnValue({
+        privileges: [OpPrivilegioConstants.GESTIONAR_PAGINAS],
+      });
+
+      const config: NavigationConfig = {
+        sections: [
+          {
+            id: 'pages',
+            title: 'Páginas',
+            icon: 'cil-library',
+            priority: 10,
+            items: [
+              {
+                id: 'pages-list',
+                name: 'Listado',
+                url: '/admin/control/paginas',
+                icon: 'cil-library',
+              },
+            ],
+            collapsible: true,
+            defaultExpanded: true,
+            requiredRoles: [],
+            requiredPermissions: [OpPrivilegioConstants.GESTIONAR_PAGINAS],
+            permissionMode: 'ALL',
+          },
+        ],
+        theme: NavigationConstants.DEFAULT_THEME,
+        userPreferences: {
+          expandedSections: [],
+          collapsedSections: [],
+          favoriteItems: [],
+        },
+      };
+
+      service.loadNavigationConfig(config);
+
+      service
+        .getNavigationItems(UserRole.LECTOR)
+        .pipe(take(1))
+        .subscribe((items) => {
+          const title = items.find((item) => item.title && item.name === 'Páginas');
+          const child = items.find((item) => item.name === 'Listado');
+
+          expect(title?.requiredPermissions).toEqual([OpPrivilegioConstants.GESTIONAR_PAGINAS]);
+          expect(title?.permissionMode).toBe('ALL');
+          expect(child?.requiredPermissions).toEqual([OpPrivilegioConstants.GESTIONAR_PAGINAS]);
+          expect(child?.permissionMode).toBe('ALL');
+          done();
+        });
+    });
+
+    it('debe preservar permisos propios del item al convertirlo', (done) => {
+      mockTokenStorageService.getUser.and.returnValue({
+        privileges: [OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS],
+      });
+
+      const config: NavigationConfig = {
+        sections: [
+          {
+            id: 'admin',
+            title: 'Administración',
+            icon: 'cil-settings',
+            priority: 10,
+            items: [
+              {
+                id: 'privileges',
+                name: 'Privilegios',
+                url: '/admin/control/gestion/privilegios',
+                icon: 'cil-check-circle',
+                requiredPermissions: [OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS],
+                permissionMode: 'ALL',
+              },
+            ],
+            collapsible: true,
+            defaultExpanded: true,
+            requiredRoles: [],
+          },
+        ],
+        theme: NavigationConstants.DEFAULT_THEME,
+        userPreferences: {
+          expandedSections: [],
+          collapsedSections: [],
+          favoriteItems: [],
+        },
+      };
+
+      service.loadNavigationConfig(config);
+
+      service
+        .getNavigationItems(UserRole.LECTOR)
+        .pipe(take(1))
+        .subscribe((items) => {
+          const item = items.find((entry) => entry.name === 'Privilegios');
+
+          expect(item?.requiredPermissions).toEqual([OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS]);
+          expect(item?.permissionMode).toBe('ALL');
+          done();
+        });
     });
   });
 

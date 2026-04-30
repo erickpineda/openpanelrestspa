@@ -251,13 +251,13 @@ describe('FileStorageService request shapes', () => {
     req.flush({ data: { uuid: 'u1' } });
   });
 
-  it('deleteMedia falla si el backend no soporta borrado', (done) => {
-    service.deleteMedia('a b').subscribe({
-      next: () => done.fail('Se esperaba error'),
-      error: (err) => {
-        expect(String(err?.message || err)).toContain('no expone endpoint');
-        done();
-      },
+  it('deleteMedia usa el endpoint dedicado de borrado global', () => {
+    service.deleteMedia('a b').subscribe((response) => {
+      expect(response).toBe('fichero borrado');
     });
+
+    const req = httpMock.expectOne((r) => r.url.includes('/fileStorage/ficheros/a%20b'));
+    expect(req.request.method).toBe('DELETE');
+    req.flush({ data: 'fichero borrado' });
   });
 });

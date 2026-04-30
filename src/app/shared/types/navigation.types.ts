@@ -91,6 +91,10 @@ export interface NavigationItem {
   url: string;
   icon: string;
   priority?: number;
+  requiredRoles?: UserRole[];
+  minRole?: UserRole;
+  requiredPermissions?: string[];
+  permissionMode?: 'ANY' | 'ALL';
   badge?: BadgeConfig;
   children?: NavigationItem[];
   contextualActions?: IContextualAction[];
@@ -109,6 +113,8 @@ export interface NavigationSection {
   collapsible: boolean;
   defaultExpanded: boolean;
   requiredRoles: UserRole[];
+  requiredPermissions?: string[];
+  permissionMode?: 'ANY' | 'ALL';
 }
 
 /**

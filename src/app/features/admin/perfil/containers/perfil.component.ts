@@ -4,7 +4,7 @@ import { UsuarioService } from '../../../../core/services/data/usuario.service';
 import { Usuario } from '../../../../core/models/usuario.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { PerfilResponse } from '../../../../core/models/perfil-response.model';
-import { FileStorageService } from '../../../../core/services/file-storage.service';
+import { PerfilMediaService } from '../../../../core/services/data/perfil-media.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
 import { finalize, take } from 'rxjs/operators';
 
@@ -23,7 +23,7 @@ export class PerfilComponent implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private toastService: ToastService,
-    private fileStorageService: FileStorageService,
+    private perfilMediaService: PerfilMediaService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -111,32 +111,34 @@ export class PerfilComponent implements OnInit {
     fileInput.click();
   }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+
     if (file) {
       this.uploading = true;
-      this.fileStorageService.uploadFile(file, 'perfil').subscribe({
-        next: (response) => {
-          // Asumimos que la respuesta contiene la URL o path de la imagen
-          // y actualizamos el perfil
-          const imageUrl = response.ruta || response.url; // Adaptar según respuesta del backend
+      this.cdr.markForCheck();
 
-          if (imageUrl && this.usuario) {
-            this.onSave({ imagen: [imageUrl] } as unknown as Usuario);
-          } else {
+      this.perfilMediaService
+        .uploadAvatar(file)
+        .pipe(
+          finalize(() => {
+            this.uploading = false;
+            if (input) {
+              input.value = '';
+            }
+            this.cdr.markForCheck();
+          })
+        )
+        .subscribe({
+          next: () => {
             this.toastService.showSuccess('Imagen subida', 'Éxito');
-            // Si el backend no devuelve URL directa, recargamos o esperamos que el usuario guarde
-            // Pero idealmente actualizamos el usuario con la nueva imagen
-          }
-          this.uploading = false;
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.toastService.showError('Error al subir imagen', 'Error');
-          this.uploading = false;
-          this.cdr.markForCheck();
-        },
-      });
+            this.cargarPerfil();
+          },
+          error: () => {
+            this.toastService.showError('Error al subir imagen', 'Error');
+          },
+        });
     }
   }
 }

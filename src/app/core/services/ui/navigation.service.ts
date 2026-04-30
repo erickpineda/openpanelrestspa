@@ -162,6 +162,8 @@ export class NavigationService implements INavigationService {
             contextualActions
           );
 
+          configuredItems = this.filterVisibleNavigationItems(configuredItems, userRole);
+
           return configuredItems;
         } catch (error) {
           this.logPermissionError(userRole, NavigationErrorCodes.CONFIGURATION_INVALID, error);
@@ -226,12 +228,120 @@ export class NavigationService implements INavigationService {
    * Filtra elementos por permisos (implementación de la interfaz)
    */
   filterByPermissions(items: INavItemEnhanced[], userRole: UserRole): INavItemEnhanced[] {
-    return NavigationUtils.filterByPermissions(items, userRole, this.getCurrentUserPrivileges());
+    return this.filterVisibleNavigationItems(items, userRole);
   }
 
   private getCurrentUserPrivileges(): string[] {
     const user = this.tokenStorage.getUser();
     return Array.isArray(user?.privileges) ? user.privileges : [];
+  }
+
+  private filterVisibleNavigationItems(
+    items: INavItemEnhanced[],
+    userRole: UserRole,
+    userPrivileges: string[] = this.getCurrentUserPrivileges()
+  ): INavItemEnhanced[] {
+    const filteredItems = items
+      .map((item) => this.filterVisibleNavigationItem(item, userRole, userPrivileges))
+      .filter((item): item is INavItemEnhanced => !!item);
+
+    return this.removeEmptyTitleSections(filteredItems);
+  }
+
+  private filterVisibleNavigationItem(
+    item: INavItemEnhanced,
+    userRole: UserRole,
+    userPrivileges: string[]
+  ): INavItemEnhanced | null {
+    if (!this.hasAccessToItem(item, userRole, userPrivileges)) {
+      return null;
+    }
+
+    const filteredItem: INavItemEnhanced = { ...item };
+
+    if (item.children && item.children.length > 0) {
+      const visibleChildren = this.filterVisibleNavigationItems(item.children, userRole, userPrivileges);
+
+      if (visibleChildren.length > 0) {
+        filteredItem.children = visibleChildren;
+      } else {
+        delete filteredItem.children;
+
+        const isWrapperSection = !item.url && !item.title;
+        if (isWrapperSection) {
+          return null;
+        }
+      }
+    }
+
+    return filteredItem;
+  }
+
+  private hasAccessToItem(
+    item: INavItemEnhanced,
+    userRole: UserRole,
+    userPrivileges: string[]
+  ): boolean {
+    const privilegeSet = new Set(Array.isArray(userPrivileges) ? userPrivileges : []);
+
+    if (item.requiredPermissions && item.requiredPermissions.length > 0) {
+      const mode = item.permissionMode || 'ANY';
+      return mode === 'ALL'
+        ? item.requiredPermissions.every((permission) => privilegeSet.has(permission))
+        : item.requiredPermissions.some((permission) => privilegeSet.has(permission));
+    }
+
+    if (item.requiredRoles && item.requiredRoles.length > 0) {
+      return item.requiredRoles.includes(userRole);
+    }
+
+    if (item.minRole) {
+      return NavigationUtils.hasMinimumRole(userRole, item.minRole);
+    }
+
+    return true;
+  }
+
+  private removeEmptyTitleSections(items: INavItemEnhanced[]): INavItemEnhanced[] {
+    const result: INavItemEnhanced[] = [];
+    let pendingTitle: INavItemEnhanced | null = null;
+    let pendingSectionItems: INavItemEnhanced[] = [];
+
+    const flushPendingSection = () => {
+      if (!pendingTitle) {
+        if (pendingSectionItems.length > 0) {
+          result.push(...pendingSectionItems);
+        }
+        pendingSectionItems = [];
+        return;
+      }
+
+      if (pendingSectionItems.length > 0) {
+        result.push(pendingTitle, ...pendingSectionItems);
+      }
+
+      pendingTitle = null;
+      pendingSectionItems = [];
+    };
+
+    for (const item of items) {
+      if (item.title) {
+        flushPendingSection();
+        pendingTitle = item;
+        continue;
+      }
+
+      if (pendingTitle) {
+        pendingSectionItems.push(item);
+        continue;
+      }
+
+      result.push(item);
+    }
+
+    flushPendingSection();
+
+    return result;
   }
 
   /**
@@ -371,17 +481,31 @@ export class NavigationService implements INavigationService {
           title: true,
           name: section.title,
           requiredRoles: section.requiredRoles, // Aplicar roles de la sección al título
+          requiredPermissions: section.requiredPermissions,
+          permissionMode: section.permissionMode,
           priority: section.priority, // Agregar prioridad al título de sección
         };
         items.push(sectionTitle);
 
-        // Agregar elementos de la sección con roles heredados
+        // Agregar elementos de la sección con restricciones heredadas cuando corresponda
         for (const item of section.items) {
           const navItem = this.convertNavigationItem(item);
+
           // Si la sección tiene roles específicos y el item no, heredar los roles de la sección
           if (section.requiredRoles.length > 0 && !navItem.requiredRoles) {
             navItem.requiredRoles = section.requiredRoles;
           }
+
+          // Si la sección tiene permisos específicos y el item no, heredar permisos/modo de la sección
+          if (
+            section.requiredPermissions &&
+            section.requiredPermissions.length > 0 &&
+            !navItem.requiredPermissions
+          ) {
+            navItem.requiredPermissions = section.requiredPermissions;
+            navItem.permissionMode = section.permissionMode || navItem.permissionMode || 'ANY';
+          }
+
           items.push(navItem);
         }
       }
@@ -399,6 +523,10 @@ export class NavigationService implements INavigationService {
       url: item.url,
       iconComponent: item.icon ? { name: item.icon } : undefined,
       priority: item.priority || 0,
+      requiredRoles: item.requiredRoles,
+      minRole: item.minRole,
+      requiredPermissions: item.requiredPermissions,
+      permissionMode: item.permissionMode,
     };
 
     // Agregar badge si existe
@@ -614,7 +742,7 @@ export class NavigationService implements INavigationService {
     userRole: UserRole
   ): INavItemEnhanced[] {
     try {
-      return NavigationUtils.filterByPermissions(items, userRole, this.getCurrentUserPrivileges());
+      return this.filterVisibleNavigationItems(items, userRole);
     } catch (error) {
       this.logPermissionError(userRole, NavigationErrorCodes.PERMISSION_DENIED, error);
       // Retornar solo elementos básicos sin restricciones

@@ -13,7 +13,7 @@ const routes: Routes = [
     canActivate: [AuthGuard], // protección del padre
     canActivateChild: [AuthGuard], // protección de hijos
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: 'control', pathMatch: 'full' },
       {
         path: 'dashboard',
         loadChildren: () =>

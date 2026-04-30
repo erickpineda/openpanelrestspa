@@ -1,20 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { EtiquetasListComponent } from './listado-etiquetas.component';
-import { UserRole } from '../../../shared/types/navigation.types';
+import { OpPrivilegioConstants } from '../../../shared/constants/op-privilegio.constants';
 
 const routes: Routes = [
   {
     path: '',
     component: EtiquetasListComponent,
     data: {
-      roles: [
-        UserRole.AUTOR,
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
-      ],
+      permissions: [OpPrivilegioConstants.GESTIONAR_ETIQUETAS],
+      permissionMode: 'ANY',
     },
   },
 ];

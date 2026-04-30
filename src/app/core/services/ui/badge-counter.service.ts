@@ -31,7 +31,7 @@ import { ComentarioService } from '../data/comentario.service';
 import { EntradaService } from '../data/entrada.service';
 import { UsuarioService } from '../data/usuario.service';
 import { TokenStorageService } from '../auth/token-storage.service';
-import { UserRole } from '../../../shared/types/navigation.types';
+import { OpPrivilegioConstants } from '../../../shared/constants/op-privilegio.constants';
 
 import { TemporaryStorageService } from './temporary-storage.service';
 import { HttpContext } from '@angular/common/http';
@@ -386,7 +386,7 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
    * Inicializa los contadores con configuración automática
    */
   initializeCounters(): void {
-    const canAccessAdminCounters = this.tokenStorage.hasMinimumRole(UserRole.ADMINISTRADOR);
+    const canAccessAdminCounters = this.hasPrivilege(OpPrivilegioConstants.VER_DASHBOARD);
 
     // Solo los perfiles admin deben consultar endpoints de moderación/usuarios.
     if (canAccessAdminCounters) {
@@ -435,6 +435,12 @@ export class BadgeCounterService implements IBadgeCounterService, OnDestroy {
       this.getMyDraftsCount(),
       NavigationConstants.REFRESH_INTERVALS.TOO_SLOW
     );
+  }
+
+  private hasPrivilege(privilege: string): boolean {
+    const user = this.tokenStorage.getUser();
+    const privileges: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+    return privileges.includes(privilege);
   }
 
   /**

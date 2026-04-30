@@ -16,6 +16,7 @@ import { AuthSyncService } from '../services/auth/auth-sync.service';
 import { LoggerService } from '../services/logger.service';
 import { AuthService } from '../services/auth/auth.service';
 import { OPSessionConstants } from '../../shared/constants/op-session.constants';
+import { OpPrivilegioConstants } from '../../shared/constants/op-privilegio.constants';
 import { UserRole } from '../../shared/types/navigation.types';
 
 @Injectable({
@@ -84,10 +85,88 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
       const token = this.tokenStorage.getToken();
       const user = this.tokenStorage.getUser();
       if (token && user) {
-        return this.router.parseUrl('/admin/control/perfil');
+        const privileges: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+        const has = (privilege: string) => privileges.includes(privilege);
+        const hasAny = (required: string[]) => required.some((privilege) => has(privilege));
+
+        if (has(OpPrivilegioConstants.VER_DASHBOARD)) {
+          return this.router.parseUrl('/admin/dashboard');
+        }
+
+        if (
+          hasAny([
+            OpPrivilegioConstants.CREAR_ENTRADAS,
+            OpPrivilegioConstants.EDITAR_ENTRADAS_PROPIAS,
+            OpPrivilegioConstants.EDITAR_ENTRADAS_TODO,
+          ])
+        ) {
+          return this.router.parseUrl('/admin/control/entradas');
+        }
+
+        if (
+          hasAny([
+            OpPrivilegioConstants.GESTIONAR_PERFIL,
+            OpPrivilegioConstants.VER_CONTENIDO_PROPIO,
+          ])
+        ) {
+          return this.router.parseUrl('/admin/control/perfil');
+        }
+
+        return this.router.parseUrl('/');
       }
     } catch {}
     return this.router.parseUrl('/login');
+  }
+
+  private hasRequiredPermissions(
+    data: Record<string, unknown>,
+    context: 'canActivate' | 'canLoad' | 'canMatch'
+  ): boolean | UrlTree | undefined {
+    const requiredPermissions = data['permissions'] as Array<string> | undefined;
+    const hasPermissionRequirements = !!requiredPermissions && requiredPermissions.length > 0;
+
+    if (!hasPermissionRequirements) {
+      return undefined;
+    }
+
+    const permissionMode = (data['permissionMode'] as 'ANY' | 'ALL' | undefined) ?? 'ANY';
+    const user = this.tokenStorage.getUser();
+    const userPrivs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+    const set = new Set(userPrivs);
+    const ok =
+      permissionMode === 'ALL'
+        ? requiredPermissions.every((p) => set.has(p))
+        : requiredPermissions.some((p) => set.has(p));
+
+    if (!ok) {
+      this.log.info(`🔐 AuthGuard - Usuario no tiene permisos requeridos (${context}):`, requiredPermissions);
+      return this.redirectForForbidden();
+    }
+
+    return true;
+  }
+
+  private hasRequiredRolesOrMinRole(
+    data: Record<string, unknown>,
+    context: 'canActivate' | 'canLoad' | 'canMatch'
+  ): boolean | UrlTree {
+    const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
+    if (requiredRoles && requiredRoles.length > 0 && !this.tokenStorage.hasAnyRole(requiredRoles)) {
+      this.log.info(`🔐 AuthGuard - Usuario no tiene los roles requeridos (${context}):`, requiredRoles);
+      return this.redirectForForbidden();
+    }
+
+    const minRoleRaw = data['minRole'] as UserRole | string | undefined;
+    if (minRoleRaw) {
+      const minRole =
+        typeof minRoleRaw === 'string' ? this.tokenStorage.parseUserRole(minRoleRaw) : minRoleRaw;
+      if (!minRole || !this.tokenStorage.hasMinimumRole(minRole)) {
+        this.log.info(`🔐 AuthGuard - Usuario no cumple el rol mínimo requerido (${context}):`, minRoleRaw);
+        return this.redirectForForbidden();
+      }
+    }
+
+    return true;
   }
 
   canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree {
@@ -112,47 +191,13 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
       return false;
     }
 
-    // comprobación de permisos (preferida; desacopla de roles hardcodeados)
-    const requiredPermissions = route.data['permissions'] as Array<string> | undefined;
-    const hasPermissionRequirements = !!requiredPermissions && requiredPermissions.length > 0;
-    const permissionMode = (route.data['permissionMode'] as 'ANY' | 'ALL' | undefined) ?? 'ANY';
-    if (hasPermissionRequirements) {
-      const user = this.tokenStorage.getUser();
-      const userPrivs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
-      const set = new Set(userPrivs);
-      const ok =
-        permissionMode === 'ALL'
-          ? requiredPermissions.every((p) => set.has(p))
-          : requiredPermissions.some((p) => set.has(p));
-      if (!ok) {
-        this.log.info('🔐 AuthGuard - Usuario no tiene los permisos requeridos:', requiredPermissions);
-        return this.redirectForForbidden();
-      }
+    const data = (route.data || {}) as Record<string, unknown>;
+    const permissionDecision = this.hasRequiredPermissions(data, 'canActivate');
+    if (permissionDecision !== undefined) {
+      return permissionDecision;
     }
 
-    const data: any = route.data || {};
-    const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
-    if (
-      !hasPermissionRequirements &&
-      requiredRoles &&
-      requiredRoles.length > 0 &&
-      !this.tokenStorage.hasAnyRole(requiredRoles)
-    ) {
-      this.log.info('🔐 AuthGuard - Usuario no tiene los roles requeridos:', requiredRoles);
-      return this.redirectForForbidden();
-    }
-
-    const minRoleRaw = data['minRole'] as UserRole | string | undefined;
-    if (minRoleRaw) {
-      const minRole =
-        typeof minRoleRaw === 'string' ? this.tokenStorage.parseUserRole(minRoleRaw) : minRoleRaw;
-      if (!minRole || !this.tokenStorage.hasMinimumRole(minRole)) {
-        this.log.info('🔐 AuthGuard - Usuario no cumple el rol mínimo requerido:', minRoleRaw);
-        return this.redirectForForbidden();
-      }
-    }
-
-    return true;
+    return this.hasRequiredRolesOrMinRole(data, 'canActivate');
   }
 
   canActivateChild(childRoute: ActivatedRouteSnapshot): boolean | UrlTree {
@@ -166,47 +211,13 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     }
     if (!check) return false;
 
-    const data: any = route.data || {};
-
-    const requiredPermissions = data['permissions'] as Array<string> | undefined;
-    const hasPermissionRequirements = !!requiredPermissions && requiredPermissions.length > 0;
-    const permissionMode = (data['permissionMode'] as 'ANY' | 'ALL' | undefined) ?? 'ANY';
-    if (hasPermissionRequirements) {
-      const user = this.tokenStorage.getUser();
-      const userPrivs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
-      const set = new Set(userPrivs);
-      const ok =
-        permissionMode === 'ALL'
-          ? requiredPermissions.every((p) => set.has(p))
-          : requiredPermissions.some((p) => set.has(p));
-      if (!ok) {
-        this.log.info('🔐 AuthGuard - Usuario no tiene los permisos requeridos (canLoad):', requiredPermissions);
-        return this.redirectForForbidden();
-      }
+    const data = (route.data || {}) as Record<string, unknown>;
+    const permissionDecision = this.hasRequiredPermissions(data, 'canLoad');
+    if (permissionDecision !== undefined) {
+      return permissionDecision;
     }
 
-    const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
-    if (
-      !hasPermissionRequirements &&
-      requiredRoles &&
-      requiredRoles.length > 0 &&
-      !this.tokenStorage.hasAnyRole(requiredRoles)
-    ) {
-      this.log.info('🔐 AuthGuard - Usuario no tiene los roles requeridos (canLoad):', requiredRoles);
-      return this.redirectForForbidden();
-    }
-
-    const minRoleRaw = data['minRole'] as UserRole | string | undefined;
-    if (minRoleRaw) {
-      const minRole =
-        typeof minRoleRaw === 'string' ? this.tokenStorage.parseUserRole(minRoleRaw) : minRoleRaw;
-      if (!minRole || !this.tokenStorage.hasMinimumRole(minRole)) {
-        this.log.info('🔐 AuthGuard - Usuario no cumple rol mínimo (canLoad):', minRoleRaw);
-        return this.redirectForForbidden();
-      }
-    }
-
-    return true;
+    return this.hasRequiredRolesOrMinRole(data, 'canLoad');
   }
 
   canMatch(route: Route, segments: UrlSegment[]): boolean | UrlTree {
@@ -216,50 +227,13 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad, CanMat
     }
     if (!check) return false;
 
-    const data: any = route.data || {};
-
-    const requiredPermissions = data['permissions'] as Array<string> | undefined;
-    const hasPermissionRequirements = !!requiredPermissions && requiredPermissions.length > 0;
-    const permissionMode = (data['permissionMode'] as 'ANY' | 'ALL' | undefined) ?? 'ANY';
-    if (hasPermissionRequirements) {
-      const user = this.tokenStorage.getUser();
-      const userPrivs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
-      const set = new Set(userPrivs);
-      const ok =
-        permissionMode === 'ALL'
-          ? requiredPermissions.every((p) => set.has(p))
-          : requiredPermissions.some((p) => set.has(p));
-      if (!ok) {
-        this.log.info('🔐 AuthGuard - Usuario no tiene permisos requeridos (canMatch):', requiredPermissions);
-        return this.redirectForForbidden();
-      }
+    const data = (route.data || {}) as Record<string, unknown>;
+    const permissionDecision = this.hasRequiredPermissions(data, 'canMatch');
+    if (permissionDecision !== undefined) {
+      return permissionDecision;
     }
 
-    const requiredRoles = data['roles'] as Array<UserRole | string> | undefined;
-    if (
-      !hasPermissionRequirements &&
-      requiredRoles &&
-      requiredRoles.length > 0 &&
-      !this.tokenStorage.hasAnyRole(requiredRoles)
-    ) {
-      this.log.info(
-        '🔐 AuthGuard - Usuario no tiene los roles requeridos (canMatch):',
-        requiredRoles
-      );
-      return this.redirectForForbidden();
-    }
-
-    const minRoleRaw = data['minRole'] as UserRole | string | undefined;
-    if (minRoleRaw) {
-      const minRole =
-        typeof minRoleRaw === 'string' ? this.tokenStorage.parseUserRole(minRoleRaw) : minRoleRaw;
-      if (!minRole || !this.tokenStorage.hasMinimumRole(minRole)) {
-        this.log.info('🔐 AuthGuard - Usuario no cumple rol mínimo (canMatch):', minRoleRaw);
-        return this.redirectForForbidden();
-      }
-    }
-
-    return true;
+    return this.hasRequiredRolesOrMinRole(data, 'canMatch');
   }
 
   private redirectToLogin(): void {

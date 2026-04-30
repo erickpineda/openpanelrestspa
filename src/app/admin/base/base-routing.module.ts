@@ -16,14 +16,6 @@ const routes: Routes = [
         component: BaseIndexComponent,
         data: {
           title: 'MENU.MAIN_PANEL',
-          roles: [
-            UserRole.AUTOR,
-            UserRole.EDITOR,
-            UserRole.ADMINISTRADOR,
-            UserRole.DESARROLLADOR,
-            UserRole.MANTENIMIENTO,
-            UserRole.PROPIETARIO,
-          ],
         },
       },
       {
@@ -57,12 +49,8 @@ const routes: Routes = [
           preload: true,
           delay: 4000,
           title: 'MENU.PAGES',
-          roles: [
-            UserRole.EDITOR,
-            UserRole.ADMINISTRADOR,
-            UserRole.DESARROLLADOR,
-            UserRole.PROPIETARIO,
-          ],
+          permissions: [OpPrivilegioConstants.GESTIONAR_PAGINAS],
+          permissionMode: 'ANY',
         },
       },
       // Secciones reubicadas bajo base
@@ -131,13 +119,6 @@ const routes: Routes = [
           title: 'MENU.TAGS',
           permissions: [OpPrivilegioConstants.GESTIONAR_ETIQUETAS],
           permissionMode: 'ANY',
-          roles: [
-            UserRole.AUTOR,
-            UserRole.EDITOR,
-            UserRole.ADMINISTRADOR,
-            UserRole.DESARROLLADOR,
-            UserRole.PROPIETARIO,
-          ],
         },
       },
       {
@@ -146,17 +127,11 @@ const routes: Routes = [
           import('@features/admin/perfil/perfil.module').then((m) => m.PerfilFeatureModule),
         data: {
           title: 'MENU.PROFILE',
-          permissions: [OpPrivilegioConstants.GESTIONAR_PERFIL],
-          permissionMode: 'ANY',
-          roles: [
-            UserRole.LECTOR,
-            UserRole.AUTOR,
-            UserRole.EDITOR,
-            UserRole.ADMINISTRADOR,
-            UserRole.DESARROLLADOR,
-            UserRole.MANTENIMIENTO,
-            UserRole.PROPIETARIO,
+          permissions: [
+            OpPrivilegioConstants.GESTIONAR_PERFIL,
+            OpPrivilegioConstants.VER_CONTENIDO_PROPIO,
           ],
+          permissionMode: 'ANY',
         }, // No preload
       },
       {
@@ -187,12 +162,6 @@ const routes: Routes = [
           title: 'MENU.CATEGORIES',
           permissions: [OpPrivilegioConstants.GESTIONAR_CATEGORIAS],
           permissionMode: 'ANY',
-          roles: [
-            UserRole.EDITOR,
-            UserRole.ADMINISTRADOR,
-            UserRole.DESARROLLADOR,
-            UserRole.PROPIETARIO,
-          ],
         },
       },
       {

@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpContext } from '@angular/common/http';
-import { Observable, map, throwError } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { MediaItem } from '../models/media-item.model';
 import { TokenStorageService } from './auth/token-storage.service';
 import { SKIP_GLOBAL_LOADER } from '../interceptor/network.interceptor';
+import { OpenpanelApiResponse } from '../models/openpanel-api-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class FileStorageService {
@@ -15,6 +16,10 @@ export class FileStorageService {
     private tokenStorage?: TokenStorageService
   ) {}
 
+  /**
+   * Servicio reservado para la biblioteca global de ficheros.
+   * El avatar/perfil usa PerfilMediaService y su endpoint dedicado.
+   */
   uploadFile(file: File, folder?: string, context?: HttpContext): Observable<any> {
     const form = new FormData();
     form.append('file', file);
@@ -69,9 +74,12 @@ export class FileStorageService {
     );
   }
 
-  deleteMedia(id: string, context?: HttpContext): Observable<any> {
-    void id;
-    void context;
-    return throwError(() => new Error('El backend no expone endpoint de borrado de ficheros'));
+  deleteMedia(uuid: string, context?: HttpContext): Observable<string | undefined> {
+    return this.http
+      .delete<OpenpanelApiResponse<string>>(
+        `${this.base}/fileStorage/ficheros/${encodeURIComponent(uuid)}`,
+        { context }
+      )
+      .pipe(map((response) => response?.data));
   }
 }

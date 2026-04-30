@@ -6,6 +6,8 @@ import { ComentarioService } from '../data/comentario.service';
 import { EntradaService } from '../data/entrada.service';
 import { UsuarioService } from '../data/usuario.service';
 import { TemporaryStorageService } from './temporary-storage.service';
+import { TokenStorageService } from '../auth/token-storage.service';
+import { OpPrivilegioConstants } from '../../../shared/constants/op-privilegio.constants';
 
 describe('BadgeCounterService', () => {
   let service: BadgeCounterService;
@@ -13,6 +15,7 @@ describe('BadgeCounterService', () => {
   let mockEntradaService: jasmine.SpyObj<EntradaService>;
   let mockUsuarioService: jasmine.SpyObj<UsuarioService>;
   let mockTemporaryStorage: jasmine.SpyObj<TemporaryStorageService>;
+  let mockTokenStorage: jasmine.SpyObj<TokenStorageService>;
 
   beforeEach(() => {
     const comentarioSpy = jasmine.createSpyObj('ComentarioService', [
@@ -26,6 +29,7 @@ describe('BadgeCounterService', () => {
       'listarSafeSinGlobalLoader',
     ]);
     const tempSpy = jasmine.createSpyObj('TemporaryStorageService', ['getTemporaryEntriesByType']);
+    const tokenStorageSpy = jasmine.createSpyObj('TokenStorageService', ['getUser']);
     (tempSpy as any).entriesChanged$ = new Subject<void>();
 
     // Configurar mocks por defecto para evitar errores en constructor
@@ -37,6 +41,7 @@ describe('BadgeCounterService', () => {
     usuarioSpy.listarSafeSinGlobalLoader.and.returnValue(of([] as any));
     usuarioSpy.obtenerDatosSesionActualSafe.and.returnValue(of({} as any));
     tempSpy.getTemporaryEntriesByType.and.returnValue([]);
+    tokenStorageSpy.getUser.and.returnValue({ privileges: [] });
 
     TestBed.configureTestingModule({
       providers: [
@@ -45,6 +50,7 @@ describe('BadgeCounterService', () => {
         { provide: EntradaService, useValue: entradaSpy },
         { provide: UsuarioService, useValue: usuarioSpy },
         { provide: TemporaryStorageService, useValue: tempSpy },
+        { provide: TokenStorageService, useValue: tokenStorageSpy },
       ],
     });
 
@@ -55,6 +61,7 @@ describe('BadgeCounterService', () => {
     mockTemporaryStorage = TestBed.inject(
       TemporaryStorageService
     ) as jasmine.SpyObj<TemporaryStorageService>;
+    mockTokenStorage = TestBed.inject(TokenStorageService) as jasmine.SpyObj<TokenStorageService>;
 
     service.configureFallbacks({
       retryDelayMs: 10,
@@ -355,6 +362,49 @@ describe('BadgeCounterService', () => {
       expect(() => {
         service.refreshAllCounters();
       }).not.toThrow();
+    });
+  });
+
+  describe('initializeCounters', () => {
+    it('usa VER_DASHBOARD para habilitar contadores admin', () => {
+      mockTokenStorage.getUser.and.returnValue({
+        privileges: [OpPrivilegioConstants.VER_DASHBOARD],
+      });
+      const setupSpy = spyOn(service, 'setupAutoRefreshCounter').and.callThrough();
+
+      service.initializeCounters();
+
+      expect(setupSpy).toHaveBeenCalledWith(
+        'unmoderated-comments',
+        jasmine.anything(),
+        jasmine.any(Number)
+      );
+      expect(setupSpy).toHaveBeenCalledWith(
+        'pending-users',
+        jasmine.anything(),
+        jasmine.any(Number)
+      );
+      expect(setupSpy).toHaveBeenCalledWith(
+        'system-alerts',
+        jasmine.anything(),
+        jasmine.any(Number)
+      );
+    });
+
+    it('deshabilita contadores admin si falta VER_DASHBOARD aunque existan roles altos', (done) => {
+      mockTokenStorage.getUser.and.returnValue({
+        roles: ['ADMINISTRADOR'],
+        privileges: [],
+      });
+
+      service.initializeCounters();
+
+      service.getAllCounters().pipe(take(1)).subscribe((counters) => {
+        expect(counters.get('unmoderated-comments')).toBe(0);
+        expect(counters.get('pending-users')).toBe(0);
+        expect(counters.get('system-alerts')).toBe(0);
+        done();
+      });
     });
   });
 

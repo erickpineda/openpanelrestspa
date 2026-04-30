@@ -1,4 +1,4 @@
-import { INavItemEnhanced, UserRole } from '../../shared/types/navigation.types';
+import { INavItemEnhanced } from '../../shared/types/navigation.types';
 import { OpPrivilegioConstants } from '../../shared/constants/op-privilegio.constants';
 
 export const navItems: INavItemEnhanced[] = [
@@ -21,7 +21,6 @@ export const navItems: INavItemEnhanced[] = [
     url: '/admin/control',
     iconComponent: { name: 'cil-grid' },
     priority: 95,
-    requiredPermissions: [OpPrivilegioConstants.VER_DASHBOARD],
     attributes: { id: 'nav-control-panel' },
   },
 
@@ -30,7 +29,6 @@ export const navItems: INavItemEnhanced[] = [
     title: true,
     name: 'MENU.CONTENT_MANAGEMENT',
     priority: 90,
-    requiredPermissions: [OpPrivilegioConstants.VER_DASHBOARD],
     attributes: { id: 'nav-title-content' },
   },
   {
@@ -111,12 +109,7 @@ export const navItems: INavItemEnhanced[] = [
     priority: 75,
     linkProps: { fragment: 'someAnchor' },
     attributes: { id: 'nav-pages' },
-    requiredRoles: [
-      UserRole.EDITOR,
-      UserRole.ADMINISTRADOR,
-      UserRole.DESARROLLADOR,
-      UserRole.PROPIETARIO,
-    ],
+    requiredPermissions: [OpPrivilegioConstants.GESTIONAR_PAGINAS],
   },
   {
     name: 'MENU.MEDIA',
@@ -223,7 +216,11 @@ export const navItems: INavItemEnhanced[] = [
     url: '/admin/control/perfil',
     iconComponent: { name: 'cil-user' },
     priority: 15,
-    requiredPermissions: [OpPrivilegioConstants.GESTIONAR_PERFIL],
+    requiredPermissions: [
+      OpPrivilegioConstants.GESTIONAR_PERFIL,
+      OpPrivilegioConstants.VER_CONTENIDO_PROPIO,
+    ],
+    permissionMode: 'ANY',
     dynamicBadge: {
       service: 'BadgeCounterService',
       method: 'getMyDraftsCount',
@@ -263,7 +260,7 @@ export const navItems: INavItemEnhanced[] = [
   },
   {
     name: 'MENU.ADVANCED_SETTINGS',
-    url: '/admin/control/configuracion',
+    url: '/admin/control/configuracion/ajustes',
     iconComponent: { name: 'cil-equalizer' },
     priority: 25,
     requiredPermissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],

@@ -5,7 +5,7 @@ import { AuthService } from '@app/core/services/auth/auth.service';
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
 import { PostLoginRedirectService } from '@app/core/services/auth/post-login-redirect.service';
 import { AuthSyncService } from '@app/core/services/auth/auth-sync.service';
-import { UserRole } from '@app/shared/types/navigation.types';
+import { OpPrivilegioConstants } from '@app/shared/constants/op-privilegio.constants';
 
 @Component({
   selector: 'app-login',
@@ -118,12 +118,46 @@ export class LoginComponent implements OnInit {
         return;
       }
     } catch {}
-    if (this.tokenStorage.hasMinimumRole(UserRole.ADMINISTRADOR)) {
-      this.router.navigate(['/admin']);
-    } else {
-      this.router.navigate(['/admin/control/perfil']);
+
+    if (this.hasPrivilege(OpPrivilegioConstants.VER_DASHBOARD)) {
+      this.router.navigate(['/admin/dashboard']);
+      return;
     }
+
+    if (
+      this.hasAnyPrivilege([
+        OpPrivilegioConstants.CREAR_ENTRADAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_PROPIAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_TODO,
+      ])
+    ) {
+      this.router.navigate(['/admin/control/entradas']);
+      return;
+    }
+
+    if (
+      this.hasAnyPrivilege([
+        OpPrivilegioConstants.GESTIONAR_PERFIL,
+        OpPrivilegioConstants.VER_CONTENIDO_PROPIO,
+      ])
+    ) {
+      this.router.navigate(['/admin/control/perfil']);
+      return;
+    }
+
+    this.router.navigate(['/']);
   }
+
+  private hasPrivilege(privilege: string): boolean {
+    const user = this.tokenStorage.getUser();
+    const privileges: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+    return privileges.includes(privilege);
+  }
+
+  private hasAnyPrivilege(privileges: string[]): boolean {
+    return privileges.some((privilege) => this.hasPrivilege(privilege));
+  }
+
   reloadPage(): void {
     window.location.reload();
   }

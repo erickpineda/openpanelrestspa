@@ -28,6 +28,7 @@ import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
 import { NavigationService } from '../core/services/ui/navigation.service';
 import { UserRole, INavItemEnhanced } from '../shared/types/navigation.types';
 import { OPStorageConstants } from '@app/shared/constants/op-storage.constants';
+import { OpPrivilegioConstants } from '../shared/constants/op-privilegio.constants';
 
 // ... imports existentes
 
@@ -137,7 +138,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const isDashboardRoute =
       this.router.url.includes('/admin/dashboard') || this.router.url.includes('/admin/control');
-    const canReadDashboardStats = this.tokenStorage.hasMinimumRole(UserRole.ADMINISTRADOR);
+    const currentPrivileges = this.tokenStorage.getUser()?.privileges;
+    const canReadDashboardStats =
+      Array.isArray(currentPrivileges) &&
+      currentPrivileges.includes(OpPrivilegioConstants.VER_DASHBOARD);
     if (isDashboardRoute && canReadDashboardStats) {
       this.dashboardApi
         .getContentStats()
