@@ -69,7 +69,7 @@
             <c-card-body>
               <div class="d-grid gap-2">
                 <a
-                  *ngIf="canUsersAndRoles"
+                  *ngIf="canUsers"
                   routerLink="./gestion/usuarios"
                   cButton
                   color="success"
@@ -79,7 +79,7 @@
                   <svg cIcon name="cilUser" class="me-2"></svg> {{ 'MENU.USERS' | translate }}
                 </a>
                 <a
-                  *ngIf="canUsersAndRoles"
+                  *ngIf="canRoles"
                   routerLink="./gestion/roles"
                   cButton
                   color="success"
@@ -126,7 +126,7 @@
                   {{ 'MENU.GENERAL_SETTINGS' | translate }}
                 </a>
                 <a
-                  *ngIf="canSystemSettings"
+                  *ngIf="canThemeManagement"
                   routerLink="./configuracion/temas"
                   cButton
                   color="warning"

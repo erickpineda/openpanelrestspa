@@ -12,13 +12,22 @@ export class BaseIndexComponent implements OnInit {
   canEntries = false;
   canPages = false;
   canMedia = false;
-  canUsersAndRoles = false;
+  canUsers = false;
+  canRoles = false;
   canSystemSettings = false;
+  canThemeManagement = false;
   canMaintenance = false;
   canComments = false;
   canTags = false;
   canCategories = false;
   canProfile = false;
+  private readonly commentModerationPrivileges = [
+    OpPrivilegioConstants.APROBAR_COMENTARIOS,
+    OpPrivilegioConstants.OCULTAR_COMENTARIOS,
+    OpPrivilegioConstants.BORRAR_COMENTARIOS_TODO,
+    OpPrivilegioConstants.BORRAR_COMENTARIOS,
+    OpPrivilegioConstants.MODERAR_COMENTARIOS,
+  ];
 
   constructor(
     private tokenStorage: TokenStorageService,
@@ -33,21 +42,29 @@ export class BaseIndexComponent implements OnInit {
     ]);
     this.canPages = this.hasPrivilege(OpPrivilegioConstants.GESTIONAR_PAGINAS);
     this.canMedia = this.hasPrivilege(OpPrivilegioConstants.GESTIONAR_ARCHIVOS);
-    this.canUsersAndRoles = this.hasAnyPrivilege([
-      OpPrivilegioConstants.GESTIONAR_USUARIOS,
+    this.canUsers = this.hasPrivilege(OpPrivilegioConstants.GESTIONAR_USUARIOS);
+    this.canRoles = this.hasAnyPrivilege([
+      OpPrivilegioConstants.GESTIONAR_ROLES,
       OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS,
       OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS,
     ]);
-    this.canSystemSettings = this.hasPrivilege(OpPrivilegioConstants.CONFIGURAR_SISTEMA);
+    this.canSystemSettings = this.hasAnyPrivilege([
+      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ]);
+    this.canThemeManagement = this.hasAnyPrivilege([
+      OpPrivilegioConstants.GESTIONAR_TEMAS,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ]);
     this.canMaintenance = this.hasAnyPrivilege([
       OpPrivilegioConstants.REALIZAR_MANTENIMIENTO,
       OpPrivilegioConstants.DEPURAR_ERRORES,
     ]);
-    this.canComments = this.hasPrivilege(OpPrivilegioConstants.MODERAR_COMENTARIOS);
+    this.canComments = this.hasAnyPrivilege(this.commentModerationPrivileges);
     this.canTags = this.hasPrivilege(OpPrivilegioConstants.GESTIONAR_ETIQUETAS);
     this.canCategories = this.hasPrivilege(OpPrivilegioConstants.GESTIONAR_CATEGORIAS);
     this.canProfile = this.hasAnyPrivilege([
-      OpPrivilegioConstants.VER_CONTENIDO_PROPIO,
+      OpPrivilegioConstants.GESTIONAR_PERFIL_PROPIO,
       OpPrivilegioConstants.GESTIONAR_PERFIL,
     ]);
 
@@ -64,11 +81,11 @@ export class BaseIndexComponent implements OnInit {
   }
 
   hasUsersSection(): boolean {
-    return this.canUsersAndRoles || this.canProfile;
+    return this.canUsers || this.canRoles || this.canProfile;
   }
 
   hasSystemSection(): boolean {
-    return this.canSystemSettings || this.canMaintenance;
+    return this.canSystemSettings || this.canThemeManagement || this.canMaintenance;
   }
 
   hasInteractionSection(): boolean {
@@ -80,8 +97,10 @@ export class BaseIndexComponent implements OnInit {
       this.canEntries ||
       this.canPages ||
       this.canMedia ||
-      this.canUsersAndRoles ||
+      this.canUsers ||
+      this.canRoles ||
       this.canSystemSettings ||
+      this.canThemeManagement ||
       this.canMaintenance ||
       this.canComments ||
       this.canTags ||

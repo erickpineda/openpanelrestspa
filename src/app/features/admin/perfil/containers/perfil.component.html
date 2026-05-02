@@ -18,11 +18,8 @@
             @if (usuario) {
               <div class="mb-4 position-relative d-inline-block">
                 <img
-                  [src]="
-                    usuario.imagen && usuario.imagen.length > 0
-                      ? usuario.imagen[0]
-                      : './assets/img/avatars/2.jpg'
-                  "
+                  [src]="avatarUrl || defaultAvatarUrl"
+                  (error)="onAvatarError()"
                   class="rounded-circle img-thumbnail shadow-sm"
                   width="160"
                   height="160"
@@ -54,6 +51,22 @@
                   hidden
                 />
               </div>
+              @if (usuario.imagen && usuario.imagen.length > 0) {
+                <div class="mb-4">
+                  <button
+                    cButton
+                    color="danger"
+                    variant="outline"
+                    size="sm"
+                    class="rounded-pill"
+                    (click)="onDeleteAvatar()"
+                    [disabled]="uploading"
+                  >
+                    <svg cIcon name="cilTrash" class="me-1"></svg>
+                    Eliminar avatar
+                  </button>
+                </div>
+              }
               <h4 class="fw-bold mb-1">{{ usuario.nombre }} {{ usuario.apellido }}</h4>
               <p class="text-muted mb-3">{{ usuario.email }}</p>
               <c-badge color="info" shape="rounded-pill" class="px-3 py-2 text-white shadow-sm">{{

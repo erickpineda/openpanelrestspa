@@ -351,7 +351,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     this.cargando = true;
     const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.comentarioService
-      .borrar(this.comentarioToDelete.idComentario, context)
+      .borrarModeracion(this.comentarioToDelete.idComentario, context)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {

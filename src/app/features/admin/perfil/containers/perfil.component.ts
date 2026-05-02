@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { HttpContext } from '@angular/common/http';
 import { UsuarioService } from '../../../../core/services/data/usuario.service';
 import { Usuario } from '../../../../core/models/usuario.model';
@@ -7,6 +7,7 @@ import { PerfilResponse } from '../../../../core/models/perfil-response.model';
 import { PerfilMediaService } from '../../../../core/services/data/perfil-media.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
 import { finalize, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-perfil',
@@ -14,11 +15,15 @@ import { finalize, take } from 'rxjs/operators';
   styleUrls: ['./perfil.component.scss'],
   standalone: false,
 })
-export class PerfilComponent implements OnInit {
+export class PerfilComponent implements OnInit, OnDestroy {
   usuario: PerfilResponse | null = null;
   loading = false;
   uploading = false;
   activeTab = 0; // Track active tab
+  avatarUrl: string | null = null;
+  readonly defaultAvatarUrl = './assets/img/avatars/2.jpg';
+  private avatarObjectUrl: string | null = null;
+  private avatarSubscription?: Subscription;
 
   constructor(
     private usuarioService: UsuarioService,
@@ -29,6 +34,11 @@ export class PerfilComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarPerfil();
+  }
+
+  ngOnDestroy(): void {
+    this.avatarSubscription?.unsubscribe();
+    this.revokeAvatarObjectUrl();
   }
 
   // Keyboard Shortcuts (Ctrl+1, Ctrl+2, etc.)
@@ -50,6 +60,45 @@ export class PerfilComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
+  private loadAvatar(): void {
+    this.avatarSubscription?.unsubscribe();
+    this.avatarSubscription = this.perfilMediaService
+      .getAvatarObjectUrl()
+      .pipe(take(1))
+      .subscribe({
+        next: (avatarUrl) => {
+          this.setAvatarUrl(avatarUrl);
+        },
+        error: () => {
+          this.setDefaultAvatar();
+        },
+      });
+  }
+
+  onAvatarError(): void {
+    this.setDefaultAvatar();
+    this.cdr.markForCheck();
+  }
+
+  private setAvatarUrl(avatarUrl: string): void {
+    this.revokeAvatarObjectUrl();
+    this.avatarObjectUrl = avatarUrl;
+    this.avatarUrl = avatarUrl;
+    this.cdr.markForCheck();
+  }
+
+  private setDefaultAvatar(): void {
+    this.revokeAvatarObjectUrl();
+    this.avatarUrl = this.defaultAvatarUrl;
+  }
+
+  private revokeAvatarObjectUrl(): void {
+    if (this.avatarObjectUrl) {
+      URL.revokeObjectURL(this.avatarObjectUrl);
+      this.avatarObjectUrl = null;
+    }
+  }
+
   cargarPerfil() {
     this.loading = true;
     this.cdr.markForCheck();
@@ -68,6 +117,7 @@ export class PerfilComponent implements OnInit {
       .subscribe({
         next: (res: PerfilResponse) => {
           this.usuario = res;
+          this.loadAvatar();
           this.cdr.markForCheck();
         },
         error: () => {
@@ -140,5 +190,31 @@ export class PerfilComponent implements OnInit {
           },
         });
     }
+  }
+
+  onDeleteAvatar(): void {
+    if (!this.usuario) return;
+
+    this.uploading = true;
+    this.cdr.markForCheck();
+
+    this.perfilMediaService
+      .deleteAvatar()
+      .pipe(
+        take(1),
+        finalize(() => {
+          this.uploading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.toastService.showSuccess('Imagen borrada', 'Éxito');
+          this.cargarPerfil();
+        },
+        error: () => {
+          this.toastService.showError('Error al borrar imagen', 'Error');
+        },
+      });
   }
 }

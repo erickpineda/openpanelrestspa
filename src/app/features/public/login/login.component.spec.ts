@@ -38,7 +38,7 @@ describe('LoginComponent', () => {
       privileges: [
         OpPrivilegioConstants.VER_DASHBOARD,
         OpPrivilegioConstants.CREAR_ENTRADAS,
-        OpPrivilegioConstants.GESTIONAR_PERFIL,
+        OpPrivilegioConstants.GESTIONAR_PERFIL_PROPIO,
       ],
     });
 
@@ -57,9 +57,9 @@ describe('LoginComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/admin/control/entradas']);
   });
 
-  it('redirige al perfil cuando no hay dashboard ni entradas pero sí GESTIONAR_PERFIL', () => {
+  it('redirige al perfil cuando no hay dashboard ni entradas pero sí GESTIONAR_PERFIL_PROPIO', () => {
     tokenStorage.getUser.and.returnValue({
-      privileges: [OpPrivilegioConstants.GESTIONAR_PERFIL],
+      privileges: [OpPrivilegioConstants.GESTIONAR_PERFIL_PROPIO],
     });
 
     (component as any).tryRedirectToLastRoute('manual');
@@ -75,5 +75,25 @@ describe('LoginComponent', () => {
     (component as any).tryRedirectToLastRoute('manual');
 
     expect(router.navigate).toHaveBeenCalledWith(['/']);
+  });
+
+  it('redirige al panel de control cuando solo tiene ACCESO_PANEL', () => {
+    tokenStorage.getUser.and.returnValue({
+      privileges: [OpPrivilegioConstants.ACCESO_PANEL],
+    });
+
+    (component as any).tryRedirectToLastRoute('manual');
+
+    expect(router.navigate).toHaveBeenCalledWith(['/admin/control']);
+  });
+
+  it('redirige al panel de control cuando tiene un privilegio legacy de gestión sin ACCESO_PANEL', () => {
+    tokenStorage.getUser.and.returnValue({
+      privileges: [OpPrivilegioConstants.GESTIONAR_USUARIOS],
+    });
+
+    (component as any).tryRedirectToLastRoute('manual');
+
+    expect(router.navigate).toHaveBeenCalledWith(['/admin/control']);
   });
 });

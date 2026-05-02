@@ -12,7 +12,7 @@ describe('Admin Navigation Config', () => {
     const control = navItems.find((i) => i.name === 'MENU.CONTROL_PANEL');
     const contentTitle = navItems.find((i) => i.name === 'MENU.CONTENT_MANAGEMENT');
 
-    expect(control?.requiredPermissions).not.toEqual([OpPrivilegioConstants.VER_DASHBOARD]);
+    expect(control?.requiredPermissions).toEqual([OpPrivilegioConstants.ACCESO_PANEL]);
     expect(contentTitle?.requiredPermissions).not.toEqual([OpPrivilegioConstants.VER_DASHBOARD]);
   });
 
@@ -22,5 +22,55 @@ describe('Admin Navigation Config', () => {
     expect(pages?.requiredPermissions).toEqual([OpPrivilegioConstants.GESTIONAR_PAGINAS]);
     expect(pages?.permissionMode).toBeUndefined();
     expect(pages?.requiredRoles).toBeUndefined();
+  });
+
+  it('debe mostrar Mi Perfil con el nuevo privilegio propio y compatibilidad legacy', () => {
+    const profile = navItems.find((i) => i.name === 'MENU.MY_PROFILE');
+
+    expect(profile?.requiredPermissions).toEqual([
+      OpPrivilegioConstants.GESTIONAR_PERFIL_PROPIO,
+      OpPrivilegioConstants.GESTIONAR_PERFIL,
+    ]);
+    expect(profile?.permissionMode).toBe('ANY');
+  });
+
+  it('debe separar roles del legacy GESTIONAR_ROLES_USUARIOS en navegación', () => {
+    const rolesSection = navItems.find((i) => i.name === 'MENU.ROLES_AND_PERMISSIONS');
+    const rolesItem = rolesSection?.children?.find((i) => i.name === 'MENU.ROLES');
+
+    expect(rolesSection?.requiredPermissions).toEqual([
+      OpPrivilegioConstants.GESTIONAR_ROLES,
+      OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS,
+      OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS,
+    ]);
+    expect(rolesSection?.permissionMode).toBe('ANY');
+    expect(rolesItem?.requiredPermissions).toEqual([
+      OpPrivilegioConstants.GESTIONAR_ROLES,
+      OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS,
+    ]);
+    expect(rolesItem?.permissionMode).toBe('ANY');
+  });
+
+  it('debe separar ajustes y temas con fallback legacy conservador', () => {
+    const systemSection = navItems.find((i) => i.name === 'MENU.SYSTEM_CONFIGURATION');
+    const appearance = navItems.find((i) => i.name === 'MENU.APPEARANCE');
+    const generalSettings = navItems.find((i) => i.name === 'MENU.GENERAL_SETTINGS');
+
+    expect(systemSection?.requiredPermissions).toEqual([
+      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+      OpPrivilegioConstants.GESTIONAR_TEMAS,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ]);
+    expect(systemSection?.permissionMode).toBe('ANY');
+    expect(appearance?.requiredPermissions).toEqual([
+      OpPrivilegioConstants.GESTIONAR_TEMAS,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ]);
+    expect(appearance?.permissionMode).toBe('ANY');
+    expect(generalSettings?.requiredPermissions).toEqual([
+      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ]);
+    expect(generalSettings?.permissionMode).toBe('ANY');
   });
 });

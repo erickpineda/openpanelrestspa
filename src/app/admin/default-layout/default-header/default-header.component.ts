@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { ClassToggleService, HeaderComponent } from '@coreui/angular';
@@ -15,6 +15,7 @@ import {
 import { NotificationItem } from '../../../shared/components/notifications-dropdown/notifications-dropdown.component';
 import { RightSidebarService } from '../../../core/services/ui/right-sidebar.service';
 import { TokenStorageService } from '../../../core/services/auth/token-storage.service';
+import { PerfilMediaService } from '../../../core/services/data/perfil-media.service';
 import { UserRole } from '../../../shared/types/navigation.types';
 
 interface IBreadcrumb {
@@ -60,11 +61,15 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
   } | null = null;
 
   public userMenuOpen = false;
+  public avatarUrl = './assets/img/avatars/2.jpg';
+  readonly defaultAvatarUrl = './assets/img/avatars/2.jpg';
+  private avatarObjectUrl: string | null = null;
   currentLang: Language = 'es';
   notifications: NotificationItem[] = [];
   unreadNotifications = 0;
   private translationsSubscription: Subscription | undefined;
   private tempEntriesSubscription: Subscription | undefined;
+  private avatarRefreshSubscription: Subscription | undefined;
   public canAccessControlPanel = false;
   private readonly controlPanelRoles: UserRole[] = [
     UserRole.AUTOR,
@@ -74,6 +79,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     UserRole.MANTENIMIENTO,
     UserRole.PROPIETARIO,
   ];
+  private readonly perfilMediaService = inject(PerfilMediaService, { optional: true });
 
   get messagesCount(): number {
     return this.userCounts?.messages ?? this.newMessages.length;
@@ -112,6 +118,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
 
   ngOnInit(): void {
     this.canAccessControlPanel = this.tokenStorage.hasAnyRole(this.controlPanelRoles);
+    this.refreshAvatar();
     this.breadcrumbs = this.createBreadcrumbs(this.router.routerState.root);
 
     this.languageService.currentLang$.subscribe((lang: Language) => {
@@ -123,6 +130,12 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
       this.buildNotifications();
     });
 
+    if (this.perfilMediaService) {
+      this.avatarRefreshSubscription = this.perfilMediaService.avatarChanged$.subscribe(() => {
+        this.loadAvatar();
+      });
+    }
+
     this.translationsSubscription = this.translationService.translations$.subscribe(() => {
       this.buildNotifications();
     });
@@ -130,6 +143,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     this.routerSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
+        this.refreshAvatar();
         this.breadcrumbs = this.createBreadcrumbs(this.router.routerState.root);
       });
   }
@@ -144,10 +158,18 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     if (this.tempEntriesSubscription) {
       this.tempEntriesSubscription.unsubscribe();
     }
+    if (this.avatarRefreshSubscription) {
+      this.avatarRefreshSubscription.unsubscribe();
+    }
+    this.revokeAvatarObjectUrl();
   }
 
   toggleLanguage(): void {
     this.languageService.toggleLanguage();
+  }
+
+  onAvatarError(): void {
+    this.setDefaultAvatar();
   }
 
   private buildNotifications(): void {
@@ -162,6 +184,47 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     }));
     this.notifications = tempItems;
     this.unreadNotifications = tempItems.filter((x) => x.unread).length;
+  }
+
+  private refreshAvatar(): void {
+    this.loadAvatar();
+  }
+
+  private loadAvatar(): void {
+    if (!this.perfilMediaService) {
+      this.setDefaultAvatar();
+      return;
+    }
+
+    this.perfilMediaService
+      .getAvatarObjectUrl()
+      .pipe(take(1))
+      .subscribe({
+        next: (avatarUrl) => {
+          this.setAvatarUrl(avatarUrl);
+        },
+        error: () => {
+          this.setDefaultAvatar();
+        },
+      });
+  }
+
+  private setAvatarUrl(avatarUrl: string): void {
+    this.revokeAvatarObjectUrl();
+    this.avatarObjectUrl = avatarUrl;
+    this.avatarUrl = avatarUrl;
+  }
+
+  private setDefaultAvatar(): void {
+    this.revokeAvatarObjectUrl();
+    this.avatarUrl = this.defaultAvatarUrl;
+  }
+
+  private revokeAvatarObjectUrl(): void {
+    if (this.avatarObjectUrl) {
+      URL.revokeObjectURL(this.avatarObjectUrl);
+      this.avatarObjectUrl = null;
+    }
   }
 
   onMarkAllRead(): void {

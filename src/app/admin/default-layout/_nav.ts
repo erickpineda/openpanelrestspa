@@ -21,6 +21,7 @@ export const navItems: INavItemEnhanced[] = [
     url: '/admin/control',
     iconComponent: { name: 'cil-grid' },
     priority: 95,
+    requiredPermissions: [OpPrivilegioConstants.ACCESO_PANEL],
     attributes: { id: 'nav-control-panel' },
   },
 
@@ -140,7 +141,14 @@ export const navItems: INavItemEnhanced[] = [
     url: '/admin/control/comentarios',
     iconComponent: { name: 'cil-comment-square' },
     priority: 65,
-    requiredPermissions: [OpPrivilegioConstants.MODERAR_COMENTARIOS],
+    requiredPermissions: [
+      OpPrivilegioConstants.APROBAR_COMENTARIOS,
+      OpPrivilegioConstants.OCULTAR_COMENTARIOS,
+      OpPrivilegioConstants.BORRAR_COMENTARIOS_TODO,
+      OpPrivilegioConstants.BORRAR_COMENTARIOS,
+      OpPrivilegioConstants.MODERAR_COMENTARIOS,
+    ],
+    permissionMode: 'ANY',
     linkProps: { fragment: 'listadoComentarios' },
     dynamicBadge: {
       service: 'BadgeCounterService',
@@ -157,6 +165,7 @@ export const navItems: INavItemEnhanced[] = [
     priority: 60,
     requiredPermissions: [
       OpPrivilegioConstants.GESTIONAR_USUARIOS,
+      OpPrivilegioConstants.GESTIONAR_ROLES,
       OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS,
       OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS,
     ],
@@ -182,6 +191,7 @@ export const navItems: INavItemEnhanced[] = [
     iconComponent: { name: 'cil-shield-alt' },
     priority: 50,
     requiredPermissions: [
+      OpPrivilegioConstants.GESTIONAR_ROLES,
       OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS,
       OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS,
     ],
@@ -193,7 +203,11 @@ export const navItems: INavItemEnhanced[] = [
         url: '/admin/control/gestion/roles',
         iconComponent: { name: 'cil-lock-locked' },
         priority: 100,
-        requiredPermissions: [OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS],
+        requiredPermissions: [
+          OpPrivilegioConstants.GESTIONAR_ROLES,
+          OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS,
+        ],
+        permissionMode: 'ANY',
       },
       {
         name: 'MENU.PRIVILEGES',
@@ -217,8 +231,8 @@ export const navItems: INavItemEnhanced[] = [
     iconComponent: { name: 'cil-user' },
     priority: 15,
     requiredPermissions: [
+      OpPrivilegioConstants.GESTIONAR_PERFIL_PROPIO,
       OpPrivilegioConstants.GESTIONAR_PERFIL,
-      OpPrivilegioConstants.VER_CONTENIDO_PROPIO,
     ],
     permissionMode: 'ANY',
     dynamicBadge: {
@@ -242,28 +256,45 @@ export const navItems: INavItemEnhanced[] = [
     title: true,
     name: 'MENU.SYSTEM_CONFIGURATION',
     priority: 40,
-    requiredPermissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+    requiredPermissions: [
+      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+      OpPrivilegioConstants.GESTIONAR_TEMAS,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ],
+    permissionMode: 'ANY',
   },
   {
     name: 'MENU.APPEARANCE',
     url: '/admin/control/configuracion/temas',
     iconComponent: { name: 'cil-paint-bucket' },
     priority: 35,
-    requiredPermissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+    requiredPermissions: [
+      OpPrivilegioConstants.GESTIONAR_TEMAS,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ],
+    permissionMode: 'ANY',
   },
   {
     name: 'MENU.GENERAL_SETTINGS',
     url: '/admin/control/configuracion/ajustes',
     iconComponent: { name: 'cil-settings' },
     priority: 30,
-    requiredPermissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+    requiredPermissions: [
+      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ],
+    permissionMode: 'ANY',
   },
   {
     name: 'MENU.ADVANCED_SETTINGS',
     url: '/admin/control/configuracion/ajustes',
     iconComponent: { name: 'cil-equalizer' },
     priority: 25,
-    requiredPermissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+    requiredPermissions: [
+      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ],
+    permissionMode: 'ANY',
   },
 
   // Maintenance Section (for specific roles only)

@@ -44,11 +44,11 @@ describe('NavBarPublicComponent', () => {
     expect(component.showModeratorBoard).toBeFalse();
   });
 
-  it('muestra moderación solo con MODERAR_COMENTARIOS', () => {
+  it('muestra moderación con privilegios granulares o legacy', () => {
     tokenStorage.getUser.and.returnValue({
       username: 'moderador',
       roles: ['LECTOR'],
-      privileges: [OpPrivilegioConstants.MODERAR_COMENTARIOS],
+      privileges: [OpPrivilegioConstants.APROBAR_COMENTARIOS],
     });
 
     (component as any).checkAuthStatus();

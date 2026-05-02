@@ -6,7 +6,7 @@ import { BaseIndexComponent } from './base-index.component';
 import { OpPrivilegioConstants } from '../../shared/constants/op-privilegio.constants';
 import { UserRole } from '../../shared/types/navigation.types';
 
-const routes: Routes = [
+export const baseRoutes: Routes = [
   {
     path: '',
     component: BaseComponent,
@@ -64,7 +64,11 @@ const routes: Routes = [
           preload: true,
           delay: 8000,
           title: 'MENU.SETTINGS',
-          permissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+          permissions: [
+            OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+            OpPrivilegioConstants.GESTIONAR_TEMAS,
+            OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+          ],
           permissionMode: 'ANY',
           roles: [UserRole.ADMINISTRADOR, UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
         },
@@ -100,6 +104,7 @@ const routes: Routes = [
           title: 'MENU.MANAGEMENT',
           permissions: [
             OpPrivilegioConstants.GESTIONAR_USUARIOS,
+            OpPrivilegioConstants.GESTIONAR_ROLES,
             OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS,
             OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS,
           ],
@@ -128,8 +133,8 @@ const routes: Routes = [
         data: {
           title: 'MENU.PROFILE',
           permissions: [
+            OpPrivilegioConstants.GESTIONAR_PERFIL_PROPIO,
             OpPrivilegioConstants.GESTIONAR_PERFIL,
-            OpPrivilegioConstants.VER_CONTENIDO_PROPIO,
           ],
           permissionMode: 'ANY',
         }, // No preload
@@ -174,14 +179,14 @@ const routes: Routes = [
           preload: true,
           delay: 6500,
           title: 'MENU.COMMENTS',
-          permissions: [OpPrivilegioConstants.MODERAR_COMENTARIOS],
-          permissionMode: 'ANY',
-          roles: [
-            UserRole.EDITOR,
-            UserRole.ADMINISTRADOR,
-            UserRole.DESARROLLADOR,
-            UserRole.PROPIETARIO,
+          permissions: [
+            OpPrivilegioConstants.APROBAR_COMENTARIOS,
+            OpPrivilegioConstants.OCULTAR_COMENTARIOS,
+            OpPrivilegioConstants.BORRAR_COMENTARIOS_TODO,
+            OpPrivilegioConstants.BORRAR_COMENTARIOS,
+            OpPrivilegioConstants.MODERAR_COMENTARIOS,
           ],
+          permissionMode: 'ANY',
         },
       },
     ],
@@ -189,7 +194,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forChild(baseRoutes)],
   exports: [RouterModule],
 })
 export class BaseRoutingModule {}

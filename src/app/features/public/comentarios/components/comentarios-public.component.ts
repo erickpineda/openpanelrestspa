@@ -296,8 +296,11 @@ export class ComentariosPublicComponent implements OnInit {
         this.cargarComentarios(true);
         setTimeout(() => (this.successMessage = ''), 5000);
       },
-      error: () => {
-        this.errorMessage = 'Error al enviar el comentario.';
+      error: (err: any) => {
+        this.errorMessage =
+          err?.status === 403
+            ? 'Tu cuenta no tiene permiso para publicar comentarios.'
+            : 'Error al enviar el comentario.';
         this.isSubmitting = false;
         setTimeout(() => (this.errorMessage = ''), 5000);
       },

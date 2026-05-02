@@ -17,6 +17,13 @@ import { OpPrivilegioConstants } from '@app/shared/constants/op-privilegio.const
 export class NavBarPublicComponent implements OnInit {
   user: any;
   private roles: string[] = [];
+  private readonly moderationPrivileges = [
+    OpPrivilegioConstants.APROBAR_COMENTARIOS,
+    OpPrivilegioConstants.OCULTAR_COMENTARIOS,
+    OpPrivilegioConstants.BORRAR_COMENTARIOS_TODO,
+    OpPrivilegioConstants.BORRAR_COMENTARIOS,
+    OpPrivilegioConstants.MODERAR_COMENTARIOS,
+  ];
   isLoggedIn = false;
   showAdminBoard = false;
   showModeratorBoard = false;
@@ -74,7 +81,7 @@ export class NavBarPublicComponent implements OnInit {
       this.user = this.tokenStorageService.getUser();
       this.roles = this.user.roles || [];
       this.showAdminBoard = this.hasPrivilege(OpPrivilegioConstants.VER_DASHBOARD);
-      this.showModeratorBoard = this.hasPrivilege(OpPrivilegioConstants.MODERAR_COMENTARIOS);
+      this.showModeratorBoard = this.hasAnyPrivilege(this.moderationPrivileges);
       this.username = this.user.username;
     } else {
       this.user = null;
@@ -88,6 +95,10 @@ export class NavBarPublicComponent implements OnInit {
   private hasPrivilege(privilege: string): boolean {
     const privileges: string[] = Array.isArray(this.user?.privileges) ? this.user.privileges : [];
     return privileges.includes(privilege);
+  }
+
+  private hasAnyPrivilege(privileges: string[]): boolean {
+    return privileges.some((privilege) => this.hasPrivilege(privilege));
   }
 
   navigateToRoute(route: string): void {

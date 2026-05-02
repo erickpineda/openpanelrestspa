@@ -129,4 +129,33 @@ export class ComentarioService extends CrudService<Comentario, number> {
     this.recuentosCache.set(idEntrada, { expiresAt: now + ttlMs, obs$ });
     return obs$;
   }
+
+  aprobar(idComentario: number, context?: HttpContext): Observable<any> {
+    return this.post<any>(
+      OPConstants.Methods.COMENTARIOS.APROBAR(idComentario),
+      {},
+      undefined,
+      undefined,
+      context
+    );
+  }
+
+  ocultar(idComentario: number, context?: HttpContext): Observable<any> {
+    return this.post<any>(
+      OPConstants.Methods.COMENTARIOS.OCULTAR(idComentario),
+      {},
+      undefined,
+      undefined,
+      context
+    );
+  }
+
+  borrarModeracion(idComentario: number, context?: HttpContext): Observable<any> {
+    return this.delete<any>(
+      OPConstants.Methods.COMENTARIOS.ELIMINAR_MODERACION(idComentario),
+      undefined,
+      undefined,
+      context
+    );
+  }
 }

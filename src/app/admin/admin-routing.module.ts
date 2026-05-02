@@ -12,6 +12,10 @@ const routes: Routes = [
     component: AdminComponent,
     canActivate: [AuthGuard], // protección del padre
     canActivateChild: [AuthGuard], // protección de hijos
+    data: {
+      permissions: [OpPrivilegioConstants.ACCESO_PANEL],
+      permissionMode: 'ANY',
+    },
     children: [
       { path: '', redirectTo: 'control', pathMatch: 'full' },
       {

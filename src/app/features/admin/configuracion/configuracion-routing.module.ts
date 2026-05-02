@@ -11,7 +11,10 @@ const routes: Routes = [
     component: TemaStudioComponent,
     data: {
       title: 'ADMIN.THEMES.STUDIO.TITLE',
-      permissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+      permissions: [
+        OpPrivilegioConstants.GESTIONAR_TEMAS,
+        OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+      ],
       permissionMode: 'ANY',
     },
   },
@@ -21,7 +24,10 @@ const routes: Routes = [
     pathMatch: 'full',
     data: {
       title: 'MENU.THEMES',
-      permissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+      permissions: [
+        OpPrivilegioConstants.GESTIONAR_TEMAS,
+        OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+      ],
       permissionMode: 'ANY',
     },
   },
@@ -30,7 +36,10 @@ const routes: Routes = [
     component: AjustesComponent,
     data: {
       title: 'MENU.SETTINGS',
-      permissions: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+      permissions: [
+        OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+        OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+      ],
       permissionMode: 'ANY',
     },
   },

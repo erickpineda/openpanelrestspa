@@ -99,6 +99,92 @@ describe('AuthGuard', () => {
     expect(router.parseUrl).toHaveBeenCalledWith('/admin/control/entradas');
   });
 
+  it('debe aceptar GESTIONAR_PERFIL legacy cuando la ruta pide GESTIONAR_PERFIL_PROPIO', () => {
+    tokenStorage.getUser.and.returnValue({
+      privileges: [OpPrivilegioConstants.GESTIONAR_PERFIL],
+    });
+
+    const result = guard.canActivate({
+      data: {
+        permissions: [OpPrivilegioConstants.GESTIONAR_PERFIL_PROPIO],
+      },
+    } as unknown as ActivatedRouteSnapshot);
+
+    expect(result).toBeTrue();
+  });
+
+  it('debe aceptar VER_CONTENIDO_PROPIO legacy cuando la ruta pide GESTIONAR_INTERACCIONES_PROPIAS', () => {
+    tokenStorage.getUser.and.returnValue({
+      privileges: [OpPrivilegioConstants.VER_CONTENIDO_PROPIO],
+    });
+
+    const result = guard.canActivate({
+      data: {
+        permissions: [OpPrivilegioConstants.GESTIONAR_INTERACCIONES_PROPIAS],
+      },
+    } as unknown as ActivatedRouteSnapshot);
+
+    expect(result).toBeTrue();
+  });
+
+  it('debe aceptar GESTIONAR_ROLES_USUARIOS legacy cuando la ruta pide GESTIONAR_ROLES', () => {
+    tokenStorage.getUser.and.returnValue({
+      privileges: [OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS],
+    });
+
+    const result = guard.canActivate({
+      data: {
+        permissions: [OpPrivilegioConstants.GESTIONAR_ROLES],
+      },
+    } as unknown as ActivatedRouteSnapshot);
+
+    expect(result).toBeTrue();
+  });
+
+  it('debe aceptar CONFIGURAR_SISTEMA legacy cuando la ruta pide GESTIONAR_TEMAS', () => {
+    tokenStorage.getUser.and.returnValue({
+      privileges: [OpPrivilegioConstants.CONFIGURAR_SISTEMA],
+    });
+
+    const result = guard.canActivate({
+      data: {
+        permissions: [OpPrivilegioConstants.GESTIONAR_TEMAS],
+      },
+    } as unknown as ActivatedRouteSnapshot);
+
+    expect(result).toBeTrue();
+  });
+
+  it('debe redirigir al shell admin cuando solo tiene ACCESO_PANEL', () => {
+    tokenStorage.getUser.and.returnValue({
+      privileges: [OpPrivilegioConstants.ACCESO_PANEL],
+    });
+
+    const result = guard.canActivate({
+      data: {
+        permissions: [OpPrivilegioConstants.GESTIONAR_CATEGORIAS],
+      },
+    } as unknown as ActivatedRouteSnapshot);
+
+    expect(result).toBe('/admin/control' as any);
+    expect(router.parseUrl).toHaveBeenCalledWith('/admin/control');
+  });
+
+  it('debe redirigir al shell admin cuando solo tiene GESTIONAR_AJUSTES_SISTEMA', () => {
+    tokenStorage.getUser.and.returnValue({
+      privileges: [OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA],
+    });
+
+    const result = guard.canActivate({
+      data: {
+        permissions: [OpPrivilegioConstants.GESTIONAR_CATEGORIAS],
+      },
+    } as unknown as ActivatedRouteSnapshot);
+
+    expect(result).toBe('/admin/control' as any);
+    expect(router.parseUrl).toHaveBeenCalledWith('/admin/control');
+  });
+
   it('debe aplicar la misma prioridad de permissions en canLoad y canMatch', () => {
     tokenStorage.hasAnyRole.and.returnValue(false);
 
