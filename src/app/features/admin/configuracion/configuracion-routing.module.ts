@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TemasComponent } from './temas/temas.component';
-import { AjustesComponent } from './ajustes/ajustes.component';
 import { TemaStudioComponent } from './temas/studio/tema-studio.component';
 import { OpPrivilegioConstants } from '../../../shared/constants/op-privilegio.constants';
 
@@ -33,15 +32,8 @@ const routes: Routes = [
   },
   {
     path: 'ajustes',
-    component: AjustesComponent,
-    data: {
-      title: 'MENU.SETTINGS',
-      permissions: [
-        OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
-        OpPrivilegioConstants.CONFIGURAR_SISTEMA,
-      ],
-      permissionMode: 'ANY',
-    },
+    redirectTo: 'temas',
+    pathMatch: 'full',
   },
   { path: '', redirectTo: 'temas', pathMatch: 'full' },
 ];

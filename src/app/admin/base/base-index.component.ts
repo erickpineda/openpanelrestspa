@@ -85,7 +85,7 @@ export class BaseIndexComponent implements OnInit {
   }
 
   hasSystemSection(): boolean {
-    return this.canSystemSettings || this.canThemeManagement || this.canMaintenance;
+    return this.canThemeManagement || this.canMaintenance;
   }
 
   hasInteractionSection(): boolean {
@@ -99,7 +99,6 @@ export class BaseIndexComponent implements OnInit {
       this.canMedia ||
       this.canUsers ||
       this.canRoles ||
-      this.canSystemSettings ||
       this.canThemeManagement ||
       this.canMaintenance ||
       this.canComments ||

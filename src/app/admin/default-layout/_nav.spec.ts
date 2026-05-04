@@ -51,13 +51,13 @@ describe('Admin Navigation Config', () => {
     expect(rolesItem?.permissionMode).toBe('ANY');
   });
 
-  it('debe separar ajustes y temas con fallback legacy conservador', () => {
+  it('debe exponer solo Apariencia mientras no exista backend real de ajustes', () => {
     const systemSection = navItems.find((i) => i.name === 'MENU.SYSTEM_CONFIGURATION');
     const appearance = navItems.find((i) => i.name === 'MENU.APPEARANCE');
     const generalSettings = navItems.find((i) => i.name === 'MENU.GENERAL_SETTINGS');
+    const advancedSettings = navItems.find((i) => i.name === 'MENU.ADVANCED_SETTINGS');
 
     expect(systemSection?.requiredPermissions).toEqual([
-      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
       OpPrivilegioConstants.GESTIONAR_TEMAS,
       OpPrivilegioConstants.CONFIGURAR_SISTEMA,
     ]);
@@ -67,10 +67,7 @@ describe('Admin Navigation Config', () => {
       OpPrivilegioConstants.CONFIGURAR_SISTEMA,
     ]);
     expect(appearance?.permissionMode).toBe('ANY');
-    expect(generalSettings?.requiredPermissions).toEqual([
-      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
-      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
-    ]);
-    expect(generalSettings?.permissionMode).toBe('ANY');
+    expect(generalSettings).toBeUndefined();
+    expect(advancedSettings).toBeUndefined();
   });
 });

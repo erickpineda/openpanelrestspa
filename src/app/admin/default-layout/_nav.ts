@@ -257,7 +257,6 @@ export const navItems: INavItemEnhanced[] = [
     name: 'MENU.SYSTEM_CONFIGURATION',
     priority: 40,
     requiredPermissions: [
-      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
       OpPrivilegioConstants.GESTIONAR_TEMAS,
       OpPrivilegioConstants.CONFIGURAR_SISTEMA,
     ],
@@ -274,29 +273,6 @@ export const navItems: INavItemEnhanced[] = [
     ],
     permissionMode: 'ANY',
   },
-  {
-    name: 'MENU.GENERAL_SETTINGS',
-    url: '/admin/control/configuracion/ajustes',
-    iconComponent: { name: 'cil-settings' },
-    priority: 30,
-    requiredPermissions: [
-      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
-      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
-    ],
-    permissionMode: 'ANY',
-  },
-  {
-    name: 'MENU.ADVANCED_SETTINGS',
-    url: '/admin/control/configuracion/ajustes',
-    iconComponent: { name: 'cil-equalizer' },
-    priority: 25,
-    requiredPermissions: [
-      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
-      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
-    ],
-    permissionMode: 'ANY',
-  },
-
   // Maintenance Section (for specific roles only)
   {
     title: true,

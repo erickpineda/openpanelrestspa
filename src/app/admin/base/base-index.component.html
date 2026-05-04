@@ -115,17 +115,6 @@
             <c-card-body>
               <div class="d-grid gap-2">
                 <a
-                  *ngIf="canSystemSettings"
-                  routerLink="./configuracion/ajustes"
-                  cButton
-                  color="warning"
-                  variant="ghost"
-                  class="text-start text-decoration-none text-warning-emphasis"
-                >
-                  <svg cIcon name="cilSettings" class="me-2"></svg>
-                  {{ 'MENU.GENERAL_SETTINGS' | translate }}
-                </a>
-                <a
                   *ngIf="canThemeManagement"
                   routerLink="./configuracion/temas"
                   cButton
