@@ -267,10 +267,10 @@ export class NavigationPerformanceService {
     items: INavItemEnhanced[],
     userRole: UserRole
   ): Observable<INavItemEnhanced[]> {
-    const startTime = performance.now();
-
     return this.createNavigationChunks(items).pipe(
       map((chunks) => {
+        const startTime = performance.now();
+
         // Filtrar solo chunks cargados
         const loadedChunks = chunks.filter((chunk) => chunk.loaded);
 
@@ -559,9 +559,8 @@ export class NavigationPerformanceService {
     // Calcular promedio móvil simple
     this.stats.averageRenderTime = (this.stats.averageRenderTime + renderTime) / 2;
 
-    // Log de advertencia si el renderizado es muy lento (> 1000ms)
-    // Aumentado a 1s para evitar falsos positivos en desarrollo
-    if (renderTime > 1000) {
+    // Log de advertencia si el renderizado es muy lento (> 1500ms)
+    if (renderTime > 1500) {
       console.warn('[NavigationPerformanceService] Slow render detected:', {
         renderTime,
         averageRenderTime: this.stats.averageRenderTime,

@@ -20,7 +20,9 @@ import { SKIP_GLOBAL_LOADER } from '@app/core/interceptor/network.interceptor';
 export class ComentariosPublicComponent implements OnInit {
   @Input() idEntrada!: number;
   @Input() totalComentarios: number | null = null;
-  @Input() slugEntrada: string | null = null;
+  @Input() slugEntrada!: string;
+  @Input() comentariosDeshabilitados: boolean = false;
+  @Input() comentariosGlobalesHabilitados: boolean = true;
 
   @Output() countsChange = new EventEmitter<{ visible: number; total: number | null; pending: number }>();
 
@@ -31,6 +33,8 @@ export class ComentariosPublicComponent implements OnInit {
   isLoading = false;
   pageNo = 0;
   pageSize = 10;
+  ordenSeleccionado: 'nuevos' | 'antiguos' = 'nuevos';
+  miComentarioId: number | null = null;
   hasMore = false;
   successMessage = '';
   errorMessage = '';
@@ -116,8 +120,29 @@ export class ComentariosPublicComponent implements OnInit {
 
   private getUsername(): string | null {
     const user = this.tokenStorage.getUser();
-    const username = user?.username ?? user?.nombreUsuario ?? user?.name ?? null;
-    return username != null ? String(username) : null;
+    return user?.username ?? user?.nombreUsuario ?? null;
+  }
+
+  cambiarOrdenamiento(orden: 'nuevos' | 'antiguos') {
+    this.ordenSeleccionado = orden;
+    this.pageNo = 0;
+    this.comentarios = [];
+    this.cargarComentarios(true);
+  }
+
+  scrollToMiComentario() {
+    if (this.miComentarioId) {
+      setTimeout(() => {
+        const element = document.getElementById(`comentario-${this.miComentarioId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('highlight-comment');
+          setTimeout(() => {
+            element.classList.remove('highlight-comment');
+          }, 3000);
+        }
+      }, 500);
+    }
   }
 
   private normalizeUsername(raw: any): string | null {
@@ -215,14 +240,19 @@ export class ComentariosPublicComponent implements OnInit {
   }
 
   cargarComentarios(reset: boolean = false) {
-    if (!this.idEntrada) return;
+    if (!this.slugEntrada) return;
     if (reset) {
       this.pageNo = 0;
       this.comentarios = [];
     }
 
     this.isLoading = true;
-    this.comentarioService.listarPorIdEntrada(this.idEntrada, this.pageNo, this.pageSize).subscribe({
+    
+    // Construir parámetros de ordenamiento
+    const sortBy = this.ordenSeleccionado === 'nuevos' ? 'fechaCreacion' : 'fechaCreacion';
+    const sortDir = this.ordenSeleccionado === 'nuevos' ? 'desc' : 'asc';
+    
+    this.comentarioService.listarPorSlugEntrada(this.slugEntrada, this.pageNo, this.pageSize, sortBy, sortDir).subscribe({
       next: (res: any) => {
         const elements = res?.elements || [];
         const normalized = (Array.isArray(elements) ? elements : []).map((c: any) => {
@@ -293,7 +323,16 @@ export class ComentariosPublicComponent implements OnInit {
           window.localStorage.setItem(key, String(Date.now()));
           this.showMyPendingNotice = true;
         }
-        this.cargarComentarios(true);
+        
+        // Guardar ID del comentario enviado y recargar
+        // Nota: El servicio actual no devuelve ID, se manejará en futura mejora
+        this.miComentarioId = null;
+        setTimeout(() => {
+          this.pageNo = 0;
+          this.comentarios = [];
+          this.cargarComentarios(true);
+        }, 1000);
+        
         setTimeout(() => (this.successMessage = ''), 5000);
       },
       error: (err: any) => {

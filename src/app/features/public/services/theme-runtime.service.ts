@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, map, of, switchMap, tap } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, switchMap, tap } from 'rxjs';
 import { retry } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PublicThemesService } from '@app/core/services/data/public-themes.service';
@@ -23,6 +23,8 @@ type PreviewContext =
 export class ThemeRuntimeService {
   private appliedSignature?: string;
   private appliedTokenKeys = new Set<string>();
+  private activeThemeCache: PublicTheme | null = null;
+  private activeThemeRequest$: Observable<PublicTheme> | null = null;
   private readonly PREVIEW_FALLBACK_EVENT = 'op-theme-preview-fallback';
   private readonly PREVIEW_CONTEXT_KEY = 'op-theme-preview-context';
   private readonly originalTitle = typeof document !== 'undefined' ? document.title : '';
@@ -80,14 +82,14 @@ export class ThemeRuntimeService {
           // Si el token es inválido/expiró => volver a tema activo.
           if (status === 401 || status === 403 || status === 404) {
             this.emitPreviewFallback({ kind: 'token_invalid', status, previewThemeSlug });
-            return this.publicThemes.getActive().pipe(
+            return this.getActiveTheme().pipe(
               tap((t) => this.applyTheme(t, 'active')),
               map(() => void 0)
             );
           }
           // Fallo transitorio (timeout/red/etc.): mejor aplicar activo para evitar estado "sin tema"
           this.emitPreviewFallback({ kind: 'transient_error', status, previewThemeSlug });
-          return this.publicThemes.getActive().pipe(
+          return this.getActiveTheme().pipe(
             tap((t) => this.applyTheme(t, 'active')),
             map(() => void 0)
           );
@@ -132,7 +134,7 @@ export class ThemeRuntimeService {
       }
     }
 
-    return this.publicThemes.getActive().pipe(
+    return this.getActiveTheme().pipe(
       tap((t) => this.applyTheme(t, 'active')),
       map(() => void 0),
       catchError(() => of(void 0))
@@ -267,11 +269,34 @@ export class ThemeRuntimeService {
    * Fuerza recarga del tema activo (útil tras "Activar" en admin).
    */
   refreshActive() {
-    return this.publicThemes.getActive().pipe(
+    return this.getActiveTheme(true).pipe(
       tap((t) => this.applyTheme(t, 'active')),
       map(() => void 0),
       catchError(() => of(void 0))
     );
+  }
+
+  private getActiveTheme(forceRefresh: boolean = false): Observable<PublicTheme> {
+    if (!forceRefresh && this.activeThemeCache) {
+      return of(this.activeThemeCache);
+    }
+
+    if (!forceRefresh && this.activeThemeRequest$) {
+      return this.activeThemeRequest$;
+    }
+
+    const request$ = this.publicThemes.getActive().pipe(
+      tap((theme) => {
+        this.activeThemeCache = theme ?? null;
+      }),
+      finalize(() => {
+        this.activeThemeRequest$ = null;
+      }),
+      shareReplay(1)
+    );
+
+    this.activeThemeRequest$ = request$;
+    return request$;
   }
 
   private applyTheme(theme: PublicTheme, key: string) {

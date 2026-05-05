@@ -5,6 +5,7 @@ import { CategoriaService } from '@app/core/services/data/categoria.service';
 import { EtiquetaService } from '@app/core/services/data/etiqueta.service';
 import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
 import { AuthService } from '@app/core/services/auth/auth.service';
+import { SystemSettingsRuntimeService } from '@app/core/services/data/system-settings-runtime.service';
 import { PublicBookmarksService } from '../../services/public-bookmarks.service';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
@@ -40,10 +41,12 @@ export class ListadoEntradasPublicComponent implements OnInit {
     private analytics: AnalyticsService,
     private bookmarksService: PublicBookmarksService,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private systemSettingsRuntime: SystemSettingsRuntimeService
   ) {}
 
   ngOnInit(): void {
+    this.pageSize = this.resolveEntriesPageSize();
     this.cargarCategoriasPopulares();
     this.cargarEtiquetasPopulares();
     this.route.queryParamMap
@@ -65,6 +68,16 @@ export class ListadoEntradasPublicComponent implements OnInit {
     
     this.bookmarksService.observeSlugs().subscribe(slugs => {
       this.bookmarkedSlugs = slugs;
+    });
+
+    this.systemSettingsRuntime.loadPublicSettings().subscribe(() => {
+      const nextPageSize = this.resolveEntriesPageSize();
+      if (nextPageSize === this.pageSize) {
+        return;
+      }
+      this.pageSize = nextPageSize;
+      this.currentPage = 1;
+      this.cargarPagina({ scrollToTop: false });
     });
   }
 
@@ -250,5 +263,13 @@ export class ListadoEntradasPublicComponent implements OnInit {
 
   getFechaDate(fecha: any): Date | null {
     return parseAllowedDate(fecha);
+  }
+
+  private resolveEntriesPageSize(): number {
+    const fallback = 10;
+    const resolved = Math.trunc(
+      this.systemSettingsRuntime.getNumber('listings.entries.defaultPageSize', fallback)
+    );
+    return resolved > 0 ? resolved : fallback;
   }
 }

@@ -1,3 +1,72 @@
 .card {
   min-height: 240px;
 }
+
+.settings-summary {
+  c-badge {
+    font-size: 0.82rem;
+  }
+}
+
+.setting-value {
+  max-width: 24rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.settings-flags {
+  .form-check {
+    margin-bottom: 0;
+  }
+}
+
+.settings-col-category {
+  width: 9rem;
+  min-width: 8rem;
+}
+
+.settings-col-type {
+  width: 8rem;
+  min-width: 7rem;
+}
+
+.settings-col-flags {
+  min-width: 13rem;
+}
+
+.settings-col-actions {
+  width: 6rem;
+  min-width: 6rem;
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: #fff;
+  box-shadow: -8px 0 12px -12px rgba(15, 23, 42, 0.45);
+  white-space: nowrap;
+}
+
+.settings-col-actions-header {
+  z-index: 3;
+  background: var(--cui-table-bg, #f8f9fa);
+}
+
+.settings-action-group {
+  gap: 0.125rem;
+}
+
+.settings-flag-badge {
+  font-size: 0.72rem;
+  padding-inline: 0.5rem;
+}
+
+.settings-flags-list {
+  align-items: flex-start;
+}
+
+tbody td {
+  vertical-align: top;
+}

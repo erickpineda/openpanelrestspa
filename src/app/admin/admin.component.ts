@@ -318,8 +318,6 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private refreshSidebar(): void {
     this.applyTranslationsInPlace(this.navItems);
-    // Forzar actualización de referencia para detectar cambios en OnPush
-    this.navItems = [...this.navItems];
     this.sidebarState.updateNavItems(this.navItems, this.router.url);
     this.cdr.markForCheck();
   }

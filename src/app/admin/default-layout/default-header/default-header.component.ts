@@ -131,8 +131,12 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     });
 
     if (this.perfilMediaService) {
-      this.avatarRefreshSubscription = this.perfilMediaService.avatarChanged$.subscribe(() => {
-        this.loadAvatar();
+      this.avatarRefreshSubscription = this.perfilMediaService.avatarChanged$.subscribe((event) => {
+        if (event === 'deleted') {
+          this.setDefaultAvatar();
+          return;
+        }
+        this.loadAvatar(false);
       });
     }
 
@@ -143,7 +147,6 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
     this.routerSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
-        this.refreshAvatar();
         this.breadcrumbs = this.createBreadcrumbs(this.router.routerState.root);
       });
   }
@@ -187,10 +190,10 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
   }
 
   private refreshAvatar(): void {
-    this.loadAvatar();
+    this.loadAvatar(true);
   }
 
-  private loadAvatar(): void {
+  private loadAvatar(fallbackToDefaultOnError: boolean): void {
     if (!this.perfilMediaService) {
       this.setDefaultAvatar();
       return;
@@ -201,10 +204,14 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit, O
       .pipe(take(1))
       .subscribe({
         next: (avatarUrl) => {
-          this.setAvatarUrl(avatarUrl);
+          if (avatarUrl) {
+            this.setAvatarUrl(avatarUrl);
+          }
         },
         error: () => {
-          this.setDefaultAvatar();
+          if (fallbackToDefaultOnError) {
+            this.setDefaultAvatar();
+          }
         },
       });
   }

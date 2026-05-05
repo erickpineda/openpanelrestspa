@@ -257,10 +257,23 @@ export const navItems: INavItemEnhanced[] = [
     name: 'MENU.SYSTEM_CONFIGURATION',
     priority: 40,
     requiredPermissions: [
+      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
       OpPrivilegioConstants.GESTIONAR_TEMAS,
       OpPrivilegioConstants.CONFIGURAR_SISTEMA,
     ],
     permissionMode: 'ANY',
+  },
+  {
+    name: 'MENU.GENERAL_SETTINGS',
+    url: '/admin/control/configuracion/ajustes',
+    iconComponent: { name: 'cil-settings' },
+    priority: 37,
+    requiredPermissions: [
+      OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+      OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+    ],
+    permissionMode: 'ANY',
+    attributes: { id: 'nav-general-settings' },
   },
   {
     name: 'MENU.APPEARANCE',

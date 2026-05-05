@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable, Subject, map, tap } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import { OpenpanelApiResponse } from '../../models/openpanel-api-response.model';
+import { SKIP_GLOBAL_ERROR_HANDLING } from '../../interceptor/skip-global-error.token';
+import { SKIP_GLOBAL_LOADER } from '../../interceptor/network.interceptor';
 
 export interface PerfilMediaDto {
   uuid?: string;
@@ -12,10 +14,12 @@ export interface PerfilMediaDto {
   size?: number;
 }
 
+export type AvatarChangeEvent = 'uploaded' | 'deleted';
+
 @Injectable({ providedIn: 'root' })
 export class PerfilMediaService {
   private readonly base = `${environment.backend.host}${environment.backend.uri}`;
-  private readonly avatarChangedSource = new Subject<void>();
+  private readonly avatarChangedSource = new Subject<AvatarChangeEvent>();
   readonly avatarChanged$ = this.avatarChangedSource.asObservable();
 
   constructor(private http: HttpClient) {}
@@ -26,7 +30,10 @@ export class PerfilMediaService {
   }
 
   getAvatarBlob(): Observable<Blob> {
-    return this.http.get(`${this.base}/usuarios/perfil/imagen`, { responseType: 'blob' });
+    const context = new HttpContext()
+      .set(SKIP_GLOBAL_ERROR_HANDLING, true)
+      .set(SKIP_GLOBAL_LOADER, true);
+    return this.http.get(`${this.base}/usuarios/perfil/imagen`, { responseType: 'blob', context });
   }
 
   getAvatarObjectUrl(): Observable<string> {
@@ -41,7 +48,7 @@ export class PerfilMediaService {
       .post<OpenpanelApiResponse<PerfilMediaDto>>(`${this.base}/usuarios/perfil/imagen`, formData)
       .pipe(
         map((response) => response?.data ?? {}),
-        tap(() => this.avatarChangedSource.next())
+        tap(() => this.avatarChangedSource.next('uploaded'))
       );
   }
 
@@ -50,7 +57,7 @@ export class PerfilMediaService {
       .delete<OpenpanelApiResponse<string>>(`${this.base}/usuarios/perfil/imagen`)
       .pipe(
         map((response) => response?.data),
-        tap(() => this.avatarChangedSource.next())
+        tap(() => this.avatarChangedSource.next('deleted'))
       );
   }
 }

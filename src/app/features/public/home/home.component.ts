@@ -28,7 +28,22 @@ export class HomeComponent implements OnInit {
   cargarUltimasEntradas() {
     this.loading = true;
     const searchRequest: SearchQuery = {
-      node: { type: 'condition', field: 'publicada', op: 'equal', value: true },
+      node: {
+        type: 'group',
+        op: 'AND',
+        children: [
+          { type: 'condition', field: 'publicada', op: 'equal', value: true },
+          { type: 'condition', field: 'privado', op: 'equal', value: false },
+          {
+            type: 'group',
+            op: 'OR',
+            children: [
+              { type: 'condition', field: 'password', op: 'null' },
+              { type: 'condition', field: 'password', op: 'equal', value: '' },
+            ],
+          },
+        ],
+      },
     };
 
     this.entradaService.buscarSafe(searchRequest, 0, 6, 'fechaPublicacion', 'DESC')

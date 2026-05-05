@@ -24,6 +24,22 @@
         <article class="blog-post bg-white p-md-5 p-4 rounded-4 shadow-sm">
           <header class="mb-5 border-bottom pb-4">
             <div class="d-flex gap-2 flex-wrap mb-4">
+              <!-- Badge de entrada privada -->
+              @if (esEntradaPrivada) {
+                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fs-6 fw-medium d-flex align-items-center">
+                  <svg cIcon name="cilLockLocked" size="sm" class="me-1"></svg>
+                  Privada
+                </span>
+              }
+              
+              <!-- Badge de entrada protegida -->
+              @if (esEntradaProtegida) {
+                <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2 fs-6 fw-medium d-flex align-items-center">
+                  <svg cIcon name="cilShieldAlt" size="sm" class="me-1"></svg>
+                  Protegida
+                </span>
+              }
+
               <div class="btn-group" *ngFor="let cat of entrada.categorias">
                 <span class="badge bg-primary bg-opacity-10 text-primary rounded-start-pill px-3 py-2 fs-6 fw-medium d-flex align-items-center">
                   {{ cat.nombre }}
@@ -50,8 +66,10 @@
                 <div class="fw-bold fs-5 mb-0">{{ entrada.usernameCreador || 'Usuario' }}</div>
                 <div class="text-muted small d-flex align-items-center gap-2">
                   <span>{{ entrada.fechaPublicacion | allowedDate:'dd MMM, yyyy' }}</span>
-                  <span>&bull;</span>
-                  <span><svg cIcon name="cilSpeech" size="sm"></svg> {{ comentariosCounts?.visible ?? 0 }} comentarios</span>
+                  @if (commentsEnabled) {
+                    <span>&bull;</span>
+                    <span><svg cIcon name="cilSpeech" size="sm"></svg> {{ comentariosCounts?.visible ?? 0 }} comentarios</span>
+                  }
                   @if(entrada.votos > 0) {
                     <span>&bull;</span>
                     <span class="text-success"><svg cIcon name="cilThumbUp" size="sm"></svg> {{ entrada.votos }} votos</span>
@@ -77,28 +95,30 @@
                 <span>{{ isBookmarked ? 'Guardado' : 'Guardar' }}</span>
               </button>
               
-              <div class="btn-group" role="group" aria-label="Compartir en redes sociales">
-                <button
-                  class="btn btn-outline-secondary rounded-start-pill px-3"
-                  type="button"
-                  (click)="compartir()"
-                  [cTooltip]="'PUBLIC.SHARE.COPY_LINK' | translate"
-                  cTooltipPlacement="top"
-                  [attr.aria-label]="'PUBLIC.SHARE.COPY_LINK' | translate"
-                >
-                  <svg cIcon name="cilClone"></svg>
-                  <span class="visually-hidden">{{ 'PUBLIC.SHARE.COPY_LINK' | translate }}</span>
-                </button>
-                <button class="btn btn-outline-secondary px-3" type="button" (click)="shareTo('whatsapp')" aria-label="Compartir en WhatsApp" title="WhatsApp">
-                  <svg cIcon name="cibWhatsapp"></svg>
-                </button>
-                <button class="btn btn-outline-secondary px-3" type="button" (click)="shareTo('x')" aria-label="Compartir en X" title="X (Twitter)">
-                  <svg cIcon name="cibTwitter"></svg>
-                </button>
-                <button class="btn btn-outline-secondary rounded-end-pill px-3" type="button" (click)="shareTo('linkedin')" aria-label="Compartir en LinkedIn" title="LinkedIn">
-                  <svg cIcon name="cibLinkedin"></svg>
-                </button>
-              </div>
+              @if (shareEnabled) {
+                <div class="btn-group" role="group" aria-label="Compartir en redes sociales">
+                  <button
+                    class="btn btn-outline-secondary rounded-start-pill px-3"
+                    type="button"
+                    (click)="compartir()"
+                    [cTooltip]="'PUBLIC.SHARE.COPY_LINK' | translate"
+                    cTooltipPlacement="top"
+                    [attr.aria-label]="'PUBLIC.SHARE.COPY_LINK' | translate"
+                  >
+                    <svg cIcon name="cilClone"></svg>
+                    <span class="visually-hidden">{{ 'PUBLIC.SHARE.COPY_LINK' | translate }}</span>
+                  </button>
+                  <button class="btn btn-outline-secondary px-3" type="button" (click)="shareTo('whatsapp')" aria-label="Compartir en WhatsApp" title="WhatsApp">
+                    <svg cIcon name="cibWhatsapp"></svg>
+                  </button>
+                  <button class="btn btn-outline-secondary px-3" type="button" (click)="shareTo('x')" aria-label="Compartir en X" title="X (Twitter)">
+                    <svg cIcon name="cibTwitter"></svg>
+                  </button>
+                  <button class="btn btn-outline-secondary rounded-end-pill px-3" type="button" (click)="shareTo('linkedin')" aria-label="Compartir en LinkedIn" title="LinkedIn">
+                    <svg cIcon name="cibLinkedin"></svg>
+                  </button>
+                </div>
+              }
             </div>
             
             <div class="d-flex flex-wrap gap-2 justify-content-end mt-4 mt-md-0">
@@ -164,14 +184,18 @@
           }
           
           <!-- Sección de comentarios rediseñada -->
-          <div class="comentarios-section mt-5">
-            <app-comentarios-public
-              [idEntrada]="entrada.idEntrada"
-              [slugEntrada]="entrada.slug"
-              [totalComentarios]="entrada.cantidadComentarios || 0"
-              (countsChange)="comentariosCounts = $event">
-            </app-comentarios-public>
-          </div>
+          @if (commentsEnabled) {
+            <div class="comentarios-section mt-5">
+              <app-comentarios-public
+                [idEntrada]="entrada.idEntrada"
+                [slugEntrada]="entrada.slug"
+                [totalComentarios]="entrada.cantidadComentarios || 0"
+                [comentariosDeshabilitados]="comentariosDeshabilitados"
+                [comentariosGlobalesHabilitados]="comentariosGlobalesHabilitados"
+                (countsChange)="comentariosCounts = $event">
+              </app-comentarios-public>
+            </div>
+          }
         </article>
 
         <app-dev-feature-modal

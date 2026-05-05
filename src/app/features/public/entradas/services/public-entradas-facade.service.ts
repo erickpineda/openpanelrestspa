@@ -45,6 +45,15 @@ export class PublicEntradasFacadeService {
 
     const children: any[] = [
       { type: 'condition', field: 'publicada', op: 'equal', value: true },
+      { type: 'condition', field: 'privado', op: 'equal', value: false },
+      {
+        type: 'group',
+        op: 'OR',
+        children: [
+          { type: 'condition', field: 'password', op: 'null' },
+          { type: 'condition', field: 'password', op: 'equal', value: '' },
+        ],
+      },
       ...(permitirComentario === true
         ? [{ type: 'condition', field: 'permitirComentario', op: 'equal', value: true }]
         : []),

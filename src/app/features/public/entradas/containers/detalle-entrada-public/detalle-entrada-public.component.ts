@@ -15,6 +15,7 @@ import { PublicHistoryService } from '../../services/public-history.service';
 import { PublicSubscriptionsService, UserSubscriptions } from '../../../services/public-subscriptions.service';
 import { CategoriaService } from '@app/core/services/data/categoria.service';
 import { EtiquetaService } from '@app/core/services/data/etiqueta.service';
+import { SystemSettingsRuntimeService } from '@app/core/services/data/system-settings-runtime.service';
 import { SearchUtilService } from '@app/core/services/utils/search-util.service';
 import { RouterModule } from '@angular/router';
 import { SharedOPModule } from '@shared/shared.module';
@@ -46,6 +47,7 @@ export class DetalleEntradaPublicComponent implements OnInit {
   comentariosCounts: { visible: number; total: number | null; pending: number } | null = null;
   devModalVisible = false;
   devModalBodyKey = 'PUBLIC.DEV_MODAL.BODY_GENERIC';
+  runtimeSettingsLoaded = false;
   private destroy$ = new Subject<void>();
   private categoriaNombreToCodigo = new Map<string, string>();
   private etiquetaNombreToCodigo = new Map<string, string>();
@@ -67,11 +69,18 @@ export class DetalleEntradaPublicComponent implements OnInit {
     private subsService: PublicSubscriptionsService,
     private categoriaService: CategoriaService,
     private etiquetaService: EtiquetaService,
-    private searchUtil: SearchUtilService
+    private searchUtil: SearchUtilService,
+    private systemSettingsRuntime: SystemSettingsRuntimeService
   ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = this.tokenStorage.isLoggedIn();
+    this.systemSettingsRuntime
+      .loadPublicSettings()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.runtimeSettingsLoaded = true;
+      });
 
     if (this.isLoggedIn) {
       this.subsService.observeSubscriptions().pipe(takeUntil(this.destroy$)).subscribe((subs: UserSubscriptions) => {
@@ -252,7 +261,7 @@ export class DetalleEntradaPublicComponent implements OnInit {
   }
 
   compartir(): void {
-    if (OPConstants.App.Public.Features.SHARE_ENABLED !== true) {
+    if (!this.shareEnabled) {
       this.openDevModal('PUBLIC.DEV_MODAL.BODY_SHARE');
       return;
     }
@@ -328,7 +337,7 @@ export class DetalleEntradaPublicComponent implements OnInit {
   }
 
   shareTo(channel: 'whatsapp' | 'x' | 'linkedin'): void {
-    if (OPConstants.App.Public.Features.SHARE_ENABLED !== true) {
+    if (!this.shareEnabled) {
       this.openDevModal('PUBLIC.DEV_MODAL.BODY_SHARE');
       return;
     }
@@ -367,6 +376,15 @@ export class DetalleEntradaPublicComponent implements OnInit {
           op: 'AND',
           children: [
             { type: 'condition', field: 'publicada', op: 'equal', value: true },
+            { type: 'condition', field: 'privado', op: 'equal', value: false },
+            {
+              type: 'group',
+              op: 'OR',
+              children: [
+                { type: 'condition', field: 'password', op: 'null' },
+                { type: 'condition', field: 'password', op: 'equal', value: '' },
+              ],
+            },
             { type: 'condition', field: 'idEntrada', op: 'not_equal', value: idEntrada },
             { type: 'condition', field: filterKey, op: 'equal', value: v },
           ],
@@ -459,5 +477,32 @@ export class DetalleEntradaPublicComponent implements OnInit {
       resumen: this.entrada?.resumen ?? null,
       fechaPublicacion: this.entrada?.fechaPublicacion ?? null,
     });
+  }
+
+  get commentsEnabled(): boolean {
+    return !!this.entrada; // Siempre mostrar la sección si hay entrada
+  }
+
+  get comentariosGlobalesHabilitados(): boolean {
+    return this.systemSettingsRuntime.getBoolean('comments.enabled', true);
+  }
+
+  get shareEnabled(): boolean {
+    return this.systemSettingsRuntime.getBoolean(
+      'integrations.social.share.enabled',
+      OPConstants.App.Public.Features.SHARE_ENABLED === true
+    );
+  }
+
+  get esEntradaPrivada(): boolean {
+    return this.entrada?.privado === true;
+  }
+
+  get esEntradaProtegida(): boolean {
+    return this.entrada?.password && this.entrada?.password.trim().length > 0;
+  }
+
+  get comentariosDeshabilitados(): boolean {
+    return !!this.entrada && this.entrada?.permitirComentario === false;
   }
 }

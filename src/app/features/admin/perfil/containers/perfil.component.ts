@@ -6,6 +6,7 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 import { PerfilResponse } from '../../../../core/models/perfil-response.model';
 import { PerfilMediaService } from '../../../../core/services/data/perfil-media.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../../../core/interceptor/network.interceptor';
 import { finalize, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
@@ -33,6 +34,14 @@ export class PerfilComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.avatarSubscription = this.perfilMediaService.avatarChanged$.subscribe((event) => {
+      if (event === 'deleted') {
+        this.setDefaultAvatar();
+        this.cdr.markForCheck();
+        return;
+      }
+      this.loadAvatar(false);
+    });
     this.cargarPerfil();
   }
 
@@ -60,17 +69,20 @@ export class PerfilComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  private loadAvatar(): void {
-    this.avatarSubscription?.unsubscribe();
-    this.avatarSubscription = this.perfilMediaService
+  private loadAvatar(fallbackToDefaultOnError: boolean = true): void {
+    this.perfilMediaService
       .getAvatarObjectUrl()
       .pipe(take(1))
       .subscribe({
         next: (avatarUrl) => {
-          this.setAvatarUrl(avatarUrl);
+          if (avatarUrl) {
+            this.setAvatarUrl(avatarUrl);
+          }
         },
         error: () => {
-          this.setDefaultAvatar();
+          if (fallbackToDefaultOnError) {
+            this.setDefaultAvatar();
+          }
         },
       });
   }
@@ -102,8 +114,9 @@ export class PerfilComponent implements OnInit, OnDestroy {
   cargarPerfil() {
     this.loading = true;
     this.cdr.markForCheck();
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     this.usuarioService
-      .obtenerDatosSesionActualSafe()
+      .obtenerDatosSesionActualSafe(context)
       .pipe(
         take(1),
         finalize(() => {
@@ -117,7 +130,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (res: PerfilResponse) => {
           this.usuario = res;
-          this.loadAvatar();
+          this.loadAvatar(true);
           this.cdr.markForCheck();
         },
         error: () => {
@@ -183,7 +196,13 @@ export class PerfilComponent implements OnInit, OnDestroy {
         .subscribe({
           next: () => {
             this.toastService.showSuccess('Imagen subida', 'Éxito');
-            this.cargarPerfil();
+            if (this.usuario) {
+              this.usuario = {
+                ...this.usuario,
+                imagen: this.usuario.imagen && this.usuario.imagen.length > 0 ? this.usuario.imagen : ['avatar'],
+              };
+            }
+            this.cdr.markForCheck();
           },
           error: () => {
             this.toastService.showError('Error al subir imagen', 'Error');
@@ -210,7 +229,13 @@ export class PerfilComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.toastService.showSuccess('Imagen borrada', 'Éxito');
-          this.cargarPerfil();
+          if (this.usuario) {
+            this.usuario = {
+              ...this.usuario,
+              imagen: [],
+            };
+          }
+          this.cdr.markForCheck();
         },
         error: () => {
           this.toastService.showError('Error al borrar imagen', 'Error');

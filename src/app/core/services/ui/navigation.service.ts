@@ -257,24 +257,27 @@ export class NavigationService implements INavigationService {
       return null;
     }
 
-    const filteredItem: INavItemEnhanced = { ...item };
-
     if (item.children && item.children.length > 0) {
       const visibleChildren = this.filterVisibleNavigationItems(item.children, userRole, userPrivileges);
 
       if (visibleChildren.length > 0) {
-        filteredItem.children = visibleChildren;
-      } else {
-        delete filteredItem.children;
-
-        const isWrapperSection = !item.url && !item.title;
-        if (isWrapperSection) {
-          return null;
+        if (visibleChildren !== item.children) {
+          return { ...item, children: visibleChildren };
         }
+        return item;
       }
+
+      const isWrapperSection = !item.url && !item.title;
+      if (isWrapperSection) {
+        return null;
+      }
+
+      const filteredItem: INavItemEnhanced = { ...item };
+      delete filteredItem.children;
+      return filteredItem;
     }
 
-    return filteredItem;
+    return item;
   }
 
   private hasAccessToItem(

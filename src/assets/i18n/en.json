@@ -899,8 +899,11 @@
       "SEARCH_PLACEHOLDER": "Search by key or value...",
       "CATEGORY_PLACEHOLDER": "e.g. General",
       "KEY_PLACEHOLDER": "e.g. SITE_TITLE",
+      "CODE_PLACEHOLDER": "e.g. site.title",
       "VALUE_PLACEHOLDER": "Setting value...",
+      "DEFAULT_VALUE_PLACEHOLDER": "Value used when no explicit value exists...",
       "DESCRIPTION_PLACEHOLDER": "Optional description for this setting...",
+      "EMPTY_OPTION": "Unset",
       "KEY_REQUIRED": "Key is required",
       "VALUE_REQUIRED": "Value is required",
       "CONFIRM_DELETE_MSG": "Are you sure you want to delete the setting",
@@ -908,13 +911,33 @@
       "X_RECORDS": "{{ count }} records",
       "ADVANCED_FILTERS": "Advanced Filters",
       "FILTER_BY_CATEGORY": "Filter by category...",
+      "FILTER_BY_TYPE": "Filter by type...",
       "FILTER_BY_KEY": "Filter by key...",
       "NO_SETTINGS_FOUND": "No settings found",
       "ADJUST_FILTERS_HELP": "Try adjusting your search criteria",
+      "BOOLEAN": {
+        "TRUE": "True",
+        "FALSE": "False"
+      },
+      "SUMMARY": {
+        "TOTAL": "{{ count }} settings",
+        "PUBLIC": "{{ count }} public",
+        "REQUIRES_RESTART": "{{ count }} require restart",
+        "NON_EDITABLE": "{{ count }} non-editable"
+      },
       "TABLE": {
         "CATEGORY": "Category",
         "KEY": "Key",
+        "CODE": "Code",
         "VALUE": "Value",
+        "DEFAULT_VALUE": "Default value",
+        "TYPE": "Type",
+        "ORDER": "Order",
+        "FLAGS": "Flags",
+        "PUBLIC": "Public",
+        "EDITABLE": "Editable",
+        "VISIBLE": "Visible",
+        "REQUIRES_RESTART": "Requires restart",
         "DESCRIPTION": "Description",
         "NO_DESCRIPTION": "No description",
         "ACTIONS": "Actions"
@@ -928,7 +951,8 @@
         "LOAD": "Error loading settings",
         "CREATE": "Error creating setting",
         "UPDATE": "Error updating setting",
-        "DELETE": "Error deleting setting"
+        "DELETE": "Error deleting setting",
+        "INVALID_CATEGORY": "The selected category is not valid"
       }
     },
     "PAGES": {

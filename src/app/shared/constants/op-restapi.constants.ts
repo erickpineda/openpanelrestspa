@@ -57,6 +57,7 @@ export const OPRestMethods: any = {
     OCULTAR: (id: number) => `/comentarios/${id}/ocultar`,
     ELIMINAR_MODERACION: (id: number) => `/comentarios/${id}/moderacion`,
     LISTAR_POR_ID_ENTRADA: (idEntrada: number) => `/comentarios/listarPorIdEntrada/${idEntrada}`,
+    LISTAR_POR_SLUG_ENTRADA: (slugEntrada: string) => `/comentarios/listarPorSlugEntrada/${encodeURIComponent(slugEntrada)}`,
     RECUENTOS_POR_ID_ENTRADA: (idEntrada: number) => `/comentarios/recuentosPorIdEntrada/${idEntrada}`,
     BUSCAR: '/comentarios/buscar',
   },
@@ -112,9 +113,6 @@ export const OPRestMethods: any = {
   },
   CONFIRM_REGISTER: {
     BASE: '/usuarios/validaRegistro/confirmarRegistroUsuario',
-  },
-  HERRAMIENTAS_AUXILIAR: {
-    BASE: '/herramientas/sistema',
   },
   FICHEROS: {
     RUTA_INTERNA: '/fileStorage/ficheros/obtenerDatos/',

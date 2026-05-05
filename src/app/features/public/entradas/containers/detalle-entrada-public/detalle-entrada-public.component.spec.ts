@@ -18,6 +18,7 @@ describe('DetalleEntradaPublicComponent', () => {
     const categoriaService: any = { buscarSinGlobalLoader: () => ({ pipe: () => ({ subscribe: () => undefined }) }) };
     const etiquetaService: any = { buscarSinGlobalLoader: () => ({ pipe: () => ({ subscribe: () => undefined }) }) };
     const searchUtil: any = { buildSingle: () => ({}) };
+    const systemSettingsRuntime: any = { getBoolean: (_key: string, fallback: boolean) => fallback };
 
     return new DetalleEntradaPublicComponent(
       route,
@@ -35,7 +36,8 @@ describe('DetalleEntradaPublicComponent', () => {
       subsService,
       categoriaService,
       etiquetaService,
-      searchUtil
+      searchUtil,
+      systemSettingsRuntime
     );
   };
 

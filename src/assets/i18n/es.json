@@ -907,8 +907,11 @@
       "SEARCH_PLACEHOLDER": "Buscar por clave o valor...",
       "CATEGORY_PLACEHOLDER": "Ej. General",
       "KEY_PLACEHOLDER": "Ej. SITE_TITLE",
+      "CODE_PLACEHOLDER": "Ej. site.title",
       "VALUE_PLACEHOLDER": "Valor del ajuste...",
+      "DEFAULT_VALUE_PLACEHOLDER": "Valor aplicado cuando no haya uno explícito...",
       "DESCRIPTION_PLACEHOLDER": "Descripción opcional para saber qué controla este ajuste...",
+      "EMPTY_OPTION": "Sin definir",
       "KEY_REQUIRED": "La clave es obligatoria",
       "VALUE_REQUIRED": "El valor es obligatorio",
       "CONFIRM_DELETE_MSG": "¿Está seguro de que desea eliminar el ajuste",
@@ -916,13 +919,33 @@
       "X_RECORDS": "{{count}} registros",
       "ADVANCED_FILTERS": "Filtros Avanzados",
       "FILTER_BY_CATEGORY": "Filtrar por categoría...",
+      "FILTER_BY_TYPE": "Filtrar por tipo...",
       "FILTER_BY_KEY": "Filtrar por clave...",
       "NO_SETTINGS_FOUND": "No se encontraron ajustes",
       "ADJUST_FILTERS_HELP": "Intenta ajustar los criterios de búsqueda",
+      "BOOLEAN": {
+        "TRUE": "Verdadero",
+        "FALSE": "Falso"
+      },
+      "SUMMARY": {
+        "TOTAL": "{{count}} ajustes",
+        "PUBLIC": "{{count}} públicos",
+        "REQUIRES_RESTART": "{{count}} requieren reinicio",
+        "NON_EDITABLE": "{{count}} no editables"
+      },
       "TABLE": {
         "CATEGORY": "Categoría",
         "KEY": "Clave",
+        "CODE": "Código",
         "VALUE": "Valor",
+        "DEFAULT_VALUE": "Valor por defecto",
+        "TYPE": "Tipo",
+        "ORDER": "Orden",
+        "FLAGS": "Indicadores",
+        "PUBLIC": "Público",
+        "EDITABLE": "Editable",
+        "VISIBLE": "Visible",
+        "REQUIRES_RESTART": "Requiere reinicio",
         "DESCRIPTION": "Descripción",
         "NO_DESCRIPTION": "Sin descripción",
         "ACTIONS": "Acciones"
@@ -936,7 +959,8 @@
         "LOAD": "Error cargando ajustes",
         "CREATE": "Error creando ajuste",
         "UPDATE": "Error actualizando ajuste",
-        "DELETE": "Error eliminando ajuste"
+        "DELETE": "Error eliminando ajuste",
+        "INVALID_CATEGORY": "La categoría seleccionada no es válida"
       }
     },
     "DEV_TOOLS": {

@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { SystemSettingsRuntimeService } from '@app/core/services/data/system-settings-runtime.service';
 import { parseAllowedDate } from '@shared/utils/date-utils';
 
 @Injectable({
@@ -10,11 +11,14 @@ export class PublicSeoService {
   constructor(
     private title: Title,
     private meta: Meta,
-    @Inject(DOCUMENT) private document: Document
+    @Inject(DOCUMENT) private document: Document,
+    private systemSettingsRuntime: SystemSettingsRuntimeService
   ) {}
 
   updateTitle(title: string) {
-    this.title.setTitle(`${title} | OpenPanel`);
+    const siteName = this.getSiteName();
+    const normalizedTitle = String(title || '').trim();
+    this.title.setTitle(normalizedTitle ? `${normalizedTitle} | ${siteName}` : siteName);
   }
 
   updateMeta(name: string, content: string) {
@@ -57,8 +61,10 @@ export class PublicSeoService {
   }
 
   setEntradaSeo(entrada: any) {
-    const titulo = String(entrada?.titulo ?? 'OpenPanel');
-    const resumen = String(entrada?.resumen ?? titulo);
+    const siteName = this.getSiteName();
+    const siteDescription = this.getSiteDescription(siteName);
+    const titulo = String(entrada?.titulo ?? siteName);
+    const resumen = String(entrada?.resumen ?? siteDescription ?? titulo);
     const url = typeof window !== 'undefined' ? window.location.href : '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const image = String(entrada?.imagenDestacadaUrl ?? `${origin}/assets/img/home-bg.jpg`);
@@ -69,6 +75,7 @@ export class PublicSeoService {
 
     this.updateOpenGraph('og:title', titulo);
     this.updateOpenGraph('og:description', resumen);
+    this.updateOpenGraph('og:site_name', siteName);
     this.updateOpenGraph('og:url', url);
     this.updateOpenGraph('og:type', 'article');
     this.updateOpenGraph('og:image', image);
@@ -96,5 +103,13 @@ export class PublicSeoService {
         ? { '@type': 'Person', name: String(entrada.usernameCreador) }
         : undefined,
     });
+  }
+
+  private getSiteName(): string {
+    return this.systemSettingsRuntime.getString('site.name', 'OpenPanel');
+  }
+
+  private getSiteDescription(siteName: string): string {
+    return this.systemSettingsRuntime.getString('site.description', siteName);
   }
 }

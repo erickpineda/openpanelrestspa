@@ -92,16 +92,47 @@ export class ComentarioService extends CrudService<Comentario, number> {
     return this.get<any>(this.endpoint, params, undefined, context);
   }
 
-  listarPorIdEntrada(idEntrada: number, page: number, size: number): Observable<PaginaResponse> {
+  listarPorIdEntrada(idEntrada: number, page: number, size: number, sortBy?: string, sortDir?: string): Observable<PaginaResponse> {
     const params: any = {};
     params[OPConstants.Pagination.PAGE_NO_PARAM] = page.toString();
     params[this.pageSizeParam] = size.toString();
+    
+    // Añadir parámetros de ordenamiento si se proporcionan
+    if (sortBy) {
+      params['sortBy'] = sortBy;
+    }
+    if (sortDir) {
+      params['sortDir'] = sortDir;
+    }
+    
     return this.safeGetData<PaginaResponse>(
       OPConstants.Methods.COMENTARIOS.LISTAR_POR_ID_ENTRADA(idEntrada),
       new PaginaResponse(),
       params,
       undefined,
       'comentarios.listarPorIdEntrada'
+    );
+  }
+
+  listarPorSlugEntrada(slugEntrada: string, page: number, size: number, sortBy?: string, sortDir?: string): Observable<PaginaResponse> {
+    const params: any = {};
+    params[OPConstants.Pagination.PAGE_NO_PARAM] = page.toString();
+    params[this.pageSizeParam] = size.toString();
+    
+    // Añadir parámetros de ordenamiento si se proporcionan
+    if (sortBy) {
+      params['sortBy'] = sortBy;
+    }
+    if (sortDir) {
+      params['sortDir'] = sortDir;
+    }
+    
+    return this.safeGetData<PaginaResponse>(
+      OPConstants.Methods.COMENTARIOS.LISTAR_POR_SLUG_ENTRADA(slugEntrada),
+      new PaginaResponse(),
+      params,
+      undefined,
+      'comentarios.listarPorSlugEntrada'
     );
   }
 
