@@ -13,7 +13,7 @@ import { UiAnomalyMonitorService } from '../ui/ui-anomaly-monitor.service';
 import { AuthSyncService } from './auth-sync.service';
 
 export interface SessionExpirationData {
-  type: 'LOGOUT' | 'SESSION_EXPIRED' | 'ANOTHER_DEVICE';
+  type: 'LOGOUT' | 'SESSION_EXPIRED' | 'SESSION_ORPHANED' | 'ANOTHER_DEVICE';
   message: string;
   allowSave?: boolean;
   timestamp: number;
@@ -173,6 +173,38 @@ export class SessionManagerService {
         isManual: false,
       });
     } catch {}
+  }
+
+  public notifySessionOrphaned(): void {
+    const payload: SessionExpirationData = {
+      type: OPSessionConstants.TYPE_SESSION_ORPHANED as 'SESSION_ORPHANED',
+      message: 'Su sesión ha sido invalidada por el administrador',
+      allowSave: false,
+      timestamp: Date.now(),
+      origin: 'local'
+    };
+    this.log.warn('SessionManagerService: Notificando sesión huérfana - Forzando logout inmediato');
+    
+    // Limpiar token inmediatamente para evitar navegación
+    this.tokenStorage.signOut();
+    
+    // Emitir evento para notificar a los componentes
+    this.sessionExpiredSubject.next(payload);
+    
+    // Sincronizar con otras pestañas
+    try {
+      this.authSync.notifyLogout({
+        originTabId: this.tokenStorage.getOrCreateTabId(),
+        reason: OPSessionConstants.TYPE_SESSION_ORPHANED,
+        isManual: false,
+      });
+    } catch {}
+    
+    // Forzar redirección al login inmediatamente
+    // Usar window.location para forzar la redirección incluso durante errores HTTP
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 100);
   }
 
   public logout(): void {

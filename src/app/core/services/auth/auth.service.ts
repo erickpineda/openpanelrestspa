@@ -148,6 +148,20 @@ export class AuthService {
     }
   }
 
+  // Verificar estado de la sesión con backend (detecta sesiones huérfanas)
+  public validateSessionStatus(): Observable<any> {
+    return this.http
+      .get<OpenpanelApiResponse<any>>(this.urlBase + this.urlUri + '/auth/session-status', {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + this.tokenStorage.getToken(),
+        }),
+      })
+      .pipe(
+        map((res) => res?.data)
+      );
+  }
+
   // Forzar logout local (limpia storage, notifica sync y actualiza estado)
   public forceLogoutDueToExpiredToken(): void {
     // En vez de redirigir de inmediato, emitimos evento de expiración

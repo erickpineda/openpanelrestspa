@@ -19,6 +19,7 @@ export const OPSessionConstants = {
   TYPE_SESSION_EXPIRED: 'SESSION_EXPIRED',
   TYPE_LOGOUT: 'LOGOUT',
   TYPE_ANOTHER_DEVICE: 'ANOTHER_DEVICE',
+  TYPE_SESSION_ORPHANED: 'SESSION_ORPHANED',
   // Otros identificadores relevantes
   POST_LOGIN_HANDLED_PREFIX: 'post-login-handled-',
   // Ventana de protección anti-race (ms)

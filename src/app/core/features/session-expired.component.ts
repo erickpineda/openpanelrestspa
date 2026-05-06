@@ -85,6 +85,15 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
           return;
         }
 
+        // SESIÓN HUÉRFANA: Redirigir inmediatamente sin mostrar modal
+        if (data.type === 'SESSION_ORPHANED') {
+          this.log.warn('SessionExpiredComponent: Sesión huérfana detectada - Redirigiendo inmediatamente');
+          this.tokenStorage.signOut();
+          this.hideModal();
+          this.router.navigate(['/login'], { replaceUrl: true });
+          return;
+        }
+
         // --- LÓGICA DE DELEGACIÓN CENTRALIZADA ---
         // Verificamos si este componente debe ceder el control al UnsavedWorkModalComponent.
         // Esto aplica tanto para LOGOUT (remoto/con guardado) como para SESSION_EXPIRED.
