@@ -1,10 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { EntradaService } from '@app/core/services/data/entrada.service';
 import { Entrada } from '@app/core/models/entrada.model';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { parseAllowedDate } from '@shared/utils/date-utils';
 import { AnalyticsService } from '@app/core/services/analytics/analytics.service';
 import { SearchQuery } from '@app/shared/models/search.models';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +13,8 @@ import { SearchQuery } from '@app/shared/models/search.models';
   styleUrls: ['./home.component.css'],
   standalone: false,
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   ultimasEntradas: Entrada[] = [];
   loading = false;
 
@@ -47,7 +49,10 @@ export class HomeComponent implements OnInit {
     };
 
     this.entradaService.buscarSafe(searchRequest, 0, 6, 'fechaPublicacion', 'DESC')
-      .pipe(finalize(() => this.loading = false))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.loading = false)
+      )
       .subscribe({
         next: (res) => {
           this.ultimasEntradas = res.elements || [];
@@ -56,6 +61,11 @@ export class HomeComponent implements OnInit {
           console.error('Error cargando entradas en home', err);
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getFechaDate(fecha: any): Date | null {

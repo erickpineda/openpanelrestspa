@@ -96,7 +96,8 @@ export class LoginComponent implements OnInit {
       next: () => {
         this.isLoginFailed = false;
         this.isLoggedIn = true;
-        this.roles = this.tokenStorage.getUser().roles;
+        const user = this.tokenStorage.getUser();
+        this.roles = user?.roles ?? [];
         this.isLoading = false;
         this.errorMessage = '';
         this.errorMessageKey = null;

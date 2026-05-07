@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthSyncService } from '@app/core/services/auth/auth-sync.service';
 import { AuthService } from '@app/core/services/auth/auth.service';
@@ -7,6 +7,8 @@ import { LoggerService } from '@app/core/services/logger.service';
 import { OPConstants } from '@shared/constants/op-global.constants';
 import { LanguageService, Language } from '@app/core/services/language.service';
 import { OpPrivilegioConstants } from '@app/shared/constants/op-privilegio.constants';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-nav-bar-public',
@@ -14,7 +16,8 @@ import { OpPrivilegioConstants } from '@app/shared/constants/op-privilegio.const
   styleUrls: ['./nav-bar-public.component.scss'],
   standalone: false,
 })
-export class NavBarPublicComponent implements OnInit {
+export class NavBarPublicComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   user: any;
   private roles: string[] = [];
   private readonly moderationPrivileges = [
@@ -46,22 +49,33 @@ export class NavBarPublicComponent implements OnInit {
     private log: LoggerService,
     public languageService: LanguageService
   ) {
-    window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, () => {
-      this.log.info('🔄 NavBar: Estado de autenticación cambiado');
-      this.checkAuthStatus();
-    });
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        this.authSync.initializeAuthState();
-        this.checkAuthStatus();
-      }
-    });
+    window.addEventListener(OPConstants.Events.AUTH_STATE_CHANGED, this.onAuthStateChanged);
+    document.addEventListener('visibilitychange', this.onVisibilityChanged);
   }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    window.removeEventListener(OPConstants.Events.AUTH_STATE_CHANGED, this.onAuthStateChanged);
+    document.removeEventListener('visibilitychange', this.onVisibilityChanged);
+  }
+
+  private onAuthStateChanged = () => {
+    this.log.info('🔄 NavBar: Estado de autenticación cambiado');
+    this.checkAuthStatus();
+  };
+
+  private onVisibilityChanged = () => {
+    if (!document.hidden) {
+      this.authSync.initializeAuthState();
+      this.checkAuthStatus();
+    }
+  };
 
   ngOnInit(): void {
     this.checkAuthStatus();
     this.authSync.initializeAuthState();
-    this.languageService.currentLang$.subscribe((lang: Language) => {
+    this.languageService.currentLang$.pipe(takeUntil(this.destroy$)).subscribe((lang: Language) => {
       this.currentLang = lang;
     });
   }
@@ -79,7 +93,7 @@ export class NavBarPublicComponent implements OnInit {
     this.log.info('🔐 NavBar - Estado de autenticación:', this.isLoggedIn);
     if (this.isLoggedIn) {
       this.user = this.tokenStorageService.getUser();
-      this.roles = this.user.roles || [];
+      this.roles = this.user?.roles ?? [];
       this.showAdminBoard = this.hasPrivilege(OpPrivilegioConstants.VER_DASHBOARD);
       this.showModeratorBoard = this.hasAnyPrivilege(this.moderationPrivileges);
       this.username = this.user.username;

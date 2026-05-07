@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ComentarioService } from '@app/core/services/data/comentario.service';
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
 import { parseAllowedDate } from '@shared/utils/date-utils';
@@ -9,6 +9,8 @@ import { SharedOPModule } from '@shared/shared.module';
 import { UsuarioService } from '@app/core/services/data/usuario.service';
 import { HttpContext } from '@angular/common/http';
 import { SKIP_GLOBAL_LOADER } from '@app/core/interceptor/network.interceptor';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-comentarios-public',
@@ -17,7 +19,8 @@ import { SKIP_GLOBAL_LOADER } from '@app/core/interceptor/network.interceptor';
   standalone: true,
   imports: [SharedOPModule, RouterModule],
 })
-export class ComentariosPublicComponent implements OnInit {
+export class ComentariosPublicComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   @Input() idEntrada!: number;
   @Input() totalComentarios: number | null = null;
   @Input() slugEntrada!: string;
@@ -70,6 +73,11 @@ export class ComentariosPublicComponent implements OnInit {
     this.cargarComentarios(true);
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private openDevModal(bodyKey: string): void {
     this.devModalBodyKey = bodyKey;
     this.devModalVisible = true;
@@ -81,7 +89,7 @@ export class ComentariosPublicComponent implements OnInit {
       return;
     }
     if (!this.idEntrada) return;
-    this.comentarioService.obtenerRecuentosPorIdEntradaCached(this.idEntrada).subscribe((rec) => {
+    this.comentarioService.obtenerRecuentosPorIdEntradaCached(this.idEntrada).pipe(takeUntil(this.destroy$)).subscribe((rec) => {
       if (!rec) {
         this.openDevModal('PUBLIC.DEV_MODAL.BODY_COMMENT_COUNTS');
         return;
@@ -209,7 +217,7 @@ export class ComentariosPublicComponent implements OnInit {
       if (!Number.isFinite(idNum)) continue;
 
       this.requestedUserIds.add(userId);
-      this.usuarioService.obtenerPorIdSafe(idNum, context).subscribe({
+      this.usuarioService.obtenerPorIdSafe(idNum, context).pipe(takeUntil(this.destroy$)).subscribe({
         next: (u: any) => {
           const username = u?.username ?? u?.nombreUsuario ?? u?.name ?? null;
           const v = username != null ? String(username).trim() : '';
@@ -252,7 +260,7 @@ export class ComentariosPublicComponent implements OnInit {
     const sortBy = this.ordenSeleccionado === 'nuevos' ? 'fechaCreacion' : 'fechaCreacion';
     const sortDir = this.ordenSeleccionado === 'nuevos' ? 'desc' : 'asc';
     
-    this.comentarioService.listarPorSlugEntrada(this.slugEntrada, this.pageNo, this.pageSize, sortBy, sortDir).subscribe({
+    this.comentarioService.listarPorSlugEntrada(this.slugEntrada, this.pageNo, this.pageSize, sortBy, sortDir).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const elements = res?.elements || [];
         const normalized = (Array.isArray(elements) ? elements : []).map((c: any) => {
@@ -313,7 +321,7 @@ export class ComentariosPublicComponent implements OnInit {
       return;
     }
 
-    this.comentarioService.crear(payload).subscribe({
+    this.comentarioService.crear(payload).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.successMessage = 'Comentario enviado con éxito. Pendiente de moderación.';
         this.nuevoComentarioTexto = '';

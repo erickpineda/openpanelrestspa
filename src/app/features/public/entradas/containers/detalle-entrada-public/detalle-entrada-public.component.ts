@@ -213,14 +213,14 @@ export class DetalleEntradaPublicComponent implements OnInit {
       const nombre = String(c?.nombre ?? '').trim();
       const codigo = String(c?.codigo ?? '').trim();
       if (codigo) this.categoriaNombreToCodigo.set(nombre || codigo, codigo);
-      if (!codigo && nombre) this.resolveCategoriaCodigoByNombre(nombre).subscribe();
+      if (!codigo && nombre) this.resolveCategoriaCodigoByNombre(nombre).pipe(takeUntil(this.destroy$)).subscribe();
     });
     const etiquetas = Array.isArray(entrada?.etiquetas) ? entrada.etiquetas : [];
     etiquetas.forEach((t: any) => {
       const nombre = String(t?.nombre ?? '').trim();
       const codigo = String(t?.codigo ?? '').trim();
       if (codigo) this.etiquetaNombreToCodigo.set(nombre || codigo, codigo);
-      if (!codigo && nombre) this.resolveEtiquetaCodigoByNombre(nombre).subscribe();
+      if (!codigo && nombre) this.resolveEtiquetaCodigoByNombre(nombre).pipe(takeUntil(this.destroy$)).subscribe();
     });
   }
 
@@ -391,7 +391,7 @@ export class DetalleEntradaPublicComponent implements OnInit {
         },
       };
       this.relatedLoading = true;
-      this.entradaService.buscarSafe(searchRequest, 0, this.relatedMaxItems, 'fechaPublicacion', 'DESC').subscribe({
+      this.entradaService.buscarSafe(searchRequest, 0, this.relatedMaxItems, 'fechaPublicacion', 'DESC').pipe(takeUntil(this.destroy$)).subscribe({
         next: (res) => {
           const elements = Array.isArray((res as any)?.elements) ? (res as any).elements : [];
           this.relatedEntradas = elements.filter((e: any) => Number(e?.idEntrada) !== idEntrada);

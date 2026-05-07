@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PublicEntradasFacadeService } from '../../services/public-entradas-facade.service';
 import { parseAllowedDate } from '@shared/utils/date-utils';
 import { CategoriaService } from '@app/core/services/data/categoria.service';
@@ -8,7 +8,8 @@ import { AuthService } from '@app/core/services/auth/auth.service';
 import { SystemSettingsRuntimeService } from '@app/core/services/data/system-settings-runtime.service';
 import { PublicBookmarksService } from '../../services/public-bookmarks.service';
 import { ActivatedRoute } from '@angular/router';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-listado-entradas-public',
@@ -16,7 +17,8 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
   styleUrls: ['./listado-entradas-public.component.scss'],
   standalone: false,
 })
-export class ListadoEntradasPublicComponent implements OnInit {
+export class ListadoEntradasPublicComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   entradas$ = this.facade.entradas$;
   loading$ = this.facade.loading$;
   totalPages$ = this.facade.totalPages$;
@@ -58,6 +60,7 @@ export class ListadoEntradasPublicComponent implements OnInit {
         })),
         distinctUntilChanged((a, b) => a.q === b.q && a.categoria === b.categoria && a.etiqueta === b.etiqueta)
       )
+      .pipe(takeUntil(this.destroy$))
       .subscribe(({ q, categoria, etiqueta }) => {
         this.searchText = q;
         this.categoriasSeleccionadas = categoria ? [categoria] : [];
@@ -66,11 +69,11 @@ export class ListadoEntradasPublicComponent implements OnInit {
         this.cargarPagina();
       });
     
-    this.bookmarksService.observeSlugs().subscribe(slugs => {
+    this.bookmarksService.observeSlugs().pipe(takeUntil(this.destroy$)).subscribe(slugs => {
       this.bookmarkedSlugs = slugs;
     });
 
-    this.systemSettingsRuntime.loadPublicSettings().subscribe(() => {
+    this.systemSettingsRuntime.loadPublicSettings().pipe(takeUntil(this.destroy$)).subscribe(() => {
       const nextPageSize = this.resolveEntriesPageSize();
       if (nextPageSize === this.pageSize) {
         return;
@@ -81,19 +84,25 @@ export class ListadoEntradasPublicComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   isBookmarked(slug: string): boolean {
     return this.bookmarkedSlugs.has(slug);
   }
 
   isLoggedIn(): boolean {
     let loggedIn = false;
-    this.authService.user$.subscribe(user => loggedIn = !!user).unsubscribe();
+    this.authService.user$.pipe(takeUntil(this.destroy$)).subscribe(user => loggedIn = !!user);
     return loggedIn;
   }
 
   cargarCategoriasPopulares() {
     this.categoriaService
       .listarPaginaSinGlobalLoader(0, 50, 'cantidadEntradas', 'DESC')
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           const data = res?.data || res;
@@ -112,6 +121,7 @@ export class ListadoEntradasPublicComponent implements OnInit {
   cargarEtiquetasPopulares() {
     this.etiquetaService
       .listarPaginaSinGlobalLoader(0, 50, 'frecuencia', 'DESC')
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           const data = res?.data || res;

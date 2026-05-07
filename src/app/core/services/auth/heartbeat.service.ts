@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, interval, of, throwError } from 'rxjs';
-import { catchError, switchMap, takeWhile } from 'rxjs/operators';
+import { catchError, switchMap, takeWhile, tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { SessionManagerService } from './session-manager.service';
 import { LoggerService } from '../logger.service';
@@ -12,6 +12,7 @@ import { OPSessionConstants } from '../../../shared/constants/op-session.constan
 export class HeartbeatService {
   private heartbeatInterval: any;
   private isRunning = false;
+  private consecutiveFailures = 0;
   private readonly HEARTBEAT_INTERVAL = 2 * 60 * 1000; // 2 minutos en milisegundos
   private readonly MAX_FAILURES = 3; // Máximo de fallos consecutivos antes de forzar logout
 
@@ -33,19 +34,21 @@ export class HeartbeatService {
     }
 
     this.isRunning = true;
+    this.consecutiveFailures = 0;
     this.log.info('HeartbeatService: Iniciando verificacion periodica de sesion');
 
     this.heartbeatInterval = interval(this.HEARTBEAT_INTERVAL).pipe(
       takeWhile(() => this.isRunning),
       switchMap(() => this.checkSessionStatus()),
-      catchError((error, caught) => {
+      tap(() => this.consecutiveFailures = 0),
+      catchError((error) => {
         this.log.error('HeartbeatService: Error en verificacion de sesion', error);
         
-        // Si hay error, lo reintentamos hasta el maximo de fallos
-        if (Number(caught) < this.MAX_FAILURES) {
+        this.consecutiveFailures++;
+        
+        if (this.consecutiveFailures < this.MAX_FAILURES) {
           return of(null); // Continuar con el siguiente ciclo
         } else {
-          // Demasiados fallos, forzar logout
           this.log.warn('HeartbeatService: Maximo de fallos alcanzado, forzando logout');
           this.forceLogoutDueToHeartbeatFailures();
           return throwError(() => error);
