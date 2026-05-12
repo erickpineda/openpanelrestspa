@@ -223,13 +223,13 @@ export const navItems: INavItemEnhanced[] = [
   {
     title: true,
     name: 'MENU.MY_ACCOUNT',
-    priority: 20,
+    priority: 45,
   },
   {
     name: 'MENU.MY_PROFILE',
     url: '/admin/control/perfil',
     iconComponent: { name: 'cil-user' },
-    priority: 15,
+    priority: 43,
     requiredPermissions: [
       OpPrivilegioConstants.GESTIONAR_PERFIL_PROPIO,
       OpPrivilegioConstants.GESTIONAR_PERFIL,
