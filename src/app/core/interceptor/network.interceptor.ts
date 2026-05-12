@@ -92,13 +92,6 @@ export class NetworkInterceptor implements HttpInterceptor {
 
     // Manejar códigos de estado específicos
     switch (error.status) {
-      case 403:
-        this.toastService.showWarning(
-          'No tienes permisos para realizar esta acción.',
-          'Acceso Denegado'
-        );
-        break;
-
       case 404:
         // Opcional: No mostrar error global para 404 si se maneja localmente
         // this.notificationService.warning('El recurso solicitado no existe.');
