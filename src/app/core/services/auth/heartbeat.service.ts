@@ -86,6 +86,11 @@ export class HeartbeatService {
             this.sessionManager.notifySessionOrphaned();
             return throwError(() => 'SESSION_ORPHANED');
           
+          case 'ERROR':
+            this.log.warn('HeartbeatService: Error transitorio en validacion de sesion',
+              response.message);
+            return of(null); // Error transitorio, reintentar en el proximo ciclo
+
           case 'INVALID':
           default:
             this.log.warn('HeartbeatService: Sesion invalida detectada');
