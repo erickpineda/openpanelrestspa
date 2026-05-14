@@ -162,6 +162,18 @@ export class AuthService {
       );
   }
 
+  // Intentar refrescar la sesión via POST /auth/refreshToken
+  public refreshToken(): Observable<any> {
+    const token = this.tokenStorage.getToken();
+    return this.http
+      .post(this.urlBase + this.urlUri + this.urlAuth + OPConstants.Methods.AUTH.REFRESH_TOKEN, {}, {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + (token || ''),
+        }),
+      });
+  }
+
   // Forzar logout local (limpia storage, notifica sync y actualiza estado)
   public forceLogoutDueToExpiredToken(): void {
     // En vez de redirigir de inmediato, emitimos evento de expiración
