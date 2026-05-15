@@ -19,6 +19,7 @@ import { ReaderPreferencesService } from './features/public/services/reader-pref
 import { UserInteractionsSyncService } from './core/services/sync/user-interactions-sync.service';
 import { ThemeRuntimeService } from './features/public/services/theme-runtime.service';
 import { filter } from 'rxjs/operators';
+import { HeartbeatService } from './core/services/auth/heartbeat.service';
 
 @Component({
   selector: 'app-root',
@@ -48,7 +49,8 @@ export class AppComponent implements OnInit {
     private analyticsRouter: AnalyticsRouterService,
     private readerPrefs: ReaderPreferencesService,
     private userInteractionsSync: UserInteractionsSyncService,
-    private themeRuntime: ThemeRuntimeService
+    private themeRuntime: ThemeRuntimeService,
+    private heartbeatService: HeartbeatService
   ) {
     this.iconSetService.icons = { ...iconSubset };
   }
@@ -65,6 +67,11 @@ export class AppComponent implements OnInit {
 
     // Luego comprobar token actual (si está caducado forzará logout)
     this.authService.ensureTokenValidOnInit();
+
+    // Iniciar detección de sesiones huérfanas si hay token válido
+    if (this.authService.isTokenValid()) {
+      this.heartbeatService.startHeartbeat();
+    }
 
     // Mantenimiento periódico de post-login-redirect + limpieza inicial
     this.tokenStorage.cleanExpiredPostLoginRedirects();

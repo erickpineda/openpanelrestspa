@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
 import { PublicBookmarksService, PublicBookmark } from '../../../entradas/services/public-bookmarks.service';
 import { PublicVotesService } from '../../../entradas/services/public-votes.service';
@@ -7,8 +7,8 @@ import { PublicSubscriptionsService, UserSubscriptions } from '../../../services
 import { ReaderPreferencesService, ReaderPreferences } from '../../../services/reader-preferences.service';
 import { CategoriaService } from '@app/core/services/data/categoria.service';
 import { EtiquetaService } from '@app/core/services/data/etiqueta.service';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { forkJoin, of, Subject } from 'rxjs';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 
 type PublicHistoryEntry = {
   idEntrada: number;
@@ -29,7 +29,8 @@ type SubscriptionItem = {
   styleUrls: ['./perfil-public.component.scss'],
   standalone: false,
 })
-export class PerfilPublicComponent implements OnInit {
+export class PerfilPublicComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   user: any;
   bookmarks: PublicBookmark[] = [];
   votes: PublicBookmark[] = [];
@@ -75,25 +76,25 @@ export class PerfilPublicComponent implements OnInit {
     this.loadVotes();
     this.loadHistory();
     
-    this.prefsService.getPreferences().subscribe(prefs => {
+    this.prefsService.getPreferences().pipe(takeUntil(this.destroy$)).subscribe(prefs => {
       this.readerPrefs = prefs;
     });
 
-    this.subsService.observeSubscriptions().subscribe(subs => {
+    this.subsService.observeSubscriptions().pipe(takeUntil(this.destroy$)).subscribe(subs => {
       this.subscriptions = subs;
       this.resolveSubscriptionNames(subs);
     });
   }
 
   loadBookmarks(): void {
-    this.bookmarksService.getBookmarks().subscribe(bookmarks => {
+    this.bookmarksService.getBookmarks().pipe(takeUntil(this.destroy$)).subscribe(bookmarks => {
       this.bookmarks = bookmarks;
       this.checkPagination();
     });
   }
 
   loadVotes(): void {
-    this.votesService.getVotes().subscribe(votes => {
+    this.votesService.getVotes().pipe(takeUntil(this.destroy$)).subscribe(votes => {
       this.votes = votes;
       this.checkVotesPagination();
     });
@@ -296,14 +297,19 @@ export class PerfilPublicComponent implements OnInit {
     });
 
     if (catRequests.length > 0) {
-      forkJoin(catRequests).subscribe((items) => {
+      forkJoin(catRequests).pipe(takeUntil(this.destroy$)).subscribe((items) => {
         this.categoriasSeguidas = items;
       });
     }
     if (tagRequests.length > 0) {
-      forkJoin(tagRequests).subscribe((items) => {
+      forkJoin(tagRequests).pipe(takeUntil(this.destroy$)).subscribe((items) => {
         this.etiquetasSeguidas = items;
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

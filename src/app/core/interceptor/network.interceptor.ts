@@ -50,8 +50,8 @@ export class NetworkInterceptor implements HttpInterceptor {
       tap((event) => {
         if (event instanceof HttpResponse) {
           const elapsed = Date.now() - started;
-          // Log de peticiones lentas (> 1s)
-          if (elapsed > 1000) {
+          // Log de peticiones lentas (> 1.5s)
+          if (elapsed > 1500) {
             this.log.warn(`🐢 Petición lenta: ${request.method} ${request.url} (${elapsed}ms)`);
           }
         }
@@ -92,13 +92,6 @@ export class NetworkInterceptor implements HttpInterceptor {
 
     // Manejar códigos de estado específicos
     switch (error.status) {
-      case 403:
-        this.toastService.showWarning(
-          'No tienes permisos para realizar esta acción.',
-          'Acceso Denegado'
-        );
-        break;
-
       case 404:
         // Opcional: No mostrar error global para 404 si se maneja localmente
         // this.notificationService.warning('El recurso solicitado no existe.');

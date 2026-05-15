@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { TemasComponent } from './temas/temas.component';
 import { AjustesComponent } from './ajustes/ajustes.component';
+import { TemasComponent } from './temas/temas.component';
 import { TemaStudioComponent } from './temas/studio/tema-studio.component';
-import { UserRole } from '../../../shared/types/navigation.types';
+import { OpPrivilegioConstants } from '../../../shared/constants/op-privilegio.constants';
 
 const routes: Routes = [
   {
@@ -11,7 +11,11 @@ const routes: Routes = [
     component: TemaStudioComponent,
     data: {
       title: 'ADMIN.THEMES.STUDIO.TITLE',
-      roles: [UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
+      permissions: [
+        OpPrivilegioConstants.GESTIONAR_TEMAS,
+        OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+      ],
+      permissionMode: 'ANY',
     },
   },
   {
@@ -20,13 +24,25 @@ const routes: Routes = [
     pathMatch: 'full',
     data: {
       title: 'MENU.THEMES',
-      roles: [UserRole.DESARROLLADOR, UserRole.PROPIETARIO],
+      permissions: [
+        OpPrivilegioConstants.GESTIONAR_TEMAS,
+        OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+      ],
+      permissionMode: 'ANY',
     },
   },
   {
     path: 'ajustes',
     component: AjustesComponent,
-    data: { title: 'MENU.SETTINGS', roles: [UserRole.ADMINISTRADOR, UserRole.PROPIETARIO] },
+    pathMatch: 'full',
+    data: {
+      title: 'MENU.GENERAL_SETTINGS',
+      permissions: [
+        OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+        OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+      ],
+      permissionMode: 'ANY',
+    },
   },
   { path: '', redirectTo: 'temas', pathMatch: 'full' },
 ];

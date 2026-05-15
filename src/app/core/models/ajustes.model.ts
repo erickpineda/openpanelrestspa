@@ -1,6 +1,3 @@
-export interface Ajustes {
-  id?: number;
-  clave?: string;
-  valor?: string;
-  categoria?: string;
-}
+import { SystemSetting } from './system-setting.model';
+
+export type Ajustes = SystemSetting;

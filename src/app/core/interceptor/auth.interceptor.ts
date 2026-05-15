@@ -55,22 +55,14 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(authReq).pipe(
       catchError((err: any) => {
         if (err instanceof HttpErrorResponse) {
-          // Si un endpoint protegido devuelve 401:
-          // - Solo tratamos como sesión caducada cuando no hay token o ya está expirado.
-          // - Si el token sigue válido, dejamos que el error se maneje como falta de permisos.
           if (err.status === 401 && !isAuthEndpoint) {
             const currentToken = this.tokenStorage.getToken();
-            const shouldExpireSession = !currentToken || isJwtExpired(currentToken, 0);
-            if (!shouldExpireSession) {
-              return throwError(() => err);
+            if (!currentToken || isJwtExpired(currentToken, 0)) {
+              this.sessionManager.notifySessionExpired();
+            } else {
+              this.sessionManager.notifySessionOrphaned();
             }
-            this.sessionManager.notifySessionExpired();
             return EMPTY;
-          }
-
-          // Un 403 normalmente significa permisos insuficientes, no sesión expirada.
-          if (err.status === 403 && !isAuthEndpoint) {
-            return throwError(() => err);
           }
         }
         return throwError(() => err);

@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from '@app/core/services/auth/auth.service';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-register-public',
@@ -8,7 +10,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./register-public.component.scss'],
   standalone: false,
 })
-export class RegisterPublicComponent implements OnInit {
+export class RegisterPublicComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   form: any = { username: '', password: '', email: '', nombre: '', apellidos: '' };
   isLoading = false;
   isSuccessful = false;
@@ -22,9 +25,14 @@ export class RegisterPublicComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   onSubmit(): void {
     this.isLoading = true;
-    this.authService.register(this.form).subscribe({
+    this.authService.register(this.form).pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         this.isSuccessful = true;
         this.isSignUpFailed = false;

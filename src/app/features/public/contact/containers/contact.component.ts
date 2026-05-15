@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ToastService } from '@app/core/services/ui/toast.service';
 import { TranslationService } from '@app/core/services/translation.service';
 import { SharedOPModule } from '@shared/shared.module';
@@ -10,7 +10,7 @@ import { SharedOPModule } from '@shared/shared.module';
   standalone: true,
   imports: [SharedOPModule],
 })
-export class ContactComponent implements OnInit {
+export class ContactComponent {
   model = {
     name: '',
     email: '',
@@ -26,8 +26,6 @@ export class ContactComponent implements OnInit {
     private toast: ToastService,
     private i18n: TranslationService
   ) {}
-  ngOnInit(): void {}
-
   buildMailtoHref(): string {
     const subject = `Contacto OpenPanel - ${this.model.name}`.trim();
     const bodyLines = [

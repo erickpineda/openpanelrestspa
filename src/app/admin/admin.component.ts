@@ -28,6 +28,7 @@ import { SidebarStateService } from '../core/services/ui/sidebar-state.service';
 import { NavigationService } from '../core/services/ui/navigation.service';
 import { UserRole, INavItemEnhanced } from '../shared/types/navigation.types';
 import { OPStorageConstants } from '@app/shared/constants/op-storage.constants';
+import { OpPrivilegioConstants } from '../shared/constants/op-privilegio.constants';
 
 // ... imports existentes
 
@@ -137,7 +138,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const isDashboardRoute =
       this.router.url.includes('/admin/dashboard') || this.router.url.includes('/admin/control');
-    const canReadDashboardStats = this.tokenStorage.hasMinimumRole(UserRole.ADMINISTRADOR);
+    const currentPrivileges = this.tokenStorage.getUser()?.privileges;
+    const canReadDashboardStats =
+      Array.isArray(currentPrivileges) &&
+      currentPrivileges.includes(OpPrivilegioConstants.VER_DASHBOARD);
     if (isDashboardRoute && canReadDashboardStats) {
       this.dashboardApi
         .getContentStats()
@@ -314,8 +318,6 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private refreshSidebar(): void {
     this.applyTranslationsInPlace(this.navItems);
-    // Forzar actualización de referencia para detectar cambios en OnPush
-    this.navItems = [...this.navItems];
     this.sidebarState.updateNavItems(this.navItems, this.router.url);
     this.cdr.markForCheck();
   }
@@ -335,6 +337,21 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     const filtered: any[] = [];
 
     items.forEach((originalItem) => {
+      // 0. Check requiredPermissions (si están presentes, prevalecen sobre roles)
+      if (originalItem.requiredPermissions && originalItem.requiredPermissions.length > 0) {
+        const user = this.tokenStorage.getUser();
+        const privs: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+        const set = new Set(privs);
+        const mode: 'ANY' | 'ALL' = (originalItem.permissionMode as any) || 'ANY';
+        const ok =
+          mode === 'ALL'
+            ? originalItem.requiredPermissions.every((p: string) => set.has(p))
+            : originalItem.requiredPermissions.some((p: string) => set.has(p));
+        if (!ok) {
+          return;
+        }
+      }
+
       // 1. Check requiredRoles
       if (originalItem.requiredRoles && !originalItem.requiredRoles.includes(role)) {
         return;

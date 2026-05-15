@@ -5,7 +5,7 @@ import { AuthService } from '@app/core/services/auth/auth.service';
 import { TokenStorageService } from '@app/core/services/auth/token-storage.service';
 import { PostLoginRedirectService } from '@app/core/services/auth/post-login-redirect.service';
 import { AuthSyncService } from '@app/core/services/auth/auth-sync.service';
-import { UserRole } from '@app/shared/types/navigation.types';
+import { OpPrivilegioConstants } from '@app/shared/constants/op-privilegio.constants';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +15,52 @@ import { UserRole } from '@app/shared/types/navigation.types';
   standalone: false,
 })
 export class LoginComponent implements OnInit {
+  private readonly privilegiosEntradas = [
+    OpPrivilegioConstants.CREAR_ENTRADAS,
+    OpPrivilegioConstants.EDITAR_ENTRADAS_PROPIAS,
+    OpPrivilegioConstants.EDITAR_ENTRADAS_TODO,
+  ];
+
+  private readonly privilegiosPerfilPropio = [
+    OpPrivilegioConstants.GESTIONAR_PERFIL_PROPIO,
+    OpPrivilegioConstants.GESTIONAR_PERFIL,
+  ];
+  private readonly privilegiosModeracionComentarios = [
+    OpPrivilegioConstants.APROBAR_COMENTARIOS,
+    OpPrivilegioConstants.OCULTAR_COMENTARIOS,
+    OpPrivilegioConstants.BORRAR_COMENTARIOS_TODO,
+    OpPrivilegioConstants.BORRAR_COMENTARIOS,
+    OpPrivilegioConstants.MODERAR_COMENTARIOS,
+  ];
+  private readonly privilegiosGestion = [
+    OpPrivilegioConstants.GESTIONAR_USUARIOS,
+    OpPrivilegioConstants.GESTIONAR_ROLES,
+    OpPrivilegioConstants.GESTIONAR_ROLES_USUARIOS,
+    OpPrivilegioConstants.GESTIONAR_PRIVILEGIOS,
+  ];
+  private readonly privilegiosSistema = [
+    OpPrivilegioConstants.GESTIONAR_AJUSTES_SISTEMA,
+    OpPrivilegioConstants.GESTIONAR_TEMAS,
+    OpPrivilegioConstants.CONFIGURAR_SISTEMA,
+  ];
+  private readonly privilegiosAccesoPanel = [
+    OpPrivilegioConstants.ACCESO_PANEL,
+    OpPrivilegioConstants.VER_DASHBOARD,
+    ...this.privilegiosEntradas,
+    ...this.privilegiosPerfilPropio,
+    OpPrivilegioConstants.GESTIONAR_INTERACCIONES_PROPIAS,
+    OpPrivilegioConstants.VER_CONTENIDO_PROPIO,
+    OpPrivilegioConstants.GESTIONAR_PAGINAS,
+    OpPrivilegioConstants.GESTIONAR_ARCHIVOS,
+    ...this.privilegiosModeracionComentarios,
+    OpPrivilegioConstants.GESTIONAR_CATEGORIAS,
+    OpPrivilegioConstants.GESTIONAR_ETIQUETAS,
+    ...this.privilegiosGestion,
+    ...this.privilegiosSistema,
+    OpPrivilegioConstants.REALIZAR_MANTENIMIENTO,
+    OpPrivilegioConstants.DEPURAR_ERRORES,
+  ];
+
   icons = { cilUser, cilLockLocked };
   form: any = { username: null, password: null };
   isLoggedIn = false;
@@ -50,7 +96,8 @@ export class LoginComponent implements OnInit {
       next: () => {
         this.isLoginFailed = false;
         this.isLoggedIn = true;
-        this.roles = this.tokenStorage.getUser().roles;
+        const user = this.tokenStorage.getUser();
+        this.roles = user?.roles ?? [];
         this.isLoading = false;
         this.errorMessage = '';
         this.errorMessageKey = null;
@@ -118,12 +165,40 @@ export class LoginComponent implements OnInit {
         return;
       }
     } catch {}
-    if (this.tokenStorage.hasMinimumRole(UserRole.ADMINISTRADOR)) {
-      this.router.navigate(['/admin']);
-    } else {
-      this.router.navigate(['/admin/control/perfil']);
+
+    if (this.hasPrivilege(OpPrivilegioConstants.VER_DASHBOARD)) {
+      this.router.navigate(['/admin/dashboard']);
+      return;
     }
+
+    if (this.hasAnyPrivilege(this.privilegiosEntradas)) {
+      this.router.navigate(['/admin/control/entradas']);
+      return;
+    }
+
+    if (this.hasAnyPrivilege(this.privilegiosPerfilPropio)) {
+      this.router.navigate(['/admin/control/perfil']);
+      return;
+    }
+
+    if (this.hasAnyPrivilege(this.privilegiosAccesoPanel)) {
+      this.router.navigate(['/admin/control']);
+      return;
+    }
+
+    this.router.navigate(['/']);
   }
+
+  private hasPrivilege(privilege: string): boolean {
+    const user = this.tokenStorage.getUser();
+    const privileges: string[] = Array.isArray(user?.privileges) ? user.privileges : [];
+    return privileges.includes(privilege);
+  }
+
+  private hasAnyPrivilege(privileges: string[]): boolean {
+    return privileges.some((privilege) => this.hasPrivilege(privilege));
+  }
+
   reloadPage(): void {
     window.location.reload();
   }

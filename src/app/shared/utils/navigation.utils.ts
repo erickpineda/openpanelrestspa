@@ -30,9 +30,22 @@ export class NavigationUtils {
   /**
    * Filtra elementos de navegación basado en los permisos del rol del usuario
    */
-  static filterByPermissions(items: INavItemEnhanced[], userRole: UserRole): INavItemEnhanced[] {
+  static filterByPermissions(
+    items: INavItemEnhanced[],
+    userRole: UserRole,
+    userPrivileges?: string[]
+  ): INavItemEnhanced[] {
+    const privSet = new Set(Array.isArray(userPrivileges) ? userPrivileges : []);
     return items
       .filter((item) => {
+        // Si el item define permisos requeridos, evaluarlos primero (preferido)
+        if (item.requiredPermissions && item.requiredPermissions.length > 0) {
+          const mode = item.permissionMode || 'ANY';
+          return mode === 'ALL'
+            ? item.requiredPermissions.every((p) => privSet.has(p))
+            : item.requiredPermissions.some((p) => privSet.has(p));
+        }
+
         // Si el item tiene roles requeridos específicos, verificar contra esos
         if (item.requiredRoles && item.requiredRoles.length > 0) {
           return item.requiredRoles.includes(userRole);
@@ -49,7 +62,7 @@ export class NavigationUtils {
       .map((item) => {
         // Recursivamente filtrar children si existen
         if (item.children && item.children.length > 0) {
-          const filteredChildren = this.filterByPermissions(item.children, userRole);
+          const filteredChildren = this.filterByPermissions(item.children, userRole, userPrivileges);
           return {
             ...item,
             children: filteredChildren,

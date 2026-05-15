@@ -88,7 +88,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       this.usuarioService.obtenerPorId(idUsuario).subscribe({
         next: (response: OpenpanelApiResponse<any>) => {
-          const usuario: Usuario = response.data ? response.data : Usuario;
+          const usuario: Usuario = response.data ? response.data : new Usuario();
           resolve(usuario);
         },
         error: (err: any) => {
@@ -102,7 +102,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       this.entradaService.obtenerPorId(idEntrada).subscribe({
         next: (response: OpenpanelApiResponse<any>) => {
-          const entrada: Entrada = response.data ? response.data.elements : Entrada;
+          const entrada: Entrada = response.data ? response.data.elements : new Entrada();
           resolve(entrada);
         },
         error: (err: any) => {
@@ -351,7 +351,7 @@ export class ListadoComentariosComponent implements OnInit, OnDestroy {
     this.cargando = true;
     const context = new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLING, true);
     this.comentarioService
-      .borrar(this.comentarioToDelete.idComentario, context)
+      .borrarModeracion(this.comentarioToDelete.idComentario, context)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {

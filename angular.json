@@ -104,7 +104,7 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "hmr": false
+            "hmr": true
           },
           "configurations": {
             "production": {

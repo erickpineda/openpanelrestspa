@@ -31,7 +31,11 @@ describe('OPRestMethods', () => {
     expect(OPRestMethods.BUSCAR.DEFINICIONES).toBe('/buscar/definicionesBuscador');
     expect(OPRestMethods.REDIS.BASE).toBe('/redis');
     expect(OPRestMethods.CONFIRM_REGISTER.BASE).toBe('/usuarios/validaRegistro/confirmarRegistroUsuario');
-    expect(OPRestMethods.HERRAMIENTAS_AUXILIAR.BASE).toBe('/herramientas/sistema');
     expect(OPRestMethods.FICHEROS.RUTA_INTERNA).toBe('/fileStorage/ficheros/obtenerDatos/');
+  });
+
+  it('no debe reintroducir endpoints públicos legacy de herramientas auxiliar', () => {
+    expect(Object.keys(OPRestMethods)).not.toContain('HERRAMIENTAS_AUXILIAR');
+    expect('HERRAMIENTAS_AUXILIAR' in OPRestMethods).toBeFalse();
   });
 });

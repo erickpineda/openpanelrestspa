@@ -7,6 +7,7 @@ import {
   SessionExpirationData,
 } from '../../core/services/auth/session-manager.service';
 import { TokenStorageService } from '../services/auth/token-storage.service';
+import { AuthService } from '../services/auth/auth.service';
 import { RouteTrackerService } from '../../core/services/auth/route-tracker.service';
 import { PostLoginRedirectService } from '../services/auth/post-login-redirect.service';
 import { UnsavedWorkService } from '../services/utils/unsaved-work.service';
@@ -30,10 +31,13 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
   timeSinceExpiry: string = '';
   private timerInterval: any;
 
+  private refreshAttempted = false;
+
   constructor(
     private router: Router,
     private sessionManager: SessionManagerService,
     private tokenStorage: TokenStorageService,
+    private authService: AuthService,
     private routeTracker: RouteTrackerService,
     private postLoginRedirect: PostLoginRedirectService,
     private unsavedWorkService: UnsavedWorkService,
@@ -44,6 +48,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.refreshAttempted = false;
     this.log.info('SessionExpiredComponent: Inicializando...');
     const hasSession = this.hasActiveSession();
     const onAdmin = this.router.url.includes('/admin');
@@ -82,6 +87,15 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
         // Verificación crítica: Si es cierre manual LOCAL, nunca mostrar modal.
         if (data.isManual && data.origin === 'local') {
           this.log.info('SessionExpiredComponent: Ignorando logout manual local explícito');
+          return;
+        }
+
+        // SESIÓN HUÉRFANA: Redirigir inmediatamente sin mostrar modal
+        if (data.type === 'SESSION_ORPHANED') {
+          this.log.warn('SessionExpiredComponent: Sesión huérfana detectada - Redirigiendo inmediatamente');
+          this.tokenStorage.signOut();
+          this.hideModal();
+          this.router.navigate(['/login'], { replaceUrl: true });
           return;
         }
 
@@ -133,7 +147,10 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
           const saveEvent = new CustomEvent(OPConstants.Events.SAVE_UNSAVED_WORK);
           window.dispatchEvent(saveEvent);
 
-          this.startTimer(data.timestamp);
+          // No reiniciar el timer si el modal ya está visible (evita reseteo a 0)
+          if (!this.isVisible) {
+            this.startTimer(data.timestamp);
+          }
         } else {
           this.stopTimer();
         }
@@ -148,6 +165,7 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
     this.subs.add(
       this.sessionManager.sessionRestored$.subscribe(() => {
         this.log.info('SessionExpiredComponent: Sesión restaurada, cerrando modal');
+        this.refreshAttempted = false;
         this.hideModal();
         // Opcional: recargar o navegar a home si estamos atrapados en el modal
         // Pero hideModal ya hace isVisible = false.
@@ -267,17 +285,36 @@ export class SessionExpiredComponent implements OnInit, OnDestroy {
   }
 
   goToLogin(): void {
-    // 1. Ocultar modal
+    if (this.refreshAttempted) {
+      this.doHardRedirectToLogin();
+      return;
+    }
+    this.refreshAttempted = true;
+
+    // Intentar refresh token antes de redirigir al login
+    this.authService.refreshToken().subscribe({
+      next: () => {
+        this.log.info('SessionExpiredComponent: Refresh exitoso, sesión recuperada');
+        this.refreshAttempted = false;
+        this.hideModal();
+        this.cleanupVisualArtifacts();
+      },
+      error: () => {
+        this.log.info('SessionExpiredComponent: Refresh falló, redirigiendo al login');
+        this.doHardRedirectToLogin();
+      },
+    });
+  }
+
+  private doHardRedirectToLogin(): void {
     this.isVisible = false;
     this.sessionData = null;
     this.cdr.detectChanges();
 
-    // 2. Esperar cierre de animación y limpiar backdrops
     setTimeout(() => {
       this.cleanupVisualArtifacts();
       this.saveRedirectUrl();
 
-      // LIMPIEZA CRÍTICA: Asegurar que el token inválido se elimine antes de navegar
       this.tokenStorage.signOut();
       this.activeTabService.clearCurrentTab();
 

@@ -1,12 +1,14 @@
-import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { HttpContext } from '@angular/common/http';
 import { UsuarioService } from '../../../../core/services/data/usuario.service';
 import { Usuario } from '../../../../core/models/usuario.model';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { PerfilResponse } from '../../../../core/models/perfil-response.model';
-import { FileStorageService } from '../../../../core/services/file-storage.service';
+import { PerfilMediaService } from '../../../../core/services/data/perfil-media.service';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../../core/interceptor/error.interceptor';
+import { SKIP_GLOBAL_LOADER } from '../../../../core/interceptor/network.interceptor';
 import { finalize, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-perfil',
@@ -14,21 +16,38 @@ import { finalize, take } from 'rxjs/operators';
   styleUrls: ['./perfil.component.scss'],
   standalone: false,
 })
-export class PerfilComponent implements OnInit {
+export class PerfilComponent implements OnInit, OnDestroy {
   usuario: PerfilResponse | null = null;
   loading = false;
   uploading = false;
   activeTab = 0; // Track active tab
+  avatarUrl: string | null = null;
+  readonly defaultAvatarUrl = './assets/img/avatars/2.jpg';
+  private avatarObjectUrl: string | null = null;
+  private avatarSubscription?: Subscription;
 
   constructor(
     private usuarioService: UsuarioService,
     private toastService: ToastService,
-    private fileStorageService: FileStorageService,
+    private perfilMediaService: PerfilMediaService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.avatarSubscription = this.perfilMediaService.avatarChanged$.subscribe((event) => {
+      if (event === 'deleted') {
+        this.setDefaultAvatar();
+        this.cdr.markForCheck();
+        return;
+      }
+      this.loadAvatar(false);
+    });
     this.cargarPerfil();
+  }
+
+  ngOnDestroy(): void {
+    this.avatarSubscription?.unsubscribe();
+    this.revokeAvatarObjectUrl();
   }
 
   // Keyboard Shortcuts (Ctrl+1, Ctrl+2, etc.)
@@ -50,11 +69,54 @@ export class PerfilComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
+  private loadAvatar(fallbackToDefaultOnError: boolean = true): void {
+    this.perfilMediaService
+      .getAvatarObjectUrl()
+      .pipe(take(1))
+      .subscribe({
+        next: (avatarUrl) => {
+          if (avatarUrl) {
+            this.setAvatarUrl(avatarUrl);
+          }
+        },
+        error: () => {
+          if (fallbackToDefaultOnError) {
+            this.setDefaultAvatar();
+          }
+        },
+      });
+  }
+
+  onAvatarError(): void {
+    this.setDefaultAvatar();
+    this.cdr.markForCheck();
+  }
+
+  private setAvatarUrl(avatarUrl: string): void {
+    this.revokeAvatarObjectUrl();
+    this.avatarObjectUrl = avatarUrl;
+    this.avatarUrl = avatarUrl;
+    this.cdr.markForCheck();
+  }
+
+  private setDefaultAvatar(): void {
+    this.revokeAvatarObjectUrl();
+    this.avatarUrl = this.defaultAvatarUrl;
+  }
+
+  private revokeAvatarObjectUrl(): void {
+    if (this.avatarObjectUrl) {
+      URL.revokeObjectURL(this.avatarObjectUrl);
+      this.avatarObjectUrl = null;
+    }
+  }
+
   cargarPerfil() {
     this.loading = true;
     this.cdr.markForCheck();
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADER, true);
     this.usuarioService
-      .obtenerDatosSesionActualSafe()
+      .obtenerDatosSesionActualSafe(context)
       .pipe(
         take(1),
         finalize(() => {
@@ -68,6 +130,7 @@ export class PerfilComponent implements OnInit {
       .subscribe({
         next: (res: PerfilResponse) => {
           this.usuario = res;
+          this.loadAvatar(true);
           this.cdr.markForCheck();
         },
         error: () => {
@@ -111,32 +174,72 @@ export class PerfilComponent implements OnInit {
     fileInput.click();
   }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+
     if (file) {
       this.uploading = true;
-      this.fileStorageService.uploadFile(file, 'perfil').subscribe({
-        next: (response) => {
-          // Asumimos que la respuesta contiene la URL o path de la imagen
-          // y actualizamos el perfil
-          const imageUrl = response.ruta || response.url; // Adaptar según respuesta del backend
+      this.cdr.markForCheck();
 
-          if (imageUrl && this.usuario) {
-            this.onSave({ imagen: [imageUrl] } as unknown as Usuario);
-          } else {
+      this.perfilMediaService
+        .uploadAvatar(file)
+        .pipe(
+          finalize(() => {
+            this.uploading = false;
+            if (input) {
+              input.value = '';
+            }
+            this.cdr.markForCheck();
+          })
+        )
+        .subscribe({
+          next: () => {
             this.toastService.showSuccess('Imagen subida', 'Éxito');
-            // Si el backend no devuelve URL directa, recargamos o esperamos que el usuario guarde
-            // Pero idealmente actualizamos el usuario con la nueva imagen
-          }
+            if (this.usuario) {
+              this.usuario = {
+                ...this.usuario,
+                imagen: this.usuario.imagen && this.usuario.imagen.length > 0 ? this.usuario.imagen : ['avatar'],
+              };
+            }
+            this.cdr.markForCheck();
+          },
+          error: () => {
+            this.toastService.showError('Error al subir imagen', 'Error');
+          },
+        });
+    }
+  }
+
+  onDeleteAvatar(): void {
+    if (!this.usuario) return;
+
+    this.uploading = true;
+    this.cdr.markForCheck();
+
+    this.perfilMediaService
+      .deleteAvatar()
+      .pipe(
+        take(1),
+        finalize(() => {
           this.uploading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.toastService.showSuccess('Imagen borrada', 'Éxito');
+          if (this.usuario) {
+            this.usuario = {
+              ...this.usuario,
+              imagen: [],
+            };
+          }
           this.cdr.markForCheck();
         },
         error: () => {
-          this.toastService.showError('Error al subir imagen', 'Error');
-          this.uploading = false;
-          this.cdr.markForCheck();
+          this.toastService.showError('Error al borrar imagen', 'Error');
         },
       });
-    }
   }
 }

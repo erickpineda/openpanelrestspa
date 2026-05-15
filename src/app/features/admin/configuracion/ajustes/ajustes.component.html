@@ -1,10 +1,15 @@
 <c-container class="container-fluid">
   <c-card class="mb-4 border-top-3 border-top-primary shadow-sm" aria-live="polite">
     <c-card-header class="bg-white border-bottom py-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-2">
-          <svg cIcon name="cilSettings" size="lg" class="text-primary"></svg>
-          <h4 class="mb-0 text-primary">{{ 'ADMIN.SETTINGS.TITLE' | translate }}</h4>
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+        <div class="d-flex align-items-start gap-2">
+          <svg cIcon name="cilSettings" size="lg" class="text-primary mt-1"></svg>
+          <div>
+            <h4 class="mb-0 text-primary">{{ 'ADMIN.SETTINGS.TITLE' | translate }}</h4>
+            <div class="text-body-secondary small">
+              {{ 'ADMIN.SETTINGS.SUBTITLE' | translate }}
+            </div>
+          </div>
         </div>
         <div class="btn-group" role="group" aria-label="Acciones">
           <button
@@ -40,6 +45,21 @@
         </c-alert>
       }
 
+      <div class="settings-summary d-flex flex-wrap gap-2 mb-4">
+        <c-badge color="primary" shape="rounded-pill" class="px-3 py-2">
+          {{ 'ADMIN.SETTINGS.SUMMARY.TOTAL' | translate: { count: totalElements } }}
+        </c-badge>
+        <c-badge color="success" shape="rounded-pill" class="px-3 py-2">
+          {{ 'ADMIN.SETTINGS.SUMMARY.PUBLIC' | translate: { count: publicCount } }}
+        </c-badge>
+        <c-badge color="warning" shape="rounded-pill" class="px-3 py-2">
+          {{ 'ADMIN.SETTINGS.SUMMARY.REQUIRES_RESTART' | translate: { count: restartCount } }}
+        </c-badge>
+        <c-badge color="secondary" shape="rounded-pill" class="px-3 py-2">
+          {{ 'ADMIN.SETTINGS.SUMMARY.NON_EDITABLE' | translate: { count: nonEditableCount } }}
+        </c-badge>
+      </div>
+
       <div class="bg-light bg-opacity-50 p-3 rounded-3 mb-4 border">
         <div class="d-flex flex-wrap gap-3 align-items-end">
           <div class="flex-grow-1" style="max-width: 400px">
@@ -59,6 +79,18 @@
                 class="border-start-0 ps-0 shadow-none"
                 [disabled]="loading"
               />
+              @if (basicSearchText) {
+                <button
+                  cButton
+                  color="secondary"
+                  variant="outline"
+                  type="button"
+                  (click)="clearBasicSearch()"
+                  [disabled]="loading"
+                >
+                  {{ 'COMMON.CLEAN' | translate }}
+                </button>
+              }
             </div>
           </div>
           <div class="d-flex align-items-end">
@@ -125,6 +157,44 @@
                     (Z-A) Descendente
                   </button>
                 </li>
+                <li><hr cDropdownDivider /></li>
+                <li><h6 cDropdownHeader class="dropdown-header small">Por Tipo</h6></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('tipo', 'ASC')">
+                    <span *ngIf="isSortActive('tipo', 'ASC')" class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    (A-Z) Ascendente
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('tipo', 'DESC')">
+                    <span *ngIf="isSortActive('tipo', 'DESC')" class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    (Z-A) Descendente
+                  </button>
+                </li>
+                <li><hr cDropdownDivider /></li>
+                <li><h6 cDropdownHeader class="dropdown-header small">Por Orden</h6></li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('orden', 'ASC')">
+                    <span *ngIf="isSortActive('orden', 'ASC')" class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    Menor a mayor
+                  </button>
+                </li>
+                <li>
+                  <button cDropdownItem (click)="ordenar('orden', 'DESC')">
+                    <span
+                      *ngIf="isSortActive('orden', 'DESC')"
+                      class="me-1 text-success fw-bold"
+                      >✓</span
+                    >
+                    Mayor a menor
+                  </button>
+                </li>
               </ul>
             </c-dropdown>
           </div>
@@ -163,14 +233,35 @@
               <label class="form-label small fw-bold text-muted">{{
                 'ADMIN.SETTINGS.TABLE.CATEGORY' | translate
               }}</label>
-              <input
-                cFormControl
-                type="text"
-                [placeholder]="'ADMIN.SETTINGS.FILTER_BY_CATEGORY' | translate"
-                [value]="filtroCategoria"
-                (input)="filtroCategoria = $any($event.target).value"
+              <select
+                cSelect
+                [(ngModel)]="filtroCategoria"
+                name="filtroCategoria"
                 [disabled]="loading"
-              />
+                (ngModelChange)="onFilterChange()"
+              >
+                <option value="">{{ 'ADMIN.SETTINGS.FILTER_BY_CATEGORY' | translate }}</option>
+                @for (categoria of categoriasDisponibles; track categoria) {
+                  <option [value]="categoria">{{ categoria }}</option>
+                }
+              </select>
+            </c-col>
+            <c-col xs="12" md="4">
+              <label class="form-label small fw-bold text-muted">{{
+                'ADMIN.SETTINGS.TABLE.TYPE' | translate
+              }}</label>
+              <select
+                cSelect
+                [(ngModel)]="filtroTipo"
+                name="filtroTipo"
+                [disabled]="loading"
+                (ngModelChange)="onFilterChange()"
+              >
+                <option value="">{{ 'ADMIN.SETTINGS.FILTER_BY_TYPE' | translate }}</option>
+                @for (tipo of tiposDisponibles; track tipo) {
+                  <option [value]="tipo">{{ getTipoLabel(tipo) }}</option>
+                }
+              </select>
             </c-col>
             <c-col xs="12" md="4">
               <label class="form-label small fw-bold text-muted">{{
@@ -181,11 +272,59 @@
                 type="text"
                 [placeholder]="'ADMIN.SETTINGS.FILTER_BY_KEY' | translate"
                 [value]="filtroClave"
-                (input)="filtroClave = $any($event.target).value"
+                (input)="filtroClave = $any($event.target).value; onFilterChange()"
                 [disabled]="loading"
               />
             </c-col>
-            <c-col xs="12" md="4" class="d-flex justify-content-md-end gap-2">
+            <c-col xs="12" md="4">
+              <label class="form-label small fw-bold text-muted">{{
+                'ADMIN.SETTINGS.TABLE.PUBLIC' | translate
+              }}</label>
+              <select
+                cSelect
+                [(ngModel)]="filtroPublico"
+                name="filtroPublico"
+                [disabled]="loading"
+                (ngModelChange)="onFilterChange()"
+              >
+                @for (option of triStateOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </c-col>
+            <c-col xs="12" md="4">
+              <label class="form-label small fw-bold text-muted">{{
+                'ADMIN.SETTINGS.TABLE.EDITABLE' | translate
+              }}</label>
+              <select
+                cSelect
+                [(ngModel)]="filtroEditable"
+                name="filtroEditable"
+                [disabled]="loading"
+                (ngModelChange)="onFilterChange()"
+              >
+                @for (option of triStateOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </c-col>
+            <c-col xs="12" md="4">
+              <label class="form-label small fw-bold text-muted">{{
+                'ADMIN.SETTINGS.TABLE.REQUIRES_RESTART' | translate
+              }}</label>
+              <select
+                cSelect
+                [(ngModel)]="filtroRequiereReinicio"
+                name="filtroRequiereReinicio"
+                [disabled]="loading"
+                (ngModelChange)="onFilterChange()"
+              >
+                @for (option of triStateOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </c-col>
+            <c-col xs="12" class="d-flex justify-content-md-end gap-2">
               <button
                 cButton
                 color="secondary"
@@ -229,8 +368,7 @@
               <tr>
                 <th
                   scope="col"
-                  class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase"
-                  style="width: 250px"
+                  class="py-3 ps-4 border-0 text-secondary small fw-bold text-uppercase settings-col-category"
                 >
                   {{ 'ADMIN.SETTINGS.TABLE.CATEGORY' | translate }}
                 </th>
@@ -240,10 +378,18 @@
                 <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase">
                   {{ 'ADMIN.SETTINGS.TABLE.VALUE' | translate }}
                 </th>
+                <th scope="col" class="py-3 border-0 text-secondary small fw-bold text-uppercase settings-col-type">
+                  {{ 'ADMIN.SETTINGS.TABLE.TYPE' | translate }}
+                </th>
                 <th
                   scope="col"
-                  class="py-3 pe-4 border-0 text-secondary small fw-bold text-uppercase text-end"
-                  style="width: 120px"
+                  class="py-3 border-0 text-secondary small fw-bold text-uppercase settings-col-flags"
+                >
+                  {{ 'ADMIN.SETTINGS.TABLE.FLAGS' | translate }}
+                </th>
+                <th
+                  scope="col"
+                  class="py-3 pe-4 border-0 text-secondary small fw-bold text-uppercase text-end settings-col-actions settings-col-actions-header"
                 >
                   {{ 'ADMIN.SETTINGS.TABLE.ACTIONS' | translate }}
                 </th>
@@ -252,21 +398,77 @@
             <tbody>
               @for (a of pagedAjustes; track trackByAjuste($index, a)) {
                 <tr>
-                  <td class="px-3">
+                  <td class="px-3 settings-col-category">
                     <c-badge color="info" shape="rounded-pill" class="fw-normal">
                       {{ a.categoria }}
                     </c-badge>
                   </td>
-                  <td class="px-3 fw-medium text-dark">{{ a.clave }}</td>
                   <td
-                    class="px-3 text-muted text-truncate"
-                    style="max-width: 300px"
-                    [title]="a.valor"
+                    class="px-3"
                   >
-                    {{ a.valor }}
+                    <div class="fw-semibold text-dark">{{ a.clave }}</div>
+                    <div class="small text-body-secondary" *ngIf="a.descripcion">
+                      {{ a.descripcion }}
+                    </div>
+                    <div class="small text-body-secondary" *ngIf="a.codigo">
+                      {{ 'ADMIN.SETTINGS.TABLE.CODE' | translate }}: {{ a.codigo }}
+                    </div>
                   </td>
-                  <td class="px-3 text-end">
-                    <c-button-group role="group">
+                  <td class="px-3">
+                    <div class="setting-value text-muted" [title]="getValorResumen(a)">
+                      {{ getValorResumen(a) }}
+                    </div>
+                    <div class="small text-body-secondary" *ngIf="a.valorPorDefecto">
+                      {{ 'ADMIN.SETTINGS.TABLE.DEFAULT_VALUE' | translate }}:
+                      {{ a.valorPorDefecto }}
+                    </div>
+                  </td>
+                  <td class="px-3 settings-col-type">
+                    <c-badge color="primary" shape="rounded-pill" class="fw-normal">
+                      {{ getTipoLabel(a.tipo) }}
+                    </c-badge>
+                    <div class="small text-body-secondary mt-2" *ngIf="a.orden != null">
+                      {{ 'ADMIN.SETTINGS.TABLE.ORDER' | translate }}: {{ a.orden }}
+                    </div>
+                  </td>
+                  <td class="px-3 settings-col-flags">
+                    <div class="d-flex flex-wrap gap-1 settings-flags-list">
+                      <c-badge
+                        [color]="getBooleanBadgeColor(a.publico)"
+                        shape="rounded-pill"
+                        class="fw-normal settings-flag-badge"
+                      >
+                        {{ 'ADMIN.SETTINGS.TABLE.PUBLIC' | translate }}:
+                        {{ getBooleanLabel(a.publico) }}
+                      </c-badge>
+                      <c-badge
+                        [color]="getBooleanBadgeColor(a.editable, 'dark')"
+                        shape="rounded-pill"
+                        class="fw-normal settings-flag-badge"
+                      >
+                        {{ 'ADMIN.SETTINGS.TABLE.EDITABLE' | translate }}:
+                        {{ getBooleanLabel(a.editable) }}
+                      </c-badge>
+                      <c-badge
+                        [color]="getBooleanBadgeColor(a.visible, 'secondary')"
+                        shape="rounded-pill"
+                        class="fw-normal settings-flag-badge"
+                      >
+                        {{ 'ADMIN.SETTINGS.TABLE.VISIBLE' | translate }}:
+                        {{ getBooleanLabel(a.visible) }}
+                      </c-badge>
+                      <c-badge
+                        [color]="getBooleanBadgeColor(a.requiereReinicio, 'secondary')"
+                        shape="rounded-pill"
+                        class="fw-normal settings-flag-badge"
+                      >
+                        {{ 'ADMIN.SETTINGS.TABLE.REQUIRES_RESTART' | translate }}:
+                        {{ getBooleanLabel(a.requiereReinicio) }}
+                      </c-badge>
+                    </div>
+                  </td>
+                  <td class="px-3 text-end settings-col-actions">
+                    <c-button-group role="group" class="settings-action-group">
                       <button
                         cButton
                         color="info"
@@ -284,6 +486,7 @@
                         size="sm"
                         (click)="delete(a)"
                         [cTooltip]="'COMMON.DELETE' | translate"
+                        [disabled]="!a.clave"
                       >
                         <svg cIcon name="cilTrash" size="sm"></svg>
                       </button>
@@ -292,7 +495,7 @@
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="4" class="text-center py-5 text-muted">
+                  <td colspan="6" class="text-center py-5 text-muted">
                     <div class="d-flex flex-column align-items-center">
                       <svg
                         cIcon
@@ -349,50 +552,170 @@
   </c-modal-header>
   <c-modal-body class="p-4">
     <form [formGroup]="form">
-      <div class="mb-4">
-        <label class="form-label fw-bold text-secondary small">{{
-          'ADMIN.SETTINGS.TABLE.CATEGORY' | translate
-        }}</label>
-        <input
-          cFormControl
-          type="text"
-          formControlName="categoria"
-          [placeholder]="'ADMIN.SETTINGS.CATEGORY_PLACEHOLDER' | translate"
-        />
-      </div>
-      <div class="mb-4">
-        <label class="form-label fw-bold text-secondary small">{{
-          'ADMIN.SETTINGS.TABLE.KEY' | translate
-        }}</label>
-        <input
-          cFormControl
-          type="text"
-          formControlName="clave"
-          [placeholder]="'ADMIN.SETTINGS.KEY_PLACEHOLDER' | translate"
-        />
-      </div>
-      <div class="mb-4">
-        <label class="form-label fw-bold text-secondary small">{{
-          'ADMIN.SETTINGS.TABLE.VALUE' | translate
-        }}</label>
-        <textarea
-          cFormControl
-          formControlName="valor"
-          rows="4"
-          [placeholder]="'ADMIN.SETTINGS.VALUE_PLACEHOLDER' | translate"
-        ></textarea>
-      </div>
-      <div class="col-12">
-        <label class="form-label small fw-bold text-muted">{{
-          'ADMIN.SETTINGS.TABLE.DESCRIPTION' | translate
-        }}</label>
-        <textarea
-          cFormControl
-          rows="2"
-          formControlName="descripcion"
-          [placeholder]="'ADMIN.SETTINGS.DESCRIPTION_PLACEHOLDER' | translate"
-        ></textarea>
-      </div>
+      <c-row class="g-4">
+        <c-col xs="12" md="6">
+          <label class="form-label fw-bold text-secondary small">{{
+            'ADMIN.SETTINGS.TABLE.CATEGORY' | translate
+          }}</label>
+          <select
+            cSelect
+            formControlName="categoria"
+          >
+            @for (categoria of categoriasDisponibles; track categoria) {
+              <option [value]="categoria">{{ categoria }}</option>
+            }
+          </select>
+        </c-col>
+        <c-col xs="12" md="6">
+          <label class="form-label fw-bold text-secondary small">{{
+            'ADMIN.SETTINGS.TABLE.KEY' | translate
+          }}</label>
+          <input
+            cFormControl
+            type="text"
+            formControlName="clave"
+            [placeholder]="'ADMIN.SETTINGS.KEY_PLACEHOLDER' | translate"
+          />
+        </c-col>
+        <c-col xs="12" md="6">
+          <label class="form-label fw-bold text-secondary small">{{
+            'ADMIN.SETTINGS.TABLE.CODE' | translate
+          }}</label>
+          <input
+            cFormControl
+            type="text"
+            formControlName="codigo"
+            [placeholder]="'ADMIN.SETTINGS.CODE_PLACEHOLDER' | translate"
+          />
+        </c-col>
+        <c-col xs="12" md="3">
+          <label class="form-label fw-bold text-secondary small">{{
+            'ADMIN.SETTINGS.TABLE.TYPE' | translate
+          }}</label>
+          <select cSelect formControlName="tipo">
+            @for (option of typeOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </c-col>
+        <c-col xs="12" md="3">
+          <label class="form-label fw-bold text-secondary small">{{
+            'ADMIN.SETTINGS.TABLE.ORDER' | translate
+          }}</label>
+          <input cFormControl type="number" min="0" step="1" formControlName="orden" />
+        </c-col>
+        <c-col xs="12">
+          <label class="form-label fw-bold text-secondary small">{{
+            'ADMIN.SETTINGS.TABLE.VALUE' | translate
+          }}</label>
+          @if (usesBooleanInput()) {
+            <select cSelect formControlName="valor">
+              <option value="">{{ 'ADMIN.SETTINGS.EMPTY_OPTION' | translate }}</option>
+              <option value="true">{{ 'ADMIN.SETTINGS.BOOLEAN.TRUE' | translate }}</option>
+              <option value="false">{{ 'ADMIN.SETTINGS.BOOLEAN.FALSE' | translate }}</option>
+            </select>
+          } @else if (usesLongTextInput()) {
+            <textarea
+              cFormControl
+              formControlName="valor"
+              rows="4"
+              [placeholder]="'ADMIN.SETTINGS.VALUE_PLACEHOLDER' | translate"
+            ></textarea>
+          } @else {
+            <input
+              cFormControl
+              [type]="usesNumericInput() ? 'number' : 'text'"
+              [step]="usesNumericInput() ? getValueStep() : null"
+              formControlName="valor"
+              [placeholder]="'ADMIN.SETTINGS.VALUE_PLACEHOLDER' | translate"
+            />
+          }
+        </c-col>
+        <c-col xs="12">
+          <label class="form-label fw-bold text-secondary small">{{
+            'ADMIN.SETTINGS.TABLE.DEFAULT_VALUE' | translate
+          }}</label>
+          @if (usesBooleanInput()) {
+            <select cSelect formControlName="valorPorDefecto">
+              <option value="">{{ 'ADMIN.SETTINGS.EMPTY_OPTION' | translate }}</option>
+              <option value="true">{{ 'ADMIN.SETTINGS.BOOLEAN.TRUE' | translate }}</option>
+              <option value="false">{{ 'ADMIN.SETTINGS.BOOLEAN.FALSE' | translate }}</option>
+            </select>
+          } @else if (usesLongTextInput()) {
+            <textarea
+              cFormControl
+              rows="3"
+              formControlName="valorPorDefecto"
+              [placeholder]="'ADMIN.SETTINGS.DEFAULT_VALUE_PLACEHOLDER' | translate"
+            ></textarea>
+          } @else {
+            <input
+              cFormControl
+              [type]="usesNumericInput() ? 'number' : 'text'"
+              [step]="usesNumericInput() ? getValueStep() : null"
+              formControlName="valorPorDefecto"
+              [placeholder]="'ADMIN.SETTINGS.DEFAULT_VALUE_PLACEHOLDER' | translate"
+            />
+          }
+        </c-col>
+        <c-col xs="12">
+          <label class="form-label small fw-bold text-muted">{{
+            'ADMIN.SETTINGS.TABLE.DESCRIPTION' | translate
+          }}</label>
+          <textarea
+            cFormControl
+            rows="2"
+            formControlName="descripcion"
+            [placeholder]="'ADMIN.SETTINGS.DESCRIPTION_PLACEHOLDER' | translate"
+          ></textarea>
+        </c-col>
+        <c-col xs="12">
+          <div class="settings-flags border rounded-3 p-3 bg-light bg-opacity-50">
+            <div class="small fw-bold text-muted mb-3">
+              {{ 'ADMIN.SETTINGS.TABLE.FLAGS' | translate }}
+            </div>
+            <c-row class="g-3">
+              <c-col xs="12" md="6">
+                <div class="form-check">
+                  <input cFormCheckInput type="checkbox" id="settingEditable" formControlName="editable" />
+                  <label cFormCheckLabel for="settingEditable">
+                    {{ 'ADMIN.SETTINGS.TABLE.EDITABLE' | translate }}
+                  </label>
+                </div>
+              </c-col>
+              <c-col xs="12" md="6">
+                <div class="form-check">
+                  <input cFormCheckInput type="checkbox" id="settingVisible" formControlName="visible" />
+                  <label cFormCheckLabel for="settingVisible">
+                    {{ 'ADMIN.SETTINGS.TABLE.VISIBLE' | translate }}
+                  </label>
+                </div>
+              </c-col>
+              <c-col xs="12" md="6">
+                <div class="form-check">
+                  <input cFormCheckInput type="checkbox" id="settingPublico" formControlName="publico" />
+                  <label cFormCheckLabel for="settingPublico">
+                    {{ 'ADMIN.SETTINGS.TABLE.PUBLIC' | translate }}
+                  </label>
+                </div>
+              </c-col>
+              <c-col xs="12" md="6">
+                <div class="form-check">
+                  <input
+                    cFormCheckInput
+                    type="checkbox"
+                    id="settingRequiresRestart"
+                    formControlName="requiereReinicio"
+                  />
+                  <label cFormCheckLabel for="settingRequiresRestart">
+                    {{ 'ADMIN.SETTINGS.TABLE.REQUIRES_RESTART' | translate }}
+                  </label>
+                </div>
+              </c-col>
+            </c-row>
+          </div>
+        </c-col>
+      </c-row>
     </form>
   </c-modal-body>
   <c-modal-footer class="bg-light border-top-0">

@@ -1,6 +1,5 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { SharedCoreUiModule } from '../shared/shared-coreui.module';
 
 import { AdminRoutingModule } from './admin-routing.module';
@@ -26,7 +25,6 @@ const APP_CONTAINERS = [
   imports: [
     CommonModule,
     AdminRoutingModule,
-    ReactiveFormsModule,
     SharedCoreUiModule,
 
     // Shared Modules (SharedOPModule exports SharedWidgetsModule & SharedCoreUiModule)

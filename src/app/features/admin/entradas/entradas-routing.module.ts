@@ -5,20 +5,19 @@ import { CrearEntradaComponent } from './crear/crear-entrada.component';
 import { EditarEntradaComponent } from './editar/editar-entrada.component';
 import { TemporaryEntriesManagerComponent } from './entradas-temporales/temporary-entries-manager.component';
 import { EntradaIdRedirectGuard } from './guards/entrada-id-redirect.guard';
-import { UserRole } from '../../../shared/types/navigation.types';
+import { OpPrivilegioConstants } from '../../../shared/constants/op-privilegio.constants';
 
 const routes: Routes = [
   {
     path: '',
     component: ListadoEntradasComponent,
     data: {
-      roles: [
-        UserRole.AUTOR,
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
+      permissions: [
+        OpPrivilegioConstants.CREAR_ENTRADAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_PROPIAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_TODO,
       ],
+      permissionMode: 'ANY',
     },
   },
   {
@@ -26,13 +25,12 @@ const routes: Routes = [
     component: CrearEntradaComponent,
     data: {
       title: 'MENU.CREATE_ENTRY',
-      roles: [
-        UserRole.AUTOR,
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
+      permissions: [
+        OpPrivilegioConstants.CREAR_ENTRADAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_PROPIAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_TODO,
       ],
+      permissionMode: 'ANY',
     },
   },
   {
@@ -40,13 +38,12 @@ const routes: Routes = [
     component: EditarEntradaComponent,
     data: {
       title: 'MENU.EDIT_ENTRY',
-      roles: [
-        UserRole.AUTOR,
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
+      permissions: [
+        OpPrivilegioConstants.CREAR_ENTRADAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_PROPIAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_TODO,
       ],
+      permissionMode: 'ANY',
     },
   },
   {
@@ -55,13 +52,12 @@ const routes: Routes = [
     canActivate: [EntradaIdRedirectGuard],
     data: {
       title: 'MENU.EDIT_ENTRY',
-      roles: [
-        UserRole.AUTOR,
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
+      permissions: [
+        OpPrivilegioConstants.CREAR_ENTRADAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_PROPIAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_TODO,
       ],
+      permissionMode: 'ANY',
     },
   },
   {
@@ -69,13 +65,12 @@ const routes: Routes = [
     component: TemporaryEntriesManagerComponent,
     data: {
       title: 'MENU.TEMP_ENTRIES',
-      roles: [
-        UserRole.AUTOR,
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
+      permissions: [
+        OpPrivilegioConstants.CREAR_ENTRADAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_PROPIAS,
+        OpPrivilegioConstants.EDITAR_ENTRADAS_TODO,
       ],
+      permissionMode: 'ANY',
     },
   },
 ];

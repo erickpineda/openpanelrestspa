@@ -43,3 +43,25 @@
     border-color: var(--cui-border-color) !important;
   }
 }
+
+.highlight-comment {
+  animation: highlightPulse 3s ease-in-out;
+  border-left: 4px solid #0d6efd;
+  background-color: #f8f9fa;
+  padding-left: 12px;
+}
+
+@keyframes highlightPulse {
+  0% {
+    background-color: #e7f3ff;
+    border-left-color: #0066cc;
+  }
+  50% {
+    background-color: #cce5ff;
+    border-left-color: #004499;
+  }
+  100% {
+    background-color: #f8f9fa;
+    border-left-color: #0d6efd;
+  }
+}

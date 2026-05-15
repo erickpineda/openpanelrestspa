@@ -52,6 +52,17 @@ export interface INavItemEnhanced extends INavData {
   priority?: number;
   requiredRoles?: UserRole[];
   minRole?: UserRole;
+  /**
+   * Permisos/privilegios requeridos para ver el item.
+   * Preferido frente a requiredRoles (evita acoplar la UI a enums hardcodeados).
+   */
+  requiredPermissions?: string[];
+  /**
+   * Modo de evaluación de requiredPermissions.
+   * - ANY: basta con tener 1
+   * - ALL: requiere todos
+   */
+  permissionMode?: 'ANY' | 'ALL';
   dynamicBadge?: {
     service: string;
     method: string;
@@ -80,6 +91,10 @@ export interface NavigationItem {
   url: string;
   icon: string;
   priority?: number;
+  requiredRoles?: UserRole[];
+  minRole?: UserRole;
+  requiredPermissions?: string[];
+  permissionMode?: 'ANY' | 'ALL';
   badge?: BadgeConfig;
   children?: NavigationItem[];
   contextualActions?: IContextualAction[];
@@ -98,6 +113,8 @@ export interface NavigationSection {
   collapsible: boolean;
   defaultExpanded: boolean;
   requiredRoles: UserRole[];
+  requiredPermissions?: string[];
+  permissionMode?: 'ANY' | 'ALL';
 }
 
 /**

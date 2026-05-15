@@ -4,19 +4,15 @@ import { PaginaIdRedirectGuard } from './guards/pagina-id-redirect.guard';
 import { ListadoPaginasComponent } from './listado-paginas.component';
 import { EditarPaginaComponent } from './editar/editar-pagina.component';
 import { CrearPaginaComponent } from './crear/crear-pagina.component';
-import { UserRole } from '../../../shared/types/navigation.types';
+import { OpPrivilegioConstants } from '../../../shared/constants/op-privilegio.constants';
 
 const routes: Routes = [
   {
     path: '',
     component: ListadoPaginasComponent,
     data: {
-      roles: [
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
-      ],
+      permissions: [OpPrivilegioConstants.GESTIONAR_PAGINAS],
+      permissionMode: 'ANY',
     },
   },
   {
@@ -24,12 +20,8 @@ const routes: Routes = [
     component: CrearPaginaComponent,
     data: {
       title: 'MENU.CREATE_PAGE',
-      roles: [
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
-      ],
+      permissions: [OpPrivilegioConstants.GESTIONAR_PAGINAS],
+      permissionMode: 'ANY',
     },
   },
   {
@@ -37,12 +29,8 @@ const routes: Routes = [
     component: EditarPaginaComponent,
     data: {
       title: 'MENU.EDIT_PAGE',
-      roles: [
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
-      ],
+      permissions: [OpPrivilegioConstants.GESTIONAR_PAGINAS],
+      permissionMode: 'ANY',
     },
   },
   {
@@ -51,12 +39,8 @@ const routes: Routes = [
     canActivate: [PaginaIdRedirectGuard],
     data: {
       title: 'MENU.EDIT_PAGE',
-      roles: [
-        UserRole.EDITOR,
-        UserRole.ADMINISTRADOR,
-        UserRole.DESARROLLADOR,
-        UserRole.PROPIETARIO,
-      ],
+      permissions: [OpPrivilegioConstants.GESTIONAR_PAGINAS],
+      permissionMode: 'ANY',
     },
   },
 ];
