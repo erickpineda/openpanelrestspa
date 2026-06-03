@@ -56,12 +56,12 @@ import { DevFeatureModalComponent } from './components/dev-feature-modal/dev-fea
     TranslatePipe,
     AllowedDatePipe,
     SanitizeHtmlPipe,
+    BuscadorAvanzadoComponent,
   ],
   declarations: [
     GlobalErrorComponent,
     NotFoundComponent,
     ErrorBoundaryComponent,
-    BuscadorAvanzadoComponent,
     OpPaginationComponent,
     UnsavedWorkDirective,
     NotificationsDropdownComponent,

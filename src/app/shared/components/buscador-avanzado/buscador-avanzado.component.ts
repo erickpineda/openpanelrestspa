@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnDestroy, ChangeDetectionStrategy, input, output, effect, ChangeDetectorRef } from '@angular/core';
+import { Subscription, Observable } from 'rxjs';
 import {
   BuscadorCampoDef,
   BuscadorDefinicionesAdaptadas,
@@ -16,38 +16,50 @@ import {
   serializeDateInputToBackend,
   serializeDateTimeLocalInputToBackend,
 } from '../../utils/date-utils';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ButtonModule, FormModule, GridModule } from '@coreui/angular';
+import { IconModule } from '@coreui/icons-angular';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 /**
- * BuscadorAvanzadoComponent (v2)
- * - Editor recursivo de un árbol SearchQuery.node (group/condition).
- * - Renderiza campos/operaciones en base a SearchDefinitionsDTO.fields.
- * - Serializa date/datetime-local a los formatos públicos del backend.
+ * BuscadorAvanzadoComponent (v2) - Signals + OnPush
  */
 @Component({
   selector: 'app-buscador-avanzado',
   templateUrl: './buscador-avanzado.component.html',
   styleUrls: ['./buscador-avanzado.component.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ButtonModule,
+    FormModule,
+    GridModule,
+    IconModule,
+    TranslatePipe
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
+export class BuscadorAvanzadoComponent implements OnDestroy {
   // =================== Inputs ===================
-  @Input() definiciones: any;
-  @Input() autoTrigger: boolean = false;
-  @Input() debounceMs: number = 300;
-  @Input() showButton: boolean = true;
-  @Input() showSearchButton?: boolean;
-  @Input() showClearButton: boolean = false;
-  @Input() placeholder: string = 'Ingrese valor a buscar';
-  @Input() defaultField?: string;
-  @Input() camposPrioritarios: string[] = [];
-  @Input() camposCatalogo: string[] = [];
-  @Input() cargarCatalogosFn?: () => import('rxjs').Observable<{ [key: string]: string[] }>;
+  definiciones = input<any>();
+  autoTrigger = input<boolean>(false);
+  debounceMs = input<number>(300);
+  showButton = input<boolean>(true);
+  showSearchButton = input<boolean | undefined>();
+  showClearButton = input<boolean>(false);
+  placeholder = input<string>('Ingrese valor a buscar');
+  defaultField = input<string | undefined>();
+  camposPrioritarios = input<string[]>([]);
+  camposCatalogo = input<string[]>([]);
+  cargarCatalogosFn = input<(() => Observable<{ [key: string]: string[] }>) | undefined>();
 
   // =================== Outputs ===================
-  @Output() filtroSeleccionado = new EventEmitter<SearchQuery>();
-  @Output() filtroChanged = new EventEmitter<SearchQuery>();
-  @Output() onSearch = new EventEmitter<SearchQuery>();
-  @Output() onClear = new EventEmitter<void>();
+  filtroSeleccionado = output<SearchQuery>();
+  filtroChanged = output<SearchQuery>();
+  onSearch = output<SearchQuery>();
+  onClear = output<void>();
 
   // =================== State ===================
   public adaptedDefs?: BuscadorDefinicionesAdaptadas;
@@ -58,10 +70,14 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
   private catalogOptions: { [key: string]: string[] } = {};
   private catalogosSub?: Subscription;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['definiciones'] && this.definiciones) {
-      this.inicializarBuscador();
-    }
+  constructor(private cdr: ChangeDetectorRef) {
+    effect(() => {
+      const defs = this.definiciones();
+      if (defs) {
+        this.inicializarBuscador();
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -70,7 +86,8 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
 
   // =================== UI helpers ===================
   public debeMostrarBotonBusqueda(): boolean {
-    return this.showSearchButton !== undefined ? this.showSearchButton : this.showButton;
+    const ssb = this.showSearchButton();
+    return ssb !== undefined ? ssb : this.showButton();
   }
 
   public trackByNode = (_: number, n: SearchNodeUI) => n._id;
@@ -85,13 +102,13 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
   public limpiar(): void {
     this.root = this.createDefaultRoot();
     const payload = this.buildQuery();
-    if (this.autoTrigger) this.filtroChanged.emit(payload);
+    if (this.autoTrigger()) this.filtroChanged.emit(payload);
     this.filtroSeleccionado.emit(payload);
     this.onClear.emit();
   }
 
   public onNodeChange(): void {
-    if (!this.autoTrigger) return;
+    if (!this.autoTrigger()) return;
     this.filtroChanged.emit(this.buildQuery());
   }
 
@@ -132,10 +149,11 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
 
   public getOrderedFields(): BuscadorCampoDef[] {
     const campos = this.adaptedDefs?.campos || [];
+    const prioritarios = this.camposPrioritarios() || [];
     return [
-      ...campos.filter((c) => this.camposPrioritarios.includes(c.key)),
+      ...campos.filter((c) => prioritarios.includes(c.key)),
       ...campos
-        .filter((c) => !this.camposPrioritarios.includes(c.key))
+        .filter((c) => !prioritarios.includes(c.key))
         .sort((a, b) => a.label.localeCompare(b.label)),
     ];
   }
@@ -157,18 +175,13 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     return [];
   }
 
-  /**
-   * Para campos de catálogo (p.ej. categoria/estado/tipo), cuando la operación es
-   * equal / not_equal se debe mostrar un selector (desplegable) con los valores del catálogo.
-   */
   public shouldUseCatalogSelect(node: SearchConditionNodeUI): boolean {
     if (!node) return false;
     const fieldKey = String(node.field || '');
     if (!fieldKey) return false;
-    if (!this.camposCatalogo.includes(fieldKey)) return false;
+    const catalogo = this.camposCatalogo() || [];
+    if (!catalogo.includes(fieldKey)) return false;
     if (!this.isEqualityOp(node.op)) return false;
-    // Importante (UX): aunque el catálogo aún esté cargando, mostramos el <select>
-    // y renderizamos un placeholder de "cargando" hasta que lleguen opciones.
     return true;
   }
 
@@ -178,13 +191,16 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
 
   // =================== Init / Catalogs ===================
   private inicializarBuscador(): void {
-    this.adaptedDefs = getBuscadorDefinicionesAmigables(this.definiciones);
+    this.adaptedDefs = getBuscadorDefinicionesAmigables(this.definiciones());
 
+    const catalogo = this.camposCatalogo() || [];
     const contieneCamposCatalogo = (this.adaptedDefs?.campos || []).some((c) =>
-      this.camposCatalogo.includes(c.key)
+      catalogo.includes(c.key)
     );
-    if (contieneCamposCatalogo && this.cargarCatalogosFn) {
-      this.cargarCatalogosGenerico();
+    
+    const cargarFn = this.cargarCatalogosFn();
+    if (contieneCamposCatalogo && cargarFn) {
+      this.cargarCatalogosGenerico(cargarFn);
     }
 
     const ejemploNode = (this.adaptedDefs?.ejemplo as any)?.node as SearchNode | undefined;
@@ -196,16 +212,17 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private cargarCatalogosGenerico(): void {
+  private cargarCatalogosGenerico(cargarFn: () => Observable<{ [key: string]: string[] }>): void {
     if (Object.keys(this.catalogOptions).length > 0) return;
     this.catalogosError = null;
-    if (!this.cargarCatalogosFn) return;
-    this.catalogosSub = this.cargarCatalogosFn().subscribe({
+    this.catalogosSub = cargarFn().subscribe({
       next: (mapped) => {
         this.catalogOptions = { ...mapped };
+        this.cdr.markForCheck();
       },
       error: () => {
         this.catalogosError = 'Error al cargar catálogos. Intente recargar la página.';
+        this.cdr.markForCheck();
       },
     });
   }
@@ -236,9 +253,7 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
     }
 
     let value: any = c.value;
-    // Evitar enviar criterios incompletos (p.ej. equal con value vacío), porque el backend devuelve 400.
     if (value === '' || value === null || value === undefined) {
-      // Permitir contains '' en string como "match-all" (no filtra, pero es válido)
       const isContains = opLower === 'contains';
       const isString = (def?.tipo || 'string') === 'string';
       if (!(isContains && isString)) {
@@ -286,9 +301,10 @@ export class BuscadorAvanzadoComponent implements OnChanges, OnDestroy {
 
   private createDefaultCondition(): SearchConditionNodeUI {
     const ordered = this.getOrderedFields();
+    const defaultF = this.defaultField();
     const field =
-      (this.defaultField && ordered.some((c) => c.key === this.defaultField)
-        ? this.defaultField
+      (defaultF && ordered.some((c) => c.key === defaultF)
+        ? defaultF
         : ordered[0]?.key) || '';
     const ops = this.getOperationsForField(field);
     const op = (ops[0]?.value as any) || 'contains';

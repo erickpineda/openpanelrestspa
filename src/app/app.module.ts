@@ -5,7 +5,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CoreModule } from './core/core.module';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { timeoutInterceptor } from './core/interceptor/timeout.interceptor';
+import { languageInterceptor } from './core/interceptor/language.interceptor';
+import { dateInterceptor } from './core/interceptor/date.interceptor';
+import { authInterceptor } from './core/interceptor/auth.interceptor';
+import { networkInterceptor } from './core/interceptor/network.interceptor';
+import { errorInterceptor } from './core/interceptor/error.interceptor';
 import { CustomPreloadingStrategyService } from './core/preloading/custom-preloading-strategy.service';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
@@ -34,7 +40,14 @@ import { GlobalErrorHandlerService } from './core/errors/global-error/global-err
     CustomPreloadingStrategyService,
     { provide: ErrorHandler, useExisting: GlobalErrorHandlerService },
     { provide: LOCALE_ID, useValue: 'es-ES' },
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptors([
+      timeoutInterceptor,
+      languageInterceptor,
+      dateInterceptor,
+      authInterceptor,
+      networkInterceptor,
+      errorInterceptor
+    ])),
   ],
 })
 export class AppModule {}
